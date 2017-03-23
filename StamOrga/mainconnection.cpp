@@ -28,8 +28,8 @@ int MainConnection::DoBackgroundWork()
     }
 
     QHostAddress sender(this->m_conInfo->GetHostAddress());
-    const char *pData = msg.GetNetworkProtocol();
-    socket.writeDatagram(pData, msg.GetSize(), sender, this->m_conInfo->GetPort());
+    const char *pData = msg.getNetworkProtocol();
+    socket.writeDatagram(pData, msg.getNetworkSize(), sender, this->m_conInfo->GetPort());
 
     this->m_pConTimeout = new QTimer();
     this->m_pConTimeout->setSingleShot(true);

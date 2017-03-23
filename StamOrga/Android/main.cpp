@@ -3,7 +3,7 @@
 #include <QQmlContext>
 
 #include "userinterface.h"
-#include "../../Common/General/config.h"
+#include "../../Common/General/globalfunctions.h"
 
 int main(int argc, char *argv[])
 {
