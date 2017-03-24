@@ -34,3 +34,13 @@ HEADERS += \
     ../Common/General/globalfunctions.h \
     General/console.h \
     General/usercommand.h
+
+
+unix {
+#    QMAKE_POST_LINK = mkdir -p $$OUTPUT_FOLDER && cp $$TARGET $$OUTPUT_FOLDER
+    QMAKE_LFLAGS += -Wl,-rpath,"'\$$ORIGIN'"
+
+    target.path = /home/pi/StFaeKSC
+    INSTALLS += target
+
+}
