@@ -29,7 +29,7 @@ MessageProtocol *MessageBuffer::GetNextMessage()
 
     msg_Header *pHead = (msg_Header *)this->m_DataBuffer.constData();
 
-    uint payLoadLength = qFromLittleEndian(pHead->length);
+    uint payLoadLength = qFromBigEndian(pHead->length);
 
     int tmp = payLoadLength % sizeof(quint32);
     if (tmp > 0)

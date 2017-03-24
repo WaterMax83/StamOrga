@@ -35,24 +35,26 @@ MessageProtocol::MessageProtocol(quint32 index, QByteArray &data) : MessageProto
 
     this->m_pHead = (msg_Header *)this->m_Data.constData();
 
-    this->m_pHead->index = index;
-    this->m_pHead->length = length;
-    this->m_pHead->timestamp = CalcTimeStamp();
+    this->m_pHead->index = qToBigEndian(index);
+    this->m_pHead->length = qToBigEndian(length);
+    this->m_pHead->timestamp = qToBigEndian(CalcTimeStamp());
 }
 
 MessageProtocol::MessageProtocol(quint32 index, quint32 data) : MessageProtocol()
 {
     QDataStream wStream(&this->m_Data, QIODevice::WriteOnly);
+    wStream.setByteOrder(QDataStream::BigEndian);
 
     wStream.device()->seek(this->m_Data.length());
 
-    wStream << qToLittleEndian(data);
+    wStream << data;
 
     this->m_pHead = (msg_Header *)this->m_Data.constData();
 
-    this->m_pHead->index = index;
-    this->m_pHead->length = sizeof(data);
-    this->m_pHead->timestamp = CalcTimeStamp();
+    quint32 size = sizeof(data);
+    this->m_pHead->index = qToBigEndian(index);
+    this->m_pHead->length = qToBigEndian(size);
+    this->m_pHead->timestamp = qToBigEndian(CalcTimeStamp());
 }
 
 

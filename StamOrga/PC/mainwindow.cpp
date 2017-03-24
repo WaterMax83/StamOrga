@@ -6,7 +6,6 @@
 
 #include "../../Common/Network/messageprotocol.h"
 #include "../../Common/General/globalfunctions.h"
-#include "../connectioninfo.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -17,7 +16,13 @@ MainWindow::MainWindow(QWidget *parent) :
     SetMessagePattern();
 
     this->m_pMainCon = new ConnectionHandling();
-    connect(this->m_pMainCon, &ConnectionHandling::NotifyConnectionFinished, this, &MainWindow::ConnectionFinished);
+    connect(this->m_pMainCon, &ConnectionHandling::notifyConnectionFinished, this, &MainWindow::ConnectionFinished);
+
+    this->m_pGlobalData = new GlobalData();
+
+    this->ui->lEditSendUserName->setText(this->m_pGlobalData->userName());
+    this->ui->lEditIpAddr->setText(this->m_pGlobalData->ipAddr());
+    this->ui->spBoxPort->setValue(this->m_pGlobalData->conPort());
 }
 
 MainWindow::~MainWindow()
@@ -27,19 +32,21 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_btnSendData_clicked()
 {
-    ConnectionInfo *info = this->m_pMainCon->GetConnectionInfo();
-    QMutexLocker locker(&info->m_infoMutex);
-
-    info->SetUserName(this->ui->lEditSendUserName->text());
-    info->SetHostAddress(this->ui->lEditIpAddr->text());
-    info->SetPort(this->ui->spBoxPort->value());
+    this->m_pMainCon->setGlobalData(this->m_pGlobalData);
+    this->m_pGlobalData->setUserName(this->ui->lEditSendUserName->text());
+    this->m_pGlobalData->setIpAddr(this->ui->lEditIpAddr->text());
+    this->m_pGlobalData->setConPort(this->ui->spBoxPort->value());
     if (this->m_pMainCon->StartMainConnection())
     {
         this->ui->btnSendData->setEnabled(false);
     }
 }
 
-void MainWindow::ConnectionFinished()
+void MainWindow::ConnectionFinished(bool result)
 {
     this->ui->btnSendData->setEnabled(true);
+    if (result)
+        this->ui->conResult->setStyleSheet("background-color:green");
+    else
+        this->ui->conResult->setStyleSheet("background-color:red");
 }

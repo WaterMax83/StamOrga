@@ -8,7 +8,7 @@ ApplicationWindow {
     visible: true
     width: 540
     height: 960
-    title: qsTr("Hello World")
+    title: qsTr("StamOrga")
 
 //    SwipeView {
 //        id: swipeView
@@ -18,7 +18,7 @@ ApplicationWindow {
     StackView {
         id: stackView
         anchors.fill: parent
-        Page1 {
+        UserLogin {
             anchors.fill: parent
         }
 

@@ -56,7 +56,7 @@ void UdpServer::checkNewOncomingData()
 
         while((msg = this->m_lUserCons[i].msgBuffer.GetNextMessage()) != NULL) {
 
-            if (msg->GetIndex() == OP_CODE_CMD_REQ::REQ_CONNECT_USER) {
+            if (msg->getIndex() == OP_CODE_CMD_REQ::REQ_CONNECT_USER) {
 
                 QString userName(QByteArray(msg->getPointerToData(), msg->getDataLength()));
                 MessageProtocol *ack;

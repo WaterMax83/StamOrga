@@ -1,33 +1,42 @@
 #ifndef MAINCONNECTION_H
 #define MAINCONNECTION_H
 
-#include <QObject>
-#include <QTimer>
+#include <QtCore/QObject>
+#include <QtCore/QTimer>
+#include <QtNetwork/QUdpSocket>
 
-#include "connectioninfo.h"
+#include "globaldata.h"
 #include "../Common/General/backgroundworker.h"
+#include "../Common/Network/messagebuffer.h"
 
 class MainConnection : public BackgroundWorker
 {
     Q_OBJECT
 public:
-    MainConnection(ConnectionInfo *info);
+    MainConnection(GlobalData *pData);
+    ~MainConnection();
 
     int DoBackgroundWork() override;
 
     QString m_workerName = "MainConnection";
 
 signals:
-    void ConnectionRequestFinished(bool result, const QString &msg);
-    void ConnectionEstablished();
+    void connectionRequestFinished(bool result, const QString &msg);
+    void connectionEstablished();
 
 private slots:
-    void ConnectionTimeoutFired();
+    void connectionTimeoutFired();
+    void readyReadMasterPort();
 
 private:
-    ConnectionInfo *m_conInfo;
+    GlobalData      *m_pGlobalData;
+    MessageBuffer   m_messageBuffer;
 
-    QTimer *m_pConTimeout;
+    QTimer          *m_pConTimeout;
+    QUdpSocket      *m_pMasterUdpSocket = NULL;
+    QHostAddress    m_hMasterReceiver;
+
+    void checkNewOncomingData();
 
 };
 

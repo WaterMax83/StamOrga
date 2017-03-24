@@ -4,7 +4,7 @@
 #include <QObject>
 
 #include "mainconnection.h"
-#include "connectioninfo.h"
+#include "globaldata.h"
 #include "../Common/General/backgroundcontroller.h"
 
 
@@ -16,13 +16,19 @@ public:
 
     bool StartMainConnection();
 
-    ConnectionInfo *GetConnectionInfo() { return &this->m_conInfo; }
+    void setGlobalData(GlobalData *pData)
+    {
+        if (pData != NULL)
+            this->m_pGlobalData = pData;
+    }
+
+//    ConnectionInfo *GetConnectionInfo() { return &this->m_conInfo; }
 
 signals:
-    void NotifyError(const QString &error);
-    void NotifyInfo(const QString &info);
+    void notifyError(const QString &error);
+    void notifyInfo(const QString &info);
 
-    void NotifyConnectionFinished();
+    void notifyConnectionFinished(bool result);
 
 public slots:
 
@@ -33,7 +39,7 @@ private:
     BackgroundController m_ctrlMainCon;
     MainConnection *m_pMainCon = NULL;
 
-    ConnectionInfo m_conInfo;
+    GlobalData *m_pGlobalData = NULL;
 };
 
 #endif // CONNECTIONHANDLING_H

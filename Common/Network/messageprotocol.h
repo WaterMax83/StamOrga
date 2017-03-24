@@ -25,9 +25,9 @@ public:
 //    void SetTimeStamp(quint32 time) { this->m_pHead->timestamp = time; }
 //    void SetIndex(quint32 index) { this->m_pHead->index = index; }
 
-    quint32 GetTimeStamp() { return qFromLittleEndian(this->m_pHead->timestamp); }
-    quint32 GetIndex() { return qFromLittleEndian(this->m_pHead->index); }
-    quint32 getDataLength() { return qFromLittleEndian(this->m_pHead->length); }
+    quint32 getTimeStamp() { return qFromBigEndian(this->m_pHead->timestamp); }
+    quint32 getIndex() { return qFromBigEndian(this->m_pHead->index); }
+    quint32 getDataLength() { return qFromBigEndian(this->m_pHead->length); }
 
     quint32 getNetworkSize() { return this->m_Data.size(); }
     const char *getNetworkProtocol() { return this->m_Data.constData();}
@@ -37,6 +37,13 @@ public:
         if (this->getDataLength() == 0)
             return NULL;
         return getNetworkProtocol() + MSG_HEADER_SIZE;
+    }
+
+    quint32 getIntData()
+    {
+        if (this->getDataLength() != 4)
+            return 0;
+        return qFromBigEndian(*(quint32*)this->getPointerToData());
     }
 
 

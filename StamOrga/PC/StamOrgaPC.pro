@@ -8,7 +8,7 @@ QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = StamOrga
+TARGET = StamOrgaPC
 TEMPLATE = app
 
 
@@ -21,7 +21,7 @@ SOURCES += main.cpp\
     ../../Common/General/backgroundworker.cpp \
     ../connectionhandling.cpp \
     ../mainconnection.cpp \
-    ../connectioninfo.cpp
+    ../globaldata.cpp
 
 HEADERS  += mainwindow.h \
     ../../Common/Network/messagebuffer.h \
@@ -32,6 +32,6 @@ HEADERS  += mainwindow.h \
     ../../Common/General/backgroundworker.h \
     ../connectionhandling.h \
     ../mainconnection.h \
-    ../connectioninfo.h
+    ../globaldata.h
 
 FORMS    += mainwindow.ui

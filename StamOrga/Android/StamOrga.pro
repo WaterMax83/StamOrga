@@ -5,13 +5,13 @@ CONFIG += c++11
 SOURCES += main.cpp \
 	userinterface.cpp \
     ../ConnectionHandling.cpp \
-    ../connectioninfo.cpp \
     ../mainconnection.cpp \
     ../../Common/General/backgroundcontroller.cpp \
     ../../Common/General/backgroundworker.cpp \
     ../../Common/Network/messagebuffer.cpp \
     ../../Common/Network/messagecommand.cpp \
-    ../../Common/Network/messageprotocol.cpp
+    ../../Common/Network/messageprotocol.cpp \
+    ../globaldata.cpp
 
 RESOURCES += qml.qrc
 
@@ -40,7 +40,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     userinterface.h \
     ../connectionhandling.h \
-    ../connectioninfo.h \
     ../mainconnection.h \
     ../../Common/General/backgroundcontroller.h \
     ../../Common/General/backgroundworker.h \
@@ -48,4 +47,5 @@ HEADERS += \
     ../../Common/General/globaltiming.h \
     ../../Common/Network/messagebuffer.h \
     ../../Common/Network/messagecommand.h \
-    ../../Common/Network/messageprotocol.h
+    ../../Common/Network/messageprotocol.h \
+    ../globaldata.h

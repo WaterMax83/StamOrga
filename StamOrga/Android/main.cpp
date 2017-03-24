@@ -1,9 +1,11 @@
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
+#include <QtGui/QGuiApplication>
+#include <QtQml/QQmlApplicationEngine>
+#include <QtQml/QQmlContext>
+#include <QtCore/QSettings>
 
 #include "userinterface.h"
 #include "../../Common/General/globalfunctions.h"
+#include "../globaldata.h"
 
 int main(int argc, char *argv[])
 {
@@ -16,11 +18,10 @@ int main(int argc, char *argv[])
     // Set the global Message Pattern
     SetMessagePattern();
 
+    GlobalData globalUserData;
+
     QQmlApplicationEngine engine;
-
-//    MainConnect maincon;
-
-//    engine.rootContext()->setContextProperty("MainConnect", &maincon);
+    engine.rootContext()->setContextProperty("globalUserData", &globalUserData);
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));
 
     return app.exec();

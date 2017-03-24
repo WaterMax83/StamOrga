@@ -111,6 +111,16 @@
      <string>UserName</string>
     </property>
    </widget>
+   <widget class="QWidget" name="conResult" native="true">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>20</y>
+      <width>31</width>
+      <height>31</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
