@@ -32,4 +32,5 @@ HEADERS += \
     General/globaldata.h \
     General/listeduser.h \
     ../Common/General/globalfunctions.h \
-    General/console.h
+    General/console.h \
+    General/usercommand.h

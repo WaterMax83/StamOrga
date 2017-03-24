@@ -74,11 +74,11 @@ void Console::printHelp()
 {
     std::cout << "\nConsole for StFaeKSC\n\n";
 
-    qDebug().noquote() << tr("Known commands are:");
-    qDebug().noquote() << "help:\t\t"   << tr("Show this info");
-    qDebug().noquote() << ADD_USER << " %NAME%\t" << "Add a new user";
-    qDebug().noquote() << "exit:\t\t"   << tr("exit the program");
-    qDebug().noquote() << "quit:\t\t"   << tr("exit the program");
+    std::cout << "Known commands are:" << std::endl;
+    std::cout << "help:\t\t"   << "Show this info" << std::endl;
+    std::cout << "user:\t\t"   << "use the user command" << std::endl;
+    std::cout << "exit:\t\t"   << "exit the program" << std::endl;
+    std::cout << "quit:\t\t"   << "exit the program" << std::endl;
 }
 
 
