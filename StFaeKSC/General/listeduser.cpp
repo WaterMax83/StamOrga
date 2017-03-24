@@ -1,6 +1,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QSettings>
 
+#include <iostream>
 
 #include "listeduser.h"
 #include "../Common/General/globalfunctions.h"
@@ -38,22 +39,22 @@ ListedUser::ListedUser()
     this->m_pUserSettings->endGroup();
 }
 
-bool ListedUser::addNewUser(const QString &name)
+int ListedUser::addNewUser(const QString &name)
 {
     if (name.length() < MIN_SIZE_USERNAME) {
-        qWarning() << QString("Name \"%1\" is too short").arg(name);
-        return false;
+        qWarning().noquote() << QString("Name \"%1\" is too short").arg(name);
+        return -1;
     }
 
     if (this->userExists(name)) {
         qWarning().noquote() << QString("User \"%1\" already exists").arg(name);
-        return false;
+        return -1;
     }
 
     int size = this->getNumberOfUsers();
     if (this->userExists(size)) {
-        qWarning() << QString("User Index \"%1\" already exists").arg(size);
-        return false;
+        qWarning().noquote() << QString("User Index \"%1\" already exists").arg(size);
+        return -1;
     }
 
     this->m_pUserSettings->beginGroup(USER_GROUP);
@@ -68,8 +69,44 @@ bool ListedUser::addNewUser(const QString &name)
 
     this->addNewUserLogin(name, name, 0x0, size);
 
-    qInfo() << QString("Added new user: %1").arg(name);
-    return true;
+    qInfo().noquote() << QString("Added new user: %1").arg(name);
+    return size;
+}
+
+int ListedUser::removeUser(const QString &name)
+{
+    int index = this->getUserLoginIndex(name);
+    if (index < 0 || index > this->m_lUserLogin.size() - 1)
+    {
+        qWarning().noquote() << QString("Could not find user \"%1\"").arg(name);
+        return -1;
+    }
+    this->m_lUserLogin.removeAt(index);
+
+    this->m_pUserSettings->beginGroup(USER_GROUP);
+    this->m_pUserSettings->remove("");              // clear all elements
+
+    this->m_pUserSettings->beginWriteArray(LOGIN_ARRAY);
+    for (int i=0; i<this->m_lUserLogin.size(); i++) {
+        this->m_pUserSettings->setArrayIndex(i);
+        this->m_pUserSettings->setValue(LOGIN_USERNAME, this->m_lUserLogin[i].userName);
+        this->m_pUserSettings->setValue(LOGIN_PASSWORD, this->m_lUserLogin[i].password);
+        this->m_pUserSettings->setValue(LOGIN_PROPERTIES, this->m_lUserLogin[i].properties);
+    }
+
+    this->m_pUserSettings->endArray();
+    this->m_pUserSettings->endGroup();
+
+    qInfo().noquote() << QString("remove User \"%1\"").arg(name);
+    return 0;
+}
+
+int ListedUser::showAllUsers()
+{
+    foreach (UserLogin login, this->m_lUserLogin) {
+        std::cout << login.userName.toStdString() << std::endl;
+    }
+    return 0;
 }
 
 bool ListedUser::userExists(QString name)
@@ -100,6 +137,16 @@ void ListedUser::addNewUserLogin(QString name, QString password, quint32 prop, q
     login.properties = prop;
     login.index = index;
     this->m_lUserLogin.append(login);
+}
+
+int ListedUser::getUserLoginIndex(const QString &name)
+{
+    for (int i=0; i<this->m_lUserLogin.size(); i++)
+    {
+        if (this->m_lUserLogin[i].userName == name)
+            return i;
+    }
+    return -1;
 }
 
 

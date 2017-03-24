@@ -8,10 +8,9 @@
 #include <stdlib.h>
 
 #include "console.h"
-
+#include "usercommand.h"
 
 #define SETTINGS_PATH "/Settings/settings.ini"
-
 
 #define ADD_USER        "adduser"
 #define ADD_USER_SIZE   QString(ADD_USER).size()
@@ -55,9 +54,9 @@ void Console::readCommand()
         {
             this->printHelp();
         }
-        else if (qLine.length() > ADD_USER_SIZE && qLine.left(ADD_USER_SIZE) == ADD_USER)
+        else if (qLine == "user" || qLine.left(5) == "user ")
         {
-            this->m_pGlobalData->m_UserList.addNewUser(qLine.right(qLine.length() - ADD_USER_SIZE).trimmed());
+            UserCommand::runUserCommand(qLine, &this->m_pGlobalData->m_UserList);
         }
         else if (line.length() == 0)
         {
@@ -73,11 +72,13 @@ void Console::readCommand()
 
 void Console::printHelp()
 {
-    qDebug().noquote() << tr("\nConsole for StFaeKSC\n\n");
+    std::cout << "\nConsole for StFaeKSC\n\n";
 
     qDebug().noquote() << tr("Known commands are:");
     qDebug().noquote() << "help:\t\t"   << tr("Show this info");
     qDebug().noquote() << ADD_USER << " %NAME%\t" << "Add a new user";
+    qDebug().noquote() << "exit:\t\t"   << tr("exit the program");
+    qDebug().noquote() << "quit:\t\t"   << tr("exit the program");
 }
 
 

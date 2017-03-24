@@ -18,7 +18,9 @@ public:
     ListedUser();
     ~ListedUser();
 
-    bool addNewUser(const QString &name);
+    int addNewUser(const QString &name);
+    int removeUser(const QString &name);
+    int showAllUsers();
 
     quint32 getNumberOfUsers() { return this->m_lUserLogin.size(); }
 
@@ -30,6 +32,7 @@ private:
     QList<UserLogin>    m_lUserLogin;
 
     void addNewUserLogin(QString name, QString password, quint32 prop, quint32 index);
+    int getUserLoginIndex(const QString &name);
 
 };
 
