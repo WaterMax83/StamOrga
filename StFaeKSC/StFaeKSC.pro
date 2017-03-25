@@ -18,7 +18,8 @@ SOURCES += main.cpp \
     ../Common/Network/messagecommand.cpp \
     General/globaldata.cpp \
     General/listeduser.cpp \
-    General/console.cpp
+    General/console.cpp \
+    Network/udpdataserver.cpp
 
 HEADERS += \
     ../Common/General/backgroundcontroller.h \
@@ -33,7 +34,8 @@ HEADERS += \
     General/listeduser.h \
     ../Common/General/globalfunctions.h \
     General/console.h \
-    General/usercommand.h
+    General/usercommand.h \
+    Network/udpdataserver.h
 
 
 unix {

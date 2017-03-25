@@ -10,8 +10,6 @@ GlobalData::GlobalData(QObject *parent) : QObject(parent)
 
     this->m_pMainUserSettings = new QSettings();
 
-    qDebug() << this->m_pMainUserSettings->fileName();
-
     this->m_pMainUserSettings->beginGroup("USER_LOGIN");
 
     this->setUserName(this->m_pMainUserSettings->value("UserName", "").toString());

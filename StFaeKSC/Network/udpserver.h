@@ -5,21 +5,29 @@
 #include <QtCore/QList>
 #include <QtNetwork/QUdpSocket>
 
-#include <../Common/General/backgroundworker.h>
-#include <../Common/Network/messagebuffer.h>
+#include "udpdataserver.h"
 #include "General/globaldata.h"
+#include <../Common/General/backgroundworker.h>
+#include <../Common/General/backgroundcontroller.h>
+#include <../Common/Network/messagebuffer.h>
 
 
 struct UserConnection {
-    QHostAddress    sender;
-    quint16         port;
-    MessageBuffer   msgBuffer;
-    bool            isConnected;
+    QHostAddress            sender;
+    quint16                 srcPort;
+    MessageBuffer           msgBuffer;
+
+    bool                    isConnected;
+    quint16                 dataPort;
+
+    UdpDataServer           *pDataServer;
+    BackgroundController    *pctrlUdpDataServer;
 };
+
 
 class UdpServer : public BackgroundWorker
 {
-
+    Q_OBJECT
 public:
     UdpServer(GlobalData *pData);
     ~UdpServer();
@@ -33,6 +41,8 @@ private slots:
     void readyReadMasterPort();
     void readChannelFinished();
 
+    void onConnectionTimedOut(quint16 port);
+
 private:
     QUdpSocket                  *m_pUdpMasterSocket = NULL;
 
@@ -41,6 +51,8 @@ private:
     QList<UserConnection>       m_lUserCons;
 
     UserConnection  *getUserConnection(QHostAddress addr, quint16 port);
+
+    quint16 getFreeDataPort();
 
     void checkNewOncomingData();
 };

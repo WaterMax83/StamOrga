@@ -50,7 +50,6 @@ void MainConnection::connectionTimeoutFired()
 
 void MainConnection::readyReadMasterPort()
 {
-    qDebug() << "got new Message";
     while(this->m_pMasterUdpSocket->hasPendingDatagrams()) {
         QHostAddress sender;
         quint16 port;
@@ -62,7 +61,6 @@ void MainConnection::readyReadMasterPort()
                 && this->m_hMasterReceiver.toIPv4Address() == sender.toIPv4Address()) {
 
                 this->m_messageBuffer.StoreNewData(datagram);
-                qDebug() << "receiving from " << sender.toIPv4Address();
             }
         }
     }
@@ -77,7 +75,8 @@ void MainConnection::checkNewOncomingData()
 
         if (msg->getIndex() == OP_CODE_CMD_RES::ACK_CONNECT_USER) {
             this->m_pConTimeout->stop();
-			quint32 rValue = msg->getIntData();			
+            quint32 rValue = msg->getIntData();
+            qDebug() << QString("return value = %1").arg(rValue);
             if (msg->getDataLength() == 4 && rValue > 0)
                 emit this->connectionRequestFinished(true, "");
             else
