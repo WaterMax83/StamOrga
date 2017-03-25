@@ -32,7 +32,7 @@ Console::Console(GlobalData *pData, QObject *parent) : QObject(parent)
 void Console::run()
 {
     //: This is the welcome text
-    qDebug().noquote() << tr("Welcome to Console for StFaeKSC");
+    std::cout << "Welcome to Console for StFaeKSC" << std::endl;
     std::cout << "> " << std::flush;
 
     /* connect the input of a new line in the console */
@@ -46,7 +46,7 @@ void Console::readCommand()
     std::string line;
     std::getline(std::cin, line);
     if (std::cin.eof() || line == "quit" || line == "exit") {
-        qDebug().noquote() << tr("Ending console!");
+        std::cout << "Ending console!" << std::endl;
         emit quit();
     } else {
         QString qLine = QString::fromStdString(line);
@@ -64,7 +64,7 @@ void Console::readCommand()
         }
         else
         {
-            qDebug().noquote() << tr("Unkown command: ") << qLine;
+            std::cout << "Unkown command: " << qLine.toStdString();
         }
         std::cout << "> " << std::flush;
     }

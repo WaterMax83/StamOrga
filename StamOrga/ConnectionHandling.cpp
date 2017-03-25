@@ -26,9 +26,9 @@ bool ConnectionHandling::StartMainConnection()
     return true;
 }
 
-void ConnectionHandling::MainConReqFin(bool result, const QString &msg)
+void ConnectionHandling::mainConReqFin(quint32 result, const QString &msg)
 {
-    if (result)
+    if (result > 0)
     {
         emit this->notifyInfo("Connection ok");
         qInfo() << "Connection ok";
@@ -38,6 +38,6 @@ void ConnectionHandling::MainConReqFin(bool result, const QString &msg)
         emit this->notifyError("Error connecting: " + msg);
         qWarning() << "Error connecting: " << msg;
     }
-    emit this->notifyConnectionFinished(result);
+    emit this->notifyConnectionFinished(result > 0 ? true : false);
     this->m_ctrlMainCon.Stop();
 }

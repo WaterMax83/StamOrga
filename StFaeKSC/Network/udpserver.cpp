@@ -62,12 +62,17 @@ void UdpServer::checkNewOncomingData()
 
             if (msg->getIndex() == OP_CODE_CMD_REQ::REQ_CONNECT_USER) {
 
+                /* Get userName from packet */
                 QString userName(QByteArray(msg->getPointerToData(), msg->getDataLength()));
                 MessageProtocol *ack;
                 if (this->m_pGlobalData->m_UserList.userExists(userName)) {
-                    this->m_lUserCons[i].dataPort = this->getFreeDataPort();
+                    if (this->m_lUserCons[i].dataPort == 0)                         // when there is not already a port, create a new
+                        this->m_lUserCons[i].dataPort = this->getFreeDataPort();
+
                     ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_CONNECT_USER, (quint32)this->m_lUserCons[i].dataPort);
-                    if (this->m_lUserCons[i].dataPort) {
+
+                    /* Create new thread if it is not running and you got a port */
+                    if (this->m_lUserCons[i].dataPort && !this->m_lUserCons[i].pctrlUdpDataServer->IsRunning()) {
                         this->m_lUserCons[i].pDataServer = new UdpDataServer(this->m_lUserCons[i].dataPort,
                                                                              this->m_lUserCons[i].sender,
                                                                              this->m_pGlobalData);
@@ -79,6 +84,7 @@ void UdpServer::checkNewOncomingData()
                 else
                     ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_CONNECT_USER, 0x0);
 
+                /* send answer */
                 const char *pData = ack->getNetworkProtocol();
                 this->m_pUdpMasterSocket->writeDatagram(pData, ack->getNetworkSize(), this->m_lUserCons[i].sender, this->m_lUserCons[i].srcPort);
 
@@ -134,7 +140,7 @@ quint16 UdpServer::getFreeDataPort()
 
 void UdpServer::readChannelFinished()
 {
-    qDebug() << "Signal readChannelFinished was called";
+//    qDebug() << "Signal readChannelFinished was called";
 }
 
 

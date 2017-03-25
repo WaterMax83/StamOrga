@@ -24,10 +24,9 @@ int MainConnection::DoBackgroundWork()
 
     if (!this->m_pMasterUdpSocket->bind())
     {
-        emit this->connectionRequestFinished(false, this->m_pMasterUdpSocket->errorString());
+        emit this->connectionRequestFinished(0, this->m_pMasterUdpSocket->errorString());
         return -1;
     }
-//    masterSocket
 
     connect(this->m_pMasterUdpSocket, &QUdpSocket::readyRead, this, &MainConnection::readyReadMasterPort);
 
@@ -45,7 +44,7 @@ int MainConnection::DoBackgroundWork()
 
 void MainConnection::connectionTimeoutFired()
 {
-    emit this->connectionRequestFinished(false, "Timeout");
+    emit this->connectionRequestFinished(0, "Timeout");
 }
 
 void MainConnection::readyReadMasterPort()
@@ -77,10 +76,11 @@ void MainConnection::checkNewOncomingData()
             this->m_pConTimeout->stop();
             quint32 rValue = msg->getIntData();
             qDebug() << QString("return value = %1").arg(rValue);
-            if (msg->getDataLength() == 4 && rValue > 0)
-                emit this->connectionRequestFinished(true, "");
+            if (msg->getDataLength() == 4 && rValue > 0) {
+                emit this->connectionRequestFinished(rValue, "");
+            }
             else
-                emit this->connectionRequestFinished(false, QString("Wrong user %1").arg(rValue));
+                emit this->connectionRequestFinished(0, QString("Wrong user %1").arg(rValue));
         }
         delete msg;
     }

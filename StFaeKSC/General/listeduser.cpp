@@ -12,7 +12,8 @@ ListedUser::ListedUser()
 
     if (!CheckFilePathExistAndCreate(userSetFilePath))
     {
-        qDebug() << "Could not create File for UserSettings";
+        CONSOLE_CRITICAL(QString("Could not create File for UserSettings"));
+        return;
     }
 
     this->m_pUserSettings = new QSettings(userSetFilePath, QSettings::IniFormat);
@@ -54,12 +55,12 @@ ListedUser::ListedUser()
 int ListedUser::addNewUser(const QString &name, const QString &password, quint32 props)
 {
     if (name.length() < MIN_SIZE_USERNAME) {
-        qWarning().noquote() << QString("Name \"%1\" is too short").arg(name);
+        CONSOLE_WARNING (QString("Name \"%1\" is too short").arg(name));
         return -1;
     }
 
     if (this->userExists(name)) {
-        qWarning().noquote() << QString("User \"%1\" already exists").arg(name);
+        CONSOLE_WARNING (QString("User \"%1\" already exists").arg(name));
         return -1;
     }
 
@@ -83,7 +84,7 @@ int ListedUser::addNewUser(const QString &name, const QString &password, quint32
 
     this->addNewUserLogin(name, name, 0x0, newIndex, false);
 
-    qInfo().noquote() << QString("Added new user: %1").arg(name);
+    CONSOLE_INFO(QString("Added new user: %1").arg(name));
     return newIndex;
 }
 
@@ -92,7 +93,7 @@ int ListedUser::removeUser(const QString &name)
     int index = this->getUserLoginIndex(name);
     if (index < 0 || index > this->m_lUserLogin.size() - 1)
     {
-        qWarning().noquote() << QString("Could not find user \"%1\"").arg(name);
+        CONSOLE_WARNING(QString("Could not find user \"%1\"").arg(name));
         return -1;
     }
 
@@ -102,7 +103,7 @@ int ListedUser::removeUser(const QString &name)
 
     this->saveActualUserList();
 
-    qInfo().noquote() << QString("remove User \"%1\"").arg(name);
+    CONSOLE_INFO(QString("removed User \"%1\"").arg(name));
     return 0;
 }
 
@@ -134,6 +135,8 @@ void ListedUser::saveActualUserList()
 
     this->m_pUserSettings->endArray();
     this->m_pUserSettings->endGroup();
+
+    qDebug() << QString("saved actual User List with %1 entries").arg(this->m_lUserLogin.size());
 }
 
 bool ListedUser::userExists(QString name)
@@ -164,12 +167,12 @@ bool ListedUser::addNewUserLogin(QString name, QString password, quint32 prop, q
 {
     if (checkUser) {
         if (userExists(name)) {
-            qWarning().noquote() << QString("User \"%1\" already exists, not adding to internal list").arg(name);
+            qWarning() << QString("User \"%1\" already exists, not adding to internal list").arg(name);
             return false;
         }
 
         if (index == 0 || userExists(index)) {
-            qWarning().noquote() << QString("User \"%1\" with index \"%2\" already exists, saving with new index").arg(name).arg(index);
+            qWarning() << QString("User \"%1\" with index \"%2\" already exists, saving with new index").arg(name).arg(index);
             this->addNewUserLogin(name, password, prop, index, &this->m_lAddUserLoginProblems);
             return false;
         }

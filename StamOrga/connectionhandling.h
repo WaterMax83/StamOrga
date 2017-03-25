@@ -33,7 +33,7 @@ signals:
 public slots:
 
 private slots:
-    void MainConReqFin(bool result, const QString &msg);
+    void mainConReqFin(quint32 result, const QString &msg);
 
 private:
     BackgroundController m_ctrlMainCon;
