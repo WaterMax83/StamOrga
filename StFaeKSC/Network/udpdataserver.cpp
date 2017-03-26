@@ -1,22 +1,21 @@
 #include "udpdataserver.h"
 #include "../Common/Network/messageprotocol.h"
 
-UdpDataServer::UdpDataServer(quint32 port, QHostAddress addr, GlobalData *pData) : BackgroundWorker()
+UdpDataServer::UdpDataServer(UserConData *pUsrConData, GlobalData *pGlobalData) : BackgroundWorker()
 {
-    this->SetWorkerName(QString("UDP Data Server %1").arg(port));
+    this->SetWorkerName(QString("UDP Data Server %1").arg(pUsrConData->dataPort));
 
-    this->m_dataPort = port;
-    this->m_senderAddr = addr;
-    this->m_pGlobalData = pData;
+    this->m_pUsrConData = pUsrConData;
+    this->m_pGlobalData = pGlobalData;
 }
 
 
 int UdpDataServer::DoBackgroundWork()
 {
     this->m_pUdpSocket = new QUdpSocket();
-    if (!this->m_pUdpSocket->bind(QHostAddress::Any, this->m_dataPort))
+    if (!this->m_pUdpSocket->bind(QHostAddress::Any, this->m_pUsrConData->dataPort))
     {
-        qDebug() << QString("Error binding socket  for port %1: %2\n").arg(this->m_dataPort).arg(this->m_pUdpSocket->errorString());
+        qDebug() << QString("Error binding socket  for port %1: %2\n").arg(this->m_pUsrConData->dataPort).arg(this->m_pUdpSocket->errorString());
         return -1;
     }
     connect(this->m_pUdpSocket, &QUdpSocket::readyRead, this, &UdpDataServer::readyReadSocketPort);
@@ -41,7 +40,8 @@ void UdpDataServer::readyReadSocketPort()
         datagram.resize(this->m_pUdpSocket->pendingDatagramSize());
 
         if (this->m_pUdpSocket->readDatagram(datagram.data(), datagram.size(), &sender, &port)) {
-            if (port == this->m_dataPort && sender.toIPv4Address() == this->m_senderAddr.toIPv4Address())
+            if (port == this->m_pUsrConData->dataPort
+                && sender.toIPv4Address() == this->m_pUsrConData->sender.toIPv4Address())
                 this->m_msgBuffer.StoreNewData(datagram);
         }
     }
@@ -51,7 +51,7 @@ void UdpDataServer::readyReadSocketPort()
 
 void UdpDataServer::onConnectionResetTimeout()
 {
-    emit this->notifyConnectionTimedOut(this->m_dataPort);
+    emit this->notifyConnectionTimedOut(this->m_pUsrConData->dataPort);
 }
 
 void UdpDataServer::checkNewOncomingData()

@@ -35,7 +35,8 @@ HEADERS += \
     ../Common/General/globalfunctions.h \
     General/console.h \
     General/usercommand.h \
-    Network/udpdataserver.h
+    Network/udpdataserver.h \
+    Network/connectiondata.h
 
 
 unix {

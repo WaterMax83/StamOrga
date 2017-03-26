@@ -5,6 +5,7 @@
 #include <QtCore/QTimer>
 #include <QtNetwork/QUdpSocket>
 
+#include "connectiondata.h"
 #include "../General/globaldata.h"
 #include "../Common/General/backgroundworker.h"
 #include "../Common/Network/messagebuffer.h"
@@ -13,7 +14,7 @@ class UdpDataServer : public BackgroundWorker
 {
     Q_OBJECT
 public:
-    UdpDataServer(quint32 port, QHostAddress addr, GlobalData *pData);
+    UdpDataServer(UserConData *pUsrConData, GlobalData *pGlobalData);
     ~UdpDataServer();
 
 protected:
@@ -30,8 +31,7 @@ private slots:
 
 private:
     GlobalData      *m_pGlobalData;
-    quint32         m_dataPort;
-    QHostAddress    m_senderAddr;
+    UserConData     *m_pUsrConData;
 
     QUdpSocket      *m_pUdpSocket = NULL;
     MessageBuffer   m_msgBuffer;

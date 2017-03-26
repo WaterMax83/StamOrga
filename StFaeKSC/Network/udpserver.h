@@ -6,6 +6,7 @@
 #include <QtNetwork/QUdpSocket>
 
 #include "udpdataserver.h"
+#include "connectiondata.h"
 #include "General/globaldata.h"
 #include <../Common/General/backgroundworker.h>
 #include <../Common/General/backgroundcontroller.h>
@@ -13,13 +14,9 @@
 
 
 struct UserConnection {
-    QHostAddress            sender;
-    quint16                 srcPort;
-    MessageBuffer           msgBuffer;
-
     bool                    isConnected;
-    quint16                 dataPort;
-
+    MessageBuffer           msgBuffer;
+    UserConData             userConData;
     UdpDataServer           *pDataServer;
     BackgroundController    *pctrlUdpDataServer;
 };

@@ -35,9 +35,9 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
 
     if (m_logFile != NULL) {
         QTextStream out(m_logFile);
-        out << QDateTime::currentDateTime().toString("YYYY.MM.dd hh:mm:ss.zzz") << ": " << outPutString;
+        out << QDateTime::currentDateTime().toString("MMM.dd hh:mm:ss.zzz") << ": " << outPutString;
     }
-    else {
+    else if (type != QtDebugMsg && type != QtInfoMsg){
         std::cout << outPutString.toStdString() << std::endl;
     }
 }
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
 
     qInstallMessageHandler(myMessageOutput);
 
-    qDebug() << "\n*************************************************************";
+    qDebug() << "*************************************************************";
     qInfo() << "Starting StFaeKSC";
 
     GlobalData globalData;
