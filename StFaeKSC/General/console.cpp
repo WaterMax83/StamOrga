@@ -10,6 +10,7 @@
 #include "console.h"
 #include "usercommand.h"
 
+
 #define SETTINGS_PATH "/Settings/settings.ini"
 
 #define ADD_USER        "adduser"
@@ -50,21 +51,21 @@ void Console::readCommand()
         emit quit();
     } else {
         QString qLine = QString::fromStdString(line);
-        if (qLine == "help")
-        {
+        if (qLine == "help") {
             this->printHelp();
         }
-        else if (qLine == "user" || qLine.left(5) == "user ")
-        {
+        else if (qLine == "user" || qLine.left(5) == "user ") {
             UserCommand::runUserCommand(qLine, &this->m_pGlobalData->m_UserList);
         }
-        else if (line.length() == 0)
-        {
+        else if (qLine == "log" || qLine.left(4) == "log ") {
+            UserCommand::runLoggingCommand(qLine);
 
         }
-        else
-        {
-            std::cout << "Unkown command: " << qLine.toStdString();
+        else if (line.length() == 0) {
+
+        }
+        else {
+            std::cout << "Unkown command: " << qLine.toStdString() << std::endl;
         }
         std::cout << "> " << std::flush;
     }
@@ -77,6 +78,7 @@ void Console::printHelp()
     std::cout << "Known commands are:" << std::endl;
     std::cout << "help:\t\t"   << "Show this info" << std::endl;
     std::cout << "user:\t\t"   << "use the user command" << std::endl;
+    std::cout << "log %i:\t\t"   << "show the last user log" << std::endl;
     std::cout << "exit:\t\t"   << "exit the program" << std::endl;
     std::cout << "quit:\t\t"   << "exit the program" << std::endl;
 }

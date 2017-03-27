@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "listeduser.h"
+#include "../Common/General/logging.h"
 
 class UserCommand
 {
@@ -27,6 +28,19 @@ public:
             return pUsers->showAllUsers();
 
         return ShowUserCommandHelp();
+    }
+
+    static int runLoggingCommand(const QString &cmd)
+    {
+        QStringList list = cmd.split(' ');
+        if (list.size() < 2 || list.value(0) != "log")
+            return showLoggingInfo(5);
+
+        bool ok;
+        int numb = list.value(1).toInt(&ok);
+        if (ok)
+            return showLoggingInfo(numb);
+        return showLoggingInfo(5);
     }
 
 private:

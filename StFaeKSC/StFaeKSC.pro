@@ -19,7 +19,8 @@ SOURCES += main.cpp \
     General/globaldata.cpp \
     General/listeduser.cpp \
     General/console.cpp \
-    Network/udpdataserver.cpp
+    Network/udpdataserver.cpp \
+    ../Common/General/logging.cpp
 
 HEADERS += \
     ../Common/General/backgroundcontroller.h \
@@ -36,7 +37,8 @@ HEADERS += \
     General/console.h \
     General/usercommand.h \
     Network/udpdataserver.h \
-    Network/connectiondata.h
+    Network/connectiondata.h \
+    ../Common/General/logging.h
 
 
 unix {

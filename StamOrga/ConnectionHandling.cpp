@@ -18,7 +18,7 @@ bool ConnectionHandling::StartMainConnection()
     }
 
     this->m_pMainCon = new MainConnection(this->m_pGlobalData);
-    connect(this->m_pMainCon, &MainConnection::connectionRequestFinished, this, &ConnectionHandling::MainConReqFin);
+    connect(this->m_pMainCon, &MainConnection::connectionRequestFinished, this, &ConnectionHandling::mainConReqFin);
     this->m_ctrlMainCon.Start(this->m_pMainCon, false);
 
     this->m_pGlobalData->saveGlobalUserSettings();

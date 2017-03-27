@@ -136,7 +136,7 @@ void ListedUser::saveActualUserList()
     this->m_pUserSettings->endArray();
     this->m_pUserSettings->endGroup();
 
-    qDebug() << QString("saved actual User List with %1 entries").arg(this->m_lUserLogin.size());
+    qDebug().noquote() << QString("saved actual User List with %1 entries").arg(this->m_lUserLogin.size());
 }
 
 bool ListedUser::userExists(QString name)
@@ -167,12 +167,12 @@ bool ListedUser::addNewUserLogin(QString name, QString password, quint32 prop, q
 {
     if (checkUser) {
         if (userExists(name)) {
-            qWarning() << QString("User \"%1\" already exists, not adding to internal list").arg(name);
+            qWarning().noquote() << QString("User \"%1\" already exists, not adding to internal list").arg(name);
             return false;
         }
 
         if (index == 0 || userExists(index)) {
-            qWarning() << QString("User \"%1\" with index \"%2\" already exists, saving with new index").arg(name).arg(index);
+            qWarning().noquote() << QString("User \"%1\" with index \"%2\" already exists, saving with new index").arg(name).arg(index);
             this->addNewUserLogin(name, password, prop, index, &this->m_lAddUserLoginProblems);
             return false;
         }
