@@ -4,7 +4,7 @@
 #include <QtCore/QDebug>
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
-
+#include <QtCore/QString>
 
 #include <iostream>
 
@@ -22,28 +22,18 @@ inline void SetMessagePattern()
 }
 
 
-inline bool CheckFilePathExistAndCreate(const QString &path)
-{
-    QFileInfo checkFileInfo(path);
-    if (!checkFileInfo.exists())
-    {
-        /* File is not present, create it */
-        qInfo().noquote() << QString("File %1 not found, maybe first run, try to create it: ").arg(path);
-        if (!checkFileInfo.dir().exists() && !checkFileInfo.dir().mkpath(checkFileInfo.dir().absolutePath()))
-        {
-            qCritical() << "Error creating directory\n";
-            return false;
-        }
-        QFile file(path);
-        if (!file.open(QIODevice::WriteOnly))
-        {
-            qCritical() << "Error creating file\n";
-            return false;
-        }
-        qInfo().noquote() << "SUCCESS";
-    }
-    return true;
-}
+extern bool CheckFilePathExistAndCreate(const QString &path);
+
+
+#define ERROR_CODE_SUCCESS          1
+#define ERROR_CODE_NO_ERROR         0
+#define ERROR_CODE_COMMON           -1
+#define ERROR_CODE_WRONG_SIZE       -2
+#define ERROR_CODE_NO_USER          -20
+#define ERROR_CODE_WRONG_PASSWORD   -21
+
+
+extern QString getErrorCodeString(qint32 code);
 
 
 

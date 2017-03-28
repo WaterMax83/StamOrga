@@ -5,9 +5,11 @@
 
 struct UserConData {
     QHostAddress            sender;
-    quint16                 srcPort;
-    quint16                 dataPort;
+    quint16                 srcMasterPort;
+    quint16                 dstDataPort;
+    quint16                 srcDataPort;
     QString                 userName;
+    bool                    bIsConnected;
 };
 
 #endif // CONNECTIONDATA_H

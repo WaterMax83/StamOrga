@@ -19,8 +19,10 @@ class MessageProtocol
 public:
     MessageProtocol();
     MessageProtocol(QByteArray &data);
+    MessageProtocol(quint32 index);
     MessageProtocol(quint32 index, QByteArray &data);
     MessageProtocol(quint32 index, quint32 data);
+    MessageProtocol(quint32 index, qint32 data);
 
 //    void SetTimeStamp(quint32 time) { this->m_pHead->timestamp = time; }
 //    void SetIndex(quint32 index) { this->m_pHead->index = index; }
@@ -39,11 +41,11 @@ public:
         return getNetworkProtocol() + MSG_HEADER_SIZE;
     }
 
-    quint32 getIntData()
+    qint32 getIntData()
     {
         if (this->getDataLength() != 4)
             return 0;
-        return qFromBigEndian(*(quint32*)this->getPointerToData());
+        return qFromBigEndian(*(qint32*)this->getPointerToData());
     }
 
 

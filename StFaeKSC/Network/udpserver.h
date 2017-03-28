@@ -14,7 +14,6 @@
 
 
 struct UserConnection {
-    bool                    isConnected;
     MessageBuffer           msgBuffer;
     UserConData             userConData;
     UdpDataServer           *pDataServer;
@@ -47,7 +46,7 @@ private:
 
     QList<UserConnection>       m_lUserCons;
 
-    UserConnection  *getUserConnection(QHostAddress addr, quint16 port);
+    UserConnection  *getUserMasterConnection(QHostAddress addr, quint16 port);
 
     quint16 getFreeDataPort();
 

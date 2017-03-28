@@ -7,6 +7,7 @@
 
 #include "connectiondata.h"
 #include "../General/globaldata.h"
+#include "../General/dataconnection.h"
 #include "../Common/General/backgroundworker.h"
 #include "../Common/Network/messagebuffer.h"
 
@@ -32,13 +33,18 @@ private slots:
 private:
     GlobalData      *m_pGlobalData;
     UserConData     *m_pUsrConData;
+    DataConnection  *m_pDataConnection = NULL;
 
     QUdpSocket      *m_pUdpSocket = NULL;
     MessageBuffer   m_msgBuffer;
 
     QTimer          *m_pConResetTimer = NULL;
 
+    bool            m_bIsLoggedIn = false;
+
     void checkNewOncomingData();
+
+    MessageProtocol *checkNewMessage(MessageProtocol *msg);
 };
 
 #endif // UDPDATASERVER_H

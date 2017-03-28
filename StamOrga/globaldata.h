@@ -9,7 +9,7 @@ class GlobalData : public QObject
     Q_OBJECT
     Q_PROPERTY(QString userName READ userName WRITE setUserName NOTIFY userNameChanged)
     Q_PROPERTY(QString ipAddr READ ipAddr WRITE setIpAddr NOTIFY ipAddrChanged)
-    Q_PROPERTY(quint32 conPort READ conPort WRITE setConPort NOTIFY conPortChanged)
+    Q_PROPERTY(quint32 conMasterPort READ conMasterPort WRITE setConMasterPort NOTIFY conMasterPortChanged)
 public:
     explicit GlobalData(QObject *parent = 0);
 
@@ -31,12 +31,20 @@ public:
         }
     }
 
-    quint32 conPort() { return this->m_uPort; }
-    void setConPort(quint32 port)
+    quint32 conMasterPort() { return this->m_uMasterPort; }
+    void setConMasterPort(quint32 port)
     {
-        if (this->m_uPort != port) {
-            this->m_uPort = port;
-            emit conPortChanged();
+        if (this->m_uMasterPort != port) {
+            this->m_uMasterPort = port;
+            emit conMasterPortChanged();
+        }
+    }
+
+    quint32 conDataPort() { return this->m_uDataPort; }
+    void setConDataPort(quint32 port)
+    {
+        if (this->m_uDataPort != port) {
+            this->m_uDataPort = port;
         }
     }
 
@@ -45,14 +53,16 @@ public:
 signals:
     void userNameChanged();
     void ipAddrChanged();
-    void conPortChanged();
+    void conMasterPortChanged();
 
 public slots:
 
 private:
     QString m_userName;
     QString m_ipAddress;
-    quint32 m_uPort;
+    quint32 m_uMasterPort;
+
+    quint16 m_uDataPort;
 
     QSettings *m_pMainUserSettings;
 };

@@ -3,6 +3,7 @@
 
 #include "connectionhandling.h"
 #include "../Common/Network/messageprotocol.h"
+#include "../Common/General/globalfunctions.h"
 
 ConnectionHandling::ConnectionHandling(QObject *parent) : QObject(parent)
 {
@@ -13,7 +14,7 @@ bool ConnectionHandling::StartMainConnection()
 {
     if (this->m_ctrlMainCon.IsRunning())
     {
-        emit this->notifyError("Main Connect is already running");
+        qWarning() << QString("Main Connect is already running");
         return false;
     }
 
@@ -26,18 +27,32 @@ bool ConnectionHandling::StartMainConnection()
     return true;
 }
 
-void ConnectionHandling::mainConReqFin(quint32 result, const QString &msg)
+void ConnectionHandling::mainConReqFin(qint32 result, const QString &msg)
 {
-    if (result > 0)
+    if (result > ERROR_CODE_NO_ERROR)
     {
-        emit this->notifyInfo("Connection ok");
-        qInfo() << "Connection ok";
+        this->m_pGlobalData->setConDataPort((quint16)result);
+        this->m_pDataCon = new DataConnection(this->m_pGlobalData);
+        connect(this->m_pDataCon, &DataConnection::notifyLoginRequest, this, &ConnectionHandling::dataConLoginFinished);
+        this->m_ctrlDataCon.Start(this->m_pDataCon, false);
     }
     else
     {
-        emit this->notifyError("Error connecting: " + msg);
-        qWarning() << "Error connecting: " << msg;
+        qWarning() << "Error main connecting: " << msg;
+        emit this->notifyConnectionFinished(false);
     }
-    emit this->notifyConnectionFinished(result > 0 ? true : false);
     this->m_ctrlMainCon.Stop();
+}
+
+
+void ConnectionHandling::dataConLoginFinished(qint32 result)
+{
+    if (result == ERROR_CODE_SUCCESS) {
+        qInfo().noquote() << "Logged in succesfully";
+        emit this->notifyConnectionFinished(true);
+    }
+    else {
+        qWarning().noquote() << QString("Error Login: %1").arg(getErrorCodeString(result));
+        emit this->notifyConnectionFinished(false);
+    }
 }

@@ -21,8 +21,7 @@ public:
     QString m_workerName = "MainConnection";
 
 signals:
-    void connectionRequestFinished(quint32 result, const QString &msg);
-    void connectionEstablished();
+    void connectionRequestFinished(qint32 result, const QString &msg);
 
 private slots:
     void connectionTimeoutFired();

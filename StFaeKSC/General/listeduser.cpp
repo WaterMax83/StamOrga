@@ -163,6 +163,23 @@ bool ListedUser::userExists(quint32 index)
     return false;
 }
 
+bool ListedUser::userCheckPassword(QString name, QString passw)
+{
+    QMutexLocker locker(&this->m_mUserListMutex);
+
+    if (name.length() < MIN_SIZE_USERNAME)
+        return false;
+
+    foreach (UserLogin login, this->m_lUserLogin) {
+        if (login.userName == name) {
+            if (login.password == passw)
+                return true;
+            return false;
+        }
+    }
+    return false;
+}
+
 bool ListedUser::addNewUserLogin(QString name, QString password, quint32 prop, quint32 index, bool checkUser)
 {
     if (checkUser) {

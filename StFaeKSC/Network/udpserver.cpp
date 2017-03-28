@@ -1,5 +1,6 @@
 #include "udpserver.h"
 #include "../../Common/Network/messagecommand.h"
+#include "../../Common/General/globalfunctions.h"
 
 
 #define UDP_PORT    55000
@@ -38,12 +39,13 @@ void UdpServer::readyReadMasterPort()
 
         if (this->m_pUdpMasterSocket->readDatagram(datagram.data(), datagram.size(), &sender, &port)) {
             /* Check if user Connection already exists */
-            UserConnection *usrCon = this->getUserConnection(sender, port);
+            UserConnection *usrCon = this->getUserMasterConnection(sender, port);
             if (usrCon == NULL) {
                 UserConnection con;
                 con.userConData.sender = sender;
-                con.userConData.srcPort = port;
-                con.userConData.dataPort = 0;
+                con.userConData.srcMasterPort = port;
+                con.userConData.dstDataPort = 0;
+                con.userConData.srcDataPort = 0;
                 con.pctrlUdpDataServer = NULL;
                 con.pDataServer = NULL;
                 this->m_lUserCons.append(con);
@@ -71,15 +73,18 @@ void UdpServer::checkNewOncomingData()
                 MessageProtocol *ack;
                 if (this->m_pGlobalData->m_UserList.userExists(userName)) {
 
-                    if (this->m_lUserCons[i].userConData.dataPort == 0) {                         // when there is not already a port, create a new
-                        this->m_lUserCons[i].userConData.dataPort = this->getFreeDataPort();
-                        qInfo().noquote() << QString("Added user %1 with data port %2").arg(userName).arg(this->m_lUserCons[i].userConData.dataPort);
+                    if (this->m_lUserCons[i].userConData.dstDataPort == 0) {                         // when there is not already a port, create a new
+                        this->m_lUserCons[i].userConData.dstDataPort = this->getFreeDataPort();
+                        qInfo().noquote() << QString("Connected user %1 with data port %2 for %3")
+                                             .arg(userName)
+                                             .arg(this->m_lUserCons[i].userConData.dstDataPort)
+                                             .arg(this->m_lUserCons[i].userConData.sender.toString());
                     }
 
-                    ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_CONNECT_USER, (quint32)this->m_lUserCons[i].userConData.dataPort);
+                    ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_CONNECT_USER, (qint32)this->m_lUserCons[i].userConData.dstDataPort);
 
                     /* Create new thread if it is not running and you got a port */
-                    if (this->m_lUserCons[i].userConData.dataPort && this->m_lUserCons[i].pctrlUdpDataServer == NULL) {
+                    if (this->m_lUserCons[i].userConData.dstDataPort && this->m_lUserCons[i].pctrlUdpDataServer == NULL) {
                         this->m_lUserCons[i].userConData.userName = userName;
                         this->m_lUserCons[i].pDataServer = new UdpDataServer(&this->m_lUserCons[i].userConData,
                                                                              this->m_pGlobalData);
@@ -89,7 +94,7 @@ void UdpServer::checkNewOncomingData()
                     }
                 }
                 else {
-                    ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_CONNECT_USER, 0x0);
+                    ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_CONNECT_USER, ERROR_CODE_NO_USER);
                     qInfo().noquote() << QString("Wrong user tried to connect: %1").arg(userName);
                 }
 
@@ -97,7 +102,7 @@ void UdpServer::checkNewOncomingData()
                 const char *pData = ack->getNetworkProtocol();
                 this->m_pUdpMasterSocket->writeDatagram(pData, ack->getNetworkSize(),
                                                         this->m_lUserCons[i].userConData.sender,
-                                                        this->m_lUserCons[i].userConData.srcPort);
+                                                        this->m_lUserCons[i].userConData.srcMasterPort);
 
                 delete ack;
             }
@@ -111,7 +116,7 @@ void UdpServer::onConnectionTimedOut(quint16 port)
 {
     for (int i=0; i<this->m_lUserCons.size(); i++)
     {
-        if (this->m_lUserCons[i].userConData.dataPort == port)
+        if (this->m_lUserCons[i].userConData.dstDataPort == port)
         {
             qInfo().noquote() << QString("Connection timeout for user %1 with port %2").arg(this->m_lUserCons[i].userConData.userName).arg(port);
             this->m_lUserCons[i].pctrlUdpDataServer->Stop();
@@ -122,10 +127,10 @@ void UdpServer::onConnectionTimedOut(quint16 port)
     }
 }
 
-UserConnection *UdpServer::getUserConnection(QHostAddress addr, quint16 port)
+UserConnection *UdpServer::getUserMasterConnection(QHostAddress addr, quint16 port)
 {
     for (int i=0; i<this->m_lUserCons.size(); i++) {
-        if (this->m_lUserCons[i].userConData.sender == addr && this->m_lUserCons[i].userConData.srcPort == port)
+        if (this->m_lUserCons[i].userConData.sender == addr && this->m_lUserCons[i].userConData.srcMasterPort == port)
             return &this->m_lUserCons[i];
     }
     return NULL;
@@ -137,7 +142,7 @@ quint16 UdpServer::getFreeDataPort()
     do {
         bool bAlreadyUsed = false;
         foreach(UserConnection usrCon, this->m_lUserCons) {
-            if (usrCon.userConData.dataPort == retPort) {
+            if (usrCon.userConData.dstDataPort == retPort) {
                 bAlreadyUsed = true;
                 break;
             }

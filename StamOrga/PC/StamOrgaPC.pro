@@ -21,7 +21,9 @@ SOURCES += main.cpp\
     ../../Common/General/backgroundworker.cpp \
     ../connectionhandling.cpp \
     ../mainconnection.cpp \
-    ../globaldata.cpp
+    ../globaldata.cpp \
+    ../dataconnection.cpp \
+    ../../Common/General/globalfunctions.cpp
 
 HEADERS  += mainwindow.h \
     ../../Common/Network/messagebuffer.h \
@@ -32,6 +34,9 @@ HEADERS  += mainwindow.h \
     ../../Common/General/backgroundworker.h \
     ../connectionhandling.h \
     ../mainconnection.h \
-    ../globaldata.h
+    ../globaldata.h \
+    ../dataconnection.h \
+    ../../Common/General/globalfunctions.h \
+    ../../Common/General/config.h
 
 FORMS    += mainwindow.ui

@@ -38,6 +38,7 @@ public:
 
     bool userExists(QString name);
     bool userExists(quint32 index);
+    bool userCheckPassword(QString name, QString passw);
 
 private:
     QSettings           *m_pUserSettings = NULL;
