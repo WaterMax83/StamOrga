@@ -1,5 +1,12 @@
 debug/
+Debug/
 GeneratedFiles/
+Release/
 x64/
 *.pro.user
 *.pro.user.*
+*.sdf
+*.opensdf
+*.vcxproj*
+*.suo
+*.sln
