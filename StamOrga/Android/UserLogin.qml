@@ -18,6 +18,8 @@ UserLoginForm {
         userInt.startSendingData()
         btnSendData.enabled = false
         busyConnectIndicator.visible = true;
+        txtInfoConnecting.text = "Verbinde ..."
+        txtInfoConnecting.visible = true;
     }
 
     UserInterface {
@@ -27,12 +29,18 @@ UserLoginForm {
             btnSendData.enabled = true
             busyConnectIndicator.visible = false;
             console.log("UserLogin return value: " + result)
-            if (result === 1)
+            if (result === 1) {
                 btnSendData.background.color = "green"
+                txtInfoConnecting.text = "Verbindung erfolgreich"
+            }
             else {
                 btnSendData.background.color = "red"
-//                if (result == -3)   // timeout
-//                else
+                if (result == -3)  {  // timeout
+                    txtInfoConnecting.text = "Fehler: keine Antwort"
+                }
+                else {
+                    txtInfoConnecting.text = "Verbindungsdaten fehlerhaft"
+                }
             }
         }
     }

@@ -27,14 +27,18 @@ int main(int argc, char *argv[])
 
     globalUserData.loadGlobalSettings();
 
-    if (globalUserData.userName().size() == 0) {
-        if (engine.rootObjects().size() == 0) {
-            qCritical() << "Warning no root qml object loaded, end programm";
-            return -1;
-        }
-        QObject *pRootObject = engine.rootObjects().first();
-        QMetaObject::invokeMethod(pRootObject, "openUserLogin");
+    if (engine.rootObjects().size() == 0) {
+        qCritical() << "Warning no root qml object loaded, end programm";
+        return -1;
     }
+
+    QObject *pRootObject = engine.rootObjects().first();
+    QMetaObject::invokeMethod(pRootObject, "openUserLogin");
+
+//    if (globalUserData.userName().size() == 0) {
+
+
+//    }
 
     return app.exec();
 }

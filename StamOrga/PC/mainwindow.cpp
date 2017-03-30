@@ -25,6 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
     this->m_pGlobalData->loadGlobalSettings();
 
     this->ui->lEditSendUserName->setText(this->m_pGlobalData->userName());
+    this->ui->lEditTextPassword->setText(this->m_pGlobalData->passWord());
     this->ui->lEditIpAddr->setText(this->m_pGlobalData->ipAddr());
     this->ui->spBoxPort->setValue(this->m_pGlobalData->conMasterPort());
 }
@@ -38,6 +39,7 @@ void MainWindow::on_btnSendData_clicked()
 {
     this->m_pConHandling->setGlobalData(this->m_pGlobalData);
     this->m_pGlobalData->setUserName(this->ui->lEditSendUserName->text());
+    this->m_pGlobalData->setPassWord(this->ui->lEditTextPassword->text());
     this->m_pGlobalData->setIpAddr(this->ui->lEditIpAddr->text());
     this->m_pGlobalData->setConMasterPort(this->ui->spBoxPort->value());
     if (this->m_pConHandling->startMainConnection())

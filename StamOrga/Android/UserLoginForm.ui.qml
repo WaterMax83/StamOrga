@@ -11,7 +11,8 @@ Item {
     property alias txtUserName: txtUserName
     property alias spBoxPort: spBoxPort
     property alias txtPassWord: txtPassWord
-    property alias busyConnectIndicator : busyConnectIndicator
+    property alias busyConnectIndicator: busyConnectIndicator
+    property alias txtInfoConnecting: txtInfoConnecting
 
     ColumnLayout {
         id: columnLayout1
@@ -32,7 +33,6 @@ Item {
             Layout.fillWidth: false
             placeholderText: qsTr("Text Field")
         }
-
 
         SpinBox {
             id: spBoxPort
@@ -76,30 +76,51 @@ Item {
             TextField {
                 id: txtPassWord
             }
-
-
         }
 
-        BusyIndicator {
-            id: busyConnectIndicator
-            opacity: 1
-            visible: false
+        RowLayout {
+            id: rowLayout
+            width: 100
+            height: 50
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+
+            Column {
+                id: space
+                width: 0
+                height: 60
+            }
+
+            ColumnLayout {
+                id: columnLayout
+                width: 100
+                height: 100
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+
+                BusyIndicator {
+                    id: busyConnectIndicator
+                    opacity: 1
+                    visible: false
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                }
+
+                Text {
+                    id: txtInfoConnecting
+                    text: qsTr("Text")
+                    visible: false
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    font.pixelSize: 12
+                }
+            }
         }
 
         Button {
             id: btnSendData
-            text: qsTr("Verbinden")
+            width: 150
+            text: qsTr("Verbindung prüfen")
+            Layout.fillWidth: false
             Layout.fillHeight: false
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             transformOrigin: Item.Center
         }
-
-
-
-
-
-
     }
-
 }

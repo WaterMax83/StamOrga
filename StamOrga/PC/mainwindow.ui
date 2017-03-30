@@ -131,10 +131,39 @@
      </rect>
     </property>
     <property name="text">
-     <string>Version</string>
+     <string>Password</string>
     </property>
    </widget>
    <widget class="QLineEdit" name="lEditTextVersion">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>128</y>
+      <width>211</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>130</y>
+      <width>47</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Version</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lEditTextPassword">
     <property name="geometry">
      <rect>
       <x>70</x>
