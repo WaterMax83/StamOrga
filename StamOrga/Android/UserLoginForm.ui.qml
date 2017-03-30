@@ -115,8 +115,9 @@ Item {
 
         Button {
             id: btnSendData
-            width: 150
+            width: 250
             text: qsTr("Verbindung prüfen")
+            Layout.preferredWidth: 150
             Layout.fillWidth: false
             Layout.fillHeight: false
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter

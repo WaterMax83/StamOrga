@@ -45,7 +45,7 @@ int MainConnection::DoBackgroundWork()
 
 void MainConnection::connectionTimeoutFired()
 {
-    emit this->connectionRequestFinished(0, "Timeout");
+    emit this->connectionRequestFinished(ERROR_CODE_TIMEOUT, "Timeout");
 }
 
 void MainConnection::readyReadMasterPort()
