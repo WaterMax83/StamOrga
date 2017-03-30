@@ -131,20 +131,23 @@
      </rect>
     </property>
     <property name="text">
-     <string>PassWord</string>
+     <string>Version</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lEditSendUserName_2">
+   <widget class="QLineEdit" name="lEditTextVersion">
     <property name="geometry">
      <rect>
       <x>70</x>
-      <y>100</y>
+      <y>98</y>
       <width>211</width>
       <height>20</height>
      </rect>
     </property>
     <property name="text">
      <string/>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>

@@ -15,7 +15,8 @@ class ConnectionHandling : public QObject
 public:
     explicit ConnectionHandling(QObject *parent = 0);
 
-    bool StartMainConnection();
+    bool startMainConnection();
+    bool startGettingInfo();
 
     void setGlobalData(GlobalData *pData)
     {
@@ -26,13 +27,18 @@ public:
 //    ConnectionInfo *GetConnectionInfo() { return &this->m_conInfo; }
 
 signals:
-    void notifyConnectionFinished(bool result);
+    void sNotifyConnectionFinished(qint32 result);
+    void sNotifyVersionRequest(qint32 result, QString msg);
+
+    void sStartSendLoginRequest();
+    void sStartSendVersionRequest();
 
 public slots:
 
 private slots:
-    void mainConReqFin(qint32 result, const QString &msg);
-    void dataConLoginFinished(qint32 result);
+    void slMainConReqFin(qint32 result, const QString &msg);
+    void slDataConLoginFinished(qint32 result);
+    void slDataConVersionFinished(qint32 result, QString msg);
 
 private:
     BackgroundController m_ctrlMainCon;
@@ -42,6 +48,13 @@ private:
     DataConnection *m_pDataCon = NULL;
 
     GlobalData *m_pGlobalData = NULL;
+
+    void sendLoginRequest();
+    void sendVersionRequest();
+
+    void startDataConnection();
+    void stopDataConnection();
+    bool isDataConnectionActive() { return this->m_ctrlDataCon.IsRunning(); }
 };
 
 #endif // CONNECTIONHANDLING_H

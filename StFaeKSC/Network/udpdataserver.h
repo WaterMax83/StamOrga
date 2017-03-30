@@ -40,8 +40,6 @@ private:
 
     QTimer          *m_pConResetTimer = NULL;
 
-    bool            m_bIsLoggedIn = false;
-
     void checkNewOncomingData();
 
     MessageProtocol *checkNewMessage(MessageProtocol *msg);

@@ -8,10 +8,13 @@ class GlobalData : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString userName READ userName WRITE setUserName NOTIFY userNameChanged)
+    Q_PROPERTY(QString passWord READ passWord WRITE setPassWord NOTIFY passWordChanged)
     Q_PROPERTY(QString ipAddr READ ipAddr WRITE setIpAddr NOTIFY ipAddrChanged)
     Q_PROPERTY(quint32 conMasterPort READ conMasterPort WRITE setConMasterPort NOTIFY conMasterPortChanged)
 public:
     explicit GlobalData(QObject *parent = 0);
+
+    void loadGlobalSettings();
 
     QString userName() { return this->m_userName; }
     void setUserName(const QString &user)
@@ -19,6 +22,15 @@ public:
         if (this->m_userName != user) {
             this->m_userName = user;
             emit userNameChanged();
+        }
+    }
+
+    QString passWord() { return this->m_passWord; }
+    void setPassWord(const QString &passw)
+    {
+        if (this->m_passWord != passw) {
+            this->m_passWord = passw;
+            emit passWordChanged();
         }
     }
 
@@ -52,6 +64,7 @@ public:
 
 signals:
     void userNameChanged();
+    void passWordChanged();
     void ipAddrChanged();
     void conMasterPortChanged();
 
@@ -59,6 +72,7 @@ public slots:
 
 private:
     QString m_userName;
+    QString m_passWord;
     QString m_ipAddress;
     quint32 m_uMasterPort;
 

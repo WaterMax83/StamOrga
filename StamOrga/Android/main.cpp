@@ -2,6 +2,7 @@
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/QQmlContext>
 #include <QtCore/QSettings>
+#include <QtCore/QMetaObject>
 
 #include "userinterface.h"
 #include "../../Common/General/globalfunctions.h"
@@ -23,6 +24,17 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("globalUserData", &globalUserData);
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));
+
+    globalUserData.loadGlobalSettings();
+
+    if (globalUserData.userName().size() == 0) {
+        if (engine.rootObjects().size() == 0) {
+            qCritical() << "Warning no root qml object loaded, end programm";
+            return -1;
+        }
+        QObject *pRootObject = engine.rootObjects().first();
+        QMetaObject::invokeMethod(pRootObject, "openUserLogin");
+    }
 
     return app.exec();
 }

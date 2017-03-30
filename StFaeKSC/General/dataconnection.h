@@ -13,8 +13,10 @@ class DataConnection : public QObject
 public:
     explicit DataConnection(GlobalData *pGData, QObject *parent = 0);
 
-    MessageProtocol *requestCheckUserLogin(MessageProtocol *msg, UserConData *pUserConData);
+    MessageProtocol *requestCheckUserLogin(MessageProtocol *msg);
     MessageProtocol *requestGetProgramVersion(MessageProtocol *msg);
+
+    void setUserConnectionData(UserConData * pUsrConData) { this->m_pUserConData = pUsrConData; }
 
 signals:
 
@@ -22,6 +24,7 @@ public slots:
 
 private:
     GlobalData      *m_pGlobalData;
+    UserConData     *m_pUserConData;
 };
 
 #endif // DATACONNECTION_H

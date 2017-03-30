@@ -1,6 +1,8 @@
 import QtQuick 2.7
 import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.0
+import QtQuick.Extras 1.4
+import QtQuick.Window 2.2
 
 Item {
     id: item1
@@ -8,6 +10,8 @@ Item {
     property alias txtIPAddress: txtIPAddress
     property alias txtUserName: txtUserName
     property alias spBoxPort: spBoxPort
+    property alias txtPassWord: txtPassWord
+    property alias busyConnectIndicator : busyConnectIndicator
 
     ColumnLayout {
         id: columnLayout1
@@ -38,18 +42,63 @@ Item {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
         }
 
-        TextField {
-            id: txtUserName
-            text: qsTr("")
+        ColumnLayout {
+            id: columnLayout2
+            width: 100
+            height: 100
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+
+            Label {
+                id: label1
+                text: qsTr("Benutzername")
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            }
+
+            TextField {
+                id: txtUserName
+                text: qsTr("")
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            }
+        }
+
+        ColumnLayout {
+            id: columnLayout3
+            width: 100
+            height: 100
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+
+            Label {
+                id: label2
+                text: qsTr("Passwort")
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            }
+
+            TextField {
+                id: txtPassWord
+            }
+
+
+        }
+
+        BusyIndicator {
+            id: busyConnectIndicator
+            opacity: 1
+            visible: false
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
         }
+
         Button {
             id: btnSendData
-            text: qsTr("Send Data")
+            text: qsTr("Verbinden")
             Layout.fillHeight: false
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             transformOrigin: Item.Center
         }
+
+
+
+
+
 
     }
 

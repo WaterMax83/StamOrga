@@ -9,6 +9,7 @@ UdpDataServer::UdpDataServer(UserConData *pUsrConData, GlobalData *pGlobalData) 
 
     this->m_pUsrConData = pUsrConData;
     this->m_pGlobalData = pGlobalData;
+
 }
 
 
@@ -29,6 +30,7 @@ int UdpDataServer::DoBackgroundWork()
     this->m_pConResetTimer->start();
 
     this->m_pDataConnection = new DataConnection(this->m_pGlobalData);
+    this->m_pDataConnection->setUserConnectionData(this->m_pUsrConData);
 
     return 0;
 }
@@ -80,17 +82,19 @@ void UdpDataServer::checkNewOncomingData()
 
 MessageProtocol *UdpDataServer::checkNewMessage(MessageProtocol *msg)
 {
-    if (this->m_bIsLoggedIn) {
+    if (this->m_pUsrConData->bIsConnected) {
         switch(msg->getIndex()) {
         case OP_CODE_CMD_REQ::REQ_LOGIN_USER:
-            return this->m_pDataConnection->requestCheckUserLogin(msg, this->m_pUsrConData);
+            return this->m_pDataConnection->requestCheckUserLogin(msg);
+        case OP_CODE_CMD_REQ::REQ_GET_VERSION:
+            return this->m_pDataConnection->requestGetProgramVersion(msg);
         default:
-            qInfo().noquote() << QString("Unkown command %1").arg(msg->getIndex());
+            qWarning().noquote() << QString("Unkown command %1").arg(msg->getIndex());
             return NULL;
         }
     }
     else if (msg->getIndex() == OP_CODE_CMD_REQ::REQ_LOGIN_USER)
-        return this->m_pDataConnection->requestCheckUserLogin(msg, this->m_pUsrConData);
+        return this->m_pDataConnection->requestCheckUserLogin(msg);
     else
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_NOT_LOGGED_IN);
 

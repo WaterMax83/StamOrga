@@ -5,22 +5,22 @@
 UserInterface::UserInterface(QObject *parent) : QObject(parent)
 {
     this->m_pMainCon = new ConnectionHandling();
-    connect(this->m_pMainCon, &ConnectionHandling::notifyConnectionFinished, this, &UserInterface::connectionFinished);
+    connect(this->m_pMainCon, &ConnectionHandling::sNotifyConnectionFinished, this, &UserInterface::connectionFinished);
 }
 
-void UserInterface::StartSendingData()
+void UserInterface::startSendingData()
 {
     qDebug() << "Started sending Data";
 
     this->m_pMainCon->setGlobalData(this->m_pGlobalData);
 
-    if (this->m_pMainCon->StartMainConnection())
+    if (this->m_pMainCon->startMainConnection())
     {
 //        this->ui->btnSendData->setEnabled(false);
     }
 }
 
-void UserInterface::connectionFinished(bool result)
+void UserInterface::connectionFinished(qint32 result)
 {
     //this->ui->btnSendData->setEnabled(true);
     emit this->notifyConnectionFinished(result);

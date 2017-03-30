@@ -48,7 +48,6 @@ public:
         return qFromBigEndian(*(qint32*)this->getPointerToData());
     }
 
-
 private:
     QByteArray m_Data;
 

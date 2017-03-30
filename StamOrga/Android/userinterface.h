@@ -17,7 +17,7 @@ class UserInterface : public QObject
 public:
     explicit UserInterface(QObject *parent = 0);
 
-    Q_INVOKABLE void StartSendingData();
+    Q_INVOKABLE void startSendingData();
 
 
 //    QString userName() { return this->m_UserName; }
@@ -30,10 +30,10 @@ public:
     void setGlobalData(GlobalData *pData) { this->m_pGlobalData = pData; }
 
 signals:
-    void notifyConnectionFinished(bool result);
+    void notifyConnectionFinished(qint32 result);
 
 public slots:
-    void connectionFinished(bool result);
+    void connectionFinished(qint32 result);
 
 
 private:

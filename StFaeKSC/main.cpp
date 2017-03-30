@@ -19,9 +19,9 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("watermax.com");
     QCoreApplication::setApplicationName("StFaeKSC");
 
-    QString logginPath = QCoreApplication::applicationDirPath() + "/Log/Actual.log";
+    QString logginPath = getUserHomeConfigPath() + "/Log/Actual.log";
 
-    if (!CheckFilePathExistAndCreate(logginPath)) {
+    if (!checkFilePathExistAndCreate(logginPath)) {
         CONSOLE_CRITICAL(QString("Could not create file for Logging"));
     }
     else {
@@ -34,6 +34,7 @@ int main(int argc, char *argv[])
 
     qDebug() << "*************************************************************";
     qInfo() << "Starting StFaeKSC";
+    qDebug() << getUserHomeConfigPath();
 
     GlobalData globalData;
 
@@ -48,5 +49,9 @@ int main(int argc, char *argv[])
     con.run();
     QObject::connect(&con, SIGNAL(quit()), &a, SLOT(quit()));
 
-    return a.exec();
+    int result = a.exec();
+
+    qDebug() << QString("Ending program %1: %2").arg(result).arg(QCoreApplication::applicationPid());
+
+    return result;
 }

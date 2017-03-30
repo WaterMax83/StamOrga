@@ -1,6 +1,19 @@
 #include "globalfunctions.h"
 
-bool CheckFilePathExistAndCreate(const QString &path)
+
+QString getUserHomePath()
+{
+    return QDir::homePath();
+}
+
+QString getUserHomeConfigPath()
+{
+    QString home = getUserHomePath();
+    home.append("/.config/StFaeKSC");
+    return home;
+}
+
+bool checkFilePathExistAndCreate(const QString &path)
 {
     QFileInfo checkFileInfo(path);
     if (!checkFileInfo.exists())
@@ -34,6 +47,10 @@ QString getErrorCodeString(qint32 code)
         return QString("Common unkown error: %1").arg(code);
     case ERROR_CODE_WRONG_SIZE:
         return QString("Wrong data size: %1").arg(code);
+    case ERROOR_CODE_ERR_SEND:
+        return QString("Error sending data: %1").arg(code);
+    case ERROR_CODE_NO_ANSWER:
+        return QString("Did not get an answer: %1").arg(code);
     case ERROR_CODE_NO_USER:
         return QString("User not known: %1").arg(code);
     case ERROR_CODE_WRONG_PASSWORD:
@@ -41,4 +58,15 @@ QString getErrorCodeString(qint32 code)
     default:
         return QString("Unkown error: %1").arg(code);
     }
+}
+
+#define DEFAULT_PADDING_SIZE    4
+
+inline uint CalculatePaddingSize(uint uLength)
+{
+    int nRem = uLength % DEFAULT_PADDING_SIZE;
+    if (nRem > 0)
+        return DEFAULT_PADDING_SIZE - nRem;
+    else
+        return 0;
 }

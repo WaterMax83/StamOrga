@@ -79,8 +79,7 @@ void MainConnection::checkNewOncomingData()
                 emit this->connectionRequestFinished(ERROR_CODE_WRONG_SIZE, QString("Datalength is wrong, expected 4").arg(msg->getDataLength()));
             else  {
                 qint32 rValue = msg->getIntData();
-                qDebug() << QString("return value for connect = %1").arg(rValue);
-                if (rValue > 0)
+                if (rValue > ERROR_CODE_NO_ERROR)
                     emit this->connectionRequestFinished(rValue, "");
                 else if (rValue == ERROR_CODE_NO_USER)
                     emit this->connectionRequestFinished(rValue, QString("Wrong user %1").arg(this->m_pGlobalData->userName()));

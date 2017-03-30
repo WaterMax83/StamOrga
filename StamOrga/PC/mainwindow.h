@@ -20,12 +20,13 @@ public:
 
 private slots:
     void on_btnSendData_clicked();
-    void ConnectionFinished(bool result);
+    void connectionFinished(qint32 result);
+    void versionRequestFinished(qint32 result, QString msg);
 
 private:
     Ui::MainWindow *ui;
 
-    ConnectionHandling *m_pMainCon;
+    ConnectionHandling *m_pConHandling;
     GlobalData          *m_pGlobalData;
 };
 

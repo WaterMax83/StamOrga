@@ -21,16 +21,24 @@ inline void SetMessagePattern()
     qSetMessagePattern("%{time dd.MM hh:mm:ss.zzz} %{type} - %{message}");
 }
 
+extern QString getUserHomePath();
 
-extern bool CheckFilePathExistAndCreate(const QString &path);
+extern QString getUserHomeConfigPath();
+
+extern bool checkFilePathExistAndCreate(const QString &path);
 
 
+#define ERROR_CODE_NEW_VERSION      5
 #define ERROR_CODE_SUCCESS          1
 #define ERROR_CODE_NO_ERROR         0
 #define ERROR_CODE_COMMON           -1
 #define ERROR_CODE_WRONG_SIZE       -2
+#define ERROR_CODE_TIMEOUT          -3
+#define ERROOR_CODE_ERR_SEND        -4
+#define ERROR_CODE_NO_ANSWER        -5
 #define ERROR_CODE_NO_USER          -20
 #define ERROR_CODE_WRONG_PASSWORD   -21
+
 
 
 extern QString getErrorCodeString(qint32 code);

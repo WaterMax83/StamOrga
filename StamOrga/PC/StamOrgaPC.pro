@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     ../mainconnection.cpp \
     ../globaldata.cpp \
     ../dataconnection.cpp \
-    ../../Common/General/globalfunctions.cpp
+    ../../Common/General/globalfunctions.cpp \
+    ../datahandling.cpp
 
 HEADERS  += mainwindow.h \
     ../../Common/Network/messagebuffer.h \
@@ -37,6 +38,7 @@ HEADERS  += mainwindow.h \
     ../globaldata.h \
     ../dataconnection.h \
     ../../Common/General/globalfunctions.h \
-    ../../Common/General/config.h
+    ../../Common/General/config.h \
+    ../datahandling.h
 
 FORMS    += mainwindow.ui

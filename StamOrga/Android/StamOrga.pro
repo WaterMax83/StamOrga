@@ -13,7 +13,8 @@ SOURCES += main.cpp \
     ../../Common/Network/messageprotocol.cpp \
     ../globaldata.cpp \
     ../../Common/General/globalfunctions.cpp \
-    ../dataconnection.cpp
+    ../dataconnection.cpp \
+    ../datahandling.cpp
 
 RESOURCES += qml.qrc
 
@@ -52,7 +53,8 @@ HEADERS += \
     ../../Common/Network/messageprotocol.h \
     ../globaldata.h \
     ../../Common/General/globalfunctions.h \
-    ../dataconnection.h
+    ../dataconnection.h \
+    ../datahandling.h
 
 DISTFILES += \
     android/AndroidManifest.xml \

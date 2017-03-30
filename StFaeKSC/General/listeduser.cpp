@@ -8,9 +8,9 @@
 
 ListedUser::ListedUser()
 {
-    QString userSetFilePath = QCoreApplication::applicationDirPath() + "/Settings/ListedUsers.ini";
+    QString userSetFilePath = getUserHomeConfigPath() + "/Settings/ListedUsers.ini";
 
-    if (!CheckFilePathExistAndCreate(userSetFilePath))
+    if (!checkFilePathExistAndCreate(userSetFilePath))
     {
         CONSOLE_CRITICAL(QString("Could not create File for UserSettings"));
         return;
