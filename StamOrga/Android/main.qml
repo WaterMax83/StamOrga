@@ -16,22 +16,28 @@ ApplicationWindow {
 //        currentIndex: tabBar.currentIndex
 
     header: ToolBar {
-//        Material.foreground: "white"
-        height: 75
+        height: 50
 
         RowLayout {
             spacing: 20
             anchors.fill: parent
 
-//            ToolButton {
-//                contentItem: Image {
-//                    fillMode: Image.Pad
-//                    horizontalAlignment: Image.AlignHCenter
-//                    verticalAlignment: Image.AlignVCenter
-//                    source: "qrc:/images/drawer.png"
-//                }
-//                onClicked: drawer.open()
-//            }
+            ToolButton {
+                contentItem: Image {
+                    fillMode: Image.Pad
+                    horizontalAlignment: Image.AlignHCenter
+                    verticalAlignment: Image.AlignVCenter
+                    source: stackView.depth > 1 ? "images/back.png" : "images/drawer.png"
+                }
+                onClicked: {
+                    if (stackView.depth > 1) {
+                        stackView.pop()
+                        listView.currentIndex = -1
+                    } else {
+                        drawer.open()
+                    }
+                }
+            }
 
             Label {
                 id: titleLabel
@@ -42,31 +48,6 @@ ApplicationWindow {
                 verticalAlignment: Qt.AlignVCenter
                 Layout.fillWidth: true
             }
-
-//            ToolButton {
-//                contentItem: Image {
-//                    fillMode: Image.Pad
-//                    horizontalAlignment: Image.AlignHCenter
-//                    verticalAlignment: Image.AlignVCenter
-//                    source: "qrc:/images/menu.png"
-//                }
-//                onClicked: optionsMenu.open()
-
-//                Menu {
-//                    id: optionsMenu
-//                    x: parent.width - width
-//                    transformOrigin: Menu.TopRight
-
-//                    MenuItem {
-//                        text: "Settings"
-//                        onTriggered: settingsPopup.open()
-//                    }
-//                    MenuItem {
-//                        text: "About"
-//                        onTriggered: aboutDialog.open()
-//                    }
-//                }
-//            }
         }
     }
 
@@ -95,7 +76,8 @@ ApplicationWindow {
     }
 
     function openUserLogin() {
-        stackView.replace("qrc:/UserLogin.qml")
+        titleLabel.text = "Benutzer"
+        stackView.push("qrc:/pages/UserLogin.qml")
     }
 
 

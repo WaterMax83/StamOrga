@@ -153,8 +153,9 @@ void DataConnection::startSendUpdPassRequest(QString newPassWord)
     wPassReq << (qint16)newPassWord.size();
     passReq.append(newPassWord);
 
+    QVariant tmp(newPassWord);
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN, passReq);
-    if (this->sendMessageRequest(&msg, &QVariant(newPassWord)) < 0)
+    if (this->sendMessageRequest(&msg, &tmp) < 0)
         emit this->notifyUpdPassRequest(ERROOR_CODE_ERR_SEND);
 }
 

@@ -28,7 +28,7 @@ qint32 DataHandling::getHandleVersionResponse(MessageProtocol *msg, QString *ver
     QString remVersion(QByteArray(pData + sizeof(quint32), msg->getDataLength() - sizeof(quint32)));
 
     if (uVersion > STAM_ORGA_VERSION_I) {
-        version->append(QString("There is a new version available: %1, your version is %2").arg(remVersion, STAM_ORGA_VERSION_S));
+        version->append(QString("Deine Version: %2\nAktuelle Version: %1").arg(remVersion, STAM_ORGA_VERSION_S));
         return ERROR_CODE_NEW_VERSION;
     }
     version->append(remVersion);

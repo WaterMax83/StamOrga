@@ -1,7 +1,7 @@
 #ifndef USERINTERFACE_H
 #define USERINTERFACE_H
 
-#include <QObject>
+#include <QtCore/QObject>
 
 #include "../connectionhandling.h"
 #include "../globaldata.h"
@@ -17,7 +17,7 @@ class UserInterface : public QObject
 public:
     explicit UserInterface(QObject *parent = 0);
 
-    Q_INVOKABLE void startSendingData();
+    Q_INVOKABLE qint32 startSendingData(QString name, QString passw);
 
 
 //    QString userName() { return this->m_UserName; }
@@ -31,9 +31,11 @@ public:
 
 signals:
     void notifyConnectionFinished(qint32 result);
+    void notifyVersionRequestFinished(qint32 result, QString msg);
 
 public slots:
-    void connectionFinished(qint32 result);
+    void slConnectionRequestFinished(qint32 result);
+    void slVersionRequestFinished(qint32 result, QString msg);
 
 
 private:
@@ -41,7 +43,7 @@ private:
 //    QString m_ipAddr;
 //    quint16 m_port;
 
-    ConnectionHandling *m_pMainCon;
+    ConnectionHandling *m_pConHandle;
 
     GlobalData *m_pGlobalData = NULL;
 };

@@ -32,18 +32,24 @@ int main(int argc, char *argv[])
 
     qInstallMessageHandler(logMyMessageLogginOutPut);
 
-    qDebug() << "*************************************************************";
+    qInfo() << "*************************************************************";
     qInfo() << "Starting StFaeKSC";
-    qDebug() << getUserHomeConfigPath();
 
     GlobalData globalData;
 
     BackgroundController ctrlUdp;
-    UdpServer *udpServ = new UdpServer(&globalData);
+    if (argc > 1 && QString(argv[1]) == "-noServer") {
+        qInfo() << "Starting only as a deamon without a server";
+    } else {
+
+        UdpServer *udpServ = new UdpServer(&globalData);
+
+        ctrlUdp.Start(udpServ, false);
+    }
 
     /* TODO: Connect for ctrlUdp::notifyBackgroundWorkerFinished */
 
-    ctrlUdp.Start(udpServ, false);
+
 
     Console con(&globalData);
     con.run();
@@ -51,7 +57,7 @@ int main(int argc, char *argv[])
 
     int result = a.exec();
 
-    qDebug() << QString("Ending program %1: %2").arg(result).arg(QCoreApplication::applicationPid());
+    qDebug().noquote() << QString("Ending program %1: %2").arg(result).arg(QCoreApplication::applicationPid());
 
     return result;
 }

@@ -3,7 +3,6 @@ import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.0
 import QtQuick.Extras 1.4
 import QtQuick.Window 2.2
-
 Item {
     id: item1
     property alias btnSendData: btnSendData
@@ -11,11 +10,12 @@ Item {
     property alias txtUserName: txtUserName
     property alias spBoxPort: spBoxPort
     property alias txtPassWord: txtPassWord
-    property alias busyConnectIndicator: busyConnectIndicator
     property alias txtInfoConnecting: txtInfoConnecting
+    property alias busyConnectIndicator: busyConnectIndicator
 
     ColumnLayout {
-        id: columnLayout1
+        id: mainColumnLayout
+        spacing: 35
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 20
         anchors.right: parent.right
@@ -28,9 +28,8 @@ Item {
         TextField {
             id: txtIPAddress
             text: "140.80.61.57"
+            implicitWidth: 250
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            Layout.fillHeight: false
-            Layout.fillWidth: false
             placeholderText: qsTr("Text Field")
         }
 
@@ -44,8 +43,7 @@ Item {
 
         ColumnLayout {
             id: columnLayout2
-            width: 100
-            height: 100
+            spacing: 5
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
             Label {
@@ -57,14 +55,14 @@ Item {
             TextField {
                 id: txtUserName
                 text: qsTr("")
+                padding: 8
+                implicitWidth: 250
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             }
         }
 
         ColumnLayout {
             id: columnLayout3
-            width: 100
-            height: 100
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
             Label {
@@ -75,25 +73,23 @@ Item {
 
             TextField {
                 id: txtPassWord
+                implicitWidth: 250
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             }
         }
 
         RowLayout {
             id: rowLayout
-            width: 100
-            height: 50
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
             Column {
                 id: space
                 width: 0
-                height: 60
+                height: 81
             }
 
             ColumnLayout {
                 id: columnLayout
-                width: 100
-                height: 100
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
                 BusyIndicator {
@@ -103,23 +99,18 @@ Item {
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }
 
-                Text {
+                Label {
                     id: txtInfoConnecting
-                    text: qsTr("Text")
+                    text: qsTr("Label")
                     visible: false
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                    font.pixelSize: 12
                 }
             }
         }
 
         Button {
             id: btnSendData
-            width: 250
             text: qsTr("Verbindung prüfen")
-            Layout.preferredWidth: 150
-            Layout.fillWidth: false
-            Layout.fillHeight: false
+            implicitWidth: 250
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             transformOrigin: Item.Center
         }

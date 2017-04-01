@@ -17,8 +17,8 @@ public:
     explicit ConnectionHandling(QObject *parent = 0);
     ~ConnectionHandling();
 
-    bool startMainConnection(QString name, QString passw);
-    bool startGettingInfo();
+    qint32 startMainConnection(QString name, QString passw);
+    qint32 startGettingInfo();
 
     bool startUpdatePassword(QString newPassWord);
 
@@ -70,9 +70,12 @@ private:
     void sendUserPropertiesRequest();
     void sendUpdatePasswordRequest(QString newPassWord);
 
+    void checkTimeoutResult(qint32 result);
+
     void startDataConnection();
     void stopDataConnection();
     bool isDataConnectionActive() { return this->m_ctrlDataCon.IsRunning(); }
+    bool isMainConnectionActive() { return this->m_ctrlMainCon.IsRunning(); }
 };
 
 #endif // CONNECTIONHANDLING_H

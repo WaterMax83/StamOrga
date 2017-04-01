@@ -3,6 +3,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QSettings>
+#include <QtNetwork/QHostInfo>
 
 class GlobalData : public QObject
 {
@@ -61,6 +62,7 @@ public:
     }
 
     bool bIsConnected;
+    quint32 uUserProperties;
 
     void saveGlobalUserSettings();
 
@@ -71,6 +73,9 @@ signals:
     void conMasterPortChanged();
 
 public slots:
+
+private slots:
+    void callBackLookUpHost(const QHostInfo &host);
 
 private:
     QString m_userName;

@@ -21,27 +21,29 @@ ConnectionHandling::ConnectionHandling(QObject *parent) : QObject(parent)
     connect(this->m_pTimerLoginReset, &QTimer::timeout, this, &ConnectionHandling::slTimerConLoginFired);
 }
 
-bool ConnectionHandling::startMainConnection(QString name, QString passw)
+qint32 ConnectionHandling::startMainConnection(QString name, QString passw)
 {
-    if (this->m_ctrlMainCon.IsRunning())
+    if (this->isMainConnectionActive())
     {
         if (name == this->m_pGlobalData->userName()) {
             if (this->m_pGlobalData->bIsConnected && passw == this->m_pGlobalData->passWord()) {
                 emit this->sNotifyConnectionFinished(ERROR_CODE_SUCCESS);
                 qDebug() << "Saving to log in again, should already be succesfull";
-                return true;
+                return ERROR_CODE_NO_ERROR;
             }
             this->m_pGlobalData->setPassWord(passw);
             this->startDataConnection();
             QThread::msleep(1);
             this->sendLoginRequest();
             this->m_pGlobalData->saveGlobalUserSettings();
-            return true;
+            return ERROR_CODE_SUCCESS;
         }
         this->m_ctrlMainCon.Stop();
         this->stopDataConnection();
         QThread::msleep(2);
-    }
+    } else
+        this->stopDataConnection();
+
     this->m_pGlobalData->setUserName(name);
     this->m_pGlobalData->setPassWord(passw);
 
@@ -51,14 +53,14 @@ bool ConnectionHandling::startMainConnection(QString name, QString passw)
 
     this->m_pGlobalData->saveGlobalUserSettings();
 
-    return true;
+    return ERROR_CODE_SUCCESS;
 }
 
-bool ConnectionHandling::startGettingInfo()
+qint32 ConnectionHandling::startGettingInfo()
 {
     this->sendVersionRequest();
     this->sendUserPropertiesRequest();
-    return true;
+    return ERROR_CODE_SUCCESS;
 }
 
 bool ConnectionHandling::startUpdatePassword(QString newPassWord)
@@ -84,6 +86,8 @@ void ConnectionHandling::slMainConReqFin(qint32 result, const QString &msg)
     {
         qWarning() << "Error main connecting: " << msg;
         emit this->sNotifyConnectionFinished(result);
+        this->m_ctrlMainCon.Stop();
+        this->stopDataConnection();
     }
 }
 
@@ -111,10 +115,9 @@ void ConnectionHandling::slDataConLoginFinished(qint32 result)
         qInfo().noquote() << "Logged in succesfully";
         this->m_pGlobalData->bIsConnected = true;
         this->m_pTimerLoginReset->start();
-    }
-    else {
+    } else {
         qWarning().noquote() << QString("Error Login: %1").arg(getErrorCodeString(result));
-        this->stopDataConnection();
+        this->checkTimeoutResult(result);
     }
 
     emit this->sNotifyConnectionFinished(result);
@@ -139,7 +142,7 @@ void ConnectionHandling::slDataConVersionFinished(qint32 result, QString msg)
     qDebug() << "version request finished: "  << msg;
 
     emit this->sNotifyVersionRequest(result, msg);
-    this->m_pTimerLoginReset->start();
+    this->checkTimeoutResult(result);
 }
 
 /*
@@ -159,8 +162,10 @@ void ConnectionHandling::slDataConUserPropsFinished(qint32 result, quint32 value
     disconnect(this->m_pDataCon, &DataConnection::notifyUserPropsRequest,
             this, &ConnectionHandling::slDataConUserPropsFinished);
 
+    if (result == ERROR_CODE_SUCCESS)
+        this->m_pGlobalData->uUserProperties = value;
     emit this->sNotifyUserPropertiesRequest(result, value);
-    this->m_pTimerLoginReset->start();
+    this->checkTimeoutResult(result);
 }
 
 /*
@@ -182,6 +187,17 @@ void ConnectionHandling::slDataConUpdPassFinished(qint32 result)
             this, &ConnectionHandling::slDataConUpdPassFinished);
 
     emit this->sNotifyUpdatePasswordRequest(result);
+    this->checkTimeoutResult(result);
+}
+
+
+void ConnectionHandling::checkTimeoutResult(qint32 result)
+{
+    if (result == ERROR_CODE_TIMEOUT) {
+        this->m_ctrlMainCon.Stop();
+        this->stopDataConnection();
+    } else if (this->m_pGlobalData->bIsConnected)
+        this->m_pTimerLoginReset->start();              // restart Timer
 }
 
 
@@ -235,9 +251,9 @@ void ConnectionHandling::slTimerConLoginFired()
 
 ConnectionHandling::~ConnectionHandling()
 {
-    if (this->m_ctrlDataCon.IsRunning())
+    if (this->isDataConnectionActive())
         this->stopDataConnection();
 
-    if (this->m_ctrlMainCon.IsRunning())
+    if (this->isMainConnectionActive())
         this->m_ctrlMainCon.Stop();
 }
