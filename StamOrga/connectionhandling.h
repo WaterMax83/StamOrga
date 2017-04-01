@@ -1,7 +1,8 @@
 #ifndef CONNECTIONHANDLING_H
 #define CONNECTIONHANDLING_H
 
-#include <QObject>
+#include <QtCore/QObject>
+#include <QtCore/QTimer>
 
 #include "mainconnection.h"
 #include "dataconnection.h"
@@ -14,9 +15,12 @@ class ConnectionHandling : public QObject
     Q_OBJECT
 public:
     explicit ConnectionHandling(QObject *parent = 0);
+    ~ConnectionHandling();
 
-    bool startMainConnection();
+    bool startMainConnection(QString name, QString passw);
     bool startGettingInfo();
+
+    bool startUpdatePassword(QString newPassWord);
 
     void setGlobalData(GlobalData *pData)
     {
@@ -29,9 +33,13 @@ public:
 signals:
     void sNotifyConnectionFinished(qint32 result);
     void sNotifyVersionRequest(qint32 result, QString msg);
+    void sNotifyUserPropertiesRequest(qint32 result, quint32 value);
+    void sNotifyUpdatePasswordRequest(qint32 result);
 
     void sStartSendLoginRequest();
     void sStartSendVersionRequest();
+    void sStartSendUserPropertiesRequest();
+    void sStartSendUpdatePasswordRequest(QString newPassWord);
 
 public slots:
 
@@ -39,6 +47,11 @@ private slots:
     void slMainConReqFin(qint32 result, const QString &msg);
     void slDataConLoginFinished(qint32 result);
     void slDataConVersionFinished(qint32 result, QString msg);
+    void slDataConUserPropsFinished(qint32 result, quint32 value);
+    void slDataConUpdPassFinished(qint32 result);
+
+    void slTimerConResetFired();
+    void slTimerConLoginFired();
 
 private:
     BackgroundController m_ctrlMainCon;
@@ -49,8 +62,13 @@ private:
 
     GlobalData *m_pGlobalData = NULL;
 
+    QTimer      *m_pTimerConReset;
+    QTimer      *m_pTimerLoginReset;
+
     void sendLoginRequest();
     void sendVersionRequest();
+    void sendUserPropertiesRequest();
+    void sendUpdatePasswordRequest(QString newPassWord);
 
     void startDataConnection();
     void stopDataConnection();

@@ -10,6 +10,11 @@
 #include "../Common/General/backgroundworker.h"
 #include "../Common/Network/messagebuffer.h"
 
+struct ActualRequest {
+    quint32     request;
+    QVariant    data;
+};
+
 class DataConnection : public BackgroundWorker
 {
     Q_OBJECT
@@ -25,10 +30,14 @@ public:
 signals:
     void notifyLoginRequest(qint32 result);
     void notifyVersionRequest(qint32 result, QString msg);
+    void notifyUserPropsRequest(qint32 result, quint32 value);
+    void notifyUpdPassRequest(qint32 result);
 
 public slots:
     void startSendLoginRequest();
     void startSendVersionRequest();
+    void startSendUserPropsRequest();
+    void startSendUpdPassRequest(QString newPassWord);
 
 private slots:
     void connectionTimeoutFired();
@@ -45,10 +54,13 @@ private:
 
 
     void checkNewOncomingData();
-    qint32 sendMessageRequest(MessageProtocol *msg);
+    qint32 sendMessageRequest(MessageProtocol *msg, QVariant *data = NULL);
     void removeActualRequest(quint32 req);
 
-    QList<quint32>         m_lActualRequest;
+    bool    m_bRequestLoginAgain;
+    void sendActualRequestsAgain();
+
+    QList<ActualRequest>         m_lActualRequest;
 };
 
 #endif // DATACONNECTION_H

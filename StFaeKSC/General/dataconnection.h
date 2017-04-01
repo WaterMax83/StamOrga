@@ -14,6 +14,8 @@ public:
     explicit DataConnection(GlobalData *pGData, QObject *parent = 0);
 
     MessageProtocol *requestCheckUserLogin(MessageProtocol *msg);
+    MessageProtocol *requestGetUserProperties();
+    MessageProtocol *requestUserChangeLogin(MessageProtocol *msg);
     MessageProtocol *requestGetProgramVersion(MessageProtocol *msg);
 
     void setUserConnectionData(UserConData * pUsrConData) { this->m_pUserConData = pUsrConData; }

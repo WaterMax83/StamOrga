@@ -112,7 +112,7 @@ int ListedUser::showAllUsers()
     QMutexLocker locker(&this->m_mUserListMutex);
 
     foreach (UserLogin login, this->m_lUserLogin) {
-        std::cout << login.userName.toStdString() << std::endl;
+        std::cout << login.userName.toStdString() << ": 0x" << QString::number(login.properties, 16).toStdString() << std::endl;
     }
     return 0;
 }
@@ -180,6 +180,54 @@ bool ListedUser::userCheckPassword(QString name, QString passw)
     return false;
 }
 
+bool ListedUser::userChangePassword(QString name, QString passw)
+{
+    QMutexLocker locker(&this->m_mUserListMutex);
+
+    if (name.length() < MIN_SIZE_USERNAME)
+        return false;
+
+    for (int i=0; i<this->m_lUserLogin.size(); i++) {
+        if (this->m_lUserLogin[i].userName == name) {
+            if (this->updateUserLoginValue(&this->m_lUserLogin[i], LOGIN_PASSWORD, QVariant(passw))) {
+                this->m_lUserLogin[i].password = passw;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool ListedUser::userChangeProperties(QString name, quint32 props)
+{
+    QMutexLocker locker(&this->m_mUserListMutex);
+
+    if (name.length() < MIN_SIZE_USERNAME)
+        return false;
+
+    for (int i=0; i<this->m_lUserLogin.size(); i++) {
+        if (this->m_lUserLogin[i].userName == name) {
+            if (this->updateUserLoginValue(&this->m_lUserLogin[i], LOGIN_PROPERTIES, QVariant(props))) {
+                this->m_lUserLogin[i].properties = props;
+                return true;
+            } else
+                return false;
+        }
+    }
+    return false;
+}
+
+quint32 ListedUser::getUserProperties(QString name)
+{
+    QMutexLocker locker(&this->m_mUserListMutex);
+
+    foreach (UserLogin login, this->m_lUserLogin) {
+        if (login.userName == name)
+            return login.properties;
+    }
+    return 0;
+}
+
 bool ListedUser::addNewUserLogin(QString name, QString password, quint32 prop, quint32 index, bool checkUser)
 {
     if (checkUser) {
@@ -232,6 +280,30 @@ quint32 ListedUser::getNextLoginIndex()
             index = this->m_lUserLogin[i].index;
     }
     return index+1;
+}
+
+bool ListedUser::updateUserLoginValue(UserLogin *pUserLog, QString key, QVariant value)
+{
+    bool rValue = false;
+    QMutexLocker locker(&this->m_mUserIniMutex);
+
+    this->m_pUserSettings->beginGroup(USER_GROUP);
+    int arrayCount = this->m_pUserSettings->beginReadArray(LOGIN_ARRAY);
+    for (int i=0; i<arrayCount; i++) {
+        this->m_pUserSettings->setArrayIndex(i);
+        QString actName = this->m_pUserSettings->value(LOGIN_USERNAME, "").toString();
+        quint32 actIndex = this->m_pUserSettings->value(LOGIN_INDEX, 0).toInt();
+        if (pUserLog->userName == actName && pUserLog->index == actIndex) {
+
+            this->m_pUserSettings->setValue(key, value);
+            qInfo().noquote() << QString("Change %1 of user %2 to %3").arg(key).arg(pUserLog->userName).arg(value.toString());
+            rValue = true;
+            break;
+        }
+    }
+    this->m_pUserSettings->endArray();
+    this->m_pUserSettings->endArray();
+    return rValue;
 }
 
 

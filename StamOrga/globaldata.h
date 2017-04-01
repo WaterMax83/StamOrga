@@ -60,6 +60,8 @@ public:
         }
     }
 
+    bool bIsConnected;
+
     void saveGlobalUserSettings();
 
 signals:

@@ -39,6 +39,9 @@ public:
     bool userExists(QString name);
     bool userExists(quint32 index);
     bool userCheckPassword(QString name, QString passw);
+    bool userChangePassword(QString name, QString passw);
+    bool userChangeProperties(QString name, quint32 props);
+    quint32 getUserProperties(QString name);
 
 private:
     QSettings           *m_pUserSettings = NULL;
@@ -55,7 +58,7 @@ private:
     quint32 getUserLoginIndex(const QString &name);
     quint32 getNextLoginIndex();
 
-
+    bool updateUserLoginValue(UserLogin *pUserLog, QString key, QVariant value);
 
 };
 

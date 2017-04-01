@@ -39,6 +39,8 @@ bool checkFilePathExistAndCreate(const QString &path)
 QString getErrorCodeString(qint32 code)
 {
     switch(code) {
+    case ERROR_CODE_NEW_VERSION:
+        return QString("new Version: %1").arg(code);
     case ERROR_CODE_SUCCESS:
         return QString("Success: %1").arg(code);
     case ERROR_CODE_NO_ERROR:
@@ -47,6 +49,8 @@ QString getErrorCodeString(qint32 code)
         return QString("Common unkown error: %1").arg(code);
     case ERROR_CODE_WRONG_SIZE:
         return QString("Wrong data size: %1").arg(code);
+    case ERROR_CODE_TIMEOUT:
+        return QString("No answer, timeout: %1").arg(code);
     case ERROOR_CODE_ERR_SEND:
         return QString("Error sending data: %1").arg(code);
     case ERROR_CODE_NO_ANSWER:

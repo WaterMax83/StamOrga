@@ -1,1 +1,17 @@
 https://github.com/WaterMax83/StamOrga.git
+
+Das Repository laden
+git clone https://github.com/WaterMax83/StamOrga.git
+
+git checkout -b xyz				neuen branch anlegen
+git branch -D xyz				branch löschen
+git checkout xyz				zu branch wechseln
+
+git format-patch master > fix.patch		patch erzeugen vom branch zu master
+
+git status						aktuelle Änderungen sehen
+git add .						aktuelle Änderungen für commit vormerken
+git commit -m "blabla"			aktuelle Änderungen committen
+git push origin master			master branch auf server laden
+
+git reset --hard HEAD			branch zurücksetzen auf letzten Stand

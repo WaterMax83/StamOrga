@@ -7,6 +7,7 @@ GlobalData::GlobalData(QObject *parent) : QObject(parent)
 {
     QGuiApplication::setOrganizationName("WaterMax");
     QGuiApplication::setApplicationName("StamOrga");
+    this->bIsConnected = false;
 }
 
 void GlobalData::loadGlobalSettings()

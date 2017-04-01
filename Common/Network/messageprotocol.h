@@ -4,6 +4,8 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QtEndian>
 
+#include "../../Common/General/globalfunctions.h"
+
 struct msg_Header
 {
     quint32 timestamp;
@@ -44,7 +46,7 @@ public:
     qint32 getIntData()
     {
         if (this->getDataLength() != 4)
-            return 0;
+            return ERROR_CODE_WRONG_SIZE;
         return qFromBigEndian(*(qint32*)this->getPointerToData());
     }
 

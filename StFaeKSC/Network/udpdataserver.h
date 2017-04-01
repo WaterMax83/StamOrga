@@ -29,6 +29,7 @@ signals:
 private slots:
     void readyReadSocketPort();
     void onConnectionResetTimeout();
+    void onConnectionLoginTimeout();
 
 private:
     GlobalData      *m_pGlobalData;
@@ -38,6 +39,7 @@ private:
     QUdpSocket      *m_pUdpSocket = NULL;
     MessageBuffer   m_msgBuffer;
 
+    QTimer          *m_pConLoginTimer = NULL;
     QTimer          *m_pConResetTimer = NULL;
 
     void checkNewOncomingData();

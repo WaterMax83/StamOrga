@@ -22,6 +22,10 @@ private slots:
     void on_btnSendData_clicked();
     void connectionFinished(qint32 result);
     void versionRequestFinished(qint32 result, QString msg);
+    void propertyRequestFinished(qint32 result, quint32 value);
+    void updatePasswordFinished(qint32 result);
+
+    void on_btnUdpatePassword_clicked();
 
 private:
     Ui::MainWindow *ui;

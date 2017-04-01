@@ -64,7 +64,6 @@ void MainConnection::readyReadMasterPort()
             }
         }
     }
-
     this->checkNewOncomingData();
 }
 

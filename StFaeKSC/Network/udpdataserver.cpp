@@ -2,6 +2,8 @@
 #include "../Common/Network/messageprotocol.h"
 #include "../Common/Network/messagecommand.h"
 #include "../Common/General/globalfunctions.h"
+#include "../Common/General/globaltiming.h"
+
 
 UdpDataServer::UdpDataServer(UserConData *pUsrConData, GlobalData *pGlobalData) : BackgroundWorker()
 {
@@ -23,9 +25,14 @@ int UdpDataServer::DoBackgroundWork()
     }
     connect(this->m_pUdpSocket, &QUdpSocket::readyRead, this, &UdpDataServer::readyReadSocketPort);
 
+    this->m_pConLoginTimer = new QTimer();
+    this->m_pConLoginTimer->setSingleShot(true);
+    this->m_pConLoginTimer->setInterval(CON_LOGIN_TIMEOUT_MSEC);
+    connect(this->m_pConLoginTimer, &QTimer::timeout, this, &UdpDataServer::onConnectionLoginTimeout);
+
     this->m_pConResetTimer = new QTimer();
     this->m_pConResetTimer->setSingleShot(true);
-    this->m_pConResetTimer->setInterval(10000);
+    this->m_pConResetTimer->setInterval(CON_RESET_TIMEOUT_MSEC);
     connect(this->m_pConResetTimer, &QTimer::timeout, this, &UdpDataServer::onConnectionResetTimeout);
     this->m_pConResetTimer->start();
 
@@ -36,8 +43,9 @@ int UdpDataServer::DoBackgroundWork()
 }
 
 void UdpDataServer::readyReadSocketPort()
-{
-    this->m_pConResetTimer->start();            // something was coming, reset timer
+{      
+    this->m_pConResetTimer->start();
+
 
     while(this->m_pUdpSocket->hasPendingDatagrams()) {
         QHostAddress sender;
@@ -54,6 +62,12 @@ void UdpDataServer::readyReadSocketPort()
     }
 
     this->checkNewOncomingData();
+}
+
+void UdpDataServer::onConnectionLoginTimeout()
+{
+    this->m_pUsrConData->bIsConnected = false;
+    qDebug().noquote() << QString("User %1 was inactive, logged out").arg(this->m_pUsrConData->userName);
 }
 
 void UdpDataServer::onConnectionResetTimeout()
@@ -82,29 +96,52 @@ void UdpDataServer::checkNewOncomingData()
 
 MessageProtocol *UdpDataServer::checkNewMessage(MessageProtocol *msg)
 {
+    MessageProtocol *ack = NULL;
+
     if (this->m_pUsrConData->bIsConnected) {
+
         switch(msg->getIndex()) {
         case OP_CODE_CMD_REQ::REQ_LOGIN_USER:
-            return this->m_pDataConnection->requestCheckUserLogin(msg);
+            ack = this->m_pDataConnection->requestCheckUserLogin(msg);
+            break;
+
+        case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
+            ack = this->m_pDataConnection->requestGetUserProperties();
+            break;
+
+        case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
+            ack = this->m_pDataConnection->requestUserChangeLogin(msg);
+            break;
+
         case OP_CODE_CMD_REQ::REQ_GET_VERSION:
-            return this->m_pDataConnection->requestGetProgramVersion(msg);
+            ack = this->m_pDataConnection->requestGetProgramVersion(msg);
+            break;
+
         default:
             qWarning().noquote() << QString("Unkown command %1").arg(msg->getIndex());
-            return NULL;
+            break;
         }
+        if (ack != NULL && this->m_pUsrConData->bIsConnected)
+            this->m_pConLoginTimer->start();        // reset Timer
     }
-    else if (msg->getIndex() == OP_CODE_CMD_REQ::REQ_LOGIN_USER)
-        return this->m_pDataConnection->requestCheckUserLogin(msg);
-    else
-        return new MessageProtocol(OP_CODE_CMD_RES::ACK_NOT_LOGGED_IN);
+    else if (msg->getIndex() == OP_CODE_CMD_REQ::REQ_LOGIN_USER) {
 
-    return NULL;
+        ack = this->m_pDataConnection->requestCheckUserLogin(msg);
+        if (this->m_pUsrConData->bIsConnected)
+            this->m_pConLoginTimer->start();        // start Timer
+    } else
+        ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_NOT_LOGGED_IN);
+
+    return ack;;
 }
 
 UdpDataServer::~UdpDataServer()
 {
     if (this->m_pDataConnection != NULL)
         delete this->m_pDataConnection;
+
+    if (this->m_pConLoginTimer != NULL)
+        delete this->m_pConLoginTimer;
 
     if (this->m_pConResetTimer != NULL)
         delete this->m_pConResetTimer;

@@ -1,4 +1,4 @@
-#ifndef MAINCONNECTION_H
+  #ifndef MAINCONNECTION_H
 #define MAINCONNECTION_H
 
 #include <QtCore/QObject>
