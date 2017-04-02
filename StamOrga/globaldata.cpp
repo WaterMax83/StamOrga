@@ -12,7 +12,6 @@ GlobalData::GlobalData(QObject *parent) : QObject(parent)
     this->uUserProperties = 0x0;
 
     int tmp = QHostInfo::lookupHost("watermax83.ddns.net", this, SLOT(callBackLookUpHost(QHostInfo)));
-    qDebug().noquote() << QString("Called lookup host %1").arg(tmp);
 }
 
 void GlobalData::loadGlobalSettings()

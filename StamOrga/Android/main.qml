@@ -11,11 +11,6 @@ ApplicationWindow {
     height: 960
     title: qsTr("StamOrga")
 
-//    SwipeView {
-//        id: swipeView
-//        anchors.fill: parent
-//        currentIndex: tabBar.currentIndex
-
     onClosing: {
 //        if( UserInterface.isDeviceMobile && stackView.depth > 1){
         if(stackView.depth > 1){
@@ -110,50 +105,12 @@ ApplicationWindow {
 
         initialItem: Pane {
             id: pane
-
-//            background: Color.blue
-//            background.color: "red"
-            Rectangle {
-                id: arrow
-                anchors.left: parent.left
-                anchors.bottom: parent.bottom
-                color: "red"
-                width: 200
-                height: 250
-            }
         }
-//        UserLogin {
-//            anchors.fill: parent
-//        }
-
     }
 
     function openUserLogin() {
         listView.currentIndex = 0
         stackView.push("qrc:/pages/UserLogin.qml")
     }
-
-
-
-
-//
-
-//        Page {
-//            Label {
-//                text: qsTr("Second page")
-//                anchors.centerIn: parent
-//            }
-//        }
-//    }
 }
 
-//    footer: TabBar {
-//        id: tabBar
-//        currentIndex: swipeView.currentIndex
-//        TabButton {
-//            text: qsTr("First")
-//        }
-//        TabButton {
-//            text: qsTr("Second")
-//        }
-//    }

@@ -15,8 +15,6 @@ UserInterface::UserInterface(QObject *parent) : QObject(parent)
 
 qint32 UserInterface::startSendingData(QString name, QString passw)
 {
-    qDebug() << "Started sending Data";
-
     this->m_pConHandle->setGlobalData(this->m_pGlobalData);
 
     return this->m_pConHandle->startMainConnection(name, passw);
@@ -24,7 +22,9 @@ qint32 UserInterface::startSendingData(QString name, QString passw)
 
 qint32 UserInterface::startUpdateUserPassword(QString newPassw)
 {
-    this->m_pConHandle->startUpdatePassword(newPassw);
+    if (this->m_pConHandle->startUpdatePassword(newPassw))
+        return ERROR_CODE_SUCCESS;
+    return ERROR_CODE_COMMON;
 }
 
 void UserInterface::slConnectionRequestFinished(qint32 result)
