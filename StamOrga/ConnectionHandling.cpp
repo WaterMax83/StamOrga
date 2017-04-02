@@ -26,7 +26,7 @@ qint32 ConnectionHandling::startMainConnection(QString name, QString passw)
     if (this->isMainConnectionActive())
     {
         if (name == this->m_pGlobalData->userName()) {
-            if (this->m_pGlobalData->bIsConnected && passw == this->m_pGlobalData->passWord()) {
+            if (this->m_pGlobalData->bIsConnected() && passw == this->m_pGlobalData->passWord()) {
                 emit this->sNotifyConnectionFinished(ERROR_CODE_SUCCESS);
                 qDebug() << "Saving to log in again, should already be succesfull";
                 return ERROR_CODE_NO_ERROR;
@@ -113,7 +113,7 @@ void ConnectionHandling::slDataConLoginFinished(qint32 result)
 
     if (result == ERROR_CODE_SUCCESS) {
         qInfo().noquote() << "Logged in succesfully";
-        this->m_pGlobalData->bIsConnected = true;
+        this->m_pGlobalData->setbIsConnected(true);
         this->m_pTimerLoginReset->start();
     } else {
         qWarning().noquote() << QString("Error Login: %1").arg(getErrorCodeString(result));
@@ -180,13 +180,18 @@ void ConnectionHandling::sendUpdatePasswordRequest(QString newPassWord)
     emit this->sStartSendUpdatePasswordRequest(newPassWord);
 }
 
-void ConnectionHandling::slDataConUpdPassFinished(qint32 result)
+void ConnectionHandling::slDataConUpdPassFinished(qint32 result, QString newPassWord)
 {
     this->startDataConnection();                        // call it every time, if it is already started it just returns
     connect(this->m_pDataCon, &DataConnection::notifyUpdPassRequest,
             this, &ConnectionHandling::slDataConUpdPassFinished);
 
-    emit this->sNotifyUpdatePasswordRequest(result);
+    if (result == ERROR_CODE_SUCCESS) {
+        this->m_pGlobalData->setPassWord(newPassWord);
+        this->m_pGlobalData->saveGlobalUserSettings();
+    }
+
+    emit this->sNotifyUpdatePasswordRequest(result, newPassWord);
     this->checkTimeoutResult(result);
 }
 
@@ -196,7 +201,7 @@ void ConnectionHandling::checkTimeoutResult(qint32 result)
     if (result == ERROR_CODE_TIMEOUT) {
         this->m_ctrlMainCon.Stop();
         this->stopDataConnection();
-    } else if (this->m_pGlobalData->bIsConnected)
+    } else if (this->m_pGlobalData->bIsConnected())
         this->m_pTimerLoginReset->start();              // restart Timer
 }
 
@@ -222,7 +227,7 @@ void ConnectionHandling::startDataConnection()
 
 void ConnectionHandling::stopDataConnection()
 {
-    this->m_pGlobalData->bIsConnected = false;
+    this->m_pGlobalData->setbIsConnected(false);
 
     if (!this->isDataConnectionActive())
         return;
@@ -246,7 +251,7 @@ void ConnectionHandling::slTimerConResetFired()
 
 void ConnectionHandling::slTimerConLoginFired()
 {
-    this->m_pGlobalData->bIsConnected = false;
+    this->m_pGlobalData->setbIsConnected(false);
 }
 
 ConnectionHandling::~ConnectionHandling()

@@ -8,7 +8,7 @@ GlobalData::GlobalData(QObject *parent) : QObject(parent)
 {
     QGuiApplication::setOrganizationName("WaterMax");
     QGuiApplication::setApplicationName("StamOrga");
-    this->bIsConnected = false;
+    this->setbIsConnected(false);
     this->uUserProperties = 0x0;
 
     int tmp = QHostInfo::lookupHost("watermax83.ddns.net", this, SLOT(callBackLookUpHost(QHostInfo)));

@@ -34,7 +34,7 @@ signals:
     void sNotifyConnectionFinished(qint32 result);
     void sNotifyVersionRequest(qint32 result, QString msg);
     void sNotifyUserPropertiesRequest(qint32 result, quint32 value);
-    void sNotifyUpdatePasswordRequest(qint32 result);
+    void sNotifyUpdatePasswordRequest(qint32 result, QString newPassWord);
 
     void sStartSendLoginRequest();
     void sStartSendVersionRequest();
@@ -48,7 +48,7 @@ private slots:
     void slDataConLoginFinished(qint32 result);
     void slDataConVersionFinished(qint32 result, QString msg);
     void slDataConUserPropsFinished(qint32 result, quint32 value);
-    void slDataConUpdPassFinished(qint32 result);
+    void slDataConUpdPassFinished(qint32 result, QString newPassWord);
 
     void slTimerConResetFired();
     void slTimerConLoginFired();

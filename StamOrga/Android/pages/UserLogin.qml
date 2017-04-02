@@ -18,37 +18,30 @@ Flickable {
 
         ColumnLayout {
             id: mainColumnLayout
-            width: parent.width
+            width: pane.width
             spacing: 35
-
-//            anchors.bottom: parent.bottom
-//            anchors.bottomMargin: 20
-//            anchors.right: parent.right
-//            anchors.rightMargin: 0
-//            anchors.left: parent.left
-//            anchors.leftMargin: 0
-//            anchors.top: parent.top
-//            anchors.topMargin: 20
 
             TextField {
                 id: txtIPAddress
                 text: globalUserData.ipAddr
-                implicitWidth: 250
+                implicitWidth: mainColumnLayout.width / 3 * 2
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 placeholderText: qsTr("Text Field")
+                visible: userInt.isDebuggingEnabled()
             }
 
-            SpinBox {
-                id: spBoxPort
-                to: 100000
-                from: 1
-                value: globalUserData.conMasterPort
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            }
+//            SpinBox {
+//                id: spBoxPort
+//                to: 100000
+//                from: 1
+//                value: globalUserData.conMasterPort
+//                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+//            }
 
             ColumnLayout {
                 id: columnLayout2
                 spacing: 5
+                width: mainColumnLayout.width
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
                 Label {
@@ -61,13 +54,14 @@ Flickable {
                     id: txtUserName
                     text: globalUserData.userName
                     padding: 8
-                    implicitWidth: 250
+                    implicitWidth: mainColumnLayout.width / 3 * 2
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }
             }
 
             ColumnLayout {
                 id: columnLayout3
+                width: mainColumnLayout.width
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
                 Label {
@@ -79,7 +73,7 @@ Flickable {
                 TextField {
                     id: txtPassWord
                     text: globalUserData.passWord
-                    implicitWidth: 250
+                    implicitWidth: mainColumnLayout.width / 3 * 2
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }
             }
@@ -116,12 +110,13 @@ Flickable {
             Button {
                 id: btnSendData
                 text: qsTr("Verbindung prüfen")
-                implicitWidth: 250
+                implicitWidth: mainColumnLayout.width / 4 * 2
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 transformOrigin: Item.Center
                 onClicked: {
-                    globalUserData.ipAddr = txtIPAddress.text
-                    globalUserData.conPort = spBoxPort.value
+                    if (userInt.isDebuggingEnabled())
+                        globalUserData.ipAddr = txtIPAddress.text
+//                    globalUserData.conPort = spBoxPort.value
                     if (userInt.startSendingData(txtUserName.text, txtPassWord.text) > 0) {
                         btnSendData.enabled = false
                         busyConnectIndicator.visible = true;
@@ -130,6 +125,28 @@ Flickable {
                     }
                 }
             }
+
+            ToolSeparator {
+                id: toolSeparator2
+                orientation: "Horizontal"
+                implicitWidth: mainColumnLayout.width / 3 * 1
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            }
+
+            Button {
+                id: btnChangePassWord
+                text: qsTr("Password ändern")
+                implicitWidth: mainColumnLayout.width / 4 * 2
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                transformOrigin: Item.Center
+                enabled: globalUserData.bIsConnected
+                onClicked: {
+                    txtnewPassWord.text = ""
+                    txtnewPassWordReplay.text = ""
+                    changePassWordDialog.open()
+                }
+            }
+
         }
     }
 
@@ -147,10 +164,10 @@ Flickable {
             else {
                 btnSendData.background.color = "red"
                 if (result === -3)  {  // timeout
-                    txtInfoConnecting.text = "Fehler: keine Antwort"
+                    txtInfoConnecting.text = "Fehler: keine Verbindung"
                 }
                 else {
-                    txtInfoConnecting.text = "Verbindungsdaten fehlerhaft"
+                    txtInfoConnecting.text = "Benutzerdaten fehlerhaft"
                 }
             }
         }
@@ -159,6 +176,105 @@ Flickable {
             if (result === 5) {
                 versionDialogTextUpdate.text = msg;
                 versionDialog.open()
+            }
+        }
+        onNotifyUpdatePasswordRequestFinished: {
+            busyConnectIndicator.visible = false;
+            if (result === 1)
+                txtInfoConnecting.text = "Passwort erfolgreich geändert"
+            else
+                txtInfoConnecting.text = "Fehler beim Passwort ändern"
+        }
+    }
+
+    Dialog {
+        id: changePassWordDialog
+        x: Math.round((flickable.width - width) / 2)
+        y: Math.round(flickable.height / 6)
+        width: Math.round(Math.min(flickable.width, flickable.height) / 3 * 2)
+        modal: true
+        focus: true
+        title: "Password ändern"
+
+        standardButtons: Dialog.Ok | Dialog.Cancel
+        onAccepted: {
+//            settings.style = styleBox.displayText
+            labelPasswordTooShort.visible = false
+            labelPasswordDiffer.visible = false
+            if (txtnewPassWord.text.length < 6) {
+                labelPasswordTooShort.visible = true
+                changePassWordDialog.open()
+            } else if (txtnewPassWord.text == txtnewPassWordReplay.text) {
+                userInt.startUpdateUserPassword(txtnewPassWord.text)
+                busyConnectIndicator.visible = true;
+                txtInfoConnecting.visible = true;
+                txtInfoConnecting.text = "Ändere Passwort"
+                changePassWordDialog.close()
+            } else {
+                labelPasswordDiffer.visible = true
+                changePassWordDialog.open()
+            }
+        }
+        onRejected: {
+            changePassWordDialog.close()
+            labelPasswordTooShort.visible = false
+            labelPasswordDiffer.visible = false
+        }
+
+        contentItem: ColumnLayout {
+            id: changePasswordColumn
+            width: changePassWordDialog.width
+            spacing: 20
+
+            ColumnLayout {
+                id: columnLayoutChPass2
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+
+                Label {
+                    id: labelChaPass1
+                    text: qsTr("neues Passwort")
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                }
+
+                TextField {
+                    id: txtnewPassWord
+                    text: globalUserData.passWord
+                    implicitWidth: changePasswordColumn.width / 4 * 3
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                }
+            }
+
+            ColumnLayout {
+                id: columnLayoutChPass3
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+
+                Label {
+                    id: labelChaPass2
+                    text: qsTr("Passwort wiederholen")
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                }
+
+                TextField {
+                    id: txtnewPassWordReplay
+                    text: globalUserData.passWord
+                    implicitWidth: changePasswordColumn.width / 4 * 3
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                }
+            }
+
+            Label {
+                id: labelPasswordDiffer
+                visible: false
+                text: qsTr("Passwörter stimmen nicht überein")
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                color: "red"
+            }
+            Label {
+                id: labelPasswordTooShort
+                visible: false
+                text: qsTr("Das Passwort muss mindestens 6 Zeichen lang sein")
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                color: "orange"
             }
         }
     }

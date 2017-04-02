@@ -31,7 +31,7 @@ signals:
     void notifyLoginRequest(qint32 result);
     void notifyVersionRequest(qint32 result, QString msg);
     void notifyUserPropsRequest(qint32 result, quint32 value);
-    void notifyUpdPassRequest(qint32 result);
+    void notifyUpdPassRequest(qint32 result, QString passw);
 
 public slots:
     void startSendLoginRequest();
@@ -56,6 +56,7 @@ private:
     void checkNewOncomingData();
     qint32 sendMessageRequest(MessageProtocol *msg, QVariant *data = NULL);
     void removeActualRequest(quint32 req);
+    QVariant getActualRequestData(quint32);
 
     bool    m_bRequestLoginAgain;
     void sendActualRequestsAgain();

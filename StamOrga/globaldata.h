@@ -12,6 +12,7 @@ class GlobalData : public QObject
     Q_PROPERTY(QString passWord READ passWord WRITE setPassWord NOTIFY passWordChanged)
     Q_PROPERTY(QString ipAddr READ ipAddr WRITE setIpAddr NOTIFY ipAddrChanged)
     Q_PROPERTY(quint32 conMasterPort READ conMasterPort WRITE setConMasterPort NOTIFY conMasterPortChanged)
+    Q_PROPERTY(bool bIsConnected READ bIsConnected WRITE setbIsConnected NOTIFY bIsConnectedChanged)
 public:
     explicit GlobalData(QObject *parent = 0);
 
@@ -61,7 +62,14 @@ public:
         }
     }
 
-    bool bIsConnected;
+    bool bIsConnected() { return this->m_bIsConnected; }
+    void setbIsConnected(bool enable)
+    {
+        if (this->m_bIsConnected != enable) {
+            this->m_bIsConnected = enable;
+            emit this->bIsConnectedChanged();
+        }
+    }
     quint32 uUserProperties;
 
     void saveGlobalUserSettings();
@@ -71,6 +79,7 @@ signals:
     void passWordChanged();
     void ipAddrChanged();
     void conMasterPortChanged();
+    void bIsConnectedChanged();
 
 public slots:
 
@@ -82,6 +91,8 @@ private:
     QString m_passWord;
     QString m_ipAddress;
     quint32 m_uMasterPort;
+
+    bool m_bIsConnected;
 
     quint16 m_uDataPort;
 

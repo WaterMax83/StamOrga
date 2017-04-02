@@ -302,7 +302,7 @@ bool ListedUser::updateUserLoginValue(UserLogin *pUserLog, QString key, QVariant
         }
     }
     this->m_pUserSettings->endArray();
-    this->m_pUserSettings->endArray();
+    this->m_pUserSettings->endGroup();
     return rValue;
 }
 

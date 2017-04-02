@@ -92,8 +92,12 @@ void DataConnection::checkNewOncomingData()
             break;
         }
         case OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN:
-            emit this->notifyUpdPassRequest(msg->getIntData());
+        {
+            qint32 result = msg->getIntData();
+            QVariant passw = this->getActualRequestData(msg->getIndex() & 0x00FFFFFF);
+            emit this->notifyUpdPassRequest(result, passw.toString());
             break;
+        }
         case OP_CODE_CMD_RES::ACK_NOT_LOGGED_IN:
             if (!this->m_bRequestLoginAgain) {
                 this->m_bRequestLoginAgain = true;
@@ -156,7 +160,7 @@ void DataConnection::startSendUpdPassRequest(QString newPassWord)
     QVariant tmp(newPassWord);
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN, passReq);
     if (this->sendMessageRequest(&msg, &tmp) < 0)
-        emit this->notifyUpdPassRequest(ERROOR_CODE_ERR_SEND);
+        emit this->notifyUpdPassRequest(ERROOR_CODE_ERR_SEND, "");
 }
 
 void DataConnection::connectionTimeoutFired()
@@ -211,6 +215,14 @@ void DataConnection::removeActualRequest(quint32 req)
         if (this->m_lActualRequest[i].request == req)
             this->m_lActualRequest.removeAt(i);
     }
+}
+QVariant DataConnection::getActualRequestData(quint32 req)
+{
+    for (int i=0; i<this->m_lActualRequest.size(); i++) {
+        if (this->m_lActualRequest[i].request == req)
+            return this->m_lActualRequest[i].data;
+    }
+    return QVariant(0);
 }
 
 void DataConnection::sendActualRequestsAgain()

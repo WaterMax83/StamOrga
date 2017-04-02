@@ -19,12 +19,25 @@ public:
 
     Q_INVOKABLE qint32 startSendingData(QString name, QString passw);
 
+    Q_INVOKABLE qint32 startUpdateUserPassword(QString newPassw);
 
-//    QString userName() { return this->m_UserName; }
-//    void setUserName(const QString &s) { this->m_UserName = s; }
+    Q_INVOKABLE bool isDebuggingEnabled()
+    {
+#ifdef QT_DEBUG
+        return true;
+#else
+        return false;
+#endif
+    }
 
-//    QString ipAddr() { return this->m_ipAddr; }
-//    void setIpAddr(const QString &s) { this->m_ipAddr = s; }
+    Q_INVOKABLE bool isDeviceMobile()
+    {
+#ifdef Q_OS_ANDROID
+        return true;
+#else
+        return false;
+#endif
+    }
 
     GlobalData *globalData() { return this->m_pGlobalData; }
     void setGlobalData(GlobalData *pData) { this->m_pGlobalData = pData; }
@@ -32,10 +45,12 @@ public:
 signals:
     void notifyConnectionFinished(qint32 result);
     void notifyVersionRequestFinished(qint32 result, QString msg);
+    void notifyUpdatePasswordRequestFinished(qint32 result, QString newPassWord);
 
 public slots:
     void slConnectionRequestFinished(qint32 result);
     void slVersionRequestFinished(qint32 result, QString msg);
+    void slUpdatePasswordRequestFinished(qint32 result, QString newPassWord);
 
 
 private:
