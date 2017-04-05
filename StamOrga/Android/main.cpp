@@ -3,11 +3,12 @@
 #include <QtQml/QQmlContext>
 #include <QtCore/QSettings>
 #include <QtCore/QMetaObject>
+#include <QtCore/QDateTime>
 
 
 #include "userinterface.h"
 #include "../../Common/General/globalfunctions.h"
-#include "../globaldata.h"
+#include "../Data/globaldata.h"
 
 int main(int argc, char *argv[])
 {
@@ -23,7 +24,7 @@ int main(int argc, char *argv[])
     // global data class
     GlobalData globalUserData;
 
-    // engine to start qml display
+    // engine to start qml display -> takes about half a second
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("globalUserData", &globalUserData);
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));
@@ -41,12 +42,11 @@ int main(int argc, char *argv[])
 #endif
 
     QObject *pRootObject = engine.rootObjects().first();
-    QMetaObject::invokeMethod(pRootObject, "openUserLogin");
+    if (globalUserData.userName().size() == 0)
+        QMetaObject::invokeMethod(pRootObject, "openUserLogin", Q_ARG(QVariant, true));
+    else
+        QMetaObject::invokeMethod(pRootObject, "openUserLogin", Q_ARG(QVariant, false));
 
-//    if (globalUserData.userName().size() == 0) {
-
-
-//    }
 
     return app.exec();
 }

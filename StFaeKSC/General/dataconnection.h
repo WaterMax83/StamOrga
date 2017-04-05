@@ -17,6 +17,7 @@ public:
     MessageProtocol *requestGetUserProperties();
     MessageProtocol *requestUserChangeLogin(MessageProtocol *msg);
     MessageProtocol *requestGetProgramVersion(MessageProtocol *msg);
+    MessageProtocol *requestGetGamesList(MessageProtocol *msg);
 
     void setUserConnectionData(UserConData * pUsrConData) { this->m_pUserConData = pUsrConData; }
 

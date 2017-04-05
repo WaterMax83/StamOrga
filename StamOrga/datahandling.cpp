@@ -4,12 +4,10 @@
 #include "../Common/General/globalfunctions.h"
 #include "../Common/General/config.h"
 
-DataHandling::DataHandling()
+DataHandling::DataHandling(GlobalData *pData)
 {
-
+    this->m_pGlobalData = pData;
 }
-
-
 
 qint32 DataHandling::getHandleLoginResponse(MessageProtocol *msg)
 {
@@ -43,6 +41,65 @@ qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol *msg, quint32 *p
     const char *pData = msg->getPointerToData();
     qint32 rValue = qFromBigEndian(*((qint32 *)pData));
     *props = qFromBigEndian(*((quint32 *)(pData + 4)));
+
+    return rValue;
+}
+
+qint32 DataHandling::getHandleGamesListResponse(MessageProtocol *msg)
+{
+    if (msg->getDataLength() < 8)
+        return ERROR_CODE_WRONG_SIZE;
+
+    const char *pData = msg->getPointerToData();
+    qint32 rValue = qFromBigEndian(*((qint32 *)pData));
+
+    if (rValue != ERROR_CODE_SUCCESS)
+        return rValue;
+
+    quint32 totalSize = msg->getDataLength();
+    quint32 offset = 4;
+    quint16 totalPacks = qFromBigEndian(*(quint16 *)(pData + offset));
+
+    offset += 2;
+    while(offset < totalSize && totalPacks > 0) {
+        GamePlay play;
+        quint16 size = qFromBigEndian(*(qint16 *)(pData + offset));
+        offset += 2;
+
+        if (size <= 8) {
+            qWarning().noquote() << QString("Size is to small %1").arg(size);
+            break;
+        }
+
+        quint16 version = qFromBigEndian(*(qint16 *)(pData + offset));
+        if (version != 0x1) {
+            qWarning().noquote() << QString("Unknown game version %1").arg(version);
+            break;
+        }
+        offset += 2;
+        play.index = *(qint8 *)(pData + offset);
+        offset += 1;
+        play.comp = *(qint8 *)(pData + offset);
+        offset += 1;
+
+
+        play.timestamp = qFromBigEndian(*(qint64 *)(pData + offset));
+        offset += 8;
+
+        QString playString(QByteArray(pData + offset, size - 8));
+        offset += (size - 12);
+        QStringList lplayString = playString.split(";");
+
+        if (lplayString.size() > 0)
+            play.home = lplayString.value(0);
+        if (lplayString.size() > 1)
+            play.away = lplayString.value(1);
+        if (lplayString.size() > 2)
+            play.score = lplayString.value(2);
+
+        this->m_pGlobalData->addNewGamePlay(play);
+        totalPacks--;
+    }
 
     return rValue;
 }

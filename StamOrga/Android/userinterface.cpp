@@ -11,9 +11,11 @@ UserInterface::UserInterface(QObject *parent) : QObject(parent)
             this, &UserInterface::slVersionRequestFinished);
     connect(this->m_pConHandle, &ConnectionHandling::sNotifyUpdatePasswordRequest,
             this, &UserInterface::slUpdatePasswordRequestFinished);
+    connect(this->m_pConHandle, &ConnectionHandling::sNotifyGamesListRequest,
+            this, &UserInterface::slGettingGamesListFinished);
 }
 
-qint32 UserInterface::startSendingData(QString name, QString passw)
+qint32 UserInterface::startMainConnection(QString name, QString passw)
 {
     this->m_pConHandle->setGlobalData(this->m_pGlobalData);
 
@@ -22,16 +24,20 @@ qint32 UserInterface::startSendingData(QString name, QString passw)
 
 qint32 UserInterface::startUpdateUserPassword(QString newPassw)
 {
-    if (this->m_pConHandle->startUpdatePassword(newPassw))
-        return ERROR_CODE_SUCCESS;
-    return ERROR_CODE_COMMON;
+    return this->m_pConHandle->startUpdatePassword(newPassw);
+}
+
+qint32 UserInterface::startGettingGamesList()
+{
+    return this->m_pConHandle->startGettingGamesList();
 }
 
 void UserInterface::slConnectionRequestFinished(qint32 result)
 {
     //this->ui->btnSendData->setEnabled(true);
     emit this->notifyConnectionFinished(result);
-    this->m_pConHandle->startGettingInfo();
+    this->m_pConHandle->startGettingVersionInfo();
+    this->m_pConHandle->startGettingUserProps();
 }
 
 void UserInterface::slVersionRequestFinished(qint32 result, QString msg)
@@ -43,4 +49,9 @@ void UserInterface::slVersionRequestFinished(qint32 result, QString msg)
 void UserInterface::slUpdatePasswordRequestFinished(qint32 result, QString newPassWord)
 {
     emit this->notifyUpdatePasswordRequestFinished(result, newPassWord);
+}
+
+void UserInterface::slGettingGamesListFinished(qint32 result)
+{
+    emit this->notifyGamesListFinished(result);
 }

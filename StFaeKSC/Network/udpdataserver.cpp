@@ -117,6 +117,10 @@ MessageProtocol *UdpDataServer::checkNewMessage(MessageProtocol *msg)
             ack = this->m_pDataConnection->requestGetProgramVersion(msg);
             break;
 
+        case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
+            ack = this->m_pDataConnection->requestGetGamesList(msg);
+            break;
+
         default:
             qWarning().noquote() << QString("Unkown command %1").arg(msg->getIndex());
             break;

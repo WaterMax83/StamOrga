@@ -30,8 +30,8 @@ ListedUser::ListedUser()
             this->m_pUserSettings->setArrayIndex(i);
             QString name = this->m_pUserSettings->value(LOGIN_USERNAME, "").toString();
             QString passw = this->m_pUserSettings->value(LOGIN_PASSWORD, "").toString();
-            quint32 prop = this->m_pUserSettings->value(LOGIN_PROPERTIES, 0x0).toInt();
-            quint32 index = this->m_pUserSettings->value(LOGIN_INDEX, 0).toInt();
+            quint32 prop = this->m_pUserSettings->value(LOGIN_PROPERTIES, 0x0).toUInt();
+            quint32 index = this->m_pUserSettings->value(LOGIN_INDEX, 0).toUInt();
             if (!this->addNewUserLogin(name, passw, prop, index))
                 bProblems = true;
         }

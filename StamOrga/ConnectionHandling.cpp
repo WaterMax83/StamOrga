@@ -56,9 +56,14 @@ qint32 ConnectionHandling::startMainConnection(QString name, QString passw)
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 ConnectionHandling::startGettingInfo()
+qint32 ConnectionHandling::startGettingVersionInfo()
 {
     this->sendVersionRequest();
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 ConnectionHandling::startGettingUserProps()
+{
     this->sendUserPropertiesRequest();
     return ERROR_CODE_SUCCESS;
 }
@@ -67,6 +72,12 @@ bool ConnectionHandling::startUpdatePassword(QString newPassWord)
 {
     this->sendUpdatePasswordRequest(newPassWord);
     return true;
+}
+
+qint32 ConnectionHandling::startGettingGamesList()
+{
+    this->sendGamesListRequest();
+    return ERROR_CODE_SUCCESS;
 }
 
 /*
@@ -182,8 +193,7 @@ void ConnectionHandling::sendUpdatePasswordRequest(QString newPassWord)
 
 void ConnectionHandling::slDataConUpdPassFinished(qint32 result, QString newPassWord)
 {
-    this->startDataConnection();                        // call it every time, if it is already started it just returns
-    connect(this->m_pDataCon, &DataConnection::notifyUpdPassRequest,
+    disconnect(this->m_pDataCon, &DataConnection::notifyUpdPassRequest,
             this, &ConnectionHandling::slDataConUpdPassFinished);
 
     if (result == ERROR_CODE_SUCCESS) {
@@ -192,6 +202,27 @@ void ConnectionHandling::slDataConUpdPassFinished(qint32 result, QString newPass
     }
 
     emit this->sNotifyUpdatePasswordRequest(result, newPassWord);
+    this->checkTimeoutResult(result);
+}
+
+/*
+ * Functions for getting Games list
+ */
+void ConnectionHandling::sendGamesListRequest()
+{
+    this->startDataConnection();
+    connect(this->m_pDataCon, &DataConnection::notifyGamesListRequest,
+            this, &ConnectionHandling::slDataConGamesListFinished);
+
+    emit this->sStartSendGamesListRequest();
+}
+
+void ConnectionHandling::slDataConGamesListFinished(qint32 result)
+{
+    disconnect(this->m_pDataCon, &DataConnection::notifyGamesListRequest,
+            this, &ConnectionHandling::slDataConGamesListFinished);
+
+    emit this->sNotifyGamesListRequest(result);
     this->checkTimeoutResult(result);
 }
 
@@ -221,6 +252,8 @@ void ConnectionHandling::startDataConnection()
             this->m_pDataCon, &DataConnection::startSendUserPropsRequest);
     connect(this, &ConnectionHandling::sStartSendUpdatePasswordRequest,
             this->m_pDataCon, &DataConnection::startSendUpdPassRequest);
+    connect(this, &ConnectionHandling::sStartSendGamesListRequest,
+            this->m_pDataCon, &DataConnection::startSendGamesListRequest);
 
     this->m_ctrlDataCon.Start(this->m_pDataCon, false);
 }
@@ -240,6 +273,8 @@ void ConnectionHandling::stopDataConnection()
             this->m_pDataCon, &DataConnection::startSendUserPropsRequest);
     disconnect(this, &ConnectionHandling::sStartSendUpdatePasswordRequest,
             this->m_pDataCon, &DataConnection::startSendUpdPassRequest);
+    disconnect(this, &ConnectionHandling::sStartSendGamesListRequest,
+            this->m_pDataCon, &DataConnection::startSendGamesListRequest);
 
     this->m_ctrlDataCon.Stop();
 }

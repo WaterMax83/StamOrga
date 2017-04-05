@@ -51,7 +51,7 @@ QString getErrorCodeString(qint32 code)
         return QString("Wrong data size: %1").arg(code);
     case ERROR_CODE_TIMEOUT:
         return QString("No answer, timeout: %1").arg(code);
-    case ERROOR_CODE_ERR_SEND:
+    case ERROR_CODE_ERR_SEND:
         return QString("Error sending data: %1").arg(code);
     case ERROR_CODE_NO_ANSWER:
         return QString("Did not get an answer: %1").arg(code);

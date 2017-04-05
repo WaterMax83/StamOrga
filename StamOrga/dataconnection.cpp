@@ -22,6 +22,8 @@ int DataConnection::DoBackgroundWork()
     this->m_pConTimeout->setInterval(3000);
     connect(this->m_pConTimeout, &QTimer::timeout, this, &DataConnection::connectionTimeoutFired);
 
+    this->m_pDataHandle = new DataHandling(this->m_pGlobalData);
+
     this->m_pDataUdpSocket = new QUdpSocket();
     if (!this->m_pDataUdpSocket->bind())
     {
@@ -74,20 +76,20 @@ void DataConnection::checkNewOncomingData()
                 this->m_bRequestLoginAgain = false;
             }
             else
-                emit this->notifyLoginRequest(this->m_dataHandle.getHandleLoginResponse(msg));
+                emit this->notifyLoginRequest(this->m_pDataHandle->getHandleLoginResponse(msg));
             break;
 
         case OP_CODE_CMD_RES::ACK_GET_VERSION:
         {
             QString version;
-            qint32 uVersion = this->m_dataHandle.getHandleVersionResponse(msg, &version);
+            qint32 uVersion = this->m_pDataHandle->getHandleVersionResponse(msg, &version);
             emit this->notifyVersionRequest(uVersion, version);
             break;
         }
         case OP_CODE_CMD_RES::ACK_GET_USER_PROPS:
         {
             quint32 props;
-            qint32 rValue = this->m_dataHandle.getHandleUserPropsResponse(msg, &props);
+            qint32 rValue = this->m_pDataHandle->getHandleUserPropsResponse(msg, &props);
             emit this->notifyUserPropsRequest(rValue, props);
             break;
         }
@@ -105,6 +107,12 @@ void DataConnection::checkNewOncomingData()
             }
             break;
 
+        case OP_CODE_CMD_RES::ACK_GET_GAMES_LIST:
+        {
+            qint32 result = this->m_pDataHandle->getHandleGamesListResponse(msg);
+            emit this->notifyGamesListRequest(result);
+            break;
+        }
         default:
             delete msg;
             continue;
@@ -122,7 +130,7 @@ void DataConnection::startSendLoginRequest()
     aPassw.append(this->m_pGlobalData->passWord());
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_LOGIN_USER, aPassw);
     if (this->sendMessageRequest(&msg) < 0)
-        emit this->notifyLoginRequest(ERROOR_CODE_ERR_SEND);
+        emit this->notifyLoginRequest(ERROR_CODE_ERR_SEND);
 }
 
 void DataConnection::startSendVersionRequest()
@@ -135,14 +143,14 @@ void DataConnection::startSendVersionRequest()
     version.append(QString(STAM_ORGA_VERSION_S));
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_GET_VERSION, version);
     if (this->sendMessageRequest(&msg) < 0)
-        emit this->notifyVersionRequest(ERROOR_CODE_ERR_SEND, "");
+        emit this->notifyVersionRequest(ERROR_CODE_ERR_SEND, "");
 }
 
 void DataConnection::startSendUserPropsRequest()
 {
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_GET_USER_PROPS);
     if (this->sendMessageRequest(&msg) < 0)
-        emit this->notifyUserPropsRequest(ERROOR_CODE_ERR_SEND, 0);
+        emit this->notifyUserPropsRequest(ERROR_CODE_ERR_SEND, 0);
 }
 
 void DataConnection::startSendUpdPassRequest(QString newPassWord)
@@ -160,7 +168,14 @@ void DataConnection::startSendUpdPassRequest(QString newPassWord)
     QVariant tmp(newPassWord);
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN, passReq);
     if (this->sendMessageRequest(&msg, &tmp) < 0)
-        emit this->notifyUpdPassRequest(ERROOR_CODE_ERR_SEND, "");
+        emit this->notifyUpdPassRequest(ERROR_CODE_ERR_SEND, "");
+}
+
+void DataConnection::startSendGamesListRequest()
+{
+    MessageProtocol msg(OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST);
+    if (this->sendMessageRequest(&msg) < 0)
+        emit this->notifyGamesListRequest(ERROR_CODE_ERR_SEND);
 }
 
 void DataConnection::connectionTimeoutFired()
@@ -179,6 +194,9 @@ void DataConnection::connectionTimeoutFired()
         case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
             emit this->notifyUserPropsRequest(ERROR_CODE_NO_ANSWER, 0);
             break;
+
+        case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
+            emit this->notifyGamesListRequest(ERROR_CODE_NO_ANSWER);
         }
         this->m_lActualRequest.removeLast();
     }
@@ -241,6 +259,10 @@ void DataConnection::sendActualRequestsAgain()
             this->startSendUpdPassRequest(this->m_lActualRequest[i].data.toString());
             break;
 
+        case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
+            this->startSendGamesListRequest();
+            break;
+
         default:
             continue;
         }
@@ -251,4 +273,7 @@ DataConnection::~DataConnection()
 {
     if (this->m_pDataUdpSocket != NULL)
         delete this->m_pDataUdpSocket;
+
+    if (this->m_pDataHandle != NULL)
+        delete this->m_pDataHandle;
 }

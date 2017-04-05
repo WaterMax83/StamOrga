@@ -17,12 +17,14 @@ SOURCES += main.cpp \
     ../Common/Network/messageprotocol.cpp \
     ../Common/Network/messagecommand.cpp \
     General/globaldata.cpp \
-    General/listeduser.cpp \
     General/console.cpp \
     Network/udpdataserver.cpp \
     ../Common/General/logging.cpp \
     ../Common/General/globalfunctions.cpp \
-    General/dataconnection.cpp
+    General/dataconnection.cpp \
+    Data/listeduser.cpp \
+    Data/games.cpp \
+    Data/readdatacsv.cpp
 
 HEADERS += \
     ../Common/General/backgroundcontroller.h \
@@ -34,14 +36,16 @@ HEADERS += \
     ../Common/General/globaltiming.h \
     ../Common/Network/messagecommand.h \
     General/globaldata.h \
-    General/listeduser.h \
     ../Common/General/globalfunctions.h \
     General/console.h \
     General/usercommand.h \
     Network/udpdataserver.h \
     Network/connectiondata.h \
     ../Common/General/logging.h \
-    General/dataconnection.h
+    General/dataconnection.h \
+    Data/listeduser.h \
+    Data/games.h \
+    Data/readdatacsv.h
 
 
 unix {

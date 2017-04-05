@@ -1,8 +1,11 @@
 import QtQuick 2.7
-import QtQuick.Controls 2.0
+import QtQuick.Controls 2.1
 import QtQuick.Layouts 1.0
 
 import com.watermax.demo 1.0
+
+import "pages" as MyPages
+import "components" as MyComponents
 
 ApplicationWindow {
     id: window
@@ -12,8 +15,7 @@ ApplicationWindow {
     title: qsTr("StamOrga")
 
     onClosing: {
-//        if( UserInterface.isDeviceMobile && stackView.depth > 1){
-        if(stackView.depth > 1){
+        if( userInt.isDeviceMobile() && stackView.depth > 1){
             close.accepted = false
             stackView.pop();
             listView.currentIndex = -1
@@ -64,6 +66,24 @@ ApplicationWindow {
                 verticalAlignment: Qt.AlignVCenter
                 Layout.fillWidth: true
             }
+
+            ToolButton {
+                contentItem: Image {
+                    fillMode: Image.Pad
+                    horizontalAlignment: Image.AlignHCenter
+                    verticalAlignment: Image.AlignVCenter
+                    source:  "images/refresh.png"
+                    visible: stackView.depth > 1 ? false : true
+                }
+                onClicked: {
+
+                    if (userInt.startMainConnection(globalUserData.userName, globalUserData.passWord) > 0) {
+                        busyLoadingIndicator.visible = true
+                        txtInfoLoading.text = "Verbinde"
+                        txtInfoLoading.visible = true
+                    }
+                }
+            }
         }
     }
 
@@ -104,13 +124,114 @@ ApplicationWindow {
         anchors.fill: parent
 
         initialItem: Pane {
-            id: pane
+            id: mainPane
+            width: parent.width
+
+            ColumnLayout {
+                id: mainColumnLayout
+                anchors.right: parent.right
+                anchors.left: parent.left
+                width: parent.width
+                ColumnLayout {
+                    id: columnLayoutBusyInfo
+                    spacing: 5
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+
+                    BusyIndicator {
+                        id: busyLoadingIndicator
+                        visible: false
+                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    }
+
+                    Label {
+                        id: txtInfoLoading
+                        visible: false
+                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    }
+                }
+                ColumnLayout {
+                    id: columnLayoutGames
+                    anchors.right: parent.right
+                    anchors.left: parent.left
+                    width: parent.width
+                    spacing: 10
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                }
+            }
         }
     }
 
-    function openUserLogin() {
-        listView.currentIndex = 0
-        stackView.push("qrc:/pages/UserLogin.qml")
+    Component {
+        id: viewUserLogin
+
+        MyPages.UserLogin {}
+    }
+
+    Component {
+        id: gameView
+
+        MyComponents.Games {}
+    }
+
+
+    UserInterface {
+        id: userInt
+        globalData: globalUserData
+        onNotifyConnectionFinished : {
+            console.log("UserLogin return value: " + result)
+            if (result === 1) {
+                userInt.startGettingGamesList()
+                txtInfoLoading.text = "Lade Spielliste"
+            } else {
+                busyLoadingIndicator.visible = false
+                if (result === -3)
+                    txtInfoLoading.text = "Fehler: keine Verbindung"
+                else
+                    txtInfoLoading.text = "Benutzerdaten fehlerhaft"
+            }
+        }
+        onNotifyGamesListFinished : {
+            busyLoadingIndicator.visible = false
+            if (result === 1) {
+                txtInfoLoading.visible = false
+
+                showListedGames()
+//                var component = Qt.createComponent(MyComponents.Games);
+
+//                if (sprite == null)
+//                    console.log("Error creating object")
+//                else
+//                    console.log("Success")
+
+            } else {
+                txtInfoLoading.text = "Fehler beim Lesen der Daten: " + result
+            }
+        }
+    }
+
+
+
+    function openUserLogin(open) {
+        if (open === true) {
+            listView.currentIndex = 0
+            stackView.push(viewUserLogin);
+        }
+        showListedGames()
+    }
+
+    function showListedGames() {
+        var test = globalUserData.getGamePlay()
+        console.log("number of games = " + test.size())
+        var sprite1 = gameView.createObject(columnLayoutGames)//, {"x":100, "y": 100});
+        sprite1.textItem = "Hallo1"
+        sprite1.showGamesInfo()
+        var sprite2 = gameView.createObject(columnLayoutGames)//, {"x":100, "y": 200});
+        sprite2.textItem = "Hallo2"
+        var sprite3 = gameView.createObject(columnLayoutGames)//, {"x":100, "y": 300});
+        sprite3.textItem = "Hallo3"
+        var sprite4 = gameView.createObject(columnLayoutGames)//, {"x":100, "y": 300});
+        sprite4.textItem = "Hallo4"
+        console.log("Width = " + sprite1.width + " " + sprite2.width + " " + sprite3.width)
     }
 }
 

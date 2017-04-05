@@ -5,7 +5,7 @@
 #include <QtCore/QList>
 #include <QtNetwork/QUdpSocket>
 
-#include "globaldata.h"
+#include "../Data/globaldata.h"
 #include "datahandling.h"
 #include "../Common/General/backgroundworker.h"
 #include "../Common/Network/messagebuffer.h"
@@ -32,12 +32,14 @@ signals:
     void notifyVersionRequest(qint32 result, QString msg);
     void notifyUserPropsRequest(qint32 result, quint32 value);
     void notifyUpdPassRequest(qint32 result, QString passw);
+    void notifyGamesListRequest(qint32 result);
 
 public slots:
     void startSendLoginRequest();
     void startSendVersionRequest();
     void startSendUserPropsRequest();
     void startSendUpdPassRequest(QString newPassWord);
+    void startSendGamesListRequest();
 
 private slots:
     void connectionTimeoutFired();
@@ -46,7 +48,7 @@ private slots:
 private:
     GlobalData      *m_pGlobalData;
     MessageBuffer   m_messageBuffer;
-    DataHandling    m_dataHandle;
+    DataHandling    *m_pDataHandle;
 
     QTimer          *m_pConTimeout;
     QUdpSocket      *m_pDataUdpSocket = NULL;

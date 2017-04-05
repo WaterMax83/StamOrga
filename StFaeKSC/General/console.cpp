@@ -57,6 +57,12 @@ void Console::readCommand()
         else if (qLine == "user" || qLine.left(5) == "user ") {
             UserCommand::runUserCommand(qLine, &this->m_pGlobalData->m_UserList);
         }
+        else if (qLine == "game" || qLine.left(5) == "game ") {
+            UserCommand::runGameCommand(qLine, &this->m_pGlobalData->m_GamesList);
+        }
+        else if (qLine == "read" || qLine.left(5) == "read ") {
+            UserCommand::runReadCommand(qLine, this->m_pGlobalData);
+        }
         else if (qLine == "log" || qLine.left(4) == "log ") {
             UserCommand::runLoggingCommand(qLine);
 
@@ -78,6 +84,8 @@ void Console::printHelp()
     std::cout << "Known commands are:" << std::endl;
     std::cout << "help:\t\t"   << "Show this info" << std::endl;
     std::cout << "user:\t\t"   << "use the user command" << std::endl;
+    std::cout << "game:\t\t"   << "use the game command" << std::endl;
+    std::cout << "read %PATH%:\t"   << "read a new file in csv file format" << std::endl;
     std::cout << "log %i:\t\t"   << "show the last user log" << std::endl;
     std::cout << "exit:\t\t"   << "exit the program" << std::endl;
     std::cout << "quit:\t\t"   << "exit the program" << std::endl;

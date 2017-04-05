@@ -39,5 +39,10 @@
         <file>images/qt-logo@3x.png</file>
         <file>images/qt-logo@4x.png</file>
         <file>pages/UserLogin.qml</file>
+        <file>images/+material/refresh.png</file>
+        <file>images/refresh.png</file>
+        <file>userinterface.h</file>
+        <file>components/Games.qml</file>
+        <file>pages/UserLoginForm.ui.qml</file>
     </qresource>
 </RCC>

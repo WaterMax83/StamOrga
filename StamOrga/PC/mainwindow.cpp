@@ -18,10 +18,16 @@ MainWindow::MainWindow(QWidget *parent) :
     SetMessagePattern();
 
     this->m_pConHandling = new ConnectionHandling();
-    connect(this->m_pConHandling, &ConnectionHandling::sNotifyConnectionFinished, this, &MainWindow::connectionFinished);
-    connect(this->m_pConHandling, &ConnectionHandling::sNotifyVersionRequest, this, &MainWindow::versionRequestFinished);
-    connect(this->m_pConHandling, &ConnectionHandling::sNotifyUserPropertiesRequest, this, &MainWindow::propertyRequestFinished);
-    connect(this->m_pConHandling, &ConnectionHandling::sNotifyUpdatePasswordRequest, this, &MainWindow::updatePasswordFinished);
+    connect(this->m_pConHandling, &ConnectionHandling::sNotifyConnectionFinished,
+            this, &MainWindow::connectionFinished);
+    connect(this->m_pConHandling, &ConnectionHandling::sNotifyVersionRequest,
+            this, &MainWindow::versionRequestFinished);
+    connect(this->m_pConHandling, &ConnectionHandling::sNotifyUserPropertiesRequest,
+            this, &MainWindow::propertyRequestFinished);
+    connect(this->m_pConHandling, &ConnectionHandling::sNotifyUpdatePasswordRequest,
+            this, &MainWindow::updatePasswordFinished);
+    connect(this->m_pConHandling, &ConnectionHandling::sNotifyGamesListRequest,
+            this, &MainWindow::getGamesListFinished);
 
     this->m_pGlobalData = new GlobalData();
     this->m_pGlobalData->loadGlobalSettings();
@@ -102,3 +108,13 @@ void MainWindow::updatePasswordFinished(qint32 result)
         this->ui->lEditTextUpdatePassword->setText(getErrorCodeString(result));
 }
 
+
+void MainWindow::on_btnGetGamesList_clicked()
+{
+    this->m_pConHandling->startGetGamesList();
+}
+
+void MainWindow::getGamesListFinished(qint32 result)
+{
+    qDebug() << QString("Getting Games list request answer: %1 ").arg(result);
+}

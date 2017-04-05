@@ -24,8 +24,11 @@ private slots:
     void versionRequestFinished(qint32 result, QString msg);
     void propertyRequestFinished(qint32 result, quint32 value);
     void updatePasswordFinished(qint32 result);
+    void getGamesListFinished(qint32 result);
 
     void on_btnUdpatePassword_clicked();
+
+    void on_btnGetGamesList_clicked();
 
 private:
     Ui::MainWindow *ui;

@@ -6,7 +6,7 @@
 
 #include "mainconnection.h"
 #include "dataconnection.h"
-#include "globaldata.h"
+#include "../Data/globaldata.h"
 #include "../Common/General/backgroundcontroller.h"
 
 
@@ -18,9 +18,12 @@ public:
     ~ConnectionHandling();
 
     qint32 startMainConnection(QString name, QString passw);
-    qint32 startGettingInfo();
+    qint32 startGettingVersionInfo();
+    qint32 startGettingUserProps();
+    qint32 startGettingGamesList();
 
     bool startUpdatePassword(QString newPassWord);
+
 
     void setGlobalData(GlobalData *pData)
     {
@@ -35,11 +38,13 @@ signals:
     void sNotifyVersionRequest(qint32 result, QString msg);
     void sNotifyUserPropertiesRequest(qint32 result, quint32 value);
     void sNotifyUpdatePasswordRequest(qint32 result, QString newPassWord);
+    void sNotifyGamesListRequest(qint32 result);
 
     void sStartSendLoginRequest();
     void sStartSendVersionRequest();
     void sStartSendUserPropertiesRequest();
     void sStartSendUpdatePasswordRequest(QString newPassWord);
+    void sStartSendGamesListRequest();
 
 public slots:
 
@@ -49,6 +54,7 @@ private slots:
     void slDataConVersionFinished(qint32 result, QString msg);
     void slDataConUserPropsFinished(qint32 result, quint32 value);
     void slDataConUpdPassFinished(qint32 result, QString newPassWord);
+    void slDataConGamesListFinished(qint32 result);
 
     void slTimerConResetFired();
     void slTimerConLoginFired();
@@ -69,6 +75,7 @@ private:
     void sendVersionRequest();
     void sendUserPropertiesRequest();
     void sendUpdatePasswordRequest(QString newPassWord);
+    void sendGamesListRequest();
 
     void checkTimeoutResult(qint32 result);
 

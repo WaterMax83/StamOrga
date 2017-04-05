@@ -25,6 +25,7 @@ class GlobalData : public QObject
     Q_PROPERTY(QString ipAddr READ ipAddr WRITE setIpAddr NOTIFY ipAddrChanged)
     Q_PROPERTY(quint32 conMasterPort READ conMasterPort WRITE setConMasterPort NOTIFY conMasterPortChanged)
     Q_PROPERTY(bool bIsConnected READ bIsConnected WRITE setbIsConnected NOTIFY bIsConnectedChanged)
+    Q_PROPERTY(QList<GamePlay> getGamePlay READ getGamePlay)
 public:
     explicit GlobalData(QObject *parent = 0);
 
@@ -92,6 +93,13 @@ public:
     void saveGlobalUserSettings();
 
     void addNewGamePlay(const GamePlay &gPlay);
+
+    QList<GamePlay> getGamePlay() { return this->m_lGamePlay; }
+//    {
+//        if (index < this->m_lGamePlay.size())
+//            return this->m_lGamePlay.at(index);
+//        return GamePlay();
+//    }
 
 signals:
     void userNameChanged();

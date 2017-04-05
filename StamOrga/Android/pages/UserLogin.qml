@@ -6,7 +6,7 @@ import com.watermax.demo 1.0
 
 Flickable {
     id: flickable
-    width: parent.width
+//    width: parent.width
     contentHeight: pane.height
 
     Pane {
@@ -27,7 +27,7 @@ Flickable {
                 implicitWidth: mainColumnLayout.width / 3 * 2
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 placeholderText: qsTr("Text Field")
-                visible: userInt.isDebuggingEnabled()
+                visible: userIntUser.isDebuggingEnabled()
             }
 
 //            SpinBox {
@@ -114,10 +114,10 @@ Flickable {
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 transformOrigin: Item.Center
                 onClicked: {
-                    if (userInt.isDebuggingEnabled())
+                    if (userIntUser.isDebuggingEnabled())
                         globalUserData.ipAddr = txtIPAddress.text
 //                    globalUserData.conPort = spBoxPort.value
-                    if (userInt.startSendingData(txtUserName.text, txtPassWord.text) > 0) {
+                    if (userIntUser.startMainConnection(txtUserName.text, txtPassWord.text) > 0) {
                         btnSendData.enabled = false
                         busyConnectIndicator.visible = true;
                         txtInfoConnecting.text = "Verbinde ..."
@@ -151,7 +151,7 @@ Flickable {
     }
 
     UserInterface {
-        id: userInt
+        id: userIntUser
         globalData: globalUserData
         onNotifyConnectionFinished : {
             btnSendData.enabled = true
@@ -205,7 +205,7 @@ Flickable {
                 labelPasswordTooShort.visible = true
                 changePassWordDialog.open()
             } else if (txtnewPassWord.text == txtnewPassWordReplay.text) {
-                userInt.startUpdateUserPassword(txtnewPassWord.text)
+                userIntUser.startUpdateUserPassword(txtnewPassWord.text)
                 busyConnectIndicator.visible = true;
                 txtInfoConnecting.visible = true;
                 txtInfoConnecting.text = "Ändere Passwort"

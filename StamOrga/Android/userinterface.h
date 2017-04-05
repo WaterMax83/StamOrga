@@ -4,7 +4,7 @@
 #include <QtCore/QObject>
 
 #include "../connectionhandling.h"
-#include "../globaldata.h"
+#include "../Data/globaldata.h"
 
 class UserInterface : public QObject
 {
@@ -17,7 +17,9 @@ class UserInterface : public QObject
 public:
     explicit UserInterface(QObject *parent = 0);
 
-    Q_INVOKABLE qint32 startSendingData(QString name, QString passw);
+    Q_INVOKABLE qint32 startMainConnection(QString name, QString passw);
+
+    Q_INVOKABLE qint32 startGettingGamesList();
 
     Q_INVOKABLE qint32 startUpdateUserPassword(QString newPassw);
 
@@ -46,11 +48,13 @@ signals:
     void notifyConnectionFinished(qint32 result);
     void notifyVersionRequestFinished(qint32 result, QString msg);
     void notifyUpdatePasswordRequestFinished(qint32 result, QString newPassWord);
+    void notifyGamesListFinished(qint32 result);
 
 public slots:
     void slConnectionRequestFinished(qint32 result);
     void slVersionRequestFinished(qint32 result, QString msg);
     void slUpdatePasswordRequestFinished(qint32 result, QString newPassWord);
+    void slGettingGamesListFinished(qint32 result);
 
 
 private:

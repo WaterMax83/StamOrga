@@ -11,10 +11,10 @@ SOURCES += main.cpp \
     ../../Common/Network/messagebuffer.cpp \
     ../../Common/Network/messagecommand.cpp \
     ../../Common/Network/messageprotocol.cpp \
-    ../globaldata.cpp \
     ../../Common/General/globalfunctions.cpp \
     ../dataconnection.cpp \
-    ../datahandling.cpp
+    ../datahandling.cpp \
+    ../Data/globaldata.cpp
 
 RESOURCES += qml.qrc
 
@@ -51,10 +51,10 @@ HEADERS += \
     ../../Common/Network/messagebuffer.h \
     ../../Common/Network/messagecommand.h \
     ../../Common/Network/messageprotocol.h \
-    ../globaldata.h \
     ../../Common/General/globalfunctions.h \
     ../dataconnection.h \
-    ../datahandling.h
+    ../datahandling.h \
+    ../Data/globaldata.h
 
 DISTFILES += \
     android/AndroidManifest.xml \

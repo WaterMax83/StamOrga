@@ -5,7 +5,7 @@
 #include <QtCore/QTimer>
 #include <QtNetwork/QUdpSocket>
 
-#include "globaldata.h"
+#include "../Data/globaldata.h"
 #include "../Common/General/backgroundworker.h"
 #include "../Common/Network/messagebuffer.h"
 

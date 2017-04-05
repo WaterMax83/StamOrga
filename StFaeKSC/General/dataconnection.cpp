@@ -107,3 +107,53 @@ MessageProtocol *DataConnection::requestGetProgramVersion(MessageProtocol *msg)
     ownVersion.append(QString(STAM_ORGA_VERSION_S));
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_VERSION, ownVersion);
 }
+
+
+/*
+ * 0                Header          12
+ * 12   quint32     result          4
+ * 16   quint16     totalSize       2
+ * 18   quint16     sizePack1       2
+ * 20   quint16     version         2
+ * 22   quint8      sIndex          1
+ * 23   quint8      comp            1
+ * 24   quint64     datetime        8
+ * 32   QString     infoGame        X
+ * 32+X qutin16     sizePack2       2
+ */
+
+#define GAMES_OFFSET    2 + 1 + 1 + 8           // version + sIndex + comp + datetime
+
+MessageProtocol *DataConnection::requestGetGamesList(MessageProtocol *msg)
+{
+    QByteArray ackArray;
+    QDataStream wAckArray(&ackArray, QIODevice::WriteOnly);
+    wAckArray.setByteOrder(QDataStream::BigEndian);
+
+    quint16 numbOfGames = this->m_pGlobalData->m_GamesList.startRequestGetGamesPlay();
+    wAckArray << (quint32)ERROR_CODE_SUCCESS << numbOfGames;
+
+    for (quint32 i=0; i<numbOfGames; i++) {
+        GamesPlay *pGame = this->m_pGlobalData->m_GamesList.getRequestGamesPlay(i);
+        if (pGame == NULL)
+            continue;
+
+        QString game(pGame->home + ";" + pGame->away +  ";" + pGame->score);
+
+
+        wAckArray.device()->seek(ackArray.size());
+        wAckArray << quint16(game.toUtf8().size() + GAMES_OFFSET);
+        wAckArray << quint16(0x1);                                      //Version
+        wAckArray << quint8(pGame->saisonIndex);
+        wAckArray << quint8(pGame->competition);
+        wAckArray << pGame->datetime;
+
+        ackArray.append(game);
+    }
+
+
+    this->m_pGlobalData->m_GamesList.stopRequestGetGamesPlay();
+
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_GAMES_LIST, ackArray);
+
+}
