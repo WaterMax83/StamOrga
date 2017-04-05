@@ -2,11 +2,12 @@ import QtQuick 2.7
 import QtQuick.Controls 2.1
 import QtQuick.Layouts 1.0
 
-
+import com.watermax.demo 1.0
 
 Rectangle {
     id: mainRectangle
-    property alias textItem: labelLine1.text
+//    property alias gamePlayItem: gamePlayItem
+//    property var gamePlayItem
 
     width: parent.width
 //    width: 100
@@ -30,9 +31,18 @@ Rectangle {
         }
     }
 
-    function showGamesInfo() {
-        console.log("Inside Games")
+    function showGamesInfo(gamePlayItem) {
+//        console.log("Inside Games")
+        labelLine1.text = gamePlayItem.home
+        labelLine2.text = gamePlayItem.away
     }
+
+//    Component {
+//        id: test
+//    }
+//    GamePlay*{
+
+//    }
 }
 
 

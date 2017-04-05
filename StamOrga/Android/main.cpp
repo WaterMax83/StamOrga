@@ -20,6 +20,8 @@ int main(int argc, char *argv[])
 
     // Register our component type with QML.
     qmlRegisterType<UserInterface>("com.watermax.demo", 1, 0, "UserInterface");
+//    qmlRegisterType<GamePlay*>("com.watermax.demo", 1, 0, "GamePlay*");
+    qRegisterMetaType<GamePlay *>("GamePlay*");
 
     // global data class
     GlobalData globalUserData;

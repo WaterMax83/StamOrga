@@ -114,8 +114,11 @@ Flickable {
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 transformOrigin: Item.Center
                 onClicked: {
-                    if (userIntUser.isDebuggingEnabled())
+                    if (userIntUser.isDebuggingEnabled()) {
+                        console.log("Hallo")
                         globalUserData.ipAddr = txtIPAddress.text
+                    }
+                    console.log("Hallo")
 //                    globalUserData.conPort = spBoxPort.value
                     if (userIntUser.startMainConnection(txtUserName.text, txtPassWord.text) > 0) {
                         btnSendData.enabled = false

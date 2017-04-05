@@ -11,7 +11,7 @@ GlobalData::GlobalData(QObject *parent) : QObject(parent)
     this->setbIsConnected(false);
     this->uUserProperties = 0x0;
 
-    int tmp = QHostInfo::lookupHost("watermax83.ddns.net", this, SLOT(callBackLookUpHost(QHostInfo)));
+    QHostInfo::lookupHost("watermax83.ddns.net", this, SLOT(callBackLookUpHost(QHostInfo)));
 }
 
 void GlobalData::loadGlobalSettings()
@@ -43,7 +43,7 @@ void GlobalData::saveGlobalUserSettings()
 
 }
 
-void GlobalData::addNewGamePlay(const GamePlay &gPlay)
+void GlobalData::addNewGamePlay(GamePlay *gPlay)
 {
     if (!this->existGamePlay(gPlay)) {
         QMutexLocker lock(&this->m_mutexGame);
@@ -52,14 +52,14 @@ void GlobalData::addNewGamePlay(const GamePlay &gPlay)
     }
 }
 
-bool GlobalData::existGamePlay(const GamePlay &gPlay)
+bool GlobalData::existGamePlay(GamePlay *gPlay)
 {
     QMutexLocker lock(&this->m_mutexGame);
 
     for(int i=0; i < this->m_lGamePlay.size(); i++) {
-        if (this->m_lGamePlay[i].index == gPlay.index &&
-            this->m_lGamePlay[i].comp == gPlay.comp &&
-            this->m_lGamePlay[i].timestamp == gPlay.timestamp)
+        if (this->m_lGamePlay[i]->index() == gPlay->index() &&
+            this->m_lGamePlay[i]->competition() == gPlay->competition() &&
+            this->m_lGamePlay[i]->timestamp() == gPlay->timestamp())
             return true;
     }
     return false;

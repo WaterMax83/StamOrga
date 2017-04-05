@@ -1,6 +1,7 @@
 #include <QtCore/QtEndian>
 
 #include "datahandling.h"
+#include "../Data/gameplay.h"
 #include "../Common/General/globalfunctions.h"
 #include "../Common/General/config.h"
 
@@ -62,7 +63,7 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol *msg)
 
     offset += 2;
     while(offset < totalSize && totalPacks > 0) {
-        GamePlay play;
+        GamePlay *play = new GamePlay();
         quint16 size = qFromBigEndian(*(qint16 *)(pData + offset));
         offset += 2;
 
@@ -77,13 +78,13 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol *msg)
             break;
         }
         offset += 2;
-        play.index = *(qint8 *)(pData + offset);
+        play->setIndex(*(qint8 *)(pData + offset));
         offset += 1;
-        play.comp = *(qint8 *)(pData + offset);
+        play->setCompetition(*(qint8 *)(pData + offset));
         offset += 1;
 
 
-        play.timestamp = qFromBigEndian(*(qint64 *)(pData + offset));
+        play->setTimeStamp(qFromBigEndian(*(qint64 *)(pData + offset)));
         offset += 8;
 
         QString playString(QByteArray(pData + offset, size - 8));
@@ -91,11 +92,11 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol *msg)
         QStringList lplayString = playString.split(";");
 
         if (lplayString.size() > 0)
-            play.home = lplayString.value(0);
+            play->setHome(lplayString.value(0));
         if (lplayString.size() > 1)
-            play.away = lplayString.value(1);
+            play->setAway(lplayString.value(1));
         if (lplayString.size() > 2)
-            play.score = lplayString.value(2);
+            play->setScore(lplayString.value(2));
 
         this->m_pGlobalData->addNewGamePlay(play);
         totalPacks--;

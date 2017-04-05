@@ -220,18 +220,28 @@ ApplicationWindow {
     }
 
     function showListedGames() {
-        var test = globalUserData.getGamePlay()
-        console.log("number of games = " + test.size())
-        var sprite1 = gameView.createObject(columnLayoutGames)//, {"x":100, "y": 100});
-        sprite1.textItem = "Hallo1"
-        sprite1.showGamesInfo()
-        var sprite2 = gameView.createObject(columnLayoutGames)//, {"x":100, "y": 200});
-        sprite2.textItem = "Hallo2"
-        var sprite3 = gameView.createObject(columnLayoutGames)//, {"x":100, "y": 300});
-        sprite3.textItem = "Hallo3"
-        var sprite4 = gameView.createObject(columnLayoutGames)//, {"x":100, "y": 300});
-        sprite4.textItem = "Hallo4"
-        console.log("Width = " + sprite1.width + " " + sprite2.width + " " + sprite3.width)
+//        var test = globalUserData.getGamePlay()
+
+        if (globalUserData.getNumbOfGamePlay() > 0) {
+            var test = globalUserData.getGamePlay(0)
+            console.log("number of games = " + test.home)
+            var sprite1 = gameView.createObject(columnLayoutGames)//, {"x":100, "y": 100});
+//            sprite1.gameplayItem =
+            sprite1.showGamesInfo(globalUserData.getGamePlay(0))
+            var sprite2 = gameView.createObject(columnLayoutGames)//, {"x":100, "y": 200});
+//            sprite2.textItem = "Hallo2"
+//            sprite2.gameplayItem = globalUserData.getGamePlay(1)
+            sprite2.showGamesInfo(globalUserData.getGamePlay(1))
+            var sprite3 = gameView.createObject(columnLayoutGames)//, {"x":100, "y": 300});
+//            sprite3.textItem = "Hallo3"
+//            sprite3.gameplayItem = globalUserData.getGamePlay(2)
+            sprite3.showGamesInfo(globalUserData.getGamePlay(2))
+            var sprite4 = gameView.createObject(columnLayoutGames)//, {"x":100, "y": 300});
+//            sprite4.textItem = "Hallo4"
+//            sprite4.gameplayItem = globalUserData.getGamePlay(3)
+            sprite4.showGamesInfo(globalUserData.getGamePlay(3))
+        }
+//        console.log("Width = " + sprite1.width + " " + sprite2.width + " " + sprite3.width)
     }
 }
 

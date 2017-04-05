@@ -7,15 +7,7 @@
 #include <QtCore/QList>
 #include <QtNetwork/QHostInfo>
 
-
-struct GamePlay{
-    QString home;
-    QString away;
-    QString score;
-    quint8 comp;
-    quint8 index;
-    qint64 timestamp;
-};
+#include "gameplay.h"
 
 class GlobalData : public QObject
 {
@@ -25,7 +17,7 @@ class GlobalData : public QObject
     Q_PROPERTY(QString ipAddr READ ipAddr WRITE setIpAddr NOTIFY ipAddrChanged)
     Q_PROPERTY(quint32 conMasterPort READ conMasterPort WRITE setConMasterPort NOTIFY conMasterPortChanged)
     Q_PROPERTY(bool bIsConnected READ bIsConnected WRITE setbIsConnected NOTIFY bIsConnectedChanged)
-    Q_PROPERTY(QList<GamePlay> getGamePlay READ getGamePlay)
+
 public:
     explicit GlobalData(QObject *parent = 0);
 
@@ -34,9 +26,11 @@ public:
     QString userName() { QMutexLocker lock(&this->m_mutexUser); return this->m_userName; }
     void setUserName(const QString &user)
     {
-        QMutexLocker lock(&this->m_mutexUser);
         if (this->m_userName != user) {
-            this->m_userName = user;
+            {
+                QMutexLocker lock(&this->m_mutexUser);
+                this->m_userName = user;
+            }
             emit userNameChanged();
         }
     }
@@ -44,9 +38,11 @@ public:
     QString passWord() { QMutexLocker lock(&this->m_mutexUser); return this->m_passWord; }
     void setPassWord(const QString &passw)
     {
-        QMutexLocker lock(&this->m_mutexUser);
         if (this->m_passWord != passw) {
-            this->m_passWord = passw;
+            {
+                QMutexLocker lock(&this->m_mutexUser);
+                this->m_passWord = passw;
+            }
             emit passWordChanged();
         }
     }
@@ -54,9 +50,11 @@ public:
     QString ipAddr() { QMutexLocker lock(&this->m_mutexUser); return this->m_ipAddress; }
     void setIpAddr(const QString &ip)
     {
-        QMutexLocker lock(&this->m_mutexUser);
         if (this->m_ipAddress != ip) {
-            this->m_ipAddress = ip;
+            {
+                QMutexLocker lock(&this->m_mutexUser);
+                this->m_ipAddress = ip;
+            }
             emit ipAddrChanged();
         }
     }
@@ -64,9 +62,11 @@ public:
     quint32 conMasterPort() { QMutexLocker lock(&this->m_mutexUser); return this->m_uMasterPort; }
     void setConMasterPort(quint32 port)
     {
-        QMutexLocker lock(&this->m_mutexUser);
         if (this->m_uMasterPort != port) {
-            this->m_uMasterPort = port;
+            {
+                QMutexLocker lock(&this->m_mutexUser);
+                this->m_uMasterPort = port;
+            }
             emit conMasterPortChanged();
         }
     }
@@ -92,14 +92,14 @@ public:
 
     void saveGlobalUserSettings();
 
-    void addNewGamePlay(const GamePlay &gPlay);
-
-    QList<GamePlay> getGamePlay() { return this->m_lGamePlay; }
-//    {
-//        if (index < this->m_lGamePlay.size())
-//            return this->m_lGamePlay.at(index);
-//        return GamePlay();
-//    }
+    void addNewGamePlay(GamePlay *gPlay);
+    Q_INVOKABLE quint32 getNumbOfGamePlay() { return this->m_lGamePlay.size(); }
+    Q_INVOKABLE GamePlay *getGamePlay(int index)
+    {
+        if (index < this->m_lGamePlay.size())
+            return this->m_lGamePlay.at(index);
+        return NULL;
+    }
 
 signals:
     void userNameChanged();
@@ -128,8 +128,8 @@ private:
 
     QSettings *m_pMainUserSettings;
 
-    QList<GamePlay> m_lGamePlay;
-    bool existGamePlay(const GamePlay &gPlay);
+    QList<GamePlay*> m_lGamePlay;
+    bool existGamePlay(GamePlay *gPlay);
 };
 
 #endif // GLOBALDATA_H

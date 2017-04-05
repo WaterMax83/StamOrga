@@ -14,7 +14,8 @@ SOURCES += main.cpp \
     ../../Common/General/globalfunctions.cpp \
     ../dataconnection.cpp \
     ../datahandling.cpp \
-    ../Data/globaldata.cpp
+    ../Data/globaldata.cpp \
+    ../Data/gameplay.cpp
 
 RESOURCES += qml.qrc
 
@@ -54,7 +55,8 @@ HEADERS += \
     ../../Common/General/globalfunctions.h \
     ../dataconnection.h \
     ../datahandling.h \
-    ../Data/globaldata.h
+    ../Data/globaldata.h \
+    ../Data/gameplay.h
 
 DISTFILES += \
     android/AndroidManifest.xml \
