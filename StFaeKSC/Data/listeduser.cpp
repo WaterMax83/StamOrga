@@ -30,9 +30,10 @@ ListedUser::ListedUser()
             this->m_pUserSettings->setArrayIndex(i);
             QString name = this->m_pUserSettings->value(LOGIN_USERNAME, "").toString();
             QString passw = this->m_pUserSettings->value(LOGIN_PASSWORD, "").toString();
+            QString readname = this->m_pUserSettings->value(LOGIN_READNAME, "").toString();
             quint32 prop = this->m_pUserSettings->value(LOGIN_PROPERTIES, 0x0).toUInt();
             quint32 index = this->m_pUserSettings->value(LOGIN_INDEX, 0).toUInt();
-            if (!this->addNewUserLogin(name, passw, prop, index))
+            if (!this->addNewUserLogin(name, passw, prop, index, readname))
                 bProblems = true;
         }
         this->m_pUserSettings->endArray();
@@ -45,7 +46,8 @@ ListedUser::ListedUser()
         bProblems = true;
         this->m_lAddUserLoginProblems[i].index = this->getNextLoginIndex();
         this->addNewUserLogin(this->m_lAddUserLoginProblems[i].userName, this->m_lAddUserLoginProblems[i].password,
-                              this->m_lAddUserLoginProblems[i].properties, this->m_lAddUserLoginProblems[i].index);
+                              this->m_lAddUserLoginProblems[i].properties, this->m_lAddUserLoginProblems[i].index,
+                              this->m_lAddUserLoginProblems[i].readName);
     }
 
     if (bProblems)
@@ -82,7 +84,7 @@ int ListedUser::addNewUser(const QString &name, const QString &password, quint32
     this->m_pUserSettings->endGroup();
     this->m_pUserSettings->sync();
 
-    this->addNewUserLogin(name, name, 0x0, newIndex, false);
+    this->addNewUserLogin(name, name, 0x0, newIndex, "",false);
 
     CONSOLE_INFO(QString("Added new user: %1").arg(name));
     return newIndex;
@@ -112,7 +114,10 @@ int ListedUser::showAllUsers()
     QMutexLocker locker(&this->m_mUserListMutex);
 
     foreach (UserLogin login, this->m_lUserLogin) {
-        std::cout << login.userName.toStdString() << ": 0x" << QString::number(login.properties, 16).toStdString() << std::endl;
+        std::cout << login.userName.toStdString()
+                  << " - " << login.readName.toStdString()
+                  << " : 0x" << QString::number(login.properties, 16).toStdString()
+                  << std::endl;
     }
     return 0;
 }
@@ -129,6 +134,7 @@ void ListedUser::saveActualUserList()
         this->m_pUserSettings->setArrayIndex(i);
         this->m_pUserSettings->setValue(LOGIN_USERNAME, this->m_lUserLogin[i].userName);
         this->m_pUserSettings->setValue(LOGIN_PASSWORD, this->m_lUserLogin[i].password);
+        this->m_pUserSettings->setValue(LOGIN_READNAME, this->m_lUserLogin[i].readName);
         this->m_pUserSettings->setValue(LOGIN_PROPERTIES, this->m_lUserLogin[i].properties);
         this->m_pUserSettings->setValue(LOGIN_INDEX, this->m_lUserLogin[i].index);
     }
@@ -217,6 +223,25 @@ bool ListedUser::userChangeProperties(QString name, quint32 props)
     return false;
 }
 
+bool ListedUser::userChangeReadName(QString name, QString readName)
+{
+    QMutexLocker locker(&this->m_mUserListMutex);
+
+    if (name.length() < MIN_SIZE_USERNAME || readName.length() < 3)
+        return false;
+
+    for (int i=0; i<this->m_lUserLogin.size(); i++) {
+        if (this->m_lUserLogin[i].userName == name) {
+            if (this->updateUserLoginValue(&this->m_lUserLogin[i], LOGIN_READNAME, QVariant(readName))) {
+                this->m_lUserLogin[i].readName = readName;
+                return true;
+            } else
+                return false;
+        }
+    }
+    return false;
+}
+
 quint32 ListedUser::getUserProperties(QString name)
 {
     QMutexLocker locker(&this->m_mUserListMutex);
@@ -228,7 +253,18 @@ quint32 ListedUser::getUserProperties(QString name)
     return 0;
 }
 
-bool ListedUser::addNewUserLogin(QString name, QString password, quint32 prop, quint32 index, bool checkUser)
+QString ListedUser::getReadableName(QString name)
+{
+    QMutexLocker locker(&this->m_mUserListMutex);
+
+    foreach (UserLogin login, this->m_lUserLogin) {
+        if (login.userName == name)
+            return login.readName;
+    }
+    return "";
+}
+
+bool ListedUser::addNewUserLogin(QString name, QString password, quint32 prop, quint32 index, QString readname, bool checkUser)
 {
     if (checkUser) {
         if (userExists(name)) {
@@ -238,22 +274,23 @@ bool ListedUser::addNewUserLogin(QString name, QString password, quint32 prop, q
 
         if (index == 0 || userExists(index)) {
             qWarning().noquote() << QString("User \"%1\" with index \"%2\" already exists, saving with new index").arg(name).arg(index);
-            this->addNewUserLogin(name, password, prop, index, &this->m_lAddUserLoginProblems);
+            this->addNewUserLogin(name, password, prop, index, readname, &this->m_lAddUserLoginProblems);
             return false;
         }
     }
 
-    this->addNewUserLogin(name, password, prop, index, &this->m_lUserLogin);
+    this->addNewUserLogin(name, password, prop, index, readname, &this->m_lUserLogin);
     return true;
 }
 
-void ListedUser::addNewUserLogin(QString name, QString password, quint32 prop, quint32 index, QList<UserLogin> *pList)
+void ListedUser::addNewUserLogin(QString name, QString password, quint32 prop, quint32 index, QString readname, QList<UserLogin> *pList)
 {
     QMutexLocker locker(&this->m_mUserListMutex);
 
     UserLogin login;
     login.userName = name;
     login.password = password;
+    login.readName = readname;
     login.properties = prop;
     login.index = index;
     pList->append(login);

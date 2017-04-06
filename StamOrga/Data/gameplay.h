@@ -45,7 +45,7 @@ public:
 
     QString timestamp()
     {
-        return QDateTime::fromMSecsSinceEpoch(this->m_timestamp).toString("dd.MM.YY hh:mm");
+        return QDateTime::fromMSecsSinceEpoch(this->m_timestamp).toString("dd.MM.yy hh:mm");
     }
     void setTimeStamp(qint64 ts)
     {
@@ -65,6 +65,11 @@ public:
             return "Unknown";
         }
     }
+    quint8 compValue()
+    {
+        return this->m_comp;
+    }
+
     void setCompetition(quint8 co)
     {
         if (this->m_comp != co){

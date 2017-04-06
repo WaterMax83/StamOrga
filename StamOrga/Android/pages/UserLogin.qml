@@ -150,6 +150,26 @@ Flickable {
                 }
             }
 
+            ToolSeparator {
+                id: toolSeparator3
+                orientation: "Horizontal"
+                implicitWidth: mainColumnLayout.width / 3 * 1
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            }
+
+            Button {
+                id: btnChangeReadableName
+                text: qsTr("Öffentlicher Name")
+                implicitWidth: mainColumnLayout.width / 4 * 2
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                transformOrigin: Item.Center
+                enabled: globalUserData.bIsConnected
+                onClicked: {
+                    txtReadableName.text = globalUserData.readableName
+                    changeReadableName.open()
+                }
+            }
+
         }
     }
 
@@ -187,6 +207,13 @@ Flickable {
                 txtInfoConnecting.text = "Passwort erfolgreich geändert"
             else
                 txtInfoConnecting.text = "Fehler beim Passwort ändern"
+        }
+        onNotifyUpdateReadableNameRequest: {
+            busyConnectIndicator.visible = false;
+            if (result === 1)
+                txtInfoConnecting.text = "Namen erfolgreich geändert"
+            else
+                txtInfoConnecting.text = "Fehler beim Namen ändern"
         }
     }
 
@@ -276,6 +303,55 @@ Flickable {
                 id: labelPasswordTooShort
                 visible: false
                 text: qsTr("Das Passwort muss mindestens 6 Zeichen lang sein")
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                color: "orange"
+            }
+        }
+    }
+
+    Dialog {
+        id: changeReadableName
+        x: Math.round((flickable.width - width) / 2)
+        y: Math.round(flickable.height / 6)
+        width: Math.round(Math.min(flickable.width, flickable.height) / 3 * 2)
+        modal: true
+        focus: true
+        title: "Öffentlicher Name"
+
+        standardButtons: Dialog.Ok | Dialog.Cancel
+        onAccepted: {
+            labelNameTooShort.visible = false
+            if (txtReadableName.text.length < 3) {
+                labelNameTooShort.visible = true
+                changeReadableName.open()
+            } else {
+                userIntUser.startUpdateReadableName(txtReadableName.text)
+                busyConnectIndicator.visible = true;
+                txtInfoConnecting.visible = true;
+                txtInfoConnecting.text = "Ändere Öffentlichen Namen"
+                changeReadableName.close()
+            }
+        }
+        onRejected: {
+            changeReadableName.close()
+            labelNameTooShort.visible = false
+        }
+
+        contentItem: ColumnLayout {
+            id: changeReadableNameColumn
+            width: changePassWordDialog.width
+            spacing: 20
+
+            TextField {
+                id: txtReadableName
+                implicitWidth: changeReadableNameColumn.width / 4 * 3
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            }
+
+            Label {
+                id: labelNameTooShort
+                visible: false
+                text: qsTr("Der Name muss mindestns 3 Zeichen lang sein")
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 color: "orange"
             }

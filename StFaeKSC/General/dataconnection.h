@@ -16,6 +16,7 @@ public:
     MessageProtocol *requestCheckUserLogin(MessageProtocol *msg);
     MessageProtocol *requestGetUserProperties();
     MessageProtocol *requestUserChangeLogin(MessageProtocol *msg);
+    MessageProtocol *requestUserChangeReadname(MessageProtocol *msg);
     MessageProtocol *requestGetProgramVersion(MessageProtocol *msg);
     MessageProtocol *requestGetGamesList(MessageProtocol *msg);
 

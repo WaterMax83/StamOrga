@@ -32,6 +32,7 @@ signals:
     void notifyVersionRequest(qint32 result, QString msg);
     void notifyUserPropsRequest(qint32 result, quint32 value);
     void notifyUpdPassRequest(qint32 result, QString passw);
+    void notifyUpdReadabelNameRequest(qint32 result, QString name);
     void notifyGamesListRequest(qint32 result);
 
 public slots:
@@ -39,6 +40,7 @@ public slots:
     void startSendVersionRequest();
     void startSendUserPropsRequest();
     void startSendUpdPassRequest(QString newPassWord);
+    void startSendReadableNameRequest(QString name);
     void startSendGamesListRequest();
 
 private slots:

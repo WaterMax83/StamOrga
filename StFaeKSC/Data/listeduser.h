@@ -9,6 +9,7 @@
 struct UserLogin {
     QString userName;
     QString password;
+    QString readName;
     quint32 properties;
     quint32 index;
 };
@@ -17,6 +18,7 @@ struct UserLogin {
 #define LOGIN_ARRAY             "logins"
 #define LOGIN_USERNAME          "username"
 #define LOGIN_PASSWORD          "password"
+#define LOGIN_READNAME          "readname"
 #define LOGIN_PROPERTIES        "properties"
 #define LOGIN_INDEX             "index"
 
@@ -41,7 +43,9 @@ public:
     bool userCheckPassword(QString name, QString passw);
     bool userChangePassword(QString name, QString passw);
     bool userChangeProperties(QString name, quint32 props);
+    bool userChangeReadName(QString name, QString readName);
     quint32 getUserProperties(QString name);
+    QString getReadableName(QString name);
 
 private:
     QSettings           *m_pUserSettings = NULL;
@@ -53,8 +57,8 @@ private:
 
     void saveActualUserList();
 
-    bool addNewUserLogin(QString name, QString password, quint32 prop, quint32 index, bool checkUser = true);
-    void addNewUserLogin(QString name, QString password, quint32 prop, quint32 index, QList<UserLogin> *pList);
+    bool addNewUserLogin(QString name, QString password, quint32 prop, quint32 index, QString readname, bool checkUser = true);
+    void addNewUserLogin(QString name, QString password, quint32 prop, quint32 index, QString readname, QList<UserLogin> *pList);
     quint32 getUserLoginIndex(const QString &name);
     quint32 getNextLoginIndex();
 

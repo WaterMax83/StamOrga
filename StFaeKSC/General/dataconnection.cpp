@@ -30,8 +30,12 @@ MessageProtocol *DataConnection::requestCheckUserLogin(MessageProtocol *msg)
     return ack;
 }
 
-/*
+/* Answer
  * 0                Header          12
+ * 12               SUCCESS         4
+ * 16               PROPS           4
+ * 20               size            2
+ * 22               readableName    X
  */
 MessageProtocol *DataConnection::requestGetUserProperties()
 {
@@ -40,6 +44,10 @@ MessageProtocol *DataConnection::requestGetUserProperties()
     wAnswer.setByteOrder(QDataStream::BigEndian);
     wAnswer << ERROR_CODE_SUCCESS;
     wAnswer << this->m_pGlobalData->m_UserList.getUserProperties(this->m_pUserConData->userName);
+
+    QString readableName = this->m_pGlobalData->m_UserList.getReadableName(this->m_pUserConData->userName);
+    wAnswer << quint16(readableName.toUtf8().size());
+    answer.append(readableName);
 
     MessageProtocol *ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_USER_PROPS, answer);
 
@@ -55,9 +63,8 @@ MessageProtocol *DataConnection::requestGetUserProperties()
  */
 MessageProtocol *DataConnection::requestUserChangeLogin(MessageProtocol *msg)
 {
-    MessageProtocol *ack = NULL;
     if (msg->getDataLength() <= 8) {
-        qWarning() << QString("Getting no version data from %1").arg(this->m_pUserConData->userName);
+        qWarning() << QString("Getting no user login data from %1").arg(this->m_pUserConData->userName);
         return NULL;
     }
 
@@ -78,11 +85,35 @@ MessageProtocol *DataConnection::requestUserChangeLogin(MessageProtocol *msg)
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN, ERROR_CODE_WRONG_PASSWORD);
 
     if (this->m_pGlobalData->m_UserList.userChangePassword(this->m_pUserConData->userName, newPassw))
-        ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN, ERROR_CODE_SUCCESS);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN, ERROR_CODE_SUCCESS);
     else
-        ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN, ERROR_CODE_COMMON);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN, ERROR_CODE_COMMON);
+}
 
-    return ack;
+/*
+ * 0                    Header          12
+ * 12       quint16     size            2
+ * 14       String      new readName    X
+ */
+MessageProtocol *DataConnection::requestUserChangeReadname(MessageProtocol *msg)
+{
+    if (msg->getDataLength() <= 4) {
+        qWarning() << QString("Getting no readname from %1").arg(this->m_pUserConData->userName);
+        return NULL;
+    }
+
+    qint32 totalLength = (qint32)msg->getDataLength();
+    const char *pData = msg->getPointerToData();
+
+    quint16 actLength = qFromBigEndian(*((quint16 *)pData));
+    if (actLength + 2 > totalLength)
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN, ERROR_CODE_WRONG_SIZE);
+    QString newReadName(QByteArray(pData + 2, actLength));
+
+    if (!this->m_pGlobalData->m_UserList.userChangeReadName(this->m_pUserConData->userName, newReadName))
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN, ERROR_CODE_COMMON);
+
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_USER_CHANGE_READNAME, ERROR_CODE_SUCCESS);
 }
 
 /*

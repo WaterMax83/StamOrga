@@ -6,43 +6,35 @@ import com.watermax.demo 1.0
 
 Rectangle {
     id: mainRectangle
-//    property alias gamePlayItem: gamePlayItem
-//    property var gamePlayItem
+    property var m_gamePlayItem
 
     width: parent.width
-//    width: 100
     height: 50
-    color: "red"
-//    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+    color: "#85C4BE"
     ColumnLayout {
         id: columnLayout
         width: mainRectangle.width
         spacing: 3
         Label {
             id: labelLine1
-            text: qsTr("Benutzername")
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            text: qsTr("Date and what")
+            Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
         }
 
         Label {
             id: labelLine2
-            text: qsTr("Benutzername")
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            text: qsTr("Game")
+            Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
         }
     }
 
     function showGamesInfo(gamePlayItem) {
-//        console.log("Inside Games")
-        labelLine1.text = gamePlayItem.home
-        labelLine2.text = gamePlayItem.away
+        if (gamePlayItem !== null) {
+            m_gamePlayItem = gamePlayItem
+            labelLine1.text = gamePlayItem.timestamp + "\t" + gamePlayItem.competition + "\t" + gamePlayItem.index
+            labelLine2.text = gamePlayItem.home + " - " + gamePlayItem.away + "\t" + gamePlayItem.score
+        }
     }
-
-//    Component {
-//        id: test
-//    }
-//    GamePlay*{
-
-//    }
 }
 
 

@@ -74,6 +74,12 @@ bool ConnectionHandling::startUpdatePassword(QString newPassWord)
     return true;
 }
 
+qint32 ConnectionHandling::startUpdateReadableName(QString name)
+{
+    this->sendUpdateReadableNameRequest(name);
+    return ERROR_CODE_SUCCESS;
+}
+
 qint32 ConnectionHandling::startGettingGamesList()
 {
     this->sendGamesListRequest();
@@ -206,6 +212,32 @@ void ConnectionHandling::slDataConUpdPassFinished(qint32 result, QString newPass
 }
 
 /*
+ * Functions for updating readable name
+ */
+void ConnectionHandling::sendUpdateReadableNameRequest(QString name)
+{
+    this->startDataConnection();                        // call it every time, if it is already started it just returns
+    connect(this->m_pDataCon, &DataConnection::notifyUpdReadabelNameRequest,
+            this, &ConnectionHandling::slDataConUpdReadNameFinished);
+
+    emit this->sStartSendUpdateReadableNameRequest(name);
+}
+
+void ConnectionHandling::slDataConUpdReadNameFinished(qint32 result, QString name)
+{
+    disconnect(this->m_pDataCon, &DataConnection::notifyUpdReadabelNameRequest,
+            this, &ConnectionHandling::slDataConUpdReadNameFinished);
+
+    if (result == ERROR_CODE_SUCCESS) {
+        this->m_pGlobalData->setReadableName(name);
+        this->m_pGlobalData->saveGlobalUserSettings();
+    }
+
+    emit this->sNotifyUpdateReadableNameRequest(result);
+    this->checkTimeoutResult(result);
+}
+
+/*
  * Functions for getting Games list
  */
 void ConnectionHandling::sendGamesListRequest()
@@ -252,6 +284,8 @@ void ConnectionHandling::startDataConnection()
             this->m_pDataCon, &DataConnection::startSendUserPropsRequest);
     connect(this, &ConnectionHandling::sStartSendUpdatePasswordRequest,
             this->m_pDataCon, &DataConnection::startSendUpdPassRequest);
+    connect(this, &ConnectionHandling::sStartSendUpdateReadableNameRequest,
+            this->m_pDataCon, &DataConnection::startSendReadableNameRequest);
     connect(this, &ConnectionHandling::sStartSendGamesListRequest,
             this->m_pDataCon, &DataConnection::startSendGamesListRequest);
 
@@ -273,6 +307,8 @@ void ConnectionHandling::stopDataConnection()
             this->m_pDataCon, &DataConnection::startSendUserPropsRequest);
     disconnect(this, &ConnectionHandling::sStartSendUpdatePasswordRequest,
             this->m_pDataCon, &DataConnection::startSendUpdPassRequest);
+    disconnect(this, &ConnectionHandling::sStartSendUpdateReadableNameRequest,
+            this->m_pDataCon, &DataConnection::startSendReadableNameRequest);
     disconnect(this, &ConnectionHandling::sStartSendGamesListRequest,
             this->m_pDataCon, &DataConnection::startSendGamesListRequest);
 

@@ -193,16 +193,7 @@ ApplicationWindow {
         onNotifyGamesListFinished : {
             busyLoadingIndicator.visible = false
             if (result === 1) {
-                txtInfoLoading.visible = false
-
                 showListedGames()
-//                var component = Qt.createComponent(MyComponents.Games);
-
-//                if (sprite == null)
-//                    console.log("Error creating object")
-//                else
-//                    console.log("Success")
-
             } else {
                 txtInfoLoading.text = "Fehler beim Lesen der Daten: " + result
             }
@@ -220,28 +211,20 @@ ApplicationWindow {
     }
 
     function showListedGames() {
-//        var test = globalUserData.getGamePlay()
 
-        if (globalUserData.getNumbOfGamePlay() > 0) {
-            var test = globalUserData.getGamePlay(0)
-            console.log("number of games = " + test.home)
-            var sprite1 = gameView.createObject(columnLayoutGames)//, {"x":100, "y": 100});
-//            sprite1.gameplayItem =
-            sprite1.showGamesInfo(globalUserData.getGamePlay(0))
-            var sprite2 = gameView.createObject(columnLayoutGames)//, {"x":100, "y": 200});
-//            sprite2.textItem = "Hallo2"
-//            sprite2.gameplayItem = globalUserData.getGamePlay(1)
-            sprite2.showGamesInfo(globalUserData.getGamePlay(1))
-            var sprite3 = gameView.createObject(columnLayoutGames)//, {"x":100, "y": 300});
-//            sprite3.textItem = "Hallo3"
-//            sprite3.gameplayItem = globalUserData.getGamePlay(2)
-            sprite3.showGamesInfo(globalUserData.getGamePlay(2))
-            var sprite4 = gameView.createObject(columnLayoutGames)//, {"x":100, "y": 300});
-//            sprite4.textItem = "Hallo4"
-//            sprite4.gameplayItem = globalUserData.getGamePlay(3)
-            sprite4.showGamesInfo(globalUserData.getGamePlay(3))
+        for (var j = columnLayoutGames.children.length; j > 0; j--) {
+            columnLayoutGames.children[j-1].destroy()
         }
-//        console.log("Width = " + sprite1.width + " " + sprite2.width + " " + sprite3.width)
+
+        txtInfoLoading.visible = true
+        if (globalUserData.getGamePlayLength() > 0) {
+            for (var i=0; i<globalUserData.getGamePlayLength(); i++) {
+                var sprite = gameView.createObject(columnLayoutGames)
+                sprite.showGamesInfo(globalUserData.getGamePlay(i))
+            }
+            txtInfoLoading.text = "Letzes Update am " + globalUserData.getGamePlayLastUpdate()
+        } else
+            txtInfoLoading.text = "Keine Daten zum anzeigen"
     }
 }
 

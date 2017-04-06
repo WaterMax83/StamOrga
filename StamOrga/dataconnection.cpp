@@ -100,6 +100,13 @@ void DataConnection::checkNewOncomingData()
             emit this->notifyUpdPassRequest(result, passw.toString());
             break;
         }
+        case OP_CODE_CMD_RES::ACK_USER_CHANGE_READNAME:
+        {
+            qint32 result = msg->getIntData();
+            QVariant name = this->getActualRequestData(msg->getIndex() & 0x00FFFFFF);
+            emit this->notifyUpdReadabelNameRequest(result, name.toString());
+            break;
+        }
         case OP_CODE_CMD_RES::ACK_NOT_LOGGED_IN:
             if (!this->m_bRequestLoginAgain) {
                 this->m_bRequestLoginAgain = true;
@@ -171,6 +178,16 @@ void DataConnection::startSendUpdPassRequest(QString newPassWord)
         emit this->notifyUpdPassRequest(ERROR_CODE_ERR_SEND, "");
 }
 
+void DataConnection::startSendReadableNameRequest(QString name)
+{
+    QByteArray readName;
+    readName.append(name);
+    qDebug() << QString("Sending readable name %1 with size %2").arg(name).arg(readName.size());
+    MessageProtocol msg(OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME, readName);
+    if (this->sendMessageRequest(&msg) < 0)
+        emit this->notifyLoginRequest(ERROR_CODE_ERR_SEND);
+}
+
 void DataConnection::startSendGamesListRequest()
 {
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST);
@@ -193,6 +210,14 @@ void DataConnection::connectionTimeoutFired()
 
         case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
             emit this->notifyUserPropsRequest(ERROR_CODE_NO_ANSWER, 0);
+            break;
+
+        case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
+            emit this->notifyUpdPassRequest(ERROR_CODE_NO_ANSWER, "");
+            break;
+
+        case OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME:
+            emit this->notifyUpdReadabelNameRequest(ERROR_CODE_NO_ANSWER, "");
             break;
 
         case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
@@ -257,6 +282,10 @@ void DataConnection::sendActualRequestsAgain()
 
         case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
             this->startSendUpdPassRequest(this->m_lActualRequest[i].data.toString());
+            break;
+
+        case OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME:
+            this->startSendReadableNameRequest(this->m_lActualRequest[i].data.toString());
             break;
 
         case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:

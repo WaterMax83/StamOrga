@@ -20,9 +20,11 @@ public:
     qint32 startMainConnection(QString name, QString passw);
     qint32 startGettingVersionInfo();
     qint32 startGettingUserProps();
+    bool startUpdatePassword(QString newPassWord);
+    qint32 startUpdateReadableName(QString name);
     qint32 startGettingGamesList();
 
-    bool startUpdatePassword(QString newPassWord);
+
 
 
     void setGlobalData(GlobalData *pData)
@@ -38,12 +40,14 @@ signals:
     void sNotifyVersionRequest(qint32 result, QString msg);
     void sNotifyUserPropertiesRequest(qint32 result, quint32 value);
     void sNotifyUpdatePasswordRequest(qint32 result, QString newPassWord);
+    void sNotifyUpdateReadableNameRequest(qint32 result);
     void sNotifyGamesListRequest(qint32 result);
 
     void sStartSendLoginRequest();
     void sStartSendVersionRequest();
     void sStartSendUserPropertiesRequest();
     void sStartSendUpdatePasswordRequest(QString newPassWord);
+    void sStartSendUpdateReadableNameRequest(QString name);
     void sStartSendGamesListRequest();
 
 public slots:
@@ -54,6 +58,7 @@ private slots:
     void slDataConVersionFinished(qint32 result, QString msg);
     void slDataConUserPropsFinished(qint32 result, quint32 value);
     void slDataConUpdPassFinished(qint32 result, QString newPassWord);
+    void slDataConUpdReadNameFinished(qint32 result, QString name);
     void slDataConGamesListFinished(qint32 result);
 
     void slTimerConResetFired();
@@ -75,6 +80,7 @@ private:
     void sendVersionRequest();
     void sendUserPropertiesRequest();
     void sendUpdatePasswordRequest(QString newPassWord);
+    void sendUpdateReadableNameRequest(QString name);
     void sendGamesListRequest();
 
     void checkTimeoutResult(qint32 result);

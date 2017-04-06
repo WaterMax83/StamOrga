@@ -36,12 +36,17 @@ qint32 DataHandling::getHandleVersionResponse(MessageProtocol *msg, QString *ver
 
 qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol *msg, quint32 *props)
 {
-    if (msg->getDataLength() != 8)
+    if (msg->getDataLength() < 12)
         return ERROR_CODE_WRONG_SIZE;
 
     const char *pData = msg->getPointerToData();
     qint32 rValue = qFromBigEndian(*((qint32 *)pData));
     *props = qFromBigEndian(*((quint32 *)(pData + 4)));
+
+    quint16 readableNameSize = qFromBigEndian(*((quint16 *)(pData + 8)));
+    QString readableName(QByteArray(pData + 10, readableNameSize));
+
+    this->m_pGlobalData->setReadableName(readableName);
 
     return rValue;
 }
@@ -62,6 +67,8 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol *msg)
     quint16 totalPacks = qFromBigEndian(*(quint16 *)(pData + offset));
 
     offset += 2;
+
+    this->m_pGlobalData->startUpdateGamesPlay();
     while(offset < totalSize && totalPacks > 0) {
         GamePlay *play = new GamePlay();
         quint16 size = qFromBigEndian(*(qint16 *)(pData + offset));
@@ -101,6 +108,8 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol *msg)
         this->m_pGlobalData->addNewGamePlay(play);
         totalPacks--;
     }
+
+    this->m_pGlobalData->saveActualGamesList();
 
     return rValue;
 }

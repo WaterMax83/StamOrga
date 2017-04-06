@@ -113,6 +113,10 @@ MessageProtocol *UdpDataServer::checkNewMessage(MessageProtocol *msg)
             ack = this->m_pDataConnection->requestUserChangeLogin(msg);
             break;
 
+        case OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME:
+            ack = this->m_pDataConnection->requestUserChangeReadname(msg);
+            break;
+
         case OP_CODE_CMD_REQ::REQ_GET_VERSION:
             ack = this->m_pDataConnection->requestGetProgramVersion(msg);
             break;

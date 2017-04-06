@@ -23,6 +23,8 @@ public:
 
     Q_INVOKABLE qint32 startUpdateUserPassword(QString newPassw);
 
+    Q_INVOKABLE qint32 startUpdateReadableName(QString name);
+
     Q_INVOKABLE bool isDebuggingEnabled()
     {
 #ifdef QT_DEBUG
@@ -48,12 +50,14 @@ signals:
     void notifyConnectionFinished(qint32 result);
     void notifyVersionRequestFinished(qint32 result, QString msg);
     void notifyUpdatePasswordRequestFinished(qint32 result, QString newPassWord);
+    void notifyUpdateReadableNameRequest(qint32 result);
     void notifyGamesListFinished(qint32 result);
 
 public slots:
     void slConnectionRequestFinished(qint32 result);
     void slVersionRequestFinished(qint32 result, QString msg);
     void slUpdatePasswordRequestFinished(qint32 result, QString newPassWord);
+    void slUpdateReadableNameRequestFinished(qint32 result);
     void slGettingGamesListFinished(qint32 result);
 
 
