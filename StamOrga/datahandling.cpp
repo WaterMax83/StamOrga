@@ -24,7 +24,12 @@ qint32 DataHandling::getHandleVersionResponse(MessageProtocol *msg, QString *ver
 
     const char *pData = msg->getPointerToData();
     quint32 uVersion = qFromBigEndian(*((quint32 *)pData));
-    QString remVersion(QByteArray(pData + sizeof(quint32), msg->getDataLength() - sizeof(quint32)));
+
+    quint16 size = qFromBigEndian(*((quint16 *)(pData + 4)));
+    if (size > msg->getDataLength())
+        return ERROR_CODE_WRONG_SIZE;
+
+    QString remVersion(QByteArray(pData + 6, size));
 
     if (uVersion > STAM_ORGA_VERSION_I) {
         version->append(QString("Deine Version: %2\nAktuelle Version: %1").arg(remVersion, STAM_ORGA_VERSION_S));

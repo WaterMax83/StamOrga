@@ -17,7 +17,12 @@ DataConnection::DataConnection(GlobalData *pGData, QObject *parent) : QObject(pa
 MessageProtocol *DataConnection::requestCheckUserLogin(MessageProtocol *msg)
 {
     MessageProtocol *ack = NULL;
-    QString passw(QByteArray(msg->getPointerToData(), msg->getDataLength()));
+    const char *pData = msg->getPointerToData();
+    qint16 size = qFromBigEndian(*((quint16 *)pData));
+    if (size > msg->getDataLength())
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_LOGIN_USER, ERROR_CODE_WRONG_SIZE);
+
+    QString passw(QByteArray(pData + 2, size));
     if (this->m_pGlobalData->m_UserList.userCheckPassword(this->m_pUserConData->userName, passw)) {
         ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_LOGIN_USER, ERROR_CODE_SUCCESS);
         this->m_pUserConData->bIsConnected = true;
@@ -119,6 +124,7 @@ MessageProtocol *DataConnection::requestUserChangeReadname(MessageProtocol *msg)
 /*
  * 0                Header          12
  * 12   quint32     version         4
+ * 16   quint16     size            2
  * 16   String      version         X
  */
 MessageProtocol *DataConnection::requestGetProgramVersion(MessageProtocol *msg)
@@ -128,12 +134,17 @@ MessageProtocol *DataConnection::requestGetProgramVersion(MessageProtocol *msg)
         return NULL;
     }
 
-    QString remVersion(QByteArray(msg->getPointerToData() + sizeof(quint32), msg->getDataLength() - sizeof(quint32)));
+    const char *pData = msg->getPointerToData();
+    quint16 actLength = qFromBigEndian(*((quint16 *)(pData + 4)));
+    if (actLength > msg->getDataLength())
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_VERSION,ERROR_CODE_WRONG_SIZE);
+    QString remVersion(QByteArray(msg->getPointerToData() + 6, actLength));
     qInfo().noquote() << QString("Version from %1 = %2").arg(this->m_pUserConData->userName).arg(remVersion);
     QByteArray ownVersion;
     QDataStream wVersion(&ownVersion, QIODevice::WriteOnly);
     wVersion.setByteOrder(QDataStream::BigEndian);
     wVersion << (quint32)STAM_ORGA_VERSION_I;
+    wVersion << quint16(QString(STAM_ORGA_VERSION_S).toUtf8().size());
 
     ownVersion.append(QString(STAM_ORGA_VERSION_S));
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_VERSION, ownVersion);

@@ -133,8 +133,12 @@ void DataConnection::checkNewOncomingData()
 
 void DataConnection::startSendLoginRequest()
 {
+    QString passWord = this->m_pGlobalData->passWord();
     QByteArray aPassw;
-    aPassw.append(this->m_pGlobalData->passWord());
+    QDataStream wPassword(&aPassw, QIODevice::WriteOnly);
+    wPassword.setByteOrder(QDataStream::BigEndian);
+    wPassword << quint16(passWord.toUtf8().size());
+    aPassw.append(passWord);
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_LOGIN_USER, aPassw);
     if (this->sendMessageRequest(&msg) < 0)
         emit this->notifyLoginRequest(ERROR_CODE_ERR_SEND);
@@ -146,6 +150,7 @@ void DataConnection::startSendVersionRequest()
     QDataStream wVersion(&version, QIODevice::WriteOnly);
     wVersion.setByteOrder(QDataStream::BigEndian);
     wVersion << (quint32)STAM_ORGA_VERSION_I;
+    wVersion << quint16(QString(STAM_ORGA_VERSION_S).toUtf8().size());
 
     version.append(QString(STAM_ORGA_VERSION_S));
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_GET_VERSION, version);
@@ -181,6 +186,9 @@ void DataConnection::startSendUpdPassRequest(QString newPassWord)
 void DataConnection::startSendReadableNameRequest(QString name)
 {
     QByteArray readName;
+    QDataStream wReadName(&readName, QIODevice::WriteOnly);
+    wReadName.setByteOrder(QDataStream::BigEndian);
+    wReadName << quint16(name.toUtf8().size());
     readName.append(name);
     qDebug() << QString("Sending readable name %1 with size %2").arg(name).arg(readName.size());
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME, readName);

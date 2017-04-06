@@ -211,7 +211,7 @@ Flickable {
         onNotifyUpdateReadableNameRequest: {
             busyConnectIndicator.visible = false;
             if (result === 1)
-                txtInfoConnecting.text = "Namen erfolgreich geändert"
+                txtInfoConnecting.text = "Name erfolgreich geändert"
             else
                 txtInfoConnecting.text = "Fehler beim Namen ändern"
         }
