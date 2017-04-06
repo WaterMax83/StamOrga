@@ -70,7 +70,6 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol *msg)
     quint32 totalSize = msg->getDataLength();
     quint32 offset = 4;
     quint16 totalPacks = qFromBigEndian(*(quint16 *)(pData + offset));
-
     offset += 2;
 
     this->m_pGlobalData->startUpdateGamesPlay();
@@ -96,7 +95,15 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol *msg)
         offset += 1;
 
 
-        play->setTimeStamp(qFromBigEndian(*(qint64 *)(pData + offset)));
+//        play->setTimeStamp(qFromBigEndian(*(qint64 *)(pData + offset)));
+        qint32 tmp = *(qint32 *)(pData + offset);
+        qDebug() << QString("First value = %1").arg(tmp);
+        qint64 timeStamp = qint64(tmp << 32);
+        tmp = *(quint32 *)(pData + offset + 4);
+        qDebug() << QString("Second value = %1").arg(tmp);
+        timeStamp |= qint64(tmp);
+
+        play->setTimeStamp(qFromBigEndian(timeStamp));
         offset += 8;
 
         QString playString(QByteArray(pData + offset, size - 8));
