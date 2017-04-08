@@ -10,8 +10,8 @@ import "components" as MyComponents
 ApplicationWindow {
     id: window
     visible: true
-    width: 540
-    height: 960
+    width: userInt.isDeviceMobile() ? 540 : 360
+    height: userInt.isDeviceMobile() ? 960 : 600
     title: qsTr("StamOrga")
 
     onClosing: {
@@ -123,41 +123,48 @@ ApplicationWindow {
         id: stackView
         anchors.fill: parent
 
-        initialItem: Pane {
+        initialItem: Flickable {
+            id: flickable
+        //    width: parent.width
+            contentHeight: mainPane.height
+            Pane {
             id: mainPane
             width: parent.width
 
-            ColumnLayout {
-                id: mainColumnLayout
-                anchors.right: parent.right
-                anchors.left: parent.left
-                width: parent.width
                 ColumnLayout {
-                    id: columnLayoutBusyInfo
-                    spacing: 5
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-
-                    BusyIndicator {
-                        id: busyLoadingIndicator
-                        visible: false
-                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                    }
-
-                    Label {
-                        id: txtInfoLoading
-                        visible: false
-                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                    }
-                }
-                ColumnLayout {
-                    id: columnLayoutGames
+                    id: mainColumnLayout
                     anchors.right: parent.right
                     anchors.left: parent.left
                     width: parent.width
-                    spacing: 10
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    ColumnLayout {
+                        id: columnLayoutBusyInfo
+                        spacing: 5
+                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+
+                        BusyIndicator {
+                            id: busyLoadingIndicator
+                            visible: false
+                            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                        }
+
+                        Label {
+                            id: txtInfoLoading
+                            visible: false
+                            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                        }
+                    }
+                    ColumnLayout {
+                        id: columnLayoutGames
+                        anchors.right: parent.right
+                        anchors.left: parent.left
+                        width: parent.width
+                        spacing: 10
+                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    }
                 }
             }
+
+            ScrollIndicator.vertical: ScrollIndicator { }
         }
     }
 
@@ -178,7 +185,6 @@ ApplicationWindow {
         id: userInt
         globalData: globalUserData
         onNotifyConnectionFinished : {
-            console.log("UserLogin return value: " + result)
             if (result === 1) {
                 userInt.startGettingGamesList()
                 txtInfoLoading.text = "Lade Spielliste"

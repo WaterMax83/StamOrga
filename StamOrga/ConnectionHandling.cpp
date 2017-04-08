@@ -156,7 +156,6 @@ void ConnectionHandling::slDataConVersionFinished(qint32 result, QString msg)
 {
     disconnect(this->m_pDataCon, &DataConnection::notifyVersionRequest,
             this, &ConnectionHandling::slDataConVersionFinished);
-    qDebug() << "version request finished: "  << msg;
 
     emit this->sNotifyVersionRequest(result, msg);
     this->checkTimeoutResult(result);

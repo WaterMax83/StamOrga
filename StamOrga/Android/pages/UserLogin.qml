@@ -12,14 +12,14 @@ Flickable {
     Pane {
         id: pane
         width: flickable.width
-        height: flickable.height * 1.25
+//        height: flickable.height * 1.25
 
         Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
         ColumnLayout {
             id: mainColumnLayout
             width: pane.width
-            spacing: 35
+            spacing: 25
 
             TextField {
                 id: txtIPAddress
@@ -137,6 +137,33 @@ Flickable {
             }
 
             Button {
+                id: btnChangeReadableName
+                text: qsTr("Öffentlicher Name")
+                implicitWidth: mainColumnLayout.width / 4 * 2
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                transformOrigin: Item.Center
+                enabled: globalUserData.bIsConnected
+                onClicked: {
+                    txtReadableName.text = globalUserData.readableName
+                    changeReadableName.open()
+                }
+//                onEnabledChanged: {
+//                    if (btnChangeReadableName.enabled) {
+//                        /* Is called before readable name is there */
+//                        if (globalUserData.readableName.length == 0)
+//                            btnChangeReadableName.background.color = "#FFAAAA"
+//                    }
+//                }
+            }
+
+            ToolSeparator {
+                id: toolSeparator3
+                orientation: "Horizontal"
+                implicitWidth: mainColumnLayout.width / 3 * 1
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            }
+
+            Button {
                 id: btnChangePassWord
                 text: qsTr("Password ändern")
                 implicitWidth: mainColumnLayout.width / 4 * 2
@@ -150,26 +177,6 @@ Flickable {
                 }
             }
 
-            ToolSeparator {
-                id: toolSeparator3
-                orientation: "Horizontal"
-                implicitWidth: mainColumnLayout.width / 3 * 1
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            }
-
-            Button {
-                id: btnChangeReadableName
-                text: qsTr("Öffentlicher Name")
-                implicitWidth: mainColumnLayout.width / 4 * 2
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                transformOrigin: Item.Center
-                enabled: globalUserData.bIsConnected
-                onClicked: {
-                    txtReadableName.text = globalUserData.readableName
-                    changeReadableName.open()
-                }
-            }
-
         }
     }
 
@@ -179,7 +186,6 @@ Flickable {
         onNotifyConnectionFinished : {
             btnSendData.enabled = true
             busyConnectIndicator.visible = false;
-//            console.log("UserLogin return value: " + result)
             if (result === 1) {
                 btnSendData.background.color = "green"
                 txtInfoConnecting.text = "Verbindung erfolgreich"
@@ -195,7 +201,6 @@ Flickable {
             }
         }
         onNotifyVersionRequestFinished : {
-//            console.log("version request: " + result + " - " + msg);
             if (result === 5) {
                 versionDialogTextUpdate.text = msg;
                 versionDialog.open()
@@ -297,6 +302,8 @@ Flickable {
                 visible: false
                 text: qsTr("Passwörter stimmen nicht überein")
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                wrapMode: Text.WordWrap
+                Layout.maximumWidth: parent.width
                 color: "red"
             }
             Label {
@@ -304,6 +311,8 @@ Flickable {
                 visible: false
                 text: qsTr("Das Passwort muss mindestens 6 Zeichen lang sein")
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                wrapMode: Text.WordWrap
+                Layout.maximumWidth: parent.width
                 color: "orange"
             }
         }
@@ -353,6 +362,8 @@ Flickable {
                 visible: false
                 text: qsTr("Der Name muss mindestns 3 Zeichen lang sein")
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                wrapMode: Text.WordWrap
+                Layout.maximumWidth: parent.width
                 color: "orange"
             }
         }

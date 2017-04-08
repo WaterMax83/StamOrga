@@ -109,7 +109,11 @@ public:
 
     void startUpdateGamesPlay();
     void addNewGamePlay(GamePlay *gPlay);
-    Q_INVOKABLE quint32 getGamePlayLength() { return this->m_lGamePlay.size(); }
+    Q_INVOKABLE quint32 getGamePlayLength()
+    {
+        QMutexLocker lock(&this->m_mutexGame);
+        return this->m_lGamePlay.size();
+    }
     Q_INVOKABLE GamePlay *getGamePlay(int index);
     Q_INVOKABLE QString getGamePlayLastUpdate();
 

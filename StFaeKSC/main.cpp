@@ -1,4 +1,5 @@
 #include <QtCore/QCoreApplication>
+#include <QtCore/QDataStream>
 #include <QtCore/QFile>
 
 #include "../Common/General/backgroundcontroller.h"

@@ -94,16 +94,14 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol *msg)
         play->setCompetition(*(qint8 *)(pData + offset));
         offset += 1;
 
-
+        /* On Android there are problems reading from qint64 pointers???? SIGBUS*/
 //        play->setTimeStamp(qFromBigEndian(*(qint64 *)(pData + offset)));
-        qint32 tmp = *(qint32 *)(pData + offset);
-        qDebug() << QString("First value = %1").arg(tmp);
-        qint64 timeStamp = qint64(tmp << 32);
-        tmp = *(quint32 *)(pData + offset + 4);
-        qDebug() << QString("Second value = %1").arg(tmp);
+        quint32 tmp = qFromBigEndian(*(qint32 *)(pData + offset));
+        qint64 timeStamp = qint64(tmp) << 32;
+        tmp = qFromBigEndian(*(quint32 *)(pData + offset + 4));
         timeStamp |= qint64(tmp);
 
-        play->setTimeStamp(qFromBigEndian(timeStamp));
+        play->setTimeStamp(timeStamp);
         offset += 8;
 
         QString playString(QByteArray(pData + offset, size - 8));

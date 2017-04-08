@@ -105,6 +105,11 @@ void GlobalData::saveActualGamesList()
 
 void GlobalData::startUpdateGamesPlay()
 {
+    QMutexLocker lock(&this->m_mutexGame);
+
+    /* need to delet, because they are all pointers */
+    for (int i=0; i<this->m_lGamePlay.size(); i++)
+        delete this->m_lGamePlay[i];
     this->m_lGamePlay.clear();
     this->m_gpLastTimeStamp = QDateTime::currentDateTime().toMSecsSinceEpoch();
 }
@@ -136,6 +141,8 @@ bool GlobalData::existGamePlay(GamePlay *gPlay)
 
 GamePlay *GlobalData::getGamePlay(int index)
 {
+    QMutexLocker lock(&this->m_mutexGame);
+
     if (index < this->m_lGamePlay.size())
         return this->m_lGamePlay.at(index);
     return NULL;
@@ -143,6 +150,7 @@ GamePlay *GlobalData::getGamePlay(int index)
 
 QString GlobalData::getGamePlayLastUpdate()
 {
+    QMutexLocker lock(&this->m_mutexGame);
     return QDateTime::fromMSecsSinceEpoch(this->m_gpLastTimeStamp).toString("dd.MM.yy hh:mm:ss");
 }
 
