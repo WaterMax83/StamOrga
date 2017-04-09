@@ -37,6 +37,7 @@ extern bool checkFilePathExistAndCreate(const QString &path);
 #define ERROR_CODE_ERR_SEND        -4
 #define ERROR_CODE_NO_ANSWER        -5
 #define ERROR_CODE_NO_CONNECT       -6
+#define ERROR_CODE_ALREADY_EXIST    -7
 #define ERROR_CODE_NO_USER          -20
 #define ERROR_CODE_WRONG_PASSWORD   -21
 

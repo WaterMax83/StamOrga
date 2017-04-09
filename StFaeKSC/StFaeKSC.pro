@@ -24,7 +24,8 @@ SOURCES += main.cpp \
     General/dataconnection.cpp \
     Data/listeduser.cpp \
     Data/games.cpp \
-    Data/readdatacsv.cpp
+    Data/readdatacsv.cpp \
+    Data/seasonticket.cpp
 
 HEADERS += \
     ../Common/General/backgroundcontroller.h \
@@ -45,7 +46,8 @@ HEADERS += \
     General/dataconnection.h \
     Data/listeduser.h \
     Data/games.h \
-    Data/readdatacsv.h
+    Data/readdatacsv.h \
+    Data/seasonticket.h
 
 
 unix {

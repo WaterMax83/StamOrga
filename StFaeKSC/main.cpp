@@ -50,8 +50,6 @@ int main(int argc, char *argv[])
 
     /* TODO: Connect for ctrlUdp::notifyBackgroundWorkerFinished */
 
-
-
     Console con(&globalData);
     con.run();
     QObject::connect(&con, SIGNAL(quit()), &a, SLOT(quit()));

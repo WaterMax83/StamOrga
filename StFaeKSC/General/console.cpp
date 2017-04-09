@@ -1,5 +1,7 @@
 
 #include <QCoreApplication>
+#include <QtCore/QDir>
+#include <QtCore/QFileInfo>
 #include <QThread>
 #include <QDebug>
 
@@ -9,6 +11,7 @@
 
 #include "console.h"
 #include "usercommand.h"
+#include "../Common/General/globalfunctions.h"
 
 
 #define SETTINGS_PATH "/Settings/settings.ini"
@@ -39,6 +42,18 @@ void Console::run()
     /* connect the input of a new line in the console */
     connect(this->m_pSNotify, SIGNAL(activated(int)), this, SLOT(readCommand()));
 
+    QDir appDir(this->m_applicationPath);
+    QStringList appDirFiles = appDir.entryList(QDir::Readable | QDir::Files);
+
+    if (appDirFiles.size() == 0)
+        return;
+
+    for (int i=0; i < appDirFiles.size(); i++) {
+        if (appDirFiles.at(i).endsWith(".csv")) {
+            qInfo() << (QString("Found %1 trying to read in").arg(appDirFiles.at(i)));
+            UserCommand::runReadCommand("read " + appDirFiles.at(i), this->m_pGlobalData);
+        }
+    }
 }
 
 /* parsing the input commands */

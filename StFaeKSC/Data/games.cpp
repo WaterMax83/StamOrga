@@ -69,7 +69,8 @@ int Games::addNewGame(QString home, QString away, qint64 datetime, quint8 sIndex
 
     GamesPlay *pGame;
     if ((pGame = this->gameExists(sIndex, comp)) != NULL) {
-        CONSOLE_INFO (QString("Game \"%1\" already exists, updating info").arg(sIndex + ":" + comp));
+//        QString info = QString("%1 : %2").arg(sIndex).arg(comp);
+//        qInfo() << (QString("Game \"%1\" already exists, updating info").arg(info));
 
         QMutexLocker locker(&this->m_mGamesListMutex);
 
@@ -86,7 +87,7 @@ int Games::addNewGame(QString home, QString away, qint64 datetime, quint8 sIndex
                 pGame->datetime = datetime;
             }
         }
-        if (pGame->score != score) {
+        if (pGame->score != score && score.size() > 0) {
             if (this->updateGamesPlayValue(pGame, PLAY_SCORE, QVariant(score)))
                 pGame->score = score;
         }
@@ -164,7 +165,7 @@ void Games::saveActualGamesList()
     for (int i=0; i<this->m_lGamesPlay.size(); i++) {
         this->m_pGamesSettings->setArrayIndex(i);
         this->m_pGamesSettings->setValue(PLAY_HOME, this->m_lGamesPlay[i].home);
-        this->m_pGamesSettings->setValue(PLAY_ARRAY, this->m_lGamesPlay[i].away);
+        this->m_pGamesSettings->setValue(PLAY_AWAY, this->m_lGamesPlay[i].away);
         this->m_pGamesSettings->setValue(PLAY_DATETIME, this->m_lGamesPlay[i].datetime);
         this->m_pGamesSettings->setValue(PLAY_SAISON_INDEX, this->m_lGamesPlay[i].saisonIndex);
         this->m_pGamesSettings->setValue(PLAY_SCORE, this->m_lGamesPlay[i].score);
