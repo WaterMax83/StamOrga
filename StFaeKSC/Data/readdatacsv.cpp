@@ -108,6 +108,7 @@ int ReadDataCSV::readNewGameData(QStringList line)
 
 int ReadDataCSV::readNewUserData(QStringList line)
 {
-
+    if (line.length() < 2)
+        return -1;
     return 0;
 }

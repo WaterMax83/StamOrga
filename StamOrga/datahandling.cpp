@@ -69,6 +69,13 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol *msg)
 
     quint32 totalSize = msg->getDataLength();
     quint32 offset = 4;
+	quint16 version = qFromBigEndian(*(qint16 *)(pData + offset));
+	if (version != 0x1) {
+		qWarning().noquote() << QString("Unknown game version %1").arg(version);
+		return -1;
+	}
+	offset += 2;
+	
     quint16 totalPacks = qFromBigEndian(*(quint16 *)(pData + offset));
     offset += 2;
 
@@ -83,12 +90,12 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol *msg)
             break;
         }
 
-        quint16 version = qFromBigEndian(*(qint16 *)(pData + offset));
-        if (version != 0x1) {
-            qWarning().noquote() << QString("Unknown game version %1").arg(version);
-            break;
-        }
-        offset += 2;
+        // quint16 version = qFromBigEndian(*(qint16 *)(pData + offset));
+        // if (version != 0x1) {
+            // qWarning().noquote() << QString("Unknown game version %1").arg(version);
+            // break;
+        // }
+        // offset += 2;
         play->setIndex(*(qint8 *)(pData + offset));
         offset += 1;
         play->setCompetition(*(qint8 *)(pData + offset));
@@ -104,8 +111,8 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol *msg)
         play->setTimeStamp(timeStamp);
         offset += 8;
 
-        QString playString(QByteArray(pData + offset, size - 8));
-        offset += (size - 12);
+        QString playString(QByteArray(pData + offset, size - 10));
+        offset += (size - 10);
         QStringList lplayString = playString.split(";");
 
         if (lplayString.size() > 0)

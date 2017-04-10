@@ -1,4 +1,4 @@
-https://github.com/WaterMax83/StamOrga.git
+﻿https://github.com/WaterMax83/StamOrga.git
 
 Das Repository laden
 git clone https://github.com/WaterMax83/StamOrga.git
@@ -8,6 +8,7 @@ git branch -D xyz				branch löschen
 git checkout xyz				zu branch wechseln
 
 git format-patch master > fix.patch		patch erzeugen vom branch zu master
+git apply fix.patch
 
 git status						aktuelle Änderungen sehen
 git add .						aktuelle Änderungen für commit vormerken

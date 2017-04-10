@@ -1,14 +1,13 @@
 #include <QtCore/QDateTime>
 
-#include "seasonticket.h"
 #include "../Common/General/globalfunctions.h"
+#include "seasonticket.h"
 
 SeasonTicket::SeasonTicket()
 {
     QString ticketSetFilePath = getUserHomeConfigPath() + "/Settings/SeasonTicket.ini";
 
-    if (!checkFilePathExistAndCreate(ticketSetFilePath))
-    {
+    if (!checkFilePathExistAndCreate(ticketSetFilePath)) {
         CONSOLE_CRITICAL(QString("Could not create File for SeasonTicket setting"));
         return;
     }
@@ -23,14 +22,14 @@ SeasonTicket::SeasonTicket()
         this->m_pTicketsSettings->beginGroup(TICKET_GROUP);
         int sizeOfTicket = this->m_pTicketsSettings->beginReadArray(TICKET_ARRAY);
 
-        for (int i=0; i<sizeOfTicket; i++ ) {
+        for (int i = 0; i < sizeOfTicket; i++) {
             this->m_pTicketsSettings->setArrayIndex(i);
-            QString user = this->m_pTicketsSettings->value(TICKET_USER, "").toString();
-            QString name = this->m_pTicketsSettings->value(TICKET_NAME, "").toString();
-            qint64 timestamp = this->m_pTicketsSettings->value(TICKET_TIMESTAMP, 0x0).toULongLong();
-            quint32 discount = this->m_pTicketsSettings->value(TICKET_DISCOUNT, 0).toUInt();
-            QString place = this->m_pTicketsSettings->value(TICKET_PLACE, "").toString();
-            quint32 index = this->m_pTicketsSettings->value(TICKET_INDEX, 0).toInt();
+            QString user      = this->m_pTicketsSettings->value(TICKET_USER, "").toString();
+            QString name      = this->m_pTicketsSettings->value(TICKET_NAME, "").toString();
+            qint64  timestamp = this->m_pTicketsSettings->value(TICKET_TIMESTAMP, 0x0).toULongLong();
+            quint8  discount  = quint8(this->m_pTicketsSettings->value(TICKET_DISCOUNT, 0).toUInt());
+            QString place     = this->m_pTicketsSettings->value(TICKET_PLACE, "").toString();
+            quint32 index     = this->m_pTicketsSettings->value(TICKET_INDEX, 0).toInt();
             if (!this->addNewTicketInfo(user, name, timestamp, discount, place, index))
                 bProblems = true;
         }
@@ -39,34 +38,33 @@ SeasonTicket::SeasonTicket()
     }
 
 
-    for (int i=0; i<this->m_lAddTicketInfoProblems.size(); i++)
-    {
-        bProblems = true;
+    for (int i = 0; i < this->m_lAddTicketInfoProblems.size(); i++) {
+        bProblems                               = true;
         this->m_lAddTicketInfoProblems[i].index = this->getNextTicketIndex();
         this->addNewTicketInfo(this->m_lAddTicketInfoProblems[i].user, this->m_lAddTicketInfoProblems[i].name,
-                              this->m_lAddTicketInfoProblems[i].timestamp, this->m_lAddTicketInfoProblems[i].discount,
-                              this->m_lAddTicketInfoProblems[i].place, this->m_lAddTicketInfoProblems[i].index);
+                               this->m_lAddTicketInfoProblems[i].timestamp, this->m_lAddTicketInfoProblems[i].discount,
+                               this->m_lAddTicketInfoProblems[i].place, this->m_lAddTicketInfoProblems[i].index);
     }
 
     if (bProblems)
         this->saveActualTicketList();
 
-//    this->sortGamesListByTime();
+    //    this->sortGamesListByTime();
 }
 
-int SeasonTicket::addNewSeasonTicket(QString user, QString name, quint32 discount)
+int SeasonTicket::addNewSeasonTicket(QString user, QString name, quint8 discount)
 {
-//    if (sIndex == 0 || comp == 0) {
-//        qWarning().noquote() << "Could not add game because saisonIndex or competition were zero";
-//        return ERROR_CODE_COMMON;
-//    }
+    //    if (sIndex == 0 || comp == 0) {
+    //        qWarning().noquote() << "Could not add game because saisonIndex or competition were zero";
+    //        return ERROR_CODE_COMMON;
+    //    }
 
-    TicketInfo *pTicket;
+    TicketInfo* pTicket;
     if ((pTicket = this->ticketExists(name)) != NULL) {
-//        QString info = QString("%1 : %2").arg(sIndex).arg(comp);
-//        qInfo() << (QString("Game \"%1\" already exists, updating info").arg(info))
+        //        QString info = QString("%1 : %2").arg(sIndex).arg(comp);
+        //        qInfo() << (QString("Game \"%1\" already exists, updating info").arg(info))
 
-//        return pGame->index;
+        //        return pGame->index;
         return ERROR_CODE_ALREADY_EXIST;
     }
 
@@ -89,30 +87,29 @@ int SeasonTicket::addNewSeasonTicket(QString user, QString name, quint32 discoun
     this->m_pTicketsSettings->endGroup();
     this->m_pTicketsSettings->sync();
 
-    this->addNewTicketInfo(user, name, timestamp,discount, name, newIndex, false);
+    this->addNewTicketInfo(user, name, timestamp, discount, name, newIndex, false);
 
     CONSOLE_INFO(QString("Added new ticket: %1").arg(name));
     return newIndex;
 }
 
-//int ListedUser::removeUser(const QString &name)
-//{
-//    int index = this->getUserLoginIndex(name);
-//    if (index < 0 || index > this->m_lUserLogin.size() - 1)
-//    {
-//        CONSOLE_WARNING(QString("Could not find user \"%1\"").arg(name));
-//        return -1;
-//    }
+int SeasonTicket::removeTicket(const QString& name)
+{
+    int index = this->getTicketInfoIndex(name);
+    if (index < 0 || index > this->m_lTicketInfo.size() - 1) {
+        CONSOLE_WARNING(QString("Could not find season ticket \"%1\"").arg(name));
+        return ERROR_CODE_COMMON;
+    }
 
-//    QMutexLocker locker(&this->m_mUserListMutex);
+    QMutexLocker locker(&this->m_mTicketInfoMutex);
 
-//    this->m_lUserLogin.removeAt(index);
+    this->m_lTicketInfo.removeAt(index);
 
-//    this->saveActualUserList();
+    this->saveActualTicketList();
 
-//    CONSOLE_INFO(QString("removed User \"%1\"").arg(name));
-//    return 0;
-//}
+    CONSOLE_INFO(QString("removed Ticket \"%1\"").arg(name));
+    return ERROR_CODE_SUCCESS;
+}
 
 int SeasonTicket::showAllSeasonTickets()
 {
@@ -132,10 +129,10 @@ void SeasonTicket::saveActualTicketList()
     QMutexLocker locker(&this->m_mTicketIniMutex);
 
     this->m_pTicketsSettings->beginGroup(TICKET_GROUP);
-    this->m_pTicketsSettings->remove("");              // clear all elements
+    this->m_pTicketsSettings->remove(""); // clear all elements
 
     this->m_pTicketsSettings->beginWriteArray(TICKET_ARRAY);
-    for (int i=0; i<this->m_lTicketInfo.size(); i++) {
+    for (int i = 0; i < this->m_lTicketInfo.size(); i++) {
         this->m_pTicketsSettings->setArrayIndex(i);
         this->m_pTicketsSettings->setValue(TICKET_USER, this->m_lTicketInfo[i].user);
         this->m_pTicketsSettings->setValue(TICKET_NAME, this->m_lTicketInfo[i].name);
@@ -151,11 +148,11 @@ void SeasonTicket::saveActualTicketList()
     qDebug().noquote() << QString("saved actual SeasonTicket List with %1 entries").arg(this->m_lTicketInfo.size());
 }
 
-TicketInfo *SeasonTicket::ticketExists(QString name)
+TicketInfo* SeasonTicket::ticketExists(QString name)
 {
     QMutexLocker locker(&this->m_mTicketInfoMutex);
 
-    for (int i=0; i<this->m_lTicketInfo.size(); i++) {
+    for (int i = 0; i < this->m_lTicketInfo.size(); i++) {
         if (this->m_lTicketInfo[i].name == name)
             return &this->m_lTicketInfo[i];
     }
@@ -239,7 +236,7 @@ bool SeasonTicket::ticketExists(quint32 index)
 //}
 
 
-bool SeasonTicket::addNewTicketInfo(QString user, QString name, qint64 datetime, quint32 discount, QString place, quint32 index, bool checkTicket)
+bool SeasonTicket::addNewTicketInfo(QString user, QString name, qint64 datetime, quint8 discount, QString place, quint32 index, bool checkTicket)
 {
     if (checkTicket) {
         if (index == 0 || this->ticketExists(index)) {
@@ -253,51 +250,51 @@ bool SeasonTicket::addNewTicketInfo(QString user, QString name, qint64 datetime,
     return true;
 }
 
-void SeasonTicket::addNewTicketInfo(QString user, QString name, qint64 datetime, quint32 discount, QString place, quint32 index, QList<TicketInfo> *pList)
+void SeasonTicket::addNewTicketInfo(QString user, QString name, qint64 datetime, quint8 discount, QString place, quint32 index, QList<TicketInfo>* pList)
 {
     QMutexLocker locker(&this->m_mTicketInfoMutex);
 
     TicketInfo ticket;
-    ticket.user = user;
-    ticket.name = name;
+    ticket.user      = user;
+    ticket.name      = name;
     ticket.timestamp = datetime;
-    ticket.discount = discount;
-    ticket.place = place;
-    ticket.index = index;
+    ticket.discount  = discount;
+    ticket.place     = place;
+    ticket.index     = index;
     pList->append(ticket);
 }
 
-//quint32 ListedUser::getUserLoginIndex(const QString &name)
-//{
-//    QMutexLocker locker(&this->m_mUserListMutex);
+quint32 SeasonTicket::getTicketInfoIndex(const QString& name)
+{
+    QMutexLocker locker(&this->m_mTicketInfoMutex);
 
-//    for (int i=0; i<this->m_lUserLogin.size(); i++) {
-//        if (this->m_lUserLogin[i].userName == name)
-//            return i;
-//    }
-//    return -1;
-//}
+    for (int i = 0; i < this->m_lTicketInfo.size(); i++) {
+        if (this->m_lTicketInfo[i].name == name)
+            return i;
+    }
+    return -1;
+}
 
 quint32 SeasonTicket::getNextTicketIndex()
 {
     QMutexLocker locker(&this->m_mTicketInfoMutex);
 
     quint32 index = 0;
-    for (int i=0; i<this->m_lTicketInfo.size(); i++) {
+    for (int i = 0; i < this->m_lTicketInfo.size(); i++) {
         if (this->m_lTicketInfo[i].index > index)
             index = this->m_lTicketInfo[i].index;
     }
-    return index+1;
+    return index + 1;
 }
 
-bool SeasonTicket::updateTicketInfoValue(TicketInfo *pTicket, QString key, QVariant value)
+bool SeasonTicket::updateTicketInfoValue(TicketInfo* pTicket, QString key, QVariant value)
 {
-    bool rValue = false;
+    bool         rValue = false;
     QMutexLocker locker(&this->m_mTicketIniMutex);
 
     this->m_pTicketsSettings->beginGroup(TICKET_GROUP);
     int arrayCount = this->m_pTicketsSettings->beginReadArray(TICKET_ARRAY);
-    for (int i=0; i<arrayCount; i++) {
+    for (int i = 0; i < arrayCount; i++) {
         this->m_pTicketsSettings->setArrayIndex(i);
         quint32 actIndex = this->m_pTicketsSettings->value(TICKET_INDEX, 0).toInt();
         if (pTicket->index == actIndex) {

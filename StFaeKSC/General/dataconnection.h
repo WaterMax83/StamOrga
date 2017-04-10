@@ -18,7 +18,10 @@ public:
     MessageProtocol *requestUserChangeLogin(MessageProtocol *msg);
     MessageProtocol *requestUserChangeReadname(MessageProtocol *msg);
     MessageProtocol *requestGetProgramVersion(MessageProtocol *msg);
-    MessageProtocol *requestGetGamesList(MessageProtocol *msg);
+    MessageProtocol *requestGetGamesList(/*MessageProtocol *msg*/);
+    MessageProtocol *requestGetTicketsList(/*MessageProtocol *msg*/);
+    MessageProtocol *requestAddSeasonTicket(MessageProtocol *msg);
+    MessageProtocol *requestRemoveSeasonTicket(MessageProtocol *msg);
 
     void setUserConnectionData(UserConData * pUsrConData) { this->m_pUserConData = pUsrConData; }
 

@@ -122,7 +122,19 @@ MessageProtocol *UdpDataServer::checkNewMessage(MessageProtocol *msg)
             break;
 
         case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
-            ack = this->m_pDataConnection->requestGetGamesList(msg);
+            ack = this->m_pDataConnection->requestGetGamesList();
+            break;
+
+        case OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST:
+            ack = this->m_pDataConnection->requestGetTicketsList();
+            break;
+
+        case OP_CODE_CMD_REQ::REQ_ADD_TICKET:
+            ack = this->m_pDataConnection->requestAddSeasonTicket(msg);
+            break;
+
+        case OP_CODE_CMD_REQ::REQ_REMOVE_TICKET:
+            ack = this->m_pDataConnection->requestRemoveSeasonTicket(msg);
             break;
 
         default:
