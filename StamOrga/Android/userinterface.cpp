@@ -15,6 +15,12 @@ UserInterface::UserInterface(QObject *parent) : QObject(parent)
             this, &UserInterface::slUpdateReadableNameRequestFinished);
     connect(this->m_pConHandle, &ConnectionHandling::sNotifyGamesListRequest,
             this, &UserInterface::slGettingGamesListFinished);
+    connect(this->m_pConHandle, &ConnectionHandling::sNotifySeasonTicketAddRequest,
+            this, &UserInterface::slSeasonTicketAddFinished);
+    connect(this->m_pConHandle, &ConnectionHandling::sNotifySeasonTicketRemoveRequest,
+            this, &UserInterface::slSeasonTicketRemoveFinished);
+    connect(this->m_pConHandle, &ConnectionHandling::sNotifySeasonTicketListRequest,
+            this, &UserInterface::slSeasonTicketListFinished);
 }
 
 qint32 UserInterface::startMainConnection(QString name, QString passw)
@@ -37,6 +43,21 @@ qint32 UserInterface::startUpdateReadableName(QString name)
 qint32 UserInterface::startGettingGamesList()
 {
     return this->m_pConHandle->startGettingGamesList();
+}
+
+qint32 UserInterface::startAddSeasonTicket(QString name, quint32 discount)
+{
+    return this->m_pConHandle->startSeasonTicketAdd(name, discount);
+}
+
+qint32 UserInterface::startRemoveSeasonTicket(QString name)
+{
+    return this->m_pConHandle->startSeasonTicketRemove(name);
+}
+
+qint32 UserInterface::startGettingSeasonTicketList()
+{
+    return this->m_pConHandle->startGettingSeasonTicketList();
 }
 
 void UserInterface::slConnectionRequestFinished(qint32 result)
@@ -66,4 +87,20 @@ void UserInterface::slGettingGamesListFinished(qint32 result)
 void UserInterface::slUpdateReadableNameRequestFinished(qint32 result)
 {
     emit this->notifyUpdateReadableNameRequest(result);
+}
+
+void UserInterface::slSeasonTicketAddFinished(qint32 result)
+{
+    qDebug() << "Add Ticket Answer 3";
+    emit this->notifySeasonTicketAddFinished(result);
+}
+
+void UserInterface::slSeasonTicketRemoveFinished(qint32 result)
+{
+    emit this->notifySeasonTicketRemoveFinished(result);
+}
+
+void UserInterface::slSeasonTicketListFinished(qint32 result)
+{
+    emit this->notifySeasonTicketListFinished(result);
 }

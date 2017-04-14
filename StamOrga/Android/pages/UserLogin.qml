@@ -82,11 +82,11 @@ Flickable {
                 id: rowLayout
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
-                Column {
-                    id: space
-                    width: 0
-                    height: 81
-                }
+//                Column {
+//                    id: space
+//                    width: 0
+//                    height: 81
+//                }
 
                 ColumnLayout {
                     id: columnLayout
@@ -360,7 +360,7 @@ Flickable {
             Label {
                 id: labelNameTooShort
                 visible: false
-                text: qsTr("Der Name muss mindestns 3 Zeichen lang sein")
+                text: qsTr("Der Name muss mindestens 3 Zeichen lang sein")
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 wrapMode: Text.WordWrap
                 Layout.maximumWidth: parent.width
@@ -377,7 +377,7 @@ Flickable {
         x: (flickable.width - width) / 2
         y: flickable.height / 6
         width: Math.min(flickable.width, flickable.height) / 3 * 2
-        contentHeight: versionColumn.height
+//        contentHeight: versionColumn.height
 
         Column {
             id: versionColumn

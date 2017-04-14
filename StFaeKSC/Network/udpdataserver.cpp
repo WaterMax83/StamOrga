@@ -67,7 +67,9 @@ void UdpDataServer::readyReadSocketPort()
 void UdpDataServer::onConnectionLoginTimeout()
 {
     this->m_pUsrConData->bIsConnected = false;
-    qDebug().noquote() << QString("User %1 was inactive, logged out").arg(this->m_pUsrConData->userName);
+    qDebug().noquote() << QString("User %1 with Port %2 was inactive, logged out")
+                          .arg(this->m_pUsrConData->userName)
+                          .arg(this->m_pUsrConData->dstDataPort);
 }
 
 void UdpDataServer::onConnectionResetTimeout()

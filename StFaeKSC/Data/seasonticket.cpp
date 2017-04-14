@@ -63,10 +63,7 @@ int SeasonTicket::addNewSeasonTicket(QString user, quint32 userIndex, QString na
 
     TicketInfo* pTicket;
     if ((pTicket = this->ticketExists(name)) != NULL) {
-        //        QString info = QString("%1 : %2").arg(sIndex).arg(comp);
-        //        qInfo() << (QString("Game \"%1\" already exists, updating info").arg(info))
-
-        //        return pGame->index;
+        qInfo() << QString("SeasonTicket \"%1\" already exists, cannot add").arg(name);
         return ERROR_CODE_ALREADY_EXIST;
     }
 
@@ -92,7 +89,7 @@ int SeasonTicket::addNewSeasonTicket(QString user, quint32 userIndex, QString na
 
     this->addNewTicketInfo(user, userIndex, name, timestamp, discount, name, newIndex, false);
 
-    CONSOLE_INFO(QString("Added new ticket: %1").arg(name));
+//    qInfo() << (QString("Added new ticket: %1").arg(name));
     return newIndex;
 }
 
@@ -100,7 +97,7 @@ int SeasonTicket::removeTicket(const QString& name)
 {
     int index = this->getTicketInfoIndex(name);
     if (index < 0 || index > this->m_lTicketInfo.size() - 1) {
-        CONSOLE_WARNING(QString("Could not find season ticket \"%1\"").arg(name));
+        qWarning() << (QString("Could not find season ticket \"%1\" to remove").arg(name));
         return ERROR_CODE_COMMON;
     }
 
@@ -110,7 +107,7 @@ int SeasonTicket::removeTicket(const QString& name)
 
     this->saveActualTicketList();
 
-    CONSOLE_INFO(QString("removed Ticket \"%1\"").arg(name));
+//    qInfo() << (QString("removed Ticket \"%1\"").arg(name));
     return ERROR_CODE_SUCCESS;
 }
 

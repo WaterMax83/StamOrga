@@ -129,7 +129,7 @@ ApplicationWindow {
 
                 Component.onCompleted: {
                     append({title: "Benutzer", element : viewUserLogin, imgsource : ""});
-                    append({title: "Dauerkarten", element : viewSeasonTickets, imgsource : "images/add.png"})
+                    append({title: "Dauerkarten", element : viewSeasonTickets, imgsource : "images/refresh.png"})
                 }
             }
 
@@ -202,7 +202,9 @@ ApplicationWindow {
     Component {
         id: viewSeasonTickets
 
-        MyPages.SeasonTickets {}
+        MyPages.SeasonTickets {
+            userIntTicket: userInt
+        }
     }
 
     Component {
@@ -234,6 +236,10 @@ ApplicationWindow {
             } else {
                 txtInfoLoading.text = "Fehler beim Lesen der Daten: " + result
             }
+        }
+        onNotifySeasonTicketAddFinished: {
+            console.log("Add Season Ticket main")
+            stackView.currentItem.notifySeasonTicketAdd(result);
         }
     }
 

@@ -277,9 +277,14 @@ MessageProtocol* DataConnection::requestAddSeasonTicket(MessageProtocol* msg)
 
     QString userName = this->m_pUserConData->userName;
     quint32 userIndex = this->m_pGlobalData->m_UserList.getUserLoginIndex(userName);
-    if (this->m_pGlobalData->m_SeasonTicket.addNewSeasonTicket(userName, userIndex, ticketName, discount) > 0)
+    qint32 rCode = this->m_pGlobalData->m_SeasonTicket.addNewSeasonTicket(userName, userIndex, ticketName, discount);
+    if (rCode > ERROR_CODE_NO_ERROR) {
+        qInfo().noquote() << QString("User %1 added SeasonTicket %2")
+                             .arg(this->m_pUserConData->userName)
+                             .arg(ticketName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_ADD_TICKET, ERROR_CODE_SUCCESS);
-    return new MessageProtocol(OP_CODE_CMD_RES::ACK_ADD_TICKET, ERROR_CODE_COMMON);
+    }
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_ADD_TICKET, rCode);
 }
 
 /*
@@ -300,7 +305,11 @@ MessageProtocol* DataConnection::requestRemoveSeasonTicket(MessageProtocol* msg)
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_REMOVE_TICKET, ERROR_CODE_WRONG_SIZE);
     QString ticketName(QByteArray(pData + 2, actLength));
 
-    if (this->m_pGlobalData->m_SeasonTicket.removeTicket(ticketName) == ERROR_CODE_SUCCESS)
+    if (this->m_pGlobalData->m_SeasonTicket.removeTicket(ticketName) == ERROR_CODE_SUCCESS) {
+        qInfo().noquote() << QString("User %1 removed SeasonTicket %2")
+                             .arg(this->m_pUserConData->userName)
+                             .arg(ticketName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_REMOVE_TICKET, ERROR_CODE_SUCCESS);
+    }
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_REMOVE_TICKET, ERROR_CODE_COMMON);
 }

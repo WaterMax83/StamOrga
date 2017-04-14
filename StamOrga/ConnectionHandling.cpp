@@ -86,6 +86,25 @@ qint32 ConnectionHandling::startGettingGamesList()
     return ERROR_CODE_SUCCESS;
 }
 
+qint32 ConnectionHandling::startSeasonTicketRemove(QString name)
+{
+    this->sendSeasonTicketRemove(name);
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 ConnectionHandling::startSeasonTicketAdd(QString name, quint32 discount)
+{
+    this->sendSeasonTicketAdd(name, discount);
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 ConnectionHandling::startGettingSeasonTicketList()
+{
+    this->sendSeasonTicketList();
+    return ERROR_CODE_SUCCESS;
+}
+
+
 /*
  * Answer function after connection with username
  */
@@ -257,6 +276,69 @@ void ConnectionHandling::slDataConGamesListFinished(qint32 result)
     this->checkTimeoutResult(result);
 }
 
+/*
+ * Functions for getting removing season ticket
+ */
+void ConnectionHandling::sendSeasonTicketRemove(QString name)
+{
+    this->startDataConnection();
+    connect(this->m_pDataCon, &DataConnection::notifyRemoveSeasonTicketRequest,
+            this, &ConnectionHandling::slDataConSeasonTicketRemoveFinished);
+
+    emit this->sStartSendSeasonTicketRemoveRequest(name);
+}
+
+void ConnectionHandling::slDataConSeasonTicketRemoveFinished(qint32 result)
+{
+    disconnect(this->m_pDataCon, &DataConnection::notifyRemoveSeasonTicketRequest,
+            this, &ConnectionHandling::slDataConSeasonTicketRemoveFinished);
+
+    emit this->sNotifySeasonTicketRemoveRequest(result);
+    this->checkTimeoutResult(result);
+}
+
+/*
+ * Functions for getting adding season ticket
+ */
+void ConnectionHandling::sendSeasonTicketAdd(QString name, quint32 discount)
+{
+    this->startDataConnection();
+    connect(this->m_pDataCon, &DataConnection::notifyAddSeasonTicketRequest,
+            this, &ConnectionHandling::slDataConSeasonTicketAddFinished);
+
+    emit this->sStartSendSeasonTicketAddRequest(name, discount);
+}
+
+void ConnectionHandling::slDataConSeasonTicketAddFinished(qint32 result)
+{
+    disconnect(this->m_pDataCon, &DataConnection::notifyAddSeasonTicketRequest,
+            this, &ConnectionHandling::slDataConSeasonTicketAddFinished);
+
+    emit this->sNotifySeasonTicketAddRequest(result);
+    this->checkTimeoutResult(result);
+}
+
+/*
+ * Functions for getting getting season ticket list
+ */
+void ConnectionHandling::sendSeasonTicketList()
+{
+    this->startDataConnection();
+    connect(this->m_pDataCon, &DataConnection::notifySeasonTicketListRequest,
+            this, &ConnectionHandling::slDataConSeasonTicketListFinished);
+
+    emit this->sStartSendSeasonTicketListRequest();
+}
+
+void ConnectionHandling::slDataConSeasonTicketListFinished(qint32 result)
+{
+    disconnect(this->m_pDataCon, &DataConnection::notifySeasonTicketListRequest,
+            this, &ConnectionHandling::slDataConSeasonTicketListFinished);
+
+    emit this->sNotifySeasonTicketListRequest(result);
+    this->checkTimeoutResult(result);
+}
+
 
 void ConnectionHandling::checkTimeoutResult(qint32 result)
 {
@@ -287,6 +369,12 @@ void ConnectionHandling::startDataConnection()
             this->m_pDataCon, &DataConnection::startSendReadableNameRequest);
     connect(this, &ConnectionHandling::sStartSendGamesListRequest,
             this->m_pDataCon, &DataConnection::startSendGamesListRequest);
+    connect(this, &ConnectionHandling::sStartSendSeasonTicketRemoveRequest,
+            this->m_pDataCon, &DataConnection::startSendRemoveSeasonTicket);
+    connect(this, &ConnectionHandling::sStartSendSeasonTicketAddRequest,
+            this->m_pDataCon, &DataConnection::startSendAddSeasonTicket);
+    connect(this, &ConnectionHandling::sStartSendSeasonTicketListRequest,
+            this->m_pDataCon, &DataConnection::startSendSeasonTicketListRequest);
 
     this->m_ctrlDataCon.Start(this->m_pDataCon, false);
 }
@@ -310,6 +398,12 @@ void ConnectionHandling::stopDataConnection()
             this->m_pDataCon, &DataConnection::startSendReadableNameRequest);
     disconnect(this, &ConnectionHandling::sStartSendGamesListRequest,
             this->m_pDataCon, &DataConnection::startSendGamesListRequest);
+    disconnect(this, &ConnectionHandling::sStartSendSeasonTicketRemoveRequest,
+            this->m_pDataCon, &DataConnection::startSendRemoveSeasonTicket);
+    disconnect(this, &ConnectionHandling::sStartSendSeasonTicketAddRequest,
+            this->m_pDataCon, &DataConnection::startSendAddSeasonTicket);
+    disconnect(this, &ConnectionHandling::sStartSendSeasonTicketListRequest,
+            this->m_pDataCon, &DataConnection::startSendSeasonTicketListRequest);
 
     this->m_ctrlDataCon.Stop();
 }

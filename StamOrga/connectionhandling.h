@@ -23,6 +23,9 @@ public:
     bool startUpdatePassword(QString newPassWord);
     qint32 startUpdateReadableName(QString name);
     qint32 startGettingGamesList();
+    qint32 startSeasonTicketRemove(QString name);
+    qint32 startSeasonTicketAdd(QString name, quint32 discount);
+    qint32 startGettingSeasonTicketList();
 
 
 
@@ -42,6 +45,9 @@ signals:
     void sNotifyUpdatePasswordRequest(qint32 result, QString newPassWord);
     void sNotifyUpdateReadableNameRequest(qint32 result);
     void sNotifyGamesListRequest(qint32 result);
+    void sNotifySeasonTicketRemoveRequest(quint32 result);
+    void sNotifySeasonTicketAddRequest(quint32 result);
+    void sNotifySeasonTicketListRequest(quint32 result);
 
     void sStartSendLoginRequest();
     void sStartSendVersionRequest();
@@ -49,6 +55,9 @@ signals:
     void sStartSendUpdatePasswordRequest(QString newPassWord);
     void sStartSendUpdateReadableNameRequest(QString name);
     void sStartSendGamesListRequest();
+    void sStartSendSeasonTicketRemoveRequest(QString name);
+    void sStartSendSeasonTicketAddRequest(QString name, quint32 discount);
+    void sStartSendSeasonTicketListRequest();
 
 public slots:
 
@@ -60,6 +69,9 @@ private slots:
     void slDataConUpdPassFinished(qint32 result, QString newPassWord);
     void slDataConUpdReadNameFinished(qint32 result, QString name);
     void slDataConGamesListFinished(qint32 result);
+    void slDataConSeasonTicketRemoveFinished(qint32 result);
+    void slDataConSeasonTicketAddFinished(qint32 result);
+    void slDataConSeasonTicketListFinished(qint32 result);
 
     void slTimerConResetFired();
     void slTimerConLoginFired();
@@ -82,6 +94,9 @@ private:
     void sendUpdatePasswordRequest(QString newPassWord);
     void sendUpdateReadableNameRequest(QString name);
     void sendGamesListRequest();
+    void sendSeasonTicketRemove(QString name);
+    void sendSeasonTicketAdd(QString name, quint32 discount);
+    void sendSeasonTicketList();
 
     void checkTimeoutResult(qint32 result);
 

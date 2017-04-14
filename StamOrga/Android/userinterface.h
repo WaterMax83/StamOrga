@@ -25,6 +25,12 @@ public:
 
     Q_INVOKABLE qint32 startUpdateReadableName(QString name);
 
+    Q_INVOKABLE qint32 startAddSeasonTicket(QString name, quint32 discount);
+
+    Q_INVOKABLE qint32 startRemoveSeasonTicket(QString name);
+
+    Q_INVOKABLE qint32 startGettingSeasonTicketList();
+
     Q_INVOKABLE bool isDebuggingEnabled()
     {
 #ifdef QT_DEBUG
@@ -52,6 +58,9 @@ signals:
     void notifyUpdatePasswordRequestFinished(qint32 result, QString newPassWord);
     void notifyUpdateReadableNameRequest(qint32 result);
     void notifyGamesListFinished(qint32 result);
+    void notifySeasonTicketAddFinished(qint32 result);
+    void notifySeasonTicketRemoveFinished(qint32 result);
+    void notifySeasonTicketListFinished(qint32 result);
 
 public slots:
     void slConnectionRequestFinished(qint32 result);
@@ -59,6 +68,9 @@ public slots:
     void slUpdatePasswordRequestFinished(qint32 result, QString newPassWord);
     void slUpdateReadableNameRequestFinished(qint32 result);
     void slGettingGamesListFinished(qint32 result);
+    void slSeasonTicketAddFinished(qint32 result);
+    void slSeasonTicketRemoveFinished(qint32 result);
+    void slSeasonTicketListFinished(qint32 result);
 
 
 private:
