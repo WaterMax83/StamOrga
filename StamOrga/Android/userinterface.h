@@ -10,10 +10,7 @@ class UserInterface : public QObject
 {
     Q_OBJECT
 
-//    Q_PROPERTY(QString userName READ userName WRITE setUserName)
-//    Q_PROPERTY(QString ipAddr READ ipAddr WRITE setIpAddr)
-//    Q_PROPERTY(quint16 port READ port WRITE setPort)
-      Q_PROPERTY(GlobalData * globalData READ globalData WRITE setGlobalData)
+    Q_PROPERTY(GlobalData * globalData READ globalData WRITE setGlobalData)
 public:
     explicit UserInterface(QObject *parent = 0);
 
@@ -49,8 +46,14 @@ public:
 #endif
     }
 
-    GlobalData *globalData() { return this->m_pGlobalData; }
-    void setGlobalData(GlobalData *pData) { this->m_pGlobalData = pData; }
+    GlobalData *globalData()
+    {
+        return this->m_pConHandle->getGlobalData();
+    }
+    void setGlobalData(GlobalData *pData)
+    {
+        this->m_pConHandle->setGlobalData(pData);
+    }
 
 signals:
     void notifyConnectionFinished(qint32 result);
@@ -74,13 +77,7 @@ public slots:
 
 
 private:
-//    QString m_UserName;
-//    QString m_ipAddr;
-//    quint16 m_port;
-
     ConnectionHandling *m_pConHandle;
-
-    GlobalData *m_pGlobalData = NULL;
 };
 
 #endif // USERINTERFACE_H

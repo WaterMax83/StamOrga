@@ -36,6 +36,11 @@ public:
             this->m_pGlobalData = pData;
     }
 
+    GlobalData* getGlobalData()
+    {
+        return this->m_pGlobalData;
+    }
+
 //    ConnectionInfo *GetConnectionInfo() { return &this->m_conInfo; }
 
 signals:
@@ -50,28 +55,15 @@ signals:
     void sNotifySeasonTicketListRequest(quint32 result);
 
     void sStartSendLoginRequest();
-    void sStartSendVersionRequest();
-    void sStartSendUserPropertiesRequest();
-    void sStartSendUpdatePasswordRequest(QString newPassWord);
-    void sStartSendUpdateReadableNameRequest(QString name);
-    void sStartSendGamesListRequest();
-    void sStartSendSeasonTicketRemoveRequest(QString name);
-    void sStartSendSeasonTicketAddRequest(QString name, quint32 discount);
-    void sStartSendSeasonTicketListRequest();
+
+    void sStartSendNewRequest(DataConRequest request);
 
 public slots:
 
 private slots:
     void slMainConReqFin(qint32 result, const QString &msg);
-    void slDataConLoginFinished(qint32 result);
-    void slDataConVersionFinished(qint32 result, QString msg);
-    void slDataConUserPropsFinished(qint32 result, quint32 value);
-    void slDataConUpdPassFinished(qint32 result, QString newPassWord);
-    void slDataConUpdReadNameFinished(qint32 result, QString name);
-    void slDataConGamesListFinished(qint32 result);
-    void slDataConSeasonTicketRemoveFinished(qint32 result);
-    void slDataConSeasonTicketAddFinished(qint32 result);
-    void slDataConSeasonTicketListFinished(qint32 result);
+
+    void slDataConLastRequestFinished(DataConRequest request);
 
     void slTimerConResetFired();
     void slTimerConLoginFired();
@@ -89,14 +81,6 @@ private:
     QTimer      *m_pTimerLoginReset;
 
     void sendLoginRequest();
-    void sendVersionRequest();
-    void sendUserPropertiesRequest();
-    void sendUpdatePasswordRequest(QString newPassWord);
-    void sendUpdateReadableNameRequest(QString name);
-    void sendGamesListRequest();
-    void sendSeasonTicketRemove(QString name);
-    void sendSeasonTicketAdd(QString name, quint32 discount);
-    void sendSeasonTicketList();
 
     void checkTimeoutResult(qint32 result);
 

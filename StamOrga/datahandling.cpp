@@ -39,14 +39,14 @@ qint32 DataHandling::getHandleVersionResponse(MessageProtocol *msg, QString *ver
     return ERROR_CODE_NO_ERROR;
 }
 
-qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol *msg, quint32 *props)
+qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol *msg, QString *props)
 {
     if (msg->getDataLength() < 12)
         return ERROR_CODE_WRONG_SIZE;
 
     const char *pData = msg->getPointerToData();
     qint32 rValue = qFromBigEndian(*((qint32 *)pData));
-    *props = qFromBigEndian(*((quint32 *)(pData + 4)));
+    *props = QString::number(qFromBigEndian(*((quint32 *)(pData + 4))));
 
     quint16 readableNameSize = qFromBigEndian(*((quint16 *)(pData + 8)));
     QString readableName(QByteArray(pData + 10, readableNameSize));

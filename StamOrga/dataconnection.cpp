@@ -69,87 +69,82 @@ void DataConnection::checkNewOncomingData()
     MessageProtocol *msg;
     while((msg = this->m_messageBuffer.GetNextMessage()) != NULL) {
 
+        DataConRequest request = this->getActualRequest(msg->getIndex() & 0x00FFFFFF);
+        if (request.m_request == 0)
+            continue;
+
         switch (msg->getIndex()) {
         case OP_CODE_CMD_RES::ACK_LOGIN_USER:
             if (this->m_bRequestLoginAgain) {
                 this->sendActualRequestsAgain();
                 this->m_bRequestLoginAgain = false;
+                continue;
             }
-            else
-                emit this->notifyLoginRequest(this->m_pDataHandle->getHandleLoginResponse(msg));
+            else {
+                request.m_result = this->m_pDataHandle->getHandleLoginResponse(msg);
+                emit this->notifyLastRequestFinished(request);
+            }
+
             break;
 
         case OP_CODE_CMD_RES::ACK_GET_VERSION:
-        {
-            QString version;
-            qint32 uVersion = this->m_pDataHandle->getHandleVersionResponse(msg, &version);
-            emit this->notifyVersionRequest(uVersion, version);
+            request.m_result = this->m_pDataHandle->getHandleVersionResponse(msg, &request.m_returnData);
             break;
-        }
+
         case OP_CODE_CMD_RES::ACK_GET_USER_PROPS:
-        {
-            quint32 props;
-            qint32 rValue = this->m_pDataHandle->getHandleUserPropsResponse(msg, &props);
-            emit this->notifyUserPropsRequest(rValue, props);
+            request.m_result = this->m_pDataHandle->getHandleUserPropsResponse(msg,& request.m_returnData);
             break;
-        }
+
         case OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN:
-        {
-            qint32 result = msg->getIntData();
-            QVariant passw = this->getActualRequestData(msg->getIndex() & 0x00FFFFFF);
-            emit this->notifyUpdPassRequest(result, passw.toString());
+            request.m_result = msg->getIntData();
+            if (request.m_lData.size() > 0)
+                request.m_returnData = request.m_lData.at(0);
             break;
-        }
+
         case OP_CODE_CMD_RES::ACK_USER_CHANGE_READNAME:
-        {
-            qint32 result = msg->getIntData();
-            QVariant name = this->getActualRequestData(msg->getIndex() & 0x00FFFFFF);
-            emit this->notifyUpdReadabelNameRequest(result, name.toString());
+            request.m_result = msg->getIntData();
+            if (request.m_lData.size() > 0)
+                request.m_returnData = request.m_lData.at(0);
             break;
-        }
+
         case OP_CODE_CMD_RES::ACK_NOT_LOGGED_IN:
             if (!this->m_bRequestLoginAgain) {
                 this->m_bRequestLoginAgain = true;
-                this->startSendLoginRequest();
+                DataConRequest conReq;
+                conReq.m_request = OP_CODE_CMD_REQ::REQ_LOGIN_USER;
+                this->startSendLoginRequest(conReq);
             }
             break;
 
         case OP_CODE_CMD_RES::ACK_GET_GAMES_LIST:
-        {
-            qint32 result = this->m_pDataHandle->getHandleGamesListResponse(msg);
-            emit this->notifyGamesListRequest(result);
+            request.m_result = this->m_pDataHandle->getHandleGamesListResponse(msg);
             break;
-        }
+
         case OP_CODE_CMD_RES::ACK_ADD_TICKET:
-        {
-            qint32 result = msg->getIntData();;
-            emit this->notifyAddSeasonTicketRequest(result);
+            request.m_result = msg->getIntData();;
             break;
-        }
+
         case OP_CODE_CMD_RES::ACK_REMOVE_TICKET:
-        {
-            qint32 result = msg->getIntData();
-            emit this->notifyRemoveSeasonTicketRequest(result);
+            request.m_result = msg->getIntData();
             break;
-        }
+
         case OP_CODE_CMD_RES::ACK_GET_TICKETS_LIST:
-        {
-            qint32 result = this->m_pDataHandle->getHandleSeasonTicketListResponse(msg);
-            emit this->notifyGamesListRequest(result);
+            request.m_result = this->m_pDataHandle->getHandleSeasonTicketListResponse(msg);
             break;
-        }
+
         default:
             delete msg;
             continue;
         }
-        this->removeActualRequest(msg->getIndex() & 0x00FFFFFF);
+        emit this->notifyLastRequestFinished(request);
+        this->removeActualRequest(request.m_request);
         if (this->m_lActualRequest.size() == 0)
             this->m_pConTimeout->stop();
         delete msg;
     }
 }
 
-void DataConnection::startSendLoginRequest()
+void DataConnection::startSendLoginRequest(DataConRequest request)
 {
     QString passWord = this->m_pGlobalData->passWord();
     QByteArray aPassw;
@@ -158,11 +153,10 @@ void DataConnection::startSendLoginRequest()
     wPassword << quint16(passWord.toUtf8().size());
     aPassw.append(passWord);
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_LOGIN_USER, aPassw);
-    if (this->sendMessageRequest(&msg) < 0)
-        emit this->notifyLoginRequest(ERROR_CODE_ERR_SEND);
+    this->sendMessageRequest(&msg, request);
 }
 
-void DataConnection::startSendVersionRequest()
+void DataConnection::startSendVersionRequest(DataConRequest request)
 {
     QByteArray version;
     QDataStream wVersion(&version, QIODevice::WriteOnly);
@@ -172,22 +166,22 @@ void DataConnection::startSendVersionRequest()
 
     version.append(QString(STAM_ORGA_VERSION_S));
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_GET_VERSION, version);
-    if (this->sendMessageRequest(&msg) < 0)
-        emit this->notifyVersionRequest(ERROR_CODE_ERR_SEND, "");
+    this->sendMessageRequest(&msg, request);
 }
 
-void DataConnection::startSendUserPropsRequest()
+void DataConnection::startSendUserPropsRequest(DataConRequest request)
 {
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_GET_USER_PROPS);
-    if (this->sendMessageRequest(&msg) < 0)
-        emit this->notifyUserPropsRequest(ERROR_CODE_ERR_SEND, 0);
+    this->sendMessageRequest(&msg, request);
 }
 
-void DataConnection::startSendUpdPassRequest(QString newPassWord)
+void DataConnection::startSendUpdPassRequest(DataConRequest request)
 {
     QByteArray passReq;
     QDataStream wPassReq(&passReq, QIODevice::WriteOnly);
     wPassReq.setByteOrder(QDataStream::BigEndian);
+
+    QString newPassWord = request.m_lData.at(0);
 
     wPassReq << (qint16)this->m_pGlobalData->passWord().size();
     passReq.append(this->m_pGlobalData->passWord());
@@ -195,117 +189,75 @@ void DataConnection::startSendUpdPassRequest(QString newPassWord)
     wPassReq << (qint16)newPassWord.size();
     passReq.append(newPassWord);
 
-    QVariant tmp(newPassWord);
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN, passReq);
-    if (this->sendMessageRequest(&msg, &tmp) < 0)
-        emit this->notifyUpdPassRequest(ERROR_CODE_ERR_SEND, "");
+    this->sendMessageRequest(&msg, request);
 }
 
-void DataConnection::startSendReadableNameRequest(QString name)
+void DataConnection::startSendReadableNameRequest(DataConRequest request)
 {
+    QString name = request.m_lData.at(0);
     QByteArray readName;
     QDataStream wReadName(&readName, QIODevice::WriteOnly);
     wReadName.setByteOrder(QDataStream::BigEndian);
     wReadName << quint16(name.toUtf8().size());
     readName.append(name);
-    qDebug() << QString("Sending readable name %1 with size %2").arg(name).arg(readName.size());
 
-    QVariant tmp(name);
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME, readName);
-    if (this->sendMessageRequest(&msg, &tmp) < 0)
-        emit this->notifyLoginRequest(ERROR_CODE_ERR_SEND);
+    this->sendMessageRequest(&msg, request);
 }
 
-void DataConnection::startSendGamesListRequest()
+void DataConnection::startSendGamesListRequest(DataConRequest request)
 {
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST);
-    if (this->sendMessageRequest(&msg) < 0)
-        emit this->notifyGamesListRequest(ERROR_CODE_ERR_SEND);
+    this->sendMessageRequest(&msg, request);
 }
 
-void DataConnection::startSendAddSeasonTicket(QString name, quint32 discount)
+void DataConnection::startSendAddSeasonTicket(DataConRequest request)
 {
+    QString name = request.m_lData.at(1);
     QByteArray seasonTicket;
     QDataStream wSeasonTicket(&seasonTicket, QIODevice::WriteOnly);
     wSeasonTicket.setByteOrder(QDataStream::BigEndian);
-    wSeasonTicket << discount;
+    wSeasonTicket << request.m_lData.at(1).toUInt();
     wSeasonTicket << quint16(name.toUtf8().size());
     seasonTicket.append(name);
 
-    QVariant tmp(seasonTicket);
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_ADD_TICKET, seasonTicket);
-    if (this->sendMessageRequest(&msg, &tmp) < 0)
-        emit this->notifyGamesListRequest(ERROR_CODE_ERR_SEND);
+    this->sendMessageRequest(&msg, request);
 }
 
-void DataConnection::startSendRemoveSeasonTicket(QString name)
+void DataConnection::startSendRemoveSeasonTicket(DataConRequest request)
 {
+    QString name = request.m_lData.at(0);
     QByteArray seasonTicket;
     QDataStream wSeasonTicket(&seasonTicket, QIODevice::WriteOnly);
     wSeasonTicket.setByteOrder(QDataStream::BigEndian);
     wSeasonTicket << quint16(name.toUtf8().size());
     seasonTicket.append(name);
 
-    QVariant tmp(name);
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_REMOVE_TICKET, seasonTicket);
-    if (this->sendMessageRequest(&msg, &tmp) < 0)
-        emit this->notifyGamesListRequest(ERROR_CODE_ERR_SEND);
+    this->sendMessageRequest(&msg, request);
 }
 
-void DataConnection::startSendSeasonTicketListRequest()
+void DataConnection::startSendSeasonTicketListRequest(DataConRequest request)
 {
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST);
-    if (this->sendMessageRequest(&msg) < 0)
-        emit this->notifyGamesListRequest(ERROR_CODE_ERR_SEND);
+    this->sendMessageRequest(&msg, request);
 }
 
 void DataConnection::connectionTimeoutFired()
 {
     qDebug() << "Timeout from Data UdpServer";
     while(this->m_lActualRequest.size() > 0) {
-        switch(this->m_lActualRequest.last().request) {
-        case OP_CODE_CMD_REQ::REQ_LOGIN_USER:
-            emit this->notifyLoginRequest(ERROR_CODE_NO_ANSWER);
-            break;
-
-        case OP_CODE_CMD_REQ::REQ_GET_VERSION:
-            emit this->notifyVersionRequest(ERROR_CODE_NO_ANSWER, "");
-            break;
-
-        case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
-            emit this->notifyUserPropsRequest(ERROR_CODE_NO_ANSWER, 0);
-            break;
-
-        case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
-            emit this->notifyUpdPassRequest(ERROR_CODE_NO_ANSWER, "");
-            break;
-
-        case OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME:
-            emit this->notifyUpdReadabelNameRequest(ERROR_CODE_NO_ANSWER, "");
-            break;
-
-        case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
-            emit this->notifyGamesListRequest(ERROR_CODE_NO_ANSWER);
-            break;
-
-        case OP_CODE_CMD_REQ::REQ_ADD_TICKET:
-            emit this->notifyAddSeasonTicketRequest(ERROR_CODE_NO_ANSWER);
-            break;
-
-        case OP_CODE_CMD_REQ::REQ_REMOVE_TICKET:
-            emit this->notifyRemoveSeasonTicketRequest(ERROR_CODE_NO_ANSWER);
-            break;
-
-        case OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST:
-            emit this->notifySeasonTicketListRequest(ERROR_CODE_NO_ANSWER);
-            break;
-        }
+        DataConRequest request = this->m_lActualRequest.last();
+        request.m_result = ERROR_CODE_NO_ANSWER;
+        emit this->notifyLastRequestFinished(request);
         this->m_lActualRequest.removeLast();
     }
     this->m_bRequestLoginAgain = false;
 }
 
-qint32 DataConnection::sendMessageRequest(MessageProtocol *msg, QVariant *data)
+qint32 DataConnection::sendMessageRequest(MessageProtocol *msg, DataConRequest request)
 {
     if (this->m_pDataUdpSocket == NULL)
         return -1;
@@ -319,11 +271,12 @@ qint32 DataConnection::sendMessageRequest(MessageProtocol *msg, QVariant *data)
 
     /* Only add when not sending request again */
     if (!this->m_bRequestLoginAgain) {
-        ActualRequest actReq;
-        actReq.request = msg->getIndex();
-        if (data != NULL)
-            actReq.data = *data;
-        this->m_lActualRequest.append(actReq);
+        this->m_lActualRequest.append(request);
+    }
+
+    if (rValue < 0) {
+        request.m_result = ERROR_CODE_ERR_SEND;
+        emit this->notifyLastRequestFinished(request);
     }
 
     return rValue;
@@ -332,65 +285,90 @@ qint32 DataConnection::sendMessageRequest(MessageProtocol *msg, QVariant *data)
 void DataConnection::removeActualRequest(quint32 req)
 {
     for (int i=0; i<this->m_lActualRequest.size(); i++) {
-        if (this->m_lActualRequest[i].request == req)
+        if (this->m_lActualRequest[i].m_request == req) {
+//            if (this->m_lActualRequest[i].m_lData != NULL)
+//                delete this->m_lActualRequest[i].m_lData;
             this->m_lActualRequest.removeAt(i);
+        }
     }
 }
-QVariant DataConnection::getActualRequestData(quint32 req)
+
+
+DataConRequest DataConnection::getActualRequest(quint32 req)
 {
     for (int i=0; i<this->m_lActualRequest.size(); i++) {
-        if (this->m_lActualRequest[i].request == req)
-            return this->m_lActualRequest[i].data;
+        if (this->m_lActualRequest[i].m_request == req) {
+            return this->m_lActualRequest[i];
+        }
     }
-    return QVariant(0);
+    return DataConRequest(0);
+}
+
+QString DataConnection::getActualRequestData(quint32 req, qint32 index)
+{
+    for (int i=0; i<this->m_lActualRequest.size(); i++) {
+        if (this->m_lActualRequest[i].m_request == req) {
+            if (this->m_lActualRequest[i].m_lData.size() > index)
+                return this->m_lActualRequest[i].m_lData.at(index);
+        }
+    }
+    return NULL;
 }
 
 void DataConnection::sendActualRequestsAgain()
 {
     for (int i=0; i<this->m_lActualRequest.size(); i++) {
-        switch (this->m_lActualRequest[i].request) {
-        case OP_CODE_CMD_REQ::REQ_GET_VERSION:
-            this->startSendVersionRequest();
-            break;
-
-        case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
-            this->startSendUserPropsRequest();
-            break;
-
-        case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
-            this->startSendUpdPassRequest(this->m_lActualRequest[i].data.toString());
-            break;
-
-        case OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME:
-            this->startSendReadableNameRequest(this->m_lActualRequest[i].data.toString());
-            break;
-
-        case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
-            this->startSendGamesListRequest();
-            break;
-
-        case OP_CODE_CMD_REQ::REQ_ADD_TICKET:
-        {
-            QByteArray request = this->m_lActualRequest[i].data.toByteArray();
-            quint32 discount = qFromBigEndian(*(quint32 *)request.constData());
-            quint16 size = qFromBigEndian(*(quint16 *)(request.constData() + 4));
-            QString name(QByteArray(request.constData() + 6, size));
-            this->startSendAddSeasonTicket(name, discount);
-            break;
-        }
-
-        case OP_CODE_CMD_REQ::REQ_REMOVE_TICKET:
-            this->startSendRemoveSeasonTicket(this->m_lActualRequest[i].data.toString());
-            break;
-
-        case OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST:
-            this->startSendSeasonTicketListRequest();
-            break;
-
-        default:
-            continue;
-        }
+        this->startSendNewRequest(this->m_lActualRequest[i]);
     }
+}
+
+void DataConnection::startSendNewRequest(DataConRequest request)
+{
+    switch (request.m_request) {
+    case OP_CODE_CMD_REQ::REQ_LOGIN_USER:
+        this->startSendLoginRequest(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_GET_VERSION:
+        this->startSendVersionRequest(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
+        this->startSendUserPropsRequest(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
+        if (request.m_lData.size() > 0)
+            this->startSendUpdPassRequest(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME:
+        if (request.m_lData.size() > 0)
+            this->startSendReadableNameRequest(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
+        this->startSendGamesListRequest(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_ADD_TICKET:
+        if (request.m_lData.size() > 1)
+            this->startSendAddSeasonTicket(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_REMOVE_TICKET:
+        if (request.m_lData.size() > 0)
+            this->startSendRemoveSeasonTicket(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST:
+        this->startSendSeasonTicketListRequest(request);
+        break;
+
+    default:
+        return;
+    }
+
 }
 
 DataConnection::~DataConnection()

@@ -9,6 +9,7 @@
 #include "userinterface.h"
 #include "../../Common/General/globalfunctions.h"
 #include "../Data/globaldata.h"
+#include "../dataconnection.h"
 
 int main(int argc, char *argv[])
 {
@@ -22,6 +23,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<UserInterface>("com.watermax.demo", 1, 0, "UserInterface");
 //    qmlRegisterType<GamePlay*>("com.watermax.demo", 1, 0, "GamePlay*");
     qRegisterMetaType<GamePlay *>("GamePlay*");
+    qRegisterMetaType<DataConRequest>("DataConRequest");
 
     // global data class
     GlobalData globalUserData;

@@ -10,9 +10,17 @@
 #include "../Common/General/backgroundworker.h"
 #include "../Common/Network/messagebuffer.h"
 
-struct ActualRequest {
-    quint32     request;
-    QVariant    data;
+struct DataConRequest {
+    quint32            m_request;
+    QList<QString>     m_lData;
+    qint32             m_result;
+    QString            m_returnData;
+
+    DataConRequest(quint32 req)
+    {
+        m_request = req;
+    }
+    DataConRequest() {}
 };
 
 class DataConnection : public BackgroundWorker
@@ -28,26 +36,10 @@ public:
 
 
 signals:
-    void notifyLoginRequest(qint32 result);
-    void notifyVersionRequest(qint32 result, QString msg);
-    void notifyUserPropsRequest(qint32 result, quint32 value);
-    void notifyUpdPassRequest(qint32 result, QString passw);
-    void notifyUpdReadabelNameRequest(qint32 result, QString name);
-    void notifyGamesListRequest(qint32 result);
-    void notifyAddSeasonTicketRequest(qint32 result);
-    void notifyRemoveSeasonTicketRequest(qint32 result);
-    void notifySeasonTicketListRequest(qint32 result);
+    void notifyLastRequestFinished(DataConRequest request);
 
 public slots:
-    void startSendLoginRequest();
-    void startSendVersionRequest();
-    void startSendUserPropsRequest();
-    void startSendUpdPassRequest(QString newPassWord);
-    void startSendReadableNameRequest(QString name);
-    void startSendGamesListRequest();
-    void startSendAddSeasonTicket(QString name, quint32 discount);
-    void startSendRemoveSeasonTicket(QString name);
-    void startSendSeasonTicketListRequest();
+    void startSendNewRequest(DataConRequest request);
 
 private slots:
     void connectionTimeoutFired();
@@ -62,16 +54,27 @@ private:
     QUdpSocket      *m_pDataUdpSocket = NULL;
     QHostAddress    m_hDataReceiver;
 
+    void startSendLoginRequest(DataConRequest request);
+    void startSendVersionRequest(DataConRequest request);
+    void startSendUserPropsRequest(DataConRequest request);
+    void startSendUpdPassRequest(DataConRequest request);
+    void startSendReadableNameRequest(DataConRequest request);
+    void startSendGamesListRequest(DataConRequest request);
+    void startSendAddSeasonTicket(DataConRequest request);
+    void startSendRemoveSeasonTicket(DataConRequest request);
+    void startSendSeasonTicketListRequest(DataConRequest request);
+
 
     void checkNewOncomingData();
-    qint32 sendMessageRequest(MessageProtocol *msg, QVariant *data = NULL);
+    qint32 sendMessageRequest(MessageProtocol *msg, DataConRequest request);
     void removeActualRequest(quint32 req);
-    QVariant getActualRequestData(quint32);
+    DataConRequest getActualRequest(quint32 req);
+    QString getActualRequestData(quint32 req, qint32 index);
 
     bool    m_bRequestLoginAgain;
     void sendActualRequestsAgain();
 
-    QList<ActualRequest>         m_lActualRequest;
+    QList<DataConRequest>         m_lActualRequest;
 };
 
 #endif // DATACONNECTION_H

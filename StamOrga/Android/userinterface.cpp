@@ -25,8 +25,6 @@ UserInterface::UserInterface(QObject *parent) : QObject(parent)
 
 qint32 UserInterface::startMainConnection(QString name, QString passw)
 {
-    this->m_pConHandle->setGlobalData(this->m_pGlobalData);
-
     return this->m_pConHandle->startMainConnection(name, passw);
 }
 

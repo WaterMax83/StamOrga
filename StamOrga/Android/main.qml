@@ -111,7 +111,6 @@ ApplicationWindow {
                 highlighted: ListView.isCurrentItem
                 onClicked: {
                     listView.currentIndex = index
-                    console.log("Index is actual " + index)
                     stackView.push(model.element)
                     if (model.imgsource !== "") {
                         imageToolButton.visible = true
