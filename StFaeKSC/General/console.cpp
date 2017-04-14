@@ -51,7 +51,7 @@ void Console::run()
     for (int i = 0; i < appDirFiles.size(); i++) {
         if (appDirFiles.at(i).endsWith(".csv")) {
             qInfo() << (QString("Found %1 trying to read in").arg(appDirFiles.at(i)));
-            UserCommand::runReadCommand("read " + appDirFiles.at(i), this->m_pGlobalData);
+            UserCommand::runReadCommand("read " + this->m_applicationPath + "/" + appDirFiles.at(i), this->m_pGlobalData);
         }
     }
 }
