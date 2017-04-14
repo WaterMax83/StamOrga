@@ -44,5 +44,8 @@
         <file>userinterface.h</file>
         <file>components/Games.qml</file>
         <file>pages/UserLoginForm.ui.qml</file>
+        <file>pages/SeasonTickets.qml</file>
+        <file>images/+material/add.png</file>
+        <file>images/add.png</file>
     </qresource>
 </RCC>

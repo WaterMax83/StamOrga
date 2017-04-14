@@ -34,6 +34,9 @@ signals:
     void notifyUpdPassRequest(qint32 result, QString passw);
     void notifyUpdReadabelNameRequest(qint32 result, QString name);
     void notifyGamesListRequest(qint32 result);
+    void notifyAddSeasonTicketRequest(qint32 result);
+    void notifyRemoveSeasonTicketRequest(qint32 result);
+    void notifySeasonTicketListRequest(qint32 result);
 
 public slots:
     void startSendLoginRequest();
@@ -42,6 +45,9 @@ public slots:
     void startSendUpdPassRequest(QString newPassWord);
     void startSendReadableNameRequest(QString name);
     void startSendGamesListRequest();
+    void startSendAddSeasonTicket(QString name, quint32 discount);
+    void startSendRemoveSeasonTicket(QString name);
+    void startSendSeasonTicketListRequest();
 
 private slots:
     void connectionTimeoutFired();

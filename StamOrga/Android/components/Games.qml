@@ -31,7 +31,7 @@ Rectangle {
     function showGamesInfo(gamePlayItem) {
         if (gamePlayItem !== null) {
             m_gamePlayItem = gamePlayItem
-            labelLine1.text = gamePlayItem.timestamp + "\t" + gamePlayItem.competition + "\t" + gamePlayItem.index
+            labelLine1.text = gamePlayItem.timestamp + "\t" +  gamePlayItem.getCompetitionIndex() + " - " + gamePlayItem.competition
             labelLine2.text = gamePlayItem.home + " - " + gamePlayItem.away + "\t" + gamePlayItem.score
         }
     }

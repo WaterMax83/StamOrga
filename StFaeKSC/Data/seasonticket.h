@@ -9,6 +9,7 @@
 
 struct TicketInfo {
     QString user;
+    quint32 userIndex;
     QString name;
     qint64  timestamp;
     quint8  discount;
@@ -26,6 +27,7 @@ struct TicketInfo {
 #define TICKET_GROUP "TICKETS"
 #define TICKET_ARRAY "season"
 #define TICKET_USER "user"
+#define TICKET_USER_INDEX "userIndex"
 #define TICKET_NAME "name"
 #define TICKET_INDEX "index"
 #define TICKET_DISCOUNT "discount"
@@ -39,7 +41,7 @@ public:
     ~SeasonTicket();
 
 
-    int addNewSeasonTicket(QString user, QString name, quint8 discount);
+    int addNewSeasonTicket(QString user, quint32 userIndex, QString name, quint8 discount);
     int removeTicket(const QString& name);
     int showAllSeasonTickets();
 
@@ -82,8 +84,8 @@ private:
 
     void saveActualTicketList();
 
-    bool addNewTicketInfo(QString user, QString name, qint64 datetime, quint8 discount, QString place, quint32 index, bool checkTicket = true);
-    void addNewTicketInfo(QString user, QString name, qint64 datetime, quint8 discount, QString place, quint32 index, QList<TicketInfo>* pList);
+    bool addNewTicketInfo(QString user, quint32 userIndex, QString name, qint64 datetime, quint8 discount, QString place, quint32 index, bool checkTicket = true);
+    void addNewTicketInfo(QString user, quint32 userIndex, QString name, qint64 datetime, quint8 discount, QString place, quint32 index, QList<TicketInfo>* pList);
     quint32 getTicketInfoIndex(const QString& name);
     quint32 getNextTicketIndex();
 

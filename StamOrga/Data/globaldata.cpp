@@ -93,7 +93,7 @@ void GlobalData::saveActualGamesList()
         this->m_pMainUserSettings->setArrayIndex(i);
         this->m_pMainUserSettings->setValue(PLAY_HOME, this->m_lGamePlay[i]->home());
         this->m_pMainUserSettings->setValue(PLAY_ARRAY, this->m_lGamePlay[i]->away());
-        this->m_pMainUserSettings->setValue(PLAY_DATETIME, this->m_lGamePlay[i]->timestamp());
+        this->m_pMainUserSettings->setValue(PLAY_DATETIME, this->m_lGamePlay[i]->timestamp64Bit());
         this->m_pMainUserSettings->setValue(PLAY_SAISON_INDEX, this->m_lGamePlay[i]->index());
         this->m_pMainUserSettings->setValue(PLAY_SCORE, this->m_lGamePlay[i]->score());
         this->m_pMainUserSettings->setValue(PLAY_COMPETITION, this->m_lGamePlay[i]->compValue());

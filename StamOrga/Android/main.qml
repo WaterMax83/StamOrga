@@ -69,18 +69,23 @@ ApplicationWindow {
 
             ToolButton {
                 contentItem: Image {
+                    id: imageToolButton
                     fillMode: Image.Pad
                     horizontalAlignment: Image.AlignHCenter
                     verticalAlignment: Image.AlignVCenter
                     source:  "images/refresh.png"
-                    visible: stackView.depth > 1 ? false : true
+//                    visible: stackView.depth > 1 ? false : true
                 }
                 onClicked: {
+                    if (stackView.depth === 1) {
+                        if (userInt.startMainConnection(globalUserData.userName, globalUserData.passWord) > 0) {
+                            busyLoadingIndicator.visible = true
+                            txtInfoLoading.text = "Verbinde"
+                            txtInfoLoading.visible = true
+                        }
+                    } else if (imageToolButton.visible === true){
+                        stackView.currentItem.toolButtonClicked()
 
-                    if (userInt.startMainConnection(globalUserData.userName, globalUserData.passWord) > 0) {
-                        busyLoadingIndicator.visible = true
-                        txtInfoLoading.text = "Verbinde"
-                        txtInfoLoading.visible = true
                     }
                 }
             }
@@ -106,13 +111,26 @@ ApplicationWindow {
                 highlighted: ListView.isCurrentItem
                 onClicked: {
                     listView.currentIndex = index
-                    stackView.push(model.source)
+                    console.log("Index is actual " + index)
+                    stackView.push(model.element)
+                    if (model.imgsource !== "") {
+                        imageToolButton.visible = true
+                        imageToolButton.source = model.imgsource
+                    } else {
+                        imageToolButton.visible = false
+                    }
+
                     drawer.close()
                 }
             }
 
             model: ListModel {
-                ListElement { title: "Benutzer"; source: "qrc:/pages/UserLogin.qml" }
+                //ListElement { title: "Benutzer"; source: "qrc:/pages/UserLogin.qml"; element: viewUserLogin }
+
+                Component.onCompleted: {
+                    append({title: "Benutzer", element : viewUserLogin, imgsource : ""});
+                    append({title: "Dauerkarten", element : viewSeasonTickets, imgsource : "images/add.png"})
+                }
             }
 
             ScrollIndicator.vertical: ScrollIndicator { }
@@ -166,12 +184,25 @@ ApplicationWindow {
 
             ScrollIndicator.vertical: ScrollIndicator { }
         }
+
+        onCurrentItemChanged: {
+            if (stackView.depth === 1) {
+                imageToolButton.visible = true
+                imageToolButton.source = "images/refresh.png"
+            }
+        }
     }
 
     Component {
         id: viewUserLogin
 
         MyPages.UserLogin {}
+    }
+
+    Component {
+        id: viewSeasonTickets
+
+        MyPages.SeasonTickets {}
     }
 
     Component {

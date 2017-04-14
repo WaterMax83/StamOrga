@@ -120,6 +120,24 @@ void DataConnection::checkNewOncomingData()
             emit this->notifyGamesListRequest(result);
             break;
         }
+        case OP_CODE_CMD_RES::ACK_ADD_TICKET:
+        {
+            qint32 result = msg->getIntData();;
+            emit this->notifyAddSeasonTicketRequest(result);
+            break;
+        }
+        case OP_CODE_CMD_RES::ACK_REMOVE_TICKET:
+        {
+            qint32 result = msg->getIntData();
+            emit this->notifyRemoveSeasonTicketRequest(result);
+            break;
+        }
+        case OP_CODE_CMD_RES::ACK_GET_TICKETS_LIST:
+        {
+            qint32 result = this->m_pDataHandle->getHandleSeasonTicketListResponse(msg);
+            emit this->notifyGamesListRequest(result);
+            break;
+        }
         default:
             delete msg;
             continue;
@@ -191,14 +209,52 @@ void DataConnection::startSendReadableNameRequest(QString name)
     wReadName << quint16(name.toUtf8().size());
     readName.append(name);
     qDebug() << QString("Sending readable name %1 with size %2").arg(name).arg(readName.size());
+
+    QVariant tmp(name);
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME, readName);
-    if (this->sendMessageRequest(&msg) < 0)
+    if (this->sendMessageRequest(&msg, &tmp) < 0)
         emit this->notifyLoginRequest(ERROR_CODE_ERR_SEND);
 }
 
 void DataConnection::startSendGamesListRequest()
 {
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST);
+    if (this->sendMessageRequest(&msg) < 0)
+        emit this->notifyGamesListRequest(ERROR_CODE_ERR_SEND);
+}
+
+void DataConnection::startSendAddSeasonTicket(QString name, quint32 discount)
+{
+    QByteArray seasonTicket;
+    QDataStream wSeasonTicket(&seasonTicket, QIODevice::WriteOnly);
+    wSeasonTicket.setByteOrder(QDataStream::BigEndian);
+    wSeasonTicket << discount;
+    wSeasonTicket << quint16(name.toUtf8().size());
+    seasonTicket.append(name);
+
+    QVariant tmp(seasonTicket);
+    MessageProtocol msg(OP_CODE_CMD_REQ::REQ_ADD_TICKET, seasonTicket);
+    if (this->sendMessageRequest(&msg, &tmp) < 0)
+        emit this->notifyGamesListRequest(ERROR_CODE_ERR_SEND);
+}
+
+void DataConnection::startSendRemoveSeasonTicket(QString name)
+{
+    QByteArray seasonTicket;
+    QDataStream wSeasonTicket(&seasonTicket, QIODevice::WriteOnly);
+    wSeasonTicket.setByteOrder(QDataStream::BigEndian);
+    wSeasonTicket << quint16(name.toUtf8().size());
+    seasonTicket.append(name);
+
+    QVariant tmp(name);
+    MessageProtocol msg(OP_CODE_CMD_REQ::REQ_REMOVE_TICKET, seasonTicket);
+    if (this->sendMessageRequest(&msg, &tmp) < 0)
+        emit this->notifyGamesListRequest(ERROR_CODE_ERR_SEND);
+}
+
+void DataConnection::startSendSeasonTicketListRequest()
+{
+    MessageProtocol msg(OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST);
     if (this->sendMessageRequest(&msg) < 0)
         emit this->notifyGamesListRequest(ERROR_CODE_ERR_SEND);
 }
@@ -230,6 +286,19 @@ void DataConnection::connectionTimeoutFired()
 
         case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
             emit this->notifyGamesListRequest(ERROR_CODE_NO_ANSWER);
+            break;
+
+        case OP_CODE_CMD_REQ::REQ_ADD_TICKET:
+            emit this->notifyAddSeasonTicketRequest(ERROR_CODE_NO_ANSWER);
+            break;
+
+        case OP_CODE_CMD_REQ::REQ_REMOVE_TICKET:
+            emit this->notifyRemoveSeasonTicketRequest(ERROR_CODE_NO_ANSWER);
+            break;
+
+        case OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST:
+            emit this->notifySeasonTicketListRequest(ERROR_CODE_NO_ANSWER);
+            break;
         }
         this->m_lActualRequest.removeLast();
     }
@@ -298,6 +367,24 @@ void DataConnection::sendActualRequestsAgain()
 
         case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
             this->startSendGamesListRequest();
+            break;
+
+        case OP_CODE_CMD_REQ::REQ_ADD_TICKET:
+        {
+            QByteArray request = this->m_lActualRequest[i].data.toByteArray();
+            quint32 discount = qFromBigEndian(*(quint32 *)request.constData());
+            quint16 size = qFromBigEndian(*(quint16 *)(request.constData() + 4));
+            QString name(QByteArray(request.constData() + 6, size));
+            this->startSendAddSeasonTicket(name, discount);
+            break;
+        }
+
+        case OP_CODE_CMD_REQ::REQ_REMOVE_TICKET:
+            this->startSendRemoveSeasonTicket(this->m_lActualRequest[i].data.toString());
+            break;
+
+        case OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST:
+            this->startSendSeasonTicketListRequest();
             break;
 
         default:

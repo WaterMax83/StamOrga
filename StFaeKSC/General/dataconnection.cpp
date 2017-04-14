@@ -1,12 +1,13 @@
 #include <QtCore/QDataStream>
 
-#include "dataconnection.h"
-#include "../Common/General/globalfunctions.h"
 #include "../Common/General/config.h"
+#include "../Common/General/globalfunctions.h"
 #include "../Common/Network/messagecommand.h"
 #include "../Data/seasonticket.h"
+#include "dataconnection.h"
 
-DataConnection::DataConnection(GlobalData *pGData, QObject *parent) : QObject(parent)
+DataConnection::DataConnection(GlobalData* pGData, QObject* parent)
+    : QObject(parent)
 {
     this->m_pGlobalData = pGData;
 }
@@ -15,22 +16,21 @@ DataConnection::DataConnection(GlobalData *pGData, QObject *parent) : QObject(pa
  * 0                Header          12
  * 12   String      password        X
  */
-MessageProtocol *DataConnection::requestCheckUserLogin(MessageProtocol *msg)
+MessageProtocol* DataConnection::requestCheckUserLogin(MessageProtocol* msg)
 {
-    MessageProtocol *ack = NULL;
-    const char *pData = msg->getPointerToData();
-    quint16 size = qFromBigEndian(*((quint16 *)pData));
+    MessageProtocol* ack   = NULL;
+    const char*      pData = msg->getPointerToData();
+    quint16          size  = qFromBigEndian(*((quint16*)pData));
     if (size > msg->getDataLength())
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_LOGIN_USER, ERROR_CODE_WRONG_SIZE);
 
     QString passw(QByteArray(pData + 2, size));
     if (this->m_pGlobalData->m_UserList.userCheckPassword(this->m_pUserConData->userName, passw)) {
-        ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_LOGIN_USER, ERROR_CODE_SUCCESS);
+        ack                                = new MessageProtocol(OP_CODE_CMD_RES::ACK_LOGIN_USER, ERROR_CODE_SUCCESS);
         this->m_pUserConData->bIsConnected = true;
         qInfo().noquote() << QString("User %1 logged in").arg(this->m_pUserConData->userName);
-    }
-    else {
-        ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_LOGIN_USER, ERROR_CODE_WRONG_PASSWORD);
+    } else {
+        ack                                = new MessageProtocol(OP_CODE_CMD_RES::ACK_LOGIN_USER, ERROR_CODE_WRONG_PASSWORD);
         this->m_pUserConData->bIsConnected = false;
     }
     return ack;
@@ -43,9 +43,9 @@ MessageProtocol *DataConnection::requestCheckUserLogin(MessageProtocol *msg)
  * 20               size            2
  * 22               readableName    X
  */
-MessageProtocol *DataConnection::requestGetUserProperties()
+MessageProtocol* DataConnection::requestGetUserProperties()
 {
-    QByteArray answer;
+    QByteArray  answer;
     QDataStream wAnswer(&answer, QIODevice::WriteOnly);
     wAnswer.setByteOrder(QDataStream::BigEndian);
     wAnswer << ERROR_CODE_SUCCESS;
@@ -55,7 +55,7 @@ MessageProtocol *DataConnection::requestGetUserProperties()
     wAnswer << quint16(readableName.toUtf8().size());
     answer.append(readableName);
 
-    MessageProtocol *ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_USER_PROPS, answer);
+    MessageProtocol* ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_USER_PROPS, answer);
 
     return ack;
 }
@@ -67,22 +67,22 @@ MessageProtocol *DataConnection::requestGetUserProperties()
  * 14+X     quint16     size            2
  * 16+X     String      new Passw       Y
  */
-MessageProtocol *DataConnection::requestUserChangeLogin(MessageProtocol *msg)
+MessageProtocol* DataConnection::requestUserChangeLogin(MessageProtocol* msg)
 {
     if (msg->getDataLength() <= 8) {
         qWarning() << QString("Getting no user login data from %1").arg(this->m_pUserConData->userName);
         return NULL;
     }
 
-    qint32 totalLength = (qint32)msg->getDataLength();
-    const char *pData = msg->getPointerToData();
+    qint32      totalLength = (qint32)msg->getDataLength();
+    const char* pData       = msg->getPointerToData();
 
-    quint16 actLength = qFromBigEndian(*((quint16 *)pData));
+    quint16 actLength = qFromBigEndian(*((quint16*)pData));
     if (actLength + 2 > totalLength)
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN, ERROR_CODE_WRONG_SIZE);
     QString actPassw(QByteArray(pData + 2, actLength));
 
-    quint16 newLength = qFromBigEndian(*((quint16 *)(pData + 2 + actLength)));
+    quint16 newLength = qFromBigEndian(*((quint16*)(pData + 2 + actLength)));
     if (newLength + actLength + 2 + 2 > totalLength)
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN, ERROR_CODE_WRONG_SIZE);
     QString newPassw(QByteArray(pData + 2 + actLength + 2, newLength));
@@ -101,17 +101,17 @@ MessageProtocol *DataConnection::requestUserChangeLogin(MessageProtocol *msg)
  * 12       quint16     size            2
  * 14       String      new readName    X
  */
-MessageProtocol *DataConnection::requestUserChangeReadname(MessageProtocol *msg)
+MessageProtocol* DataConnection::requestUserChangeReadname(MessageProtocol* msg)
 {
     if (msg->getDataLength() <= 4) {
         qWarning() << QString("Getting no readname from %1").arg(this->m_pUserConData->userName);
         return NULL;
     }
 
-    qint32 totalLength = (qint32)msg->getDataLength();
-    const char *pData = msg->getPointerToData();
+    qint32      totalLength = (qint32)msg->getDataLength();
+    const char* pData       = msg->getPointerToData();
 
-    quint16 actLength = qFromBigEndian(*((quint16 *)pData));
+    quint16 actLength = qFromBigEndian(*((quint16*)pData));
     if (actLength + 2 > totalLength)
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN, ERROR_CODE_WRONG_SIZE);
     QString newReadName(QByteArray(pData + 2, actLength));
@@ -128,20 +128,20 @@ MessageProtocol *DataConnection::requestUserChangeReadname(MessageProtocol *msg)
  * 16   quint16     size            2
  * 16   String      version         X
  */
-MessageProtocol *DataConnection::requestGetProgramVersion(MessageProtocol *msg)
+MessageProtocol* DataConnection::requestGetProgramVersion(MessageProtocol* msg)
 {
     if (msg->getDataLength() <= 6) {
         qWarning() << QString("Getting no version data from %1").arg(this->m_pUserConData->userName);
         return NULL;
     }
 
-    const char *pData = msg->getPointerToData();
-    quint16 actLength = qFromBigEndian(*((quint16 *)(pData + 4)));
+    const char* pData     = msg->getPointerToData();
+    quint16     actLength = qFromBigEndian(*((quint16*)(pData + 4)));
     if (actLength > msg->getDataLength())
-        return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_VERSION,ERROR_CODE_WRONG_SIZE);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_VERSION, ERROR_CODE_WRONG_SIZE);
     QString remVersion(QByteArray(pData + 6, actLength));
     qInfo().noquote() << QString("Version from %1 = %2").arg(this->m_pUserConData->userName).arg(remVersion);
-    QByteArray ownVersion;
+    QByteArray  ownVersion;
     QDataStream wVersion(&ownVersion, QIODevice::WriteOnly);
     wVersion.setByteOrder(QDataStream::BigEndian);
     wVersion << (quint32)STAM_ORGA_VERSION_I;
@@ -165,24 +165,24 @@ MessageProtocol *DataConnection::requestGetProgramVersion(MessageProtocol *msg)
  * 32+X qutin16     sizePack2       2
  */
 
-#define GAMES_OFFSET    1 + 1 + 8           // sIndex + comp + datetime
+#define GAMES_OFFSET 1 + 1 + 8 // sIndex + comp + datetime
 
-MessageProtocol *DataConnection::requestGetGamesList(/*MessageProtocol *msg*/)
+MessageProtocol* DataConnection::requestGetGamesList(/*MessageProtocol *msg*/)
 {
-    QByteArray ackArray;
+    QByteArray  ackArray;
     QDataStream wAckArray(&ackArray, QIODevice::WriteOnly);
     wAckArray.setByteOrder(QDataStream::BigEndian);
 
     quint16 numbOfGames = this->m_pGlobalData->m_GamesList.startRequestGetGamesPlay();
-    wAckArray << (quint32)ERROR_CODE_SUCCESS << numbOfGames;
-    wAckArray << quint16(0x1);                                      //Version
+    wAckArray << (quint32)ERROR_CODE_SUCCESS;
+    wAckArray << quint16(0x1) << numbOfGames; //Version
 
-    for (quint32 i=0; i<numbOfGames; i++) {
-        GamesPlay *pGame = this->m_pGlobalData->m_GamesList.getRequestGamesPlay(i);
+    for (quint32 i = 0; i < numbOfGames; i++) {
+        GamesPlay* pGame = this->m_pGlobalData->m_GamesList.getRequestGamesPlay(i);
         if (pGame == NULL)
             continue;
 
-        QString game(pGame->home + ";" + pGame->away +  ";" + pGame->score);
+        QString game(pGame->home + ";" + pGame->away + ";" + pGame->score);
 
 
         wAckArray.device()->seek(ackArray.size());
@@ -197,6 +197,8 @@ MessageProtocol *DataConnection::requestGetGamesList(/*MessageProtocol *msg*/)
 
     this->m_pGlobalData->m_GamesList.stopRequestGetGamesPlay();
 
+    qInfo().noquote() << QString("User %1 request Games List with %2 entries").arg(this->m_pUserConData->userName).arg(numbOfGames);
+
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_GAMES_LIST, ackArray);
 }
 
@@ -207,24 +209,27 @@ MessageProtocol *DataConnection::requestGetGamesList(/*MessageProtocol *msg*/)
  * 18     quint16     version         2
  * 20     quint16     sizeTick1       2
  * 22     quint8      discount        1
- * 25     QString     name+place      X
- * 25+X   qutin16     sizeTick2       2
+ * 23     quint8      IsOwnUser       1
+ * 26     QString     name+place      X
+ * 26+X   qutin16     sizeTick2       2
  */
 
-#define TICKET_OFFSET    1          // discount
+#define TICKET_OFFSET 1 + 1 // discount + isOwnUser
 
-MessageProtocol *DataConnection::requestGetTicketsList(/*MessageProtocol *msg*/)
+MessageProtocol* DataConnection::requestGetTicketsList(/*MessageProtocol *msg*/)
 {
-    QByteArray ackArray;
+    QByteArray  ackArray;
     QDataStream wAckArray(&ackArray, QIODevice::WriteOnly);
     wAckArray.setByteOrder(QDataStream::BigEndian);
 
     quint16 numbOfTickets = this->m_pGlobalData->m_SeasonTicket.startRequestGetTicketInfoList();
     wAckArray << (quint32)ERROR_CODE_SUCCESS << numbOfTickets;
-    wAckArray << quint16(0x1);                                      //Version
+    wAckArray << quint16(0x1); //Version
 
-    for (quint32 i=0; i<numbOfTickets; i++) {
-        TicketInfo *pTicket = this->m_pGlobalData->m_SeasonTicket.getRequestTicketInfo(i);
+    quint32 userIndex = this->m_pGlobalData->m_UserList.getUserLoginIndex(this->m_pUserConData->userName);
+
+    for (quint32 i = 0; i < numbOfTickets; i++) {
+        TicketInfo* pTicket = this->m_pGlobalData->m_SeasonTicket.getRequestTicketInfo(i);
         if (pTicket == NULL)
             continue;
 
@@ -234,6 +239,11 @@ MessageProtocol *DataConnection::requestGetTicketsList(/*MessageProtocol *msg*/)
         wAckArray.device()->seek(ackArray.size());
         wAckArray << quint16(ticket.toUtf8().size() + TICKET_OFFSET);
         wAckArray << quint8(pTicket->discount);
+
+        if (pTicket->userIndex == userIndex)
+            wAckArray << quint8(0x1);
+        else
+            wAckArray << quint8(0x0);
 
         ackArray.append(ticket);
     }
@@ -250,22 +260,24 @@ MessageProtocol *DataConnection::requestGetTicketsList(/*MessageProtocol *msg*/)
  * 16   quint16     size            2
  * 18   String      name            X
  */
-MessageProtocol *DataConnection::requestAddSeasonTicket(MessageProtocol *msg)
+MessageProtocol* DataConnection::requestAddSeasonTicket(MessageProtocol* msg)
 {
     if (msg->getDataLength() <= 6) {
         qWarning() << QString("Message for adding season ticket to short for user %1").arg(this->m_pUserConData->userName);
         return NULL;
     }
 
-    const char *pData = msg->getPointerToData();
-    quint32 discount = qFromBigEndian(*((quint32 *)(pData)));
-    quint16 actLength = qFromBigEndian(*((quint16 *)(pData + 4)));
+    const char* pData     = msg->getPointerToData();
+    quint32     discount  = qFromBigEndian(*((quint32*)(pData)));
+    quint16     actLength = qFromBigEndian(*((quint16*)(pData + 4)));
     if (actLength > msg->getDataLength())
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_ADD_TICKET, ERROR_CODE_WRONG_SIZE);
     QString ticketName(QByteArray(pData + 6, actLength));
-//    qInfo().noquote() << QString("Version from %1 = %2").arg(this->m_pUserConData->userName).arg(remVersion);
+    //    qInfo().noquote() << QString("Version from %1 = %2").arg(this->m_pUserConData->userName).arg(remVersion);
 
-    if (this->m_pGlobalData->m_SeasonTicket.addNewSeasonTicket(this->m_pUserConData->userName, ticketName, discount) > 0)
+    QString userName = this->m_pUserConData->userName;
+    quint32 userIndex = this->m_pGlobalData->m_UserList.getUserLoginIndex(userName);
+    if (this->m_pGlobalData->m_SeasonTicket.addNewSeasonTicket(userName, userIndex, ticketName, discount) > 0)
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_ADD_TICKET, ERROR_CODE_SUCCESS);
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_ADD_TICKET, ERROR_CODE_COMMON);
 }
@@ -275,15 +287,15 @@ MessageProtocol *DataConnection::requestAddSeasonTicket(MessageProtocol *msg)
  * 12   quint16     size            2
  * 14   String      name            X
  */
-MessageProtocol *DataConnection::requestRemoveSeasonTicket(MessageProtocol *msg)
+MessageProtocol* DataConnection::requestRemoveSeasonTicket(MessageProtocol* msg)
 {
     if (msg->getDataLength() <= 2) {
         qWarning() << QString("Message for removing season ticket to short for user %1").arg(this->m_pUserConData->userName);
         return NULL;
     }
 
-    const char *pData = msg->getPointerToData();
-    quint16 actLength = qFromBigEndian(*((quint16 *)(pData + 2)));
+    const char* pData     = msg->getPointerToData();
+    quint16     actLength = qFromBigEndian(*((quint16*)(pData + 2)));
     if (actLength > msg->getDataLength())
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_REMOVE_TICKET, ERROR_CODE_WRONG_SIZE);
     QString ticketName(QByteArray(pData + 2, actLength));

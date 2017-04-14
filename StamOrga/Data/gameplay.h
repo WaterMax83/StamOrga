@@ -45,7 +45,11 @@ public:
 
     QString timestamp()
     {
-        return QDateTime::fromMSecsSinceEpoch(this->m_timestamp).toString("dd.MM.yy hh:mm");
+        return QDateTime::fromMSecsSinceEpoch(this->m_timestamp).toString("ddd, dd.MM.yy hh:mm");
+    }
+    qint64 timestamp64Bit()
+    {
+        return this->m_timestamp;
     }
     void setTimeStamp(qint64 ts)
     {
@@ -59,8 +63,9 @@ public:
     {
         switch(this->m_comp) {
         case 1:
+            return "1 Bundesliga";
         case 2:
-            return "2 BL";
+            return "2 Bundesliga";
         default:
             return "Unknown";
         }
@@ -85,6 +90,13 @@ public:
             this->m_index = index;
             emit this->indexChanged();
         }
+    }
+    Q_INVOKABLE QString getCompetitionIndex()
+    {
+        if (this->m_comp == 1 || this->m_comp == 2) {
+            return QString("%1. Spieltag").arg(this->m_index);
+        }
+        return "not implemented";
     }
 
 

@@ -131,3 +131,11 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol *msg)
     return rValue;
 }
 
+qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol *msg)
+{
+    if (msg->getDataLength() < 8)
+        return ERROR_CODE_WRONG_SIZE;
+
+    return 0;
+}
+
