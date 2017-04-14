@@ -250,7 +250,7 @@ void DataConnection::connectionTimeoutFired()
     qDebug() << "Timeout from Data UdpServer";
     while(this->m_lActualRequest.size() > 0) {
         DataConRequest request = this->m_lActualRequest.last();
-        request.m_result = ERROR_CODE_NO_ANSWER;
+        request.m_result = ERROR_CODE_TIMEOUT;
         emit this->notifyLastRequestFinished(request);
         this->m_lActualRequest.removeLast();
     }

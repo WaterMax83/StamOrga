@@ -64,10 +64,8 @@ Flickable {
         if (result === 1) {
             txtInfoSeasonTicket.text = "Success"
         }
-        else if (result === -7)
-            txtInfoSeasonTicket.text = "Dauerkarte existiert bereits"
         else
-            txtInfoSeasonTicket.text = "Error: " + result
+            txtInfoSeasonTicket.text = userIntTicket.getErrorCodeToString(result)
     }
 
     ScrollIndicator.vertical: ScrollIndicator { }

@@ -188,14 +188,9 @@ Flickable {
                 btnSendData.background.color = "green"
                 txtInfoConnecting.text = "Verbindung erfolgreich"
             }
-            else {
+            else {getErrorCodeToString
                 btnSendData.background.color = "red"
-                if (result === -3)  {  // timeout
-                    txtInfoConnecting.text = "Fehler: keine Verbindung"
-                }
-                else {
-                    txtInfoConnecting.text = "Benutzerdaten fehlerhaft"
-                }
+                txtInfoConnecting.text = userIntUser.getErrorCodeToString(result);
             }
         }
         onNotifyVersionRequestFinished : {

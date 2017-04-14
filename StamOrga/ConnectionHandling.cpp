@@ -59,72 +59,62 @@ qint32 ConnectionHandling::startMainConnection(QString name, QString passw)
 
 qint32 ConnectionHandling::startGettingVersionInfo()
 {
-    this->startDataConnection();
     DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_VERSION);
-    emit this->sStartSendNewRequest(req);
+    this->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 
 qint32 ConnectionHandling::startGettingUserProps()
 {
-    this->startDataConnection();
     DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_USER_PROPS);
-    emit this->sStartSendNewRequest(req);
+    this->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 
 bool ConnectionHandling::startUpdatePassword(QString newPassWord)
 {
-    this->startDataConnection();
     DataConRequest req(OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN);
     req.m_lData.append(newPassWord);
-    emit this->sStartSendNewRequest(req);
+    this->sendNewRequest(req);
     return true;
 }
 
 qint32 ConnectionHandling::startUpdateReadableName(QString name)
 {
-    this->startDataConnection();
     DataConRequest req(OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME);
     req.m_lData.append(name);
-    emit this->sStartSendNewRequest(req);
+    this->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 
 qint32 ConnectionHandling::startGettingGamesList()
 {
-//    this->sendGamesListRequest();
-
-    this->startDataConnection();
     DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST);
-    emit this->sStartSendNewRequest(req);
+    this->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 
 qint32 ConnectionHandling::startSeasonTicketRemove(QString name)
 {
-    this->startDataConnection();
     DataConRequest req(OP_CODE_CMD_REQ::REQ_REMOVE_TICKET);
     req.m_lData.append(name);
-    emit this->sStartSendNewRequest(req);
+    this->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 
 qint32 ConnectionHandling::startSeasonTicketAdd(QString name, quint32 discount)
 {
-    this->startDataConnection();
     DataConRequest req(OP_CODE_CMD_REQ::REQ_ADD_TICKET);
     req.m_lData.append(QString::number(discount));
     req.m_lData.append(name);
-    emit this->sStartSendNewRequest(req);
+    this->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 
 qint32 ConnectionHandling::startGettingSeasonTicketList()
 {
-    this->startDataConnection();
     DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST);
-    emit this->sStartSendNewRequest(req);
+    this->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 
@@ -148,6 +138,13 @@ void ConnectionHandling::slMainConReqFin(qint32 result, const QString &msg)
         emit this->sNotifyConnectionFinished(result);
         this->m_ctrlMainCon.Stop();
         this->stopDataConnection();
+
+        while (this->m_lErrorMainCon.size() > 0) {
+            DataConRequest request = this->m_lErrorMainCon.last();
+            request.m_result = result;
+            this->slDataConLastRequestFinished(request);
+            this->m_lErrorMainCon.removeLast();
+        }
     }
 }
 
@@ -164,6 +161,18 @@ void ConnectionHandling::sendLoginRequest()
     emit this->sStartSendNewRequest(req);
 }
 
+void ConnectionHandling::sendNewRequest(DataConRequest request)
+{
+    if (this->isMainConnectionActive()) {
+        this->startDataConnection();
+
+        emit this->sStartSendNewRequest(request);
+    } else {
+        this->m_lErrorMainCon.prepend(request);
+        this->startMainConnection(this->m_pGlobalData->userName(), this->m_pGlobalData->passWord());
+    }
+}
+
 
 void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
 {
@@ -172,10 +181,21 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
             if (request.m_result == ERROR_CODE_SUCCESS) {
                 qInfo().noquote() << "Logged in succesfully";
                 this->m_pGlobalData->setbIsConnected(true);
+                while (this->m_lErrorMainCon.size() > 0) {
+                    this->sendNewRequest(this->m_lErrorMainCon.last());
+                    this->m_lErrorMainCon.removeLast();
+                }
             } else {
                 qWarning().noquote() << QString("Error Login: %1").arg(getErrorCodeString(request.m_result));
-
+                while (this->m_lErrorMainCon.size() > 0) {
+                    DataConRequest newReq = this->m_lErrorMainCon.last();
+                    newReq.m_result = request.m_result;
+                    this->slDataConLastRequestFinished(newReq);
+                    this->m_lErrorMainCon.removeLast();
+                }
             }
+
+
 
             emit this->sNotifyConnectionFinished(request.m_result);
         break;

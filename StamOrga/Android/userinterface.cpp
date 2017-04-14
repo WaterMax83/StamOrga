@@ -89,7 +89,6 @@ void UserInterface::slUpdateReadableNameRequestFinished(qint32 result)
 
 void UserInterface::slSeasonTicketAddFinished(qint32 result)
 {
-    qDebug() << "Add Ticket Answer 3";
     emit this->notifySeasonTicketAddFinished(result);
 }
 

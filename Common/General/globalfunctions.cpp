@@ -40,27 +40,31 @@ QString getErrorCodeString(qint32 code)
 {
     switch(code) {
     case ERROR_CODE_NEW_VERSION:
-        return QString("new Version: %1").arg(code);
+        return QString("neue Version: %1").arg(code);
     case ERROR_CODE_SUCCESS:
-        return QString("Success: %1").arg(code);
+        return QString("Erfolgreich: %1").arg(code);
     case ERROR_CODE_NO_ERROR:
-        return QString("No Error: %1").arg(code);
+        return QString("Kein Fehler: %1").arg(code);
     case ERROR_CODE_COMMON:
-        return QString("Common unkown error: %1").arg(code);
+        return QString("Fehler: Standart Fehler: %1").arg(code);
     case ERROR_CODE_WRONG_SIZE:
-        return QString("Wrong data size: %1").arg(code);
+        return QString("Fehler: Falsche Datengroesse: %1").arg(code);
     case ERROR_CODE_TIMEOUT:
-        return QString("No answer, timeout: %1").arg(code);
+        return QString("Fehler: Keine Antwort: %1").arg(code);
     case ERROR_CODE_ERR_SEND:
-        return QString("Error sending data: %1").arg(code);
-    case ERROR_CODE_NO_ANSWER:
-        return QString("Did not get an answer: %1").arg(code);
+        return QString("Fehler: Fehler beim Senden: %1").arg(code);
+//    case ERROR_CODE_NO_ANSWER:
+//        return QString("Did not get an answer: %1").arg(code);
     case ERROR_CODE_NO_USER:
-        return QString("User not known: %1").arg(code);
+        return QString("Fehler: Benutzer unbekannt: %1").arg(code);
     case ERROR_CODE_WRONG_PASSWORD:
-        return QString("Password invalid: %1").arg(code);
+        return QString("Fehler: Passwort falsch: %1").arg(code);
+    case ERROR_CODE_NO_CONNECT:
+        return QString("Fehler: keine Verbindung: %1").arg(code);
+    case ERROR_CODE_ALREADY_EXIST:
+        return QString("Fehler: existiert bereits: %1").arg(code);
     default:
-        return QString("Unkown error: %1").arg(code);
+        return QString("Unbekannter Fehler: %1").arg(code);
     }
 }
 

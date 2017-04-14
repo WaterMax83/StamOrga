@@ -5,6 +5,7 @@
 
 #include "../connectionhandling.h"
 #include "../Data/globaldata.h"
+#include "../../Common/General/globalfunctions.h"
 
 class UserInterface : public QObject
 {
@@ -44,6 +45,11 @@ public:
 #else
         return false;
 #endif
+    }
+
+    Q_INVOKABLE QString getErrorCodeToString(qint32 code)
+    {
+        return getErrorCodeString(code);
     }
 
     GlobalData *globalData()

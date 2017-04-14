@@ -237,7 +237,6 @@ ApplicationWindow {
             }
         }
         onNotifySeasonTicketAddFinished: {
-            console.log("Add Season Ticket main")
             stackView.currentItem.notifySeasonTicketAdd(result);
         }
     }

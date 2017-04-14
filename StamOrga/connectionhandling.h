@@ -80,7 +80,10 @@ private:
     QTimer      *m_pTimerConReset;
     QTimer      *m_pTimerLoginReset;
 
+    QList<DataConRequest> m_lErrorMainCon;
+
     void sendLoginRequest();
+    void sendNewRequest(DataConRequest request);
 
     void checkTimeoutResult(qint32 result);
 
