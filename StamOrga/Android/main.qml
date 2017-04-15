@@ -77,13 +77,7 @@ ApplicationWindow {
 //                    visible: stackView.depth > 1 ? false : true
                 }
                 onClicked: {
-                    if (stackView.depth === 1) {
-                        if (userInt.startMainConnection(globalUserData.userName, globalUserData.passWord) > 0) {
-                            busyLoadingIndicator.visible = true
-                            txtInfoLoading.text = "Verbinde"
-                            txtInfoLoading.visible = true
-                        }
-                    } else if (imageToolButton.visible === true){
+                    if (imageToolButton.visible === true){
                         stackView.currentItem.toolButtonClicked()
 
                     }
@@ -124,7 +118,6 @@ ApplicationWindow {
             }
 
             model: ListModel {
-                //ListElement { title: "Benutzer"; source: "qrc:/pages/UserLogin.qml"; element: viewUserLogin }
 
                 Component.onCompleted: {
                     append({title: "Benutzer", element : viewUserLogin, imgsource : ""});
@@ -140,104 +133,61 @@ ApplicationWindow {
         id: stackView
         anchors.fill: parent
 
-        initialItem: Flickable {
-            id: flickable
-        //    width: parent.width
-            contentHeight: mainPane.height
-            Pane {
-            id: mainPane
-            width: parent.width
-
-                ColumnLayout {
-                    id: mainColumnLayout
-                    anchors.right: parent.right
-                    anchors.left: parent.left
-                    width: parent.width
-                    ColumnLayout {
-                        id: columnLayoutBusyInfo
-                        spacing: 5
-                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-
-                        BusyIndicator {
-                            id: busyLoadingIndicator
-                            visible: false
-                            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                        }
-
-                        Label {
-                            id: txtInfoLoading
-                            visible: false
-                            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                        }
-                    }
-                    ColumnLayout {
-                        id: columnLayoutGames
-                        anchors.right: parent.right
-                        anchors.left: parent.left
-                        width: parent.width
-                        spacing: 10
-                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                    }
-                }
-            }
-
-            ScrollIndicator.vertical: ScrollIndicator { }
-        }
+        initialItem: viewGames
 
         onCurrentItemChanged: {
             if (stackView.depth === 1) {
                 imageToolButton.visible = true
                 imageToolButton.source = "images/refresh.png"
             }
+            stackView.currentItem.pageOpenedUpdateView()
+        }
+    }
+
+    Component {
+        id: viewGames
+        MyPages.GamesPage {
+            userIntGames: userInt
         }
     }
 
     Component {
         id: viewUserLogin
-
-        MyPages.UserLogin {}
+        MyPages.UserLogin {
+//            userIntUser: userInt
+        }
     }
 
     Component {
         id: viewSeasonTickets
-
         MyPages.SeasonTickets {
             userIntTicket: userInt
         }
     }
 
-    Component {
-        id: gameView
-
-        MyComponents.Games {}
-    }
-
-
     UserInterface {
         id: userInt
         globalData: globalUserData
         onNotifyConnectionFinished : {
-            if (result === 1) {
-                userInt.startGettingGamesList()
-                txtInfoLoading.text = "Lade Spielliste"
-            } else {
-                busyLoadingIndicator.visible = false
-                if (result === -3)
-                    txtInfoLoading.text = "Fehler: keine Verbindung"
-                else
-                    txtInfoLoading.text = "Benutzerdaten fehlerhaft"
-            }
+//            if (result === 1) {
+//                userInt.startGettingGamesList()
+//                txtInfoLoading.text = "Lade Spielliste"
+//            } else {
+//                busyLoadingIndicator.visible = false
+//                if (result === -3)
+//                    txtInfoLoading.text = "Fehler: keine Verbindung"
+//                else
+//                    txtInfoLoading.text = "Benutzerdaten fehlerhaft"
+//            }
         }
         onNotifyGamesListFinished : {
-            busyLoadingIndicator.visible = false
-            if (result === 1) {
-                showListedGames()
-            } else {
-                txtInfoLoading.text = "Fehler beim Lesen der Daten: " + result
-            }
+            stackView.currentItem.notifyGamesListFinished(result);
         }
         onNotifySeasonTicketAddFinished: {
             stackView.currentItem.notifySeasonTicketAdd(result);
+        }
+        onNotifySeasonTicketListFinished: {
+            stackView.currentItem.notifySeasonTicketListFinished(result);
         }
     }
 
@@ -247,25 +197,9 @@ ApplicationWindow {
         if (open === true) {
             listView.currentIndex = 0
             stackView.push(viewUserLogin);
-        }
-        showListedGames()
-    }
-
-    function showListedGames() {
-
-        for (var j = columnLayoutGames.children.length; j > 0; j--) {
-            columnLayoutGames.children[j-1].destroy()
-        }
-
-        txtInfoLoading.visible = true
-        if (globalUserData.getGamePlayLength() > 0) {
-            for (var i=0; i<globalUserData.getGamePlayLength(); i++) {
-                var sprite = gameView.createObject(columnLayoutGames)
-                sprite.showGamesInfo(globalUserData.getGamePlay(i))
-            }
-            txtInfoLoading.text = "Letzes Update am " + globalUserData.getGamePlayLastUpdate()
         } else
-            txtInfoLoading.text = "Keine Daten zum anzeigen"
+            stackView.currentItem.showListedGames()
     }
+
 }
 

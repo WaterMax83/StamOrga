@@ -82,7 +82,6 @@ void DataConnection::checkNewOncomingData()
             }
             else {
                 request.m_result = this->m_pDataHandle->getHandleLoginResponse(msg);
-                emit this->notifyLastRequestFinished(request);
             }
 
             break;

@@ -87,15 +87,10 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol *msg)
 
         if (size <= 8) {
             qWarning().noquote() << QString("Size is to small %1").arg(size);
+            delete play;
             break;
         }
 
-        // quint16 version = qFromBigEndian(*(qint16 *)(pData + offset));
-        // if (version != 0x1) {
-            // qWarning().noquote() << QString("Unknown game version %1").arg(version);
-            // break;
-        // }
-        // offset += 2;
         play->setIndex(*(qint8 *)(pData + offset));
         offset += 1;
         play->setCompetition(*(qint8 *)(pData + offset));
@@ -136,6 +131,58 @@ qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol *msg)
     if (msg->getDataLength() < 8)
         return ERROR_CODE_WRONG_SIZE;
 
-    return 0;
+    const char *pData = msg->getPointerToData();
+    qint32 rValue = qFromBigEndian(*((qint32 *)pData));
+
+    if (rValue != ERROR_CODE_SUCCESS)
+        return rValue;
+
+    quint32 totalSize = msg->getDataLength();
+    quint32 offset = 4;
+    quint16 version = qFromBigEndian(*(qint16 *)(pData + offset));
+    if (version != 0x1) {
+        qWarning().noquote() << QString("Unknown season ticket version %1").arg(version);
+        return -1;
+    }
+    offset += 2;
+
+    quint16 totalPacks = qFromBigEndian(*(quint16 *)(pData + offset));
+    offset += 2;
+
+    qDebug() << QString("Getting %1 number of tickets").arg(totalPacks);
+
+    this->m_pGlobalData->startUpdateSeasonTickets();
+    while(offset < totalSize && totalPacks > 0) {
+        SeasonTicket *sTicket = new SeasonTicket();
+        quint16 size = qFromBigEndian(*(qint16 *)(pData + offset));
+        offset += 2;
+
+        if (size <= 8) {
+            qWarning().noquote() << QString("Size is to small %1").arg(size);
+            delete sTicket;
+            break;
+        }
+
+        sTicket->setDiscount(*(qint8 *)(pData + offset));
+        offset += 1;
+        quint8 IsOwnTicket = (*(qint8 *)(pData + offset));
+        offset += 1;
+
+        QString ticketString(QByteArray(pData + offset, size - 2));
+        offset += (size - 2);
+        QStringList lsticketString = ticketString.split(";");
+
+        if (lsticketString.size() > 0)
+            sTicket->setName(lsticketString.value(0));
+        if (lsticketString.size() > 1)
+            sTicket->setPlace(lsticketString.value(1));
+
+        this->m_pGlobalData->addNewSeasonTicket(sTicket);
+        totalPacks--;
+    }
+
+    this->m_pGlobalData->saveCurrentSeasonTickets();
+
+    return rValue;
 }
 

@@ -6,13 +6,13 @@ import com.watermax.demo 1.0
 
 Flickable {
     id: flickable
-//    width: parent.width
     contentHeight: pane.height
+
+//    property UserInterface userIntUser
 
     Pane {
         id: pane
         width: flickable.width
-//        height: flickable.height * 1.25
 
         Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
@@ -78,32 +78,21 @@ Flickable {
                 }
             }
 
-            RowLayout {
-                id: rowLayout
+            ColumnLayout {
+                id: columnLayout
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
-//                Column {
-//                    id: space
-//                    width: 0
-//                    height: 81
-//                }
-
-                ColumnLayout {
-                    id: columnLayout
+                BusyIndicator {
+                    id: busyConnectIndicator
+                    opacity: 1
+                    visible: false
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                }
 
-                    BusyIndicator {
-                        id: busyConnectIndicator
-                        opacity: 1
-                        visible: false
-                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                    }
-
-                    Label {
-                        id: txtInfoConnecting
-                        text: qsTr("Label")
-                        visible: false
-                    }
+                Label {
+                    id: txtInfoConnecting
+                    text: qsTr("Label")
+                    visible: false
                 }
             }
 
@@ -213,6 +202,10 @@ Flickable {
             else
                 txtInfoConnecting.text = "Fehler beim Namen ändern"
         }
+    }
+
+    function pageOpenedUpdateView() {
+
     }
 
     Dialog {

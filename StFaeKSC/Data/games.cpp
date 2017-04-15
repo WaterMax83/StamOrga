@@ -336,7 +336,7 @@ bool Games::updateGamesPlayValue(GamesPlay *pGame, QString key, QVariant value)
         if (pGame->index == actIndex) {
 
             this->m_pGamesSettings->setValue(key, value);
-            qInfo().noquote() << QString("Change %1 of game %2:%3 to %4").arg(key, pGame->saisonIndex, pGame->competition).arg(value.toString());
+            qInfo().noquote() << QString("Change %1 of game %2-%3 to %4").arg(key).arg(pGame->saisonIndex, pGame->competition).arg(value.toString());
             rValue = true;
             break;
         }

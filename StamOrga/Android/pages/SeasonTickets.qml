@@ -30,14 +30,17 @@ Flickable {
             Label {
                 id: txtInfoSeasonTicket
                 text: qsTr("Label")
-                visible: false
+                visible: true
             }
         }
 
-        Rectangle {
-            width: 150
-            height: 150
-            color: "blue"
+        ColumnLayout {
+            id: columnLayoutTickets
+            anchors.right: parent.right
+            anchors.left: parent.left
+            width: parent.width
+            spacing: 10
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
         }
 
         Button {
@@ -56,16 +59,76 @@ Flickable {
     }
 
     function toolButtonClicked() {
-        console.log("Clicked the ToolButton inside SeasonTIcket")
+        userIntTicket.startGettingSeasonTicketList()
+        busyConnectIndicatorTicket.visible = true;
+        txtInfoSeasonTicket.text = "Lade Dauerkarten Liste"
     }
 
     function notifySeasonTicketAdd(result) {
         busyConnectIndicatorTicket.visible = false;
         if (result === 1) {
-            txtInfoSeasonTicket.text = "Success"
+            toolButtonClicked()
         }
         else
             txtInfoSeasonTicket.text = userIntTicket.getErrorCodeToString(result)
+    }
+
+    function notifySeasonTicketListFinished(result) {
+        busyConnectIndicatorTicket.visible = false;
+        if (result === 1) {
+            showSeasonTickets()
+        } else {
+            txtInfoSeasonTicket.text = userIntTicket.getErrorCodeToString(result);
+        }
+    }
+
+    function pageOpenedUpdateView() {
+        showSeasonTickets()
+    }
+
+    function showSeasonTickets() {
+
+        for (var j = columnLayoutTickets.children.length; j > 0; j--) {
+            columnLayoutTickets.children[j-1].destroy()
+        }
+
+        if (globalUserData.getSeasonTicketLength() > 0) {
+            for (var i=0; i<globalUserData.getSeasonTicketLength(); i++) {
+                var sprite = seasonTicketItem.createObject(columnLayoutTickets)
+                sprite.showTicketInfo(globalUserData.getSeasonTicket(i))
+            }
+            txtInfoSeasonTicket.text = "Letzes Update am " + globalUserData.getSeasonTicketLastUpdate()
+        } else
+            txtInfoSeasonTicket.text = "Keine Daten zum anzeigen"
+    }
+
+    Component {
+        id: seasonTicketItem
+        Rectangle {
+            id: ticketRectangleItem
+            property var m_SeasonTicketItem
+
+            width: parent.width
+            height: 50
+            color: "#81848E"
+            ColumnLayout {
+                id: columnLayoutTicketItem
+                width: ticketRectangleItem.width
+                spacing: 3
+                Label {
+                    id: labelTicketItem
+                    text: qsTr("text")
+                    Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
+                }
+            }
+
+            function showTicketInfo(seasontTicketItem) {
+                if (seasontTicketItem !== null) {
+                    m_SeasonTicketItem = seasontTicketItem
+                    labelTicketItem.text = seasontTicketItem.name + " bei " + seasontTicketItem.place
+                }
+            }
+        }
     }
 
     ScrollIndicator.vertical: ScrollIndicator { }
@@ -88,7 +151,6 @@ Flickable {
             } else {
                 userIntTicket.startAddSeasonTicket(txtnewSeasonTicketName.text, 0);
                 busyConnectIndicatorTicket.visible = true;
-                txtInfoSeasonTicket.visible = true;
                 txtInfoSeasonTicket.text = "Füge Dauerkarte hinzu"
                 addSeasonTicketDlg.close()
             }

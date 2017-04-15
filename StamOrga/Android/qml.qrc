@@ -22,5 +22,6 @@
         <file>pages/SeasonTickets.qml</file>
         <file>images/+material/add.png</file>
         <file>images/add.png</file>
+        <file>pages/GamesPage.qml</file>
     </qresource>
 </RCC>

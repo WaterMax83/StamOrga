@@ -8,6 +8,7 @@
 #include <QtNetwork/QHostInfo>
 
 #include "gameplay.h"
+#include "seasonticket.h"
 
 class GlobalData : public QObject
 {
@@ -117,6 +118,19 @@ public:
     Q_INVOKABLE GamePlay *getGamePlay(int index);
     Q_INVOKABLE QString getGamePlayLastUpdate();
 
+
+    void saveCurrentSeasonTickets();
+
+    void startUpdateSeasonTickets();
+    void addNewSeasonTicket(SeasonTicket *sTicket);
+    Q_INVOKABLE quint32 getSeasonTicketLength()
+    {
+        QMutexLocker lock(&this->m_mutexTicket);
+        return this->m_lSeasonTicket.size();
+    }
+    Q_INVOKABLE SeasonTicket *getSeasonTicket(int index);
+    Q_INVOKABLE QString getSeasonTicketLastUpdate();
+
 signals:
     void userNameChanged();
     void passWordChanged();
@@ -140,6 +154,7 @@ private:
     QMutex  m_mutexUser;
     QMutex  m_mutexUserIni;
     QMutex  m_mutexGame;
+    QMutex  m_mutexTicket;
 
     bool m_bIsConnected;
 
@@ -150,6 +165,10 @@ private:
     QList<GamePlay*> m_lGamePlay;
     qint64          m_gpLastTimeStamp;
     bool existGamePlay(GamePlay *gPlay);
+
+    QList<SeasonTicket*> m_lSeasonTicket;
+    qint64          m_stLastTimeStamp;
+    bool existSeasonTicket(SeasonTicket *sTicket);
 };
 
 #endif // GLOBALDATA_H

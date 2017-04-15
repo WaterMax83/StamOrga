@@ -32,6 +32,7 @@ MessageProtocol* DataConnection::requestCheckUserLogin(MessageProtocol* msg)
     } else {
         ack                                = new MessageProtocol(OP_CODE_CMD_RES::ACK_LOGIN_USER, ERROR_CODE_WRONG_PASSWORD);
         this->m_pUserConData->bIsConnected = false;
+        qWarning().noquote() << QString("User %1 tried to login with wrong password").arg(this->m_pUserConData->userName);
     }
     return ack;
 }
@@ -54,6 +55,8 @@ MessageProtocol* DataConnection::requestGetUserProperties()
     QString readableName = this->m_pGlobalData->m_UserList.getReadableName(this->m_pUserConData->userName);
     wAnswer << quint16(readableName.toUtf8().size());
     answer.append(readableName);
+
+    qInfo().noquote() << QString("User %1 getting user properties %2").arg(this->m_pUserConData->userName, readableName);
 
     MessageProtocol* ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_USER_PROPS, answer);
 
@@ -205,8 +208,8 @@ MessageProtocol* DataConnection::requestGetGamesList(/*MessageProtocol *msg*/)
 /*
  * 0                Header          12
  * 12     quint32     result          4
- * 16     quint16     numbOfTickets   2
- * 18     quint16     version         2
+ * 16     quint16     version         2
+ * 18     quint16     numbOfTickets   2
  * 20     quint16     sizeTick1       2
  * 22     quint8      discount        1
  * 23     quint8      IsOwnUser       1
@@ -223,8 +226,8 @@ MessageProtocol* DataConnection::requestGetTicketsList(/*MessageProtocol *msg*/)
     wAckArray.setByteOrder(QDataStream::BigEndian);
 
     quint16 numbOfTickets = this->m_pGlobalData->m_SeasonTicket.startRequestGetTicketInfoList();
-    wAckArray << (quint32)ERROR_CODE_SUCCESS << numbOfTickets;
-    wAckArray << quint16(0x1); //Version
+    wAckArray << (quint32)ERROR_CODE_SUCCESS;
+    wAckArray << quint16(0x1) << numbOfTickets; //Version
 
     quint32 userIndex = this->m_pGlobalData->m_UserList.getUserLoginIndex(this->m_pUserConData->userName);
 
@@ -248,6 +251,7 @@ MessageProtocol* DataConnection::requestGetTicketsList(/*MessageProtocol *msg*/)
         ackArray.append(ticket);
     }
 
+    qInfo().noquote() << QString("User %1 request Ticket List with %2 entries").arg(this->m_pUserConData->userName).arg(numbOfTickets);
 
     this->m_pGlobalData->m_SeasonTicket.stopRequestGetTicketInfoList();
 

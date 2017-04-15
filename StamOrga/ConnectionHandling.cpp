@@ -24,10 +24,19 @@ ConnectionHandling::ConnectionHandling(QObject *parent) : QObject(parent)
 
 qint32 ConnectionHandling::startMainConnection(QString name, QString passw)
 {
+    bool bChangedUserName = false;
+    bool bChangedPassword = false;
+
+    if (name != this->m_pGlobalData->userName())
+        bChangedUserName = true;
+
+    if (passw != this->m_pGlobalData->passWord())
+        bChangedPassword = true;
+
     if (this->isMainConnectionActive())
     {
-        if (name == this->m_pGlobalData->userName()) {
-            if (this->m_pGlobalData->bIsConnected() && passw == this->m_pGlobalData->passWord()) {
+        if (!bChangedUserName) {
+            if (this->m_pGlobalData->bIsConnected() && !bChangedPassword) {
                 emit this->sNotifyConnectionFinished(ERROR_CODE_SUCCESS);
                 qDebug() << "Did not log in again, should already be succesfull";
                 return ERROR_CODE_NO_ERROR;
@@ -45,14 +54,17 @@ qint32 ConnectionHandling::startMainConnection(QString name, QString passw)
     } else
         this->stopDataConnection();
 
-    this->m_pGlobalData->setUserName(name);
-    this->m_pGlobalData->setPassWord(passw);
+    if (bChangedUserName)
+        this->m_pGlobalData->setUserName(name);
+    if (bChangedPassword)
+        this->m_pGlobalData->setPassWord(passw);
 
     this->m_pMainCon = new MainConnection(this->m_pGlobalData);
     connect(this->m_pMainCon, &MainConnection::connectionRequestFinished, this, &ConnectionHandling::slMainConReqFin);
     this->m_ctrlMainCon.Start(this->m_pMainCon, false);
 
-    this->m_pGlobalData->saveGlobalUserSettings();
+    if (bChangedPassword || bChangedUserName)
+        this->m_pGlobalData->saveGlobalUserSettings();
 
     return ERROR_CODE_SUCCESS;
 }
@@ -179,7 +191,6 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
     switch(request.m_request) {
     case OP_CODE_CMD_REQ::REQ_LOGIN_USER:
             if (request.m_result == ERROR_CODE_SUCCESS) {
-                qInfo().noquote() << "Logged in succesfully";
                 this->m_pGlobalData->setbIsConnected(true);
                 while (this->m_lErrorMainCon.size() > 0) {
                     this->sendNewRequest(this->m_lErrorMainCon.last());
@@ -201,7 +212,6 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
         break;
 
     case OP_CODE_CMD_REQ::REQ_GET_VERSION:
-        qDebug() << QString("Answer from Version Info");
         emit this->sNotifyVersionRequest(request.m_result, request.m_returnData);
         break;
 
