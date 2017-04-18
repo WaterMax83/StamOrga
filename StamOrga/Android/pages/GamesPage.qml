@@ -36,7 +36,7 @@ Flickable {
                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                }
            }
-           ColumnLayout {
+           Column {
                id: columnLayoutGames
                anchors.right: parent.right
                anchors.left: parent.left
@@ -58,7 +58,7 @@ Flickable {
         showListedGames()
     }
 
-    function notifyGamesListFinished(result) {
+    function notifyUserIntGamesListFinished(result) {
         busyLoadingIndicatorGames.visible = false
         if (result === 1) {
             showListedGames()
@@ -82,6 +82,20 @@ Flickable {
        } else
            txtInfoLoadingGames.text = "Keine Daten zum anzeigen"
    }
+
+   function notifyUserIntVersionRequestFinished(result, msg) {
+       if (result === 5) {
+           var component = Qt.createComponent("../components/VersionDialog.qml");
+           if (component.status === Component.Ready) {
+               var dialog = component.createObject(parent,{popupType: 1});
+               dialog.versionText = msg;
+               dialog.parentHeight = flickableGames.height
+               dialog.parentWidth = flickableGames.width
+               dialog.open();
+           }
+       }
+   }
+   function notifyUserIntConnectionFinished(result) {}
 
    Component {
        id: gameView

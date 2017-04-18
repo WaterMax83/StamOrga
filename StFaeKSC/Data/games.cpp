@@ -68,7 +68,7 @@ int Games::addNewGame(QString home, QString away, qint64 datetime, quint8 sIndex
     }
 
     GamesPlay *pGame;
-    if ((pGame = this->gameExists(sIndex, comp)) != NULL) {
+    if ((pGame = this->gameExists(sIndex, comp, datetime)) != NULL) {
 //        QString info = QString("%1 : %2").arg(sIndex).arg(comp);
 //        qInfo() << (QString("Game \"%1\" already exists, updating info").arg(info));
 
@@ -179,13 +179,18 @@ void Games::saveActualGamesList()
     qDebug().noquote() << QString("saved actual Games List with %1 entries").arg(this->m_lGamesPlay.size());
 }
 
-GamesPlay *Games::gameExists(quint8 sIndex, quint8 comp)
+GamesPlay *Games::gameExists(quint8 sIndex, quint8 comp, qint64 datetime)
 {
     QMutexLocker locker(&this->m_mGamesListMutex);
 
+    QDateTime date = QDateTime::fromMSecsSinceEpoch(datetime);
     for (int i=0; i<this->m_lGamesPlay.size(); i++) {
-        if (this->m_lGamesPlay[i].saisonIndex == sIndex && this->m_lGamesPlay[i].competition == comp)
-            return &this->m_lGamesPlay[i];
+        if (this->m_lGamesPlay[i].saisonIndex == sIndex && this->m_lGamesPlay[i].competition == comp) {
+            QDateTime oldData = QDateTime::fromMSecsSinceEpoch(this->m_lGamesPlay[i].datetime);
+            if (date.date().year() == oldData.date().year() &&
+                date.date().month() == oldData.date().month())
+                return &this->m_lGamesPlay[i];
+        }
     }
     return NULL;
 }

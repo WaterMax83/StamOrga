@@ -4,15 +4,17 @@ import QtQuick.Layouts 1.0
 
 import com.watermax.demo 1.0
 
+//import "../components" as MyComponents
+
 Flickable {
-    id: flickable
+    id: flickableUser
     contentHeight: pane.height
 
-//    property UserInterface userIntUser
+    property UserInterface userIntUser
 
     Pane {
         id: pane
-        width: flickable.width
+        width: parent.width
 
         Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
@@ -167,41 +169,49 @@ Flickable {
         }
     }
 
-    UserInterface {
-        id: userIntUser
-        globalData: globalUserData
-        onNotifyConnectionFinished : {
-            btnSendData.enabled = true
-            busyConnectIndicator.visible = false;
-            if (result === 1) {
-                btnSendData.background.color = "green"
-                txtInfoConnecting.text = "Verbindung erfolgreich"
+
+    function notifyUserIntConnectionFinished(result) {
+        btnSendData.enabled = true
+        busyConnectIndicator.visible = false;
+        if (result === 1) {
+            btnSendData.background.color = "green"
+            txtInfoConnecting.text = "Verbindung erfolgreich"
+        }
+        else {
+            btnSendData.background.color = "red"
+            txtInfoConnecting.text = userIntUser.getErrorCodeToString(result);
+        }
+    }
+
+
+    function notifyUserIntVersionRequestFinished(result, msg) {
+        if (result === 5) {
+            var component = Qt.createComponent("../components/VersionDialog.qml");
+            if (component.status === Component.Ready) {
+                var dialog = component.createObject(parent,{popupType: 1});
+                dialog.versionText = msg;
+                dialog.parentHeight = flickableUser.height
+                dialog.parentWidth = flickableUser.width
+                dialog.open();
             }
-            else {getErrorCodeToString
-                btnSendData.background.color = "red"
-                txtInfoConnecting.text = userIntUser.getErrorCodeToString(result);
-            }
         }
-        onNotifyVersionRequestFinished : {
-            if (result === 5) {
-                versionDialogTextUpdate.text = msg;
-                versionDialog.open()
-            }
-        }
-        onNotifyUpdatePasswordRequestFinished: {
-            busyConnectIndicator.visible = false;
-            if (result === 1)
-                txtInfoConnecting.text = "Passwort erfolgreich geändert"
-            else
-                txtInfoConnecting.text = "Fehler beim Passwort ändern"
-        }
-        onNotifyUpdateReadableNameRequest: {
-            busyConnectIndicator.visible = false;
-            if (result === 1)
-                txtInfoConnecting.text = "Name erfolgreich geändert"
-            else
-                txtInfoConnecting.text = "Fehler beim Namen ändern"
-        }
+    }
+
+    function notifyUserIntUpdatePasswordFinished(result) {
+        busyConnectIndicator.visible = false;
+        if (result === 1)
+            txtInfoConnecting.text = "Passwort erfolgreich geändert"
+        else
+            txtInfoConnecting.text = "Fehler beim Passwort ändern"
+    }
+
+
+    function notifyUserIntUpdateReadableNameFinished(result) {
+        busyConnectIndicator.visible = false;
+        if (result === 1)
+            txtInfoConnecting.text = "Name erfolgreich geändert"
+        else
+            txtInfoConnecting.text = "Fehler beim Namen ändern"
     }
 
     function pageOpenedUpdateView() {
@@ -210,9 +220,9 @@ Flickable {
 
     Dialog {
         id: changePassWordDialog
-        x: Math.round((flickable.width - width) / 2)
-        y: Math.round(flickable.height / 6)
-        width: Math.round(Math.min(flickable.width, flickable.height) / 3 * 2)
+        x: Math.round((flickableUser.width - width) / 2)
+        y: Math.round(flickableUser.height / 6)
+        width: Math.round(Math.min(flickableUser.width, flickableUser.height) / 3 * 2)
         modal: true
         focus: true
         title: "Password ändern"
@@ -306,9 +316,9 @@ Flickable {
 
     Dialog {
         id: changeReadableName
-        x: Math.round((flickable.width - width) / 2)
-        y: Math.round(flickable.height / 6)
-        width: Math.round(Math.min(flickable.width, flickable.height) / 3 * 2)
+        x: Math.round((flickableUser.width - width) / 2)
+        y: Math.round(flickableUser.height / 6)
+        width: Math.round(Math.min(flickableUser.width, flickableUser.height) / 3 * 2)
         modal: true
         focus: true
         title: "Öffentlicher Name"
@@ -351,37 +361,6 @@ Flickable {
                 wrapMode: Text.WordWrap
                 Layout.maximumWidth: parent.width
                 color: "orange"
-            }
-        }
-    }
-
-    Dialog {
-        id: versionDialog
-        modal: true
-        focus: true
-        title: "Neue Version"
-        x: (flickable.width - width) / 2
-        y: flickable.height / 6
-        width: Math.min(flickable.width, flickable.height) / 3 * 2
-//        contentHeight: versionColumn.height
-
-        Column {
-            id: versionColumn
-            spacing: 20
-
-            Label {
-                width: versionDialog.availableWidth
-                text: "Es gibt eine neue Version von StamOrga"
-                wrapMode: Label.Wrap
-                font.pixelSize: 12
-            }
-
-            Label {
-                id: versionDialogTextUpdate
-                width: versionDialog.availableWidth
-                text: ""
-                wrapMode: Label.Wrap
-                font.pixelSize: 12
             }
         }
     }

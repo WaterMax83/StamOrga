@@ -19,7 +19,7 @@ int DataConnection::DoBackgroundWork()
     /* Have to do it here or it will not be in the correct thread */
     this->m_pConTimeout = new QTimer();
     this->m_pConTimeout->setSingleShot(true);
-    this->m_pConTimeout->setInterval(3000);
+    this->m_pConTimeout->setInterval(10000);
     connect(this->m_pConTimeout, &QTimer::timeout, this, &DataConnection::connectionTimeoutFired);
 
     this->m_pDataHandle = new DataHandling(this->m_pGlobalData);

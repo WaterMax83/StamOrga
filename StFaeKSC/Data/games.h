@@ -49,7 +49,7 @@ public:
 
     quint16 getNumberOfGames() { return this->m_lGamesPlay.size(); }
 
-    GamesPlay *gameExists(quint8 sIndex, quint8 comp);
+    GamesPlay *gameExists(quint8 sIndex, quint8 comp, qint64 datetime);
     bool gameExists(quint32 index);
 
     quint16 startRequestGetGamesPlay()

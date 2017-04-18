@@ -6,35 +6,88 @@ import QtQuick.Window 2.2
 
 import "../components" as MyComponents
 
-Pane {
-    id: mainPane
+Rectangle {
+    id: mainRectangle
+    property var m_gamePlayItem
 
+    width: 200
+    height: childrenRect.height * 1.1
+    color: "#85C4BE"
+    radius: 8
+    border.color: "grey"
+    border.width: 2
     ColumnLayout {
-        id: mainColumnLayout
-        anchors.right: parent.right
-        anchors.left: parent.left
-        ColumnLayout {
-            id: columnLayoutBusyInfo
-            spacing: 5
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+        id: columnLayout
+        width: mainRectangle.width
+        spacing: 1
+        Label {
+            id: labelLine1
+            text: qsTr("Date")
+            leftPadding: 5
+            topPadding: 5
+            Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
+        }
 
-            BusyIndicator {
-                id: busyLoadingIndicator
-                visible: true
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+        Label {
+            id: labelLine2
+            text: qsTr("What")
+            leftPadding: 5
+            Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
+        }
+
+        RowLayout {
+            id: layoutExplicitGame
+            spacing: 0
+            Layout.fillWidth: true
+
+            Layout.minimumWidth: columnLayout.width
+            Layout.preferredWidth: columnLayout.width
+            //            columns: 4
+            Label {
+                id: labelLineHome
+                width: contentWidth
+                text: qsTr("Home")
+                leftPadding: 5
+                //                Layout.fillWidth: true
+                Layout.minimumWidth: layoutExplicitGame / 30 * 10
+                Layout.preferredWidth: layoutExplicitGame / 30 * 10
+                Layout.maximumWidth: layoutExplicitGame / 30 * 10
+                Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
 
             Label {
-                id: txtInfoLoading
-                visible: true
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                id: labelLineHyphen
+                width: contentWidth
+                text: qsTr(" - ")
+                //                Layout.fillWidth: true
+                Layout.minimumWidth: layoutExplicitGame / 30 * 1
+                Layout.preferredWidth: layoutExplicitGame / 30 * 1
+                Layout.maximumWidth: layoutExplicitGame / 30 * 1
+                Layout.alignment: Qt.AlignHCenter
+            }
+
+            Label {
+                id: labelLineAway
+                width: contentWidth
+                text: qsTr("AwayBigger")
+                //                Layout.fillWidth: true
+                Layout.minimumWidth: layoutExplicitGame / 30 * 10
+                Layout.preferredWidth: layoutExplicitGame / 30 * 10
+                Layout.maximumWidth: layoutExplicitGame / 30 * 10
+                Layout.alignment: Qt.AlignHCenter
+            }
+
+            Label {
+                id: labelLineScore
+                width: contentWidth
+                text: qsTr("0:0")
+                rightPadding: 10
+                //                Layout.fillWidth: true
+                Layout.minimumWidth: layoutExplicitGame / 30 * 5
+                Layout.preferredWidth: layoutExplicitGame / 30 * 5
+                Layout.maximumWidth: layoutExplicitGame / 30 * 5
+                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
             }
         }
-        ColumnLayout {
-
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-        }
     }
-
-
 }

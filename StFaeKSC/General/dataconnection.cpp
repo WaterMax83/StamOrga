@@ -147,10 +147,21 @@ MessageProtocol* DataConnection::requestGetProgramVersion(MessageProtocol* msg)
     QByteArray  ownVersion;
     QDataStream wVersion(&ownVersion, QIODevice::WriteOnly);
     wVersion.setByteOrder(QDataStream::BigEndian);
+
+//#define VERSION_TEST
+#ifdef VERSION_TEST
+#define ORGA_VERSION_I     0x0B0A0000      // VX.Y.Z => 0xXXYYZZZZ
+#define ORGA_VERSION_S     "VB.A.0"
+    wVersion << (quint32)ORGA_VERSION_I;
+    wVersion << quint16(QString(ORGA_VERSION_S).toUtf8().size());
+    ownVersion.append(QString(ORGA_VERSION_S));
+#else
     wVersion << (quint32)STAM_ORGA_VERSION_I;
     wVersion << quint16(QString(STAM_ORGA_VERSION_S).toUtf8().size());
-
     ownVersion.append(QString(STAM_ORGA_VERSION_S));
+#endif
+
+
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_VERSION, ownVersion);
 }
 

@@ -64,7 +64,7 @@ Flickable {
         txtInfoSeasonTicket.text = "Lade Dauerkarten Liste"
     }
 
-    function notifySeasonTicketAdd(result) {
+    function notifyUserIntSeasonTicketAdd(result) {
         busyConnectIndicatorTicket.visible = false;
         if (result === 1) {
             toolButtonClicked()
@@ -73,7 +73,7 @@ Flickable {
             txtInfoSeasonTicket.text = userIntTicket.getErrorCodeToString(result)
     }
 
-    function notifySeasonTicketListFinished(result) {
+    function notifyUserIntSeasonTicketListFinished(result) {
         busyConnectIndicatorTicket.visible = false;
         if (result === 1) {
             showSeasonTickets()
@@ -81,6 +81,21 @@ Flickable {
             txtInfoSeasonTicket.text = userIntTicket.getErrorCodeToString(result);
         }
     }
+
+    function notifyUserIntVersionRequestFinished(result, msg) {
+        if (result === 5) {
+            var component = Qt.createComponent("../components/VersionDialog.qml");
+            if (component.status === Component.Ready) {
+                var dialog = component.createObject(parent,{popupType: 1});
+                dialog.versionText = msg;
+                dialog.parentHeight = flickableTickets.height
+                dialog.parentWidth = flickableTickets.width
+                dialog.open();
+            }
+        }
+    }
+
+    function notifyUserIntConnectionFinished(result) {}
 
     function pageOpenedUpdateView() {
         showSeasonTickets()

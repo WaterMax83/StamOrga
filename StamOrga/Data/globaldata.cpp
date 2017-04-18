@@ -1,5 +1,6 @@
 #include <QtGui/QGuiApplication>
 #include <QtCore/QDebug>
+#include <QtNetwork/QNetworkConfigurationManager>
 
 
 #include "globaldata.h"
@@ -251,6 +252,27 @@ void GlobalData::callBackLookUpHost(const QHostInfo &host)
 #ifdef Q_OS_ANDROID
     if (host.addresses().size() > 0)
         this->setIpAddr(host.addresses().value(0).toString());
+
+#ifdef QT_DEBUG
+    QNetworkConfigurationManager ncm;
+    QList<QNetworkConfiguration> nc = ncm.allConfigurations();
+
+    foreach( QNetworkConfiguration item, nc )
+    {
+       if (item.bearerType() == QNetworkConfiguration::BearerWLAN)
+      {
+           if (item.state() == QNetworkConfiguration::StateFlag::Active)
+               this->setIpAddr("192.168.0.35");
+//                 qDebug() << "Wifi " << item.name();
+//                 qDebug() << "state " << item.state();
+      }
+//       else {
+//           qDebug() << "Network " << item.name();
+//           qDebug() << "state " << item.state();
+//       }
+    }
+#endif
+
 #else
     if (host.addresses().size() > 0)
         qDebug().noquote() << QString("Getting host info ip: %1").arg(host.addresses().value(0).toString()) ;

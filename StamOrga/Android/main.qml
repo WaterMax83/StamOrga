@@ -154,7 +154,7 @@ ApplicationWindow {
     Component {
         id: viewUserLogin
         MyPages.UserLogin {
-//            userIntUser: userInt
+            userIntUser: userInt
         }
     }
 
@@ -169,25 +169,25 @@ ApplicationWindow {
         id: userInt
         globalData: globalUserData
         onNotifyConnectionFinished : {
-//            if (result === 1) {
-//                userInt.startGettingGamesList()
-//                txtInfoLoading.text = "Lade Spielliste"
-//            } else {
-//                busyLoadingIndicator.visible = false
-//                if (result === -3)
-//                    txtInfoLoading.text = "Fehler: keine Verbindung"
-//                else
-//                    txtInfoLoading.text = "Benutzerdaten fehlerhaft"
-//            }
+             stackView.currentItem.notifyUserIntConnectionFinished(result);
+        }
+        onNotifyVersionRequestFinished : {
+            stackView.currentItem.notifyUserIntVersionRequestFinished(result, msg);
+        }
+        onNotifyUpdatePasswordRequestFinished: {
+            stackView.currentItem.notifyUserIntUpdatePasswordFinished(result);
+        }
+        onNotifyUpdateReadableNameRequest: {
+            stackView.currentItem.notifyUserIntUpdateReadableNameFinished(result);
         }
         onNotifyGamesListFinished : {
-            stackView.currentItem.notifyGamesListFinished(result);
+            stackView.currentItem.notifyUserIntGamesListFinished(result);
         }
         onNotifySeasonTicketAddFinished: {
-            stackView.currentItem.notifySeasonTicketAdd(result);
+            stackView.currentItem.notifyUserIntSeasonTicketAdd(result);
         }
         onNotifySeasonTicketListFinished: {
-            stackView.currentItem.notifySeasonTicketListFinished(result);
+            stackView.currentItem.notifyUserIntSeasonTicketListFinished(result);
         }
     }
 
