@@ -20,6 +20,7 @@
 #define TICKET_NAME           "name"
 #define TICKET_PLACE               "place"
 #define TICKET_DISCOUNT            "discount"
+#define TICKET_OWN              "OwnTicket"
 
 
 GlobalData::GlobalData(QObject *parent) : QObject(parent)
@@ -73,10 +74,11 @@ void GlobalData::loadGlobalSettings()
     int ticketCount = this->m_pMainUserSettings->beginReadArray(TICKET_ARRAY);
     for (int i=0; i<ticketCount; i++) {
         this->m_pMainUserSettings->setArrayIndex(i);
-        SeasonTicket *ticket = new SeasonTicket();
+        SeasonTicketItem *ticket = new SeasonTicketItem();
         ticket->setName(this->m_pMainUserSettings->value(TICKET_NAME, "").toString());
         ticket->setPlace(this->m_pMainUserSettings->value(TICKET_PLACE, "").toString());
         ticket->setDiscount(quint8(this->m_pMainUserSettings->value(TICKET_DISCOUNT, 0).toUInt()));
+        ticket->setTicketOwn(this->m_pMainUserSettings->value(TICKET_OWN, false).toBool());
         this->addNewSeasonTicket(ticket);
     }
 
@@ -192,6 +194,7 @@ void GlobalData::saveCurrentSeasonTickets()
         this->m_pMainUserSettings->setValue(TICKET_NAME, this->m_lSeasonTicket[i]->name());
         this->m_pMainUserSettings->setValue(TICKET_PLACE, this->m_lSeasonTicket[i]->place());
         this->m_pMainUserSettings->setValue(TICKET_DISCOUNT, this->m_lSeasonTicket[i]->discount());;
+        this->m_pMainUserSettings->setValue(TICKET_OWN, this->m_lSeasonTicket[i]->isTicketYourOwn());;
     }
 
     this->m_pMainUserSettings->endArray();
@@ -209,7 +212,7 @@ void GlobalData::startUpdateSeasonTickets()
     this->m_stLastTimeStamp = QDateTime::currentDateTime().toMSecsSinceEpoch();
 }
 
-void GlobalData::addNewSeasonTicket(SeasonTicket *sTicket)
+void GlobalData::addNewSeasonTicket(SeasonTicketItem *sTicket)
 {
     if (!this->existSeasonTicket(sTicket)) {
         QMutexLocker lock(&this->m_mutexTicket);
@@ -218,7 +221,7 @@ void GlobalData::addNewSeasonTicket(SeasonTicket *sTicket)
     }
 }
 
-bool GlobalData::existSeasonTicket(SeasonTicket *sTicket)
+bool GlobalData::existSeasonTicket(SeasonTicketItem *sTicket)
 {
     QMutexLocker lock(&this->m_mutexTicket);
 
@@ -232,7 +235,7 @@ bool GlobalData::existSeasonTicket(SeasonTicket *sTicket)
     return false;
 }
 
-SeasonTicket *GlobalData::getSeasonTicket(int index)
+SeasonTicketItem *GlobalData::getSeasonTicket(int index)
 {
     QMutexLocker lock(&this->m_mutexTicket);
 

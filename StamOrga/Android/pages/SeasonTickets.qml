@@ -66,6 +66,13 @@ Flickable {
             txtInfoSeasonTicket.text = userIntTicket.getErrorCodeToString(result)
     }
 
+    function notifyUserIntSeasonTicketRemoveFinished(result) {
+        console.log("Finished Delete " + result)
+        if (result === 1) {
+            toolButtonClicked()
+        }
+    }
+
     function notifyUserIntSeasonTicketListFinished(result) {
         busyConnectIndicatorTicket.visible = false;
         if (result === 1) {
@@ -114,7 +121,12 @@ Flickable {
 
     Component {
         id: seasonTicketItem
-        MyComponents.SeasonTicket { }
+        MyComponents.SeasonTicket {
+            onClickedSeasonTicket: {
+                console.log("Outside clicked " + sender.name);
+                seasonTicketClickedMenu.openWithName(sender.name)
+            }
+        }
     }
 
     Component {
@@ -132,6 +144,35 @@ Flickable {
     }
 
     ScrollIndicator.vertical: ScrollIndicator { }
+
+    property string m_ticketNameToChange
+
+    Menu {
+            id: seasonTicketClickedMenu
+            x: (flickableTickets.width - width) / 2
+            y: flickableTickets.height / 6
+
+            MenuItem {
+                id: menuItemChange
+                onClicked: {
+                    console.log("Ändern")
+                }
+            }
+            MenuItem {
+                id: menuItemRemove
+                onClicked: {
+                    userIntTicket.startRemoveSeasonTicket(m_ticketNameToChange)
+                }
+            }
+            function openWithName(name)
+            {
+                m_ticketNameToChange = name
+                menuItemChange.text = "Ändere " + name
+                menuItemRemove.text = "Lösche " + name
+                seasonTicketClickedMenu.open()
+            }
+        }
+
 
     Dialog {
         id: addSeasonTicketDlg

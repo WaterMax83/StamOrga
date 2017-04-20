@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<UserInterface>("com.watermax.demo", 1, 0, "UserInterface");
 //    qmlRegisterType<GamePlay*>("com.watermax.demo", 1, 0, "GamePlay*");
     qRegisterMetaType<GamePlay *>("GamePlay*");
-    qRegisterMetaType<SeasonTicket *>("SeasonTicket*");
+    qRegisterMetaType<SeasonTicketItem *>("SeasonTicketItem*");
     qRegisterMetaType<DataConRequest>("DataConRequest");
 
     // global data class

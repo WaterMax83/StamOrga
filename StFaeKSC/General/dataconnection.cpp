@@ -315,7 +315,7 @@ MessageProtocol* DataConnection::requestRemoveSeasonTicket(MessageProtocol* msg)
     }
 
     const char* pData     = msg->getPointerToData();
-    quint16     actLength = qFromBigEndian(*((quint16*)(pData + 2)));
+    quint16     actLength = qFromBigEndian(*((quint16*)pData));
     if (actLength > msg->getDataLength())
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_REMOVE_TICKET, ERROR_CODE_WRONG_SIZE);
     QString ticketName(QByteArray(pData + 2, actLength));

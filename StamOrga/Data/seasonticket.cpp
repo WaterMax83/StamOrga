@@ -1,6 +1,6 @@
 #include "seasonticket.h"
 
-SeasonTicket::SeasonTicket(QObject *parent) : QObject(parent)
+SeasonTicketItem::SeasonTicketItem(QObject *parent) : QObject(parent)
 {
 
 }

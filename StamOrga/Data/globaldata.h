@@ -122,13 +122,13 @@ public:
     void saveCurrentSeasonTickets();
 
     void startUpdateSeasonTickets();
-    void addNewSeasonTicket(SeasonTicket *sTicket);
+    void addNewSeasonTicket(SeasonTicketItem *sTicket);
     Q_INVOKABLE quint32 getSeasonTicketLength()
     {
         QMutexLocker lock(&this->m_mutexTicket);
         return this->m_lSeasonTicket.size();
     }
-    Q_INVOKABLE SeasonTicket *getSeasonTicket(int index);
+    Q_INVOKABLE SeasonTicketItem *getSeasonTicket(int index);
     Q_INVOKABLE QString getSeasonTicketLastUpdate();
 
 signals:
@@ -166,9 +166,9 @@ private:
     qint64          m_gpLastTimeStamp;
     bool existGamePlay(GamePlay *gPlay);
 
-    QList<SeasonTicket*> m_lSeasonTicket;
+    QList<SeasonTicketItem*> m_lSeasonTicket;
     qint64          m_stLastTimeStamp;
-    bool existSeasonTicket(SeasonTicket *sTicket);
+    bool existSeasonTicket(SeasonTicketItem *sTicket);
 };
 
 #endif // GLOBALDATA_H

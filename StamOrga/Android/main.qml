@@ -189,6 +189,9 @@ ApplicationWindow {
         onNotifySeasonTicketListFinished: {
             stackView.currentItem.notifyUserIntSeasonTicketListFinished(result);
         }
+        onNotifySeasonTicketRemoveFinished: {
+            stackView.currentItem.notifyUserIntSeasonTicketRemoveFinished(result);
+        }
     }
 
 

@@ -4,14 +4,14 @@
 #include <QtCore/QObject>
 #include <QtCore/QDateTime>
 
-class SeasonTicket: public QObject
+class SeasonTicketItem: public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QString place READ place WRITE setPlace NOTIFY placeChanged)
     Q_PROPERTY(quint8 discount READ discount WRITE setDiscount NOTIFY discountChanged)
 public:
-    explicit SeasonTicket(QObject *parent = 0);
+    explicit SeasonTicketItem(QObject *parent = 0);
 
     QString name() { return this->m_name; }
     void setName(const QString &name)
@@ -40,6 +40,12 @@ public:
         }
     }
 
+    Q_INVOKABLE bool isTicketYourOwn() { return this->m_ownTicket; }
+    void setTicketOwn(bool value)
+    {
+        this->m_ownTicket = value;
+    }
+
 
 
 signals:
@@ -53,6 +59,7 @@ private:
         QString m_name;
         QString m_place;
         quint8 m_discount;
+        bool m_ownTicket;
 };
 
 #endif // SEASONTICKET_H

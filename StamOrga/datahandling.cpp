@@ -153,7 +153,7 @@ qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol *msg)
 
     this->m_pGlobalData->startUpdateSeasonTickets();
     while(offset < totalSize && totalPacks > 0) {
-        SeasonTicket *sTicket = new SeasonTicket();
+        SeasonTicketItem *sTicket = new SeasonTicketItem();
         quint16 size = qFromBigEndian(*(qint16 *)(pData + offset));
         offset += 2;
 
@@ -166,6 +166,7 @@ qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol *msg)
         sTicket->setDiscount(*(qint8 *)(pData + offset));
         offset += 1;
         quint8 IsOwnTicket = (*(qint8 *)(pData + offset));
+        sTicket->setTicketOwn(IsOwnTicket == 0 ? false : true);
         offset += 1;
 
         QString ticketString(QByteArray(pData + offset, size - 2));
