@@ -24,5 +24,6 @@
         <file>images/add.png</file>
         <file>pages/GamesPage.qml</file>
         <file>components/VersionDialog.qml</file>
+        <file>components/SeasonTicket.qml</file>
     </qresource>
 </RCC>

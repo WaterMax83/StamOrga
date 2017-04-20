@@ -4,56 +4,49 @@ import QtQuick.Layouts 1.0
 
 import com.watermax.demo 1.0
 
+import "../components" as MyComponents
 
 Flickable {
     id: flickableTickets
     property UserInterface userIntTicket
 
-    contentHeight: mainTicketColumnLayout.height
+    contentHeight: mainPaneTickets.height
 
-    ColumnLayout {
-        id: mainTicketColumnLayout
+    Pane {
+        id: mainPaneTickets
         width: parent.width
-        spacing: 10
 
         ColumnLayout {
-            id: columnLayout
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-
-            BusyIndicator {
-                id: busyConnectIndicatorTicket
-                opacity: 1
-                visible: false
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            }
-
-            Label {
-                id: txtInfoSeasonTicket
-                text: qsTr("Label")
-                visible: true
-            }
-        }
-
-        ColumnLayout {
-            id: columnLayoutTickets
-            anchors.right: parent.right
-            anchors.left: parent.left
+            id: mainTicketColumnLayout
             width: parent.width
             spacing: 10
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-        }
 
-        Button {
-            id: btnAddSeasonTicket
-            text: qsTr("Dauerkarte hinzufügen")
-            implicitWidth: mainTicketColumnLayout.width / 3 * 2
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            transformOrigin: Item.Center
-            onClicked: {
-//                userInt
+            ColumnLayout {
+                id: columnLayout
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
-                txtnewSeasonTicketName.text = globalUserData.readableName
-                addSeasonTicketDlg.open()
+                BusyIndicator {
+                    id: busyConnectIndicatorTicket
+                    opacity: 1
+                    visible: false
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                }
+
+                Label {
+                    id: txtInfoSeasonTicket
+                    text: qsTr("Label")
+                    visible: true
+                }
+            }
+
+            ColumnLayout {
+                id: columnLayoutTickets
+                anchors.right: parent.right
+                anchors.left: parent.left
+                width: parent.width
+                spacing: 10
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+
             }
         }
     }
@@ -115,33 +108,25 @@ Flickable {
             txtInfoSeasonTicket.text = "Letzes Update am " + globalUserData.getSeasonTicketLastUpdate()
         } else
             txtInfoSeasonTicket.text = "Keine Daten zum anzeigen"
+
+        var btn = btnAddSeasonTicket.createObject(columnLayoutTickets)
     }
 
     Component {
         id: seasonTicketItem
-        Rectangle {
-            id: ticketRectangleItem
-            property var m_SeasonTicketItem
+        MyComponents.SeasonTicket { }
+    }
 
-            width: parent.width
-            height: 50
-            color: "#81848E"
-            ColumnLayout {
-                id: columnLayoutTicketItem
-                width: ticketRectangleItem.width
-                spacing: 3
-                Label {
-                    id: labelTicketItem
-                    text: qsTr("text")
-                    Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
-                }
-            }
-
-            function showTicketInfo(seasontTicketItem) {
-                if (seasontTicketItem !== null) {
-                    m_SeasonTicketItem = seasontTicketItem
-                    labelTicketItem.text = seasontTicketItem.name + " bei " + seasontTicketItem.place
-                }
+    Component {
+        id: btnAddSeasonTicket
+        Button {
+            text: qsTr("Dauerkarte hinzufügen")
+            implicitWidth: mainTicketColumnLayout.width / 3 * 2
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            transformOrigin: Item.Center
+            onClicked: {
+                txtnewSeasonTicketName.text = globalUserData.readableName
+                addSeasonTicketDlg.open()
             }
         }
     }
@@ -164,7 +149,8 @@ Flickable {
                 labelTicketNameTooShort.visible = true
                 addSeasonTicketDlg.open()
             } else {
-                userIntTicket.startAddSeasonTicket(txtnewSeasonTicketName.text, 0);
+                console.log("Ermäßigt? " + chBoxDiscount.checked)
+                userIntTicket.startAddSeasonTicket(txtnewSeasonTicketName.text, chBoxDiscount.checked ? 1 : 0);
                 busyConnectIndicatorTicket.visible = true;
                 txtInfoSeasonTicket.text = "Füge Dauerkarte hinzu"
                 addSeasonTicketDlg.close()
@@ -196,6 +182,12 @@ Flickable {
                     implicitWidth: addSeasonTicketColumn.width / 4 * 3
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }
+            }
+
+            CheckBox {
+                id: chBoxDiscount
+                text: "ermäßigt"
+                checked: false
             }
 
             Label {

@@ -10,7 +10,19 @@ Rectangle {
 
     width: parent.width
     height: childrenRect.height * 1.1
-    color: "#85C4BE"
+    property color gradColorStart: "#105050"
+    property color gradColorStop: "#509090"
+    gradient: Gradient {
+        GradientStop {
+            position: 0
+            color: gradColorStart
+        }
+
+        GradientStop {
+            position: 0.5
+            color: gradColorStop
+        }
+    }
     radius: 8
     border.color: "grey"
     border.width: 2
@@ -19,7 +31,7 @@ Rectangle {
         width: mainRectangle.width
         spacing: 1
         Label {
-            id: labelLine1
+            id: labelLineDate
             text: qsTr("Date")
             leftPadding: 5
             topPadding: 5
@@ -27,63 +39,74 @@ Rectangle {
         }
 
         Label {
-            id: labelLine2
+            id: labelLineWhat
             text: qsTr("What")
             leftPadding: 5
+            Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
+        }
+
+        Label {
+            id: labelLineHome
+            text: qsTr("Home")
+            leftPadding: 5
+            Layout.fillWidth: true
             Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
         }
 
         RowLayout {
             id: layoutExplicitGame
 
+            anchors.right: parent.right
+            anchors.left: parent.left
             Layout.preferredWidth: columnLayout.width
+            Layout.fillWidth: true
+
             Label {
-                id: labelLineHome
-                width: contentWidth
-                text: qsTr("Home")
+                id: labelLineAway
+                text: qsTr("Away")
                 leftPadding: 5
-////                Layout.fillWidth: true
-//                Layout.minimumWidth: layoutExplicitGame / 30 * 10
-//                Layout.preferredWidth: layoutExplicitGame / 30 * 10
-//                Layout.maximumWidth: layoutExplicitGame / 30 * 10
+                Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
 
             Label {
-                id: labelLineHyphen
-                width: contentWidth
-                text: qsTr(" - ")
-                Layout.alignment: Qt.AlignHCenter
-            }
-
-            Label {
-                id: labelLineAway
-                width: contentWidth
-                text: qsTr("Away")
-                Layout.alignment: Qt.AlignHCenter
-            }
-
-            Label {
                 id: labelLineScore
-                width: contentWidth
                 text: qsTr("")
-                rightPadding: 20
+                rightPadding: layoutExplicitGame.width / 100 * 30
                 Layout.alignment: Qt.AlignRight | Qt.AlignHCenter
             }
         }
+
+
     }
 
     function showGamesInfo(gamePlayItem) {
         if (gamePlayItem !== null) {
             m_gamePlayItem = gamePlayItem
-            labelLine1.text = gamePlayItem.timestamp;
-            labelLine2.text = gamePlayItem.getCompetitionIndex() + " - " + gamePlayItem.competition
-//            labelLine3.text = gamePlayItem.home + " - " + gamePlayItem.away + "\t" + gamePlayItem.score
+            labelLineDate.text = gamePlayItem.timestamp;
+            labelLineWhat.text = gamePlayItem.getCompetitionIndex() + " - " + gamePlayItem.competition
             labelLineHome.text = gamePlayItem.home;
+            if (gamePlayItem.home === "KSC")
+                labelLineHome.font.letterSpacing = 2
             labelLineAway.text = gamePlayItem.away;
+            if (gamePlayItem.away === "KSC")
+                labelLineAway.font.letterSpacing = 2
             labelLineScore.text = gamePlayItem.score;
+
+            if (gamePlayItem.isGameInPast()) {
+                mainRectangle.gradColorStart = "#505050"
+                mainRectangle.gradColorStop = "#909090"
+            }
+
         }
     }
+
+
 }
+
+
+
+
+
 
 

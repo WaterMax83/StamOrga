@@ -12,8 +12,18 @@ Rectangle {
 
     width: 200
     height: childrenRect.height * 1.1
-    color: "#85C4BE"
     radius: 8
+    gradient: Gradient {
+        GradientStop {
+            position: 0
+            color: "#275d58"
+        }
+
+        GradientStop {
+            position: 0.51
+            color: "#85c4be"
+        }
+    }
     border.color: "grey"
     border.width: 2
     ColumnLayout {
@@ -31,27 +41,24 @@ Rectangle {
         Label {
             id: labelLine2
             text: qsTr("What")
+            font.letterSpacing: 2
+            fontSizeMode: Text.FixedSize
             leftPadding: 5
             Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
         }
 
         RowLayout {
             id: layoutExplicitGame
-            spacing: 0
-            Layout.fillWidth: true
-
-            Layout.minimumWidth: columnLayout.width
+            anchors.right: parent.right
+            anchors.left: parent.left
             Layout.preferredWidth: columnLayout.width
-            //            columns: 4
+            Layout.fillWidth: true
             Label {
                 id: labelLineHome
-                width: contentWidth
+                width: 36
                 text: qsTr("Home")
                 leftPadding: 5
-                //                Layout.fillWidth: true
-                Layout.minimumWidth: layoutExplicitGame / 30 * 10
-                Layout.preferredWidth: layoutExplicitGame / 30 * 10
-                Layout.maximumWidth: layoutExplicitGame / 30 * 10
+                Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
 
@@ -59,21 +66,14 @@ Rectangle {
                 id: labelLineHyphen
                 width: contentWidth
                 text: qsTr(" - ")
-                //                Layout.fillWidth: true
-                Layout.minimumWidth: layoutExplicitGame / 30 * 1
-                Layout.preferredWidth: layoutExplicitGame / 30 * 1
-                Layout.maximumWidth: layoutExplicitGame / 30 * 1
                 Layout.alignment: Qt.AlignHCenter
             }
 
             Label {
                 id: labelLineAway
                 width: contentWidth
-                text: qsTr("AwayBigger")
-                //                Layout.fillWidth: true
-                Layout.minimumWidth: layoutExplicitGame / 30 * 10
-                Layout.preferredWidth: layoutExplicitGame / 30 * 10
-                Layout.maximumWidth: layoutExplicitGame / 30 * 10
+                text: qsTr("Away")
+                Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter
             }
 
@@ -81,12 +81,8 @@ Rectangle {
                 id: labelLineScore
                 width: contentWidth
                 text: qsTr("0:0")
-                rightPadding: 10
-                //                Layout.fillWidth: true
-                Layout.minimumWidth: layoutExplicitGame / 30 * 5
-                Layout.preferredWidth: layoutExplicitGame / 30 * 5
-                Layout.maximumWidth: layoutExplicitGame / 30 * 5
-                Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                rightPadding: 20
+                Layout.alignment: Qt.AlignRight | Qt.AlignHCenter
             }
         }
     }

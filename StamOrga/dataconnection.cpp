@@ -217,7 +217,7 @@ void DataConnection::startSendAddSeasonTicket(DataConRequest request)
     QByteArray seasonTicket;
     QDataStream wSeasonTicket(&seasonTicket, QIODevice::WriteOnly);
     wSeasonTicket.setByteOrder(QDataStream::BigEndian);
-    wSeasonTicket << request.m_lData.at(1).toUInt();
+    wSeasonTicket << request.m_lData.at(0).toUInt();
     wSeasonTicket << quint16(name.toUtf8().size());
     seasonTicket.append(name);
 
