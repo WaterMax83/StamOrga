@@ -6,27 +6,28 @@
 #include <QtCore/QMutex>
 #include <QtCore/QSettings>
 
-struct UserLogin {
-    QString userName;
+#include "configlist.h"
+
+class UserLogin :public ConfigItem
+{
+public:
     QString password;
     QString readName;
     quint32 properties;
-    quint32 index;
 };
 
-#define USER_GROUP "USERS"
-#define LOGIN_ARRAY "logins"
-#define LOGIN_USERNAME "username"
 #define LOGIN_PASSWORD "password"
 #define LOGIN_READNAME "readname"
 #define LOGIN_PROPERTIES "properties"
-#define LOGIN_INDEX "index"
+
+#define USER_INDEX_GROUP    "IndexCount"
+#define USER_MAX_COUNT      "CurrentCount"
 
 #define DEFAULT_LOGIN_PROPS 0x0
 
 #define MIN_SIZE_USERNAME 5
 
-class ListedUser
+class ListedUser : public ConfigList
 {
 public:
     ListedUser();
@@ -36,7 +37,7 @@ public:
     int removeUser(const QString& name);
     int showAllUsers();
 
-    quint32 getNumberOfUsers() { return this->m_lUserLogin.size(); }
+    quint32 getNumberOfInternalList() { return this->m_lInteralList.size(); }
 
     bool userExists(QString name);
     bool userExists(quint32 index);
@@ -45,22 +46,19 @@ public:
     bool userChangeProperties(QString name, quint32 props);
     bool userChangeReadName(QString name, QString readName);
     quint32 getUserProperties(QString name);
-    quint32 getUserLoginIndex(const QString& name);
+    qint32 getUserLoginIndex(const QString& name);
     QString getReadableName(QString name);
 
+    ConfigItem *getRequestConfigItem(int index) {Q_UNUSED(index) return NULL;}
+
 private:
-    QSettings*       m_pUserSettings = NULL;
-    QList<UserLogin> m_lUserLogin;
-    QMutex           m_mUserIniMutex;
-    QMutex           m_mUserListMutex;
+    QList<UserLogin> m_lInteralList;
+    QList<UserLogin> m_lAddItemProblems;
 
-    QList<UserLogin> m_lAddUserLoginProblems;
+    void saveCurrentInteralList() override;
 
-    void saveActualUserList();
-
-    bool addNewUserLogin(QString name, QString password, quint32 prop, quint32 index, QString readname, bool checkUser = true);
-    void addNewUserLogin(QString name, QString password, quint32 prop, quint32 index, QString readname, QList<UserLogin>* pList);
-    quint32 getNextLoginIndex();
+    bool addNewUserLogin(QString name, qint64 timestamp, quint32 index, QString password, quint32 prop, QString readname, bool checkUser = true);
+    void addNewUserLogin(QString name, qint64 timestamp, quint32 index, QString password, quint32 prop, QString readname, QList<UserLogin>* pList);
 
     bool updateUserLoginValue(UserLogin* pUserLog, QString key, QVariant value);
 };

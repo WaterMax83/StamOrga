@@ -12,37 +12,44 @@ DataConnection::DataConnection(GlobalData* pGData, QObject* parent)
     this->m_pGlobalData = pGData;
 }
 
-/*
+/* Request
  * 0                Header          12
- * 12   String      password        X
+ * 12   quint16     size            2
+ * 14   String      password        X
+ */
+/* Answer
+ * 0                Header          12
+ * 12               SUCCESS         4
  */
 MessageProtocol* DataConnection::requestCheckUserLogin(MessageProtocol* msg)
 {
-    MessageProtocol* ack   = NULL;
     const char*      pData = msg->getPointerToData();
     quint16          size  = qFromBigEndian(*((quint16*)pData));
+    qint32          result;
     if (size > msg->getDataLength())
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_LOGIN_USER, ERROR_CODE_WRONG_SIZE);
 
     QString passw(QByteArray(pData + 2, size));
     if (this->m_pGlobalData->m_UserList.userCheckPassword(this->m_pUserConData->userName, passw)) {
-        ack                                = new MessageProtocol(OP_CODE_CMD_RES::ACK_LOGIN_USER, ERROR_CODE_SUCCESS);
+        result = ERROR_CODE_SUCCESS;
         this->m_pUserConData->bIsConnected = true;
         qInfo().noquote() << QString("User %1 logged in").arg(this->m_pUserConData->userName);
     } else {
-        ack                                = new MessageProtocol(OP_CODE_CMD_RES::ACK_LOGIN_USER, ERROR_CODE_WRONG_PASSWORD);
+        result = ERROR_CODE_WRONG_PASSWORD;
         this->m_pUserConData->bIsConnected = false;
         qWarning().noquote() << QString("User %1 tried to login with wrong password").arg(this->m_pUserConData->userName);
     }
-    return ack;
+
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_LOGIN_USER, result);
 }
 
 /* Answer
  * 0                Header          12
  * 12               SUCCESS         4
  * 16               PROPS           4
- * 20               size            2
- * 22               readableName    X
+ * 20               index           4
+ * 24               size            2
+ * 26               readableName    X
  */
 MessageProtocol* DataConnection::requestGetUserProperties()
 {
@@ -51,6 +58,7 @@ MessageProtocol* DataConnection::requestGetUserProperties()
     wAnswer.setByteOrder(QDataStream::BigEndian);
     wAnswer << ERROR_CODE_SUCCESS;
     wAnswer << this->m_pGlobalData->m_UserList.getUserProperties(this->m_pUserConData->userName);
+    wAnswer << this->m_pGlobalData->m_UserList.getUserLoginIndex(this->m_pUserConData->userName);
 
     QString readableName = this->m_pGlobalData->m_UserList.getReadableName(this->m_pUserConData->userName);
     wAnswer << quint16(readableName.toUtf8().size());
@@ -127,9 +135,10 @@ MessageProtocol* DataConnection::requestUserChangeReadname(MessageProtocol* msg)
 
 /*
  * 0                Header          12
- * 12   quint32     version         4
- * 16   quint16     size            2
- * 16   String      version         X
+ * 12   quint32     SUCCESS          4
+ * 16   quint32     version         4
+ * 20   quint16     size            2
+ * 22   String      version         X
  */
 MessageProtocol* DataConnection::requestGetProgramVersion(MessageProtocol* msg)
 {
@@ -147,6 +156,7 @@ MessageProtocol* DataConnection::requestGetProgramVersion(MessageProtocol* msg)
     QByteArray  ownVersion;
     QDataStream wVersion(&ownVersion, QIODevice::WriteOnly);
     wVersion.setByteOrder(QDataStream::BigEndian);
+    wVersion << ERROR_CODE_SUCCESS;
 
 //#define VERSION_TEST
 #ifdef VERSION_TEST
@@ -175,11 +185,12 @@ MessageProtocol* DataConnection::requestGetProgramVersion(MessageProtocol* msg)
  * 22   quint8      sIndex          1
  * 23   quint8      comp            1
  * 24   quint64     datetime        8
- * 32   QString     infoGame        X
- * 32+X qutin16     sizePack2       2
+ * 32   quint32     index           4
+ * 36   QString     infoGame        X
+ * 36+X qutin16     sizePack2       2
  */
 
-#define GAMES_OFFSET 1 + 1 + 8 // sIndex + comp + datetime
+#define GAMES_OFFSET (1 + 1 + 8 + 4)// sIndex + comp + datetime + index
 
 MessageProtocol* DataConnection::requestGetGamesList(/*MessageProtocol *msg*/)
 {
@@ -187,29 +198,30 @@ MessageProtocol* DataConnection::requestGetGamesList(/*MessageProtocol *msg*/)
     QDataStream wAckArray(&ackArray, QIODevice::WriteOnly);
     wAckArray.setByteOrder(QDataStream::BigEndian);
 
-    quint16 numbOfGames = this->m_pGlobalData->m_GamesList.startRequestGetGamesPlay();
+    quint16 numbOfGames = this->m_pGlobalData->m_GamesList.startRequestGetItemList();
     wAckArray << (quint32)ERROR_CODE_SUCCESS;
     wAckArray << quint16(0x1) << numbOfGames; //Version
 
     for (quint32 i = 0; i < numbOfGames; i++) {
-        GamesPlay* pGame = this->m_pGlobalData->m_GamesList.getRequestGamesPlay(i);
+        GamesPlay* pGame = this->m_pGlobalData->m_GamesList.getRequestConfigItem(i);
         if (pGame == NULL)
             continue;
 
-        QString game(pGame->home + ";" + pGame->away + ";" + pGame->score);
+        QString game(pGame->m_itemName + ";" + pGame->away + ";" + pGame->score);
 
 
         wAckArray.device()->seek(ackArray.size());
         wAckArray << quint16(game.toUtf8().size() + GAMES_OFFSET);
         wAckArray << quint8(pGame->saisonIndex);
         wAckArray << quint8(pGame->competition);
-        wAckArray << pGame->datetime;
+        wAckArray << pGame->m_timestamp;
+        wAckArray << pGame->m_index;
 
         ackArray.append(game);
     }
 
 
-    this->m_pGlobalData->m_GamesList.stopRequestGetGamesPlay();
+    this->m_pGlobalData->m_GamesList.stopRequestGetItemList();
 
     qInfo().noquote() << QString("User %1 request Games List with %2 entries").arg(this->m_pUserConData->userName).arg(numbOfGames);
 
@@ -223,12 +235,13 @@ MessageProtocol* DataConnection::requestGetGamesList(/*MessageProtocol *msg*/)
  * 18     quint16     numbOfTickets   2
  * 20     quint16     sizeTick1       2
  * 22     quint8      discount        1
- * 23     quint8      IsOwnUser       1
- * 26     QString     name+place      X
- * 26+X   qutin16     sizeTick2       2
+ * 23     quint32     index           4
+ * 27     quint32     userIndex       4
+ * 31     QString     name+place      X
+ * 31+X   qutin16     sizeTick2       2
  */
 
-#define TICKET_OFFSET 1 + 1 // discount + isOwnUser
+#define TICKET_OFFSET (1 + 4 + 4)// discount + isOwnUser + index + userIndex
 
 MessageProtocol* DataConnection::requestGetTicketsList(/*MessageProtocol *msg*/)
 {
@@ -236,35 +249,30 @@ MessageProtocol* DataConnection::requestGetTicketsList(/*MessageProtocol *msg*/)
     QDataStream wAckArray(&ackArray, QIODevice::WriteOnly);
     wAckArray.setByteOrder(QDataStream::BigEndian);
 
-    quint16 numbOfTickets = this->m_pGlobalData->m_SeasonTicket.startRequestGetTicketInfoList();
+    quint16 numbOfTickets = this->m_pGlobalData->m_SeasonTicket.startRequestGetItemList();
     wAckArray << (quint32)ERROR_CODE_SUCCESS;
     wAckArray << quint16(0x1) << numbOfTickets; //Version
 
-    quint32 userIndex = this->m_pGlobalData->m_UserList.getUserLoginIndex(this->m_pUserConData->userName);
-
     for (quint32 i = 0; i < numbOfTickets; i++) {
-        TicketInfo* pTicket = this->m_pGlobalData->m_SeasonTicket.getRequestTicketInfo(i);
+        TicketInfo* pTicket = this->m_pGlobalData->m_SeasonTicket.getRequestConfigItem(i);
         if (pTicket == NULL)
             continue;
 
-        QString ticket(pTicket->name + ";" + pTicket->place);
+        QString ticket(pTicket->m_itemName + ";" + pTicket->place);
 
 
         wAckArray.device()->seek(ackArray.size());
         wAckArray << quint16(ticket.toUtf8().size() + TICKET_OFFSET);
         wAckArray << quint8(pTicket->discount);
-
-        if (pTicket->userIndex == userIndex)
-            wAckArray << quint8(0x1);
-        else
-            wAckArray << quint8(0x0);
+        wAckArray << pTicket->m_index;
+        wAckArray << pTicket->userIndex;
 
         ackArray.append(ticket);
     }
 
     qInfo().noquote() << QString("User %1 request Ticket List with %2 entries").arg(this->m_pUserConData->userName).arg(numbOfTickets);
 
-    this->m_pGlobalData->m_SeasonTicket.stopRequestGetTicketInfoList();
+    this->m_pGlobalData->m_SeasonTicket.stopRequestGetItemList();
 
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_TICKETS_LIST, ackArray);
 }
@@ -291,7 +299,7 @@ MessageProtocol* DataConnection::requestAddSeasonTicket(MessageProtocol* msg)
     //    qInfo().noquote() << QString("Version from %1 = %2").arg(this->m_pUserConData->userName).arg(remVersion);
 
     QString userName = this->m_pUserConData->userName;
-    quint32 userIndex = this->m_pGlobalData->m_UserList.getUserLoginIndex(userName);
+    qint32 userIndex = this->m_pGlobalData->m_UserList.getUserLoginIndex(userName);
     qint32 rCode = this->m_pGlobalData->m_SeasonTicket.addNewSeasonTicket(userName, userIndex, ticketName, discount);
     if (rCode > ERROR_CODE_NO_ERROR) {
         qInfo().noquote() << QString("User %1 added SeasonTicket %2")

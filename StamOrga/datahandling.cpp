@@ -12,9 +12,14 @@ DataHandling::DataHandling(GlobalData *pData)
 
 qint32 DataHandling::getHandleLoginResponse(MessageProtocol *msg)
 {
+    qint32 result;
     if (msg->getDataLength() != 4)
         return ERROR_CODE_WRONG_SIZE;
-    return msg->getIntData();
+    const char *pData = msg->getPointerToData();
+
+    result = qFromBigEndian(*((qint32 *)pData));
+
+    return result;
 }
 
 qint32 DataHandling::getHandleVersionResponse(MessageProtocol *msg, QString *version)
@@ -23,20 +28,21 @@ qint32 DataHandling::getHandleVersionResponse(MessageProtocol *msg, QString *ver
         return ERROR_CODE_WRONG_SIZE;
 
     const char *pData = msg->getPointerToData();
-    quint32 uVersion = qFromBigEndian(*((quint32 *)pData));
+    qint32 result = qFromBigEndian(*((qint32 *)pData));
+    quint32 uVersion = qFromBigEndian(*((quint32 *)(pData + 4)));
 
-    quint16 size = qFromBigEndian(*((quint16 *)(pData + 4)));
+    quint16 size = qFromBigEndian(*((quint16 *)(pData + 8)));
     if (size > msg->getDataLength())
         return ERROR_CODE_WRONG_SIZE;
 
-    QString remVersion(QByteArray(pData + 6, size));
+    QString remVersion(QByteArray(pData + 10, size));
 
     if (uVersion > STAM_ORGA_VERSION_I) {
         version->append(QString("Deine Version: %2\nAktuelle Version: %1").arg(remVersion, STAM_ORGA_VERSION_S));
         return ERROR_CODE_NEW_VERSION;
     }
     version->append(remVersion);
-    return ERROR_CODE_NO_ERROR;
+    return result;
 }
 
 qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol *msg, QString *props)
@@ -46,15 +52,24 @@ qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol *msg, QString *p
 
     const char *pData = msg->getPointerToData();
     qint32 rValue = qFromBigEndian(*((qint32 *)pData));
-    *props = QString::number(qFromBigEndian(*((quint32 *)(pData + 4))));
+    qint32 index = qFromBigEndian(*((qint32 *)(pData + 8)));
 
-    quint16 readableNameSize = qFromBigEndian(*((quint16 *)(pData + 8)));
-    QString readableName(QByteArray(pData + 10, readableNameSize));
+    Q_UNUSED(index);
+    /*
+     * TODO: set internal User Index
+     */
+
+    *props = QString::number(qFromBigEndian(*((quint32 *)(pData + 8))));
+
+    quint16 readableNameSize = qFromBigEndian(*((quint16 *)(pData + 12)));
+    QString readableName(QByteArray(pData + 14, readableNameSize));
 
     this->m_pGlobalData->setReadableName(readableName);
 
     return rValue;
 }
+
+#define GAMES_OFFSET (1 + 1 + 8 +4)
 
 qint32 DataHandling::getHandleGamesListResponse(MessageProtocol *msg)
 {
@@ -106,8 +121,11 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol *msg)
         play->setTimeStamp(timeStamp);
         offset += 8;
 
-        QString playString(QByteArray(pData + offset, size - 10));
-        offset += (size - 10);
+        quint32 index = qFromBigEndian(*(quint32 *)(pData + offset));
+        offset += 4;
+
+        QString playString(QByteArray(pData + offset, size - GAMES_OFFSET));
+        offset += (size - GAMES_OFFSET);
         QStringList lplayString = playString.split(";");
 
         if (lplayString.size() > 0)
@@ -125,6 +143,8 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol *msg)
 
     return rValue;
 }
+
+#define TICKET_OFFSET (1 + 4 + 4)
 
 qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol *msg)
 {
@@ -163,14 +183,16 @@ qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol *msg)
             break;
         }
 
-        sTicket->setDiscount(*(qint8 *)(pData + offset));
+        sTicket->setDiscount(*(quint8 *)(pData + offset));
         offset += 1;
-        quint8 IsOwnTicket = (*(qint8 *)(pData + offset));
-        sTicket->setTicketOwn(IsOwnTicket == 0 ? false : true);
-        offset += 1;
+        quint32 index = (*(quint32 *)(pData + offset));
+        offset += 4;
+        quint32 userIndex = (*(quint32 *)(pData + offset));
+        offset += 4;
 
-        QString ticketString(QByteArray(pData + offset, size - 2));
-        offset += (size - 2);
+
+        QString ticketString(QByteArray(pData + offset, size - TICKET_OFFSET));
+        offset += (size - TICKET_OFFSET);
         QStringList lsticketString = ticketString.split(";");
 
         if (lsticketString.size() > 0)

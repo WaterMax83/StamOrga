@@ -8,9 +8,9 @@ QString getUserHomePath()
 
 QString getUserHomeConfigPath()
 {
-    QString home = getUserHomePath();
-    home.append("/.config/StFaeKSC");
-    return home;
+    QString m_itemName = getUserHomePath();
+    m_itemName.append("/.config/StFaeKSC");
+    return m_itemName;
 }
 
 bool checkFilePathExistAndCreate(const QString &path)

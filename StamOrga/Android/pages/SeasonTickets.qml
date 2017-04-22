@@ -152,6 +152,11 @@ Flickable {
             x: (flickableTickets.width - width) / 2
             y: flickableTickets.height / 6
 
+            background: Rectangle {
+                    implicitWidth: menuItemChange.width
+                    color: "#303030"
+                }
+
             MenuItem {
                 id: menuItemChange
                 onClicked: {
