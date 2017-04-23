@@ -25,5 +25,6 @@
         <file>pages/GamesPage.qml</file>
         <file>components/VersionDialog.qml</file>
         <file>components/SeasonTicket.qml</file>
+        <file>components/EditableTextDialog.qml</file>
     </qresource>
 </RCC>

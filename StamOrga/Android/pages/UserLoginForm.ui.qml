@@ -62,6 +62,11 @@ Rectangle {
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
 
+            Button {
+                id: button
+                text: qsTr("Button")
+            }
+
             Label {
                 id: labelLineHyphen
                 width: contentWidth
@@ -84,6 +89,7 @@ Rectangle {
                 rightPadding: 20
                 Layout.alignment: Qt.AlignRight | Qt.AlignHCenter
             }
+
         }
     }
 }

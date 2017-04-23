@@ -58,6 +58,9 @@ Flickable {
                     padding: 8
                     implicitWidth: mainColumnLayout.width / 3 * 2
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    onTextChanged: {
+                        globalUserData.bIsConnected = false;
+                    }
                 }
             }
 
@@ -77,6 +80,9 @@ Flickable {
                     text: globalUserData.passWord
                     implicitWidth: mainColumnLayout.width / 3 * 2
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    onTextChanged: {
+                        globalUserData.bIsConnected = false;
+                    }
                 }
             }
 
@@ -100,15 +106,15 @@ Flickable {
 
             Button {
                 id: btnSendData
-                text: qsTr("Verbindung prüfen")
-                implicitWidth: mainColumnLayout.width / 4 * 2
+                text: qsTr("Verbindung speichern")
+                implicitWidth: Math.max(mainColumnLayout.width / 4 * 2, contentWidth)
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 transformOrigin: Item.Center
                 onClicked: {
                     if (userIntUser.isDebuggingEnabled()) {
                         globalUserData.ipAddr = txtIPAddress.text
                     }
-//                    globalUserData.conPort = spBoxPort.value
+
                     if (userIntUser.startMainConnection(txtUserName.text, txtPassWord.text) > 0) {
                         btnSendData.enabled = false
                         busyConnectIndicator.visible = true;
@@ -133,16 +139,26 @@ Flickable {
                 transformOrigin: Item.Center
                 enabled: globalUserData.bIsConnected
                 onClicked: {
-                    txtReadableName.text = globalUserData.readableName
-                    changeReadableName.open()
+                    var component = Qt.createComponent("../components/EditableTextDialog.qml");
+                    if (component.status === Component.Ready) {
+                        var dialog = component.createObject(parent,{popupType: 1});
+                        dialog.headerText = "Öffentlicher Name";
+                        dialog.parentHeight = flickableUser.height
+                        dialog.parentWidth = flickableUser.width
+                        dialog.textMinSize = 6
+                        dialog.editableText = globalUserData.readableName;
+                        dialog.acceptedTextEdit.connect(acceptedEditReadableName);
+                        dialog.open();
+                    }
+
                 }
-//                onEnabledChanged: {
-//                    if (btnChangeReadableName.enabled) {
-//                        /* Is called before readable name is there */
-//                        if (globalUserData.readableName.length == 0)
-//                            btnChangeReadableName.background.color = "#FFAAAA"
-//                    }
-//                }
+
+                function acceptedEditReadableName(text) {
+                    busyConnectIndicator.visible = true;
+                    txtInfoConnecting.visible = true;
+                    txtInfoConnecting.text = "Ändere Öffentlichen Namen"
+                    userIntUser.startUpdateReadableName(text)
+                }
             }
 
             ToolSeparator {
@@ -165,7 +181,6 @@ Flickable {
                     changePassWordDialog.open()
                 }
             }
-
         }
     }
 
@@ -229,7 +244,6 @@ Flickable {
 
         standardButtons: Dialog.Ok | Dialog.Cancel
         onAccepted: {
-//            settings.style = styleBox.displayText
             labelPasswordTooShort.visible = false
             labelPasswordDiffer.visible = false
             if (txtnewPassWord.text.length < 6) {
@@ -306,57 +320,6 @@ Flickable {
                 id: labelPasswordTooShort
                 visible: false
                 text: qsTr("Das Passwort muss mindestens 6 Zeichen lang sein")
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                wrapMode: Text.WordWrap
-                Layout.maximumWidth: parent.width
-                color: "orange"
-            }
-        }
-    }
-
-    Dialog {
-        id: changeReadableName
-        x: Math.round((flickableUser.width - width) / 2)
-        y: Math.round(flickableUser.height / 6)
-        width: Math.round(Math.min(flickableUser.width, flickableUser.height) / 3 * 2)
-        modal: true
-        focus: true
-        title: "Öffentlicher Name"
-
-        standardButtons: Dialog.Ok | Dialog.Cancel
-        onAccepted: {
-            labelNameTooShort.visible = false
-            if (txtReadableName.text.length < 3) {
-                labelNameTooShort.visible = true
-                changeReadableName.open()
-            } else {
-                userIntUser.startUpdateReadableName(txtReadableName.text)
-                busyConnectIndicator.visible = true;
-                txtInfoConnecting.visible = true;
-                txtInfoConnecting.text = "Ändere Öffentlichen Namen"
-                changeReadableName.close()
-            }
-        }
-        onRejected: {
-            changeReadableName.close()
-            labelNameTooShort.visible = false
-        }
-
-        contentItem: ColumnLayout {
-            id: changeReadableNameColumn
-            width: changePassWordDialog.width
-            spacing: 20
-
-            TextField {
-                id: txtReadableName
-                implicitWidth: changeReadableNameColumn.width / 4 * 3
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            }
-
-            Label {
-                id: labelNameTooShort
-                visible: false
-                text: qsTr("Der Name muss mindestens 3 Zeichen lang sein")
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 wrapMode: Text.WordWrap
                 Layout.maximumWidth: parent.width
