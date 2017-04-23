@@ -34,7 +34,7 @@ public:
 
 
     int addNewSeasonTicket(QString user, quint32 userIndex, QString ticketName, quint8 discount);
-    int removeTicket(const QString& ticketName);
+    int removeTicket(const quint32 index);
     int showAllSeasonTickets();
 
     quint32 getNumberOfInternalList() { return this->m_lInteralList.size(); }
@@ -58,7 +58,6 @@ private:
 
     bool addNewTicketInfo(QString user, quint32 userIndex, QString ticketName, qint64 timestamp, quint8 discount, QString place, quint32 index, bool checkTicket = true);
     void addNewTicketInfo(QString user, quint32 userIndex, QString ticketName, qint64 timestamp, quint8 discount, QString place, quint32 index, QList<TicketInfo>* pList);
-    quint32 getTicketInfoIndex(const QString& ticketName);
 
     bool updateTicketInfoValue(TicketInfo* pTicket, QString key, QVariant value);
 };

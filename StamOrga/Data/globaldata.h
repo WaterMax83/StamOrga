@@ -94,6 +94,15 @@ public:
         }
     }
 
+    quint32 userIndex() { QMutexLocker lock(&this->m_mutexUser); return this->m_userIndex; }
+    void setUserIndex(quint32 userIndex)
+    {
+        QMutexLocker lock(&this->m_mutexUser);
+        if (this->m_userIndex != userIndex) {
+            this->m_userIndex = userIndex;
+        }
+    }
+
     bool bIsConnected() { return this->m_bIsConnected; }
     void setbIsConnected(bool enable)
     {
@@ -150,6 +159,8 @@ private:
     QString m_readableName;
     QString m_ipAddress;
     quint32 m_uMasterPort;
+    quint16 m_uDataPort;
+    quint32 m_userIndex;
 
     QMutex  m_mutexUser;
     QMutex  m_mutexUserIni;
@@ -158,7 +169,7 @@ private:
 
     bool m_bIsConnected;
 
-    quint16 m_uDataPort;
+
 
     QSettings *m_pMainUserSettings;
 

@@ -14,7 +14,6 @@ public:
     quint8 saisonIndex;
     quint8 competition;
     QString score;
-//    quint32 index;
 
     static bool compareTimeStampFunction(GamesPlay p1, GamesPlay p2)
     {
@@ -37,7 +36,6 @@ public:
     ~Games();
 
     int addNewGame(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, quint8 comp);
-//    int removeUser(const QString &name);
     int showAllGames();
 
     quint32 getNumberOfInternalList() { return this->m_lInteralList.size(); }

@@ -48,9 +48,10 @@ qint32 UserInterface::startAddSeasonTicket(QString name, quint32 discount)
     return this->m_pConHandle->startSeasonTicketAdd(name, discount);
 }
 
-qint32 UserInterface::startRemoveSeasonTicket(QString name)
+qint32 UserInterface::startRemoveSeasonTicket(quint32 index)
 {
-    return this->m_pConHandle->startSeasonTicketRemove(name);
+    qDebug() << "UserINterface tries to remove idnex " << index;
+    return this->m_pConHandle->startSeasonTicketRemove(index);
 }
 
 qint32 UserInterface::startGettingSeasonTicketList()

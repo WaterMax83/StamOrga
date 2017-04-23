@@ -25,7 +25,7 @@ public:
 
     Q_INVOKABLE qint32 startAddSeasonTicket(QString name, quint32 discount);
 
-    Q_INVOKABLE qint32 startRemoveSeasonTicket(QString name);
+    Q_INVOKABLE qint32 startRemoveSeasonTicket(quint32 index);
 
     Q_INVOKABLE qint32 startGettingSeasonTicketList();
 

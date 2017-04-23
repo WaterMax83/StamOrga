@@ -53,11 +53,12 @@ qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol *msg, QString *p
     const char *pData = msg->getPointerToData();
     qint32 rValue = qFromBigEndian(*((qint32 *)pData));
     qint32 index = qFromBigEndian(*((qint32 *)(pData + 8)));
+    this->m_pGlobalData->setUserIndex(index);
 
-    Q_UNUSED(index);
-    /*
-     * TODO: set internal User Index
-     */
+    SeasonTicketItem *seasonTicket;
+    int i = 0;
+    while((seasonTicket = this->m_pGlobalData->getSeasonTicket(i++)) != NULL)
+        seasonTicket->checkTicketOwn(index);
 
     *props = QString::number(qFromBigEndian(*((quint32 *)(pData + 8))));
 
@@ -106,7 +107,7 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol *msg)
             break;
         }
 
-        play->setIndex(*(qint8 *)(pData + offset));
+        play->setSeasonIndex(*(qint8 *)(pData + offset));
         offset += 1;
         play->setCompetition(*(qint8 *)(pData + offset));
         offset += 1;
@@ -121,7 +122,7 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol *msg)
         play->setTimeStamp(timeStamp);
         offset += 8;
 
-        quint32 index = qFromBigEndian(*(quint32 *)(pData + offset));
+        play->setIndex(qFromBigEndian(*(quint32 *)(pData + offset)));
         offset += 4;
 
         QString playString(QByteArray(pData + offset, size - GAMES_OFFSET));
@@ -151,6 +152,7 @@ qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol *msg)
     if (msg->getDataLength() < 8)
         return ERROR_CODE_WRONG_SIZE;
 
+    quint32 userIndex = this->m_pGlobalData->userIndex();
     const char *pData = msg->getPointerToData();
     qint32 rValue = qFromBigEndian(*((qint32 *)pData));
 
@@ -169,8 +171,6 @@ qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol *msg)
     quint16 totalPacks = qFromBigEndian(*(quint16 *)(pData + offset));
     offset += 2;
 
-    qDebug() << QString("Getting %1 number of tickets").arg(totalPacks);
-
     this->m_pGlobalData->startUpdateSeasonTickets();
     while(offset < totalSize && totalPacks > 0) {
         SeasonTicketItem *sTicket = new SeasonTicketItem();
@@ -185,11 +185,11 @@ qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol *msg)
 
         sTicket->setDiscount(*(quint8 *)(pData + offset));
         offset += 1;
-        quint32 index = (*(quint32 *)(pData + offset));
+        sTicket->setIndex(qFromBigEndian(*(quint32 *)(pData + offset)));
         offset += 4;
-        quint32 userIndex = (*(quint32 *)(pData + offset));
+        sTicket->setUserIndex(qFromBigEndian(*(quint32 *)(pData + offset)));
         offset += 4;
-
+        sTicket->checkTicketOwn(userIndex);
 
         QString ticketString(QByteArray(pData + offset, size - TICKET_OFFSET));
         offset += (size - TICKET_OFFSET);

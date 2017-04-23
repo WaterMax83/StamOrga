@@ -126,25 +126,6 @@ int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sInde
     return newIndex;
 }
 
-//int ListedUser::removeUser(const QString &name)
-//{
-//    int index = this->getUserLoginIndex(name);
-//    if (index < 0 || index > this->m_lInteralList.size() - 1)
-//    {
-//        CONSOLE_WARNING(QString("Could not find user \"%1\"").arg(name));
-//        return -1;
-//    }
-
-//    QMutexLocker locker(&this->m_mInternalInfoMutex);
-
-//    this->m_lInteralList.removeAt(index);
-
-//    this->saveCurrentInteralList();
-
-//    CONSOLE_INFO(QString("removed User \"%1\"").arg(name));
-//    return 0;
-//}
-
 int Games::showAllGames()
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
@@ -216,70 +197,6 @@ bool Games::gameExists(quint32 index)
     return false;
 }
 
-//bool ListedUser::userCheckPassword(QString name, QString passw)
-//{
-//    QMutexLocker locker(&this->m_mInternalInfoMutex);
-
-//    if (name.length() < MIN_SIZE_USERNAME)
-//        return false;
-
-//    foreach (UserLogin login, this->m_lInteralList) {
-//        if (login.m_itemName == name) {
-//            if (login.password == passw)
-//                return true;
-//            return false;
-//        }
-//    }
-//    return false;
-//}
-
-//bool ListedUser::userChangePassword(QString name, QString passw)
-//{
-//    QMutexLocker locker(&this->m_mInternalInfoMutex);
-
-//    if (name.length() < MIN_SIZE_USERNAME)
-//        return false;
-
-//    for (int i=0; i<this->m_lInteralList.size(); i++) {
-//        if (this->m_lInteralList[i].m_itemName == name) {
-//            if (this->updateUserLoginValue(&this->m_lInteralList[i], LOGIN_PASSWORD, QVariant(passw))) {
-//                this->m_lInteralList[i].password = passw;
-//                return true;
-//            }
-//        }
-//    }
-//    return false;
-//}
-
-//bool ListedUser::userChangeProperties(QString name, quint32 props)
-//{
-//    QMutexLocker locker(&this->m_mInternalInfoMutex);
-
-//    if (name.length() < MIN_SIZE_USERNAME)
-//        return false;
-
-//    for (int i=0; i<this->m_lInteralList.size(); i++) {
-//        if (this->m_lInteralList[i].m_itemName == name) {
-//            if (this->updateUserLoginValue(&this->m_lInteralList[i], LOGIN_PROPERTIES, QVariant(props))) {
-//                this->m_lInteralList[i].properties = props;
-//                return true;
-//            } else
-//                return false;
-//        }
-//    }
-//    return false;
-//}
-
-//quint32 ListedUser::getUserProperties(QString name)
-//{
-//    QMutexLocker locker(&this->m_mInternalInfoMutex);
-
-//    foreach (UserLogin login, this->m_lInteralList) {
-//        if (login.m_itemName == name)
-//            return login.properties;
-//    }
-//    return 0;
-//}
 
 //bool ListedUser::addNewUserLogin(QString name, QString password, quint32 prop, quint32 index, bool checkUser)
 bool Games::addNewGamesPlay(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, quint8 comp, quint32 index, bool checkGame)
@@ -315,47 +232,6 @@ void Games::addNewGamesPlay(QString home, QString away, qint64 timestamp, quint8
     pList->append(play);
 }
 
-//quint32 ListedUser::getUserLoginIndex(const QString &name)
-//{
-//    QMutexLocker locker(&this->m_mInternalInfoMutex);
-
-//    for (int i=0; i<this->m_lInteralList.size(); i++) {
-//        if (this->m_lInteralList[i].m_itemName == name)
-//            return i;
-//    }
-//    return -1;
-//}
-
-//quint32 Games::getNextInternalIndex()
-//{
-//    QMutexLocker locker(&this->m_mInternalInfoMutex);
-
-//    quint32 savedIndex, newIndex;
-//    quint32 usedIndex = 0;
-//    for (int i=0; i<this->m_lInteralList.size(); i++) {
-//        if (this->m_lInteralList[i].m_index > usedIndex)
-//            usedIndex = this->m_lInteralList[i].m_index;
-//    }
-
-//    {
-
-//        QMutexLocker locker(&this->m_mConfigIniMutex);
-
-//        this->m_pConfigSettings->beginGroup(GAMES_INDEX_GROUP);
-//        savedIndex = this->m_pConfigSettings->value(GAMES_MAX_COUNT, 0).toUInt();
-
-//        if (savedIndex > usedIndex)
-//            newIndex = savedIndex;
-//        else
-//            newIndex = usedIndex;
-//        newIndex++;
-
-//        this->m_pConfigSettings->setValue(GAMES_MAX_COUNT, newIndex);
-//        this->m_pConfigSettings->endGroup();
-//    }
-
-//    return newIndex;
-//}
 
 bool Games::updateGamesPlayValue(GamesPlay *pGame, QString key, QVariant value)
 {

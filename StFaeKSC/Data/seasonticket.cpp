@@ -94,22 +94,23 @@ int SeasonTicket::addNewSeasonTicket(QString user, quint32 userIndex, QString ti
     return newIndex;
 }
 
-int SeasonTicket::removeTicket(const QString& ticketName)
+int SeasonTicket::removeTicket(const quint32 index)
 {
-    int index = this->getTicketInfoIndex(ticketName);
-    if (index < 0 || index > this->m_lInteralList.size() - 1) {
-        qWarning() << (QString("Could not find season ticket \"%1\" to remove").arg(ticketName));
-        return ERROR_CODE_COMMON;
-    }
-
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
-    this->m_lInteralList.removeAt(index);
+    for (int i=0; i < this->m_lInteralList.size(); i++) {
+        if (this->m_lInteralList[i].m_index == index) {
+            QString ticketName = this->m_lInteralList[i].m_itemName;
+            this->m_lInteralList.removeAt(i);
+            this->saveCurrentInteralList();
 
-    this->saveCurrentInteralList();
+            qInfo() << (QString("removed Ticket \"%1\"").arg(ticketName));
+            return ERROR_CODE_SUCCESS;
+        }
+    }
 
-//    qInfo() << (QString("removed Ticket \"%1\"").arg(ticketName));
-    return ERROR_CODE_SUCCESS;
+    qWarning() << (QString("Could not find season ticket with \"%1\" to remove").arg(index));
+    return ERROR_CODE_COMMON;
 }
 
 int SeasonTicket::showAllSeasonTickets()
@@ -180,6 +181,10 @@ bool SeasonTicket::ticketExists(quint32 index)
 bool SeasonTicket::addNewTicketInfo(QString user, quint32 userIndex, QString ticketName, qint64 datetime, quint8 discount, QString place, quint32 index, bool checkTicket)
 {
     if (checkTicket) {
+        if (ticketName.size() < 5) {
+            qWarning().noquote() << QString("Ticket with index %1 has to short name %2 remove it").arg(index).arg(ticketName);
+            return false;
+        }
         if (index == 0 || this->ticketExists(index)) {
             qWarning().noquote() << QString("Ticket \"%1\" with index \"%2\" already exists, saving with new index").arg(ticketName).arg(index);
             this->addNewTicketInfo(user, userIndex, ticketName, datetime, discount, place, index, &this->m_lAddItemProblems);
@@ -204,17 +209,6 @@ void SeasonTicket::addNewTicketInfo(QString user, quint32 userIndex, QString tic
     ticket.place     = place;
     ticket.m_index     = index;
     pList->append(ticket);
-}
-
-quint32 SeasonTicket::getTicketInfoIndex(const QString& ticketName)
-{
-    QMutexLocker locker(&this->m_mInternalInfoMutex);
-
-    for (int i = 0; i < this->m_lInteralList.size(); i++) {
-        if (this->m_lInteralList[i].m_itemName == ticketName)
-            return i;
-    }
-    return -1;
 }
 
 bool SeasonTicket::updateTicketInfoValue(TicketInfo* pTicket, QString key, QVariant value)

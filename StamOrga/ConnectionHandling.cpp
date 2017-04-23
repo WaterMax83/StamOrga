@@ -106,10 +106,10 @@ qint32 ConnectionHandling::startGettingGamesList()
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 ConnectionHandling::startSeasonTicketRemove(QString name)
+qint32 ConnectionHandling::startSeasonTicketRemove(quint32 index)
 {
     DataConRequest req(OP_CODE_CMD_REQ::REQ_REMOVE_TICKET);
-    req.m_lData.append(name);
+    req.m_lData.append(QString::number(index));
     this->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }

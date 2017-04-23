@@ -104,20 +104,21 @@ int ListedUser::addNewUser(const QString &name, const QString &password, quint32
 int ListedUser::removeUser(const QString &name)
 {
     int index = this->getUserLoginIndex(name);
-    if (index < 0 || index > this->m_lInteralList.size() - 1)
-    {
-        CONSOLE_WARNING(QString("Could not find user \"%1\"").arg(name));
-        return -1;
-    }
 
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
-    this->m_lInteralList.removeAt(index);
+    for (int i=0; i < this->m_lInteralList.size(); i++) {
+        if (this->m_lInteralList[i].m_index == index) {
+            this->m_lInteralList.removeAt(i);
+            this->saveCurrentInteralList();
 
-    this->saveCurrentInteralList();
+            CONSOLE_INFO(QString("removed User \"%1\"").arg(name));
+            return ERROR_CODE_SUCCESS;
+        }
+    }
 
-    CONSOLE_INFO(QString("removed User \"%1\"").arg(name));
-    return 0;
+    CONSOLE_WARNING(QString("Could not find user \"%1\"").arg(name))
+    return ERROR_CODE_COMMON;
 }
 
 int ListedUser::showAllUsers()
@@ -318,7 +319,7 @@ qint32 ListedUser::getUserLoginIndex(const QString &name)
 
     for (int i=0; i<this->m_lInteralList.size(); i++) {
         if (this->m_lInteralList[i].m_itemName == name)
-            return i;
+            return this->m_lInteralList[i].m_index;
     }
     return -1;
 }

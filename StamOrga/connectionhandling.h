@@ -23,7 +23,7 @@ public:
     bool startUpdatePassword(QString newPassWord);
     qint32 startUpdateReadableName(QString name);
     qint32 startGettingGamesList();
-    qint32 startSeasonTicketRemove(QString name);
+    qint32 startSeasonTicketRemove(quint32 index);
     qint32 startSeasonTicketAdd(QString name, quint32 discount);
     qint32 startGettingSeasonTicketList();
 

@@ -227,14 +227,9 @@ void DataConnection::startSendAddSeasonTicket(DataConRequest request)
 
 void DataConnection::startSendRemoveSeasonTicket(DataConRequest request)
 {
-    QString name = request.m_lData.at(0);
-    QByteArray seasonTicket;
-    QDataStream wSeasonTicket(&seasonTicket, QIODevice::WriteOnly);
-    wSeasonTicket.setByteOrder(QDataStream::BigEndian);
-    wSeasonTicket << quint16(name.toUtf8().size());
-    seasonTicket.append(name);
-
-    MessageProtocol msg(OP_CODE_CMD_REQ::REQ_REMOVE_TICKET, seasonTicket);
+    quint32 index = request.m_lData.at(0).toUInt();
+    qDebug() << "Index to remove = " << index;
+    MessageProtocol msg(OP_CODE_CMD_REQ::REQ_REMOVE_TICKET, index);
     this->sendMessageRequest(&msg, request);
 }
 

@@ -123,8 +123,8 @@ Flickable {
         id: seasonTicketItem
         MyComponents.SeasonTicket {
             onClickedSeasonTicket: {
-                console.log("Outside clicked " + sender.name);
-                seasonTicketClickedMenu.openWithName(sender.name)
+                console.log("Outside clicked " + sender.name + " " + sender.index);
+                seasonTicketClickedMenu.openWithNameAndIndex(sender.name, sender.index)
             }
         }
     }
@@ -145,7 +145,7 @@ Flickable {
 
     ScrollIndicator.vertical: ScrollIndicator { }
 
-    property string m_ticketNameToChange
+    property var m_ticketNameToChangeIndex
 
     Menu {
             id: seasonTicketClickedMenu
@@ -166,12 +166,13 @@ Flickable {
             MenuItem {
                 id: menuItemRemove
                 onClicked: {
-                    userIntTicket.startRemoveSeasonTicket(m_ticketNameToChange)
+                    userIntTicket.startRemoveSeasonTicket(m_ticketNameToChangeIndex)
                 }
             }
-            function openWithName(name)
+            function openWithNameAndIndex(name, index)
             {
-                m_ticketNameToChange = name
+                console.log("new indx for openeing " + index)
+                m_ticketNameToChangeIndex = index
                 menuItemChange.text = "Ändere " + name
                 menuItemRemove.text = "Lösche " + name
                 seasonTicketClickedMenu.open()
@@ -195,7 +196,6 @@ Flickable {
                 labelTicketNameTooShort.visible = true
                 addSeasonTicketDlg.open()
             } else {
-                console.log("Ermäßigt? " + chBoxDiscount.checked)
                 userIntTicket.startAddSeasonTicket(txtnewSeasonTicketName.text, chBoxDiscount.checked ? 1 : 0);
                 busyConnectIndicatorTicket.visible = true;
                 txtInfoSeasonTicket.text = "Füge Dauerkarte hinzu"

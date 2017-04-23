@@ -5,22 +5,22 @@
 
 #include "globaldata.h"
 
+#define GROUP_ARRAY_ITEM        "item"
+#define ITEM_INDEX              "index"
+
 #define GAMES_GROUP             "GAMES_LIST"
-#define PLAY_ARRAY              "play"
 #define PLAY_HOME               "home"
 #define PLAY_AWAY               "away"
 #define PLAY_DATETIME           "datetime"
 #define PLAY_SAISON_INDEX       "sIndex"
-#define PLAY_INDEX              "index"
 #define PLAY_SCORE              "score"
 #define PLAY_COMPETITION        "competition"
 
-#define SEASONTICKET_GROUP    "SeasonTicketList"
-#define TICKET_ARRAY            "ticket"
+#define SEASONTICKET_GROUP    "SEASONTICKET_LIST"
 #define TICKET_NAME           "name"
-#define TICKET_PLACE               "place"
-#define TICKET_DISCOUNT            "discount"
-#define TICKET_OWN              "OwnTicket"
+#define TICKET_PLACE          "place"
+#define TICKET_DISCOUNT       "discount"
+#define TICKET_USER_INDEX     "userIndex"
 
 
 GlobalData::GlobalData(QObject *parent) : QObject(parent)
@@ -52,14 +52,15 @@ void GlobalData::loadGlobalSettings()
     /* Getting data from last Games */
     this->m_pMainUserSettings->beginGroup(GAMES_GROUP);
     this->m_gpLastTimeStamp = this->m_pMainUserSettings->value("TIMESTAMP", 0).toLongLong();
-    int count = this->m_pMainUserSettings->beginReadArray(PLAY_ARRAY);
+    int count = this->m_pMainUserSettings->beginReadArray(GROUP_ARRAY_ITEM);
     for (int i=0; i<count; i++) {
         this->m_pMainUserSettings->setArrayIndex(i);
         GamePlay *play = new GamePlay();
         play->setHome(this->m_pMainUserSettings->value(PLAY_HOME, "").toString());
-        play->setAway(this->m_pMainUserSettings->value(PLAY_ARRAY, "").toString());
+        play->setAway(this->m_pMainUserSettings->value(PLAY_AWAY, "").toString());
         play->setTimeStamp(this->m_pMainUserSettings->value(PLAY_DATETIME, 0).toLongLong());
-        play->setIndex(quint8(this->m_pMainUserSettings->value(PLAY_SAISON_INDEX, 0).toUInt()));
+        play->setSeasonIndex(quint8(this->m_pMainUserSettings->value(PLAY_SAISON_INDEX, 0).toUInt()));
+        play->setIndex(this->m_pMainUserSettings->value(ITEM_INDEX, 0).toUInt());
         play->setScore(this->m_pMainUserSettings->value(PLAY_SCORE, "").toString());
         play->setCompetition(quint8(this->m_pMainUserSettings->value(PLAY_COMPETITION, 0).toUInt()));
         this->addNewGamePlay(play);
@@ -71,14 +72,16 @@ void GlobalData::loadGlobalSettings()
     this->m_pMainUserSettings->beginGroup(SEASONTICKET_GROUP);
     this->m_stLastTimeStamp = this->m_pMainUserSettings->value("TIMESTAMP", 0).toLongLong();
 
-    int ticketCount = this->m_pMainUserSettings->beginReadArray(TICKET_ARRAY);
+    int ticketCount = this->m_pMainUserSettings->beginReadArray(GROUP_ARRAY_ITEM);
     for (int i=0; i<ticketCount; i++) {
         this->m_pMainUserSettings->setArrayIndex(i);
         SeasonTicketItem *ticket = new SeasonTicketItem();
         ticket->setName(this->m_pMainUserSettings->value(TICKET_NAME, "").toString());
         ticket->setPlace(this->m_pMainUserSettings->value(TICKET_PLACE, "").toString());
         ticket->setDiscount(quint8(this->m_pMainUserSettings->value(TICKET_DISCOUNT, 0).toUInt()));
-        ticket->setTicketOwn(this->m_pMainUserSettings->value(TICKET_OWN, false).toBool());
+        ticket->setIndex(this->m_pMainUserSettings->value(ITEM_INDEX, 0).toUInt());
+        ticket->setUserIndex(this->m_pMainUserSettings->value(TICKET_USER_INDEX, 0).toUInt());
+
         this->addNewSeasonTicket(ticket);
     }
 
@@ -113,13 +116,14 @@ void GlobalData::saveActualGamesList()
 
     this->m_pMainUserSettings->setValue("TIMESTAMP", this->m_gpLastTimeStamp);
 
-    this->m_pMainUserSettings->beginWriteArray(PLAY_ARRAY);
+    this->m_pMainUserSettings->beginWriteArray(GROUP_ARRAY_ITEM);
     for (int i=0; i<this->m_lGamePlay.size(); i++) {
         this->m_pMainUserSettings->setArrayIndex(i);
         this->m_pMainUserSettings->setValue(PLAY_HOME, this->m_lGamePlay[i]->home());
-        this->m_pMainUserSettings->setValue(PLAY_ARRAY, this->m_lGamePlay[i]->away());
+        this->m_pMainUserSettings->setValue(PLAY_AWAY, this->m_lGamePlay[i]->away());
         this->m_pMainUserSettings->setValue(PLAY_DATETIME, this->m_lGamePlay[i]->timestamp64Bit());
-        this->m_pMainUserSettings->setValue(PLAY_SAISON_INDEX, this->m_lGamePlay[i]->index());
+        this->m_pMainUserSettings->setValue(PLAY_SAISON_INDEX, this->m_lGamePlay[i]->seasonIndex());
+        this->m_pMainUserSettings->setValue(ITEM_INDEX, this->m_lGamePlay[i]->index());
         this->m_pMainUserSettings->setValue(PLAY_SCORE, this->m_lGamePlay[i]->score());
         this->m_pMainUserSettings->setValue(PLAY_COMPETITION, this->m_lGamePlay[i]->compValue());
     }
@@ -188,13 +192,14 @@ void GlobalData::saveCurrentSeasonTickets()
 
     this->m_pMainUserSettings->setValue("TIMESTAMP", this->m_stLastTimeStamp);
 
-    this->m_pMainUserSettings->beginWriteArray(TICKET_ARRAY);
+    this->m_pMainUserSettings->beginWriteArray(GROUP_ARRAY_ITEM);
     for (int i=0; i<this->m_lSeasonTicket.size(); i++) {
         this->m_pMainUserSettings->setArrayIndex(i);
         this->m_pMainUserSettings->setValue(TICKET_NAME, this->m_lSeasonTicket[i]->name());
         this->m_pMainUserSettings->setValue(TICKET_PLACE, this->m_lSeasonTicket[i]->place());
         this->m_pMainUserSettings->setValue(TICKET_DISCOUNT, this->m_lSeasonTicket[i]->discount());;
-        this->m_pMainUserSettings->setValue(TICKET_OWN, this->m_lSeasonTicket[i]->isTicketYourOwn());;
+        this->m_pMainUserSettings->setValue(ITEM_INDEX, this->m_lSeasonTicket[i]->index());;
+        this->m_pMainUserSettings->setValue(TICKET_USER_INDEX, this->m_lSeasonTicket[i]->userIndex());;
     }
 
     this->m_pMainUserSettings->endArray();

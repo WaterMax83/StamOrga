@@ -12,7 +12,8 @@ class GamePlay : public QObject
     Q_PROPERTY(QString score READ score WRITE setScore NOTIFY scoreChanged)
     Q_PROPERTY(QString timestamp READ timestamp NOTIFY timestampChanged)
     Q_PROPERTY(QString competition READ competition NOTIFY competitionChanged)
-    Q_PROPERTY(quint8 index READ index WRITE setIndex NOTIFY indexChanged)
+    Q_PROPERTY(quint32 index READ index WRITE setIndex NOTIFY indexChanged)
+    Q_PROPERTY(quint8 seasonIndex READ seasonIndex WRITE setSeasonIndex NOTIFY seasonIndexChanged)
 public:
     explicit GamePlay(QObject *parent = 0);
 
@@ -91,6 +92,16 @@ public:
             emit this->indexChanged();
         }
     }
+
+    quint8 seasonIndex() { return this->m_seasonIndex; }
+    void setSeasonIndex(const quint8 seasonIndex)
+    {
+        if (this->m_seasonIndex != seasonIndex) {
+            this->m_seasonIndex = seasonIndex;
+            emit this->seasonIndexChanged();
+        }
+    }
+
     Q_INVOKABLE QString getCompetitionIndex()
     {
         if (this->m_comp == 1 || this->m_comp == 2) {
@@ -115,6 +126,7 @@ signals:
     void timestampChanged();
     void competitionChanged();
     void indexChanged();
+    void seasonIndexChanged();
 
 public slots:
 
@@ -123,7 +135,8 @@ private:
         QString m_away;
         QString m_score;
         quint8 m_comp;
-        quint8 m_index;
+        quint32 m_index;
+        quint8 m_seasonIndex;
         qint64 m_timestamp;
 };
 

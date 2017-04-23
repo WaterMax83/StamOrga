@@ -312,26 +312,22 @@ MessageProtocol* DataConnection::requestAddSeasonTicket(MessageProtocol* msg)
 
 /*
  * 0                Header          12
- * 12   quint16     size            2
- * 14   String      name            X
+ * 12   quint32      index           4
  */
 MessageProtocol* DataConnection::requestRemoveSeasonTicket(MessageProtocol* msg)
 {
-    if (msg->getDataLength() <= 2) {
-        qWarning() << QString("Message for removing season ticket to short for user %1").arg(this->m_pUserConData->userName);
-        return NULL;
+    if (msg->getDataLength() != 4) {
+        qWarning() << QString("Wrong message size for removing season ticket for user %1").arg(this->m_pUserConData->userName);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_REMOVE_TICKET, ERROR_CODE_WRONG_SIZE);
     }
 
     const char* pData     = msg->getPointerToData();
-    quint16     actLength = qFromBigEndian(*((quint16*)pData));
-    if (actLength > msg->getDataLength())
-        return new MessageProtocol(OP_CODE_CMD_RES::ACK_REMOVE_TICKET, ERROR_CODE_WRONG_SIZE);
-    QString ticketName(QByteArray(pData + 2, actLength));
+    quint32     index = qFromBigEndian(*((quint32*)pData));
 
-    if (this->m_pGlobalData->m_SeasonTicket.removeTicket(ticketName) == ERROR_CODE_SUCCESS) {
+    if (this->m_pGlobalData->m_SeasonTicket.removeTicket(index) == ERROR_CODE_SUCCESS) {
         qInfo().noquote() << QString("User %1 removed SeasonTicket %2")
                              .arg(this->m_pUserConData->userName)
-                             .arg(ticketName);
+                             .arg(index);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_REMOVE_TICKET, ERROR_CODE_SUCCESS);
     }
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_REMOVE_TICKET, ERROR_CODE_COMMON);
