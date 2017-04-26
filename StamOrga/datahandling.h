@@ -1,24 +1,42 @@
+/*
+*	This file is part of StamOrga
+*   Copyright (C) 2017 Markus Schneider
+*
+*	This program is free software; you can redistribute it and/or modify
+*   it under the terms of the GNU General Public License as published by
+*   the Free Software Foundation; either version 3 of the License, or
+*   (at your option) any later version.
+*
+*	Foobar is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+
+*    You should have received a copy of the GNU General Public License
+*    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #ifndef DATAHANDLING_H
 #define DATAHANDLING_H
 
 #include <QtCore/QString>
 
-#include "../Data/globaldata.h"
 #include "../Common/Network/messageprotocol.h"
+#include "../Data/globaldata.h"
 
 class DataHandling
 {
 public:
-    DataHandling(GlobalData *pData);
+    DataHandling(GlobalData* pData);
 
-    qint32 getHandleLoginResponse(MessageProtocol *msg);
-    qint32 getHandleVersionResponse(MessageProtocol *msg, QString *version);
-    qint32 getHandleUserPropsResponse(MessageProtocol *msg, QString *props);
-    qint32 getHandleGamesListResponse(MessageProtocol *msg);
-    qint32 getHandleSeasonTicketListResponse(MessageProtocol *msg);
+    qint32 getHandleLoginResponse(MessageProtocol* msg);
+    qint32 getHandleVersionResponse(MessageProtocol* msg, QString* version);
+    qint32 getHandleUserPropsResponse(MessageProtocol* msg, QString* props);
+    qint32 getHandleGamesListResponse(MessageProtocol* msg);
+    qint32 getHandleSeasonTicketListResponse(MessageProtocol* msg);
 
 private:
-    GlobalData  *m_pGlobalData;
+    GlobalData* m_pGlobalData;
 };
 
 #endif // DATAHANDLING_H

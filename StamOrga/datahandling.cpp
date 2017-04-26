@@ -1,37 +1,55 @@
+/*
+*	This file is part of StamOrga
+*   Copyright (C) 2017 Markus Schneider
+*
+*	This program is free software; you can redistribute it and/or modify
+*   it under the terms of the GNU General Public License as published by
+*   the Free Software Foundation; either version 3 of the License, or
+*   (at your option) any later version.
+*
+*	Foobar is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+
+*    You should have received a copy of the GNU General Public License
+*    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <QtCore/QtEndian>
 
-#include "datahandling.h"
-#include "../Data/gameplay.h"
-#include "../Common/General/globalfunctions.h"
 #include "../Common/General/config.h"
+#include "../Common/General/globalfunctions.h"
+#include "../Data/gameplay.h"
+#include "datahandling.h"
 
-DataHandling::DataHandling(GlobalData *pData)
+DataHandling::DataHandling(GlobalData* pData)
 {
     this->m_pGlobalData = pData;
 }
 
-qint32 DataHandling::getHandleLoginResponse(MessageProtocol *msg)
+qint32 DataHandling::getHandleLoginResponse(MessageProtocol* msg)
 {
     qint32 result;
     if (msg->getDataLength() != 4)
         return ERROR_CODE_WRONG_SIZE;
-    const char *pData = msg->getPointerToData();
+    const char* pData = msg->getPointerToData();
 
-    result = qFromBigEndian(*((qint32 *)pData));
+    result = qFromBigEndian(*((qint32*)pData));
 
     return result;
 }
 
-qint32 DataHandling::getHandleVersionResponse(MessageProtocol *msg, QString *version)
+qint32 DataHandling::getHandleVersionResponse(MessageProtocol* msg, QString* version)
 {
     if (msg->getDataLength() <= 4)
         return ERROR_CODE_WRONG_SIZE;
 
-    const char *pData = msg->getPointerToData();
-    qint32 result = qFromBigEndian(*((qint32 *)pData));
-    quint32 uVersion = qFromBigEndian(*((quint32 *)(pData + 4)));
+    const char* pData    = msg->getPointerToData();
+    qint32      result   = qFromBigEndian(*((qint32*)pData));
+    quint32     uVersion = qFromBigEndian(*((quint32*)(pData + 4)));
 
-    quint16 size = qFromBigEndian(*((quint16 *)(pData + 8)));
+    quint16 size = qFromBigEndian(*((quint16*)(pData + 8)));
     if (size > msg->getDataLength())
         return ERROR_CODE_WRONG_SIZE;
 
@@ -45,24 +63,24 @@ qint32 DataHandling::getHandleVersionResponse(MessageProtocol *msg, QString *ver
     return result;
 }
 
-qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol *msg, QString *props)
+qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol* msg, QString* props)
 {
     if (msg->getDataLength() < 12)
         return ERROR_CODE_WRONG_SIZE;
 
-    const char *pData = msg->getPointerToData();
-    qint32 rValue = qFromBigEndian(*((qint32 *)pData));
-    qint32 index = qFromBigEndian(*((qint32 *)(pData + 8)));
+    const char* pData  = msg->getPointerToData();
+    qint32      rValue = qFromBigEndian(*((qint32*)pData));
+    qint32      index  = qFromBigEndian(*((qint32*)(pData + 8)));
     this->m_pGlobalData->setUserIndex(index);
 
-    SeasonTicketItem *seasonTicket;
-    int i = 0;
-    while((seasonTicket = this->m_pGlobalData->getSeasonTicket(i++)) != NULL)
+    SeasonTicketItem* seasonTicket;
+    int               i = 0;
+    while ((seasonTicket = this->m_pGlobalData->getSeasonTicket(i++)) != NULL)
         seasonTicket->checkTicketOwn(index);
 
-    *props = QString::number(qFromBigEndian(*((quint32 *)(pData + 8))));
+    *props = QString::number(qFromBigEndian(*((quint32*)(pData + 8))));
 
-    quint16 readableNameSize = qFromBigEndian(*((quint16 *)(pData + 12)));
+    quint16 readableNameSize = qFromBigEndian(*((quint16*)(pData + 12)));
     QString readableName(QByteArray(pData + 14, readableNameSize));
 
     this->m_pGlobalData->setReadableName(readableName);
@@ -70,35 +88,35 @@ qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol *msg, QString *p
     return rValue;
 }
 
-#define GAMES_OFFSET (1 + 1 + 8 +4)
+#define GAMES_OFFSET (1 + 1 + 8 + 4)
 
-qint32 DataHandling::getHandleGamesListResponse(MessageProtocol *msg)
+qint32 DataHandling::getHandleGamesListResponse(MessageProtocol* msg)
 {
     if (msg->getDataLength() < 8)
         return ERROR_CODE_WRONG_SIZE;
 
-    const char *pData = msg->getPointerToData();
-    qint32 rValue = qFromBigEndian(*((qint32 *)pData));
+    const char* pData  = msg->getPointerToData();
+    qint32      rValue = qFromBigEndian(*((qint32*)pData));
 
     if (rValue != ERROR_CODE_SUCCESS)
         return rValue;
 
     quint32 totalSize = msg->getDataLength();
-    quint32 offset = 4;
-	quint16 version = qFromBigEndian(*(qint16 *)(pData + offset));
-	if (version != 0x1) {
-		qWarning().noquote() << QString("Unknown game version %1").arg(version);
-		return -1;
-	}
-	offset += 2;
-	
-    quint16 totalPacks = qFromBigEndian(*(quint16 *)(pData + offset));
+    quint32 offset    = 4;
+    quint16 version   = qFromBigEndian(*(qint16*)(pData + offset));
+    if (version != 0x1) {
+        qWarning().noquote() << QString("Unknown game version %1").arg(version);
+        return -1;
+    }
+    offset += 2;
+
+    quint16 totalPacks = qFromBigEndian(*(quint16*)(pData + offset));
     offset += 2;
 
     this->m_pGlobalData->startUpdateGamesPlay();
-    while(offset < totalSize && totalPacks > 0) {
-        GamePlay *play = new GamePlay();
-        quint16 size = qFromBigEndian(*(qint16 *)(pData + offset));
+    while (offset < totalSize && totalPacks > 0) {
+        GamePlay* play = new GamePlay();
+        quint16   size = qFromBigEndian(*(qint16*)(pData + offset));
         offset += 2;
 
         if (size <= 8) {
@@ -107,22 +125,22 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol *msg)
             break;
         }
 
-        play->setSeasonIndex(*(qint8 *)(pData + offset));
+        play->setSeasonIndex(*(qint8*)(pData + offset));
         offset += 1;
-        play->setCompetition(*(qint8 *)(pData + offset));
+        play->setCompetition(*(qint8*)(pData + offset));
         offset += 1;
 
         /* On Android there are problems reading from qint64 pointers???? SIGBUS*/
-//        play->setTimeStamp(qFromBigEndian(*(qint64 *)(pData + offset)));
-        quint32 tmp = qFromBigEndian(*(qint32 *)(pData + offset));
-        qint64 timeStamp = qint64(tmp) << 32;
-        tmp = qFromBigEndian(*(quint32 *)(pData + offset + 4));
+        //        play->setTimeStamp(qFromBigEndian(*(qint64 *)(pData + offset)));
+        quint32 tmp       = qFromBigEndian(*(qint32*)(pData + offset));
+        qint64  timeStamp = qint64(tmp) << 32;
+        tmp               = qFromBigEndian(*(quint32*)(pData + offset + 4));
         timeStamp |= qint64(tmp);
 
         play->setTimeStamp(timeStamp);
         offset += 8;
 
-        play->setIndex(qFromBigEndian(*(quint32 *)(pData + offset)));
+        play->setIndex(qFromBigEndian(*(quint32*)(pData + offset)));
         offset += 4;
 
         QString playString(QByteArray(pData + offset, size - GAMES_OFFSET));
@@ -147,34 +165,34 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol *msg)
 
 #define TICKET_OFFSET (1 + 4 + 4)
 
-qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol *msg)
+qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol* msg)
 {
     if (msg->getDataLength() < 8)
         return ERROR_CODE_WRONG_SIZE;
 
-    quint32 userIndex = this->m_pGlobalData->userIndex();
-    const char *pData = msg->getPointerToData();
-    qint32 rValue = qFromBigEndian(*((qint32 *)pData));
+    quint32     userIndex = this->m_pGlobalData->userIndex();
+    const char* pData     = msg->getPointerToData();
+    qint32      rValue    = qFromBigEndian(*((qint32*)pData));
 
     if (rValue != ERROR_CODE_SUCCESS)
         return rValue;
 
     quint32 totalSize = msg->getDataLength();
-    quint32 offset = 4;
-    quint16 version = qFromBigEndian(*(qint16 *)(pData + offset));
+    quint32 offset    = 4;
+    quint16 version   = qFromBigEndian(*(qint16*)(pData + offset));
     if (version != 0x1) {
         qWarning().noquote() << QString("Unknown season ticket version %1").arg(version);
         return -1;
     }
     offset += 2;
 
-    quint16 totalPacks = qFromBigEndian(*(quint16 *)(pData + offset));
+    quint16 totalPacks = qFromBigEndian(*(quint16*)(pData + offset));
     offset += 2;
 
     this->m_pGlobalData->startUpdateSeasonTickets();
-    while(offset < totalSize && totalPacks > 0) {
-        SeasonTicketItem *sTicket = new SeasonTicketItem();
-        quint16 size = qFromBigEndian(*(qint16 *)(pData + offset));
+    while (offset < totalSize && totalPacks > 0) {
+        SeasonTicketItem* sTicket = new SeasonTicketItem();
+        quint16           size    = qFromBigEndian(*(qint16*)(pData + offset));
         offset += 2;
 
         if (size <= 8) {
@@ -183,11 +201,11 @@ qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol *msg)
             break;
         }
 
-        sTicket->setDiscount(*(quint8 *)(pData + offset));
+        sTicket->setDiscount(*(quint8*)(pData + offset));
         offset += 1;
-        sTicket->setIndex(qFromBigEndian(*(quint32 *)(pData + offset)));
+        sTicket->setIndex(qFromBigEndian(*(quint32*)(pData + offset)));
         offset += 4;
-        sTicket->setUserIndex(qFromBigEndian(*(quint32 *)(pData + offset)));
+        sTicket->setUserIndex(qFromBigEndian(*(quint32*)(pData + offset)));
         offset += 4;
         sTicket->checkTicketOwn(userIndex);
 
@@ -208,4 +226,3 @@ qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol *msg)
 
     return rValue;
 }
-

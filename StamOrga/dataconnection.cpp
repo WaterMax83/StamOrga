@@ -1,15 +1,34 @@
+/*
+*	This file is part of StamOrga
+*   Copyright (C) 2017 Markus Schneider
+*
+*	This program is free software; you can redistribute it and/or modify
+*   it under the terms of the GNU General Public License as published by
+*   the Free Software Foundation; either version 3 of the License, or
+*   (at your option) any later version.
+*
+*	Foobar is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+
+*    You should have received a copy of the GNU General Public License
+*    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include <QtCore/QDataStream>
 
-#include "dataconnection.h"
 #include "../Common/General/config.h"
 #include "../Common/General/globalfunctions.h"
-#include "../Common/Network/messageprotocol.h"
 #include "../Common/Network/messagecommand.h"
+#include "../Common/Network/messageprotocol.h"
+#include "dataconnection.h"
 
-DataConnection::DataConnection(GlobalData *pData) : BackgroundWorker()
+DataConnection::DataConnection(GlobalData* pData)
+    : BackgroundWorker()
 {
     this->SetWorkerName("DataConnection");
-    this->m_pGlobalData = pData;
+    this->m_pGlobalData        = pData;
     this->m_bRequestLoginAgain = false;
 }
 
@@ -25,10 +44,9 @@ int DataConnection::DoBackgroundWork()
     this->m_pDataHandle = new DataHandling(this->m_pGlobalData);
 
     this->m_pDataUdpSocket = new QUdpSocket();
-    if (!this->m_pDataUdpSocket->bind())
-    {
+    if (!this->m_pDataUdpSocket->bind()) {
         qCritical().noquote() << QString("Could not bin socket for dataconnection");
-//        emit this->connectionRequestFinished(0, this->m_pDataUdpSocket->errorString());
+        //        emit this->connectionRequestFinished(0, this->m_pDataUdpSocket->errorString());
         return -1;
     }
     connect(this->m_pDataUdpSocket, &QUdpSocket::readyRead, this, &DataConnection::readyReadDataPort);
@@ -43,10 +61,10 @@ int DataConnection::DoBackgroundWork()
  */
 void DataConnection::readyReadDataPort()
 {
-    while(this->m_pDataUdpSocket->hasPendingDatagrams()) {
+    while (this->m_pDataUdpSocket->hasPendingDatagrams()) {
         QHostAddress sender;
-        quint16 port;
-        QByteArray datagram;
+        quint16      port;
+        QByteArray   datagram;
         datagram.resize(this->m_pDataUdpSocket->pendingDatagramSize());
 
         if (this->m_pDataUdpSocket->readDatagram(datagram.data(), datagram.size(), &sender, &port)) {
@@ -66,8 +84,8 @@ void DataConnection::readyReadDataPort()
  */
 void DataConnection::checkNewOncomingData()
 {
-    MessageProtocol *msg;
-    while((msg = this->m_messageBuffer.GetNextMessage()) != NULL) {
+    MessageProtocol* msg;
+    while ((msg = this->m_messageBuffer.GetNextMessage()) != NULL) {
 
         DataConRequest request = this->getActualRequest(msg->getIndex() & 0x00FFFFFF);
         if (request.m_request == 0)
@@ -79,8 +97,7 @@ void DataConnection::checkNewOncomingData()
                 this->sendActualRequestsAgain();
                 this->m_bRequestLoginAgain = false;
                 continue;
-            }
-            else {
+            } else {
                 request.m_result = this->m_pDataHandle->getHandleLoginResponse(msg);
             }
 
@@ -91,7 +108,7 @@ void DataConnection::checkNewOncomingData()
             break;
 
         case OP_CODE_CMD_RES::ACK_GET_USER_PROPS:
-            request.m_result = this->m_pDataHandle->getHandleUserPropsResponse(msg,& request.m_returnData);
+            request.m_result = this->m_pDataHandle->getHandleUserPropsResponse(msg, &request.m_returnData);
             break;
 
         case OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN:
@@ -120,7 +137,8 @@ void DataConnection::checkNewOncomingData()
             break;
 
         case OP_CODE_CMD_RES::ACK_ADD_TICKET:
-            request.m_result = msg->getIntData();;
+            request.m_result = msg->getIntData();
+            ;
             break;
 
         case OP_CODE_CMD_RES::ACK_REMOVE_TICKET:
@@ -145,8 +163,8 @@ void DataConnection::checkNewOncomingData()
 
 void DataConnection::startSendLoginRequest(DataConRequest request)
 {
-    QString passWord = this->m_pGlobalData->passWord();
-    QByteArray aPassw;
+    QString     passWord = this->m_pGlobalData->passWord();
+    QByteArray  aPassw;
     QDataStream wPassword(&aPassw, QIODevice::WriteOnly);
     wPassword.setByteOrder(QDataStream::BigEndian);
     wPassword << quint16(passWord.toUtf8().size());
@@ -157,7 +175,7 @@ void DataConnection::startSendLoginRequest(DataConRequest request)
 
 void DataConnection::startSendVersionRequest(DataConRequest request)
 {
-    QByteArray version;
+    QByteArray  version;
     QDataStream wVersion(&version, QIODevice::WriteOnly);
     wVersion.setByteOrder(QDataStream::BigEndian);
     wVersion << (quint32)STAM_ORGA_VERSION_I;
@@ -176,7 +194,7 @@ void DataConnection::startSendUserPropsRequest(DataConRequest request)
 
 void DataConnection::startSendUpdPassRequest(DataConRequest request)
 {
-    QByteArray passReq;
+    QByteArray  passReq;
     QDataStream wPassReq(&passReq, QIODevice::WriteOnly);
     wPassReq.setByteOrder(QDataStream::BigEndian);
 
@@ -194,8 +212,8 @@ void DataConnection::startSendUpdPassRequest(DataConRequest request)
 
 void DataConnection::startSendReadableNameRequest(DataConRequest request)
 {
-    QString name = request.m_lData.at(0);
-    QByteArray readName;
+    QString     name = request.m_lData.at(0);
+    QByteArray  readName;
     QDataStream wReadName(&readName, QIODevice::WriteOnly);
     wReadName.setByteOrder(QDataStream::BigEndian);
     wReadName << quint16(name.toUtf8().size());
@@ -213,8 +231,8 @@ void DataConnection::startSendGamesListRequest(DataConRequest request)
 
 void DataConnection::startSendAddSeasonTicket(DataConRequest request)
 {
-    QString name = request.m_lData.at(1);
-    QByteArray seasonTicket;
+    QString     name = request.m_lData.at(1);
+    QByteArray  seasonTicket;
     QDataStream wSeasonTicket(&seasonTicket, QIODevice::WriteOnly);
     wSeasonTicket.setByteOrder(QDataStream::BigEndian);
     wSeasonTicket << request.m_lData.at(0).toUInt();
@@ -242,22 +260,22 @@ void DataConnection::startSendSeasonTicketListRequest(DataConRequest request)
 void DataConnection::connectionTimeoutFired()
 {
     qDebug() << "Timeout from Data UdpServer";
-    while(this->m_lActualRequest.size() > 0) {
+    while (this->m_lActualRequest.size() > 0) {
         DataConRequest request = this->m_lActualRequest.last();
-        request.m_result = ERROR_CODE_TIMEOUT;
+        request.m_result       = ERROR_CODE_TIMEOUT;
         emit this->notifyLastRequestFinished(request);
         this->m_lActualRequest.removeLast();
     }
     this->m_bRequestLoginAgain = false;
 }
 
-qint32 DataConnection::sendMessageRequest(MessageProtocol *msg, DataConRequest request)
+qint32 DataConnection::sendMessageRequest(MessageProtocol* msg, DataConRequest request)
 {
     if (this->m_pDataUdpSocket == NULL)
         return -1;
 
-    const char *pData = msg->getNetworkProtocol();
-    qint32 rValue = this->m_pDataUdpSocket->writeDatagram(pData,
+    const char* pData  = msg->getNetworkProtocol();
+    qint32      rValue = this->m_pDataUdpSocket->writeDatagram(pData,
                                                           msg->getNetworkSize(),
                                                           this->m_hDataReceiver,
                                                           this->m_pGlobalData->conDataPort());
@@ -278,10 +296,10 @@ qint32 DataConnection::sendMessageRequest(MessageProtocol *msg, DataConRequest r
 
 void DataConnection::removeActualRequest(quint32 req)
 {
-    for (int i=0; i<this->m_lActualRequest.size(); i++) {
+    for (int i = 0; i < this->m_lActualRequest.size(); i++) {
         if (this->m_lActualRequest[i].m_request == req) {
-//            if (this->m_lActualRequest[i].m_lData != NULL)
-//                delete this->m_lActualRequest[i].m_lData;
+            //            if (this->m_lActualRequest[i].m_lData != NULL)
+            //                delete this->m_lActualRequest[i].m_lData;
             this->m_lActualRequest.removeAt(i);
         }
     }
@@ -290,7 +308,7 @@ void DataConnection::removeActualRequest(quint32 req)
 
 DataConRequest DataConnection::getActualRequest(quint32 req)
 {
-    for (int i=0; i<this->m_lActualRequest.size(); i++) {
+    for (int i = 0; i < this->m_lActualRequest.size(); i++) {
         if (this->m_lActualRequest[i].m_request == req) {
             return this->m_lActualRequest[i];
         }
@@ -300,7 +318,7 @@ DataConRequest DataConnection::getActualRequest(quint32 req)
 
 QString DataConnection::getActualRequestData(quint32 req, qint32 index)
 {
-    for (int i=0; i<this->m_lActualRequest.size(); i++) {
+    for (int i = 0; i < this->m_lActualRequest.size(); i++) {
         if (this->m_lActualRequest[i].m_request == req) {
             if (this->m_lActualRequest[i].m_lData.size() > index)
                 return this->m_lActualRequest[i].m_lData.at(index);
@@ -311,7 +329,7 @@ QString DataConnection::getActualRequestData(quint32 req, qint32 index)
 
 void DataConnection::sendActualRequestsAgain()
 {
-    for (int i=0; i<this->m_lActualRequest.size(); i++) {
+    for (int i = 0; i < this->m_lActualRequest.size(); i++) {
         this->startSendNewRequest(this->m_lActualRequest[i]);
     }
 }
@@ -362,7 +380,6 @@ void DataConnection::startSendNewRequest(DataConRequest request)
     default:
         return;
     }
-
 }
 
 DataConnection::~DataConnection()
