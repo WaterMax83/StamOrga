@@ -7,13 +7,13 @@
 *   the Free Software Foundation; either version 3 of the License, or
 *   (at your option) any later version.
 *
-*	Foobar is distributed in the hope that it will be useful,
+*	StamOrga is distributed in the hope that it will be useful,
 *    but WITHOUT ANY WARRANTY; without even the implied warranty of
 *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *    GNU General Public License for more details.
 
 *    You should have received a copy of the GNU General Public License
-*    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import QtQuick 2.7
@@ -164,6 +164,7 @@ Flickable {
     ScrollIndicator.vertical: ScrollIndicator { }
 
     property var m_ticketNameToChangeIndex
+    property var m_ticketNameToChange
 
     Menu {
             id: seasonTicketClickedMenu
@@ -184,18 +185,35 @@ Flickable {
             MenuItem {
                 id: menuItemRemove
                 onClicked: {
-                    userIntTicket.startRemoveSeasonTicket(m_ticketNameToChangeIndex)
+                    var component = Qt.createComponent("../components/AcceptDialog.qml");
+                    if (component.status === Component.Ready) {
+                        var dialog = component.createObject(mainPaneTickets,{popupType: 1});
+                        dialog.headerText = "Bestätigung";
+                        dialog.parentHeight = flickableTickets.height
+                        dialog.parentWidth = flickableTickets.width
+                        dialog.textToAccept = "Soll die Dauerkarte " + m_ticketNameToChange + " wirklich gelöscht werden?";
+                        dialog.acceptedDialog.connect(acceptedDeletingTicket);
+                        dialog.open();
+                    }
                 }
             }
+
             function openWithNameAndIndex(name, index)
             {
-                console.log("new indx for openeing " + index)
                 m_ticketNameToChangeIndex = index
+                m_ticketNameToChange = name
                 menuItemChange.text = "Ändere " + name
                 menuItemRemove.text = "Lösche " + name
                 seasonTicketClickedMenu.open()
             }
         }
+
+    function acceptedDeletingTicket() {
+        busyConnectIndicatorTicket.visible = true;
+        txtInfoSeasonTicket.visible = true;
+        txtInfoSeasonTicket.text = "Lösche Dauerkarte"
+        userIntTicket.startRemoveSeasonTicket(m_ticketNameToChangeIndex)
+    }
 
 
     Dialog {

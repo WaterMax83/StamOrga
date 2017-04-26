@@ -7,13 +7,13 @@
 *   the Free Software Foundation; either version 3 of the License, or
 *   (at your option) any later version.
 *
-*	Foobar is distributed in the hope that it will be useful,
+*	StamOrga is distributed in the hope that it will be useful,
 *    but WITHOUT ANY WARRANTY; without even the implied warranty of
 *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *    GNU General Public License for more details.
 
 *    You should have received a copy of the GNU General Public License
-*    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef CONNECTIONHANDLING_H
@@ -42,6 +42,7 @@ public:
     qint32 startUpdateReadableName(QString name);
     qint32 startGettingGamesList();
     qint32 startSeasonTicketRemove(quint32 index);
+    qint32 startSeasonTicketNewPlace(quint32 index, QString place);
     qint32 startSeasonTicketAdd(QString name, quint32 discount);
     qint32 startGettingSeasonTicketList();
 
@@ -69,6 +70,7 @@ signals:
     void sNotifySeasonTicketRemoveRequest(quint32 result);
     void sNotifySeasonTicketAddRequest(quint32 result);
     void sNotifySeasonTicketListRequest(quint32 result);
+    void sNotifySeasonTicketNewPlace(quint32 result);
 
     void sStartSendLoginRequest();
 

@@ -7,13 +7,13 @@
 *   the Free Software Foundation; either version 3 of the License, or
 *   (at your option) any later version.
 *
-*	Foobar is distributed in the hope that it will be useful,
+*	StamOrga is distributed in the hope that it will be useful,
 *    but WITHOUT ANY WARRANTY; without even the implied warranty of
 *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *    GNU General Public License for more details.
 
 *    You should have received a copy of the GNU General Public License
-*    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef USERINTERFACE_H
@@ -44,6 +44,8 @@ public:
     Q_INVOKABLE qint32 startAddSeasonTicket(QString name, quint32 discount);
 
     Q_INVOKABLE qint32 startRemoveSeasonTicket(quint32 index);
+
+    Q_INVOKABLE qint32 startNewPlaceSeasonTicket(quint32 index, QString place);
 
     Q_INVOKABLE qint32 startGettingSeasonTicketList();
 
@@ -87,6 +89,7 @@ signals:
     void notifyGamesListFinished(qint32 result);
     void notifySeasonTicketAddFinished(qint32 result);
     void notifySeasonTicketRemoveFinished(qint32 result);
+    void notifySeasonTicketNewPlaceFinished(qint32 result);
     void notifySeasonTicketListFinished(qint32 result);
 
 public slots:
@@ -97,6 +100,7 @@ public slots:
     void slGettingGamesListFinished(qint32 result);
     void slSeasonTicketAddFinished(qint32 result);
     void slSeasonTicketRemoveFinished(qint32 result);
+    void slSeasonTicketNewPlaceFinished(qint32 result);
     void slSeasonTicketListFinished(qint32 result);
 
 

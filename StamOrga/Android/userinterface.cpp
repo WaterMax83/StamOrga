@@ -7,13 +7,13 @@
 *   the Free Software Foundation; either version 3 of the License, or
 *   (at your option) any later version.
 *
-*	Foobar is distributed in the hope that it will be useful,
+*	StamOrga is distributed in the hope that it will be useful,
 *    but WITHOUT ANY WARRANTY; without even the implied warranty of
 *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *    GNU General Public License for more details.
 
 *    You should have received a copy of the GNU General Public License
-*    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <QtCore/QDebug>
@@ -37,6 +37,8 @@ UserInterface::UserInterface(QObject *parent) : QObject(parent)
             this, &UserInterface::slSeasonTicketAddFinished);
     connect(this->m_pConHandle, &ConnectionHandling::sNotifySeasonTicketRemoveRequest,
             this, &UserInterface::slSeasonTicketRemoveFinished);
+    connect(this->m_pConHandle, &ConnectionHandling::sNotifySeasonTicketNewPlace,
+            this, &UserInterface::slSeasonTicketNewPlaceFinished);
     connect(this->m_pConHandle, &ConnectionHandling::sNotifySeasonTicketListRequest,
             this, &UserInterface::slSeasonTicketListFinished);
 }
@@ -68,8 +70,12 @@ qint32 UserInterface::startAddSeasonTicket(QString name, quint32 discount)
 
 qint32 UserInterface::startRemoveSeasonTicket(quint32 index)
 {
-    qDebug() << "UserINterface tries to remove idnex " << index;
     return this->m_pConHandle->startSeasonTicketRemove(index);
+}
+
+qint32 UserInterface::startNewPlaceSeasonTicket(quint32 index, QString place)
+{
+    return this->m_pConHandle->startSeasonTicketNewPlace(index, place);
 }
 
 qint32 UserInterface::startGettingSeasonTicketList()
@@ -114,6 +120,11 @@ void UserInterface::slSeasonTicketAddFinished(qint32 result)
 void UserInterface::slSeasonTicketRemoveFinished(qint32 result)
 {
     emit this->notifySeasonTicketRemoveFinished(result);
+}
+
+void UserInterface::slSeasonTicketNewPlaceFinished(qint32 result)
+{
+    emit this->notifySeasonTicketNewPlaceFinished(result);
 }
 
 void UserInterface::slSeasonTicketListFinished(qint32 result)

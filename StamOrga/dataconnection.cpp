@@ -7,13 +7,13 @@
 *   the Free Software Foundation; either version 3 of the License, or
 *   (at your option) any later version.
 *
-*	Foobar is distributed in the hope that it will be useful,
+*	StamOrga is distributed in the hope that it will be useful,
 *    but WITHOUT ANY WARRANTY; without even the implied warranty of
 *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *    GNU General Public License for more details.
 
 *    You should have received a copy of the GNU General Public License
-*    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <QtCore/QDataStream>
@@ -145,6 +145,10 @@ void DataConnection::checkNewOncomingData()
             request.m_result = msg->getIntData();
             break;
 
+        case OP_CODE_CMD_RES::ACK_NEW_TICKET_PLACE:
+            request.m_result = msg->getIntData();
+            break;
+
         case OP_CODE_CMD_RES::ACK_GET_TICKETS_LIST:
             request.m_result = this->m_pDataHandle->getHandleSeasonTicketListResponse(msg);
             break;
@@ -246,8 +250,20 @@ void DataConnection::startSendAddSeasonTicket(DataConRequest request)
 void DataConnection::startSendRemoveSeasonTicket(DataConRequest request)
 {
     quint32 index = request.m_lData.at(0).toUInt();
-    qDebug() << "Index to remove = " << index;
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_REMOVE_TICKET, index);
+    this->sendMessageRequest(&msg, request);
+}
+
+void DataConnection::startSendNewPlaceTicket(DataConRequest request)
+{
+    QString     place = request.m_lData.at(1);
+    QByteArray  seasonTicket;
+    QDataStream wSeasonTicket(&seasonTicket, QIODevice::WriteOnly);
+    wSeasonTicket.setByteOrder(QDataStream::BigEndian);
+    wSeasonTicket << request.m_lData.at(0).toUInt();
+    wSeasonTicket << quint16(place.toUtf8().size());
+    seasonTicket.append(place);
+    MessageProtocol msg(OP_CODE_CMD_REQ::REQ_NEW_TICKET_PLACE, seasonTicket);
     this->sendMessageRequest(&msg, request);
 }
 
@@ -375,6 +391,10 @@ void DataConnection::startSendNewRequest(DataConRequest request)
 
     case OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST:
         this->startSendSeasonTicketListRequest(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_NEW_TICKET_PLACE:
+        this->startSendNewPlaceTicket(request);
         break;
 
     default:

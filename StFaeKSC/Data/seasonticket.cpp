@@ -7,13 +7,13 @@
 *   the Free Software Foundation; either version 3 of the License, or
 *   (at your option) any later version.
 *
-*	Foobar is distributed in the hope that it will be useful,
+*	StamOrga is distributed in the hope that it will be useful,
 *    but WITHOUT ANY WARRANTY; without even the implied warranty of
 *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *    GNU General Public License for more details.
 
 *    You should have received a copy of the GNU General Public License
-*    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <QtCore/QDateTime>
@@ -79,8 +79,7 @@ SeasonTicket::SeasonTicket()
 
 int SeasonTicket::addNewSeasonTicket(QString user, quint32 userIndex, QString ticketName, quint8 discount)
 {
-    TicketInfo* pTicket;
-    if ((pTicket = this->ticketExists(ticketName)) != NULL) {
+    if (this->itemExists(ticketName)) {
         qInfo() << QString("SeasonTicket \"%1\" already exists, cannot add").arg(ticketName);
         return ERROR_CODE_ALREADY_EXIST;
     }
@@ -182,21 +181,6 @@ void SeasonTicket::saveCurrentInteralList()
     qDebug().noquote() << QString("saved actual SeasonTicket List with %1 entries").arg(this->getNumberOfInternalList());
 }
 
-TicketInfo* SeasonTicket::ticketExists(QString ticketName)
-{
-    QMutexLocker locker(&this->m_mInternalInfoMutex);
-
-    for (int i = 0; i < this->getNumberOfInternalList(); i++) {
-        TicketInfo* pTicket = (TicketInfo*)(this->getItemFromArrayIndex(i));
-        if (pTicket == NULL)
-            continue;
-        if (pTicket->m_itemName == ticketName)
-            return pTicket;
-    }
-    return NULL;
-}
-
-
 bool SeasonTicket::addNewTicketInfo(QString user, quint32 userIndex, QString ticketName, qint64 datetime, quint8 discount, QString place, quint32 index, bool checkTicket)
 {
     if (checkTicket) {
@@ -220,13 +204,15 @@ void SeasonTicket::addNewTicketInfo(QString user, quint32 userIndex, QString tic
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
     TicketInfo* ticket  = new TicketInfo;
-    ticket->user        = user;
-    ticket->userIndex   = userIndex;
     ticket->m_itemName  = ticketName;
     ticket->m_timestamp = datetime;
+    ticket->m_index     = index;
+
+    ticket->user        = user;
+    ticket->userIndex   = userIndex;
     ticket->discount    = discount;
     ticket->place       = place;
-    ticket->m_index     = index;
+
     pList->append(ticket);
 }
 

@@ -7,13 +7,13 @@
 *   the Free Software Foundation; either version 3 of the License, or
 *   (at your option) any later version.
 *
-*	Foobar is distributed in the hope that it will be useful,
+*	StamOrga is distributed in the hope that it will be useful,
 *    but WITHOUT ANY WARRANTY; without even the implied warranty of
 *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *    GNU General Public License for more details.
 
 *    You should have received a copy of the GNU General Public License
-*    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #ifndef SEASONTICKET_H
@@ -50,33 +50,17 @@ public:
 
 
     int addNewSeasonTicket(QString user, quint32 userIndex, QString ticketName, quint8 discount);
-    //    int removeTicket(const quint32 index);
     int changePlaceFromTicket(const quint32 index, QString newPlace);
     int showAllSeasonTickets();
 
-    //    qint32 getNumberOfInternalList() { return this->m_lInteralList.size(); }
 
-    TicketInfo* ticketExists(QString ticketName);
-    //    bool ticketExists(quint32 index);
-
-
-    //    TicketInfo* getRequestConfigItem(int index)
-    //    {
-    //        if (index < this->m_lInteralList.size())
-    //            return &this->m_lInteralList[index];
-    //        return NULL;
-    //    }
 
 private:
-    //    QList<TicketInfo> m_lInteralList;
-    //    QList<TicketInfo> m_lAddItemProblems;
-
     void saveCurrentInteralList() override;
 
     bool addNewTicketInfo(QString user, quint32 userIndex, QString ticketName, qint64 timestamp, quint8 discount, QString place, quint32 index, bool checkTicket = true);
     void addNewTicketInfo(QString user, quint32 userIndex, QString ticketName, qint64 timestamp, quint8 discount, QString place, quint32 index, QList<ConfigItem*>* pList);
 
-    //    bool updateItemValue(TicketInfo* pTicket, QString key, QVariant value);
 };
 
 #endif // SEASONTICKET_H

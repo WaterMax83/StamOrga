@@ -7,13 +7,13 @@
 *   the Free Software Foundation; either version 3 of the License, or
 *   (at your option) any later version.
 *
-*	Foobar is distributed in the hope that it will be useful,
+*	StamOrga is distributed in the hope that it will be useful,
 *    but WITHOUT ANY WARRANTY; without even the implied warranty of
 *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 *    GNU General Public License for more details.
 
 *    You should have received a copy of the GNU General Public License
-*    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
+*    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <QDebug>
 
@@ -130,6 +130,15 @@ qint32 ConnectionHandling::startSeasonTicketRemove(quint32 index)
     return ERROR_CODE_SUCCESS;
 }
 
+qint32 ConnectionHandling::startSeasonTicketNewPlace(quint32 index, QString place)
+{
+    DataConRequest req(OP_CODE_CMD_REQ::REQ_NEW_TICKET_PLACE);
+    req.m_lData.append(QString::number(index));
+    req.m_lData.append(place);
+    this->sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
+}
+
 qint32 ConnectionHandling::startSeasonTicketAdd(QString name, quint32 discount)
 {
     qDebug() << QString("Discount = %1").arg(discount);
@@ -223,8 +232,6 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
                 }
             }
 
-
-
             emit this->sNotifyConnectionFinished(request.m_result);
         break;
 
@@ -270,6 +277,10 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
 
     case OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST:
         emit this->sNotifySeasonTicketListRequest(request.m_result);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_NEW_TICKET_PLACE:
+        emit this->sNotifySeasonTicketNewPlace(request.m_result);
         break;
 
     }
