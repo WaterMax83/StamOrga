@@ -26,5 +26,6 @@
         <file>components/VersionDialog.qml</file>
         <file>components/SeasonTicket.qml</file>
         <file>components/EditableTextDialog.qml</file>
+        <file>pages/LogginPage.qml</file>
     </qresource>
 </RCC>

@@ -129,6 +129,7 @@ Flickable {
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 transformOrigin: Item.Center
                 onClicked: {
+                    console.log("Dies ist ein Test");
                     if (userIntUser.isDebuggingEnabled()) {
                         globalUserData.ipAddr = txtIPAddress.text
                     }

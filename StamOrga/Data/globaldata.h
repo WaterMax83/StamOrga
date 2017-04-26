@@ -19,10 +19,10 @@
 #ifndef GLOBALDATA_H
 #define GLOBALDATA_H
 
+#include <QtCore/QList>
+#include <QtCore/QMutex>
 #include <QtCore/QObject>
 #include <QtCore/QSettings>
-#include <QtCore/QMutex>
-#include <QtCore/QList>
 #include <QtNetwork/QHostInfo>
 
 #include "gameplay.h"
@@ -39,12 +39,16 @@ class GlobalData : public QObject
     Q_PROPERTY(bool bIsConnected READ bIsConnected WRITE setbIsConnected NOTIFY bIsConnectedChanged)
 
 public:
-    explicit GlobalData(QObject *parent = 0);
+    explicit GlobalData(QObject* parent = 0);
 
     void loadGlobalSettings();
 
-    QString userName() { QMutexLocker lock(&this->m_mutexUser); return this->m_userName; }
-    void setUserName(const QString &user)
+    QString userName()
+    {
+        QMutexLocker lock(&this->m_mutexUser);
+        return this->m_userName;
+    }
+    void setUserName(const QString& user)
     {
         if (this->m_userName != user) {
             {
@@ -55,8 +59,12 @@ public:
         }
     }
 
-    QString readableName() { QMutexLocker lock(&this->m_mutexUser); return this->m_readableName; }
-    void setReadableName(const QString &name)
+    QString readableName()
+    {
+        QMutexLocker lock(&this->m_mutexUser);
+        return this->m_readableName;
+    }
+    void setReadableName(const QString& name)
     {
         if (this->m_readableName != name) {
             {
@@ -67,8 +75,12 @@ public:
         }
     }
 
-    QString passWord() { QMutexLocker lock(&this->m_mutexUser); return this->m_passWord; }
-    void setPassWord(const QString &passw)
+    QString passWord()
+    {
+        QMutexLocker lock(&this->m_mutexUser);
+        return this->m_passWord;
+    }
+    void setPassWord(const QString& passw)
     {
         if (this->m_passWord != passw) {
             {
@@ -79,8 +91,12 @@ public:
         }
     }
 
-    QString ipAddr() { QMutexLocker lock(&this->m_mutexUser); return this->m_ipAddress; }
-    void setIpAddr(const QString &ip)
+    QString ipAddr()
+    {
+        QMutexLocker lock(&this->m_mutexUser);
+        return this->m_ipAddress;
+    }
+    void setIpAddr(const QString& ip)
     {
         if (this->m_ipAddress != ip) {
             {
@@ -91,7 +107,11 @@ public:
         }
     }
 
-    quint32 conMasterPort() { QMutexLocker lock(&this->m_mutexUser); return this->m_uMasterPort; }
+    quint32 conMasterPort()
+    {
+        QMutexLocker lock(&this->m_mutexUser);
+        return this->m_uMasterPort;
+    }
     void setConMasterPort(quint32 port)
     {
         if (this->m_uMasterPort != port) {
@@ -103,7 +123,11 @@ public:
         }
     }
 
-    quint32 conDataPort() { QMutexLocker lock(&this->m_mutexUser); return this->m_uDataPort; }
+    quint32 conDataPort()
+    {
+        QMutexLocker lock(&this->m_mutexUser);
+        return this->m_uDataPort;
+    }
     void setConDataPort(quint32 port)
     {
         QMutexLocker lock(&this->m_mutexUser);
@@ -112,7 +136,11 @@ public:
         }
     }
 
-    quint32 userIndex() { QMutexLocker lock(&this->m_mutexUser); return this->m_userIndex; }
+    quint32 userIndex()
+    {
+        QMutexLocker lock(&this->m_mutexUser);
+        return this->m_userIndex;
+    }
     void setUserIndex(quint32 userIndex)
     {
         QMutexLocker lock(&this->m_mutexUser);
@@ -133,29 +161,43 @@ public:
 
     void saveGlobalUserSettings();
 
+#ifdef QT_DEBUG
+    Q_INVOKABLE QString getCurrentLogginList()
+    {
+        return this->m_loggingString;
+    }
+    void addNewLoggingMessage(QString log)
+    {
+        this->m_loggingString.append(log);
+        this->m_loggingString.append("\n");
+    }
+
+#endif
+
+
     void saveActualGamesList();
 
     void startUpdateGamesPlay();
-    void addNewGamePlay(GamePlay *gPlay);
+    void addNewGamePlay(GamePlay* gPlay);
     Q_INVOKABLE quint32 getGamePlayLength()
     {
         QMutexLocker lock(&this->m_mutexGame);
         return this->m_lGamePlay.size();
     }
-    Q_INVOKABLE GamePlay *getGamePlay(int index);
+    Q_INVOKABLE GamePlay* getGamePlay(int index);
     Q_INVOKABLE QString getGamePlayLastUpdate();
 
 
     void saveCurrentSeasonTickets();
 
     void startUpdateSeasonTickets();
-    void addNewSeasonTicket(SeasonTicketItem *sTicket);
+    void addNewSeasonTicket(SeasonTicketItem* sTicket);
     Q_INVOKABLE quint32 getSeasonTicketLength()
     {
         QMutexLocker lock(&this->m_mutexTicket);
         return this->m_lSeasonTicket.size();
     }
-    Q_INVOKABLE SeasonTicketItem *getSeasonTicket(int index);
+    Q_INVOKABLE SeasonTicketItem* getSeasonTicket(int index);
     Q_INVOKABLE QString getSeasonTicketLastUpdate();
 
 signals:
@@ -169,7 +211,7 @@ signals:
 public slots:
 
 private slots:
-    void callBackLookUpHost(const QHostInfo &host);
+    void callBackLookUpHost(const QHostInfo& host);
 
 private:
     QString m_userName;
@@ -180,24 +222,26 @@ private:
     quint16 m_uDataPort;
     quint32 m_userIndex;
 
-    QMutex  m_mutexUser;
-    QMutex  m_mutexUserIni;
-    QMutex  m_mutexGame;
-    QMutex  m_mutexTicket;
+    QMutex m_mutexUser;
+    QMutex m_mutexUserIni;
+    QMutex m_mutexGame;
+    QMutex m_mutexTicket;
 
     bool m_bIsConnected;
 
+#ifdef QT_DEBUG
+    QString m_loggingString;
+#endif
 
-
-    QSettings *m_pMainUserSettings;
+    QSettings* m_pMainUserSettings;
 
     QList<GamePlay*> m_lGamePlay;
-    qint64          m_gpLastTimeStamp;
-    bool existGamePlay(GamePlay *gPlay);
+    qint64           m_gpLastTimeStamp;
+    bool existGamePlay(GamePlay* gPlay);
 
     QList<SeasonTicketItem*> m_lSeasonTicket;
-    qint64          m_stLastTimeStamp;
-    bool existSeasonTicket(SeasonTicketItem *sTicket);
+    qint64                   m_stLastTimeStamp;
+    bool existSeasonTicket(SeasonTicketItem* sTicket);
 };
 
 #endif // GLOBALDATA_H

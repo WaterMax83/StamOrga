@@ -24,7 +24,6 @@ import com.watermax.demo 1.0
 
 Flickable {
    id: flickableLogging
-   width: 300
    contentHeight: mainPaneLogging.height
    Pane {
        id: mainPaneLogging
@@ -32,9 +31,8 @@ Flickable {
 
        Text {
            id: txtLogging
-           text: "Hallo Welt, Dies ist ein Test \\n Wie läuft das mit Multiline"
-           wrapMode: Text.WrapAnywhere
-           //           implicitWidth: mainPaneLogging.width
+           wrapMode: Text.WordWrap
+//           implicitWidth: mainPaneLogging.width
            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
            rightPadding: 5
            visible: true
@@ -42,6 +40,9 @@ Flickable {
 
    }
 
+   function pageOpenedUpdateView() {
+       txtLogging.text = globalUserData.getCurrentLogginList();
+   }
 
 
    ScrollIndicator.vertical: ScrollIndicator { }

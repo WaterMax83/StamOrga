@@ -16,36 +16,50 @@
 *    along with Foobar.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QtCore/QDateTime>
+#include <QtCore/QMetaObject>
+#include <QtCore/QSettings>
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/QQmlContext>
-#include <QtCore/QSettings>
-#include <QtCore/QMetaObject>
-#include <QtCore/QDateTime>
 
 
-#include "userinterface.h"
 #include "../../Common/General/globalfunctions.h"
 #include "../Data/globaldata.h"
 #include "../dataconnection.h"
+#include "userinterface.h"
 
-int main(int argc, char *argv[])
+// global data class
+GlobalData globalUserData;
+
+void stamOrgaMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg)
+{
+    Q_UNUSED(context);
+
+    QString newMessage = qFormatLogMessage(type, context, msg);
+    globalUserData.addNewLoggingMessage(newMessage);
+}
+
+
+int main(int argc, char* argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
 
     // Set the global Message Pattern
     SetMessagePattern();
+#ifdef QT_DEBUG
+#ifdef Q_OS_ANDROID
+    qInstallMessageHandler(stamOrgaMessageOutput);
+#endif
+#endif
 
     // Register our component type with QML.
     qmlRegisterType<UserInterface>("com.watermax.demo", 1, 0, "UserInterface");
-//    qmlRegisterType<GamePlay*>("com.watermax.demo", 1, 0, "GamePlay*");
-    qRegisterMetaType<GamePlay *>("GamePlay*");
-    qRegisterMetaType<SeasonTicketItem *>("SeasonTicketItem*");
+    //    qmlRegisterType<GamePlay*>("com.watermax.demo", 1, 0, "GamePlay*");
+    qRegisterMetaType<GamePlay*>("GamePlay*");
+    qRegisterMetaType<SeasonTicketItem*>("SeasonTicketItem*");
     qRegisterMetaType<DataConRequest>("DataConRequest");
-
-    // global data class
-    GlobalData globalUserData;
 
     // engine to start qml display -> takes about half a second
     QQmlApplicationEngine engine;
@@ -64,7 +78,7 @@ int main(int argc, char *argv[])
 
 #endif
 
-    QObject *pRootObject = engine.rootObjects().first();
+    QObject* pRootObject = engine.rootObjects().first();
     if (globalUserData.userName().size() == 0)
         QMetaObject::invokeMethod(pRootObject, "openUserLogin", Q_ARG(QVariant, true));
     else

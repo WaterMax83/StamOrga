@@ -142,6 +142,8 @@ ApplicationWindow {
                 Component.onCompleted: {
                     append({title: "Benutzer", element : viewUserLogin, imgsource : ""});
                     append({title: "Dauerkarten", element : viewSeasonTickets, imgsource : "images/refresh.png"})
+                    if (userInt.isDebuggingEnabled() && userInt.isDeviceMobile())
+                        append({title: "Logging", element : viewLoggingPage, imgsource : ""});
                 }
             }
 
@@ -183,6 +185,11 @@ ApplicationWindow {
         MyPages.SeasonTickets {
             userIntTicket: userInt
         }
+    }
+
+    Component {
+        id: viewLoggingPage
+        MyPages.LogginPage {}
     }
 
     UserInterface {
