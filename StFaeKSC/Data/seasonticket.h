@@ -26,13 +26,11 @@
 
 #include "configlist.h"
 
-struct TicketInfo : public ConfigItem
-{
+struct TicketInfo : public ConfigItem {
     QString user;
     quint32 userIndex;
     quint8  discount;
     QString place;
-
 };
 
 
@@ -41,8 +39,8 @@ struct TicketInfo : public ConfigItem
 #define TICKET_DISCOUNT "discount"
 #define TICKET_PLACE "place"
 
-#define TICKET_INDEX_GROUP    "IndexCount"
-#define TICKET_MAX_COUNT      "CurrentCount"
+#define TICKET_INDEX_GROUP "IndexCount"
+#define TICKET_MAX_COUNT "CurrentCount"
 
 class SeasonTicket : public ConfigList
 {
@@ -52,32 +50,33 @@ public:
 
 
     int addNewSeasonTicket(QString user, quint32 userIndex, QString ticketName, quint8 discount);
-    int removeTicket(const quint32 index);
+    //    int removeTicket(const quint32 index);
+    int changePlaceFromTicket(const quint32 index, QString newPlace);
     int showAllSeasonTickets();
 
-    quint32 getNumberOfInternalList() { return this->m_lInteralList.size(); }
+    //    qint32 getNumberOfInternalList() { return this->m_lInteralList.size(); }
 
     TicketInfo* ticketExists(QString ticketName);
-    bool ticketExists(quint32 index);
+    //    bool ticketExists(quint32 index);
 
 
-    TicketInfo* getRequestConfigItem(int index)
-    {
-        if (index < this->m_lInteralList.size())
-            return &this->m_lInteralList[index];
-        return NULL;
-    }
+    //    TicketInfo* getRequestConfigItem(int index)
+    //    {
+    //        if (index < this->m_lInteralList.size())
+    //            return &this->m_lInteralList[index];
+    //        return NULL;
+    //    }
 
 private:
-    QList<TicketInfo> m_lInteralList;
-    QList<TicketInfo> m_lAddItemProblems;
+    //    QList<TicketInfo> m_lInteralList;
+    //    QList<TicketInfo> m_lAddItemProblems;
 
     void saveCurrentInteralList() override;
 
     bool addNewTicketInfo(QString user, quint32 userIndex, QString ticketName, qint64 timestamp, quint8 discount, QString place, quint32 index, bool checkTicket = true);
-    void addNewTicketInfo(QString user, quint32 userIndex, QString ticketName, qint64 timestamp, quint8 discount, QString place, quint32 index, QList<TicketInfo>* pList);
+    void addNewTicketInfo(QString user, quint32 userIndex, QString ticketName, qint64 timestamp, quint8 discount, QString place, quint32 index, QList<ConfigItem*>* pList);
 
-    bool updateTicketInfoValue(TicketInfo* pTicket, QString key, QVariant value);
+    //    bool updateItemValue(TicketInfo* pTicket, QString key, QVariant value);
 };
 
 #endif // SEASONTICKET_H

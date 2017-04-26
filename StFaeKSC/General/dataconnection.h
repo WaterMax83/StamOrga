@@ -21,35 +21,36 @@
 
 #include <QObject>
 
-#include "globaldata.h"
-#include "../Network/connectiondata.h"
 #include "../Common/Network/messageprotocol.h"
+#include "../Network/connectiondata.h"
+#include "globaldata.h"
 
 class DataConnection : public QObject
 {
     Q_OBJECT
 public:
-    explicit DataConnection(GlobalData *pGData, QObject *parent = 0);
+    explicit DataConnection(GlobalData* pGData, QObject* parent = 0);
 
-    MessageProtocol *requestCheckUserLogin(MessageProtocol *msg);
-    MessageProtocol *requestGetUserProperties();
-    MessageProtocol *requestUserChangeLogin(MessageProtocol *msg);
-    MessageProtocol *requestUserChangeReadname(MessageProtocol *msg);
-    MessageProtocol *requestGetProgramVersion(MessageProtocol *msg);
-    MessageProtocol *requestGetGamesList(/*MessageProtocol *msg*/);
-    MessageProtocol *requestGetTicketsList(/*MessageProtocol *msg*/);
-    MessageProtocol *requestAddSeasonTicket(MessageProtocol *msg);
-    MessageProtocol *requestRemoveSeasonTicket(MessageProtocol *msg);
+    MessageProtocol* requestCheckUserLogin(MessageProtocol* msg);
+    MessageProtocol* requestGetUserProperties();
+    MessageProtocol* requestUserChangeLogin(MessageProtocol* msg);
+    MessageProtocol* requestUserChangeReadname(MessageProtocol* msg);
+    MessageProtocol* requestGetProgramVersion(MessageProtocol* msg);
+    MessageProtocol* requestGetGamesList(/*MessageProtocol *msg*/);
+    MessageProtocol* requestGetTicketsList(/*MessageProtocol *msg*/);
+    MessageProtocol* requestAddSeasonTicket(MessageProtocol* msg);
+    MessageProtocol* requestRemoveSeasonTicket(MessageProtocol* msg);
+    MessageProtocol* requestNewPlaceSeasonTicket(MessageProtocol* msg);
 
-    void setUserConnectionData(UserConData * pUsrConData) { this->m_pUserConData = pUsrConData; }
+    void setUserConnectionData(UserConData* pUsrConData) { this->m_pUserConData = pUsrConData; }
 
 signals:
 
 public slots:
 
 private:
-    GlobalData      *m_pGlobalData;
-    UserConData     *m_pUserConData;
+    GlobalData*  m_pGlobalData;
+    UserConData* m_pUserConData;
 };
 
 #endif // DATACONNECTION_H

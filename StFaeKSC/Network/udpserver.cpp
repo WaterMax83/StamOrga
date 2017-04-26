@@ -89,7 +89,7 @@ void UdpServer::checkNewOncomingData()
                 /* Get userName from packet */
                 QString userName(QByteArray(msg->getPointerToData(), msg->getDataLength()));
                 MessageProtocol *ack;
-                if (this->m_pGlobalData->m_UserList.userExists(userName)) {
+                if (this->m_pGlobalData->m_UserList.itemExists(userName)) {
 
                     if (this->m_lUserCons[i].userConData.dstDataPort == 0) {                         // when there is not already a port, create a new
                         this->m_lUserCons[i].userConData.dstDataPort = this->getFreeDataPort();

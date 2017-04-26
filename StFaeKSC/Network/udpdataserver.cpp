@@ -17,27 +17,26 @@
 */
 
 #include "udpdataserver.h"
-#include "../Common/Network/messageprotocol.h"
-#include "../Common/Network/messagecommand.h"
 #include "../Common/General/globalfunctions.h"
 #include "../Common/General/globaltiming.h"
+#include "../Common/Network/messagecommand.h"
+#include "../Common/Network/messageprotocol.h"
 
 
-UdpDataServer::UdpDataServer(UserConData *pUsrConData, GlobalData *pGlobalData) : BackgroundWorker()
+UdpDataServer::UdpDataServer(UserConData* pUsrConData, GlobalData* pGlobalData)
+    : BackgroundWorker()
 {
     this->SetWorkerName(QString("UDP Data Server %1").arg(pUsrConData->dstDataPort));
 
     this->m_pUsrConData = pUsrConData;
     this->m_pGlobalData = pGlobalData;
-
 }
 
 
 int UdpDataServer::DoBackgroundWork()
 {
     this->m_pUdpSocket = new QUdpSocket();
-    if (!this->m_pUdpSocket->bind(QHostAddress::Any, this->m_pUsrConData->dstDataPort))
-    {
+    if (!this->m_pUdpSocket->bind(QHostAddress::Any, this->m_pUsrConData->dstDataPort)) {
         qDebug() << QString("Error binding socket  for port %1: %2\n").arg(this->m_pUsrConData->dstDataPort).arg(this->m_pUdpSocket->errorString());
         return -1;
     }
@@ -61,14 +60,14 @@ int UdpDataServer::DoBackgroundWork()
 }
 
 void UdpDataServer::readyReadSocketPort()
-{      
+{
     this->m_pConResetTimer->start();
 
 
-    while(this->m_pUdpSocket->hasPendingDatagrams()) {
+    while (this->m_pUdpSocket->hasPendingDatagrams()) {
         QHostAddress sender;
-        quint16 port;
-        QByteArray datagram;
+        quint16      port;
+        QByteArray   datagram;
         datagram.resize(this->m_pUdpSocket->pendingDatagramSize());
 
         if (this->m_pUdpSocket->readDatagram(datagram.data(), datagram.size(), &sender, &port)) {
@@ -86,8 +85,8 @@ void UdpDataServer::onConnectionLoginTimeout()
 {
     this->m_pUsrConData->bIsConnected = false;
     qDebug().noquote() << QString("User %1 with Port %2 was inactive, logged out")
-                          .arg(this->m_pUsrConData->userName)
-                          .arg(this->m_pUsrConData->dstDataPort);
+                              .arg(this->m_pUsrConData->userName)
+                              .arg(this->m_pUsrConData->dstDataPort);
 }
 
 void UdpDataServer::onConnectionResetTimeout()
@@ -97,30 +96,30 @@ void UdpDataServer::onConnectionResetTimeout()
 
 void UdpDataServer::checkNewOncomingData()
 {
-    MessageProtocol *msg;
-    while((msg = this->m_msgBuffer.GetNextMessage()) != NULL) {
+    MessageProtocol* msg;
+    while ((msg = this->m_msgBuffer.GetNextMessage()) != NULL) {
 
-        MessageProtocol *ack = checkNewMessage(msg);
+        MessageProtocol* ack = checkNewMessage(msg);
 
         if (ack != NULL) {
 
-            const char *pData = ack->getNetworkProtocol();
+            const char* pData = ack->getNetworkProtocol();
             this->m_pUdpSocket->writeDatagram(pData, ack->getNetworkSize(),
-                                                    this->m_pUsrConData->sender,
-                                                    this->m_pUsrConData->srcDataPort);
+                                              this->m_pUsrConData->sender,
+                                              this->m_pUsrConData->srcDataPort);
             delete ack;
         }
         delete msg;
     }
 }
 
-MessageProtocol *UdpDataServer::checkNewMessage(MessageProtocol *msg)
+MessageProtocol* UdpDataServer::checkNewMessage(MessageProtocol* msg)
 {
-    MessageProtocol *ack = NULL;
+    MessageProtocol* ack = NULL;
 
     if (this->m_pUsrConData->bIsConnected) {
 
-        switch(msg->getIndex()) {
+        switch (msg->getIndex()) {
         case OP_CODE_CMD_REQ::REQ_LOGIN_USER:
             ack = this->m_pDataConnection->requestCheckUserLogin(msg);
             break;
@@ -157,22 +156,26 @@ MessageProtocol *UdpDataServer::checkNewMessage(MessageProtocol *msg)
             ack = this->m_pDataConnection->requestRemoveSeasonTicket(msg);
             break;
 
+        case OP_CODE_CMD_REQ::REQ_NEW_TICKET_PLACE:
+            ack = this->m_pDataConnection->requestNewPlaceSeasonTicket(msg);
+            break;
+
         default:
             qWarning().noquote() << QString("Unkown command %1").arg(msg->getIndex());
             break;
         }
         if (ack != NULL && this->m_pUsrConData->bIsConnected)
-            this->m_pConLoginTimer->start();        // reset Timer
-    }
-    else if (msg->getIndex() == OP_CODE_CMD_REQ::REQ_LOGIN_USER) {
+            this->m_pConLoginTimer->start(); // reset Timer
+    } else if (msg->getIndex() == OP_CODE_CMD_REQ::REQ_LOGIN_USER) {
 
         ack = this->m_pDataConnection->requestCheckUserLogin(msg);
         if (this->m_pUsrConData->bIsConnected)
-            this->m_pConLoginTimer->start();        // start Timer
+            this->m_pConLoginTimer->start(); // start Timer
     } else
         ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_NOT_LOGGED_IN);
 
-    return ack;;
+    return ack;
+    ;
 }
 
 UdpDataServer::~UdpDataServer()
@@ -189,4 +192,3 @@ UdpDataServer::~UdpDataServer()
     if (this->m_pUdpSocket != NULL)
         delete this->m_pUdpSocket;
 }
-

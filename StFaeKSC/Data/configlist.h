@@ -20,8 +20,8 @@
 #define CONFIGLIST_H
 
 
-#include <QtCore/QSettings>
 #include <QtCore/QMutex>
+#include <QtCore/QSettings>
 
 class ConfigItem
 {
@@ -29,24 +29,37 @@ public:
     quint32 m_index;
     QString m_itemName;
     qint64  m_timestamp;
+
+    static bool compareTimeStampFunction(ConfigItem* p1, ConfigItem* p2)
+    {
+        if (p1->m_timestamp > p2->m_timestamp)
+            return false;
+        return true;
+    }
 };
 
-#define GROUP_LIST_ITEM             "ListedItem"
-#define CONFIG_LIST_ARRAY           "item"
-#define ITEM_INDEX                  "index"
-#define ITEM_NAME                   "itemName"
-#define ITEM_TIMESTAMP              "timeStamp"
+#define GROUP_LIST_ITEM "ListedItem"
+#define CONFIG_LIST_ARRAY "item"
+#define ITEM_INDEX "index"
+#define ITEM_NAME "itemName"
+#define ITEM_TIMESTAMP "timeStamp"
 
 
-#define ITEM_INDEX_GROUP    "IndexCount"
-#define ITEM_MAX_INDEX      "CurrentCount"
+#define ITEM_INDEX_GROUP "IndexCount"
+#define ITEM_MAX_INDEX "CurrentCount"
 
 class ConfigList
 {
 public:
     ConfigList();
 
-    virtual quint32 getNumberOfInternalList() = 0;
+    virtual qint32 getNumberOfInternalList() { return this->m_lInteralList.size(); }
+
+    qint32 removeItem(const QString name);
+    qint32 removeItem(const quint32 index);
+    bool itemExists(QString name);
+    bool itemExists(quint32 index);
+    quint32 getItemIndex(const QString name);
 
     quint16 startRequestGetItemList()
     {
@@ -54,7 +67,12 @@ public:
         return this->getNumberOfInternalList();
     }
 
-    virtual ConfigItem *getRequestConfigItem(int index) = 0;
+    virtual ConfigItem* getRequestConfigItem(int index)
+    {
+        if (index < this->m_lInteralList.size())
+            return this->m_lInteralList[index];
+        return NULL;
+    }
 
     void stopRequestGetItemList()
     {
@@ -62,14 +80,21 @@ public:
     }
 
 protected:
-    QSettings           *m_pConfigSettings = NULL;
-    QMutex              m_mConfigIniMutex;
-    QMutex              m_mInternalInfoMutex;
+    QList<ConfigItem*> m_lInteralList;
+    QList<ConfigItem*> m_lAddItemProblems;
+
+    QSettings* m_pConfigSettings = NULL;
+    QMutex     m_mConfigIniMutex;
+    QMutex     m_mInternalInfoMutex;
 
     virtual void saveCurrentInteralList() = 0;
 
-    quint32 getNextInternalIndex();
+    ConfigItem* getItemFromArrayIndex(int index);
+    ConfigItem* getProblemItemFromArrayIndex(int index);
 
+    bool updateItemValue(ConfigItem* pItem, QString key, QVariant value);
+
+    quint32 getNextInternalIndex();
 };
 
 #endif // CONFIGLIST_H

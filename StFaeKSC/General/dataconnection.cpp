@@ -41,19 +41,19 @@ DataConnection::DataConnection(GlobalData* pGData, QObject* parent)
  */
 MessageProtocol* DataConnection::requestCheckUserLogin(MessageProtocol* msg)
 {
-    const char*      pData = msg->getPointerToData();
-    quint16          size  = qFromBigEndian(*((quint16*)pData));
-    qint32          result;
+    const char* pData = msg->getPointerToData();
+    quint16     size  = qFromBigEndian(*((quint16*)pData));
+    qint32      result;
     if (size > msg->getDataLength())
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_LOGIN_USER, ERROR_CODE_WRONG_SIZE);
 
     QString passw(QByteArray(pData + 2, size));
     if (this->m_pGlobalData->m_UserList.userCheckPassword(this->m_pUserConData->userName, passw)) {
-        result = ERROR_CODE_SUCCESS;
+        result                             = ERROR_CODE_SUCCESS;
         this->m_pUserConData->bIsConnected = true;
         qInfo().noquote() << QString("User %1 logged in").arg(this->m_pUserConData->userName);
     } else {
-        result = ERROR_CODE_WRONG_PASSWORD;
+        result                             = ERROR_CODE_WRONG_PASSWORD;
         this->m_pUserConData->bIsConnected = false;
         qWarning().noquote() << QString("User %1 tried to login with wrong password").arg(this->m_pUserConData->userName);
     }
@@ -76,7 +76,7 @@ MessageProtocol* DataConnection::requestGetUserProperties()
     wAnswer.setByteOrder(QDataStream::BigEndian);
     wAnswer << ERROR_CODE_SUCCESS;
     wAnswer << this->m_pGlobalData->m_UserList.getUserProperties(this->m_pUserConData->userName);
-    wAnswer << this->m_pGlobalData->m_UserList.getUserLoginIndex(this->m_pUserConData->userName);
+    wAnswer << this->m_pGlobalData->m_UserList.getItemIndex(this->m_pUserConData->userName);
 
     QString readableName = this->m_pGlobalData->m_UserList.getReadableName(this->m_pUserConData->userName);
     wAnswer << quint16(readableName.toUtf8().size());
@@ -178,8 +178,8 @@ MessageProtocol* DataConnection::requestGetProgramVersion(MessageProtocol* msg)
 
 //#define VERSION_TEST
 #ifdef VERSION_TEST
-#define ORGA_VERSION_I     0x0B0A0000      // VX.Y.Z => 0xXXYYZZZZ
-#define ORGA_VERSION_S     "VB.A.0"
+#define ORGA_VERSION_I 0x0B0A0000 // VX.Y.Z => 0xXXYYZZZZ
+#define ORGA_VERSION_S "VB.A.0"
     wVersion << (quint32)ORGA_VERSION_I;
     wVersion << quint16(QString(ORGA_VERSION_S).toUtf8().size());
     ownVersion.append(QString(ORGA_VERSION_S));
@@ -208,7 +208,7 @@ MessageProtocol* DataConnection::requestGetProgramVersion(MessageProtocol* msg)
  * 36+X qutin16     sizePack2       2
  */
 
-#define GAMES_OFFSET (1 + 1 + 8 + 4)// sIndex + comp + datetime + index
+#define GAMES_OFFSET (1 + 1 + 8 + 4) // sIndex + comp + datetime + index
 
 MessageProtocol* DataConnection::requestGetGamesList(/*MessageProtocol *msg*/)
 {
@@ -221,7 +221,7 @@ MessageProtocol* DataConnection::requestGetGamesList(/*MessageProtocol *msg*/)
     wAckArray << quint16(0x1) << numbOfGames; //Version
 
     for (quint32 i = 0; i < numbOfGames; i++) {
-        GamesPlay* pGame = this->m_pGlobalData->m_GamesList.getRequestConfigItem(i);
+        GamesPlay* pGame = (GamesPlay*)(this->m_pGlobalData->m_GamesList.getRequestConfigItem(i));
         if (pGame == NULL)
             continue;
 
@@ -259,7 +259,7 @@ MessageProtocol* DataConnection::requestGetGamesList(/*MessageProtocol *msg*/)
  * 31+X   qutin16     sizeTick2       2
  */
 
-#define TICKET_OFFSET (1 + 4 + 4)// discount + isOwnUser + index + userIndex
+#define TICKET_OFFSET (1 + 4 + 4) // discount + isOwnUser + index + userIndex
 
 MessageProtocol* DataConnection::requestGetTicketsList(/*MessageProtocol *msg*/)
 {
@@ -272,7 +272,7 @@ MessageProtocol* DataConnection::requestGetTicketsList(/*MessageProtocol *msg*/)
     wAckArray << quint16(0x1) << numbOfTickets; //Version
 
     for (quint32 i = 0; i < numbOfTickets; i++) {
-        TicketInfo* pTicket = this->m_pGlobalData->m_SeasonTicket.getRequestConfigItem(i);
+        TicketInfo* pTicket = (TicketInfo*)(this->m_pGlobalData->m_SeasonTicket.getRequestConfigItem(i));
         if (pTicket == NULL)
             continue;
 
@@ -316,37 +316,68 @@ MessageProtocol* DataConnection::requestAddSeasonTicket(MessageProtocol* msg)
     QString ticketName(QByteArray(pData + 6, actLength));
     //    qInfo().noquote() << QString("Version from %1 = %2").arg(this->m_pUserConData->userName).arg(remVersion);
 
-    QString userName = this->m_pUserConData->userName;
-    qint32 userIndex = this->m_pGlobalData->m_UserList.getUserLoginIndex(userName);
-    qint32 rCode = this->m_pGlobalData->m_SeasonTicket.addNewSeasonTicket(userName, userIndex, ticketName, discount);
+    QString userName  = this->m_pUserConData->userName;
+    qint32  userIndex = this->m_pGlobalData->m_UserList.getItemIndex(userName);
+    qint32  rCode     = this->m_pGlobalData->m_SeasonTicket.addNewSeasonTicket(userName, userIndex, ticketName, discount);
     if (rCode > ERROR_CODE_NO_ERROR) {
         qInfo().noquote() << QString("User %1 added SeasonTicket %2")
-                             .arg(this->m_pUserConData->userName)
-                             .arg(ticketName);
+                                 .arg(this->m_pUserConData->userName)
+                                 .arg(ticketName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_ADD_TICKET, ERROR_CODE_SUCCESS);
     }
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_ADD_TICKET, rCode);
 }
 
-/*
+/*  request
  * 0                Header          12
  * 12   quint32      index           4
  */
 MessageProtocol* DataConnection::requestRemoveSeasonTicket(MessageProtocol* msg)
 {
+    qint32 rCode;
     if (msg->getDataLength() != 4) {
         qWarning() << QString("Wrong message size for removing season ticket for user %1").arg(this->m_pUserConData->userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_REMOVE_TICKET, ERROR_CODE_WRONG_SIZE);
     }
 
-    const char* pData     = msg->getPointerToData();
+    const char* pData = msg->getPointerToData();
     quint32     index = qFromBigEndian(*((quint32*)pData));
 
-    if (this->m_pGlobalData->m_SeasonTicket.removeTicket(index) == ERROR_CODE_SUCCESS) {
+    if ((rCode = this->m_pGlobalData->m_SeasonTicket.removeItem(index)) == ERROR_CODE_SUCCESS) {
         qInfo().noquote() << QString("User %1 removed SeasonTicket %2")
-                             .arg(this->m_pUserConData->userName)
-                             .arg(index);
+                                 .arg(this->m_pUserConData->userName)
+                                 .arg(index);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_REMOVE_TICKET, ERROR_CODE_SUCCESS);
     }
-    return new MessageProtocol(OP_CODE_CMD_RES::ACK_REMOVE_TICKET, ERROR_CODE_COMMON);
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_REMOVE_TICKET, rCode);
+}
+
+/*  request
+ * 0                Header          12
+ * 12   quint32      index           4
+ * 16   quint16      size            2
+ * 18   QString      newPlace        X
+ */
+MessageProtocol* DataConnection::requestNewPlaceSeasonTicket(MessageProtocol* msg)
+{
+    qint32 rCode;
+    if (msg->getDataLength() <= 6) {
+        qWarning() << QString("Wrong message size for new place season ticket for user %1").arg(this->m_pUserConData->userName);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_REMOVE_TICKET, ERROR_CODE_WRONG_SIZE);
+    }
+
+    const char* pData     = msg->getPointerToData();
+    quint32     index     = qFromBigEndian(*((quint32*)pData));
+    quint16     actLength = qFromBigEndian(*((quint16*)(pData + 4)));
+    if (actLength > msg->getDataLength())
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_ADD_TICKET, ERROR_CODE_WRONG_SIZE);
+    QString newPlace(QByteArray(pData + 6, actLength));
+
+    if ((rCode = this->m_pGlobalData->m_SeasonTicket.changePlaceFromTicket(index, newPlace)) == ERROR_CODE_SUCCESS) {
+        qInfo().noquote() << QString("User %1 changed SeasonTicket place to %2")
+                                 .arg(this->m_pUserConData->userName)
+                                 .arg(newPlace);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_NEW_TICKET_PLACE, ERROR_CODE_SUCCESS);
+    }
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_NEW_TICKET_PLACE, rCode);
 }

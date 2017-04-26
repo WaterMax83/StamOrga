@@ -71,8 +71,8 @@ QString getErrorCodeString(qint32 code)
         return QString("Fehler: Keine Antwort: %1").arg(code);
     case ERROR_CODE_ERR_SEND:
         return QString("Fehler: Fehler beim Senden: %1").arg(code);
-//    case ERROR_CODE_NO_ANSWER:
-//        return QString("Did not get an answer: %1").arg(code);
+    case ERROR_CODE_NOT_FOUND:
+        return QString("Objekt nicht gefunden: %1").arg(code);
     case ERROR_CODE_NO_USER:
         return QString("Fehler: Benutzer unbekannt: %1").arg(code);
     case ERROR_CODE_WRONG_PASSWORD:

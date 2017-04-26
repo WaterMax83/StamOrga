@@ -41,9 +41,9 @@ public:
         if (list.value(1) == "add" && list.size() == 3)
             return pUsers->addNewUser(list.value(2));
         else if (list.value(1) == "remove" && list.size() == 3)
-            return pUsers->removeUser(list.value(2));
+            return pUsers->removeItem(list.value(2));
         else if (list.value(1) == "change" && list.size() == 4) {
-            if (pUsers->userExists(list.value(2))) {
+            if (pUsers->itemExists(list.value(2))) {
                 if (pUsers->userChangePassword(list.value(2), list.value(3)))
                     std::cout << "Changed password from user " << list.value(2).toStdString() << std::endl;
                 else
@@ -53,7 +53,7 @@ public:
                 std::cout << "User " << list.value(2).toStdString() << " does not exist" << std::endl;
             }
         } else if (list.value(1) == "prop" && list.size() == 4) {
-            if (pUsers->userExists(list.value(2))) {
+            if (pUsers->itemExists(list.value(2))) {
                 bool    ok;
                 quint32 prop = list.value(3).toInt(&ok, 16);
                 if (ok && pUsers->userChangeProperties(list.value(2), prop))
