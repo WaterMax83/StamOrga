@@ -23,8 +23,10 @@ import QtQuick.Layouts 1.0
 import com.watermax.demo 1.0
 
 Rectangle {
-    id: mainRectangle
+    id: mainRectangleGame
     property var m_gamePlayItem
+
+    signal clickedCurrentGame(var sender)
 
     width: parent.width
     height: childrenRect.height * 1.1
@@ -46,8 +48,16 @@ Rectangle {
     border.width: 2
     ColumnLayout {
         id: columnLayout
-        width: mainRectangle.width
+        width: mainRectangleGame.width
         spacing: 1
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                mainRectangleGame.clickedCurrentGame(m_gamePlayItem);
+            }
+        }
+
         Label {
             id: labelLineDate
             text: qsTr("Date")
@@ -112,8 +122,8 @@ Rectangle {
             labelLineScore.text = gamePlayItem.score;
 
             if (gamePlayItem.isGameInPast()) {
-                mainRectangle.gradColorStart = "#505050"
-                mainRectangle.gradColorStop = "#909090"
+                mainRectangleGame.gradColorStart = "#505050"
+                mainRectangleGame.gradColorStop = "#909090"
             }
 
         }

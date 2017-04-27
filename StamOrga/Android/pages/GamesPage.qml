@@ -118,8 +118,19 @@ Flickable {
    Component {
        id: gameView
 
-       MyComponents.Games {}
+       MyComponents.Games {
+           onClickedCurrentGame: {
+               console.log("Clicked game " + sender.home);
+
+               var component = Qt.createComponent("../pages/CurrentGamePage.qml");
+               if (component.status === Component.Ready) {
+                    stackView.push(component);
+               }
+           }
+       }
    }
+
+
 
    ScrollIndicator.vertical: ScrollIndicator { }
 }

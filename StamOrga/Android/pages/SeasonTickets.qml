@@ -85,7 +85,6 @@ Flickable {
     }
 
     function notifyUserIntSeasonTicketRemoveFinished(result) {
-        console.log("Finished Delete " + result)
         if (result === 1) {
             toolButtonClicked()
         }
@@ -96,6 +95,15 @@ Flickable {
         if (result === 1) {
             showSeasonTickets()
         } else {
+            txtInfoSeasonTicket.text = userIntTicket.getErrorCodeToString(result);
+        }
+    }
+
+    function notifyUserIntSeasonTicketNewPlaceFinished(result) {
+        busyConnectIndicatorTicket.visible = false;
+        if (result === 1) {
+            toolButtonClicked()
+        }  else {
             txtInfoSeasonTicket.text = userIntTicket.getErrorCodeToString(result);
         }
     }
@@ -141,7 +149,6 @@ Flickable {
         id: seasonTicketItem
         MyComponents.SeasonTicket {
             onClickedSeasonTicket: {
-                console.log("Outside clicked " + sender.name + " " + sender.index);
                 seasonTicketClickedMenu.openWithNameAndIndex(sender.name, sender.index)
             }
         }
@@ -179,7 +186,16 @@ Flickable {
             MenuItem {
                 id: menuItemChange
                 onClicked: {
-                    console.log("Ändern")
+                    var component = Qt.createComponent("../components/EditableTextDialog.qml");
+                    if (component.status === Component.Ready) {
+                        var dialog = component.createObject(mainPaneTickets,{popupType: 1});
+                        dialog.headerText = "Neuer Ort für " + m_ticketNameToChange;
+                        dialog.parentHeight = flickableTickets.height
+                        dialog.parentWidth = flickableTickets.width
+                        dialog.textMinSize = 6;
+                        dialog.acceptedTextEdit.connect(acceptedEditNewSeasonTicketPlace);
+                        dialog.open();
+                    }
                 }
             }
             MenuItem {
@@ -202,11 +218,18 @@ Flickable {
             {
                 m_ticketNameToChangeIndex = index
                 m_ticketNameToChange = name
-                menuItemChange.text = "Ändere " + name
+                menuItemChange.text = "Neuer Ort für " + name
                 menuItemRemove.text = "Lösche " + name
                 seasonTicketClickedMenu.open()
             }
         }
+
+    function acceptedEditNewSeasonTicketPlace(text) {
+        busyConnectIndicatorTicket.visible = true;
+        txtInfoSeasonTicket.visible = true;
+        txtInfoSeasonTicket.text = "Ändere Ort für " + m_ticketNameToChange;
+        userIntTicket.startNewPlaceSeasonTicket(m_ticketNameToChangeIndex, text);
+    }
 
     function acceptedDeletingTicket() {
         busyConnectIndicatorTicket.visible = true;

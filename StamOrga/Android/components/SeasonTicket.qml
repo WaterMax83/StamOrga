@@ -66,21 +66,49 @@ Rectangle {
             Layout.fillWidth: true
 
             Label {
+                id: labelTicketItemHead
+                text: qsTr("Name:")
+                leftPadding: 7
+                topPadding: 5
+                Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
+            }
+
+            Label {
                 id: labelTicketItem
                 text: qsTr("")
-                leftPadding: 7
+                leftPadding: labelInfoDiscountHead.width - labelTicketItemHead.width + 10
                 topPadding: 5
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
 
+
+        }
+
+        RowLayout {
+            anchors.right: parent.right
+            anchors.left: parent.left
+            Layout.preferredWidth: columnLayoutTicketItem.width
+            Layout.fillWidth: true
+
+            Label {
+                id: labelInfoDiscountHead
+                text: qsTr("Ermäßigung: ")
+                leftPadding: 7
+                visible: true
+                Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
+            }
+
             Label {
                 id: labelInfoDiscount
-                text: qsTr("ermäßigt")
-                rightPadding: layoutNameOfTicket.width / 10
-                topPadding: 5
-                visible: false
-                Layout.alignment: Qt.AlignRight | Qt.AlignHCenter
+                text: qsTr("")
+    //            rightPadding: layoutNameOfTicket.width / 10
+    //            topPadding: 5
+                leftPadding: 10
+                visible: true
+                Layout.fillWidth: true
+    //            Layout.alignment: Qt.AlignRight | Qt.AlignHCenter
+                Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
         }
 
@@ -95,9 +123,9 @@ Rectangle {
 
             Label {
                 id: labelTextWhereIsTicket
-                text: qsTr("Befindet sich bei:")
+                text: qsTr("Ort:")
                 leftPadding: 7
-                Layout.fillWidth: true
+//                Layout.fillWidth: true
                 bottomPadding: 1
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
@@ -105,9 +133,11 @@ Rectangle {
             Label {
                 id: labelInfoWhere
                 text: qsTr("")
-                rightPadding: layoutPlaceOfTicket.width / 10
+//                rightPadding: layoutPlaceOfTicket.width / 10
                 bottomPadding: 1
-                Layout.alignment: Qt.AlignRight | Qt.AlignHCenter
+                leftPadding: labelInfoDiscountHead.width - labelTextWhereIsTicket.width + 10
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
         }
     }
@@ -117,8 +147,10 @@ Rectangle {
             m_SeasonTicketItem = seasonTicketItem
             labelTicketItem.text = seasonTicketItem.name
             labelInfoWhere.text = seasonTicketItem.place;
-            if (seasonTicketItem.discount > 0)
-                labelInfoDiscount.visible = true;
+            if (seasonTicketItem.discount === 0)
+                labelInfoDiscount.text = "Nein";
+            else
+                labelInfoDiscount.text = "Ja";
             if (seasonTicketItem.isTicketYourOwn())
                 ticketRectangleItem.border.color = "#EF9A9A"
 

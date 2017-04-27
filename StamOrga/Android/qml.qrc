@@ -28,5 +28,6 @@
         <file>components/EditableTextDialog.qml</file>
         <file>pages/LogginPage.qml</file>
         <file>components/AcceptDialog.qml</file>
+        <file>pages/CurrentGamePage.qml</file>
     </qresource>
 </RCC>

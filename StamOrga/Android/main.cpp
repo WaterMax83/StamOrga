@@ -61,10 +61,14 @@ int main(int argc, char* argv[])
     qRegisterMetaType<SeasonTicketItem*>("SeasonTicketItem*");
     qRegisterMetaType<DataConRequest>("DataConRequest");
 
+    qDebug() << "Hallo Welt3";
+
     // engine to start qml display -> takes about half a second
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("globalUserData", &globalUserData);
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));
+
+    qDebug() << "Hallo Welt4";
 
     // load settings to update data
     globalUserData.loadGlobalSettings();

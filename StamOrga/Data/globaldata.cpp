@@ -16,32 +16,33 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QtGui/QGuiApplication>
 #include <QtCore/QDebug>
+#include <QtGui/QGuiApplication>
 #include <QtNetwork/QNetworkConfigurationManager>
 
 
 #include "globaldata.h"
 
-#define GROUP_ARRAY_ITEM        "item"
-#define ITEM_INDEX              "index"
+#define GROUP_ARRAY_ITEM "item"
+#define ITEM_INDEX "index"
 
-#define GAMES_GROUP             "GAMES_LIST"
-#define PLAY_HOME               "home"
-#define PLAY_AWAY               "away"
-#define PLAY_DATETIME           "datetime"
-#define PLAY_SAISON_INDEX       "sIndex"
-#define PLAY_SCORE              "score"
-#define PLAY_COMPETITION        "competition"
+#define GAMES_GROUP "GAMES_LIST"
+#define PLAY_HOME "home"
+#define PLAY_AWAY "away"
+#define PLAY_DATETIME "datetime"
+#define PLAY_SAISON_INDEX "sIndex"
+#define PLAY_SCORE "score"
+#define PLAY_COMPETITION "competition"
 
-#define SEASONTICKET_GROUP    "SEASONTICKET_LIST"
-#define TICKET_NAME           "name"
-#define TICKET_PLACE          "place"
-#define TICKET_DISCOUNT       "discount"
-#define TICKET_USER_INDEX     "userIndex"
+#define SEASONTICKET_GROUP "SEASONTICKET_LIST"
+#define TICKET_NAME "name"
+#define TICKET_PLACE "place"
+#define TICKET_DISCOUNT "discount"
+#define TICKET_USER_INDEX "userIndex"
 
 
-GlobalData::GlobalData(QObject *parent) : QObject(parent)
+GlobalData::GlobalData(QObject* parent)
+    : QObject(parent)
 {
     QGuiApplication::setOrganizationName("WaterMax");
     QGuiApplication::setApplicationName("StamOrga");
@@ -53,7 +54,7 @@ GlobalData::GlobalData(QObject *parent) : QObject(parent)
 
 void GlobalData::loadGlobalSettings()
 {
-//    QMutexLocker lock(&this->m_mutexUserIni);
+    //    QMutexLocker lock(&this->m_mutexUserIni);
 
     this->m_pMainUserSettings = new QSettings();
 
@@ -70,10 +71,10 @@ void GlobalData::loadGlobalSettings()
     /* Getting data from last Games */
     this->m_pMainUserSettings->beginGroup(GAMES_GROUP);
     this->m_gpLastTimeStamp = this->m_pMainUserSettings->value("TIMESTAMP", 0).toLongLong();
-    int count = this->m_pMainUserSettings->beginReadArray(GROUP_ARRAY_ITEM);
-    for (int i=0; i<count; i++) {
+    int count               = this->m_pMainUserSettings->beginReadArray(GROUP_ARRAY_ITEM);
+    for (int i = 0; i < count; i++) {
         this->m_pMainUserSettings->setArrayIndex(i);
-        GamePlay *play = new GamePlay();
+        GamePlay* play = new GamePlay();
         play->setHome(this->m_pMainUserSettings->value(PLAY_HOME, "").toString());
         play->setAway(this->m_pMainUserSettings->value(PLAY_AWAY, "").toString());
         play->setTimeStamp(this->m_pMainUserSettings->value(PLAY_DATETIME, 0).toLongLong());
@@ -91,9 +92,9 @@ void GlobalData::loadGlobalSettings()
     this->m_stLastTimeStamp = this->m_pMainUserSettings->value("TIMESTAMP", 0).toLongLong();
 
     int ticketCount = this->m_pMainUserSettings->beginReadArray(GROUP_ARRAY_ITEM);
-    for (int i=0; i<ticketCount; i++) {
+    for (int i = 0; i < ticketCount; i++) {
         this->m_pMainUserSettings->setArrayIndex(i);
-        SeasonTicketItem *ticket = new SeasonTicketItem();
+        SeasonTicketItem* ticket = new SeasonTicketItem();
         ticket->setName(this->m_pMainUserSettings->value(TICKET_NAME, "").toString());
         ticket->setPlace(this->m_pMainUserSettings->value(TICKET_PLACE, "").toString());
         ticket->setDiscount(quint8(this->m_pMainUserSettings->value(TICKET_DISCOUNT, 0).toUInt()));
@@ -122,20 +123,19 @@ void GlobalData::saveGlobalUserSettings()
     this->m_pMainUserSettings->endGroup();
 
     this->m_pMainUserSettings->sync();
-
 }
 
 void GlobalData::saveActualGamesList()
 {
-    QMutexLocker lock (&this->m_mutexGame);
+    QMutexLocker lock(&this->m_mutexGame);
 
     this->m_pMainUserSettings->beginGroup(GAMES_GROUP);
-    this->m_pMainUserSettings->remove("");              // clear all elements
+    this->m_pMainUserSettings->remove(""); // clear all elements
 
     this->m_pMainUserSettings->setValue("TIMESTAMP", this->m_gpLastTimeStamp);
 
     this->m_pMainUserSettings->beginWriteArray(GROUP_ARRAY_ITEM);
-    for (int i=0; i<this->m_lGamePlay.size(); i++) {
+    for (int i = 0; i < this->m_lGamePlay.size(); i++) {
         this->m_pMainUserSettings->setArrayIndex(i);
         this->m_pMainUserSettings->setValue(PLAY_HOME, this->m_lGamePlay[i]->home());
         this->m_pMainUserSettings->setValue(PLAY_AWAY, this->m_lGamePlay[i]->away());
@@ -155,38 +155,36 @@ void GlobalData::startUpdateGamesPlay()
     QMutexLocker lock(&this->m_mutexGame);
 
     /* need to delet, because they are all pointers */
-    for (int i=0; i<this->m_lGamePlay.size(); i++)
+    for (int i = 0; i < this->m_lGamePlay.size(); i++)
         delete this->m_lGamePlay[i];
     this->m_lGamePlay.clear();
     this->m_gpLastTimeStamp = QDateTime::currentDateTime().toMSecsSinceEpoch();
 }
 
-void GlobalData::addNewGamePlay(GamePlay *gPlay)
+void GlobalData::addNewGamePlay(GamePlay* gPlay)
 {
     if (!this->existGamePlay(gPlay)) {
         QMutexLocker lock(&this->m_mutexGame);
-//        qDebug() << QString("Add new game play %1:%2 = %3").arg(gPlay->home(), gPlay->away(), gPlay->score());
+        //        qDebug() << QString("Add new game play %1:%2 = %3").arg(gPlay->home(), gPlay->away(), gPlay->score());
         this->m_lGamePlay.append(gPlay);
     }
 }
 
-bool GlobalData::existGamePlay(GamePlay *gPlay)
+bool GlobalData::existGamePlay(GamePlay* gPlay)
 {
     QMutexLocker lock(&this->m_mutexGame);
 
     if (gPlay->index() == 0 || gPlay->competition() == 0)
         return false;
 
-    for(int i=0; i < this->m_lGamePlay.size(); i++) {
-        if (this->m_lGamePlay[i]->index() == gPlay->index() &&
-            this->m_lGamePlay[i]->competition() == gPlay->competition() &&
-            this->m_lGamePlay[i]->timestamp() == gPlay->timestamp())
+    for (int i = 0; i < this->m_lGamePlay.size(); i++) {
+        if (this->m_lGamePlay[i]->index() == gPlay->index() && this->m_lGamePlay[i]->competition() == gPlay->competition() && this->m_lGamePlay[i]->timestamp() == gPlay->timestamp())
             return true;
     }
     return false;
 }
 
-GamePlay *GlobalData::getGamePlay(int index)
+GamePlay* GlobalData::getGamePlay(int index)
 {
     QMutexLocker lock(&this->m_mutexGame);
 
@@ -203,21 +201,24 @@ QString GlobalData::getGamePlayLastUpdate()
 
 void GlobalData::saveCurrentSeasonTickets()
 {
-    QMutexLocker lock (&this->m_mutexTicket);
+    QMutexLocker lock(&this->m_mutexTicket);
 
     this->m_pMainUserSettings->beginGroup(SEASONTICKET_GROUP);
-    this->m_pMainUserSettings->remove("");              // clear all elements
+    this->m_pMainUserSettings->remove(""); // clear all elements
 
     this->m_pMainUserSettings->setValue("TIMESTAMP", this->m_stLastTimeStamp);
 
     this->m_pMainUserSettings->beginWriteArray(GROUP_ARRAY_ITEM);
-    for (int i=0; i<this->m_lSeasonTicket.size(); i++) {
+    for (int i = 0; i < this->m_lSeasonTicket.size(); i++) {
         this->m_pMainUserSettings->setArrayIndex(i);
         this->m_pMainUserSettings->setValue(TICKET_NAME, this->m_lSeasonTicket[i]->name());
         this->m_pMainUserSettings->setValue(TICKET_PLACE, this->m_lSeasonTicket[i]->place());
-        this->m_pMainUserSettings->setValue(TICKET_DISCOUNT, this->m_lSeasonTicket[i]->discount());;
-        this->m_pMainUserSettings->setValue(ITEM_INDEX, this->m_lSeasonTicket[i]->index());;
-        this->m_pMainUserSettings->setValue(TICKET_USER_INDEX, this->m_lSeasonTicket[i]->userIndex());;
+        this->m_pMainUserSettings->setValue(TICKET_DISCOUNT, this->m_lSeasonTicket[i]->discount());
+        ;
+        this->m_pMainUserSettings->setValue(ITEM_INDEX, this->m_lSeasonTicket[i]->index());
+        ;
+        this->m_pMainUserSettings->setValue(TICKET_USER_INDEX, this->m_lSeasonTicket[i]->userIndex());
+        ;
     }
 
     this->m_pMainUserSettings->endArray();
@@ -229,36 +230,36 @@ void GlobalData::startUpdateSeasonTickets()
     QMutexLocker lock(&this->m_mutexTicket);
 
     /* need to delete, because they are all pointers */
-    for (int i=0; i<this->m_lSeasonTicket.size(); i++)
+    for (int i = 0; i < this->m_lSeasonTicket.size(); i++)
         delete this->m_lSeasonTicket[i];
     this->m_lSeasonTicket.clear();
     this->m_stLastTimeStamp = QDateTime::currentDateTime().toMSecsSinceEpoch();
 }
 
-void GlobalData::addNewSeasonTicket(SeasonTicketItem *sTicket)
+void GlobalData::addNewSeasonTicket(SeasonTicketItem* sTicket)
 {
     if (!this->existSeasonTicket(sTicket)) {
         QMutexLocker lock(&this->m_mutexTicket);
-//        qDebug() << QString("Add new game play %1:%2 = %3").arg(gPlay->home(), gPlay->away(), gPlay->score());
+        //        qDebug() << QString("Add new game play %1:%2 = %3").arg(gPlay->home(), gPlay->away(), gPlay->score());
         this->m_lSeasonTicket.append(sTicket);
     }
 }
 
-bool GlobalData::existSeasonTicket(SeasonTicketItem *sTicket)
+bool GlobalData::existSeasonTicket(SeasonTicketItem* sTicket)
 {
     QMutexLocker lock(&this->m_mutexTicket);
 
     if (sTicket->name().size() == 0)
         return false;
 
-    for(int i=0; i < this->m_lSeasonTicket.size(); i++) {
+    for (int i = 0; i < this->m_lSeasonTicket.size(); i++) {
         if (this->m_lSeasonTicket[i]->name() == sTicket->name())
             return true;
     }
     return false;
 }
 
-SeasonTicketItem *GlobalData::getSeasonTicket(int index)
+SeasonTicketItem* GlobalData::getSeasonTicket(int index)
 {
     QMutexLocker lock(&this->m_mutexTicket);
 
@@ -273,7 +274,7 @@ QString GlobalData::getSeasonTicketLastUpdate()
     return QDateTime::fromMSecsSinceEpoch(this->m_stLastTimeStamp).toString("dd.MM.yy hh:mm:ss");
 }
 
-void GlobalData::callBackLookUpHost(const QHostInfo &host)
+void GlobalData::callBackLookUpHost(const QHostInfo& host)
 {
 #ifdef Q_OS_ANDROID
     if (host.addresses().size() > 0)
@@ -283,25 +284,22 @@ void GlobalData::callBackLookUpHost(const QHostInfo &host)
     QNetworkConfigurationManager ncm;
     QList<QNetworkConfiguration> nc = ncm.allConfigurations();
 
-    foreach( QNetworkConfiguration item, nc )
-    {
-       if (item.bearerType() == QNetworkConfiguration::BearerWLAN)
-      {
-           if (item.state() == QNetworkConfiguration::StateFlag::Active)
-               this->setIpAddr("192.168.0.35");
-//                 qDebug() << "Wifi " << item.name();
-//                 qDebug() << "state " << item.state();
-      }
-//       else {
-//           qDebug() << "Network " << item.name();
-//           qDebug() << "state " << item.state();
-//       }
+    foreach (QNetworkConfiguration item, nc) {
+        if (item.bearerType() == QNetworkConfiguration::BearerWLAN) {
+            if (item.state() == QNetworkConfiguration::StateFlag::Active)
+                this->setIpAddr("192.168.0.35");
+            //                 qDebug() << "Wifi " << item.name();
+            //                 qDebug() << "state " << item.state();
+        }
+        //       else {
+        //           qDebug() << "Network " << item.name();
+        //           qDebug() << "state " << item.state();
+        //       }
     }
 #endif
 
 #else
     if (host.addresses().size() > 0)
-        qDebug().noquote() << QString("Getting host info ip: %1").arg(host.addresses().value(0).toString()) ;
+        qDebug().noquote() << QString("Getting host info ip: %1").arg(host.addresses().value(0).toString());
 #endif
-
 }

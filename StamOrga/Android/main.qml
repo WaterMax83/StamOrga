@@ -110,44 +110,61 @@ ApplicationWindow {
         id: drawer
         width: Math.min(window.width, window.height) / 3 * 2
         height: window.height
-        dragMargin: stackView.depth > 1 ? 0 : undefined
+//        dragMargin: stackView.depth > 1 ? 0 : undefined
 
-        ListView {
-            id: listView
-
-            focus: true
-            currentIndex: -1
+        ColumnLayout {
+//            width: drawer.width
+//            spacing: 1
             anchors.fill: parent
 
-            delegate: ItemDelegate {
-                width: parent.width
-                text: model.title
-                highlighted: ListView.isCurrentItem
-                onClicked: {
-                    listView.currentIndex = index
-                    stackView.push(model.element)
-                    if (model.imgsource !== "") {
-                        imageToolButton.visible = true
-                        imageToolButton.source = model.imgsource
-                    } else {
-                        imageToolButton.visible = false
+//            Item {
+//                width: drawer.width
+//                height: drawer.width
+                Rectangle {
+                    width: drawer.width
+                    height: drawer.height
+
+                    color: "blue"
+                }
+//            }
+
+            ListView {
+                id: listView
+
+                focus: true
+                currentIndex: -1
+                anchors.fill: parent
+
+                delegate: ItemDelegate {
+                    width: parent.width
+                    text: model.title
+                    highlighted: ListView.isCurrentItem
+                    onClicked: {
+                        listView.currentIndex = index
+                        stackView.push(model.element)
+                        if (model.imgsource !== "") {
+                            imageToolButton.visible = true
+                            imageToolButton.source = model.imgsource
+                        } else {
+                            imageToolButton.visible = false
+                        }
+
+                        drawer.close()
                     }
-
-                    drawer.close()
                 }
-            }
 
-            model: ListModel {
+                model: ListModel {
 
-                Component.onCompleted: {
-                    append({title: "Benutzer", element : viewUserLogin, imgsource : ""});
-                    append({title: "Dauerkarten", element : viewSeasonTickets, imgsource : "images/refresh.png"})
-                    if (userInt.isDebuggingEnabled() && userInt.isDeviceMobile())
-                        append({title: "Logging", element : viewLoggingPage, imgsource : ""});
+                    Component.onCompleted: {
+                        append({title: "Benutzer", element : viewUserLogin, imgsource : ""});
+                        append({title: "Dauerkarten", element : viewSeasonTickets, imgsource : "images/refresh.png"})
+                        if (userInt.isDebuggingEnabled() && userInt.isDeviceMobile())
+                            append({title: "Logging", element : viewLoggingPage, imgsource : ""});
+                    }
                 }
-            }
 
-            ScrollIndicator.vertical: ScrollIndicator { }
+                ScrollIndicator.vertical: ScrollIndicator { }
+            }
         }
     }
 
@@ -219,11 +236,16 @@ ApplicationWindow {
         onNotifySeasonTicketRemoveFinished: {
             stackView.currentItem.notifyUserIntSeasonTicketRemoveFinished(result);
         }
+        onNotifySeasonTicketNewPlaceFinished: {
+            stackView.currentItem.notifyUserIntSeasonTicketNewPlaceFinished(result);
+        }
     }
 
 
 
     function openUserLogin(open) {
+
+        console.log("Start UserLogin");
         if (open === true) {
             listView.currentIndex = 0
             stackView.push(viewUserLogin);

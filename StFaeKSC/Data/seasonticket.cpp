@@ -125,7 +125,8 @@ int SeasonTicket::changePlaceFromTicket(const quint32 index, QString newPlace)
         if (pTicket->m_index == index) {
             QString ticketName = pTicket->m_itemName;
             if (this->updateItemValue(pTicket, TICKET_PLACE, QVariant(newPlace))) {
-                qInfo() << (QString("changed Place of Ticket %1 to %2").arg(ticketName, newPlace));
+                pTicket->place = newPlace;
+                qInfo().noquote() << (QString("changed Place of Ticket %1 to %2").arg(ticketName, newPlace));
                 return ERROR_CODE_SUCCESS;
             }
         }
@@ -208,10 +209,10 @@ void SeasonTicket::addNewTicketInfo(QString user, quint32 userIndex, QString tic
     ticket->m_timestamp = datetime;
     ticket->m_index     = index;
 
-    ticket->user        = user;
-    ticket->userIndex   = userIndex;
-    ticket->discount    = discount;
-    ticket->place       = place;
+    ticket->user      = user;
+    ticket->userIndex = userIndex;
+    ticket->discount  = discount;
+    ticket->place     = place;
 
     pList->append(ticket);
 }
