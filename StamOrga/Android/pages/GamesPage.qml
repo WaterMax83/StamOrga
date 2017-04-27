@@ -34,8 +34,8 @@ Flickable {
 
        ColumnLayout {
            id: mainColumnLayoutGames
-           anchors.right: parent.right
-           anchors.left: parent.left
+//           anchors.right: parent.right
+//           anchors.left: parent.left
            width: parent.width
            ColumnLayout {
                id: columnLayoutBusyInfo

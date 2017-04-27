@@ -23,21 +23,22 @@
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/QQmlContext>
 
-
 #include "../../Common/General/globalfunctions.h"
 #include "../Data/globaldata.h"
 #include "../dataconnection.h"
 #include "userinterface.h"
 
+
 // global data class
-GlobalData globalUserData;
+GlobalData* pGlobalUserData = NULL;
 
 void stamOrgaMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
     Q_UNUSED(context);
 
     QString newMessage = qFormatLogMessage(type, context, msg);
-    globalUserData.addNewLoggingMessage(newMessage);
+    if (pGlobalUserData != NULL)
+        pGlobalUserData->addNewLoggingMessage(newMessage);
 }
 
 
@@ -61,14 +62,13 @@ int main(int argc, char* argv[])
     qRegisterMetaType<SeasonTicketItem*>("SeasonTicketItem*");
     qRegisterMetaType<DataConRequest>("DataConRequest");
 
-    qDebug() << "Hallo Welt3";
+    GlobalData globalUserData;
+    pGlobalUserData = &globalUserData;
 
     // engine to start qml display -> takes about half a second
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("globalUserData", &globalUserData);
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));
-
-    qDebug() << "Hallo Welt4";
 
     // load settings to update data
     globalUserData.loadGlobalSettings();

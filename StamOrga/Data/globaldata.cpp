@@ -49,12 +49,14 @@ GlobalData::GlobalData(QObject* parent)
     this->setbIsConnected(false);
     this->uUserProperties = 0x0;
 
-    QHostInfo::lookupHost("watermax83.ddns.net", this, SLOT(callBackLookUpHost(QHostInfo)));
+
 }
 
 void GlobalData::loadGlobalSettings()
 {
     //    QMutexLocker lock(&this->m_mutexUserIni);
+
+    QHostInfo::lookupHost("watermax83.ddns.net", this, SLOT(callBackLookUpHost(QHostInfo)));
 
     this->m_pMainUserSettings = new QSettings();
 

@@ -41,6 +41,7 @@ Flickable {
 
             ColumnLayout {
                 id: columnLayout
+                spacing: 5
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
                 BusyIndicator {
@@ -54,6 +55,7 @@ Flickable {
                     id: txtInfoSeasonTicket
                     text: qsTr("Label")
                     visible: true
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }
             }
 

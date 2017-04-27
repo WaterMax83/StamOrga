@@ -112,20 +112,20 @@ ApplicationWindow {
         height: window.height
 //        dragMargin: stackView.depth > 1 ? 0 : undefined
 
-        ColumnLayout {
+//        ColumnLayout {
 //            width: drawer.width
 //            spacing: 1
-            anchors.fill: parent
+//            anchors.fill: drawer
 
 //            Item {
 //                width: drawer.width
 //                height: drawer.width
-                Rectangle {
-                    width: drawer.width
-                    height: drawer.height
+//                Rectangle {
+//                    width: drawer.width
+//                    height: drawer.height
 
-                    color: "blue"
-                }
+//                    color: "blue"
+//                }
 //            }
 
             ListView {
@@ -165,7 +165,7 @@ ApplicationWindow {
 
                 ScrollIndicator.vertical: ScrollIndicator { }
             }
-        }
+//        }
     }
 
     StackView {
@@ -245,7 +245,6 @@ ApplicationWindow {
 
     function openUserLogin(open) {
 
-        console.log("Start UserLogin");
         if (open === true) {
             listView.currentIndex = 0
             stackView.push(viewUserLogin);
