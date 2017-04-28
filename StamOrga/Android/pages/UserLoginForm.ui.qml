@@ -32,12 +32,15 @@ Flickable {
 
        Text {
            id: txtLogging
-           text: "Hallo Welt, Dies ist ein Test \\n Wie läuft das mit Multiline"
-           wrapMode: Text.WrapAnywhere
+           width: parent.width
+           text: "Hallo Welt, Dies ist ein Test \\n Wie läuft das mit Multiline ich will vesuchen hier einen richtig langen Text zu schreiben damit es am Ende überlauft"
+           styleColor: "#ffffff"
+           wrapMode: Text.WrapAtWordBoundaryOrAnywhere
            //           implicitWidth: mainPaneLogging.width
            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
            rightPadding: 5
            visible: true
+           color: "white"
        }
 
    }

@@ -31,11 +31,13 @@ Flickable {
 
        Text {
            id: txtLogging
+           width: parent.width
            wrapMode: Text.WordWrap
 //           implicitWidth: mainPaneLogging.width
            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
            rightPadding: 5
            visible: true
+           color: "white"
        }
 
    }

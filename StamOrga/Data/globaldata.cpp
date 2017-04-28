@@ -48,8 +48,6 @@ GlobalData::GlobalData(QObject* parent)
     QGuiApplication::setApplicationName("StamOrga");
     this->setbIsConnected(false);
     this->uUserProperties = 0x0;
-
-
 }
 
 void GlobalData::loadGlobalSettings()
@@ -59,6 +57,8 @@ void GlobalData::loadGlobalSettings()
     QHostInfo::lookupHost("watermax83.ddns.net", this, SLOT(callBackLookUpHost(QHostInfo)));
 
     this->m_pMainUserSettings = new QSettings();
+
+    qInfo() << this->m_pMainUserSettings->fileName();
 
     this->m_pMainUserSettings->beginGroup("USER_LOGIN");
 

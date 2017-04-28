@@ -124,8 +124,11 @@ Flickable {
 
                var component = Qt.createComponent("../pages/CurrentGamePage.qml");
                if (component.status === Component.Ready) {
-                    stackView.push(component);
-               }
+                    var sprite = stackView.push(component);
+                    sprite.showAllInfoAboutGame(sender)
+                   updateHeaderFromMain("Spiel", "")
+               } else
+                   console.log("Fehler beim laden " + component.errorString() )
            }
        }
    }

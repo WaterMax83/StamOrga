@@ -108,32 +108,36 @@ ApplicationWindow {
 
     Drawer {
         id: drawer
-        width: Math.min(window.width, window.height) / 3 * 2
+        width: Math.min(window.width, window.height) / 4 * 2
         height: window.height
-//        dragMargin: stackView.depth > 1 ? 0 : undefined
 
-//        ColumnLayout {
-//            width: drawer.width
-//            spacing: 1
-//            anchors.fill: drawer
+        ColumnLayout {
+            implicitWidth: drawer.width
+            spacing: 1
+            anchors.fill: parent
 
-//            Item {
-//                width: drawer.width
-//                height: drawer.width
-//                Rectangle {
-//                    width: drawer.width
-//                    height: drawer.height
+            Rectangle {
+                implicitWidth: drawer.width
+                implicitHeight: drawer.width
 
-//                    color: "blue"
-//                }
-//            }
+                color: "white"
+                Image {
+                    height: parent.height
+                    width: parent.width
+                    fillMode: Image.Stretch
+                    horizontalAlignment: Image.AlignHCenter
+                    verticalAlignment: Image.AlignVCenter
+                    source:  "images/StammtischLogo.png"
+                }
+            }
 
             ListView {
                 id: listView
 
                 focus: true
                 currentIndex: -1
-                anchors.fill: parent
+                implicitWidth: drawer.width
+                implicitHeight: drawer.height
 
                 delegate: ItemDelegate {
                     width: parent.width
@@ -165,7 +169,17 @@ ApplicationWindow {
 
                 ScrollIndicator.vertical: ScrollIndicator { }
             }
-//        }
+        }
+    }
+
+    function updateHeaderFromMain(text, img) {
+        if (img !== "") {
+            imageToolButton.visible = true
+            imageToolButton.source = img
+        } else {
+            imageToolButton.visible = false
+        }
+        titleLabel.text = text;
     }
 
     StackView {

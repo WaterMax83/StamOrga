@@ -29,5 +29,6 @@
         <file>pages/LogginPage.qml</file>
         <file>components/AcceptDialog.qml</file>
         <file>pages/CurrentGamePage.qml</file>
+        <file>images/StammtischLogo.png</file>
     </qresource>
 </RCC>

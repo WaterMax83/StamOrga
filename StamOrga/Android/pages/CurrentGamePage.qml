@@ -27,6 +27,7 @@ import "../components" as MyComponents
 Flickable {
     id: flickableCurrentGame
     property UserInterface userIntCurrentGame
+    property var m_gamePlayCurrentItem
 
     contentHeight: mainPaneCurrentGame.height
 
@@ -34,11 +35,20 @@ Flickable {
         id: mainPaneCurrentGame
         width: parent.width
 
-        Rectangle {
-            width: 200
-            height: 200
-            color: "blue"
+        ColumnLayout {
+            id: mainColumnLayoutCurrentGame
+            width: parent.width
+                MyComponents.Games {
+                    id: gameHeader
+            }
+
         }
+    }
+
+    function showAllInfoAboutGame(sender) {
+        console.log("Show Header " + sender.timestamp);
+        m_gamePlayCurrentItem = sender;
+        gameHeader.showGamesInfo(sender)
     }
 
     function pageOpenedUpdateView() {
