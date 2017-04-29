@@ -42,11 +42,53 @@ Flickable {
                     id: gameHeader
             }
 
+            ColumnLayout {
+                id: columnLayoutBusyInfoCurrGame
+                spacing: 0
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+
+                BusyIndicator {
+                    id: busyLoadingIndicatorCurrentGames
+                    visible: false
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                }
+
+                Label {
+                    id: txtInfoCurrentGame
+                    visible: true
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                }
+            }
+
+            Label {
+                id: txtInfoCurrentGameBlockedTickets
+                visible: true
+                text: "Nicht verfügbar:"
+                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+            }
+
+            ListView {
+                id: listViewBlockedTickets
+
+                focus: false
+                implicitWidth: mainColumnLayoutCurrentGame.width
+                implicitHeight: flickableCurrentGame.height
+//                enabled: false
+
+                delegate: ItemDelegate {
+                    width: parent.width
+                    text: model.title
+                }
+
+                model: ListModel {
+                    id: listViewModelBlockedTickets
+                }
+            }
+
         }
     }
 
     function showAllInfoAboutGame(sender) {
-        console.log("Show Header " + sender.timestamp);
         m_gamePlayCurrentItem = sender;
         gameHeader.showGamesInfo(sender)
     }
@@ -54,4 +96,23 @@ Flickable {
     function pageOpenedUpdateView() {
 
     }
+
+    function notifyUserIntSeasonTicketListFinished(result) {
+        if (result === 1) {
+            listViewModelBlockedTickets.clear();
+
+            if (globalUserData.getSeasonTicketLength() > 0) {
+                for (var i=0; i<globalUserData.getSeasonTicketLength(); i++) {
+                    listViewModelBlockedTickets.append( {title: globalUserData.getSeasonTicket(i).name })
+                }
+//                txtInfoSeasonTicket.text = "Letzes Update am " + globalUserData.getSeasonTicketLastUpdate()
+            }
+//            listViewModelBlockedTickets.append({title: "Benutzer1", src : ""});
+//            listViewModelBlockedTickets.append({title: "Benutzer2", src : ""})
+        } else {
+            txtInfoCurrentGame.text = userIntCurrentGame.getErrorCodeToString(result);
+        }
+    }
+
+    function notifyUserIntConnectionFinished(result) {}
 }

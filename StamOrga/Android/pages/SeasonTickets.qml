@@ -110,19 +110,6 @@ Flickable {
         }
     }
 
-    function notifyUserIntVersionRequestFinished(result, msg) {
-        if (result === 5) {
-            var component = Qt.createComponent("../components/VersionDialog.qml");
-            if (component.status === Component.Ready) {
-                var dialog = component.createObject(parent,{popupType: 1});
-                dialog.versionText = msg;
-                dialog.parentHeight = flickableTickets.height
-                dialog.parentWidth = flickableTickets.width
-                dialog.open();
-            }
-        }
-    }
-
     function notifyUserIntConnectionFinished(result) {}
 
     function pageOpenedUpdateView() {

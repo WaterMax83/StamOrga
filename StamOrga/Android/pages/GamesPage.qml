@@ -101,18 +101,6 @@ Flickable {
            txtInfoLoadingGames.text = "Keine Daten zum anzeigen"
    }
 
-   function notifyUserIntVersionRequestFinished(result, msg) {
-       if (result === 5) {
-           var component = Qt.createComponent("../components/VersionDialog.qml");
-           if (component.status === Component.Ready) {
-               var dialog = component.createObject(parent,{popupType: 1});
-               dialog.versionText = msg;
-               dialog.parentHeight = flickableGames.height
-               dialog.parentWidth = flickableGames.width
-               dialog.open();
-           }
-       }
-   }
    function notifyUserIntConnectionFinished(result) {}
 
    Component {
@@ -120,11 +108,13 @@ Flickable {
 
        MyComponents.Games {
            onClickedCurrentGame: {
-               console.log("Clicked game " + sender.home);
+//               console.log("Clicked game " + sender.home);
 
                var component = Qt.createComponent("../pages/CurrentGamePage.qml");
                if (component.status === Component.Ready) {
                     var sprite = stackView.push(component);
+                   userIntGames.startGettingSeasonTicketList();
+                   sprite.userIntCurrentGame = userIntGames
                     sprite.showAllInfoAboutGame(sender)
                    updateHeaderFromMain("Spiel", "")
                } else

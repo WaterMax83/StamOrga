@@ -38,7 +38,6 @@ ApplicationWindow {
         if( userInt.isDeviceMobile() && stackView.depth > 1){
             close.accepted = false
             stackView.pop();
-            listView.currentIndex = -1
         }else{
             return;
         }
@@ -49,7 +48,6 @@ ApplicationWindow {
         enabled: stackView.depth > 1
         onActivated: {
             stackView.pop()
-            listView.currentIndex = -1
         }
     }
 
@@ -70,7 +68,6 @@ ApplicationWindow {
                 onClicked: {
                     if (stackView.depth > 1) {
                         stackView.pop()
-                        listView.currentIndex = -1
                     } else {
                         drawer.open()
                     }
@@ -79,7 +76,7 @@ ApplicationWindow {
 
             Label {
                 id: titleLabel
-                text: listView.currentItem ? listView.currentItem.text : "StamOrga"
+//                text: listView.currentItem ? listView.currentItem.text : "StamOrga"
                 font.pixelSize: 25
                 elide: Label.ElideRight
                 horizontalAlignment: Qt.AlignHCenter
@@ -144,8 +141,8 @@ ApplicationWindow {
                     text: model.title
                     highlighted: ListView.isCurrentItem
                     onClicked: {
-                        listView.currentIndex = index
                         stackView.push(model.element)
+                        titleLabel.text = model.title;
                         if (model.imgsource !== "") {
                             imageToolButton.visible = true
                             imageToolButton.source = model.imgsource
@@ -192,6 +189,7 @@ ApplicationWindow {
             if (stackView.depth === 1) {
                 imageToolButton.visible = true
                 imageToolButton.source = "images/refresh.png"
+                titleLabel.text = "StamOrga";
             }
             stackView.currentItem.pageOpenedUpdateView()
         }
@@ -230,7 +228,17 @@ ApplicationWindow {
              stackView.currentItem.notifyUserIntConnectionFinished(result);
         }
         onNotifyVersionRequestFinished : {
-            stackView.currentItem.notifyUserIntVersionRequestFinished(result, msg);
+//            stackView.currentItem.notifyUserIntVersionRequestFinished(result, msg);
+            if (result === 5) {
+                var component = Qt.createComponent("/components/VersionDialog.qml");
+                if (component.status === Component.Ready) {
+                    var dialog = component.createObject(stackView,{popupType: 1});
+                    dialog.versionText = msg;
+                    dialog.parentHeight = stackView.height
+                    dialog.parentWidth = stackView.width
+                    dialog.open();
+                }
+            }
         }
         onNotifyUpdatePasswordRequestFinished: {
             stackView.currentItem.notifyUserIntUpdatePasswordFinished(result);
@@ -260,7 +268,6 @@ ApplicationWindow {
     function openUserLogin(open) {
 
         if (open === true) {
-            listView.currentIndex = 0
             stackView.push(viewUserLogin);
         } else
             stackView.currentItem.showListedGames()
