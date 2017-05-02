@@ -100,7 +100,7 @@ private:
 
     QList<DataConRequest> m_lErrorMainCon;
 
-    void sendLoginRequest();
+    void sendLoginRequest(QString password);
     void sendNewRequest(DataConRequest request);
 
     void checkTimeoutResult(qint32 result);

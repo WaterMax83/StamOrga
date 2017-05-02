@@ -37,75 +37,97 @@ Flickable {
         Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
         ColumnLayout {
-            id: mainColumnLayout
+            id: mainColumnLayoutUser
             width: pane.width
             spacing: 25
 
-            TextField {
-                id: txtIPAddress
-                text: globalUserData.ipAddr
-                implicitWidth: mainColumnLayout.width / 3 * 2
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                placeholderText: qsTr("Text Field")
-                visible: userIntUser.isDebuggingEnabled()
-            }
-
-//            SpinBox {
-//                id: spBoxPort
-//                to: 100000
-//                from: 1
-//                value: globalUserData.conMasterPort
-//                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-//            }
-
             ColumnLayout {
-                id: columnLayout2
-                spacing: 5
-                width: mainColumnLayout.width
+                id: columnLayoutUserLogin
+                width: pane.width
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-
-                Label {
-                    id: label1
-                    text: qsTr("Benutzername")
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                }
+                spacing: 25
 
                 TextField {
-                    id: txtUserName
-                    text: globalUserData.userName
-                    padding: 8
-                    implicitWidth: mainColumnLayout.width / 3 * 2
+                    id: txtIPAddress
+                    text: globalUserData.ipAddr
+                    implicitWidth: mainColumnLayoutUser.width / 3 * 2
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                    onTextChanged: {
-                        globalUserData.bIsConnected = false;
+                    placeholderText: qsTr("Text Field")
+                    visible: userIntUser.isDebuggingEnabled()
+                }
+
+    //            SpinBox {
+    //                id: spBoxPort
+    //                to: 100000
+    //                from: 1
+    //                value: globalUserData.conMasterPort
+    //                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+    //            }
+
+                ColumnLayout {
+                    spacing: 5
+                    width: mainColumnLayoutUser.width
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+
+                    Label {
+                        text: qsTr("Login / Email")
+                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    }
+
+                    TextField {
+                        id: txtUserName
+                        text: globalUserData.userName
+                        padding: 8
+                        implicitWidth: mainColumnLayoutUser.width / 3 * 2
+                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                        onTextChanged: {
+                            globalUserData.bIsConnected = false;
+                        }
+                    }
+                }
+
+                ColumnLayout {
+                    width: mainColumnLayoutUser.width
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+
+                    Label {
+                        text: qsTr("Passwort")
+                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    }
+
+                    TextField {
+                        id: txtPassWord
+                        text: globalUserData.passWord
+                        implicitWidth: mainColumnLayoutUser.width / 3 * 2
+                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                        onTextChanged: {
+                            globalUserData.bIsConnected = false;
+                        }
+                    }
+                }
+
+                Button {
+                    id: btnSendData
+                    text: qsTr("Verbinden")
+                    implicitWidth: Math.max(mainColumnLayoutUser.width / 4 * 2, contentWidth)
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    transformOrigin: Item.Center
+                    onClicked: {
+                        if (userIntUser.isDebuggingEnabled()) {
+                            globalUserData.ipAddr = txtIPAddress.text
+                        }
+
+                        if (userIntUser.startMainConnection(txtUserName.text, txtPassWord.text) > 0) {
+                            btnSendData.enabled = false
+                            busyConnectIndicator.visible = true;
+                            txtInfoConnecting.text = "Verbinde ..."
+                            txtInfoConnecting.visible = true;
+                        }
                     }
                 }
             }
 
             ColumnLayout {
-                id: columnLayout3
-                width: mainColumnLayout.width
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-
-                Label {
-                    id: label2
-                    text: qsTr("Passwort")
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                }
-
-                TextField {
-                    id: txtPassWord
-                    text: globalUserData.passWord
-                    implicitWidth: mainColumnLayout.width / 3 * 2
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                    onTextChanged: {
-                        globalUserData.bIsConnected = false;
-                    }
-                }
-            }
-
-            ColumnLayout {
-                id: columnLayout
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
                 BusyIndicator {
@@ -122,82 +144,65 @@ Flickable {
                 }
             }
 
-            Button {
-                id: btnSendData
-                text: qsTr("Verbindung speichern")
-                implicitWidth: Math.max(mainColumnLayout.width / 4 * 2, contentWidth)
+            ColumnLayout {
+                id: columnLayoutUserData
+                width: pane.width
+                spacing: 25
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                transformOrigin: Item.Center
-                onClicked: {
-                    console.log("Dies ist ein Test");
-                    if (userIntUser.isDebuggingEnabled()) {
-                        globalUserData.ipAddr = txtIPAddress.text
+
+
+                Button {
+                    id: btnChangeReadableName
+                    text: qsTr("Nutzername ändern")
+                    implicitWidth: mainColumnLayoutUser.width / 4 * 2
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    transformOrigin: Item.Center
+//                    enabled: globalUserData.bIsConnected
+                    onClicked: {
+                        var component = Qt.createComponent("../components/EditableTextDialog.qml");
+                        if (component.status === Component.Ready) {
+                            var dialog = component.createObject(flickableUser,{popupType: 1});
+                            dialog.headerText = "Nutzername ändern";
+                            dialog.parentHeight = flickableUser.height
+                            dialog.parentWidth = flickableUser.width
+                            console.log ("Width = "+ flickableUser.width)
+                            dialog.textMinSize = 6
+                            dialog.editableText = globalUserData.readableName;
+                            dialog.acceptedTextEdit.connect(acceptedEditReadableName);
+                            dialog.open();
+
+                            console.log ("X = "+ dialog.x + " ")
+                        }
+
                     }
 
-                    if (userIntUser.startMainConnection(txtUserName.text, txtPassWord.text) > 0) {
-                        btnSendData.enabled = false
+                    function acceptedEditReadableName(text) {
                         busyConnectIndicator.visible = true;
-                        txtInfoConnecting.text = "Verbinde ..."
                         txtInfoConnecting.visible = true;
+                        txtInfoConnecting.text = "Ändere Öffentlichen Namen"
+                        userIntUser.startUpdateReadableName(text)
                     }
                 }
-            }
 
-            ToolSeparator {
-                id: toolSeparator2
-                orientation: "Horizontal"
-                implicitWidth: mainColumnLayout.width / 3 * 1
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            }
+                ToolSeparator {
+                    id: toolSeparator3
+                    orientation: "Horizontal"
+                    implicitWidth: mainColumnLayoutUser.width / 3 * 1
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                }
 
-            Button {
-                id: btnChangeReadableName
-                text: qsTr("Öffentlicher Name")
-                implicitWidth: mainColumnLayout.width / 4 * 2
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                transformOrigin: Item.Center
-                enabled: globalUserData.bIsConnected
-                onClicked: {
-                    var component = Qt.createComponent("../components/EditableTextDialog.qml");
-                    if (component.status === Component.Ready) {
-                        var dialog = component.createObject(parent,{popupType: 1});
-                        dialog.headerText = "Öffentlicher Name";
-                        dialog.parentHeight = flickableUser.height
-                        dialog.parentWidth = flickableUser.width
-                        dialog.textMinSize = 6
-                        dialog.editableText = globalUserData.readableName;
-                        dialog.acceptedTextEdit.connect(acceptedEditReadableName);
-                        dialog.open();
+                Button {
+                    id: btnChangePassWord
+                    text: qsTr("Password ändern")
+                    implicitWidth: mainColumnLayoutUser.width / 4 * 2
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    transformOrigin: Item.Center
+//                    enabled: globalUserData.bIsConnected
+                    onClicked: {
+                        txtnewPassWord.text = ""
+                        txtnewPassWordReplay.text = ""
+                        changePassWordDialog.open()
                     }
-
-                }
-
-                function acceptedEditReadableName(text) {
-                    busyConnectIndicator.visible = true;
-                    txtInfoConnecting.visible = true;
-                    txtInfoConnecting.text = "Ändere Öffentlichen Namen"
-                    userIntUser.startUpdateReadableName(text)
-                }
-            }
-
-            ToolSeparator {
-                id: toolSeparator3
-                orientation: "Horizontal"
-                implicitWidth: mainColumnLayout.width / 3 * 1
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            }
-
-            Button {
-                id: btnChangePassWord
-                text: qsTr("Password ändern")
-                implicitWidth: mainColumnLayout.width / 4 * 2
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                transformOrigin: Item.Center
-                enabled: globalUserData.bIsConnected
-                onClicked: {
-                    txtnewPassWord.text = ""
-                    txtnewPassWordReplay.text = ""
-                    changePassWordDialog.open()
                 }
             }
         }
@@ -210,10 +215,14 @@ Flickable {
         if (result === 1) {
             btnSendData.background.color = "green"
             txtInfoConnecting.text = "Verbindung erfolgreich"
+            columnLayoutUserLogin.visible = false;
+            columnLayoutUserData.visible = true;
         }
         else {
             btnSendData.background.color = "red"
             txtInfoConnecting.text = userIntUser.getErrorCodeToString(result);
+            columnLayoutUserLogin.visible = true;
+            columnLayoutUserData.visible = false;
         }
     }
 
@@ -235,7 +244,13 @@ Flickable {
     }
 
     function pageOpenedUpdateView() {
-
+        if (globalUserData.userName === "" || globalUserData.passWord === "") {
+            columnLayoutUserLogin.visible = true;
+            columnLayoutUserData.visible = false;
+        } else {
+            columnLayoutUserLogin.visible = false;
+            columnLayoutUserData.visible = true;
+        }
     }
 
     Dialog {

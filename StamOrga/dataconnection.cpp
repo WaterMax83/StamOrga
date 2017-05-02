@@ -99,6 +99,13 @@ void DataConnection::checkNewOncomingData()
                 continue;
             } else {
                 request.m_result = this->m_pDataHandle->getHandleLoginResponse(msg);
+                if (request.m_result == ERROR_CODE_SUCCESS) {
+                    QString passWord = request.m_lData.at(0);
+                    if (this->m_pGlobalData->passWord() != passWord) {
+                        this->m_pGlobalData->setPassWord(passWord);
+                        this->m_pGlobalData->saveGlobalUserSettings();
+                    }
+                }
             }
 
             break;
@@ -128,6 +135,7 @@ void DataConnection::checkNewOncomingData()
                 this->m_bRequestLoginAgain = true;
                 DataConRequest conReq;
                 conReq.m_request = OP_CODE_CMD_REQ::REQ_LOGIN_USER;
+                conReq.m_lData.append(this->m_pGlobalData->passWord());
                 this->startSendLoginRequest(conReq);
             }
             break;
@@ -167,7 +175,7 @@ void DataConnection::checkNewOncomingData()
 
 void DataConnection::startSendLoginRequest(DataConRequest request)
 {
-    QString     passWord = this->m_pGlobalData->passWord();
+    QString     passWord = request.m_lData.at(0);
     QByteArray  aPassw;
     QDataStream wPassword(&aPassw, QIODevice::WriteOnly);
     wPassword.setByteOrder(QDataStream::BigEndian);
@@ -249,7 +257,7 @@ void DataConnection::startSendAddSeasonTicket(DataConRequest request)
 
 void DataConnection::startSendRemoveSeasonTicket(DataConRequest request)
 {
-    quint32 index = request.m_lData.at(0).toUInt();
+    quint32         index = request.m_lData.at(0).toUInt();
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_REMOVE_TICKET, index);
     this->sendMessageRequest(&msg, request);
 }

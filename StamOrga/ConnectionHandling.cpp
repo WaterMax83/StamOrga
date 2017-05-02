@@ -17,15 +17,16 @@
 */
 #include <QDebug>
 
-#include "connectionhandling.h"
-#include "../Common/Network/messageprotocol.h"
 #include "../Common/General/globalfunctions.h"
 #include "../Common/General/globaltiming.h"
 #include "../Common/Network/messagecommand.h"
+#include "../Common/Network/messageprotocol.h"
+#include "connectionhandling.h"
 
-#define TIMER_DIFF_MSEC      10 * 1000
+#define TIMER_DIFF_MSEC 10 * 1000
 
-ConnectionHandling::ConnectionHandling(QObject *parent) : QObject(parent)
+ConnectionHandling::ConnectionHandling(QObject* parent)
+    : QObject(parent)
 {
     this->m_pTimerConReset = new QTimer();
     this->m_pTimerConReset->setSingleShot(true);
@@ -38,6 +39,8 @@ ConnectionHandling::ConnectionHandling(QObject *parent) : QObject(parent)
     connect(this->m_pTimerLoginReset, &QTimer::timeout, this, &ConnectionHandling::slTimerConLoginFired);
 }
 
+QString mainConRequestPassWord;
+
 qint32 ConnectionHandling::startMainConnection(QString name, QString passw)
 {
     bool bChangedUserName = false;
@@ -49,19 +52,18 @@ qint32 ConnectionHandling::startMainConnection(QString name, QString passw)
     if (passw != this->m_pGlobalData->passWord())
         bChangedPassword = true;
 
-    if (this->isMainConnectionActive())
-    {
+    if (this->isMainConnectionActive()) {
         if (!bChangedUserName) {
             if (this->m_pGlobalData->bIsConnected() && !bChangedPassword) {
                 emit this->sNotifyConnectionFinished(ERROR_CODE_SUCCESS);
                 qDebug() << "Did not log in again, should already be succesfull";
                 return ERROR_CODE_NO_ERROR;
             }
-            this->m_pGlobalData->setPassWord(passw);
+            //            this->m_pGlobalData->setPassWord(passw);
             this->startDataConnection();
             QThread::msleep(1);
-            this->sendLoginRequest();
-            this->m_pGlobalData->saveGlobalUserSettings();
+            this->sendLoginRequest(passw);
+            //            this->m_pGlobalData->saveGlobalUserSettings();
             return ERROR_CODE_SUCCESS;
         }
         this->m_ctrlMainCon.Stop();
@@ -70,17 +72,18 @@ qint32 ConnectionHandling::startMainConnection(QString name, QString passw)
     } else
         this->stopDataConnection();
 
-    if (bChangedUserName)
-        this->m_pGlobalData->setUserName(name);
-    if (bChangedPassword)
-        this->m_pGlobalData->setPassWord(passw);
+    //    if (bChangedUserName)
+    //        this->m_pGlobalData->setUserName(name);
+    //    if (bChangedPassword)
+    //        this->m_pGlobalData->setPassWord(passw);
 
-    this->m_pMainCon = new MainConnection(this->m_pGlobalData);
+    this->m_pMainCon       = new MainConnection(this->m_pGlobalData, name);
+    mainConRequestPassWord = passw;
     connect(this->m_pMainCon, &MainConnection::connectionRequestFinished, this, &ConnectionHandling::slMainConReqFin);
     this->m_ctrlMainCon.Start(this->m_pMainCon, false);
 
-    if (bChangedPassword || bChangedUserName)
-        this->m_pGlobalData->saveGlobalUserSettings();
+    //    if (bChangedPassword || bChangedUserName)
+    //        this->m_pGlobalData->saveGlobalUserSettings();
 
     return ERROR_CODE_SUCCESS;
 }
@@ -160,18 +163,15 @@ qint32 ConnectionHandling::startGettingSeasonTicketList()
 /*
  * Answer function after connection with username
  */
-void ConnectionHandling::slMainConReqFin(qint32 result, const QString &msg)
+void ConnectionHandling::slMainConReqFin(qint32 result, const QString& msg)
 {
-    if (result > ERROR_CODE_NO_ERROR)
-    {
+    if (result > ERROR_CODE_NO_ERROR) {
         this->m_pGlobalData->setConDataPort((quint16)result);
         this->startDataConnection();
         QThread::msleep(2);
-        this->sendLoginRequest();
+        this->sendLoginRequest(mainConRequestPassWord);
         this->m_pTimerConReset->start();
-    }
-    else
-    {
+    } else {
         qWarning() << "Error main connecting: " << msg;
         emit this->sNotifyConnectionFinished(result);
         this->m_ctrlMainCon.Stop();
@@ -179,7 +179,7 @@ void ConnectionHandling::slMainConReqFin(qint32 result, const QString &msg)
 
         while (this->m_lErrorMainCon.size() > 0) {
             DataConRequest request = this->m_lErrorMainCon.last();
-            request.m_result = result;
+            request.m_result       = result;
             this->slDataConLastRequestFinished(request);
             this->m_lErrorMainCon.removeLast();
         }
@@ -189,12 +189,13 @@ void ConnectionHandling::slMainConReqFin(qint32 result, const QString &msg)
 /*
  * Functions for login
  */
-void ConnectionHandling::sendLoginRequest()
+void ConnectionHandling::sendLoginRequest(QString password)
 {
-    this->startDataConnection();                        // call it every time, if it is already started it just returns
+    this->startDataConnection(); // call it every time, if it is already started it just returns
 
     DataConRequest req;
     req.m_request = OP_CODE_CMD_REQ::REQ_LOGIN_USER;
+    req.m_lData.append(password);
 
     emit this->sStartSendNewRequest(req);
 }
@@ -214,25 +215,25 @@ void ConnectionHandling::sendNewRequest(DataConRequest request)
 
 void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
 {
-    switch(request.m_request) {
+    switch (request.m_request) {
     case OP_CODE_CMD_REQ::REQ_LOGIN_USER:
-            if (request.m_result == ERROR_CODE_SUCCESS) {
-                this->m_pGlobalData->setbIsConnected(true);
-                while (this->m_lErrorMainCon.size() > 0) {
-                    this->sendNewRequest(this->m_lErrorMainCon.last());
-                    this->m_lErrorMainCon.removeLast();
-                }
-            } else {
-                qWarning().noquote() << QString("Error Login: %1").arg(getErrorCodeString(request.m_result));
-                while (this->m_lErrorMainCon.size() > 0) {
-                    DataConRequest newReq = this->m_lErrorMainCon.last();
-                    newReq.m_result = request.m_result;
-                    this->slDataConLastRequestFinished(newReq);
-                    this->m_lErrorMainCon.removeLast();
-                }
+        if (request.m_result == ERROR_CODE_SUCCESS) {
+            this->m_pGlobalData->setbIsConnected(true);
+            while (this->m_lErrorMainCon.size() > 0) {
+                this->sendNewRequest(this->m_lErrorMainCon.last());
+                this->m_lErrorMainCon.removeLast();
             }
+        } else {
+            qWarning().noquote() << QString("Error Login: %1").arg(getErrorCodeString(request.m_result));
+            while (this->m_lErrorMainCon.size() > 0) {
+                DataConRequest newReq = this->m_lErrorMainCon.last();
+                newReq.m_result       = request.m_result;
+                this->slDataConLastRequestFinished(newReq);
+                this->m_lErrorMainCon.removeLast();
+            }
+        }
 
-            emit this->sNotifyConnectionFinished(request.m_result);
+        emit this->sNotifyConnectionFinished(request.m_result);
         break;
 
     case OP_CODE_CMD_REQ::REQ_GET_VERSION:
@@ -240,27 +241,27 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
         break;
 
     case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
-            if (request.m_result == ERROR_CODE_SUCCESS)
-                this->m_pGlobalData->uUserProperties = request.m_returnData.toUInt();
-            emit this->sNotifyUserPropertiesRequest(request.m_result, request.m_returnData.toUInt());
+        if (request.m_result == ERROR_CODE_SUCCESS)
+            this->m_pGlobalData->uUserProperties = request.m_returnData.toUInt();
+        emit this->sNotifyUserPropertiesRequest(request.m_result, request.m_returnData.toUInt());
         break;
 
     case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
-            if (request.m_result == ERROR_CODE_SUCCESS) {
-                this->m_pGlobalData->setPassWord(request.m_returnData);
-                this->m_pGlobalData->saveGlobalUserSettings();
-            }
+        if (request.m_result == ERROR_CODE_SUCCESS) {
+            this->m_pGlobalData->setPassWord(request.m_returnData);
+            this->m_pGlobalData->saveGlobalUserSettings();
+        }
 
-            emit this->sNotifyUpdatePasswordRequest(request.m_result, request.m_returnData);
+        emit this->sNotifyUpdatePasswordRequest(request.m_result, request.m_returnData);
         break;
 
     case OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME:
-            if (request.m_result == ERROR_CODE_SUCCESS) {
-                this->m_pGlobalData->setReadableName(request.m_returnData);
-                this->m_pGlobalData->saveGlobalUserSettings();
-            }
+        if (request.m_result == ERROR_CODE_SUCCESS) {
+            this->m_pGlobalData->setReadableName(request.m_returnData);
+            this->m_pGlobalData->saveGlobalUserSettings();
+        }
 
-            emit this->sNotifyUpdateReadableNameRequest(request.m_result);
+        emit this->sNotifyUpdateReadableNameRequest(request.m_result);
         break;
 
     case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
@@ -282,7 +283,6 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
     case OP_CODE_CMD_REQ::REQ_NEW_TICKET_PLACE:
         emit this->sNotifySeasonTicketNewPlace(request.m_result);
         break;
-
     }
 
     this->checkTimeoutResult(request.m_result);
@@ -294,7 +294,7 @@ void ConnectionHandling::checkTimeoutResult(qint32 result)
         this->m_ctrlMainCon.Stop();
         this->stopDataConnection();
     } else if (this->m_pGlobalData->bIsConnected())
-        this->m_pTimerLoginReset->start();              // restart Timer
+        this->m_pTimerLoginReset->start(); // restart Timer
 }
 
 void ConnectionHandling::startDataConnection()
@@ -320,9 +320,9 @@ void ConnectionHandling::stopDataConnection()
         return;
 
     disconnect(this, &ConnectionHandling::sStartSendNewRequest,
-            this->m_pDataCon, &DataConnection::startSendNewRequest);
+               this->m_pDataCon, &DataConnection::startSendNewRequest);
     disconnect(this->m_pDataCon, &DataConnection::notifyLastRequestFinished,
-            this, &ConnectionHandling::slDataConLastRequestFinished);
+               this, &ConnectionHandling::slDataConLastRequestFinished);
 
     this->m_ctrlDataCon.Stop();
 }

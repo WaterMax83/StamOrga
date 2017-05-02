@@ -31,7 +31,7 @@ class MainConnection : public BackgroundWorker
 {
     Q_OBJECT
 public:
-    MainConnection(GlobalData* pData);
+    MainConnection(GlobalData* pData, QString username);
     ~MainConnection();
 
     int DoBackgroundWork() override;
@@ -48,6 +48,7 @@ private slots:
 private:
     GlobalData*   m_pGlobalData;
     MessageBuffer m_messageBuffer;
+    QString       m_userName;
 
     QTimer*      m_pConTimeout;
     QUdpSocket*  m_pMasterUdpSocket = NULL;

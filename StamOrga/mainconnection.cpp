@@ -25,18 +25,19 @@
 #include "../Common/Network/messageprotocol.h"
 #include "mainconnection.h"
 
-MainConnection::MainConnection(GlobalData* pData)
+MainConnection::MainConnection(GlobalData* pData, QString username)
     : BackgroundWorker()
 {
     this->SetWorkerName("MainConnection");
     this->m_pGlobalData = pData;
+    this->m_userName    = username;
 }
 
 
 int MainConnection::DoBackgroundWork()
 {
     QByteArray aData;
-    aData.append(this->m_pGlobalData->userName());
+    aData.append(this->m_userName);
 
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_CONNECT_USER, aData);
 
@@ -96,10 +97,14 @@ void MainConnection::checkNewOncomingData()
                 emit this->connectionRequestFinished(ERROR_CODE_WRONG_SIZE, QString("Datalength is wrong, expected 4").arg(msg->getDataLength()));
             else {
                 qint32 rValue = msg->getIntData();
-                if (rValue > ERROR_CODE_NO_ERROR)
+                if (rValue > ERROR_CODE_NO_ERROR) {
+                    if (this->m_pGlobalData->userName() != this->m_userName) {
+                        this->m_pGlobalData->setUserName(this->m_userName);
+                        this->m_pGlobalData->saveGlobalUserSettings();
+                    }
                     emit this->connectionRequestFinished(rValue, "");
-                else if (rValue == ERROR_CODE_NO_USER)
-                    emit this->connectionRequestFinished(rValue, QString("Wrong user %1").arg(this->m_pGlobalData->userName()));
+                } else if (rValue == ERROR_CODE_NO_USER)
+                    emit this->connectionRequestFinished(rValue, QString("Wrong user %1").arg(this->m_userName));
                 else
                     emit this->connectionRequestFinished(rValue, QString("unkown error %1").arg(rValue));
             }

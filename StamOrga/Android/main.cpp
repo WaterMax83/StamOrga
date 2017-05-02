@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
 #endif
 
     QObject* pRootObject = engine.rootObjects().first();
-    if (globalUserData.userName().size() == 0)
+    if (globalUserData.userName().size() == 0 || globalUserData.passWord().size() == 0)
         QMetaObject::invokeMethod(pRootObject, "openUserLogin", Q_ARG(QVariant, true));
     else
         QMetaObject::invokeMethod(pRootObject, "openUserLogin", Q_ARG(QVariant, false));
