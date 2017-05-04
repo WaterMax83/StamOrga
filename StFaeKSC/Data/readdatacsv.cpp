@@ -118,7 +118,9 @@ int ReadDataCSV::readNewGameData(QStringList line)
     if (line.size() > 5)
         score = line.value(5);
 
-    this->m_pGlobalData->m_GamesList.addNewGame(home, away, datetime, sIndex, score, competition);
+    quint16 saison = 0;
+
+    this->m_pGlobalData->m_GamesList.addNewGame(home, away, datetime, sIndex, score, competition, saison);
     this->m_pGlobalData->m_GamesList.sortGamesListByTime();
 
     return ERROR_CODE_SUCCESS;

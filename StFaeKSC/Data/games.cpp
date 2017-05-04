@@ -52,10 +52,20 @@ Games::Games()
 
             QString away        = this->m_pConfigSettings->value(PLAY_AWAY, "").toString();
             quint8  saisonIndex = quint8(this->m_pConfigSettings->value(PLAY_SAISON_INDEX, 0).toUInt());
+            quint16 saison = quint16(this->m_pConfigSettings->value(PLAY_SAISON, 0).toUInt());
             QString score       = this->m_pConfigSettings->value(PLAY_SCORE, "").toString();
             quint8  competition = quint8(this->m_pConfigSettings->value(PLAY_COMPETITION, 0).toUInt());
 
-            if (!this->addNewGamesPlay(home, away, timestamp, saisonIndex, score, competition, index))
+            if (saison == 0) {
+                bProblems = true;
+                QDate date = QDateTime::fromMSecsSinceEpoch(timestamp).date();
+                if (date.month() >= 7)
+                    saison = date.year();
+                else
+                    saison = date.year() - 1;
+            }
+
+            if (!this->addNewGamesPlay(home, away, timestamp, saisonIndex, score, competition, saison, index))
                 bProblems = true;
         }
         this->m_pConfigSettings->endArray();
@@ -70,9 +80,9 @@ Games::Games()
             continue;
         pGame->m_index = this->getNextInternalIndex();
         this->addNewGamesPlay(pGame->m_itemName, pGame->away,
-                              pGame->m_timestamp, pGame->saisonIndex,
-                              pGame->score, pGame->competition,
-                              pGame->m_index);
+                              pGame->m_timestamp, pGame->m_saisonIndex,
+                              pGame->score, pGame->m_competition,
+                              pGame->m_saison, pGame->m_index);
     }
 
     if (bProblems)
@@ -81,15 +91,23 @@ Games::Games()
     this->sortGamesListByTime();
 }
 
-int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, quint8 comp)
+int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, quint8 comp, quint16 saison)
 {
     if (sIndex == 0 || comp == 0) {
         qWarning().noquote() << "Could not add game because saisonIndex or competition were zero";
         return ERROR_CODE_COMMON;
     }
 
+    if (saison == 0) {
+        QDate date = QDateTime::fromMSecsSinceEpoch(timestamp).date();
+        if (date.month() >= 7)
+            saison = date.year();
+        else
+            saison = date.year() - 1;
+    }
+
     GamesPlay* pGame;
-    if ((pGame = this->gameExists(sIndex, comp, timestamp)) != NULL) {
+    if ((pGame = this->gameExists(sIndex, comp, saison, timestamp)) != NULL) {
         //        QString info = QString("%1 : %2").arg(sIndex).arg(comp);
         //        qInfo() << (QString("Game \"%1\" already exists, updating info").arg(info));
 
@@ -132,13 +150,14 @@ int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sInde
     this->m_pConfigSettings->setValue(PLAY_AWAY, away);
     this->m_pConfigSettings->setValue(PLAY_SAISON_INDEX, sIndex);
     this->m_pConfigSettings->setValue(PLAY_SCORE, score);
+    this->m_pConfigSettings->setValue(PLAY_SAISON, saison);
     this->m_pConfigSettings->setValue(PLAY_COMPETITION, comp);
 
     this->m_pConfigSettings->endArray();
     this->m_pConfigSettings->endGroup();
     this->m_pConfigSettings->sync();
 
-    this->addNewGamesPlay(home, away, timestamp, sIndex, score, comp, newIndex, false);
+    this->addNewGamesPlay(home, away, timestamp, sIndex, score, comp, saison, newIndex, false);
 
     CONSOLE_INFO(QString("Added new game: %1").arg(home + " : " + away));
     return newIndex;
@@ -155,9 +174,9 @@ int Games::showAllGames()
         QString date = QDateTime::fromMSecsSinceEpoch(pGame->m_timestamp).toString("dd.MM.yyyy hh:mm");
         QString output;
         if (pGame->score.size() > 0)
-            output = QString("%1: %2 - %3 %4 - %5 = %6").arg(pGame->saisonIndex).arg(pGame->competition).arg(date, pGame->m_itemName, pGame->away, pGame->score);
+            output = QString("%1: %2 - %3 %4 - %5 = %6").arg(pGame->m_saisonIndex).arg(pGame->m_competition).arg(date, pGame->m_itemName, pGame->away, pGame->score);
         else
-            output = QString("%1: %2 - %3 %4 - %5").arg(pGame->saisonIndex).arg(pGame->competition).arg(date, pGame->m_itemName, pGame->away);
+            output = QString("%1: %2 - %3 %4 - %5").arg(pGame->m_saisonIndex).arg(pGame->m_competition).arg(date, pGame->m_itemName, pGame->away);
         std::cout << output.toStdString() << std::endl;
     }
     return 0;
@@ -183,9 +202,10 @@ void Games::saveCurrentInteralList()
         this->m_pConfigSettings->setValue(ITEM_INDEX, pGame->m_index);
 
         this->m_pConfigSettings->setValue(PLAY_AWAY, pGame->away);
-        this->m_pConfigSettings->setValue(PLAY_SAISON_INDEX, pGame->saisonIndex);
+        this->m_pConfigSettings->setValue(PLAY_SAISON_INDEX, pGame->m_saisonIndex);
+        this->m_pConfigSettings->setValue(PLAY_SAISON, pGame->m_saison);
         this->m_pConfigSettings->setValue(PLAY_SCORE, pGame->score);
-        this->m_pConfigSettings->setValue(PLAY_COMPETITION, pGame->competition);
+        this->m_pConfigSettings->setValue(PLAY_COMPETITION, pGame->m_competition);
     }
 
     this->m_pConfigSettings->endArray();
@@ -194,7 +214,7 @@ void Games::saveCurrentInteralList()
     qDebug().noquote() << QString("saved actual Games List with %1 entries").arg(this->getNumberOfInternalList());
 }
 
-GamesPlay* Games::gameExists(quint8 sIndex, quint8 comp, qint64 timestamp)
+GamesPlay* Games::gameExists(quint8 sIndex, quint8 comp, quint16 saison, qint64 timestamp)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
@@ -203,7 +223,7 @@ GamesPlay* Games::gameExists(quint8 sIndex, quint8 comp, qint64 timestamp)
         GamesPlay* pGame = (GamesPlay*)(this->getItemFromArrayIndex(i));
         if (pGame == NULL)
             continue;
-        if (pGame->saisonIndex == sIndex && pGame->competition == comp) {
+        if (pGame->m_saisonIndex == sIndex && pGame->m_competition == comp && pGame->m_saison == saison) {
             QDateTime oldData = QDateTime::fromMSecsSinceEpoch(pGame->m_timestamp);
             if (date.date().year() == oldData.date().year() && date.date().month() == oldData.date().month())
                 return pGame;
@@ -214,7 +234,7 @@ GamesPlay* Games::gameExists(quint8 sIndex, quint8 comp, qint64 timestamp)
 
 
 //bool ListedUser::addNewUserLogin(QString name, QString password, quint32 prop, quint32 index, bool checkUser)
-bool Games::addNewGamesPlay(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, quint8 comp, quint32 index, bool checkGame)
+bool Games::addNewGamesPlay(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, quint8 comp, quint16 saison, quint32 index, bool checkGame)
 {
     if (checkGame) {
         if (sIndex == 0 || comp == 0) {
@@ -223,16 +243,16 @@ bool Games::addNewGamesPlay(QString home, QString away, qint64 timestamp, quint8
         }
         if (index == 0 || itemExists(index)) {
             qWarning().noquote() << QString("Game \"%1\" with index \"%2\" already exists, saving with new index").arg(home + " - " + away).arg(index);
-            this->addNewGamesPlay(home, away, timestamp, sIndex, score, comp, index, &this->m_lAddItemProblems);
+            this->addNewGamesPlay(home, away, timestamp, sIndex, score, comp, saison, index, &this->m_lAddItemProblems);
             return false;
         }
     }
 
-    this->addNewGamesPlay(home, away, timestamp, sIndex, score, comp, index, &this->m_lInteralList);
+    this->addNewGamesPlay(home, away, timestamp, sIndex, score, comp, saison, index, &this->m_lInteralList);
     return true;
 }
 
-void Games::addNewGamesPlay(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, quint8 comp, quint32 index, QList<ConfigItem*>* pList)
+void Games::addNewGamesPlay(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, quint8 comp, quint16 saison, quint32 index, QList<ConfigItem*>* pList)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
@@ -240,10 +260,11 @@ void Games::addNewGamesPlay(QString home, QString away, qint64 timestamp, quint8
     play->m_itemName  = home;
     play->away        = away;
     play->m_timestamp = timestamp;
-    play->saisonIndex = sIndex;
+    play->m_saisonIndex = sIndex;
     play->score       = score;
-    play->competition = comp;
+    play->m_competition = comp;
     play->m_index     = index;
+    play->m_saison    = saison;
     pList->append(play);
 }
 

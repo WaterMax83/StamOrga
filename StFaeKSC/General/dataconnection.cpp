@@ -230,8 +230,8 @@ MessageProtocol* DataConnection::requestGetGamesList(/*MessageProtocol *msg*/)
 
         wAckArray.device()->seek(ackArray.size());
         wAckArray << quint16(game.toUtf8().size() + GAMES_OFFSET);
-        wAckArray << quint8(pGame->saisonIndex);
-        wAckArray << quint8(pGame->competition);
+        wAckArray << quint8(pGame->m_saisonIndex);
+        wAckArray << quint8(pGame->m_competition);
         wAckArray << pGame->m_timestamp;
         wAckArray << pGame->m_index;
 

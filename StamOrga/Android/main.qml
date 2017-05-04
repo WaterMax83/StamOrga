@@ -1,3 +1,4 @@
+
 /*
 *	This file is part of StamOrga
 *   Copyright (C) 2017 Markus Schneider
@@ -15,9 +16,6 @@
 *    You should have received a copy of the GNU General Public License
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-
-
 import QtQuick 2.7
 import QtQuick.Controls 2.1
 import QtQuick.Layouts 1.0
@@ -35,11 +33,11 @@ ApplicationWindow {
     title: qsTr("StamOrga")
 
     onClosing: {
-        if( userInt.isDeviceMobile() && stackView.depth > 1){
+        if (userInt.isDeviceMobile() && stackView.depth > 1) {
             close.accepted = false
-            stackView.pop();
-        }else{
-            return;
+            stackView.pop()
+        } else {
+            return
         }
     }
 
@@ -76,7 +74,7 @@ ApplicationWindow {
 
             Label {
                 id: titleLabel
-//                text: listView.currentItem ? listView.currentItem.text : "StamOrga"
+                //                text: listView.currentItem ? listView.currentItem.text : "StamOrga"
                 font.pixelSize: 25
                 elide: Label.ElideRight
                 horizontalAlignment: Qt.AlignHCenter
@@ -90,13 +88,12 @@ ApplicationWindow {
                     fillMode: Image.Pad
                     horizontalAlignment: Image.AlignHCenter
                     verticalAlignment: Image.AlignVCenter
-                    source:  "images/refresh.png"
-//                    visible: stackView.depth > 1 ? false : true
+                    source: "images/refresh.png"
+                    //                    visible: stackView.depth > 1 ? false : true
                 }
                 onClicked: {
-                    if (imageToolButton.visible === true){
+                    if (imageToolButton.visible === true) {
                         stackView.currentItem.toolButtonClicked()
-
                     }
                 }
             }
@@ -124,7 +121,7 @@ ApplicationWindow {
                     fillMode: Image.Stretch
                     horizontalAlignment: Image.AlignHCenter
                     verticalAlignment: Image.AlignVCenter
-                    source:  "images/StammtischLogo.png"
+                    source: "images/StammtischLogo.png"
                 }
             }
 
@@ -142,7 +139,7 @@ ApplicationWindow {
                     highlighted: ListView.isCurrentItem
                     onClicked: {
                         stackView.push(model.element)
-                        titleLabel.text = model.title;
+                        titleLabel.text = model.title
                         if (model.imgsource !== "") {
                             imageToolButton.visible = true
                             imageToolButton.source = model.imgsource
@@ -157,14 +154,28 @@ ApplicationWindow {
                 model: ListModel {
 
                     Component.onCompleted: {
-                        append({title: "Benutzerprofil", element : viewUserLogin, imgsource : "images/menu.png"});
-                        append({title: "Dauerkarten", element : viewSeasonTickets, imgsource : "images/refresh.png"})
-                        if (userInt.isDebuggingEnabled() && userInt.isDeviceMobile())
-                            append({title: "Logging", element : viewLoggingPage, imgsource : ""});
+                        append({
+                                   title: "Benutzerprofil",
+                                   element: viewUserLogin,
+                                   imgsource: "images/menu.png"
+                               })
+                        append({
+                                   title: "Dauerkarten",
+                                   element: viewSeasonTickets,
+                                   imgsource: "images/refresh.png"
+                               })
+                        if (userInt.isDebuggingEnabled()
+                                && userInt.isDeviceMobile())
+                            append({
+                                       title: "Logging",
+                                       element: viewLoggingPage,
+                                       imgsource: ""
+                                   })
                     }
                 }
 
-                ScrollIndicator.vertical: ScrollIndicator { }
+                ScrollIndicator.vertical: ScrollIndicator {
+                }
             }
         }
     }
@@ -176,7 +187,7 @@ ApplicationWindow {
         } else {
             imageToolButton.visible = false
         }
-        titleLabel.text = text;
+        titleLabel.text = text
     }
 
     StackView {
@@ -189,7 +200,7 @@ ApplicationWindow {
             if (stackView.depth === 1) {
                 imageToolButton.visible = true
                 imageToolButton.source = "images/refresh.png"
-                titleLabel.text = "StamOrga";
+                titleLabel.text = "StamOrga"
             }
             stackView.currentItem.pageOpenedUpdateView()
         }
@@ -218,61 +229,64 @@ ApplicationWindow {
 
     Component {
         id: viewLoggingPage
-        MyPages.LogginPage {}
+        MyPages.LogginPage {
+        }
     }
 
     UserInterface {
         id: userInt
         globalData: globalUserData
-        onNotifyConnectionFinished : {
-             stackView.currentItem.notifyUserIntConnectionFinished(result);
+        onNotifyConnectionFinished: {
+            stackView.currentItem.notifyUserIntConnectionFinished(result)
         }
-        onNotifyVersionRequestFinished : {
-//            stackView.currentItem.notifyUserIntVersionRequestFinished(result, msg);
+        onNotifyVersionRequestFinished: {
+            //            stackView.currentItem.notifyUserIntVersionRequestFinished(result, msg);
             if (result === 5) {
-                var component = Qt.createComponent("/components/VersionDialog.qml");
+                var component = Qt.createComponent(
+                            "/components/VersionDialog.qml")
                 if (component.status === Component.Ready) {
-                    var dialog = component.createObject(stackView,{popupType: 1});
-                    dialog.versionText = msg;
+                    var dialog = component.createObject(stackView, {
+                                                            popupType: 1
+                                                        })
+                    dialog.versionText = msg
                     dialog.parentHeight = stackView.height
                     dialog.parentWidth = stackView.width
-                    dialog.open();
+                    dialog.open()
                 }
             }
         }
         onNotifyUpdatePasswordRequestFinished: {
-            stackView.currentItem.notifyUserIntUpdatePasswordFinished(result);
+            stackView.currentItem.notifyUserIntUpdatePasswordFinished(result)
         }
         onNotifyUpdateReadableNameRequest: {
-            stackView.currentItem.notifyUserIntUpdateReadableNameFinished(result);
+            stackView.currentItem.notifyUserIntUpdateReadableNameFinished(
+                        result)
         }
-        onNotifyGamesListFinished : {
-            stackView.currentItem.notifyUserIntGamesListFinished(result);
+        onNotifyGamesListFinished: {
+            stackView.currentItem.notifyUserIntGamesListFinished(result)
         }
         onNotifySeasonTicketAddFinished: {
-            stackView.currentItem.notifyUserIntSeasonTicketAdd(result);
+            stackView.currentItem.notifyUserIntSeasonTicketAdd(result)
         }
         onNotifySeasonTicketListFinished: {
-            stackView.currentItem.notifyUserIntSeasonTicketListFinished(result);
+            stackView.currentItem.notifyUserIntSeasonTicketListFinished(result)
         }
         onNotifySeasonTicketRemoveFinished: {
-            stackView.currentItem.notifyUserIntSeasonTicketRemoveFinished(result);
+            stackView.currentItem.notifyUserIntSeasonTicketRemoveFinished(
+                        result)
         }
         onNotifySeasonTicketNewPlaceFinished: {
-            stackView.currentItem.notifyUserIntSeasonTicketNewPlaceFinished(result);
+            stackView.currentItem.notifyUserIntSeasonTicketNewPlaceFinished(
+                        result)
         }
     }
-
-
 
     function openUserLogin(open) {
 
         if (open === true) {
-            stackView.push(viewUserLogin);
+            stackView.push(viewUserLogin)
             imageToolButton.visible = false
         } else
             stackView.currentItem.showListedGames()
     }
-
 }
-

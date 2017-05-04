@@ -26,7 +26,8 @@ SOURCES += main.cpp \
     Data/games.cpp \
     Data/readdatacsv.cpp \
     Data/seasonticket.cpp \
-    Data/configlist.cpp
+    Data/configlist.cpp \
+    Data/readonlinegames.cpp
 
 HEADERS += \
     ../Common/General/backgroundcontroller.h \
@@ -49,7 +50,8 @@ HEADERS += \
     Data/games.h \
     Data/readdatacsv.h \
     Data/seasonticket.h \
-    Data/configlist.h
+    Data/configlist.h \
+    Data/readonlinegames.h
 
 
 unix {

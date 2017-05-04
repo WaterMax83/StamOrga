@@ -14,7 +14,9 @@
 
 *    You should have received a copy of the GNU General Public License
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
-*/#include <QtCore/QCoreApplication>
+*/
+
+#include <QtCore/QCoreApplication>
 #include <QtCore/QDataStream>
 #include <QtCore/QFile>
 
@@ -25,6 +27,7 @@
 #include "Network/udpserver.h"
 #include "General/globaldata.h"
 #include "General/console.h"
+#include "Data/readonlinegames.h"
 
 
 
@@ -63,6 +66,12 @@ int main(int argc, char *argv[])
 
         ctrlUdp.Start(udpServ, false);
     }
+
+    BackgroundController ctrlReadOnline;
+    ReadOnlineGames* online = new ReadOnlineGames();
+    online->initialize(&globalData);
+    ctrlReadOnline.Start(online, false);
+
 
     /* TODO: Connect for ctrlUdp::notifyBackgroundWorkerFinished */
 
