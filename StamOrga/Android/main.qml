@@ -157,7 +157,7 @@ ApplicationWindow {
                 model: ListModel {
 
                     Component.onCompleted: {
-                        append({title: "Benutzer", element : viewUserLogin, imgsource : ""});
+                        append({title: "Benutzerprofil", element : viewUserLogin, imgsource : "images/menu.png"});
                         append({title: "Dauerkarten", element : viewSeasonTickets, imgsource : "images/refresh.png"})
                         if (userInt.isDebuggingEnabled() && userInt.isDeviceMobile())
                             append({title: "Logging", element : viewLoggingPage, imgsource : ""});
@@ -269,6 +269,7 @@ ApplicationWindow {
 
         if (open === true) {
             stackView.push(viewUserLogin);
+            imageToolButton.visible = false
         } else
             stackView.currentItem.showListedGames()
     }

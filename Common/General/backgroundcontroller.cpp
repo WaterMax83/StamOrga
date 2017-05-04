@@ -32,19 +32,20 @@
 #include "backgroundcontroller.h"
 #include "backgroundworker.h"
 
-BackgroundController::BackgroundController(QObject *parent) : QObject(parent)
+BackgroundController::BackgroundController(QObject* parent)
+    : QObject(parent)
 {
     this->m_bBackgroundWorkerFinished = false;
 }
 
 
-void BackgroundController::Start(BackgroundWorker *worker, bool CleanupAfterWorkerFinished)
+void BackgroundController::Start(BackgroundWorker* worker, bool CleanupAfterWorkerFinished)
 {
     if (this->IsRunning())
         return;
 
     this->m_bCleanupAfterWorkerFinished = CleanupAfterWorkerFinished;
-    this->m_bBackgroundWorkerFinished = false;
+    this->m_bBackgroundWorkerFinished   = false;
 
     this->m_worker = worker;
     worker->moveToThread(&this->m_thread);
@@ -57,18 +58,18 @@ void BackgroundController::Start(BackgroundWorker *worker, bool CleanupAfterWork
     this->m_thread.start();
 }
 
-void BackgroundController::Stop()
+void BackgroundController::Stop(bool wait)
 {
     if (!this->IsRunning())
         return;
 
-    this->m_bCleanupAfterWorkerFinished = true;    /* Always cleanup when stopped */
+    this->m_bCleanupAfterWorkerFinished = true; /* Always cleanup when stopped */
     this->m_thread.requestInterruption();
 
-    if (this->m_bBackgroundWorkerFinished)
-    {
+    if (this->m_bBackgroundWorkerFinished) {
         this->m_thread.quit();
-        this->m_thread.wait();
+        if (wait)
+            this->m_thread.wait();
     }
 }
 
@@ -79,9 +80,9 @@ void BackgroundController::finishedThread()
     emit notifyThreadFinished();
 }
 
-void BackgroundController::finishedBackgroundWorker(const int &result)
+void BackgroundController::finishedBackgroundWorker(const int& result)
 {
-	disconnect(this->m_worker, &BackgroundWorker::notifyBackgroundWorkerFinished, this, &BackgroundController::finishedBackgroundWorker);
+    disconnect(this->m_worker, &BackgroundWorker::notifyBackgroundWorkerFinished, this, &BackgroundController::finishedBackgroundWorker);
 
     if (this->m_bCleanupAfterWorkerFinished)
         this->CleanupBackgroundWorker();
@@ -96,22 +97,19 @@ void BackgroundController::CleanupBackgroundWorker()
     if (this->m_worker == NULL)
         return;
 
-    if (this->IsRunning())
-    {
+    if (this->IsRunning()) {
         this->m_thread.quit();
-        if (!this->m_thread.wait(2000))
-        {
+        if (!this->m_thread.wait(2000)) {
             this->m_thread.terminate();
             this->m_thread.wait();
         }
     }
 
     disconnect(&this->m_thread, &QThread::started, this->m_worker, &BackgroundWorker::startBackgroundWork);
-	disconnect(&this->m_thread, &QThread::finished, this, &BackgroundController::finishedThread);
+    disconnect(&this->m_thread, &QThread::finished, this, &BackgroundController::finishedThread);
 
     this->m_worker = NULL;
 }
-
 
 
 BackgroundController::~BackgroundController()

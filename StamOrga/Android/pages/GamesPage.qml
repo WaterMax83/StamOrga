@@ -108,14 +108,12 @@ Flickable {
 
        MyComponents.Games {
            onClickedCurrentGame: {
-//               console.log("Clicked game " + sender.home);
-
                var component = Qt.createComponent("../pages/CurrentGamePage.qml");
                if (component.status === Component.Ready) {
                     var sprite = stackView.push(component);
-                   userIntGames.startGettingSeasonTicketList();
+//                   userIntGames.startGettingSeasonTicketList();
                    sprite.userIntCurrentGame = userIntGames
-                    sprite.showAllInfoAboutGame(sender)
+                   sprite.showAllInfoAboutGame(sender)
                    updateHeaderFromMain("Spiel", "")
                } else
                    console.log("Fehler beim laden " + component.errorString() )

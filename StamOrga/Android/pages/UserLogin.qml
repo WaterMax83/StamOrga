@@ -153,7 +153,6 @@ Flickable {
 
                 Button {
                     id: btnChangeReadableName
-                    text: qsTr("Nutzername ändern")
                     implicitWidth: mainColumnLayoutUser.width / 4 * 2
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     transformOrigin: Item.Center
@@ -208,6 +207,21 @@ Flickable {
         }
     }
 
+    function toolButtonClicked() {
+        optionsMenuUserLogin.open();
+    }
+
+    Menu {
+        id: optionsMenuUserLogin
+        x: parent.width - width
+        transformOrigin: Menu.TopRight
+
+        MenuItem {
+            text: "UserLogin anzeigen"
+            onTriggered: updateUserColumnView(true);
+        }
+    }
+
 
     function notifyUserIntConnectionFinished(result) {
         btnSendData.enabled = true
@@ -215,14 +229,12 @@ Flickable {
         if (result === 1) {
             btnSendData.background.color = "green"
             txtInfoConnecting.text = "Verbindung erfolgreich"
-            columnLayoutUserLogin.visible = false;
-            columnLayoutUserData.visible = true;
+            updateUserColumnView(false);
         }
         else {
             btnSendData.background.color = "red"
             txtInfoConnecting.text = userIntUser.getErrorCodeToString(result);
-            columnLayoutUserLogin.visible = true;
-            columnLayoutUserData.visible = false;
+            updateUserColumnView(true);
         }
     }
 
@@ -244,12 +256,23 @@ Flickable {
     }
 
     function pageOpenedUpdateView() {
-        if (globalUserData.userName === "" || globalUserData.passWord === "") {
+        if (globalUserData.userName === "" || globalUserData.passWord === "")
+            updateUserColumnView(true);
+        else
+            updateUserColumnView(false);
+    }
+
+    function updateUserColumnView(enableLogin) {
+        if (enableLogin) {
             columnLayoutUserLogin.visible = true;
             columnLayoutUserData.visible = false;
         } else {
             columnLayoutUserLogin.visible = false;
             columnLayoutUserData.visible = true;
+            if (globalUserData.readableName === "")
+                btnChangeReadableName.text = "Nutzername anlegen"
+            else
+                btnChangeReadableName.text = "Nutzername ändern"
         }
     }
 

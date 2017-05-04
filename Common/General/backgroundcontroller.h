@@ -39,34 +39,34 @@ class BackgroundController : public QObject
 {
     Q_OBJECT
 public:
-    explicit BackgroundController(QObject *parent = 0);
+    explicit BackgroundController(QObject* parent = 0);
     ~BackgroundController();
 
     bool IsRunning() { return m_thread.isRunning(); }
 
-//    void SetCleanupAfterWorkerFinished(bool value) { this->m_bCleanupAfterWorkerFinished = value; }
+    //    void SetCleanupAfterWorkerFinished(bool value) { this->m_bCleanupAfterWorkerFinished = value; }
     bool GetCleanupAfterWorkerFinished() { return this->m_bCleanupAfterWorkerFinished; }
 
     bool GetBackGroundWorkerFinished() { return this->m_bBackgroundWorkerFinished; }
 
-    void Start(BackgroundWorker *worker, bool CleanupAfterWorkerFinished = true);
+    void Start(BackgroundWorker* worker, bool CleanupAfterWorkerFinished = true);
 
-    void Stop();
+    void Stop(bool wait = true);
 
 signals:
-    void notifyBackgroundWorkerFinished(const int &result);
+    void notifyBackgroundWorkerFinished(const int& result);
     void notifyThreadFinished();
 
 public slots:
 
 private slots:
     void finishedThread();
-    void finishedBackgroundWorker(const int &result);
+    void finishedBackgroundWorker(const int& result);
 
 private:
     QThread m_thread;
 
-    BackgroundWorker *m_worker = NULL;
+    BackgroundWorker* m_worker = NULL;
 
     bool m_bCleanupAfterWorkerFinished;
 

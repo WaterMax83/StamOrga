@@ -166,7 +166,7 @@ public:
     {
         return this->m_loggingString;
     }
-    void addNewLoggingMessage(QString log)
+    void addNewLoggingMessage(QString* log)
     {
         this->m_loggingString.append(log);
         this->m_loggingString.append("\n");

@@ -60,7 +60,6 @@ void GlobalData::loadGlobalSettings()
     this->m_pMainUserSettings = new QSettings();
 
     qInfo() << this->m_pMainUserSettings->fileName();
-    qInfo() << QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
 
     this->m_pMainUserSettings->beginGroup("USER_LOGIN");
 

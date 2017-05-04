@@ -1,3 +1,4 @@
+
 QT += qml quick network
 
 CONFIG += c++11
@@ -16,7 +17,8 @@ SOURCES += main.cpp \
     ../datahandling.cpp \
     ../Data/globaldata.cpp \
     ../Data/gameplay.cpp \
-    ../Data/seasonticket.cpp
+    ../Data/seasonticket.cpp \
+    ../loggingapp.cpp
 
 RESOURCES += qml.qrc
 
@@ -58,7 +60,8 @@ HEADERS += \
     ../datahandling.h \
     ../Data/globaldata.h \
     ../Data/gameplay.h \
-    ../Data/seasonticket.h
+    ../Data/seasonticket.h \
+    ../loggingapp.h
 
 DISTFILES += \
     android/AndroidManifest.xml \

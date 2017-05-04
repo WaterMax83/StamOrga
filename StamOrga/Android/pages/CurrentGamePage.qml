@@ -60,24 +60,48 @@ Flickable {
                 }
             }
 
+            ToolSeparator {
+                id: toolSeparator1
+                orientation: "Horizontal"
+                implicitWidth: mainPaneCurrentGame.width / 3 * 1
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            }
+
             Label {
                 id: txtInfoCurrentGameBlockedTickets
-                visible: true
+                visible: false
                 text: "Nicht verfügbar:"
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
             }
 
             ListView {
                 id: listViewBlockedTickets
-
                 focus: false
                 implicitWidth: mainColumnLayoutCurrentGame.width
                 implicitHeight: flickableCurrentGame.height
-//                enabled: false
 
-                delegate: ItemDelegate {
+                delegate: RowLayout {
                     width: parent.width
-                    text: model.title
+                    height: 30
+                    Rectangle {
+                        id: imageItem
+                        anchors.left: parent.left
+                        anchors.leftMargin: parent.height
+                        width: parent.height / 4 * 2
+                        height: parent.height / 4 * 2
+                        radius: width * 0.5
+                        color: "red"
+                    }
+
+                    Text {
+                        text: model.title
+                        anchors.left: imageItem.right
+                        anchors.leftMargin: 10
+                        anchors.verticalCenter: parent.verticalCenter
+                        Layout.alignment: Qt.AlignVCenter
+                        color: "white"
+                        font.pixelSize: parent.height / 4 * 2
+                    }
                 }
 
                 model: ListModel {
@@ -89,6 +113,11 @@ Flickable {
     }
 
     function showAllInfoAboutGame(sender) {
+
+        busyLoadingIndicatorCurrentGames.visible = true;
+        txtInfoCurrentGame.text = "Lade Daten";
+        userIntCurrentGame.startGettingSeasonTicketList();
+
         m_gamePlayCurrentItem = sender;
         gameHeader.showGamesInfo(sender)
     }
@@ -98,17 +127,18 @@ Flickable {
     }
 
     function notifyUserIntSeasonTicketListFinished(result) {
+        busyLoadingIndicatorCurrentGames.visible = false;
         if (result === 1) {
             listViewModelBlockedTickets.clear();
 
             if (globalUserData.getSeasonTicketLength() > 0) {
+                txtInfoCurrentGameBlockedTickets.visible = true
                 for (var i=0; i<globalUserData.getSeasonTicketLength(); i++) {
-                    listViewModelBlockedTickets.append( {title: globalUserData.getSeasonTicket(i).name })
+                    var discount = globalUserData.getSeasonTicket(i).discount > 0 ? " *" : ""
+                    listViewModelBlockedTickets.append( {title: globalUserData.getSeasonTicket(i).name + discount })
                 }
-//                txtInfoSeasonTicket.text = "Letzes Update am " + globalUserData.getSeasonTicketLastUpdate()
             }
-//            listViewModelBlockedTickets.append({title: "Benutzer1", src : ""});
-//            listViewModelBlockedTickets.append({title: "Benutzer2", src : ""})
+            txtInfoCurrentGame.text = "Letzes Update am " + globalUserData.getSeasonTicketLastUpdate()
         } else {
             txtInfoCurrentGame.text = userIntCurrentGame.getErrorCodeToString(result);
         }
