@@ -144,7 +144,6 @@ qint32 ConnectionHandling::startSeasonTicketNewPlace(quint32 index, QString plac
 
 qint32 ConnectionHandling::startSeasonTicketAdd(QString name, quint32 discount)
 {
-    qDebug() << QString("Discount = %1").arg(discount);
     DataConRequest req(OP_CODE_CMD_REQ::REQ_ADD_TICKET);
     req.m_lData.append(QString::number(discount));
     req.m_lData.append(name);

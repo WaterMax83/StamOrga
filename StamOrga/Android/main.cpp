@@ -31,6 +31,21 @@
 #include "userinterface.h"
 
 
+LoggingApp* g_LoggingApp = NULL;
+
+void stamOrgaMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg)
+{
+    QString* newMessage = new QString();
+    newMessage->append(qFormatLogMessage(type, context, msg));
+
+    {
+        QMutexLocker lock(&g_LoggingApp->m_mutex);
+        g_LoggingApp->m_logEntries.append(newMessage);
+    }
+
+    emit g_LoggingApp->signalNewLogEntries();
+}
+
 int main(int argc, char* argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
@@ -49,6 +64,13 @@ int main(int argc, char* argv[])
     loggingApp->initialize(&globalUserData);
     BackgroundController logCtrl;
     logCtrl.Start(loggingApp, false);
+#endif
+
+#ifdef QT_DEBUG
+#ifdef Q_OS_ANDROID
+    g_LoggingApp = loggingApp;
+    qInstallMessageHandler(stamOrgaMessageOutput);
+#endif
 #endif
 
     // engine to start qml display -> takes about half a second

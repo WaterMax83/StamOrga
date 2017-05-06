@@ -237,7 +237,7 @@ void DataConnection::startSendReadableNameRequest(DataConRequest request)
 
 void DataConnection::startSendGamesListRequest(DataConRequest request)
 {
-    MessageProtocol msg(OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST);
+    MessageProtocol msg(OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST, 10);
     this->sendMessageRequest(&msg, request);
 }
 

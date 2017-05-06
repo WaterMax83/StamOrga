@@ -38,6 +38,9 @@ public:
 
     void terminate();
 
+    QList<QString*> m_logEntries;
+    QMutex          m_mutex;
+
 signals:
     void signalNewLogEntries();
 
@@ -50,10 +53,8 @@ protected:
     void stamOrgaMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg);
 
 private:
-    QFile*          m_logFile;
-    GlobalData*     m_globalData;
-    QList<QString*> m_logEntries;
-    QMutex          m_mutex;
+    QFile*      m_logFile;
+    GlobalData* m_globalData;
 };
 
 #endif // LOGGING_H

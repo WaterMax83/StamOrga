@@ -28,7 +28,8 @@
         <file>components/EditableTextDialog.qml</file>
         <file>pages/LogginPage.qml</file>
         <file>components/AcceptDialog.qml</file>
-        <file>pages/CurrentGamePage.qml</file>
         <file>images/StammtischLogo.png</file>
+        <file>pages/CurrentHomeGamePage.qml</file>
+        <file>pages/CurrentAwayGamePage.qml</file>
     </qresource>
 </RCC>

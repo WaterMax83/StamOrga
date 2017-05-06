@@ -17,9 +17,27 @@
 */
 
 #include <QtCore/QStandardPaths>
+#include <QtCore/QtGlobal>
 
 #include "../../Common/General/globalfunctions.h"
 #include "loggingapp.h"
+
+
+//LoggingApp* gLoggingApp;
+
+//static void stamOrgaMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg)
+//{
+//    QString* newMessage = new QString();
+//    newMessage->append(qFormatLogMessage(type, context, msg));
+
+//    {
+//        QMutexLocker lock(&gLoggingApp->m_mutex);
+//        gLoggingApp->m_logEntries.append(newMessage);
+//    }
+
+//    emit gLoggingApp->signalNewLogEntries();
+//}
+
 
 LoggingApp::LoggingApp(QObject* parent)
     : BackgroundWorker(parent)
@@ -34,7 +52,7 @@ void LoggingApp::initialize(GlobalData* pData)
     SetMessagePattern();
 #ifdef QT_DEBUG
 #ifdef Q_OS_ANDROID
-    qInstallMessageHandler(stamOrgaMessageOutput);
+//    qInstallMessageHandler(stamOrgaMessageOutput);
 #endif
 #endif
 }
@@ -44,11 +62,10 @@ int LoggingApp::DoBackgroundWork()
 {
 #ifdef QT_DEBUG
 #ifdef Q_OS_ANDROID
-    connect(this, &LoggingApp::signalNewLogEntries, this, &LoggingApp::slotNewLogEntries)
+    connect(this, &LoggingApp::signalNewLogEntries, this, &LoggingApp::slotNewLogEntries);
 #endif
 #endif
-            qInfo()
-        << QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    qInfo() << QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     return 0;
 }
 
@@ -74,24 +91,11 @@ void LoggingApp::slotNewLogEntries()
     this->m_logFile->flush();
 }
 
-void LoggingApp::stamOrgaMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg)
-{
-    QString* newMessage = new QString();
-    newMessage->append(qFormatLogMessage(type, context, msg));
-
-    {
-        QMutexLocker lock(&this->m_mutex);
-        this->m_logEntries.append(newMessage);
-    }
-
-    emit this->signalNewLogEntries();
-}
-
 void LoggingApp::terminate()
 {
 #ifdef QT_DEBUG
 #ifdef Q_OS_ANDROID
-    disconnect(this, &LoggingApp::signalNewLogEntries, this, &LoggingApp::slotNewLogEntries)
+    disconnect(this, &LoggingApp::signalNewLogEntries, this, &LoggingApp::slotNewLogEntries);
 #endif
 #endif
 }

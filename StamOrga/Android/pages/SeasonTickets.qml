@@ -166,6 +166,8 @@ Flickable {
             id: seasonTicketClickedMenu
             x: (flickableTickets.width - width) / 2
             y: flickableTickets.height / 6
+            title : "Test"
+            implicitHeight: mainPaneTickets.height
 
             background: Rectangle {
                     implicitWidth: menuItemChange.width

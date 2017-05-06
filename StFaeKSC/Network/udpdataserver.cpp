@@ -141,7 +141,7 @@ MessageProtocol* UdpDataServer::checkNewMessage(MessageProtocol* msg)
             break;
 
         case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
-            ack = this->m_pDataConnection->requestGetGamesList();
+            ack = this->m_pDataConnection->requestGetGamesList(msg);
             break;
 
         case OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST:

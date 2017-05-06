@@ -27,6 +27,8 @@
 
 #define GETMATCH_DATA "https://www.openligadb.de/api/getmatchdata"
 
+#define MINUTE_IN_MSEC  60 * 1000
+#define HOUR_IN_MSEC    60 * 60 * 1000
 
 
 ReadOnlineGames::ReadOnlineGames(QObject* parent)
@@ -135,14 +137,17 @@ void ReadOnlineGames::checkNewNetworkRequest()
 
 qint64 ReadOnlineGames::getNextGameInMilliSeconds()
 {
-    qint64 rValue = 4 * 60 * 60 * 1000;     // 4h - 1000ms * 60s * 60min * 4
+    qint64 rValue = 4 * HOUR_IN_MSEC;     // 4h - 1000ms * 60s * 60min * 4
     qint64 now = QDateTime::currentDateTime().toMSecsSinceEpoch();
     for(int i=0; i < this->m_onlineGames.size(); i++) {
         qint64 timestamp = this->m_onlineGames[i]->m_timeStamp;
-        if (now > timestamp)
+        if (now > timestamp) {
+            if ((now - timestamp) < 4 * HOUR_IN_MSEC)
+                rValue = 15 * MINUTE_IN_MSEC;
             continue;
+        }
         if ((timestamp - now) < rValue)
-            rValue = timestamp - now;
+            rValue = (timestamp - now) + 15 * MINUTE_IN_MSEC;
     }
     return rValue;
 }

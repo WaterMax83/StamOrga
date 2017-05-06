@@ -15,7 +15,6 @@
 *    You should have received a copy of the GNU General Public License
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 import QtQuick 2.7
 import QtQuick.Controls 2.1
 import QtQuick.Layouts 1.0
@@ -38,8 +37,8 @@ Flickable {
         ColumnLayout {
             id: mainColumnLayoutCurrentGame
             width: parent.width
-                MyComponents.Games {
-                    id: gameHeader
+            MyComponents.Games {
+                id: gameHeader
             }
 
             ColumnLayout {
@@ -83,6 +82,14 @@ Flickable {
                 delegate: RowLayout {
                     width: parent.width
                     height: 30
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            console.log("Clicked element: " + model.index + " " + model.title);
+                            clickedBlockedElement(model.index);
+                        }
+                    }
                     Rectangle {
                         id: imageItem
                         anchors.left: parent.left
@@ -108,39 +115,68 @@ Flickable {
                     id: listViewModelBlockedTickets
                 }
             }
-
         }
+
+
     }
+
+    function clickedBlockedElement(index) {
+        menuItemFree.text = "Freigeben";
+        clickedBlockedMenu.open();
+    }
+
+    Menu {
+            id: clickedBlockedMenu
+            x: (flickableCurrentGame.width - width) / 2
+            y: flickableCurrentGame.height / 6
+            title: "Test"
+
+
+            background: Rectangle {
+                    implicitWidth: menuItemFree.width
+                    color: "#303030"
+                }
+
+            MenuItem {
+                id: menuItemFree
+                onClicked: {
+                    console.log("Freigeben");
+                }
+            }
+        }
 
     function showAllInfoAboutGame(sender) {
 
-        busyLoadingIndicatorCurrentGames.visible = true;
-        txtInfoCurrentGame.text = "Lade Daten";
-        userIntCurrentGame.startGettingSeasonTicketList();
+        busyLoadingIndicatorCurrentGames.visible = true
+        txtInfoCurrentGame.text = "Lade Daten"
+        userIntCurrentGame.startGettingSeasonTicketList()
 
-        m_gamePlayCurrentItem = sender;
+        m_gamePlayCurrentItem = sender
         gameHeader.showGamesInfo(sender)
     }
 
-    function pageOpenedUpdateView() {
-
-    }
+    function pageOpenedUpdateView() {}
 
     function notifyUserIntSeasonTicketListFinished(result) {
-        busyLoadingIndicatorCurrentGames.visible = false;
+        busyLoadingIndicatorCurrentGames.visible = false
         if (result === 1) {
-            listViewModelBlockedTickets.clear();
+            listViewModelBlockedTickets.clear()
 
             if (globalUserData.getSeasonTicketLength() > 0) {
                 txtInfoCurrentGameBlockedTickets.visible = true
-                for (var i=0; i<globalUserData.getSeasonTicketLength(); i++) {
+                for (var i = 0; i < globalUserData.getSeasonTicketLength(); i++) {
                     var discount = globalUserData.getSeasonTicket(i).discount > 0 ? " *" : ""
-                    listViewModelBlockedTickets.append( {title: globalUserData.getSeasonTicket(i).name + discount })
+                    listViewModelBlockedTickets.append({
+                                                           title: globalUserData.getSeasonTicket(i).name + discount,
+                                                           index: i
+                                                       })
                 }
             }
-            txtInfoCurrentGame.text = "Letzes Update am " + globalUserData.getSeasonTicketLastUpdate()
+            txtInfoCurrentGame.text = "Letzes Update am "
+                    + globalUserData.getSeasonTicketLastUpdate()
         } else {
-            txtInfoCurrentGame.text = userIntCurrentGame.getErrorCodeToString(result);
+            txtInfoCurrentGame.text = userIntCurrentGame.getErrorCodeToString(
+                        result)
         }
     }
 
