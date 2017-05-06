@@ -23,16 +23,15 @@
 #include "messageprotocol.h"
 
 
-#define MIN_PAYLOAD_SIZE    sizeof(msg_Header)
-#define MAX_PAYLOAD_SIZE    512
+#define MIN_PAYLOAD_SIZE sizeof(msg_Header)
+//#define MAX_PAYLOAD_SIZE    512
 
 
 MessageBuffer::MessageBuffer()
 {
-
 }
 
-void MessageBuffer::StoreNewData(QByteArray &data)
+void MessageBuffer::StoreNewData(QByteArray& data)
 {
     if (data.length() == 0)
         return;
@@ -40,12 +39,12 @@ void MessageBuffer::StoreNewData(QByteArray &data)
     this->m_DataBuffer.append(data);
 }
 
-MessageProtocol *MessageBuffer::GetNextMessage()
+MessageProtocol* MessageBuffer::GetNextMessage()
 {
     if (this->m_DataBuffer.length() < 12)
         return NULL;
 
-    msg_Header *pHead = (msg_Header *)this->m_DataBuffer.constData();
+    msg_Header* pHead = (msg_Header*)this->m_DataBuffer.constData();
 
     uint payLoadLength = qFromBigEndian(pHead->length);
 
@@ -53,22 +52,20 @@ MessageProtocol *MessageBuffer::GetNextMessage()
     if (tmp > 0)
         payLoadLength += (sizeof(quint32) - tmp);
 
-    payLoadLength += MIN_PAYLOAD_SIZE;    // MinSize
+    payLoadLength += MIN_PAYLOAD_SIZE; // MinSize
 
-    if (payLoadLength > MAX_PAYLOAD_SIZE)
-    {
-        this->m_DataBuffer.clear();
+    //    if (payLoadLength > MAX_PAYLOAD_SIZE) {
+    //        this->m_DataBuffer.clear();
+    //        return NULL;
+    //    }
+
+    if (payLoadLength > (uint)this->m_DataBuffer.length()) // not yet received everything
         return NULL;
-    }
 
-    if (payLoadLength > (uint)this->m_DataBuffer.length())    // not yet received everything
-        return NULL;
-
-    QByteArray packet = this->m_DataBuffer.left(payLoadLength);
-    MessageProtocol *msg = new MessageProtocol(packet);
+    QByteArray       packet = this->m_DataBuffer.left(payLoadLength);
+    MessageProtocol* msg    = new MessageProtocol(packet);
 
     this->m_DataBuffer.remove(0, payLoadLength);
 
     return msg;
 }
-

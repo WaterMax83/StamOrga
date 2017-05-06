@@ -19,18 +19,35 @@
 #ifndef READONLINEGAMES_H
 #define READONLINEGAMES_H
 
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
 #include <QtCore/QObject>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
+#include <QtCore/QTimer>
+#include <QtCore/QList>
 
-#include "../General/globaldata.h"
 #include "../Common/General/backgroundworker.h"
+#include "../General/globaldata.h"
+
+struct OnlineGameInfo {
+    QString m_team1;
+    QString m_team2;
+    QString m_competition;
+    QString m_score;
+    quint32 m_season;
+    quint32 m_index;
+    quint32 m_matchID;
+    qint64 m_timeStamp;
+    qint64 m_lastUpdate;
+//    bool m_checkUpdate;
+};
 
 class ReadOnlineGames : public BackgroundWorker
 {
     Q_OBJECT
 public:
-    explicit ReadOnlineGames(QObject *parent = 0);
+    explicit ReadOnlineGames(QObject* parent = 0);
 
 
     void initialize(GlobalData* globalData);
@@ -38,14 +55,35 @@ public:
 signals:
 
 public slots:
-    void slotNetWorkReplayFinished(QNetworkReply *reply);
+    void slotNetWorkRequestFinished(QNetworkReply* reply);
+    void slotNetWorkRequestTimeout();
+    void slotNetWorkUpdateTimeout();
 
 
 protected:
     int DoBackgroundWork();
 
-    GlobalData* m_globalData;
+    GlobalData*            m_globalData;
     QNetworkAccessManager* m_netAccess;
+    QTimer* m_networkTimout;
+    bool m_bRequestCanceled;
+
+    QList<OnlineGameInfo*> m_onlineGames;
+    OnlineGameInfo* m_currentGameInfo;
+
+    QTimer* m_networkUpdate;
+
+    void startNetWorkRequest(OnlineGameInfo *info);
+
+    OnlineGameInfo* existCurrentGameInfo(OnlineGameInfo *info);
+
+    qint64 getNextGameInMilliSeconds();
+
+    void checkNewNetworkRequest(void);
+
+    bool readSingleGame(QJsonObject& json);
+    QString readSingleTeam(QJsonObject& json);
+    QString readSingleGameResult(QJsonArray& json);
 };
 
 #endif // READONLINEGAMES_H
