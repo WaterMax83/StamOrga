@@ -35,7 +35,7 @@ ConnectionHandling::ConnectionHandling(QObject* parent)
 
     this->m_pTimerLoginReset = new QTimer();
     this->m_pTimerLoginReset->setSingleShot(true);
-    this->m_pTimerLoginReset->setInterval(CON_RESET_TIMEOUT_MSEC - TIMER_DIFF_MSEC);
+    this->m_pTimerLoginReset->setInterval(CON_LOGIN_TIMEOUT_MSEC - TIMER_DIFF_MSEC);
     connect(this->m_pTimerLoginReset, &QTimer::timeout, this, &ConnectionHandling::slTimerConLoginFired);
 }
 

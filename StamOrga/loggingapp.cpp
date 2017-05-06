@@ -23,22 +23,6 @@
 #include "loggingapp.h"
 
 
-//LoggingApp* gLoggingApp;
-
-//static void stamOrgaMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg)
-//{
-//    QString* newMessage = new QString();
-//    newMessage->append(qFormatLogMessage(type, context, msg));
-
-//    {
-//        QMutexLocker lock(&gLoggingApp->m_mutex);
-//        gLoggingApp->m_logEntries.append(newMessage);
-//    }
-
-//    emit gLoggingApp->signalNewLogEntries();
-//}
-
-
 LoggingApp::LoggingApp(QObject* parent)
     : BackgroundWorker(parent)
 {
@@ -69,6 +53,17 @@ int LoggingApp::DoBackgroundWork()
     return 0;
 }
 
+void LoggingApp::addNewEntry(QString& entry)
+{
+    {
+        QMutexLocker lock(&this->m_mutex);
+        this->m_logEntries.append(entry);
+    }
+
+    emit this->signalNewLogEntries();
+    //    this->slotNewLogEntries();
+}
+
 void LoggingApp::slotNewLogEntries()
 {
     while (true) {
@@ -79,16 +74,16 @@ void LoggingApp::slotNewLogEntries()
             break;
         }
 
-        QString* entry = this->m_logEntries.first();
+        QString entry = this->m_logEntries.first();
         this->m_logEntries.removeFirst();
         this->m_mutex.unlock();
 
         //        this->m_logFile->write(this->createLogLine(entry));
         this->m_globalData->addNewLoggingMessage(entry);
-        delete entry;
+        //        delete entry;
     }
 
-    this->m_logFile->flush();
+    //    this->m_logFile->flush();
 }
 
 void LoggingApp::terminate()

@@ -36,10 +36,10 @@ public:
 
     void initialize(GlobalData* pData);
 
+    void addNewEntry(QString& entry);
+
     void terminate();
 
-    QList<QString*> m_logEntries;
-    QMutex          m_mutex;
 
 signals:
     void signalNewLogEntries();
@@ -53,8 +53,10 @@ protected:
     void stamOrgaMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg);
 
 private:
-    QFile*      m_logFile;
-    GlobalData* m_globalData;
+    QFile*         m_logFile;
+    GlobalData*    m_globalData;
+    QList<QString> m_logEntries;
+    QMutex         m_mutex;
 };
 
 #endif // LOGGING_H

@@ -84,11 +84,12 @@ Games::Games()
                               pGame->score, pGame->m_competition,
                               pGame->m_saison, pGame->m_index);
     }
+	
+	this->sortGamesListByTime();
 
     if (bProblems)
         this->saveCurrentInteralList();
 
-    this->sortGamesListByTime();
 }
 
 int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, quint8 comp, quint16 saison)
@@ -125,6 +126,8 @@ int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sInde
             if (this->updateItemValue(pGame, ITEM_TIMESTAMP, QVariant(timestamp))) {
                 pGame->m_timestamp = timestamp;
             }
+			
+			this->sortGamesListByTime();
         }
         if (pGame->score != score && score.size() > 0) {
             if (this->updateItemValue(pGame, PLAY_SCORE, QVariant(score)))
@@ -156,6 +159,8 @@ int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sInde
     this->m_pConfigSettings->endArray();
     this->m_pConfigSettings->endGroup();
     this->m_pConfigSettings->sync();
+	
+	this->sortGamesListByTime();
 
     this->addNewGamesPlay(home, away, timestamp, sIndex, score, comp, saison, newIndex, false);
 

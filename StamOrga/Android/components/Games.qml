@@ -29,7 +29,7 @@ Rectangle {
     signal clickedCurrentGame(var sender)
 
     width: parent.width
-    height: childrenRect.height * 1.1
+    height: childrenRect.height * 1.05
     property color gradColorStart: "#105050"
     property color gradColorStop: "#509090"
     gradient: Gradient {
@@ -62,7 +62,7 @@ Rectangle {
             id: labelLineDate
             text: qsTr("Date")
             leftPadding: 5
-            topPadding: 5
+            topPadding: 3
             Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
         }
 
@@ -77,6 +77,7 @@ Rectangle {
             id: labelLineHome
             text: qsTr("Home")
             leftPadding: 5
+            topPadding: 5
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
         }

@@ -67,7 +67,7 @@ Rectangle {
 
             Label {
                 id: labelTicketItemHead
-                text: qsTr("Name:")
+                text: qsTr("Karte:")
                 leftPadding: 7
                 topPadding: 5
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter

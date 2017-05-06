@@ -34,7 +34,7 @@ Flickable {
         id: pane
         width: parent.width
 
-        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+//        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
         ColumnLayout {
             id: mainColumnLayoutUser

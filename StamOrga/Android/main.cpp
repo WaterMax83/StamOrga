@@ -35,15 +35,10 @@ LoggingApp* g_LoggingApp = NULL;
 
 void stamOrgaMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
-    QString* newMessage = new QString();
-    newMessage->append(qFormatLogMessage(type, context, msg));
-
-    {
-        QMutexLocker lock(&g_LoggingApp->m_mutex);
-        g_LoggingApp->m_logEntries.append(newMessage);
-    }
-
-    emit g_LoggingApp->signalNewLogEntries();
+    QString newMessage;
+    newMessage.append(qFormatLogMessage(type, context, msg));
+    if (g_LoggingApp != NULL)
+        g_LoggingApp->addNewEntry(newMessage);
 }
 
 int main(int argc, char* argv[])

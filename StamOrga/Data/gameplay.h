@@ -19,8 +19,8 @@
 #ifndef GAMEPLAY_H
 #define GAMEPLAY_H
 
-#include <QtCore/QObject>
 #include <QtCore/QDateTime>
+#include <QtCore/QObject>
 
 class GamePlay : public QObject
 {
@@ -33,10 +33,10 @@ class GamePlay : public QObject
     Q_PROPERTY(quint32 index READ index WRITE setIndex NOTIFY indexChanged)
     Q_PROPERTY(quint8 seasonIndex READ seasonIndex WRITE setSeasonIndex NOTIFY seasonIndexChanged)
 public:
-    explicit GamePlay(QObject *parent = 0);
+    explicit GamePlay(QObject* parent = 0);
 
     QString home() { return this->m_home; }
-    void setHome(const QString &home)
+    void setHome(const QString& home)
     {
         if (this->m_home != home) {
             this->m_home = home;
@@ -45,7 +45,7 @@ public:
     }
 
     QString away() { return this->m_away; }
-    void setAway(const QString &away)
+    void setAway(const QString& away)
     {
         if (this->m_away != away) {
             this->m_away = away;
@@ -54,7 +54,7 @@ public:
     }
 
     QString score() { return this->m_score; }
-    void setScore(const QString &score)
+    void setScore(const QString& score)
     {
         if (this->m_score != score) {
             this->m_score = score;
@@ -80,7 +80,7 @@ public:
 
     QString competition()
     {
-        switch(this->m_comp) {
+        switch (this->m_comp) {
         case 1:
             return "1 Bundesliga";
         case 2:
@@ -96,7 +96,7 @@ public:
 
     void setCompetition(quint8 co)
     {
-        if (this->m_comp != co){
+        if (this->m_comp != co) {
             this->m_comp = co;
             emit this->competitionChanged();
         }
@@ -123,7 +123,7 @@ public:
     Q_INVOKABLE QString getCompetitionIndex()
     {
         if (this->m_comp == 1 || this->m_comp == 2) {
-            return QString("%1. Spieltag").arg(this->m_index);
+            return QString("%1. Spieltag").arg(this->m_seasonIndex);
         }
         return "not implemented";
     }
@@ -149,13 +149,13 @@ signals:
 public slots:
 
 private:
-        QString m_home;
-        QString m_away;
-        QString m_score;
-        quint8 m_comp;
-        quint32 m_index;
-        quint8 m_seasonIndex;
-        qint64 m_timestamp;
+    QString m_home;
+    QString m_away;
+    QString m_score;
+    quint8  m_comp;
+    quint32 m_index;
+    quint8  m_seasonIndex;
+    qint64  m_timestamp;
 };
 
 #endif // GAMEPLAY_H

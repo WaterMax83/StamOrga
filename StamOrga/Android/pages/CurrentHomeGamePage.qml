@@ -69,7 +69,7 @@ Flickable {
             Label {
                 id: txtInfoCurrentGameBlockedTickets
                 visible: false
-                text: "Nicht verfügbar:"
+                text: "Karte geblockt:"
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
             }
 

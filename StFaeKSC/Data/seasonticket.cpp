@@ -94,11 +94,12 @@ int SeasonTicket::addNewSeasonTicket(QString user, quint32 userIndex, QString ti
     this->m_pConfigSettings->beginGroup(GROUP_LIST_ITEM);
     this->m_pConfigSettings->beginWriteArray(CONFIG_LIST_ARRAY);
 
+	this->m_pConfigSettings->setArrayIndex(this->getNumberOfInternalList());
+	
     this->m_pConfigSettings->setValue(ITEM_NAME, ticketName);
     this->m_pConfigSettings->setValue(ITEM_TIMESTAMP, timestamp);
     this->m_pConfigSettings->setValue(ITEM_INDEX, newIndex);
-
-    this->m_pConfigSettings->setArrayIndex(this->getNumberOfInternalList());
+    
     this->m_pConfigSettings->setValue(TICKET_USER, user);
     this->m_pConfigSettings->setValue(TICKET_USER_INDEX, userIndex);
     this->m_pConfigSettings->setValue(TICKET_DISCOUNT, discount);

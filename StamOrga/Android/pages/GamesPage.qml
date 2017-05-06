@@ -36,6 +36,7 @@ Flickable {
             //           anchors.right: parent.right
             //           anchors.left: parent.left
             width: parent.width
+            spacing: 0
             ColumnLayout {
                 id: columnLayoutBusyInfo
                 spacing: 5
