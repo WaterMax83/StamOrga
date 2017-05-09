@@ -25,6 +25,8 @@
 #include <QtCore/QSettings>
 #include <QtNetwork/QHostInfo>
 
+#include "../../Common/General/backgroundcontroller.h"
+#include "../../Common/General/logging.h"
 #include "gameplay.h"
 #include "seasonticket.h"
 
@@ -157,23 +159,23 @@ public:
             emit this->bIsConnectedChanged();
         }
     }
-    quint32 uUserProperties;
+
+    Q_INVOKABLE bool userIsDebugEnabled() { return (this->m_UserProperties & 0x1) > 0 ? true : false; }
+    void SetUserProperties(quint32 value) { this->m_UserProperties = value; }
 
     void saveGlobalUserSettings();
 
-#ifdef QT_DEBUG
-    Q_INVOKABLE QString getCurrentLogginList()
+    Q_INVOKABLE QString getCurrentLoggingList(int index)
     {
-        return this->m_loggingString;
-    }
-    void addNewLoggingMessage(QString log)
-    {
-        this->m_loggingString.append(log);
-        this->m_loggingString.append("\n");
+        return this->m_logApp->getCurrentLoggingList(index);
     }
 
-#endif
+    Q_INVOKABLE QStringList getCurrentLogFileList()
+    {
+        return this->m_logApp->getLogFileDates();
+    }
 
+    Q_INVOKABLE void copyTextToClipBoard(QString text);
 
     void saveActualGamesList();
 
@@ -222,16 +224,14 @@ private:
     quint16 m_uDataPort;
     quint32 m_userIndex;
 
+    quint32 m_UserProperties;
+
     QMutex m_mutexUser;
     QMutex m_mutexUserIni;
     QMutex m_mutexGame;
     QMutex m_mutexTicket;
 
     bool m_bIsConnected;
-
-#ifdef QT_DEBUG
-    QString m_loggingString;
-#endif
 
     QSettings* m_pMainUserSettings;
 
@@ -242,6 +242,9 @@ private:
     QList<SeasonTicketItem*> m_lSeasonTicket;
     qint64                   m_stLastTimeStamp;
     bool existSeasonTicket(SeasonTicketItem* sTicket);
+
+    Logging*             m_logApp;
+    BackgroundController m_ctrlLog;
 };
 
 #endif // GLOBALDATA_H

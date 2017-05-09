@@ -63,7 +63,7 @@ public:
 signals:
     void sNotifyConnectionFinished(qint32 result);
     void sNotifyVersionRequest(qint32 result, QString msg);
-    void sNotifyUserPropertiesRequest(qint32 result, quint32 value);
+    void sNotifyUserPropertiesRequest(qint32 result);
     void sNotifyUpdatePasswordRequest(qint32 result, QString newPassWord);
     void sNotifyUpdateReadableNameRequest(qint32 result);
     void sNotifyGamesListRequest(qint32 result);

@@ -221,7 +221,7 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol *msg)
 
     quint16 numbOfGames = this->m_pGlobalData->m_GamesList.startRequestGetItemList();
 
-    quint32 gamesInPast = 0;
+    qint32 gamesInPast = 0;
     qint64 now = QDateTime::currentMSecsSinceEpoch();
     for (quint32 i = 0; i < numbOfGames; i++) {
         GamesPlay* pGame = (GamesPlay*)(this->m_pGlobalData->m_GamesList.getRequestConfigItem(i));
@@ -229,13 +229,13 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol *msg)
             gamesInPast++;
     }
 
-    quint32 startValue = 0;
+    qint32 startValue = 0;
     if (gamesInPast > maxPastGames)
         startValue = gamesInPast - maxPastGames;
     wAckArray << (quint32)ERROR_CODE_SUCCESS;
     wAckArray << quint16(0x1) << quint16(numbOfGames - startValue); //Version
 
-    for (quint32 i = startValue; i < numbOfGames; i++) {
+    for (qint32 i = startValue; i < numbOfGames; i++) {
         GamesPlay* pGame = (GamesPlay*)(this->m_pGlobalData->m_GamesList.getRequestConfigItem(i));
         if (pGame == NULL)
             continue;

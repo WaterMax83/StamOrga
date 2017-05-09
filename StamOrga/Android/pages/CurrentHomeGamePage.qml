@@ -80,14 +80,17 @@ Flickable {
                 implicitHeight: flickableCurrentGame.height
 
                 delegate: RowLayout {
+                    id: singleBlockedRow
                     width: parent.width
                     height: 30
 
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            console.log("Clicked element: " + model.index + " " + model.title);
-                            clickedBlockedElement(model.index);
+                            var globalCoordinates = singleBlockedRow.mapToItem(flickableCurrentGame, 0, 0)
+                            menuItemFree.text = "Freigeben";
+                            clickedBlockedMenu.y = globalCoordinates.y - singleBlockedRow.height / 2
+                            clickedBlockedMenu.open();
                         }
                     }
                     Rectangle {
@@ -120,11 +123,6 @@ Flickable {
 
     }
 
-    function clickedBlockedElement(index) {
-        menuItemFree.text = "Freigeben";
-        clickedBlockedMenu.open();
-    }
-
     Menu {
             id: clickedBlockedMenu
             x: (flickableCurrentGame.width - width) / 2
@@ -134,7 +132,7 @@ Flickable {
 
             background: Rectangle {
                     implicitWidth: menuItemFree.width
-                    color: "#303030"
+                    color: "#3f3f3f"
                 }
 
             MenuItem {
@@ -165,9 +163,10 @@ Flickable {
             if (globalUserData.getSeasonTicketLength() > 0) {
                 txtInfoCurrentGameBlockedTickets.visible = true
                 for (var i = 0; i < globalUserData.getSeasonTicketLength(); i++) {
-                    var discount = globalUserData.getSeasonTicket(i).discount > 0 ? " *" : ""
+                    var seasonTicketItem = globalUserData.getSeasonTicket(i)
+                    var discount = seasonTicketItem.discount > 0 ? " *" : ""
                     listViewModelBlockedTickets.append({
-                                                           title: globalUserData.getSeasonTicket(i).name + discount,
+                                                           title: seasonTicketItem.name + discount,
                                                            index: i
                                                        })
                 }

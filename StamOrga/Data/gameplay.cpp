@@ -18,7 +18,28 @@
 
 #include "gameplay.h"
 
-GamePlay::GamePlay(QObject *parent) : QObject(parent)
+GamePlay::GamePlay(QObject* parent)
+    : QObject(parent)
 {
+}
 
+
+bool GamePlay::isGameInPast()
+{
+    QDateTime now = QDateTime::currentDateTime();
+    now.addMSecs(2 * 60 * 60 * 1000);
+    if (now.toMSecsSinceEpoch() > this->m_timestamp)
+        return true;
+    return false;
+}
+
+bool GamePlay::isGameRunning()
+{
+    QDateTime now = QDateTime::currentDateTime();
+    if (now.toMSecsSinceEpoch() > this->m_timestamp) {
+        now.addMSecs(2 * 60 * 60 * 1000);
+        if (now.toMSecsSinceEpoch() < this->m_timestamp)
+            return true;
+    }
+    return false;
 }

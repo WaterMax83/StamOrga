@@ -25,6 +25,7 @@
 #include <iostream>
 
 #include "../Common/General/logging.h"
+#include "../Common/General/logging.h"
 #include "../Data/readdatacsv.h"
 #include "../General/globaldata.h"
 
@@ -70,17 +71,17 @@ public:
         return ShowUserCommandHelp();
     }
 
-    static int runLoggingCommand(const QString& cmd)
+    static int runLoggingCommand(Logging* log, const QString& cmd)
     {
         QStringList list = cmd.split(' ');
         if (list.size() < 2 || list.value(0) != "log")
-            return showLoggingInfo(5);
+            return log->showLoggingInfo(5);
 
         bool ok;
         int  numb = list.value(1).toInt(&ok);
         if (ok)
-            return showLoggingInfo(numb);
-        return showLoggingInfo(5);
+            return log->showLoggingInfo(numb);
+        return log->showLoggingInfo(5);
     }
 
     static int runGameCommand(const QString& cmd, Games* pGames)

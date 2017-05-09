@@ -128,13 +128,8 @@ public:
         return "not implemented";
     }
 
-    Q_INVOKABLE bool isGameInPast()
-    {
-        QDateTime now = QDateTime::currentDateTime();
-        if (now.toMSecsSinceEpoch() > this->m_timestamp)
-            return true;
-        return false;
-    }
+    Q_INVOKABLE bool isGameInPast();
+    Q_INVOKABLE bool isGameRunning();
 
 
 signals:

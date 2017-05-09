@@ -16,6 +16,8 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QtCore/QStandardPaths>
+
 #include "globalfunctions.h"
 
 
@@ -31,21 +33,23 @@ QString getUserHomeConfigPath()
     return m_itemName;
 }
 
-bool checkFilePathExistAndCreate(const QString &path)
+QString getUserAppDataLocation()
+{
+    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+}
+
+bool checkFilePathExistAndCreate(const QString& path)
 {
     QFileInfo checkFileInfo(path);
-    if (!checkFileInfo.exists())
-    {
+    if (!checkFileInfo.exists()) {
         /* File is not present, create it */
         qInfo().noquote() << QString("File %1 not found, maybe first run, try to create it: ").arg(path);
-        if (!checkFileInfo.dir().exists() && !checkFileInfo.dir().mkpath(checkFileInfo.dir().absolutePath()))
-        {
+        if (!checkFileInfo.dir().exists() && !checkFileInfo.dir().mkpath(checkFileInfo.dir().absolutePath())) {
             qCritical() << "Error creating directory\n";
             return false;
         }
         QFile file(path);
-        if (!file.open(QIODevice::WriteOnly))
-        {
+        if (!file.open(QIODevice::WriteOnly)) {
             qCritical() << "Error creating file\n";
             return false;
         }
@@ -56,7 +60,7 @@ bool checkFilePathExistAndCreate(const QString &path)
 
 QString getErrorCodeString(qint32 code)
 {
-    switch(code) {
+    switch (code) {
     case ERROR_CODE_NEW_VERSION:
         return QString("neue Version: %1").arg(code);
     case ERROR_CODE_SUCCESS:
@@ -86,7 +90,7 @@ QString getErrorCodeString(qint32 code)
     }
 }
 
-#define DEFAULT_PADDING_SIZE    4
+#define DEFAULT_PADDING_SIZE 4
 
 inline uint CalculatePaddingSize(uint uLength)
 {

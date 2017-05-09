@@ -23,28 +23,19 @@
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/QQmlContext>
 
+#include <iostream>
+
 #include "../../Common/General/backgroundcontroller.h"
 #include "../../Common/General/globalfunctions.h"
 #include "../Data/globaldata.h"
 #include "../dataconnection.h"
-#include "../loggingapp.h"
 #include "userinterface.h"
-
-
-LoggingApp* g_LoggingApp = NULL;
-
-void stamOrgaMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg)
-{
-    QString newMessage;
-    newMessage.append(qFormatLogMessage(type, context, msg));
-    if (g_LoggingApp != NULL)
-        g_LoggingApp->addNewEntry(newMessage);
-}
 
 int main(int argc, char* argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QGuiApplication app(argc, argv);
+
 
     // Register our component type with QML.
     qmlRegisterType<UserInterface>("com.watermax.demo", 1, 0, "UserInterface");
@@ -54,19 +45,6 @@ int main(int argc, char* argv[])
     qRegisterMetaType<DataConRequest>("DataConRequest");
 
     GlobalData globalUserData;
-#ifdef QT_DEBUG
-    LoggingApp* loggingApp = new LoggingApp();
-    loggingApp->initialize(&globalUserData);
-    BackgroundController logCtrl;
-    logCtrl.Start(loggingApp, false);
-#endif
-
-#ifdef QT_DEBUG
-#ifdef Q_OS_ANDROID
-    g_LoggingApp = loggingApp;
-    qInstallMessageHandler(stamOrgaMessageOutput);
-#endif
-#endif
 
     // engine to start qml display -> takes about half a second
     QQmlApplicationEngine engine;
@@ -91,11 +69,5 @@ int main(int argc, char* argv[])
     else
         QMetaObject::invokeMethod(pRootObject, "openUserLogin", Q_ARG(QVariant, false));
 
-
-    int result = app.exec();
-#ifdef QT_DEBUG
-    loggingApp->terminate();
-    logCtrl.Stop();
-#endif
-    return result;
+    return app.exec();
 }

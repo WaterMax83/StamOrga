@@ -31,6 +31,7 @@ Rectangle {
     width: parent.width
     height: childrenRect.height * 1.05
     property color gradColorStart: "#105050"
+//    property color colorTest: "#f30707"
     property color gradColorStop: "#509090"
     gradient: Gradient {
         GradientStop {
@@ -125,6 +126,9 @@ Rectangle {
             if (gamePlayItem.isGameInPast()) {
                 mainRectangleGame.gradColorStart = "#505050"
                 mainRectangleGame.gradColorStop = "#909090"
+            } else if (gamePlayItem.isGameRunning()) {
+                mainRectangleGame.gradColorStart = "#f30707"
+                mainRectangleGame.gradColorStop = "#ff4747"
             }
 
         }

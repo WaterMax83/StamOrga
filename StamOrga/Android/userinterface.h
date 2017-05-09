@@ -21,17 +21,17 @@
 
 #include <QtCore/QObject>
 
-#include "../connectionhandling.h"
-#include "../Data/globaldata.h"
 #include "../../Common/General/globalfunctions.h"
+#include "../Data/globaldata.h"
+#include "../connectionhandling.h"
 
 class UserInterface : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(GlobalData * globalData READ globalData WRITE setGlobalData)
+    Q_PROPERTY(GlobalData* globalData READ globalData WRITE setGlobalData)
 public:
-    explicit UserInterface(QObject *parent = 0);
+    explicit UserInterface(QObject* parent = 0);
 
     Q_INVOKABLE qint32 startMainConnection(QString name, QString passw);
 
@@ -72,11 +72,11 @@ public:
         return getErrorCodeString(code);
     }
 
-    GlobalData *globalData()
+    GlobalData* globalData()
     {
         return this->m_pConHandle->getGlobalData();
     }
-    void setGlobalData(GlobalData *pData)
+    void setGlobalData(GlobalData* pData)
     {
         this->m_pConHandle->setGlobalData(pData);
     }
@@ -84,6 +84,7 @@ public:
 signals:
     void notifyConnectionFinished(qint32 result);
     void notifyVersionRequestFinished(qint32 result, QString msg);
+    void notifyUserPropertiesFinished(qint32 result);
     void notifyUpdatePasswordRequestFinished(qint32 result, QString newPassWord);
     void notifyUpdateReadableNameRequest(qint32 result);
     void notifyGamesListFinished(qint32 result);
@@ -95,6 +96,7 @@ signals:
 public slots:
     void slConnectionRequestFinished(qint32 result);
     void slVersionRequestFinished(qint32 result, QString msg);
+    void slUserPropertiesFinished(qint32 result);
     void slUpdatePasswordRequestFinished(qint32 result, QString newPassWord);
     void slUpdateReadableNameRequestFinished(qint32 result);
     void slGettingGamesListFinished(qint32 result);
@@ -105,7 +107,7 @@ public slots:
 
 
 private:
-    ConnectionHandling *m_pConHandle;
+    ConnectionHandling* m_pConHandle;
 };
 
 #endif // USERINTERFACE_H

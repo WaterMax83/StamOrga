@@ -20,13 +20,16 @@
 
 #include "userinterface.h"
 
-UserInterface::UserInterface(QObject *parent) : QObject(parent)
+UserInterface::UserInterface(QObject* parent)
+    : QObject(parent)
 {
     this->m_pConHandle = new ConnectionHandling();
     connect(this->m_pConHandle, &ConnectionHandling::sNotifyConnectionFinished,
             this, &UserInterface::slConnectionRequestFinished);
     connect(this->m_pConHandle, &ConnectionHandling::sNotifyVersionRequest,
             this, &UserInterface::slVersionRequestFinished);
+    connect(this->m_pConHandle, &ConnectionHandling::sNotifyUserPropertiesRequest,
+            this, &UserInterface::slUserPropertiesFinished);
     connect(this->m_pConHandle, &ConnectionHandling::sNotifyUpdatePasswordRequest,
             this, &UserInterface::slUpdatePasswordRequestFinished);
     connect(this->m_pConHandle, &ConnectionHandling::sNotifyUpdateReadableNameRequest,
@@ -96,6 +99,11 @@ void UserInterface::slVersionRequestFinished(qint32 result, QString msg)
     emit this->notifyVersionRequestFinished(result, msg);
 }
 
+
+void UserInterface::slUserPropertiesFinished(qint32 result)
+{
+    emit this->notifyUserPropertiesFinished(result);
+}
 
 void UserInterface::slUpdatePasswordRequestFinished(qint32 result, QString newPassWord)
 {

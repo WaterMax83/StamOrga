@@ -152,7 +152,7 @@ ApplicationWindow {
                 }
 
                 model: ListModel {
-
+                    id: listViewListModel
                     Component.onCompleted: {
                         append({
                                    title: "Benutzerprofil",
@@ -164,8 +164,7 @@ ApplicationWindow {
                                    element: viewSeasonTickets,
                                    imgsource: "images/refresh.png"
                                })
-                        if (userInt.isDebuggingEnabled()
-                                && userInt.isDeviceMobile())
+                        if (userInt.isDebuggingEnabled())
                             append({
                                        title: "Logging",
                                        element: viewLoggingPage,
@@ -255,6 +254,20 @@ ApplicationWindow {
                 }
             }
         }
+        property bool isDebugWindowEnabled : false;
+        onNotifyUserPropertiesFinished: {
+            if (result > 0 && !userInt.isDebuggingEnabled() && !isDebugWindowEnabled) {
+                isDebugWindowEnabled = true;
+                if (globalUserData.userIsDebugEnabled) {
+                    listViewListModel.append({
+                                            title: "Logging",
+                                            element: viewLoggingPage,
+                                            imgsource: ""
+                                        })
+                }
+            }
+        }
+
         onNotifyUpdatePasswordRequestFinished: {
             stackView.currentItem.notifyUserIntUpdatePasswordFinished(result)
         }

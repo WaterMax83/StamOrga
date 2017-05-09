@@ -20,11 +20,76 @@
 #define LOGGING_H
 
 #include <QtCore/QFile>
+#include <QtCore/QList>
+#include <QtCore/QMutex>
+#include <QtCore/QObject>
+#include <QtCore/QTimer>
 
-    void logSetLogFile(QFile *pFile);
 
-    void logMyMessageLogginOutPut(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+#ifdef STAMORGA_APP
+#include "../../Common/General/backgroundworker.h"
+#else
+#include "../Common/General/backgroundworker.h"
+#endif
+
+//void logMyMessageLogginOutPut(QtMsgType type, const QMessageLogContext& context, const QString& msg);
+
+struct LogEntry {
+    QtMsgType m_type;
+    //    QMessageLogContext m_context;
+    QString m_message;
+};
+
+class Logging : public BackgroundWorker
+{
+    Q_OBJECT
+public:
+    explicit Logging(QObject* parent = 0);
+
+    void initialize();
+
+    void addNewEntry(QtMsgType type, /*const QMessageLogContext context,*/ const QString& msg);
 
     int showLoggingInfo(quint16 numbOfLines);
+
+    QString getCurrentLoggingList(int index)
+    {
+        if (index < this->m_lastLogFiles.size()) {
+            QFile file(this->m_lastLogFiles[index]);
+            if (file.open(QFile::ReadOnly))
+                return QString(file.readAll());
+        }
+
+        return this->m_currentLogging;
+    }
+
+    QStringList getLogFileDates();
+
+    void terminate();
+
+
+signals:
+    void signalNewLogEntries();
+
+private slots:
+    void slotNewLogEntries();
+    void slotEveryHourTimeout();
+
+protected:
+    int DoBackgroundWork();
+
+private:
+    QFile*           m_logFile;
+    QList<LogEntry*> m_logEntries;
+    QMutex           m_internalMutex;
+    QMutex           m_entryListMutex;
+    QString          m_currentLogging;
+    QTimer*          m_hourTimer;
+
+    QList<QString> m_lastLogFiles;
+
+    QString createLoggingFilePath();
+};
+
 
 #endif // LOGGING_H

@@ -82,7 +82,7 @@ int ReadDataCSV::readNewCSVData(QString path)
 int ReadDataCSV::readNewGameData(QStringList line)
 {
     bool ok;
-    quint8 sIndex;
+    quint8 sIndex = 0;
     if (line.size() > 0) {
         sIndex = line.value(0).toUShort(&ok);
         if (!ok) {
@@ -91,7 +91,7 @@ int ReadDataCSV::readNewGameData(QStringList line)
         }
     }
 
-    quint8 competition;
+    quint8 competition = 0;
     if (line.size() > 1) {
         competition = line.value(1).toUShort(&ok);
         if (!ok) {

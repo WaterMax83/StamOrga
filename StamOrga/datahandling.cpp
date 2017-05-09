@@ -17,6 +17,7 @@
 */
 
 #include <QtCore/QtEndian>
+#include <QtQml/QQmlEngine>
 
 #include "../Common/General/config.h"
 #include "../Common/General/globalfunctions.h"
@@ -154,6 +155,7 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol* msg)
         if (lplayString.size() > 2)
             play->setScore(lplayString.value(2));
 
+        QQmlEngine::setObjectOwnership(play, QQmlEngine::CppOwnership);
         this->m_pGlobalData->addNewGamePlay(play);
         totalPacks--;
     }
@@ -218,6 +220,7 @@ qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol* msg)
         if (lsticketString.size() > 1)
             sTicket->setPlace(lsticketString.value(1));
 
+        QQmlEngine::setObjectOwnership(sTicket, QQmlEngine::CppOwnership);
         this->m_pGlobalData->addNewSeasonTicket(sTicket);
         totalPacks--;
     }

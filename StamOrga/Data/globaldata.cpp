@@ -18,9 +18,10 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QStandardPaths>
+#include <QtGui/QClipboard>
 #include <QtGui/QGuiApplication>
 #include <QtNetwork/QNetworkConfigurationManager>
-
+#include <QtQml/QQmlEngine>
 
 #include "globaldata.h"
 
@@ -48,7 +49,11 @@ GlobalData::GlobalData(QObject* parent)
     QGuiApplication::setOrganizationName("WaterMax");
     QGuiApplication::setApplicationName("StamOrga");
     this->setbIsConnected(false);
-    this->uUserProperties = 0x0;
+    this->SetUserProperties(0x0);
+
+    this->m_logApp = new Logging();
+    this->m_logApp->initialize();
+    this->m_ctrlLog.Start(this->m_logApp, false);
 }
 
 void GlobalData::loadGlobalSettings()
@@ -85,6 +90,8 @@ void GlobalData::loadGlobalSettings()
         play->setIndex(this->m_pMainUserSettings->value(ITEM_INDEX, 0).toUInt());
         play->setScore(this->m_pMainUserSettings->value(PLAY_SCORE, "").toString());
         play->setCompetition(quint8(this->m_pMainUserSettings->value(PLAY_COMPETITION, 0).toUInt()));
+
+        QQmlEngine::setObjectOwnership(play, QQmlEngine::CppOwnership);
         this->addNewGamePlay(play);
     }
     this->m_pMainUserSettings->endArray();
@@ -98,12 +105,14 @@ void GlobalData::loadGlobalSettings()
     for (int i = 0; i < ticketCount; i++) {
         this->m_pMainUserSettings->setArrayIndex(i);
         SeasonTicketItem* ticket = new SeasonTicketItem();
+
         ticket->setName(this->m_pMainUserSettings->value(TICKET_NAME, "").toString());
         ticket->setPlace(this->m_pMainUserSettings->value(TICKET_PLACE, "").toString());
         ticket->setDiscount(quint8(this->m_pMainUserSettings->value(TICKET_DISCOUNT, 0).toUInt()));
         ticket->setIndex(this->m_pMainUserSettings->value(ITEM_INDEX, 0).toUInt());
         ticket->setUserIndex(this->m_pMainUserSettings->value(TICKET_USER_INDEX, 0).toUInt());
 
+        QQmlEngine::setObjectOwnership(ticket, QQmlEngine::CppOwnership);
         this->addNewSeasonTicket(ticket);
     }
 
@@ -262,12 +271,18 @@ bool GlobalData::existSeasonTicket(SeasonTicketItem* sTicket)
     return false;
 }
 
+SeasonTicketItem* lastItem = NULL;
+
 SeasonTicketItem* GlobalData::getSeasonTicket(int index)
 {
     QMutexLocker lock(&this->m_mutexTicket);
 
-    if (index < this->m_lSeasonTicket.size())
+    if (index < this->m_lSeasonTicket.size()) {
+        if (lastItem != NULL)
+            delete lastItem;
+
         return this->m_lSeasonTicket.at(index);
+    }
     return NULL;
 }
 
@@ -275,6 +290,12 @@ QString GlobalData::getSeasonTicketLastUpdate()
 {
     QMutexLocker lock(&this->m_mutexTicket);
     return QDateTime::fromMSecsSinceEpoch(this->m_stLastTimeStamp).toString("dd.MM.yy hh:mm:ss");
+}
+
+void GlobalData::copyTextToClipBoard(QString text)
+{
+    QClipboard* clip = QGuiApplication::clipboard();
+    clip->setText(text);
 }
 
 void GlobalData::callBackLookUpHost(const QHostInfo& host)

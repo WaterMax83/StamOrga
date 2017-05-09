@@ -20,62 +20,61 @@
 #include <QtCore/QDataStream>
 #include <QtCore/QFile>
 
+
 #include "../Common/General/backgroundcontroller.h"
 #include "../Common/General/backgroundworker.h"
 #include "../Common/General/globalfunctions.h"
 #include "../Common/General/logging.h"
-#include "Network/udpserver.h"
-#include "General/globaldata.h"
-#include "General/console.h"
 #include "Data/readonlinegames.h"
+#include "General/console.h"
+#include "General/globaldata.h"
+#include "Network/udpserver.h"
 
 
-
-
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     QCoreApplication a(argc, argv);
     QCoreApplication::setOrganizationName("WaterMax");
     QCoreApplication::setOrganizationDomain("watermax.com");
     QCoreApplication::setApplicationName("StFaeKSC");
 
-    QString logginPath = getUserHomeConfigPath() + "/Log/Actual.log";
+    GlobalData globalData;
+    Console    con(&globalData);
 
-    if (!checkFilePathExistAndCreate(logginPath)) {
-        CONSOLE_CRITICAL(QString("Could not create file for Logging"));
-    }
-    else {
-        QFile *logFile = new QFile(logginPath);
-        if (logFile->open(QFile::ReadWrite | QFile::Text | QFile::Append))
-            logSetLogFile(logFile);
-    }
+    //    QString logginPath = getUserHomeConfigPath() + "/Log/Actual.log";
 
-    qInstallMessageHandler(logMyMessageLogginOutPut);
+    //    if (!checkFilePathExistAndCreate(logginPath)) {
+    //        CONSOLE_CRITICAL(QString("Could not create file for Logging"));
+    //    } else {
+    //        QFile* logFile = new QFile(logginPath);
+    //        if (logFile->open(QFile::ReadWrite | QFile::Text | QFile::Append))
+    //            logSetLogFile(logFile);
+    //    }
+
+    //    qInstallMessageHandler(logMyMessageLogginOutPut);
 
     qInfo() << "*************************************************************";
     qInfo() << "Starting StFaeKSC";
 
-    GlobalData globalData;
 
     BackgroundController ctrlUdp;
     if (argc > 1 && QString(argv[1]) == "-noServer") {
         qInfo() << "Starting only as a deamon without a server";
     } else {
 
-        UdpServer *udpServ = new UdpServer(&globalData);
+        UdpServer* udpServ = new UdpServer(&globalData);
 
         ctrlUdp.Start(udpServ, false);
     }
 
     BackgroundController ctrlReadOnline;
-    ReadOnlineGames* online = new ReadOnlineGames();
+    ReadOnlineGames*     online = new ReadOnlineGames();
     online->initialize(&globalData);
     ctrlReadOnline.Start(online, false);
 
 
     /* TODO: Connect for ctrlUdp::notifyBackgroundWorkerFinished */
 
-    Console con(&globalData);
     con.run();
     QObject::connect(&con, SIGNAL(quit()), &a, SLOT(quit()));
 

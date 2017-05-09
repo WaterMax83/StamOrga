@@ -25,25 +25,52 @@ import com.watermax.demo 1.0
 Flickable {
    id: flickableLogging
    contentHeight: mainPaneLogging.height
+//   width: parent.width
    Pane {
        id: mainPaneLogging
        width: parent.width
 
-       Text {
-           id: txtLogging
+       ColumnLayout {
            width: parent.width
-           wrapMode: Text.WordWrap
-//           implicitWidth: mainPaneLogging.width
-           Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-           rightPadding: 5
-           visible: true
-           color: "white"
-       }
+           spacing: 5
+           ComboBox {
+                id: logFilesCombo
+               model: globalUserData.getCurrentLogFileList()
+               anchors.horizontalCenter: parent.horizontalCenter
+               onCurrentIndexChanged: {
+                   txtLogging.text = globalUserData.getCurrentLoggingList(logFilesCombo.currentIndex);
+                   console.log("Current width = " + txtLogging.width)
+               }
+           }
 
+           Text {
+               id: txtLogging
+               wrapMode: Text.WordWrap
+               Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+               Layout.maximumWidth: parent.width
+               rightPadding: 5
+               visible: true
+               color: "white"
+           }
+
+           Button {
+               text: "Kopieren"
+               implicitWidth: parent.width / 3 * 2
+               Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+               onClicked: {
+                globalUserData.copyTextToClipBoard(txtLogging.text);
+               }
+           }
+       }
    }
 
    function pageOpenedUpdateView() {
-       txtLogging.text = globalUserData.getCurrentLogginList();
+       if (logFilesCombo.count > 0)
+            logFilesCombo.currentIndex = logFilesCombo.count - 1
+       else {
+           logFilesCombo.visible = false;
+           txtLogging.text = globalUserData.getCurrentLoggingList(0);
+       }
    }
 
 

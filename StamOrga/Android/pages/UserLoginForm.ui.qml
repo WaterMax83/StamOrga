@@ -30,6 +30,10 @@ Flickable {
        id: mainPaneLogging
        width: parent.width
 
+       Rectangle {
+           color: "#3f3f3f"
+           width: parent.width
+           height: txtLogging.height
        Text {
            id: txtLogging
            width: parent.width
@@ -41,6 +45,7 @@ Flickable {
            rightPadding: 5
            visible: true
            color: "white"
+       }
        }
 
    }

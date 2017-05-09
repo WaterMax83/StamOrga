@@ -125,7 +125,8 @@ Flickable {
         if (globalUserData.getSeasonTicketLength() > 0) {
             for (var i=0; i<globalUserData.getSeasonTicketLength(); i++) {
                 var sprite = seasonTicketItem.createObject(columnLayoutTickets)
-                sprite.showTicketInfo(globalUserData.getSeasonTicket(i))
+//                sprite.showTicketInfo(globalUserData.getSeasonTicket(i))
+                sprite.showTicketInfo(i);
             }
             txtInfoSeasonTicket.text = "Letzes Update am " + globalUserData.getSeasonTicketLastUpdate()
         } else
@@ -171,7 +172,7 @@ Flickable {
 
             background: Rectangle {
                     implicitWidth: menuItemChange.width
-                    color: "#303030"
+                    color: "#3f3f3f"
                 }
 
             MenuItem {

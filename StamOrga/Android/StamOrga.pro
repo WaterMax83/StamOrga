@@ -3,12 +3,15 @@ QT += qml quick network
 
 CONFIG += c++11
 
+DEFINES += STAMORGA_APP
+
 SOURCES += main.cpp \
 	userinterface.cpp \
     ../ConnectionHandling.cpp \
     ../mainconnection.cpp \
     ../../Common/General/backgroundcontroller.cpp \
     ../../Common/General/backgroundworker.cpp \
+    ../../Common/General/logging.cpp \
     ../../Common/Network/messagebuffer.cpp \
     ../../Common/Network/messagecommand.cpp \
     ../../Common/Network/messageprotocol.cpp \
@@ -18,7 +21,7 @@ SOURCES += main.cpp \
     ../Data/globaldata.cpp \
     ../Data/gameplay.cpp \
     ../Data/seasonticket.cpp \
-    ../loggingapp.cpp
+
 
 RESOURCES += qml.qrc
 
@@ -51,6 +54,7 @@ HEADERS += \
     ../../Common/General/backgroundcontroller.h \
     ../../Common/General/backgroundworker.h \
     ../../Common/General/config.h \
+    ../../Common/General/logging.h \
     ../../Common/General/globaltiming.h \
     ../../Common/Network/messagebuffer.h \
     ../../Common/Network/messagecommand.h \
@@ -61,7 +65,6 @@ HEADERS += \
     ../Data/globaldata.h \
     ../Data/gameplay.h \
     ../Data/seasonticket.h \
-    ../loggingapp.h
 
 DISTFILES += \
     android/AndroidManifest.xml \

@@ -46,8 +46,12 @@ Console::Console(GlobalData* pData, QObject* parent)
     /* path for storing and reading files */
     this->m_applicationPath = QCoreApplication::applicationDirPath();
 
-
     this->m_pGlobalData = pData;
+
+    this->m_logging = new Logging();
+    this->m_logging->initialize();
+
+    this->m_ctrlLog.Start(this->m_logging, false);
 }
 
 
@@ -95,7 +99,7 @@ void Console::readCommand()
         } else if (qLine == "read" || qLine.left(5) == "read ") {
             UserCommand::runReadCommand(qLine, this->m_pGlobalData);
         } else if (qLine == "log" || qLine.left(4) == "log ") {
-            UserCommand::runLoggingCommand(qLine);
+            UserCommand::runLoggingCommand(this->m_logging, qLine);
 
         } else if (line.length() == 0) {
 

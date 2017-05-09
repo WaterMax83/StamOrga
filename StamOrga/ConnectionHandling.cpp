@@ -59,11 +59,9 @@ qint32 ConnectionHandling::startMainConnection(QString name, QString passw)
                 qDebug() << "Did not log in again, should already be succesfull";
                 return ERROR_CODE_NO_ERROR;
             }
-            //            this->m_pGlobalData->setPassWord(passw);
             this->startDataConnection();
             QThread::msleep(1);
             this->sendLoginRequest(passw);
-            //            this->m_pGlobalData->saveGlobalUserSettings();
             return ERROR_CODE_SUCCESS;
         }
         this->m_ctrlMainCon.Stop();
@@ -72,18 +70,11 @@ qint32 ConnectionHandling::startMainConnection(QString name, QString passw)
     } else
         this->stopDataConnection();
 
-    //    if (bChangedUserName)
-    //        this->m_pGlobalData->setUserName(name);
-    //    if (bChangedPassword)
-    //        this->m_pGlobalData->setPassWord(passw);
-
     this->m_pMainCon       = new MainConnection(this->m_pGlobalData, name);
     mainConRequestPassWord = passw;
     connect(this->m_pMainCon, &MainConnection::connectionRequestFinished, this, &ConnectionHandling::slMainConReqFin);
     this->m_ctrlMainCon.Start(this->m_pMainCon, false);
 
-    //    if (bChangedPassword || bChangedUserName)
-    //        this->m_pGlobalData->saveGlobalUserSettings();
 
     return ERROR_CODE_SUCCESS;
 }
@@ -241,8 +232,8 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
 
     case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
         if (request.m_result == ERROR_CODE_SUCCESS)
-            this->m_pGlobalData->uUserProperties = request.m_returnData.toUInt();
-        emit this->sNotifyUserPropertiesRequest(request.m_result, request.m_returnData.toUInt());
+            this->m_pGlobalData->SetUserProperties(request.m_returnData.toUInt());
+        emit this->sNotifyUserPropertiesRequest(request.m_result);
         break;
 
     case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:

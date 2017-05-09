@@ -142,16 +142,18 @@ Rectangle {
         }
     }
 
-    function showTicketInfo(seasonTicketItem) {
+    function showTicketInfo(index) {
+        var seasonTicketItem = globalUserData.getSeasonTicket(index)
+        console.log("Second line")
         if (seasonTicketItem !== null) {
             m_SeasonTicketItem = seasonTicketItem
-            labelTicketItem.text = seasonTicketItem.name
-            labelInfoWhere.text = seasonTicketItem.place;
-            if (seasonTicketItem.discount === 0)
+            labelTicketItem.text = m_SeasonTicketItem.name
+            labelInfoWhere.text = m_SeasonTicketItem.place;
+            if (m_SeasonTicketItem.discount === 0)
                 labelInfoDiscount.text = "Nein";
             else
                 labelInfoDiscount.text = "Ja";
-            if (seasonTicketItem.isTicketYourOwn())
+            if (m_SeasonTicketItem.isTicketYourOwn())
                 ticketRectangleItem.border.color = "#EF9A9A"
 
 

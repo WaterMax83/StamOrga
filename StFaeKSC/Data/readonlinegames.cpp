@@ -27,8 +27,8 @@
 
 #define GETMATCH_DATA "https://www.openligadb.de/api/getmatchdata"
 
-#define MINUTE_IN_MSEC  60 * 1000
-#define HOUR_IN_MSEC    60 * 60 * 1000
+#define MINUTE_IN_MSEC 60 * 1000
+#define HOUR_IN_MSEC 60 * 60 * 1000
 
 
 ReadOnlineGames::ReadOnlineGames(QObject* parent)
@@ -45,10 +45,10 @@ void ReadOnlineGames::initialize(GlobalData* globalData)
 int ReadOnlineGames::DoBackgroundWork()
 {
     OnlineGameInfo* gameInfo = new OnlineGameInfo();
-    gameInfo->m_competition = "bl2";
-    gameInfo->m_season = 2016;
-    gameInfo->m_index = 1;
-    gameInfo->m_matchID = 0;
+    gameInfo->m_competition  = "bl2";
+    gameInfo->m_season       = 2016;
+    gameInfo->m_index        = 1;
+    gameInfo->m_matchID      = 0;
 
     this->m_netAccess = new QNetworkAccessManager();
     connect(this->m_netAccess, &QNetworkAccessManager::finished, this, &ReadOnlineGames::slotNetWorkRequestFinished);
@@ -66,11 +66,11 @@ int ReadOnlineGames::DoBackgroundWork()
 
 
     //    QString filePath = getUserHomeConfigPath() + "/egal.json";
-//    QFile   file(filePath);
-//    if (!file.open(QFile::ReadOnly))
-//        return 0;
+    //    QFile   file(filePath);
+    //    if (!file.open(QFile::ReadOnly))
+    //        return 0;
 
-//    QByteArray arr = file.readAll();
+    //    QByteArray arr = file.readAll();
 
     //    QString     test     = d.object()["TimeZoneID"].toString();
     //    QJsonObject obj      = array[0].toObject();
@@ -86,14 +86,25 @@ int ReadOnlineGames::DoBackgroundWork()
     return 0;
 }
 
-void ReadOnlineGames::startNetWorkRequest(OnlineGameInfo *info)
+void ReadOnlineGames::startNetWorkRequest(OnlineGameInfo* info)
 {
-    OnlineGameInfo* duplex = this->existCurrentGameInfo(info);
-    QString request = QString("%1/%2/%3/%4").arg(GETMATCH_DATA, info->m_competition).arg(info->m_season).arg(info->m_index);
+    //#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
+
+
+    OnlineGameInfo* duplex  = this->existCurrentGameInfo(info);
+    QString         request = QString("%1/%2/%3/%4").arg(GETMATCH_DATA, info->m_competition).arg(info->m_season).arg(info->m_index);
     if (duplex != NULL) {
-        request = QString("%1/%2").arg(GETMATCH_DATA).arg(duplex->m_matchID);
         this->m_currentGameInfo = duplex;
         delete info;
+
+        qint64 now2Days = QDateTime::currentDateTime().addDays(2).toMSecsSinceEpoch();
+        if (now2Days > duplex->m_timeStamp && duplex->m_lastUpdate > (duplex->m_timeStamp + 120 * 60 * 1000)) {
+            /* game was 2 days in past and update was after the end of the game */
+            this->checkNewNetworkRequest();
+            return;
+        }
+
+        request = QString("%1/%2").arg(GETMATCH_DATA).arg(duplex->m_matchID);
     } else
         this->m_currentGameInfo = info;
 
@@ -103,11 +114,15 @@ void ReadOnlineGames::startNetWorkRequest(OnlineGameInfo *info)
 
 
     this->m_netAccess->get(QNetworkRequest(QUrl(request)));
+    //#else
+    Q_UNUSED(info);
+    qInfo().noquote() << "Did not use ReadOnlineGame because of version problem";
+    //#endif
 }
 
-OnlineGameInfo* ReadOnlineGames::existCurrentGameInfo(OnlineGameInfo *info)
+OnlineGameInfo* ReadOnlineGames::existCurrentGameInfo(OnlineGameInfo* info)
 {
-    for(int i=0; i < this->m_onlineGames.size(); i++) {
+    for (int i = 0; i < this->m_onlineGames.size(); i++) {
         if (this->m_onlineGames[i]->m_competition == info->m_competition) {
             if (this->m_onlineGames[i]->m_season == info->m_season) {
                 if (this->m_onlineGames[i]->m_index == info->m_index)
@@ -122,14 +137,14 @@ void ReadOnlineGames::checkNewNetworkRequest()
 {
     if (this->m_currentGameInfo->m_index < 34) {
         OnlineGameInfo* gameInfo = new OnlineGameInfo();
-        gameInfo->m_competition = this->m_currentGameInfo->m_competition;
-        gameInfo->m_season = this->m_currentGameInfo->m_season;
-        gameInfo->m_index = this->m_currentGameInfo->m_index + 1;
-        gameInfo->m_matchID = 0;
+        gameInfo->m_competition  = this->m_currentGameInfo->m_competition;
+        gameInfo->m_season       = this->m_currentGameInfo->m_season;
+        gameInfo->m_index        = this->m_currentGameInfo->m_index + 1;
+        gameInfo->m_matchID      = 0;
 
         this->startNetWorkRequest(gameInfo);
     } else {
-//        qInfo() << "Updated all Games from season 2016";
+        //        qInfo() << "Updated all Games from season 2016";
         qint64 nextUpdate = this->getNextGameInMilliSeconds();
         this->m_networkUpdate->start(nextUpdate);
     }
@@ -137,9 +152,9 @@ void ReadOnlineGames::checkNewNetworkRequest()
 
 qint64 ReadOnlineGames::getNextGameInMilliSeconds()
 {
-    qint64 rValue = 4 * HOUR_IN_MSEC;     // 4h - 1000ms * 60s * 60min * 4
-    qint64 now = QDateTime::currentDateTime().toMSecsSinceEpoch();
-    for(int i=0; i < this->m_onlineGames.size(); i++) {
+    qint64 rValue = 4 * HOUR_IN_MSEC; // 4h - 1000ms * 60s * 60min * 4
+    qint64 now    = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    for (int i = 0; i < this->m_onlineGames.size(); i++) {
         qint64 timestamp = this->m_onlineGames[i]->m_timeStamp;
         if (now > timestamp) {
             if ((now - timestamp) < 4 * HOUR_IN_MSEC)
@@ -155,9 +170,9 @@ qint64 ReadOnlineGames::getNextGameInMilliSeconds()
 void ReadOnlineGames::slotNetWorkUpdateTimeout()
 {
     OnlineGameInfo* gameInfo = new OnlineGameInfo();
-    gameInfo->m_competition = "bl2";
-    gameInfo->m_season = 2016;
-    gameInfo->m_index = 1;
+    gameInfo->m_competition  = "bl2";
+    gameInfo->m_season       = 2016;
+    gameInfo->m_index        = 1;
 
     this->startNetWorkRequest(gameInfo);
 }
@@ -175,10 +190,10 @@ void ReadOnlineGames::slotNetWorkRequestFinished(QNetworkReply* reply)
 
     this->m_networkTimout->stop();
 
-    QByteArray arr = reply->readAll();
-    QJsonDocument d = QJsonDocument::fromJson(arr);
+    QByteArray    arr = reply->readAll();
+    QJsonDocument d   = QJsonDocument::fromJson(arr);
 
-    if (d.isArray()) {  /* all Games */
+    if (d.isArray()) { /* all Games */
         QJsonArray array = d.array();
         for (int i = 0; i < array.size(); i++) {
             QJsonObject gameObj = array[i].toObject();
@@ -201,7 +216,7 @@ bool ReadOnlineGames::readSingleGame(QJsonObject& json)
     QString lastUpdateDateTime = json.value("LastUpdateDateTime").toString();
     while (lastUpdateDateTime.size() - lastUpdateDateTime.lastIndexOf(".") < 4)
         lastUpdateDateTime.append("0");
-    QDateTime lastUpdate         = QDateTime::fromString(lastUpdateDateTime, "yyyy-MM-ddThh:mm:ss.zzz");
+    QDateTime lastUpdate = QDateTime::fromString(lastUpdateDateTime, "yyyy-MM-ddThh:mm:ss.zzz");
 
     /* if nothing changed */
     if (this->m_currentGameInfo->m_matchID != 0 && this->m_currentGameInfo->m_lastUpdate == lastUpdate.toMSecsSinceEpoch())
@@ -236,7 +251,7 @@ bool ReadOnlineGames::readSingleGame(QJsonObject& json)
 
     if (!json.contains("MatchID"))
         return false;
-    quint32   matchID = json.value("MatchID").toInt();
+    quint32 matchID = json.value("MatchID").toInt();
 
     QString score = "";
     if (json.contains("MatchResults")) {
@@ -244,10 +259,10 @@ bool ReadOnlineGames::readSingleGame(QJsonObject& json)
         score                 = this->readSingleGameResult(arrResults);
     }
 
-    this->m_currentGameInfo->m_team1 = team1;
-    this->m_currentGameInfo->m_team2 = team2;
-    this->m_currentGameInfo->m_score = score;
-    this->m_currentGameInfo->m_timeStamp = gameDate.toMSecsSinceEpoch();
+    this->m_currentGameInfo->m_team1      = team1;
+    this->m_currentGameInfo->m_team2      = team2;
+    this->m_currentGameInfo->m_score      = score;
+    this->m_currentGameInfo->m_timeStamp  = gameDate.toMSecsSinceEpoch();
     this->m_currentGameInfo->m_lastUpdate = lastUpdate.toMSecsSinceEpoch();
     if (this->m_currentGameInfo->m_matchID == 0)
         this->m_currentGameInfo->m_matchID = matchID;
@@ -289,7 +304,7 @@ QString ReadOnlineGames::readSingleGameResult(QJsonArray& json)
         return "";
 
     QString rValue;
-    int typeID = 0;
+    int     typeID = 0;
     for (int i = 0; i < json.size(); i++) {
         QJsonObject objResult = json[i].toObject();
         if (!objResult.contains("PointsTeam1") || !objResult.contains("PointsTeam2") || !objResult.contains("ResultTypeID"))
