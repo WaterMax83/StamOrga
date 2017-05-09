@@ -73,8 +73,6 @@ SeasonTicket::SeasonTicket()
 
     if (bProblems)
         this->saveCurrentInteralList();
-
-    //    this->sortGamesListByTime();
 }
 
 int SeasonTicket::addNewSeasonTicket(QString user, quint32 userIndex, QString ticketName, quint8 discount)

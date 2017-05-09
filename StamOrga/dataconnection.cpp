@@ -87,9 +87,11 @@ void DataConnection::checkNewOncomingData()
     MessageProtocol* msg;
     while ((msg = this->m_messageBuffer.GetNextMessage()) != NULL) {
 
+        qDebug().noquote() << QString("Receive ack 0x%1").arg(QString::number(msg->getIndex(), 16));
         DataConRequest request = this->getActualRequest(msg->getIndex() & 0x00FFFFFF);
-        if (request.m_request == 0)
+        if (request.m_request == 0 && msg->getIndex() != OP_CODE_CMD_RES::ACK_NOT_LOGGED_IN)
             continue;
+
 
         switch (msg->getIndex()) {
         case OP_CODE_CMD_RES::ACK_LOGIN_USER:
@@ -131,12 +133,14 @@ void DataConnection::checkNewOncomingData()
             break;
 
         case OP_CODE_CMD_RES::ACK_NOT_LOGGED_IN:
+            qDebug() << QString("Ack not logged in");
             if (!this->m_bRequestLoginAgain) {
                 this->m_bRequestLoginAgain = true;
                 DataConRequest conReq;
                 conReq.m_request = OP_CODE_CMD_REQ::REQ_LOGIN_USER;
                 conReq.m_lData.append(this->m_pGlobalData->passWord());
                 this->startSendLoginRequest(conReq);
+                return;
             }
             break;
 
@@ -314,6 +318,8 @@ qint32 DataConnection::sendMessageRequest(MessageProtocol* msg, DataConRequest r
         request.m_result = ERROR_CODE_ERR_SEND;
         emit this->notifyLastRequestFinished(request);
     }
+
+    qDebug().noquote() << QString("Send request 0x%1").arg(QString::number(msg->getIndex(), 16));
 
     return rValue;
 }

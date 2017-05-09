@@ -136,5 +136,7 @@ void Console::printHelp()
 
 Console::~Console()
 {
+    if (this->m_ctrlLog.IsRunning())
+        this->m_ctrlLog.Stop();
     delete this->m_pSNotify;
 }
