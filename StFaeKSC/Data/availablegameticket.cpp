@@ -39,7 +39,7 @@ qint32 AvailableGameTickets::initialize(quint32 year, quint32 competition, quint
     this->m_gameIndex   = index;
 
     QString userSetFilePath = getUserHomeConfigPath() + "/Settings/";
-    userSetFilePath.append(QString("Tickets_Gane_%1.log").arg(index));
+    userSetFilePath.append(QString("Tickets_Game_%1.ini").arg(index));
 
     if (!checkFilePathExistAndCreate(userSetFilePath)) {
         CONSOLE_CRITICAL(QString("Could not create File for UserSettings"));
@@ -166,7 +166,7 @@ qint32 AvailableGameTickets::changeTicketState(quint32 ticketID, quint32 userID,
     }
 
     for (int i = 0; i < this->getNumberOfInternalList(); i++) {
-        AvailableTicketInfo* pTicket = (AvailableTicketInfo*)(this->getRequestConfigItem(i));
+        AvailableTicketInfo* pTicket = (AvailableTicketInfo*)(this->getItemFromArrayIndex(i));
         if (pTicket->m_ticketID == ticketID) {
             pTicket->m_userID   = userID;
             pTicket->m_state    = state;
@@ -185,7 +185,7 @@ qint32 AvailableGameTickets::getTicketState(quint32 ticketID)
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
     for (int i = 0; i < this->getNumberOfInternalList(); i++) {
-        AvailableTicketInfo* pTicket = (AvailableTicketInfo*)(this->getRequestConfigItem(i));
+        AvailableTicketInfo* pTicket = (AvailableTicketInfo*)(this->getItemFromArrayIndex(i));
         if (pTicket->m_ticketID == ticketID)
             return pTicket->m_state;
     }

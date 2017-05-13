@@ -21,6 +21,7 @@
 #include <QtNetwork/QUdpSocket>
 
 #include "../Common/General/globalfunctions.h"
+#include "../Common/General/globaltiming.h"
 #include "../Common/Network/messagecommand.h"
 #include "../Common/Network/messageprotocol.h"
 #include "mainconnection.h"

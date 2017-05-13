@@ -45,6 +45,7 @@ public:
     qint32 startSeasonTicketNewPlace(quint32 index, QString place);
     qint32 startSeasonTicketAdd(QString name, quint32 discount);
     qint32 startGettingSeasonTicketList();
+    qint32 startFreeSeasonTicket(quint32 tickedIndex, quint32 gameIndex);
 
 
     void setGlobalData(GlobalData* pData)
@@ -71,6 +72,7 @@ signals:
     void sNotifySeasonTicketAddRequest(quint32 result);
     void sNotifySeasonTicketListRequest(quint32 result);
     void sNotifySeasonTicketNewPlace(quint32 result);
+    void sNotityAvailableTicketFreeRequest(qint32 result);
 
     void sStartSendLoginRequest();
 

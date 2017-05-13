@@ -61,7 +61,7 @@ public:
     quint32 getUserProperties(QString name);
     QString getReadableName(QString name);
 
-    ConfigItem* getRequestConfigItem(int index)
+    ConfigItem* getRequestConfigItemFromListIndex(int index)
     {
         Q_UNUSED(index)
         return NULL;

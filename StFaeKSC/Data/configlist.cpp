@@ -87,6 +87,17 @@ bool ConfigList::itemExists(quint32 index)
     return false;
 }
 
+ConfigItem* ConfigList::getItem(quint32 index)
+{
+    QMutexLocker locker(&this->m_mInternalInfoMutex);
+
+    for (int i = 0; i < this->getNumberOfInternalList(); i++) {
+        if (this->m_lInteralList[i]->m_index == index)
+            return this->m_lInteralList[i];
+    }
+    return NULL;
+}
+
 quint32 ConfigList::getItemIndex(const QString name)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
@@ -109,12 +120,25 @@ QString ConfigList::getItemName(quint32 index)
     return "";
 }
 
+
+quint16 ConfigList::startRequestGetItemList()
+{
+    this->m_mInternalInfoMutex.lock();
+    return this->getNumberOfInternalList();
+}
+
+
 ConfigItem* ConfigList::getItemFromArrayIndex(int index)
 {
     if (index >= this->getNumberOfInternalList())
         return NULL;
 
     return this->m_lInteralList[index];
+}
+
+void ConfigList::stopRequestGetItemList()
+{
+    this->m_mInternalInfoMutex.unlock();
 }
 
 ConfigItem* ConfigList::getProblemItemFromArrayIndex(int index)

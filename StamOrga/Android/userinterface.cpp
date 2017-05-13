@@ -44,6 +44,9 @@ UserInterface::UserInterface(QObject* parent)
             this, &UserInterface::slSeasonTicketNewPlaceFinished);
     connect(this->m_pConHandle, &ConnectionHandling::sNotifySeasonTicketListRequest,
             this, &UserInterface::slSeasonTicketListFinished);
+
+    connect(this->m_pConHandle, &ConnectionHandling::sNotityAvailableTicketFreeRequest,
+            this, &UserInterface::slAvailableTicketFreeFinished);
 }
 
 qint32 UserInterface::startMainConnection(QString name, QString passw)
@@ -86,14 +89,19 @@ qint32 UserInterface::startGettingSeasonTicketList()
     return this->m_pConHandle->startGettingSeasonTicketList();
 }
 
+qint32 UserInterface::startFreeAvailableTicket(quint32 ticketIndex, quint32 gameIndex)
+{
+    return this->m_pConHandle->startFreeSeasonTicket(ticketIndex, gameIndex);
+}
+
 void UserInterface::slConnectionRequestFinished(qint32 result)
 {
     //this->ui->btnSendData->setEnabled(true);
     emit this->notifyConnectionFinished(result);
-	if (result > ERROR_CODE_NO_ERROR) {
-		this->m_pConHandle->startGettingVersionInfo();
-		this->m_pConHandle->startGettingUserProps();
-	}
+    if (result > ERROR_CODE_NO_ERROR) {
+        this->m_pConHandle->startGettingVersionInfo();
+        this->m_pConHandle->startGettingUserProps();
+    }
 }
 
 void UserInterface::slVersionRequestFinished(qint32 result, QString msg)
@@ -140,4 +148,9 @@ void UserInterface::slSeasonTicketNewPlaceFinished(qint32 result)
 void UserInterface::slSeasonTicketListFinished(qint32 result)
 {
     emit this->notifySeasonTicketListFinished(result);
+}
+
+void UserInterface::slAvailableTicketFreeFinished(qint32 result)
+{
+    emit this->notifyAvailableTicketFreeFinsished(result);
 }

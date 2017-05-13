@@ -60,26 +60,18 @@ public:
     qint32 removeItem(const quint32 index);
     bool itemExists(QString name);
     bool itemExists(quint32 index);
+    ConfigItem* getItem(quint32 index);
     quint32 getItemIndex(const QString name);
     QString getItemName(quint32 index);
 
-    quint16 startRequestGetItemList()
+    quint16 startRequestGetItemList();
+
+    virtual ConfigItem* getRequestConfigItemFromListIndex(int index)
     {
-        this->m_mInternalInfoMutex.lock();
-        return this->getNumberOfInternalList();
+        return this->getItemFromArrayIndex(index);
     }
 
-    virtual ConfigItem* getRequestConfigItem(int index)
-    {
-        if (index < this->m_lInteralList.size())
-            return this->m_lInteralList[index];
-        return NULL;
-    }
-
-    void stopRequestGetItemList()
-    {
-        this->m_mInternalInfoMutex.unlock();
-    }
+    void stopRequestGetItemList();
 
 protected:
     QList<ConfigItem*> m_lInteralList;

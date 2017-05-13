@@ -90,6 +90,7 @@ Flickable {
                             var globalCoordinates = singleBlockedRow.mapToItem(flickableCurrentGame, 0, 0)
                             menuItemFree.text = "Freigeben";
                             clickedBlockedMenu.y = globalCoordinates.y - singleBlockedRow.height / 2
+                            clickedBlockedMenu.menuTicketIndex = model.index
                             clickedBlockedMenu.open();
                         }
                     }
@@ -127,7 +128,8 @@ Flickable {
             id: clickedBlockedMenu
             x: (flickableCurrentGame.width - width) / 2
             y: flickableCurrentGame.height / 6
-            title: "Test"
+            property int menuTicketIndex
+
 
 
             background: Rectangle {
@@ -138,7 +140,8 @@ Flickable {
             MenuItem {
                 id: menuItemFree
                 onClicked: {
-                    console.log("Freigeben");
+                    console.log("Freigeben " + clickedBlockedMenu.menuTicketIndex + " " + m_gamePlayCurrentItem.index);
+                    userIntCurrentGame.startFreeAvailableTicket(clickedBlockedMenu.menuTicketIndex, m_gamePlayCurrentItem.index)
                 }
             }
         }
@@ -167,7 +170,7 @@ Flickable {
                     var discount = seasonTicketItem.discount > 0 ? " *" : ""
                     listViewModelBlockedTickets.append({
                                                            title: seasonTicketItem.name + discount,
-                                                           index: i
+                                                           index: seasonTicketItem.index
                                                        })
                 }
             }
@@ -176,6 +179,15 @@ Flickable {
         } else {
             txtInfoCurrentGame.text = userIntCurrentGame.getErrorCodeToString(
                         result)
+        }
+    }
+
+    function notifyAvailableTicketFreeFinished(result) {
+        console.warn("End Free Ticket = " + result);
+        if (result === 1) {
+
+        } else {
+
         }
     }
 

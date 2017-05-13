@@ -168,7 +168,7 @@ quint16 UdpServer::getFreeDataPort()
         if (!bAlreadyUsed)
             return retPort;
         retPort++;
-    } while(retPort < UDP_PORT + 100);
+    } while(retPort < UDP_PORT + 1000);
 
     return 0;
 }

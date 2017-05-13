@@ -174,6 +174,8 @@ void ReadOnlineGames::slotNetWorkUpdateTimeout()
     gameInfo->m_season       = 2016;
     gameInfo->m_index        = 1;
 
+    qDebug().noquote() << "Start new read online game info";
+
     this->startNetWorkRequest(gameInfo);
 }
 

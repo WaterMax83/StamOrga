@@ -20,6 +20,7 @@
 
 #include "../Common/General/config.h"
 #include "../Common/General/globalfunctions.h"
+#include "../Common/General/globaltiming.h"
 #include "../Common/Network/messagecommand.h"
 #include "../Common/Network/messageprotocol.h"
 #include "dataconnection.h"
@@ -173,6 +174,10 @@ void DataConnection::checkNewOncomingData()
             request.m_result = this->m_pDataHandle->getHandleSeasonTicketListResponse(msg);
             break;
 
+        case OP_CODE_CMD_RES::ACK_FREE_SEASON_TICKET:
+            request.m_result = msg->getIntData();
+            break;
+
         default:
             delete msg;
             continue;
@@ -292,6 +297,18 @@ void DataConnection::startSendNewPlaceTicket(DataConRequest request)
 void DataConnection::startSendSeasonTicketListRequest(DataConRequest request)
 {
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST);
+    this->sendMessageRequest(&msg, request);
+}
+
+void DataConnection::startSendFreeTicket(DataConRequest request)
+{
+    QByteArray  seasonTicket;
+    QDataStream wSeasonTicket(&seasonTicket, QIODevice::WriteOnly);
+    wSeasonTicket.setByteOrder(QDataStream::BigEndian);
+    wSeasonTicket << request.m_lData.at(0).toUInt();
+    wSeasonTicket << request.m_lData.at(1).toUInt();
+
+    MessageProtocol msg(OP_CODE_CMD_REQ::REQ_FREE_SEASON_TICKET, seasonTicket);
     this->sendMessageRequest(&msg, request);
 }
 
@@ -420,6 +437,10 @@ void DataConnection::startSendNewRequest(DataConRequest request)
 
     case OP_CODE_CMD_REQ::REQ_NEW_TICKET_PLACE:
         this->startSendNewPlaceTicket(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_FREE_SEASON_TICKET:
+        this->startSendFreeTicket(request);
         break;
 
     default:

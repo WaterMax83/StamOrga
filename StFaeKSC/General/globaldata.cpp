@@ -47,8 +47,8 @@ GlobalData::GlobalData()
 
 qint32 GlobalData::requestFreeSeasonTicket(quint32 ticketIndex, quint32 gameIndex, const QString userName)
 {
-    GamesPlay*  pGame   = (GamesPlay*)this->m_GamesList.getRequestConfigItem(gameIndex);
-    TicketInfo* pTicket = (TicketInfo*)this->m_SeasonTicket.getRequestConfigItem(ticketIndex);
+    GamesPlay*  pGame   = (GamesPlay*)this->m_GamesList.getItem(gameIndex);
+    TicketInfo* pTicket = (TicketInfo*)this->m_SeasonTicket.getItem(ticketIndex);
     if (pGame == NULL || pTicket == NULL)
         return ERROR_CODE_NOT_FOUND;
 
@@ -68,7 +68,7 @@ qint32 GlobalData::requestFreeSeasonTicket(quint32 ticketIndex, quint32 gameInde
                 result = ticket->changeTicketState(ticketIndex, userID, TICKET_STATE_FREE);
             }
             if (result == ERROR_CODE_SUCCESS)
-                qInfo().noquote() << QString("Changed ticketState from %1 at game %2 to %3").arg(pTicket->m_itemName, pGame->m_index).arg(TICKET_STATE_FREE);
+                qInfo().noquote() << QString("Changed ticketState from %1 at game %2 to %3").arg(pTicket->m_itemName).arg(pGame->m_index).arg(TICKET_STATE_FREE);
             else
                 qWarning().noquote() << QString("Error setting ticket state %1: %2").arg(TICKET_STATE_FREE).arg(result);
             return result;

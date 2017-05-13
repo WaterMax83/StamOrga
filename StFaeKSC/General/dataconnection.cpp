@@ -224,7 +224,7 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
     qint32 gamesInPast = 0;
     qint64 now         = QDateTime::currentMSecsSinceEpoch();
     for (quint32 i = 0; i < numbOfGames; i++) {
-        GamesPlay* pGame = (GamesPlay*)(this->m_pGlobalData->m_GamesList.getRequestConfigItem(i));
+        GamesPlay* pGame = (GamesPlay*)(this->m_pGlobalData->m_GamesList.getRequestConfigItemFromListIndex(i));
         if (pGame->m_timestamp < now)
             gamesInPast++;
     }
@@ -236,7 +236,7 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
     wAckArray << quint16(0x1) << quint16(numbOfGames - startValue); //Version
 
     for (qint32 i = startValue; i < numbOfGames; i++) {
-        GamesPlay* pGame = (GamesPlay*)(this->m_pGlobalData->m_GamesList.getRequestConfigItem(i));
+        GamesPlay* pGame = (GamesPlay*)(this->m_pGlobalData->m_GamesList.getRequestConfigItemFromListIndex(i));
         if (pGame == NULL)
             continue;
 
@@ -287,7 +287,7 @@ MessageProtocol* DataConnection::requestGetTicketsList(/*MessageProtocol *msg*/)
     wAckArray << quint16(0x1) << numbOfTickets; //Version
 
     for (quint32 i = 0; i < numbOfTickets; i++) {
-        TicketInfo* pTicket = (TicketInfo*)(this->m_pGlobalData->m_SeasonTicket.getRequestConfigItem(i));
+        TicketInfo* pTicket = (TicketInfo*)(this->m_pGlobalData->m_SeasonTicket.getRequestConfigItemFromListIndex(i));
         if (pTicket == NULL)
             continue;
 

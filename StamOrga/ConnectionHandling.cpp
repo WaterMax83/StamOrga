@@ -150,6 +150,15 @@ qint32 ConnectionHandling::startGettingSeasonTicketList()
     return ERROR_CODE_SUCCESS;
 }
 
+qint32 ConnectionHandling::startFreeSeasonTicket(quint32 tickedIndex, quint32 gameIndex)
+{
+    DataConRequest req(OP_CODE_CMD_REQ::REQ_FREE_SEASON_TICKET);
+    req.m_lData.append(QString::number(tickedIndex));
+    req.m_lData.append(QString::number(gameIndex));
+    this->sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
+}
+
 
 /*
  * Answer function after connection with username
@@ -166,7 +175,7 @@ void ConnectionHandling::slMainConReqFin(qint32 result, const QString& msg)
         qWarning() << "Error main connecting: " << msg;
         this->m_ctrlMainCon.Stop();
         this->stopDataConnection();
-		emit this->sNotifyConnectionFinished(result);
+        emit this->sNotifyConnectionFinished(result);
 
         while (this->m_lErrorMainCon.size() > 0) {
             DataConRequest request = this->m_lErrorMainCon.last();
@@ -280,6 +289,10 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
 
     case OP_CODE_CMD_REQ::REQ_NEW_TICKET_PLACE:
         emit this->sNotifySeasonTicketNewPlace(request.m_result);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_FREE_SEASON_TICKET:
+        emit this->sNotityAvailableTicketFreeRequest(request.m_result);
         break;
     }
 
