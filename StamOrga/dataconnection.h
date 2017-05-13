@@ -60,8 +60,9 @@ public slots:
     void startSendNewRequest(DataConRequest request);
 
 private slots:
-    void connectionTimeoutFired();
-    void readyReadDataPort();
+    void slotConnectionTimeoutFired();
+    void slotReadyReadDataPort();
+    void slotSocketDataError(QAbstractSocket::SocketError socketError);
 
 private:
     GlobalData*   m_pGlobalData;

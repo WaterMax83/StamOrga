@@ -88,7 +88,7 @@ int ReadOnlineGames::DoBackgroundWork()
 
 void ReadOnlineGames::startNetWorkRequest(OnlineGameInfo* info)
 {
-    //#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
 
 
     OnlineGameInfo* duplex  = this->existCurrentGameInfo(info);
@@ -112,12 +112,12 @@ void ReadOnlineGames::startNetWorkRequest(OnlineGameInfo* info)
     this->m_networkTimout->start();
     this->m_bRequestCanceled = false;
 
-
+    qInfo().noquote() << QString("Request for game %1").arg(info->m_index);
     this->m_netAccess->get(QNetworkRequest(QUrl(request)));
-    //#else
+#else
     Q_UNUSED(info);
     qInfo().noquote() << "Did not use ReadOnlineGame because of version problem";
-    //#endif
+#endif
 }
 
 OnlineGameInfo* ReadOnlineGames::existCurrentGameInfo(OnlineGameInfo* info)
@@ -194,6 +194,7 @@ void ReadOnlineGames::slotNetWorkRequestFinished(QNetworkReply* reply)
     QJsonDocument d   = QJsonDocument::fromJson(arr);
 
     if (d.isArray()) { /* all Games */
+        qInfo().noquote() << QString("Request answer for game %1").arg(this->m_currentGameInfo->m_index);
         QJsonArray array = d.array();
         for (int i = 0; i < array.size(); i++) {
             QJsonObject gameObj = array[i].toObject();
@@ -202,6 +203,7 @@ void ReadOnlineGames::slotNetWorkRequestFinished(QNetworkReply* reply)
         }
     } else { /* just single game */
         QJsonObject gameObj = d.object();
+        qInfo().noquote() << QString("Single game answer for game %1").arg(this->m_currentGameInfo->m_index);
         this->readSingleGame(gameObj);
     }
 

@@ -321,9 +321,8 @@ void GlobalData::callBackLookUpHost(const QHostInfo& host)
         //       }
     }
 #endif
+#endif
 
-#else
     if (host.addresses().size() > 0)
         qDebug().noquote() << QString("Getting host info ip: %1").arg(host.addresses().value(0).toString());
-#endif
 }

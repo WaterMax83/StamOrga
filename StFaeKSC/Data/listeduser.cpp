@@ -71,7 +71,10 @@ ListedUser::ListedUser()
         this->addNewUserLogin(pLogin->m_itemName, pLogin->m_timestamp,
                               pLogin->m_index, pLogin->password,
                               pLogin->properties, pLogin->readName);
+
+        delete pLogin;
     }
+    this->m_lAddItemProblems.clear();
 
     if (bProblems)
         this->saveCurrentInteralList();
@@ -164,7 +167,7 @@ void ListedUser::saveCurrentInteralList()
     this->m_pConfigSettings->endArray();
     this->m_pConfigSettings->endGroup();
 
-    qDebug().noquote() << QString("saved actual User List with %1 entries").arg(this->getNumberOfInternalList());
+    qDebug().noquote() << QString("saved current User List with %1 entries").arg(this->getNumberOfInternalList());
 }
 
 bool ListedUser::userCheckPassword(QString name, QString passw)

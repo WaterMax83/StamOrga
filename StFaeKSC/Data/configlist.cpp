@@ -98,6 +98,17 @@ quint32 ConfigList::getItemIndex(const QString name)
     return 0;
 }
 
+QString ConfigList::getItemName(quint32 index)
+{
+    QMutexLocker locker(&this->m_mInternalInfoMutex);
+
+    for (int i = 0; i < this->getNumberOfInternalList(); i++) {
+        if (this->m_lInteralList[i]->m_index == index)
+            return this->m_lInteralList[i]->m_itemName;
+    }
+    return "";
+}
+
 ConfigItem* ConfigList::getItemFromArrayIndex(int index)
 {
     if (index >= this->getNumberOfInternalList())
@@ -123,9 +134,9 @@ bool ConfigList::updateItemValue(ConfigItem* pItem, QString key, QVariant value)
     int arrayCount = this->m_pConfigSettings->beginReadArray(CONFIG_LIST_ARRAY);
     for (int i = 0; i < arrayCount; i++) {
         this->m_pConfigSettings->setArrayIndex(i);
-        QString actName  = this->m_pConfigSettings->value(ITEM_NAME, "").toString();
+        //        QString actName  = this->m_pConfigSettings->value(ITEM_NAME, "").toString();
         quint32 actIndex = this->m_pConfigSettings->value(ITEM_INDEX, 0).toInt();
-        if (pItem->m_itemName == actName && pItem->m_index == actIndex) {
+        if (pItem->m_index == actIndex) {
 
             this->m_pConfigSettings->setValue(key, value);
             //            qInfo().noquote() << QString("Change %1 of item %2 to %3").arg(key).arg(pItem->m_itemName).arg(value.toString());
@@ -162,4 +173,13 @@ quint32 ConfigList::getNextInternalIndex()
     this->m_pConfigSettings->endGroup();
 
     return savedIndex;
+}
+
+ConfigList::~ConfigList()
+{
+    for (int i = 0; i < this->m_lInteralList.size(); i++)
+        delete this->m_lInteralList[i];
+
+    for (int i = 0; i < this->m_lAddItemProblems.size(); i++)
+        delete this->m_lAddItemProblems[i];
 }

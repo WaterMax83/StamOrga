@@ -211,7 +211,7 @@ MessageProtocol* DataConnection::requestGetProgramVersion(MessageProtocol* msg)
 
 #define GAMES_OFFSET (1 + 1 + 8 + 4) // sIndex + comp + datetime + index
 
-MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol *msg)
+MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
 {
     QByteArray  ackArray;
     QDataStream wAckArray(&ackArray, QIODevice::WriteOnly);
@@ -222,7 +222,7 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol *msg)
     quint16 numbOfGames = this->m_pGlobalData->m_GamesList.startRequestGetItemList();
 
     qint32 gamesInPast = 0;
-    qint64 now = QDateTime::currentMSecsSinceEpoch();
+    qint64 now         = QDateTime::currentMSecsSinceEpoch();
     for (quint32 i = 0; i < numbOfGames; i++) {
         GamesPlay* pGame = (GamesPlay*)(this->m_pGlobalData->m_GamesList.getRequestConfigItem(i));
         if (pGame->m_timestamp < now)
@@ -395,4 +395,31 @@ MessageProtocol* DataConnection::requestNewPlaceSeasonTicket(MessageProtocol* ms
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_NEW_TICKET_PLACE, ERROR_CODE_SUCCESS);
     }
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_NEW_TICKET_PLACE, rCode);
+}
+
+
+/*  request
+ * 0                Header          12
+ * 12   quint32      ticketIndex     4
+ * 16   quint16      gameIndex       4
+ */
+MessageProtocol* DataConnection::requestFreeSeasonTicket(MessageProtocol* msg)
+{
+    qint32 rCode;
+    if (msg->getDataLength() != 8) {
+        qWarning() << QString("Wrong message size for free Season ticket for user %1").arg(this->m_pUserConData->userName);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_FREE_SEASON_TICKET, ERROR_CODE_WRONG_SIZE);
+    }
+
+    const char* pData       = msg->getPointerToData();
+    quint32     ticketIndex = qFromBigEndian(*((quint32*)pData));
+    quint32     gameIndex   = qFromBigEndian(*((quint32*)(pData + 4)));
+
+    if ((rCode = this->m_pGlobalData->requestFreeSeasonTicket(ticketIndex, gameIndex, this->m_pUserConData->userName)) == ERROR_CODE_SUCCESS) {
+        qInfo().noquote() << QString("User %1 freeded SeasonTicket %2")
+                                 .arg(this->m_pUserConData->userName)
+                                 .arg(this->m_pGlobalData->m_SeasonTicket.getItemName(ticketIndex));
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_FREE_SEASON_TICKET, ERROR_CODE_SUCCESS);
+    }
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_FREE_SEASON_TICKET, rCode);
 }

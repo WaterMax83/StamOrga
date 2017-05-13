@@ -54,13 +54,11 @@ public:
     int showAllSeasonTickets();
 
 
-
 private:
     void saveCurrentInteralList() override;
 
     bool addNewTicketInfo(QString user, quint32 userIndex, QString ticketName, qint64 timestamp, quint8 discount, QString place, quint32 index, bool checkTicket = true);
     void addNewTicketInfo(QString user, quint32 userIndex, QString ticketName, qint64 timestamp, quint8 discount, QString place, quint32 index, QList<ConfigItem*>* pList);
-
 };
 
 #endif // SEASONTICKET_H

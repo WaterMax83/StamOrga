@@ -164,13 +164,10 @@ Flickable {
                             dialog.headerText = "Nutzername ändern";
                             dialog.parentHeight = flickableUser.height
                             dialog.parentWidth = flickableUser.width
-                            console.log ("Width = "+ flickableUser.width)
                             dialog.textMinSize = 6
                             dialog.editableText = globalUserData.readableName;
                             dialog.acceptedTextEdit.connect(acceptedEditReadableName);
                             dialog.open();
-
-                            console.log ("X = "+ dialog.x + " ")
                         }
 
                     }

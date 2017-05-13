@@ -42,8 +42,9 @@ signals:
     void connectionRequestFinished(qint32 result, const QString& msg);
 
 private slots:
-    void connectionTimeoutFired();
-    void readyReadMasterPort();
+    void slotConnectionTimeoutFired();
+    void slotReadyReadMasterPort();
+    void slotSocketMainError(QAbstractSocket::SocketError socketError);
 
 private:
     GlobalData*   m_pGlobalData;

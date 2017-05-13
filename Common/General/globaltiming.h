@@ -22,11 +22,17 @@
 
 #include <QtCore/QDateTime>
 
-#define MSEC_PER_HOUR   3600000
+#define MSEC_PER_HOUR 3600000
 
 
-#define CON_RESET_TIMEOUT_MSEC        (15 * 60 * 1000)
-#define CON_LOGIN_TIMEOUT_MSEC        (2 * 60 * 1000)
+#define CON_RESET_TIMEOUT_MSEC (15 * 60 * 1000)
+#define CON_LOGIN_TIMEOUT_MSEC (2 * 60 * 1000)
+
+#ifdef QT_DEBUG
+#define SOCKET_TIMEOUT_MS 3000
+#else
+#define SOCKET_TIMEOUT_MS 10000
+#endif
 
 
 inline uint CalcMSecEpochToUsHour(quint64 msec64)

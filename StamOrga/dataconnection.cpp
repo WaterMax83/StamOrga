@@ -38,8 +38,8 @@ int DataConnection::DoBackgroundWork()
     /* Have to do it here or it will not be in the correct thread */
     this->m_pConTimeout = new QTimer();
     this->m_pConTimeout->setSingleShot(true);
-    this->m_pConTimeout->setInterval(10000);
-    connect(this->m_pConTimeout, &QTimer::timeout, this, &DataConnection::connectionTimeoutFired);
+    this->m_pConTimeout->setInterval(SOCKET_TIMEOUT_MS);
+    connect(this->m_pConTimeout, &QTimer::timeout, this, &DataConnection::slotConnectionTimeoutFired);
 
     this->m_pDataHandle = new DataHandling(this->m_pGlobalData);
 
@@ -49,17 +49,24 @@ int DataConnection::DoBackgroundWork()
         //        emit this->connectionRequestFinished(0, this->m_pDataUdpSocket->errorString());
         return -1;
     }
-    connect(this->m_pDataUdpSocket, &QUdpSocket::readyRead, this, &DataConnection::readyReadDataPort);
+    connect(this->m_pDataUdpSocket, &QUdpSocket::readyRead, this, &DataConnection::slotReadyReadDataPort);
+    typedef void (QAbstractSocket::*QAbstractSocketErrorSignal)(QAbstractSocket::SocketError);
+    connect(this->m_pDataUdpSocket, static_cast<QAbstractSocketErrorSignal>(&QAbstractSocket::error), this, &DataConnection::slotSocketDataError);
 
     this->m_hDataReceiver = QHostAddress(this->m_pGlobalData->ipAddr());
 
     return 0;
 }
 
+void DataConnection::slotSocketDataError(QAbstractSocket::SocketError socketError)
+{
+    qDebug().noquote() << QString("Socket Error %1 - %2 ").arg(socketError).arg(this->m_pDataUdpSocket->errorString());
+}
+
 /*
  * Function/slot to call when new data is ready from udp socket
  */
-void DataConnection::readyReadDataPort()
+void DataConnection::slotReadyReadDataPort()
 {
     while (this->m_pDataUdpSocket->hasPendingDatagrams()) {
         QHostAddress sender;
@@ -87,7 +94,7 @@ void DataConnection::checkNewOncomingData()
     MessageProtocol* msg;
     while ((msg = this->m_messageBuffer.GetNextMessage()) != NULL) {
 
-        qDebug().noquote() << QString("Receive ack 0x%1").arg(QString::number(msg->getIndex(), 16));
+        qDebug().noquote() << QString("DataConnection: Receive ack 0x%1").arg(QString::number(msg->getIndex(), 16));
         DataConRequest request = this->getActualRequest(msg->getIndex() & 0x00FFFFFF);
         if (request.m_request == 0 && msg->getIndex() != OP_CODE_CMD_RES::ACK_NOT_LOGGED_IN)
             continue;
@@ -133,8 +140,9 @@ void DataConnection::checkNewOncomingData()
             break;
 
         case OP_CODE_CMD_RES::ACK_NOT_LOGGED_IN:
-            qDebug() << QString("Ack not logged in");
+            qDebug() << QString("DataConnection: Ack not logged in");
             if (!this->m_bRequestLoginAgain) {
+                qDebug() << "DataConnection: Trying to reconnect from DataConnection";
                 this->m_bRequestLoginAgain = true;
                 DataConRequest conReq;
                 conReq.m_request = OP_CODE_CMD_REQ::REQ_LOGIN_USER;
@@ -186,6 +194,7 @@ void DataConnection::startSendLoginRequest(DataConRequest request)
     wPassword << quint16(passWord.toUtf8().size());
     aPassw.append(passWord);
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_LOGIN_USER, aPassw);
+    qDebug() << "DataConnection: Sending Login Request";
     this->sendMessageRequest(&msg, request);
 }
 
@@ -242,6 +251,7 @@ void DataConnection::startSendReadableNameRequest(DataConRequest request)
 void DataConnection::startSendGamesListRequest(DataConRequest request)
 {
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST, 10);
+    qDebug() << "DataConnection: Sending Games List request";
     this->sendMessageRequest(&msg, request);
 }
 
@@ -285,9 +295,9 @@ void DataConnection::startSendSeasonTicketListRequest(DataConRequest request)
     this->sendMessageRequest(&msg, request);
 }
 
-void DataConnection::connectionTimeoutFired()
+void DataConnection::slotConnectionTimeoutFired()
 {
-    qDebug() << "Timeout from Data UdpServer";
+    qDebug() << "DataConnection: Timeout from Data UdpServer";
     while (this->m_lActualRequest.size() > 0) {
         DataConRequest request = this->m_lActualRequest.last();
         request.m_result       = ERROR_CODE_TIMEOUT;
@@ -319,7 +329,7 @@ qint32 DataConnection::sendMessageRequest(MessageProtocol* msg, DataConRequest r
         emit this->notifyLastRequestFinished(request);
     }
 
-    qDebug().noquote() << QString("Send request 0x%1").arg(QString::number(msg->getIndex(), 16));
+    //    qDebug().noquote() << QString("Send request 0x%1").arg(QString::number(msg->getIndex(), 16));
 
     return rValue;
 }
@@ -359,6 +369,7 @@ QString DataConnection::getActualRequestData(quint32 req, qint32 index)
 
 void DataConnection::sendActualRequestsAgain()
 {
+    qDebug() << "DataConnection: Trying to send the requests again";
     for (int i = 0; i < this->m_lActualRequest.size(); i++) {
         this->startSendNewRequest(this->m_lActualRequest[i]);
     }

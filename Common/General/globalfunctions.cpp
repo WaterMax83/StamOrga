@@ -43,7 +43,7 @@ bool checkFilePathExistAndCreate(const QString& path)
     QFileInfo checkFileInfo(path);
     if (!checkFileInfo.exists()) {
         /* File is not present, create it */
-        qInfo().noquote() << QString("File %1 not found, maybe first run, try to create it: ").arg(path);
+        //        qInfo().noquote() << QString("File %1 not found, maybe first run, try to create it: ").arg(path);
         if (!checkFileInfo.dir().exists() && !checkFileInfo.dir().mkpath(checkFileInfo.dir().absolutePath())) {
             qCritical() << "Error creating directory\n";
             return false;

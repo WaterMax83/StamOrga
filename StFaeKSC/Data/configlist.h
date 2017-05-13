@@ -52,6 +52,7 @@ class ConfigList
 {
 public:
     ConfigList();
+    virtual ~ConfigList();
 
     virtual qint32 getNumberOfInternalList() { return this->m_lInteralList.size(); }
 
@@ -60,6 +61,7 @@ public:
     bool itemExists(QString name);
     bool itemExists(quint32 index);
     quint32 getItemIndex(const QString name);
+    QString getItemName(quint32 index);
 
     quint16 startRequestGetItemList()
     {

@@ -90,8 +90,10 @@ void UserInterface::slConnectionRequestFinished(qint32 result)
 {
     //this->ui->btnSendData->setEnabled(true);
     emit this->notifyConnectionFinished(result);
-    this->m_pConHandle->startGettingVersionInfo();
-    this->m_pConHandle->startGettingUserProps();
+	if (result > ERROR_CODE_NO_ERROR) {
+		this->m_pConHandle->startGettingVersionInfo();
+		this->m_pConHandle->startGettingUserProps();
+	}
 }
 
 void UserInterface::slVersionRequestFinished(qint32 result, QString msg)

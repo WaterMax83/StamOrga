@@ -48,7 +48,9 @@ int MainConnection::DoBackgroundWork()
         return -1;
     }
 
-    connect(this->m_pMasterUdpSocket, &QUdpSocket::readyRead, this, &MainConnection::readyReadMasterPort);
+    connect(this->m_pMasterUdpSocket, &QUdpSocket::readyRead, this, &MainConnection::slotReadyReadMasterPort);
+    typedef void (QAbstractSocket::*QAbstractSocketErrorSignal)(QAbstractSocket::SocketError);
+    connect(this->m_pMasterUdpSocket, static_cast<QAbstractSocketErrorSignal>(&QAbstractSocket::error), this, &MainConnection::slotSocketMainError);
 
     this->m_hMasterReceiver = QHostAddress(this->m_pGlobalData->ipAddr());
     const char* pData       = msg.getNetworkProtocol();
@@ -56,18 +58,24 @@ int MainConnection::DoBackgroundWork()
 
     this->m_pConTimeout = new QTimer();
     this->m_pConTimeout->setSingleShot(true);
-    connect(this->m_pConTimeout, &QTimer::timeout, this, &MainConnection::connectionTimeoutFired);
-    this->m_pConTimeout->start(3000);
+    connect(this->m_pConTimeout, &QTimer::timeout, this, &MainConnection::slotConnectionTimeoutFired);
+    this->m_pConTimeout->start(SOCKET_TIMEOUT_MS);
 
     return 0;
 }
 
-void MainConnection::connectionTimeoutFired()
+void MainConnection::slotSocketMainError(QAbstractSocket::SocketError socketError)
 {
-    emit this->connectionRequestFinished(ERROR_CODE_TIMEOUT, "Timeout");
+    qDebug().noquote() << QString("Socket Error %1 - %2 ").arg(socketError).arg(this->m_pMasterUdpSocket->errorString());
 }
 
-void MainConnection::readyReadMasterPort()
+void MainConnection::slotConnectionTimeoutFired()
+{
+    emit this->connectionRequestFinished(ERROR_CODE_TIMEOUT, "Timeout");
+    qDebug() << QString("Main Con Timeout %1").arg(this->m_pMasterUdpSocket->errorString());
+}
+
+void MainConnection::slotReadyReadMasterPort()
 {
     while (this->m_pMasterUdpSocket->hasPendingDatagrams()) {
         QHostAddress sender;

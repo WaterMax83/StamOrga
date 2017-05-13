@@ -39,7 +39,6 @@ Flickable {
                anchors.horizontalCenter: parent.horizontalCenter
                onCurrentIndexChanged: {
                    txtLogging.text = globalUserData.getCurrentLoggingList(logFilesCombo.currentIndex);
-                   console.log("Current width = " + txtLogging.width)
                }
            }
 

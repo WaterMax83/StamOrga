@@ -19,6 +19,9 @@
 #ifndef GLOBALDATA_H
 #define GLOBALDATA_H
 
+#include <QtCore/QList>
+
+#include "../Data/availablegameticket.h"
 #include "../Data/games.h"
 #include "../Data/listeduser.h"
 #include "../Data/seasonticket.h"
@@ -28,9 +31,12 @@ class GlobalData
 public:
     GlobalData();
 
-    ListedUser   m_UserList;
-    Games        m_GamesList;
-    SeasonTicket m_SeasonTicket;
+    qint32 requestFreeSeasonTicket(quint32 ticketIndex, quint32 gameIndex, const QString userName);
+
+    ListedUser                   m_UserList;
+    Games                        m_GamesList;
+    SeasonTicket                 m_SeasonTicket;
+    QList<AvailableGameTickets*> m_availableTickets;
 };
 
 #endif // GLOBALDATA_H

@@ -52,12 +52,12 @@ Games::Games()
 
             QString away        = this->m_pConfigSettings->value(PLAY_AWAY, "").toString();
             quint8  saisonIndex = quint8(this->m_pConfigSettings->value(PLAY_SAISON_INDEX, 0).toUInt());
-            quint16 saison = quint16(this->m_pConfigSettings->value(PLAY_SAISON, 0).toUInt());
+            quint16 saison      = quint16(this->m_pConfigSettings->value(PLAY_SAISON, 0).toUInt());
             QString score       = this->m_pConfigSettings->value(PLAY_SCORE, "").toString();
             quint8  competition = quint8(this->m_pConfigSettings->value(PLAY_COMPETITION, 0).toUInt());
 
             if (saison == 0) {
-                bProblems = true;
+                bProblems  = true;
                 QDate date = QDateTime::fromMSecsSinceEpoch(timestamp).date();
                 if (date.month() >= 7)
                     saison = date.year();
@@ -83,13 +83,14 @@ Games::Games()
                               pGame->m_timestamp, pGame->m_saisonIndex,
                               pGame->score, pGame->m_competition,
                               pGame->m_saison, pGame->m_index);
+        delete pGame;
     }
-	
-	this->sortGamesListByTime();
+    this->m_lAddItemProblems.clear();
+
+    this->sortGamesListByTime();
 
     if (bProblems)
         this->saveCurrentInteralList();
-
 }
 
 int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, quint8 comp, quint16 saison)
@@ -126,8 +127,8 @@ int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sInde
             if (this->updateItemValue(pGame, ITEM_TIMESTAMP, QVariant(timestamp))) {
                 pGame->m_timestamp = timestamp;
             }
-			
-			this->sortGamesListByTime();
+
+            this->sortGamesListByTime();
         }
         if (pGame->score != score && score.size() > 0) {
             if (this->updateItemValue(pGame, PLAY_SCORE, QVariant(score)))
@@ -159,8 +160,8 @@ int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sInde
     this->m_pConfigSettings->endArray();
     this->m_pConfigSettings->endGroup();
     this->m_pConfigSettings->sync();
-	
-	this->sortGamesListByTime();
+
+    this->sortGamesListByTime();
 
     this->addNewGamesPlay(home, away, timestamp, sIndex, score, comp, saison, newIndex, false);
 
@@ -261,15 +262,15 @@ void Games::addNewGamesPlay(QString home, QString away, qint64 timestamp, quint8
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
-    GamesPlay* play   = new GamesPlay();
-    play->m_itemName  = home;
-    play->away        = away;
-    play->m_timestamp = timestamp;
+    GamesPlay* play     = new GamesPlay();
+    play->m_itemName    = home;
+    play->away          = away;
+    play->m_timestamp   = timestamp;
     play->m_saisonIndex = sIndex;
-    play->score       = score;
+    play->score         = score;
     play->m_competition = comp;
-    play->m_index     = index;
-    play->m_saison    = saison;
+    play->m_index       = index;
+    play->m_saison      = saison;
     pList->append(play);
 }
 

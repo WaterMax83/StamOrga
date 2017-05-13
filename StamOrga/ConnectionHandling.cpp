@@ -112,7 +112,7 @@ qint32 ConnectionHandling::startUpdateReadableName(QString name)
 qint32 ConnectionHandling::startGettingGamesList()
 {
     DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST);
-    qDebug() << QString("Send Games list request: %1").arg(this->isDataConnectionActive());
+    qDebug() << QString("Send Games list request: %1").arg(this->m_pGlobalData->bIsConnected());
     this->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
@@ -164,9 +164,9 @@ void ConnectionHandling::slMainConReqFin(qint32 result, const QString& msg)
         this->m_pTimerConReset->start();
     } else {
         qWarning() << "Error main connecting: " << msg;
-        emit this->sNotifyConnectionFinished(result);
         this->m_ctrlMainCon.Stop();
         this->stopDataConnection();
+		emit this->sNotifyConnectionFinished(result);
 
         while (this->m_lErrorMainCon.size() > 0) {
             DataConRequest request = this->m_lErrorMainCon.last();
@@ -200,7 +200,7 @@ void ConnectionHandling::sendNewRequest(DataConRequest request)
             emit this->sStartSendNewRequest(request);
             return;
         } else {
-            qDebug() << QString("Trying to reconnect");
+            qDebug() << QString("Trying to reconnect from ConnectionHandling");
             this->sendLoginRequest(this->m_pGlobalData->passWord());
             this->m_lErrorMainCon.prepend(request);
         }
@@ -293,7 +293,6 @@ void ConnectionHandling::checkTimeoutResult(qint32 result)
         this->stopDataConnection();
     } else if (this->m_pGlobalData->bIsConnected()) {
         this->m_pTimerLoginReset->start(); // restart Timer
-        qDebug() << "Restart Login Timer";
     }
 }
 
@@ -334,6 +333,7 @@ void ConnectionHandling::slTimerConResetFired()
 
 void ConnectionHandling::slTimerConLoginFired()
 {
+    qDebug() << "Login Timer Timeout";
     this->m_pGlobalData->setbIsConnected(false);
 }
 
