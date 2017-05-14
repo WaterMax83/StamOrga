@@ -54,8 +54,11 @@ qint32 GlobalData::requestFreeSeasonTicket(quint32 ticketIndex, quint32 gameInde
     if (pGame == NULL || pTicket == NULL)
         return ERROR_CODE_NOT_FOUND;
 
+#undef ENABLE_PAST_CHECK
+#ifdef ENABLE_PAST_CHECK
     if (pGame->m_timestamp < QDateTime::currentMSecsSinceEpoch())
         return ERROR_CODE_IN_PAST;
+#endif
 
     qint32  result;
     quint32 userID = this->m_UserList.getItemIndex(userName);
@@ -133,7 +136,7 @@ qint32 GlobalData::requestGetAvailableSeasonTicket(const quint32 gameIndex, cons
             wData << quint32(ERROR_CODE_SUCCESS) << quint16(freeTicket.size() / 2);
             data.append(freeTicket);
 
-            ERROR_CODE_SUCCESS;
+            return ERROR_CODE_SUCCESS;
         }
     }
 

@@ -100,7 +100,7 @@ int ReadDataCSV::readNewGameData(QStringList line)
         }
     }
 
-    qint64 datetime;
+    qint64 datetime = 0;
     if (line.size() > 2) {
         QDateTime time = QDateTime::fromString(line.value(2), "dd.MM.yyyy hh:mm");
         datetime = time.toMSecsSinceEpoch();
