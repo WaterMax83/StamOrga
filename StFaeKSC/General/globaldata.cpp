@@ -18,6 +18,8 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
+#include <QtCore/QDateTime>
+#include <QtCore/QDataStream>
 
 #include "../Common/General/globalfunctions.h"
 #include "globaldata.h"
@@ -52,6 +54,9 @@ qint32 GlobalData::requestFreeSeasonTicket(quint32 ticketIndex, quint32 gameInde
     if (pGame == NULL || pTicket == NULL)
         return ERROR_CODE_NOT_FOUND;
 
+    if (pGame->m_timestamp < QDateTime::currentMSecsSinceEpoch())
+        return ERROR_CODE_IN_PAST;
+
     qint32  result;
     quint32 userID = this->m_UserList.getItemIndex(userName);
     foreach (AvailableGameTickets* ticket, this->m_availableTickets) {
@@ -79,7 +84,7 @@ qint32 GlobalData::requestFreeSeasonTicket(quint32 ticketIndex, quint32 gameInde
     if (ticket->initialize(pGame->m_saison, pGame->m_competition, pGame->m_saisonIndex, pGame->m_index)) {
         this->m_availableTickets.append(ticket);
         result = ticket->addNewTicket(ticketIndex, userID, TICKET_STATE_FREE);
-        qInfo().noquote() << QString("Changed ticketState from %1 at game %2 to %3").arg(pTicket->m_itemName, pGame->m_index).arg(TICKET_STATE_FREE);
+        qInfo().noquote() << QString("Changed ticketState from %1 at game %2 to %3").arg(pTicket->m_itemName).arg(pGame->m_index).arg(TICKET_STATE_FREE);
     } else {
         delete ticket;
         qWarning().noquote() << QString("Error creating available ticket file for game %1").arg(pGame->m_index);
@@ -87,4 +92,50 @@ qint32 GlobalData::requestFreeSeasonTicket(quint32 ticketIndex, quint32 gameInde
     }
 
     return ERROR_CODE_SUCCESS;
+}
+
+
+/*  answer
+ * 0                Header          12
+ * 12   quint32     result          4
+ * 16   quint16     freeCount       2
+ * 18   quint32     ticketIndex1    4
+ * 22   quint32     ticketIndex2    8
+ */
+qint32 GlobalData::requestGetAvailableSeasonTicket(const quint32 gameIndex, const QString userName, QByteArray &data)
+{
+    GamesPlay*  pGame   = (GamesPlay*)this->m_GamesList.getItem(gameIndex);
+    if (pGame == NULL)
+        return ERROR_CODE_NOT_FOUND;
+
+    foreach (AvailableGameTickets* ticket, this->m_availableTickets) {
+        if (ticket->getGameIndex() == gameIndex) {
+            quint16 totalCount = ticket->startRequestGetItemList();
+
+            QByteArray freeTicket;
+            QDataStream wFreeTicket(&freeTicket, QIODevice::WriteOnly);
+            wFreeTicket.setByteOrder(QDataStream::BigEndian);
+            for(int i= 0; i < totalCount; i++) {
+                AvailableTicketInfo *info = (AvailableTicketInfo*)ticket->getRequestConfigItemFromListIndex(i);
+                if (info == NULL) {
+                    wFreeTicket << quint16(0x0);
+                    continue;
+                }
+                if (info->m_state == TICKET_STATE_FREE)
+                    wFreeTicket << info->m_ticketID;
+            }
+
+            ticket->stopRequestGetItemList();
+
+            QDataStream wData(&data, QIODevice::WriteOnly);
+            wData.setByteOrder(QDataStream::BigEndian);
+
+            wData << quint32(ERROR_CODE_SUCCESS) << quint16(freeTicket.size() / 2);
+            data.append(freeTicket);
+
+            ERROR_CODE_SUCCESS;
+        }
+    }
+
+    return ERROR_CODE_NOT_FOUND;
 }

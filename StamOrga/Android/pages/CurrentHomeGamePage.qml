@@ -142,6 +142,8 @@ Flickable {
                 onClicked: {
                     console.log("Freigeben " + clickedBlockedMenu.menuTicketIndex + " " + m_gamePlayCurrentItem.index);
                     userIntCurrentGame.startFreeAvailableTicket(clickedBlockedMenu.menuTicketIndex, m_gamePlayCurrentItem.index)
+                    busyLoadingIndicatorCurrentGames.visible = true
+                    txtInfoCurrentGame.text = "Gebe Karte frei"
                 }
             }
         }
@@ -183,11 +185,13 @@ Flickable {
     }
 
     function notifyAvailableTicketFreeFinished(result) {
+        busyLoadingIndicatorCurrentGames.visible = false
         console.warn("End Free Ticket = " + result);
         if (result === 1) {
-
+            txtInfoCurrentGame.text = "Erfolgreich"
         } else {
-
+            txtInfoCurrentGame.text = userIntCurrentGame.getErrorCodeToString(
+                        result)
         }
     }
 

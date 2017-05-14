@@ -42,6 +42,7 @@ public:
     MessageProtocol* requestRemoveSeasonTicket(MessageProtocol* msg);
     MessageProtocol* requestNewPlaceSeasonTicket(MessageProtocol* msg);
     MessageProtocol* requestFreeSeasonTicket(MessageProtocol* msg);
+    MessageProtocol* requestGetAvailableTicketList(MessageProtocol* msg);
 
     void setUserConnectionData(UserConData* pUsrConData) { this->m_pUserConData = pUsrConData; }
 

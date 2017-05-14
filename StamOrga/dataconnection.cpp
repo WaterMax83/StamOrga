@@ -95,7 +95,6 @@ void DataConnection::checkNewOncomingData()
     MessageProtocol* msg;
     while ((msg = this->m_messageBuffer.GetNextMessage()) != NULL) {
 
-        qDebug().noquote() << QString("DataConnection: Receive ack 0x%1").arg(QString::number(msg->getIndex(), 16));
         DataConRequest request = this->getActualRequest(msg->getIndex() & 0x00FFFFFF);
         if (request.m_request == 0 && msg->getIndex() != OP_CODE_CMD_RES::ACK_NOT_LOGGED_IN)
             continue;
@@ -141,9 +140,7 @@ void DataConnection::checkNewOncomingData()
             break;
 
         case OP_CODE_CMD_RES::ACK_NOT_LOGGED_IN:
-            qDebug() << QString("DataConnection: Ack not logged in");
             if (!this->m_bRequestLoginAgain) {
-                qDebug() << "DataConnection: Trying to reconnect from DataConnection";
                 this->m_bRequestLoginAgain = true;
                 DataConRequest conReq;
                 conReq.m_request = OP_CODE_CMD_REQ::REQ_LOGIN_USER;
@@ -199,7 +196,6 @@ void DataConnection::startSendLoginRequest(DataConRequest request)
     wPassword << quint16(passWord.toUtf8().size());
     aPassw.append(passWord);
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_LOGIN_USER, aPassw);
-    qDebug() << "DataConnection: Sending Login Request";
     this->sendMessageRequest(&msg, request);
 }
 
@@ -256,7 +252,6 @@ void DataConnection::startSendReadableNameRequest(DataConRequest request)
 void DataConnection::startSendGamesListRequest(DataConRequest request)
 {
     MessageProtocol msg(OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST, 10);
-    qDebug() << "DataConnection: Sending Games List request";
     this->sendMessageRequest(&msg, request);
 }
 

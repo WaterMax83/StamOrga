@@ -65,6 +65,7 @@ int Logging::DoBackgroundWork()
 
     this->m_hourTimer = new QTimer();
     this->m_hourTimer->setSingleShot(true);
+    connect(this->m_hourTimer, &QTimer::timeout, this, &Logging::slotEveryHourTimeout);
 
     QString loggingPath = this->createLoggingFilePath();
 

@@ -164,6 +164,10 @@ MessageProtocol* UdpDataServer::checkNewMessage(MessageProtocol* msg)
             ack = this->m_pDataConnection->requestFreeSeasonTicket(msg);
             break;
 
+        case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS:
+            ack = this->m_pDataConnection->requestGetAvailableTicketList(msg);
+            break;
+
         default:
             qWarning().noquote() << QString("Unkown command %1").arg(msg->getIndex());
             break;

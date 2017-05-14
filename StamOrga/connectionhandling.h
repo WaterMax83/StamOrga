@@ -85,8 +85,8 @@ private slots:
 
     void slDataConLastRequestFinished(DataConRequest request);
 
-    void slTimerConResetFired();
-    void slTimerConLoginFired();
+    //    void slTimerConResetFired();
+    //    void slTimerConLoginFired();
 
 private:
     BackgroundController m_ctrlMainCon;
@@ -97,8 +97,9 @@ private:
 
     GlobalData* m_pGlobalData = NULL;
 
-    QTimer* m_pTimerConReset;
-    QTimer* m_pTimerLoginReset;
+    //    QTimer* m_pTimerConReset;
+    //    QTimer* m_pTimerLoginReset;
+    qint64 m_lastSuccessTimeStamp;
 
     QList<DataConRequest> m_lErrorMainCon;
 

@@ -32,6 +32,7 @@ public:
     GlobalData();
 
     qint32 requestFreeSeasonTicket(quint32 ticketIndex, quint32 gameIndex, const QString userName);
+    qint32 requestGetAvailableSeasonTicket(const quint32 gameIndex, const QString userName, QByteArray& data);
 
     ListedUser                   m_UserList;
     Games                        m_GamesList;

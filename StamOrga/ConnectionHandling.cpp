@@ -16,6 +16,7 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <QDebug>
+#include <QtCore/QDateTime>
 
 #include "../Common/General/globalfunctions.h"
 #include "../Common/General/globaltiming.h"
@@ -28,15 +29,16 @@
 ConnectionHandling::ConnectionHandling(QObject* parent)
     : QObject(parent)
 {
-    this->m_pTimerConReset = new QTimer();
-    this->m_pTimerConReset->setSingleShot(true);
-    this->m_pTimerConReset->setInterval(CON_RESET_TIMEOUT_MSEC - TIMER_DIFF_MSEC);
-    connect(this->m_pTimerConReset, &QTimer::timeout, this, &ConnectionHandling::slTimerConResetFired);
+    //    this->m_pTimerConReset = new QTimer();
+    //    this->m_pTimerConReset->setSingleShot(true);
+    //    this->m_pTimerConReset->setInterval(CON_RESET_TIMEOUT_MSEC - TIMER_DIFF_MSEC);
+    //    connect(this->m_pTimerConReset, &QTimer::timeout, this, &ConnectionHandling::slTimerConResetFired);
 
-    this->m_pTimerLoginReset = new QTimer();
-    this->m_pTimerLoginReset->setSingleShot(true);
-    this->m_pTimerLoginReset->setInterval(CON_LOGIN_TIMEOUT_MSEC - TIMER_DIFF_MSEC);
-    connect(this->m_pTimerLoginReset, &QTimer::timeout, this, &ConnectionHandling::slTimerConLoginFired);
+    //    this->m_pTimerLoginReset = new QTimer();
+    //    this->m_pTimerLoginReset->setSingleShot(true);
+    //    this->m_pTimerLoginReset->setInterval(CON_LOGIN_TIMEOUT_MSEC - TIMER_DIFF_MSEC);
+    //    connect(this->m_pTimerLoginReset, &QTimer::timeout, this, &ConnectionHandling::slTimerConLoginFired);
+    this->m_lastSuccessTimeStamp = 0;
 }
 
 QString mainConRequestPassWord;
@@ -112,7 +114,6 @@ qint32 ConnectionHandling::startUpdateReadableName(QString name)
 qint32 ConnectionHandling::startGettingGamesList()
 {
     DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST);
-    qDebug() << QString("Send Games list request: %1").arg(this->m_pGlobalData->bIsConnected());
     this->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
@@ -170,7 +171,8 @@ void ConnectionHandling::slMainConReqFin(qint32 result, const QString& msg)
         this->startDataConnection();
         QThread::msleep(2);
         this->sendLoginRequest(mainConRequestPassWord);
-        this->m_pTimerConReset->start();
+        //        this->m_pTimerConReset->start();
+        this->m_lastSuccessTimeStamp = QDateTime::currentMSecsSinceEpoch();
     } else {
         qWarning() << "Error main connecting: " << msg;
         this->m_ctrlMainCon.Stop();
@@ -202,18 +204,26 @@ void ConnectionHandling::sendLoginRequest(QString password)
 
 void ConnectionHandling::sendNewRequest(DataConRequest request)
 {
-    if (this->isMainConnectionActive()) {
+    qint64 now = QDateTime::currentMSecsSinceEpoch();
+    if ((now - this->m_lastSuccessTimeStamp) < (CON_RESET_TIMEOUT_MSEC - TIMER_DIFF_MSEC)) {
         this->startDataConnection();
 
-        if (this->m_pGlobalData->bIsConnected()) {
+        if ((now - this->m_lastSuccessTimeStamp) < (CON_LOGIN_TIMEOUT_MSEC - TIMER_DIFF_MSEC)) {
+            //        if (this->m_pGlobalData->bIsConnected()) {
             emit this->sStartSendNewRequest(request);
             return;
         } else {
             qDebug() << QString("Trying to reconnect from ConnectionHandling");
+            this->m_pGlobalData->setbIsConnected(false);
             this->sendLoginRequest(this->m_pGlobalData->passWord());
             this->m_lErrorMainCon.prepend(request);
         }
     } else {
+        qDebug() << QString("Trying to restart connection from ConnectionHandling");
+        this->m_pGlobalData->setbIsConnected(false);
+        if (this->isMainConnectionActive())
+            this->m_ctrlMainCon.Stop();
+        this->stopDataConnection();
         this->m_lErrorMainCon.prepend(request);
         this->startMainConnection(this->m_pGlobalData->userName(), this->m_pGlobalData->passWord());
     }
@@ -305,7 +315,8 @@ void ConnectionHandling::checkTimeoutResult(qint32 result)
         this->m_ctrlMainCon.Stop();
         this->stopDataConnection();
     } else if (this->m_pGlobalData->bIsConnected()) {
-        this->m_pTimerLoginReset->start(); // restart Timer
+        //        this->m_pTimerLoginReset->start(); // restart Timer
+        this->m_lastSuccessTimeStamp = QDateTime::currentMSecsSinceEpoch();
     }
 }
 
@@ -339,16 +350,17 @@ void ConnectionHandling::stopDataConnection()
     this->m_ctrlDataCon.Stop();
 }
 
-void ConnectionHandling::slTimerConResetFired()
-{
-    this->m_ctrlMainCon.Stop();
-}
+//void ConnectionHandling::slTimerConResetFired()
+//{
+//    qDebug() << "Connection Timer Timeout";
+//    this->m_ctrlMainCon.Stop();
+//}
 
-void ConnectionHandling::slTimerConLoginFired()
-{
-    qDebug() << "Login Timer Timeout";
-    this->m_pGlobalData->setbIsConnected(false);
-}
+//void ConnectionHandling::slTimerConLoginFired()
+//{
+//    qDebug() << "Login Timer Timeout";
+//    this->m_pGlobalData->setbIsConnected(false);
+//}
 
 ConnectionHandling::~ConnectionHandling()
 {
