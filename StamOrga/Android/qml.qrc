@@ -31,5 +31,7 @@
         <file>images/StammtischLogo.png</file>
         <file>pages/CurrentHomeGamePage.qml</file>
         <file>pages/CurrentAwayGamePage.qml</file>
+        <file>components/Toast.qml</file>
+        <file>components/ToastManager.qml</file>
     </qresource>
 </RCC>

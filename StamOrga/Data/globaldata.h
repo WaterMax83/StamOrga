@@ -199,7 +199,8 @@ public:
         QMutexLocker lock(&this->m_mutexTicket);
         return this->m_lSeasonTicket.size();
     }
-    Q_INVOKABLE SeasonTicketItem* getSeasonTicket(int index);
+    Q_INVOKABLE SeasonTicketItem* getSeasonTicketFromArrayIndex(int index);
+    SeasonTicketItem* getSeasonTicket(int ticketIndex);
     Q_INVOKABLE QString getSeasonTicketLastUpdate();
 
 signals:

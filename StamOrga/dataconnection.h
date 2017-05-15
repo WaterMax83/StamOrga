@@ -84,6 +84,7 @@ private:
     void startSendSeasonTicketListRequest(DataConRequest request);
     void startSendNewPlaceTicket(DataConRequest request);
     void startSendFreeTicket(DataConRequest request);
+    void startSendAvailableTicketListRequest(DataConRequest request);
 
 
     void   checkNewOncomingData();

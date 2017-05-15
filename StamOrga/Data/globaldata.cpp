@@ -271,17 +271,24 @@ bool GlobalData::existSeasonTicket(SeasonTicketItem* sTicket)
     return false;
 }
 
-SeasonTicketItem* lastItem = NULL;
 
-SeasonTicketItem* GlobalData::getSeasonTicket(int index)
+SeasonTicketItem* GlobalData::getSeasonTicketFromArrayIndex(int index)
 {
     QMutexLocker lock(&this->m_mutexTicket);
 
     if (index < this->m_lSeasonTicket.size()) {
-        if (lastItem != NULL)
-            delete lastItem;
-
         return this->m_lSeasonTicket.at(index);
+    }
+    return NULL;
+}
+
+SeasonTicketItem* GlobalData::getSeasonTicket(int ticketIndex)
+{
+    QMutexLocker lock(&this->m_mutexTicket);
+
+    for (int i = 0; i < this->m_lSeasonTicket.size(); i++) {
+        if (this->m_lSeasonTicket[i]->index() == ticketIndex)
+            return this->m_lSeasonTicket[i];
     }
     return NULL;
 }

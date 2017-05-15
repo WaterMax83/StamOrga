@@ -175,6 +175,10 @@ void DataConnection::checkNewOncomingData()
             request.m_result = msg->getIntData();
             break;
 
+        case OP_CODE_CMD_RES::ACK_GET_AVAILABLE_TICKETS:
+            request.m_result = this->m_pDataHandle->getHandleAvailableTicketListResponse(msg);
+            break;
+
         default:
             delete msg;
             continue;
@@ -195,7 +199,7 @@ void DataConnection::startSendLoginRequest(DataConRequest request)
     wPassword.setByteOrder(QDataStream::BigEndian);
     wPassword << quint16(passWord.toUtf8().size());
     aPassw.append(passWord);
-    MessageProtocol msg(OP_CODE_CMD_REQ::REQ_LOGIN_USER, aPassw);
+    MessageProtocol msg(request.m_request, aPassw);
     this->sendMessageRequest(&msg, request);
 }
 
@@ -208,13 +212,13 @@ void DataConnection::startSendVersionRequest(DataConRequest request)
     wVersion << quint16(QString(STAM_ORGA_VERSION_S).toUtf8().size());
 
     version.append(QString(STAM_ORGA_VERSION_S));
-    MessageProtocol msg(OP_CODE_CMD_REQ::REQ_GET_VERSION, version);
+    MessageProtocol msg(request.m_request, version);
     this->sendMessageRequest(&msg, request);
 }
 
 void DataConnection::startSendUserPropsRequest(DataConRequest request)
 {
-    MessageProtocol msg(OP_CODE_CMD_REQ::REQ_GET_USER_PROPS);
+    MessageProtocol msg(request.m_request);
     this->sendMessageRequest(&msg, request);
 }
 
@@ -232,7 +236,7 @@ void DataConnection::startSendUpdPassRequest(DataConRequest request)
     wPassReq << (qint16)newPassWord.size();
     passReq.append(newPassWord);
 
-    MessageProtocol msg(OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN, passReq);
+    MessageProtocol msg(request.m_request, passReq);
     this->sendMessageRequest(&msg, request);
 }
 
@@ -245,13 +249,13 @@ void DataConnection::startSendReadableNameRequest(DataConRequest request)
     wReadName << quint16(name.toUtf8().size());
     readName.append(name);
 
-    MessageProtocol msg(OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME, readName);
+    MessageProtocol msg(request.m_request, readName);
     this->sendMessageRequest(&msg, request);
 }
 
 void DataConnection::startSendGamesListRequest(DataConRequest request)
 {
-    MessageProtocol msg(OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST, 10);
+    MessageProtocol msg(request.m_request, 10);
     this->sendMessageRequest(&msg, request);
 }
 
@@ -265,14 +269,14 @@ void DataConnection::startSendAddSeasonTicket(DataConRequest request)
     wSeasonTicket << quint16(name.toUtf8().size());
     seasonTicket.append(name);
 
-    MessageProtocol msg(OP_CODE_CMD_REQ::REQ_ADD_TICKET, seasonTicket);
+    MessageProtocol msg(request.m_request, seasonTicket);
     this->sendMessageRequest(&msg, request);
 }
 
 void DataConnection::startSendRemoveSeasonTicket(DataConRequest request)
 {
     quint32         index = request.m_lData.at(0).toUInt();
-    MessageProtocol msg(OP_CODE_CMD_REQ::REQ_REMOVE_TICKET, index);
+    MessageProtocol msg(request.m_request, index);
     this->sendMessageRequest(&msg, request);
 }
 
@@ -285,13 +289,13 @@ void DataConnection::startSendNewPlaceTicket(DataConRequest request)
     wSeasonTicket << request.m_lData.at(0).toUInt();
     wSeasonTicket << quint16(place.toUtf8().size());
     seasonTicket.append(place);
-    MessageProtocol msg(OP_CODE_CMD_REQ::REQ_NEW_TICKET_PLACE, seasonTicket);
+    MessageProtocol msg(request.m_request, seasonTicket);
     this->sendMessageRequest(&msg, request);
 }
 
 void DataConnection::startSendSeasonTicketListRequest(DataConRequest request)
 {
-    MessageProtocol msg(OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST);
+    MessageProtocol msg(request.m_request);
     this->sendMessageRequest(&msg, request);
 }
 
@@ -303,7 +307,15 @@ void DataConnection::startSendFreeTicket(DataConRequest request)
     wSeasonTicket << request.m_lData.at(0).toUInt();
     wSeasonTicket << request.m_lData.at(1).toUInt();
 
-    MessageProtocol msg(OP_CODE_CMD_REQ::REQ_FREE_SEASON_TICKET, seasonTicket);
+    MessageProtocol msg(request.m_request, seasonTicket);
+    this->sendMessageRequest(&msg, request);
+}
+
+void DataConnection::startSendAvailableTicketListRequest(DataConRequest request)
+{
+    quint32 index = request.m_lData.at(0).toUInt();
+
+    MessageProtocol msg(request.m_request, index);
     this->sendMessageRequest(&msg, request);
 }
 
@@ -436,6 +448,10 @@ void DataConnection::startSendNewRequest(DataConRequest request)
 
     case OP_CODE_CMD_REQ::REQ_FREE_SEASON_TICKET:
         this->startSendFreeTicket(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS:
+        this->startSendAvailableTicketListRequest(request);
         break;
 
     default:

@@ -28,17 +28,22 @@ Flickable {
     property UserInterface userIntCurrentGame
     property var m_gamePlayCurrentItem
 
+    property int listViewItemHeight : 30
+
     contentHeight: mainPaneCurrentGame.height
 
     Pane {
         id: mainPaneCurrentGame
         width: parent.width
 
+
+
         ColumnLayout {
             id: mainColumnLayoutCurrentGame
             width: parent.width
             MyComponents.Games {
                 id: gameHeader
+                width: parent.width
             }
 
             ColumnLayout {
@@ -66,6 +71,7 @@ Flickable {
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             }
 
+
             Label {
                 id: txtInfoCurrentGameBlockedTickets
                 visible: false
@@ -77,12 +83,12 @@ Flickable {
                 id: listViewBlockedTickets
                 focus: false
                 implicitWidth: mainColumnLayoutCurrentGame.width
-                implicitHeight: flickableCurrentGame.height
+//                implicitHeight: listViewModelBlockedTickets.count * listViewItemHeight
 
                 delegate: RowLayout {
                     id: singleBlockedRow
                     width: parent.width
-                    height: 30
+                    height: listViewItemHeight
 
                     MouseArea {
                         anchors.fill: parent
@@ -95,7 +101,7 @@ Flickable {
                         }
                     }
                     Rectangle {
-                        id: imageItem
+                        id: imageItemBlocked
                         anchors.left: parent.left
                         anchors.leftMargin: parent.height
                         width: parent.height / 4 * 2
@@ -106,7 +112,7 @@ Flickable {
 
                     Text {
                         text: model.title
-                        anchors.left: imageItem.right
+                        anchors.left: imageItemBlocked.right
                         anchors.leftMargin: 10
                         anchors.verticalCenter: parent.verticalCenter
                         Layout.alignment: Qt.AlignVCenter
@@ -117,6 +123,63 @@ Flickable {
 
                 model: ListModel {
                     id: listViewModelBlockedTickets
+                }
+            }
+
+
+
+
+            Label {
+                id: txtInfoCurrentGameFreeTickets
+                visible: false
+                text: "Karte frei:"
+                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+            }
+
+            ListView {
+                id: listViewFreeTickets
+                focus: false
+                implicitWidth: mainColumnLayoutCurrentGame.width
+//                implicitHeight: listViewModelFreeTickets * listViewItemHeight
+
+                delegate: RowLayout {
+                    id: singleFreeRow
+                    width: parent.width
+                    height: listViewItemHeight
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+//                            var globalCoordinates = singleBlockedRow.mapToItem(flickableCurrentGame, 0, 0)
+//                            menuItemFree.text = "Freigeben";
+//                            clickedBlockedMenu.y = globalCoordinates.y - singleBlockedRow.height / 2
+//                            clickedBlockedMenu.menuTicketIndex = model.index
+//                            clickedBlockedMenu.open();
+                        }
+                    }
+                    Rectangle {
+                        id: imageItemFree
+                        anchors.left: parent.left
+                        anchors.leftMargin: parent.height
+                        width: parent.height / 4 * 2
+                        height: parent.height / 4 * 2
+                        radius: width * 0.5
+                        color: "green"
+                    }
+
+                    Text {
+                        text: model.title
+                        anchors.left: imageItemFree.right
+                        anchors.leftMargin: 10
+                        anchors.verticalCenter: parent.verticalCenter
+                        Layout.alignment: Qt.AlignVCenter
+                        color: "white"
+                        font.pixelSize: parent.height / 4 * 2
+                    }
+                }
+
+                model: ListModel {
+                    id: listViewModelFreeTickets
                 }
             }
         }
@@ -134,7 +197,7 @@ Flickable {
 
             background: Rectangle {
                     implicitWidth: menuItemFree.width
-                    color: "#3f3f3f"
+                    color: "#4f4f4f"
                 }
 
             MenuItem {
@@ -151,8 +214,8 @@ Flickable {
     function showAllInfoAboutGame(sender) {
 
         busyLoadingIndicatorCurrentGames.visible = true
-        txtInfoCurrentGame.text = "Lade Daten"
-        userIntCurrentGame.startGettingSeasonTicketList()
+        txtInfoCurrentGame.text = "Aktualisiere Daten"
+        userIntCurrentGame.startListSeasonTickets()
 
         m_gamePlayCurrentItem = sender
         gameHeader.showGamesInfo(sender)
@@ -163,21 +226,7 @@ Flickable {
     function notifyUserIntSeasonTicketListFinished(result) {
         busyLoadingIndicatorCurrentGames.visible = false
         if (result === 1) {
-            listViewModelBlockedTickets.clear()
-
-            if (globalUserData.getSeasonTicketLength() > 0) {
-                txtInfoCurrentGameBlockedTickets.visible = true
-                for (var i = 0; i < globalUserData.getSeasonTicketLength(); i++) {
-                    var seasonTicketItem = globalUserData.getSeasonTicket(i)
-                    var discount = seasonTicketItem.discount > 0 ? " *" : ""
-                    listViewModelBlockedTickets.append({
-                                                           title: seasonTicketItem.name + discount,
-                                                           index: seasonTicketItem.index
-                                                       })
-                }
-            }
-            txtInfoCurrentGame.text = "Letzes Update am "
-                    + globalUserData.getSeasonTicketLastUpdate()
+            userIntCurrentGame.startRequestAvailableTickets(m_gamePlayCurrentItem.index);
         } else {
             txtInfoCurrentGame.text = userIntCurrentGame.getErrorCodeToString(
                         result)
@@ -186,14 +235,64 @@ Flickable {
 
     function notifyAvailableTicketFreeFinished(result) {
         busyLoadingIndicatorCurrentGames.visible = false
-        console.warn("End Free Ticket = " + result);
         if (result === 1) {
-            txtInfoCurrentGame.text = "Erfolgreich"
+            toastManager.show("Karte erfolgreich freigegeben", 2000);
+            userIntCurrentGame.startRequestAvailableTickets(m_gamePlayCurrentItem.index);
         } else {
-            txtInfoCurrentGame.text = userIntCurrentGame.getErrorCodeToString(
-                        result)
+            toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
         }
     }
 
+    function notifyAvailableTicketListFinished(result) {
+        if (result === 1) {
+            toastManager.show("Karten geladen", 2000);
+        } else {
+            toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
+        }
+        showInternalTicketList();
+    }
+
     function notifyUserIntConnectionFinished(result) {}
+
+    function showInternalTicketList() {
+        listViewModelBlockedTickets.clear()
+        listViewModelFreeTickets.clear()
+
+        if (globalUserData.getSeasonTicketLength() > 0) {
+            for (var i = 0; i < globalUserData.getSeasonTicketLength(); i++) {
+                var seasonTicketItem = globalUserData.getSeasonTicketFromArrayIndex(i)
+                var discount = seasonTicketItem.discount > 0 ? " *" : ""
+                if (seasonTicketItem.isTicketFree()) {
+                    listViewModelFreeTickets.append({
+                                                        title: seasonTicketItem.name + discount,
+                                                        index: seasonTicketItem.index
+                                                    });
+                }
+                else
+                    listViewModelBlockedTickets.append({
+                                                       title: seasonTicketItem.name + discount,
+                                                       index: seasonTicketItem.index
+                                                   })
+            }
+            /* Does not work in defintion for freeTickets, so set it here */
+            listViewBlockedTickets.implicitHeight = listViewModelBlockedTickets.count * listViewItemHeight
+            listViewFreeTickets.implicitHeight = listViewModelFreeTickets.count * listViewItemHeight
+
+            if (listViewModelFreeTickets.count > 0)
+                txtInfoCurrentGameFreeTickets.visible = true
+            else
+                txtInfoCurrentGameFreeTickets.visible = false
+            if (listViewModelBlockedTickets.count > 0)
+                txtInfoCurrentGameBlockedTickets.visible = true
+            else
+                txtInfoCurrentGameBlockedTickets.visible = false
+
+        } else {
+            txtInfoCurrentGameBlockedTickets.visible = false
+            txtInfoCurrentGameFreeTickets.visible = false
+        }
+
+        txtInfoCurrentGame.text = "Letzes Update am "
+                + globalUserData.getSeasonTicketLastUpdate()
+    }
 }

@@ -40,7 +40,14 @@ struct OnlineGameInfo {
     quint32 m_matchID;
     qint64 m_timeStamp;
     qint64 m_lastUpdate;
+    bool m_gameFinished;
 //    bool m_checkUpdate;
+};
+
+struct RequestList {
+    QString m_comp;
+    quint32 m_season;
+    quint32 m_maxIndex;
 };
 
 class ReadOnlineGames : public BackgroundWorker
@@ -67,9 +74,14 @@ protected:
     QNetworkAccessManager* m_netAccess;
     QTimer* m_networkTimout;
     bool m_bRequestCanceled;
+    qint32 m_currentRequestIndex;
 
     QList<OnlineGameInfo*> m_onlineGames;
     OnlineGameInfo* m_currentGameInfo;
+
+    QList<RequestList*> m_requestList;
+    qint32 getTotalCountOfRequest();
+    OnlineGameInfo* getNextRequest(OnlineGameInfo* currentGame);
 
     QTimer* m_networkUpdate;
 
@@ -77,9 +89,9 @@ protected:
 
     OnlineGameInfo* existCurrentGameInfo(OnlineGameInfo *info);
 
-    qint64 getNextGameInMilliSeconds();
+    qint64 getNextGameInMilliSeconds(bool& fastUpdate);
 
-    void checkNewNetworkRequest(void);
+    void checkNewNetworkRequest(bool checkLastItem);
 
     bool readSingleGame(QJsonObject& json);
     QString readSingleTeam(QJsonObject& json);

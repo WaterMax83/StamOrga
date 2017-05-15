@@ -72,15 +72,16 @@ Flickable {
     }
 
     function toolButtonClicked() {
-        userIntTicket.startGettingSeasonTicketList()
+        userIntTicket.startListSeasonTickets()
         busyConnectIndicatorTicket.visible = true;
-        txtInfoSeasonTicket.text = "Lade Dauerkarten Liste"
+        txtInfoSeasonTicket.text = "Aktualisiere Dauerkarten Liste"
     }
 
     function notifyUserIntSeasonTicketAdd(result) {
         busyConnectIndicatorTicket.visible = false;
         if (result === 1) {
             toolButtonClicked()
+            toastManager.show("Karte erfolgreich hinzugefügt", 2000);
         }
         else
             txtInfoSeasonTicket.text = userIntTicket.getErrorCodeToString(result)
@@ -89,6 +90,7 @@ Flickable {
     function notifyUserIntSeasonTicketRemoveFinished(result) {
         if (result === 1) {
             toolButtonClicked()
+            toastManager.show("Karte erfolgreich gelöscht", 2000);
         }
     }
 
@@ -105,6 +107,7 @@ Flickable {
         busyConnectIndicatorTicket.visible = false;
         if (result === 1) {
             toolButtonClicked()
+            toastManager.show("Ort erfolgreich geändert", 2000);
         }  else {
             txtInfoSeasonTicket.text = userIntTicket.getErrorCodeToString(result);
         }
@@ -125,7 +128,7 @@ Flickable {
         if (globalUserData.getSeasonTicketLength() > 0) {
             for (var i=0; i<globalUserData.getSeasonTicketLength(); i++) {
                 var sprite = seasonTicketItem.createObject(columnLayoutTickets)
-//                sprite.showTicketInfo(globalUserData.getSeasonTicket(i))
+//                sprite.showTicketInfo(globalUserData.getSeasonTicketFromArrayIndex(i))
                 sprite.showTicketInfo(i);
             }
             txtInfoSeasonTicket.text = "Letzes Update am " + globalUserData.getSeasonTicketLastUpdate()
@@ -168,11 +171,11 @@ Flickable {
             x: (flickableTickets.width - width) / 2
             y: flickableTickets.height / 6
             title : "Test"
-            implicitHeight: mainPaneTickets.height
+//            implicitHeight: mainPaneTickets.height
 
             background: Rectangle {
                     implicitWidth: menuItemChange.width
-                    color: "#3f3f3f"
+                    color: "#4f4f4f"
                 }
 
             MenuItem {

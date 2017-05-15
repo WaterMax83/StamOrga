@@ -35,7 +35,7 @@ public:
 
     Q_INVOKABLE qint32 startMainConnection(QString name, QString passw);
 
-    Q_INVOKABLE qint32 startGettingGamesList();
+    Q_INVOKABLE qint32 startListGettingGames();
 
     Q_INVOKABLE qint32 startUpdateUserPassword(QString newPassw);
 
@@ -47,7 +47,9 @@ public:
 
     Q_INVOKABLE qint32 startNewPlaceSeasonTicket(quint32 index, QString place);
 
-    Q_INVOKABLE qint32 startGettingSeasonTicketList();
+    Q_INVOKABLE qint32 startListSeasonTickets();
+
+    Q_INVOKABLE qint32 startRequestAvailableTickets(quint32 gameIndex);
 
     Q_INVOKABLE qint32 startFreeAvailableTicket(quint32 ticketIndex, quint32 gameIndex);
 
@@ -95,6 +97,7 @@ signals:
     void notifySeasonTicketNewPlaceFinished(qint32 result);
     void notifySeasonTicketListFinished(qint32 result);
     void notifyAvailableTicketFreeFinsished(qint32 result);
+    void notifyAvailableTicketListFinsished(qint32 result);
 
 public slots:
     void slConnectionRequestFinished(qint32 result);
@@ -108,6 +111,7 @@ public slots:
     void slSeasonTicketNewPlaceFinished(qint32 result);
     void slSeasonTicketListFinished(qint32 result);
     void slAvailableTicketFreeFinished(qint32 result);
+    void slAvailableTicketListFinished(qint32 result);
 
 
 private:

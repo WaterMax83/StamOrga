@@ -212,6 +212,10 @@ ApplicationWindow {
         }
     }
 
+    MyComponents.ToastManager {
+        id: toastManager
+    }
+
     Component {
         id: viewUserLogin
         MyPages.UserLogin {
@@ -293,6 +297,9 @@ ApplicationWindow {
 
         onNotifyAvailableTicketFreeFinsished: {
             stackView.currentItem.notifyAvailableTicketFreeFinished(result);
+        }
+        onNotifyAvailableTicketListFinsished: {
+            stackView.currentItem.notifyAvailableTicketListFinished(result);
         }
     }
 

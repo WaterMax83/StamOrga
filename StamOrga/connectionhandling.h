@@ -40,12 +40,13 @@ public:
     qint32 startGettingUserProps();
     bool startUpdatePassword(QString newPassWord);
     qint32 startUpdateReadableName(QString name);
-    qint32 startGettingGamesList();
-    qint32 startSeasonTicketRemove(quint32 index);
-    qint32 startSeasonTicketNewPlace(quint32 index, QString place);
-    qint32 startSeasonTicketAdd(QString name, quint32 discount);
-    qint32 startGettingSeasonTicketList();
+    qint32 startListGettingGames();
+    qint32 startRemoveSeasonTicket(quint32 index);
+    qint32 startNewPlaceSeasonTicket(quint32 index, QString place);
+    qint32 startAddSeasonTicket(QString name, quint32 discount);
+    qint32 startListSeasonTickets();
     qint32 startFreeSeasonTicket(quint32 tickedIndex, quint32 gameIndex);
+    qint32 startListAvailableTicket(quint32 gameIndex);
 
 
     void setGlobalData(GlobalData* pData)
@@ -73,8 +74,9 @@ signals:
     void sNotifySeasonTicketListRequest(quint32 result);
     void sNotifySeasonTicketNewPlace(quint32 result);
     void sNotityAvailableTicketFreeRequest(qint32 result);
+    void sNotityAvailableTicketListRequest(qint32 result);
 
-    void sStartSendLoginRequest();
+    void sStartSendMainConRequest(QString name);
 
     void sStartSendNewRequest(DataConRequest request);
 

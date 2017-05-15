@@ -68,7 +68,7 @@ Flickable {
     function toolButtonClicked() {
         busyLoadingIndicatorGames.visible = true
         txtInfoLoadingGames.text = "Lade Spielliste"
-        userIntGames.startGettingGamesList()
+        userIntGames.startListGettingGames()
     }
 
     function pageOpenedUpdateView() {
@@ -114,7 +114,7 @@ Flickable {
                     component = Qt.createComponent("../pages/CurrentAwayGamePage.qml")
                 if (component.status === Component.Ready) {
                     var sprite = stackView.push(component)
-                    //                   userIntGames.startGettingSeasonTicketList();
+                    //                   userIntGames.startListSeasonTickets();
                     sprite.userIntCurrentGame = userIntGames
                     sprite.showAllInfoAboutGame(sender)
                     if (sender.home === "KSC")

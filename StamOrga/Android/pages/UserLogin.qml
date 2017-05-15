@@ -224,12 +224,12 @@ Flickable {
         btnSendData.enabled = true
         busyConnectIndicator.visible = false;
         if (result === 1) {
-            btnSendData.background.color = "green"
+//            btnSendData.background.color = "green"
             txtInfoConnecting.text = "Verbindung erfolgreich"
             updateUserColumnView(false);
         }
         else {
-            btnSendData.background.color = "red"
+//            btnSendData.background.color = "red"
             txtInfoConnecting.text = userIntUser.getErrorCodeToString(result);
             updateUserColumnView(true);
         }

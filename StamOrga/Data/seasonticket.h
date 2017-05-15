@@ -19,10 +19,10 @@
 #ifndef SEASONTICKET_H
 #define SEASONTICKET_H
 
-#include <QtCore/QObject>
 #include <QtCore/QDateTime>
+#include <QtCore/QObject>
 
-class SeasonTicketItem: public QObject
+class SeasonTicketItem : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
@@ -30,10 +30,10 @@ class SeasonTicketItem: public QObject
     Q_PROPERTY(quint8 discount READ discount WRITE setDiscount NOTIFY discountChanged)
     Q_PROPERTY(quint32 index READ index WRITE setIndex NOTIFY indexChanged)
 public:
-    explicit SeasonTicketItem(QObject *parent = 0);
+    explicit SeasonTicketItem(QObject* parent = 0);
 
     QString name() { return this->m_name; }
-    void setName(const QString &name)
+    void setName(const QString& name)
     {
         if (this->m_name != name) {
             this->m_name = name;
@@ -42,7 +42,7 @@ public:
     }
 
     QString place() { return this->m_place; }
-    void setPlace(const QString &place)
+    void setPlace(const QString& place)
     {
         if (this->m_place != place) {
             this->m_place = place;
@@ -85,6 +85,11 @@ public:
             this->m_ownTicket = false;
     }
 
+    Q_INVOKABLE bool isTicketFree() { return this->m_isTicketFree; }
+    void setTicketFree(bool free)
+    {
+        this->m_isTicketFree = free;
+    }
 
 
 signals:
@@ -96,12 +101,14 @@ signals:
 public slots:
 
 private:
-        QString m_name;
-        QString m_place;
-        quint8 m_discount;
-        quint32 m_index;
-        quint32 m_userIndex;
-        bool m_ownTicket;
+    QString m_name;
+    QString m_place;
+    quint8  m_discount;
+    quint32 m_index;
+    quint32 m_userIndex;
+    bool    m_ownTicket;
+
+    bool m_isTicketFree;
 };
 
 #endif // SEASONTICKET_H

@@ -51,6 +51,13 @@ Dialog {
         width: accepptTextDialog.width
         spacing: 20
 
+        TextField {
+            id: txtEditableText
+            implicitWidth: accepptTextDialogColumn.width / 4 * 3
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            visible: false
+        }
+
         Label {
             id: labelAcceptText
 //            implicitWidth: accepptTextDialogColumn.width / 4 * 3

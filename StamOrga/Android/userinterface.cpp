@@ -47,6 +47,8 @@ UserInterface::UserInterface(QObject* parent)
 
     connect(this->m_pConHandle, &ConnectionHandling::sNotityAvailableTicketFreeRequest,
             this, &UserInterface::slAvailableTicketFreeFinished);
+    connect(this->m_pConHandle, &ConnectionHandling::sNotityAvailableTicketListRequest,
+            this, &UserInterface::slAvailableTicketListFinished);
 }
 
 qint32 UserInterface::startMainConnection(QString name, QString passw)
@@ -64,34 +66,39 @@ qint32 UserInterface::startUpdateReadableName(QString name)
     return this->m_pConHandle->startUpdateReadableName(name);
 }
 
-qint32 UserInterface::startGettingGamesList()
+qint32 UserInterface::startListGettingGames()
 {
-    return this->m_pConHandle->startGettingGamesList();
+    return this->m_pConHandle->startListGettingGames();
 }
 
 qint32 UserInterface::startAddSeasonTicket(QString name, quint32 discount)
 {
-    return this->m_pConHandle->startSeasonTicketAdd(name, discount);
+    return this->m_pConHandle->startAddSeasonTicket(name, discount);
 }
 
 qint32 UserInterface::startRemoveSeasonTicket(quint32 index)
 {
-    return this->m_pConHandle->startSeasonTicketRemove(index);
+    return this->m_pConHandle->startRemoveSeasonTicket(index);
 }
 
 qint32 UserInterface::startNewPlaceSeasonTicket(quint32 index, QString place)
 {
-    return this->m_pConHandle->startSeasonTicketNewPlace(index, place);
+    return this->m_pConHandle->startNewPlaceSeasonTicket(index, place);
 }
 
-qint32 UserInterface::startGettingSeasonTicketList()
+qint32 UserInterface::startListSeasonTickets()
 {
-    return this->m_pConHandle->startGettingSeasonTicketList();
+    return this->m_pConHandle->startListSeasonTickets();
 }
 
 qint32 UserInterface::startFreeAvailableTicket(quint32 ticketIndex, quint32 gameIndex)
 {
     return this->m_pConHandle->startFreeSeasonTicket(ticketIndex, gameIndex);
+}
+
+qint32 UserInterface::startRequestAvailableTickets(quint32 gameIndex)
+{
+    return this->m_pConHandle->startListAvailableTicket(gameIndex);
 }
 
 void UserInterface::slConnectionRequestFinished(qint32 result)
@@ -153,4 +160,9 @@ void UserInterface::slSeasonTicketListFinished(qint32 result)
 void UserInterface::slAvailableTicketFreeFinished(qint32 result)
 {
     emit this->notifyAvailableTicketFreeFinsished(result);
+}
+
+void UserInterface::slAvailableTicketListFinished(qint32 result)
+{
+    emit this->notifyAvailableTicketListFinsished(result);
 }

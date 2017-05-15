@@ -433,7 +433,7 @@ MessageProtocol* DataConnection::requestGetAvailableTicketList(MessageProtocol* 
     qint32 rCode;
     if (msg->getDataLength() != 4) {
         qWarning() << QString("Wrong message size for get available Season ticket for user %1").arg(this->m_pUserConData->userName);
-        return new MessageProtocol(OP_CODE_CMD_RES::ACK_FREE_SEASON_TICKET, ERROR_CODE_WRONG_SIZE);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_AVAILABLE_TICKETS, ERROR_CODE_WRONG_SIZE);
     }
 
     const char* pData       = msg->getPointerToData();
@@ -443,7 +443,7 @@ MessageProtocol* DataConnection::requestGetAvailableTicketList(MessageProtocol* 
     if ((rCode = this->m_pGlobalData->requestGetAvailableSeasonTicket(gameIndex, this->m_pUserConData->userName, data)) == ERROR_CODE_SUCCESS) {
         qInfo().noquote() << QString("User %1 got available SeasonTicket List for game %1")
                                  .arg(this->m_pUserConData->userName).arg(gameIndex);
-        return new MessageProtocol(OP_CODE_CMD_RES::ACK_FREE_SEASON_TICKET, data);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_AVAILABLE_TICKETS, data);
     }
-    return new MessageProtocol(OP_CODE_CMD_RES::ACK_FREE_SEASON_TICKET, rCode);
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_AVAILABLE_TICKETS, rCode);
 }

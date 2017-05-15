@@ -31,7 +31,7 @@ class MainConnection : public BackgroundWorker
 {
     Q_OBJECT
 public:
-    MainConnection(GlobalData* pData, QString username);
+    MainConnection(GlobalData* pData);
     ~MainConnection();
 
     int DoBackgroundWork() override;
@@ -41,10 +41,14 @@ public:
 signals:
     void connectionRequestFinished(qint32 result, const QString& msg);
 
+public slots:
+    void slotSendNewMainConRequest(QString username);
+
 private slots:
     void slotConnectionTimeoutFired();
     void slotReadyReadMasterPort();
     void slotSocketMainError(QAbstractSocket::SocketError socketError);
+
 
 private:
     GlobalData*   m_pGlobalData;

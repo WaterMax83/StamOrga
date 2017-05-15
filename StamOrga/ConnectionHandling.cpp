@@ -38,6 +38,7 @@ ConnectionHandling::ConnectionHandling(QObject* parent)
     //    this->m_pTimerLoginReset->setSingleShot(true);
     //    this->m_pTimerLoginReset->setInterval(CON_LOGIN_TIMEOUT_MSEC - TIMER_DIFF_MSEC);
     //    connect(this->m_pTimerLoginReset, &QTimer::timeout, this, &ConnectionHandling::slTimerConLoginFired);
+    this->m_pMainCon             = NULL;
     this->m_lastSuccessTimeStamp = 0;
 }
 
@@ -54,29 +55,37 @@ qint32 ConnectionHandling::startMainConnection(QString name, QString passw)
     if (passw != this->m_pGlobalData->passWord())
         bChangedPassword = true;
 
-    if (this->isMainConnectionActive()) {
+    qint64 now = QDateTime::currentMSecsSinceEpoch();
+    if (this->isMainConnectionActive()
+        && (now - this->m_lastSuccessTimeStamp) < (CON_RESET_TIMEOUT_MSEC - TIMER_DIFF_MSEC)) {
+
         if (!bChangedUserName) {
-            if (this->m_pGlobalData->bIsConnected() && !bChangedPassword) {
+            if (this->m_pGlobalData->bIsConnected() && !bChangedPassword
+                && (now - this->m_lastSuccessTimeStamp) < (CON_LOGIN_TIMEOUT_MSEC - TIMER_DIFF_MSEC)) {
                 emit this->sNotifyConnectionFinished(ERROR_CODE_SUCCESS);
                 qDebug() << "Did not log in again, should already be succesfull";
                 return ERROR_CODE_NO_ERROR;
             }
             this->startDataConnection();
-            QThread::msleep(1);
+            QThread::msleep(10);
             this->sendLoginRequest(passw);
             return ERROR_CODE_SUCCESS;
         }
-        this->m_ctrlMainCon.Stop();
-        this->stopDataConnection();
-        QThread::msleep(2);
-    } else
-        this->stopDataConnection();
+    }
 
-    this->m_pMainCon       = new MainConnection(this->m_pGlobalData, name);
+    this->stopDataConnection();
+    QThread::msleep(20);
+
+    if (this->m_pMainCon == NULL) {
+        this->m_pMainCon = new MainConnection(this->m_pGlobalData);
+        connect(this->m_pMainCon, &MainConnection::connectionRequestFinished, this, &ConnectionHandling::slMainConReqFin);
+        connect(this, &ConnectionHandling::sStartSendMainConRequest, this->m_pMainCon, &MainConnection::slotSendNewMainConRequest);
+        this->m_ctrlMainCon.Start(this->m_pMainCon, false);
+        QThread::msleep(20);
+    }
+
     mainConRequestPassWord = passw;
-    connect(this->m_pMainCon, &MainConnection::connectionRequestFinished, this, &ConnectionHandling::slMainConReqFin);
-    this->m_ctrlMainCon.Start(this->m_pMainCon, false);
-
+    emit this->sStartSendMainConRequest(name);
 
     return ERROR_CODE_SUCCESS;
 }
@@ -111,14 +120,14 @@ qint32 ConnectionHandling::startUpdateReadableName(QString name)
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 ConnectionHandling::startGettingGamesList()
+qint32 ConnectionHandling::startListGettingGames()
 {
     DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST);
     this->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 ConnectionHandling::startSeasonTicketRemove(quint32 index)
+qint32 ConnectionHandling::startRemoveSeasonTicket(quint32 index)
 {
     DataConRequest req(OP_CODE_CMD_REQ::REQ_REMOVE_TICKET);
     req.m_lData.append(QString::number(index));
@@ -126,7 +135,7 @@ qint32 ConnectionHandling::startSeasonTicketRemove(quint32 index)
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 ConnectionHandling::startSeasonTicketNewPlace(quint32 index, QString place)
+qint32 ConnectionHandling::startNewPlaceSeasonTicket(quint32 index, QString place)
 {
     DataConRequest req(OP_CODE_CMD_REQ::REQ_NEW_TICKET_PLACE);
     req.m_lData.append(QString::number(index));
@@ -135,7 +144,7 @@ qint32 ConnectionHandling::startSeasonTicketNewPlace(quint32 index, QString plac
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 ConnectionHandling::startSeasonTicketAdd(QString name, quint32 discount)
+qint32 ConnectionHandling::startAddSeasonTicket(QString name, quint32 discount)
 {
     DataConRequest req(OP_CODE_CMD_REQ::REQ_ADD_TICKET);
     req.m_lData.append(QString::number(discount));
@@ -144,7 +153,7 @@ qint32 ConnectionHandling::startSeasonTicketAdd(QString name, quint32 discount)
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 ConnectionHandling::startGettingSeasonTicketList()
+qint32 ConnectionHandling::startListSeasonTickets()
 {
     DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST);
     this->sendNewRequest(req);
@@ -160,6 +169,14 @@ qint32 ConnectionHandling::startFreeSeasonTicket(quint32 tickedIndex, quint32 ga
     return ERROR_CODE_SUCCESS;
 }
 
+qint32 ConnectionHandling::startListAvailableTicket(quint32 gameIndex)
+{
+    DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS);
+    req.m_lData.append(QString::number(gameIndex));
+    this->sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
+}
+
 
 /*
  * Answer function after connection with username
@@ -167,15 +184,16 @@ qint32 ConnectionHandling::startFreeSeasonTicket(quint32 tickedIndex, quint32 ga
 void ConnectionHandling::slMainConReqFin(qint32 result, const QString& msg)
 {
     if (result > ERROR_CODE_NO_ERROR) {
+        qDebug() << QString("Trying login request with port %1").arg(result);
         this->m_pGlobalData->setConDataPort((quint16)result);
         this->startDataConnection();
-        QThread::msleep(2);
+        QThread::msleep(20);
         this->sendLoginRequest(mainConRequestPassWord);
-        //        this->m_pTimerConReset->start();
         this->m_lastSuccessTimeStamp = QDateTime::currentMSecsSinceEpoch();
     } else {
         qWarning() << "Error main connecting: " << msg;
         this->m_ctrlMainCon.Stop();
+        this->m_pMainCon = NULL;
         this->stopDataConnection();
         emit this->sNotifyConnectionFinished(result);
 
@@ -209,7 +227,6 @@ void ConnectionHandling::sendNewRequest(DataConRequest request)
         this->startDataConnection();
 
         if ((now - this->m_lastSuccessTimeStamp) < (CON_LOGIN_TIMEOUT_MSEC - TIMER_DIFF_MSEC)) {
-            //        if (this->m_pGlobalData->bIsConnected()) {
             emit this->sStartSendNewRequest(request);
             return;
         } else {
@@ -220,10 +237,6 @@ void ConnectionHandling::sendNewRequest(DataConRequest request)
         }
     } else {
         qDebug() << QString("Trying to restart connection from ConnectionHandling");
-        this->m_pGlobalData->setbIsConnected(false);
-        if (this->isMainConnectionActive())
-            this->m_ctrlMainCon.Stop();
-        this->stopDataConnection();
         this->m_lErrorMainCon.prepend(request);
         this->startMainConnection(this->m_pGlobalData->userName(), this->m_pGlobalData->passWord());
     }
@@ -232,10 +245,13 @@ void ConnectionHandling::sendNewRequest(DataConRequest request)
 
 void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
 {
+    this->checkTimeoutResult(request.m_result);
+
     switch (request.m_request) {
     case OP_CODE_CMD_REQ::REQ_LOGIN_USER:
         if (request.m_result == ERROR_CODE_SUCCESS) {
             this->m_pGlobalData->setbIsConnected(true);
+            this->checkTimeoutResult(request.m_result); // call again to set last successfull timer
             while (this->m_lErrorMainCon.size() > 0) {
                 this->sendNewRequest(this->m_lErrorMainCon.last());
                 this->m_lErrorMainCon.removeLast();
@@ -304,20 +320,28 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
     case OP_CODE_CMD_REQ::REQ_FREE_SEASON_TICKET:
         emit this->sNotityAvailableTicketFreeRequest(request.m_result);
         break;
+
+    case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS:
+        emit this->sNotityAvailableTicketListRequest(request.m_result);
+        break;
+
+    default:
+        qWarning().noquote() << QString("Unknown acknowledge: 0x%1").arg(QString::number(request.m_request, 16));
+        break;
     }
 
-    this->checkTimeoutResult(request.m_result);
+    if (request.m_result != ERROR_CODE_SUCCESS)
+        qWarning().noquote() << QString("Error receiving Command 0x%1 has result \"%2\"")
+                                    .arg(QString::number(request.m_request, 16))
+                                    .arg(getErrorCodeString(request.m_result));
 }
 
 void ConnectionHandling::checkTimeoutResult(qint32 result)
 {
-    if (result == ERROR_CODE_TIMEOUT) {
-        this->m_ctrlMainCon.Stop();
+    if (result == ERROR_CODE_TIMEOUT)
         this->stopDataConnection();
-    } else if (this->m_pGlobalData->bIsConnected()) {
-        //        this->m_pTimerLoginReset->start(); // restart Timer
+    else if (this->m_pGlobalData->bIsConnected())
         this->m_lastSuccessTimeStamp = QDateTime::currentMSecsSinceEpoch();
-    }
 }
 
 void ConnectionHandling::startDataConnection()
@@ -350,17 +374,6 @@ void ConnectionHandling::stopDataConnection()
     this->m_ctrlDataCon.Stop();
 }
 
-//void ConnectionHandling::slTimerConResetFired()
-//{
-//    qDebug() << "Connection Timer Timeout";
-//    this->m_ctrlMainCon.Stop();
-//}
-
-//void ConnectionHandling::slTimerConLoginFired()
-//{
-//    qDebug() << "Login Timer Timeout";
-//    this->m_pGlobalData->setbIsConnected(false);
-//}
 
 ConnectionHandling::~ConnectionHandling()
 {

@@ -67,18 +67,11 @@ int Logging::DoBackgroundWork()
     this->m_hourTimer->setSingleShot(true);
     connect(this->m_hourTimer, &QTimer::timeout, this, &Logging::slotEveryHourTimeout);
 
+    this->slotEveryHourTimeout();
+
     QString loggingPath = this->createLoggingFilePath();
 
     if (loggingPath.size() > 0) {
-        if (!checkFilePathExistAndCreate(loggingPath)) {
-            CONSOLE_CRITICAL(QString("Could not create file for Logging"));
-            return -1;
-        }
-        this->m_logFile = new QFile(loggingPath);
-        if (!this->m_logFile->open(QFile::ReadWrite | QFile::Text | QFile::Append)) {
-            CONSOLE_CRITICAL(QString("Could not open file for Logging"));
-            return -1;
-        }
 
         /* Read all old log files */
         QStringList nameFilter;
@@ -95,7 +88,6 @@ int Logging::DoBackgroundWork()
 
     connect(this, &Logging::signalNewLogEntries, this, &Logging::slotNewLogEntries);
 
-    this->slotEveryHourTimeout();
     return 0;
 }
 
@@ -194,8 +186,13 @@ void Logging::slotNewLogEntries()
             if (entry->m_type == QtCriticalMsg)
                 std::cout << msg.toStdString() << std::endl;
             //} else if (entry->m_type != QtDebugMsg && entry->m_type != QtInfoMsg) {
-        } else
+        }
+#ifdef QT_DEBUG
+#ifdef Q_OS_UNIX
+        else
+#endif
             std::cout << msg.toStdString() << std::endl;
+#endif
         delete entry;
         this->m_internalMutex.unlock();
     }
@@ -205,15 +202,15 @@ void Logging::slotEveryHourTimeout()
 {
     QMutexLocker lock(&this->m_internalMutex);
 
-    if (this->m_logFile == NULL)
-        return;
-
     /* Check if new path is needed */
     QString loggingPath = this->createLoggingFilePath();
-    if (loggingPath.size() > 0 && this->m_logFile != NULL) {
-        if (this->m_logFile->fileName() != loggingPath) {
-            this->m_logFile->close();
-            delete this->m_logFile;
+    if (loggingPath.size() > 0) {
+        if (this->m_logFile == NULL || this->m_logFile->fileName() != loggingPath) {
+
+            if (this->m_logFile != NULL) {
+                this->m_logFile->close();
+                delete this->m_logFile;
+            }
             if (!checkFilePathExistAndCreate(loggingPath)) {
                 CONSOLE_CRITICAL(QString("Could not create file for Logging"));
                 return;
@@ -223,6 +220,11 @@ void Logging::slotEveryHourTimeout()
                 CONSOLE_CRITICAL(QString("Could not open file for Logging"));
                 return;
             }
+#ifdef Q_OS_UNIX
+            QFileInfo info(loggingPath);
+            if(this->m_logFile->link(info.absolutePath() + "/ActualLog.log"));
+                qInfo().noquote() << QString("Create symbolic link for new actual log file %1").arg(loggingPath);
+#endif
         }
     }
 

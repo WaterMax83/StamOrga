@@ -49,16 +49,15 @@ MessageProtocol::MessageProtocol(quint32 index) : MessageProtocol()
 
 MessageProtocol::MessageProtocol(quint32 index, QByteArray &data) : MessageProtocol()
 {
-    this->m_Data.append(data);
-
     int length = data.length();
 
     int tmp = length % sizeof(quint32);
     if (tmp > 0)
     {
+        this->m_Data.fill(0x0, MSG_HEADER_SIZE + tmp);
         length += (sizeof(quint32) - tmp);
-        this->m_Data.resize(MSG_HEADER_SIZE + length);
     }
+    this->m_Data.insert(MSG_HEADER_SIZE, data);
 
     this->m_pHead = (msg_Header *)this->m_Data.constData();
 

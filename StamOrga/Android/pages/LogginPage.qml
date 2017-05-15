@@ -64,6 +64,7 @@ Flickable {
    }
 
    function pageOpenedUpdateView() {
+
        if (logFilesCombo.count > 0)
             logFilesCombo.currentIndex = logFilesCombo.count - 1
        else {

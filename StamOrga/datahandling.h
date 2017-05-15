@@ -34,6 +34,7 @@ public:
     qint32 getHandleUserPropsResponse(MessageProtocol* msg, QString* props);
     qint32 getHandleGamesListResponse(MessageProtocol* msg);
     qint32 getHandleSeasonTicketListResponse(MessageProtocol* msg);
+    qint32 getHandleAvailableTicketListResponse(MessageProtocol* msg);
 
 private:
     GlobalData* m_pGlobalData;

@@ -76,7 +76,7 @@ qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol* msg, QString* p
 
     SeasonTicketItem* seasonTicket;
     int               i = 0;
-    while ((seasonTicket = this->m_pGlobalData->getSeasonTicket(i++)) != NULL)
+    while ((seasonTicket = this->m_pGlobalData->getSeasonTicketFromArrayIndex(i++)) != NULL)
         seasonTicket->checkTicketOwn(index);
 
     *props = QString::number(qFromBigEndian(*((quint32*)(pData + 8))));
@@ -105,7 +105,7 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol* msg)
     quint32 totalSize = msg->getDataLength();
     quint32 offset    = 4;
     quint16 version   = qFromBigEndian(*(qint16*)(pData + offset));
-    if (version != 0x1) {
+    if (version > 0x3) {
         qWarning().noquote() << QString("Unknown game version %1").arg(version);
         return -1;
     }
@@ -226,6 +226,50 @@ qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol* msg)
     }
 
     this->m_pGlobalData->saveCurrentSeasonTickets();
+
+    return rValue;
+}
+
+/*  answer
+ * 0                Header          12
+ * 12   quint32     result          4
+ * 16   quint16     freeCount       2
+ * 18   quint32     ticketIndex1    4
+ * 22   quint32     ticketIndex2    8
+ */
+
+#define AVAILABLE_HEAD_OFFSET 2
+qint32 DataHandling::getHandleAvailableTicketListResponse(MessageProtocol* msg)
+{
+    if (msg->getDataLength() < 4)
+        return ERROR_CODE_WRONG_SIZE;
+
+    const char* pData  = msg->getPointerToData();
+    qint32      rValue = qFromBigEndian(*((qint32*)pData));
+    if (rValue != ERROR_CODE_SUCCESS)
+        return rValue;
+
+    for (uint i = 0; i < this->m_pGlobalData->getSeasonTicketLength(); i++) {
+        SeasonTicketItem* item = this->m_pGlobalData->getSeasonTicketFromArrayIndex(i);
+        if (item != NULL)
+            item->setTicketFree(false);
+    }
+
+    qint16  countOfFreeTickets = qFromBigEndian(*((qint16*)(pData + 4)));
+    quint32 offset             = 6;
+    for (int i = 0; i < countOfFreeTickets; i++) {
+        if (offset + AVAILABLE_HEAD_OFFSET > msg->getDataLength()) {
+            qWarning() << "Error in message for get available ticket list";
+            return rValue;
+        }
+        quint32           ticketIndex = qFromBigEndian(*((quint32*)(pData + offset)));
+        SeasonTicketItem* item        = this->m_pGlobalData->getSeasonTicket(ticketIndex);
+        if (item != NULL)
+            item->setTicketFree(true);
+        offset += 4;
+    }
+
+    qDebug() << QString("Got %1 number of free tickets").arg(countOfFreeTickets);
 
     return rValue;
 }

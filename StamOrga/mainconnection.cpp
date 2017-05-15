@@ -26,22 +26,16 @@
 #include "../Common/Network/messageprotocol.h"
 #include "mainconnection.h"
 
-MainConnection::MainConnection(GlobalData* pData, QString username)
+MainConnection::MainConnection(GlobalData* pData)
     : BackgroundWorker()
 {
     this->SetWorkerName("MainConnection");
     this->m_pGlobalData = pData;
-    this->m_userName    = username;
 }
 
 
 int MainConnection::DoBackgroundWork()
 {
-    QByteArray aData;
-    aData.append(this->m_userName);
-
-    MessageProtocol msg(OP_CODE_CMD_REQ::REQ_CONNECT_USER, aData);
-
     this->m_pMasterUdpSocket = new QUdpSocket();
 
     if (!this->m_pMasterUdpSocket->bind()) {
@@ -54,16 +48,28 @@ int MainConnection::DoBackgroundWork()
     connect(this->m_pMasterUdpSocket, static_cast<QAbstractSocketErrorSignal>(&QAbstractSocket::error), this, &MainConnection::slotSocketMainError);
 
     this->m_hMasterReceiver = QHostAddress(this->m_pGlobalData->ipAddr());
-    const char* pData       = msg.getNetworkProtocol();
-    this->m_pMasterUdpSocket->writeDatagram(pData, msg.getNetworkSize(), this->m_hMasterReceiver, this->m_pGlobalData->conMasterPort());
 
     this->m_pConTimeout = new QTimer();
     this->m_pConTimeout->setSingleShot(true);
     connect(this->m_pConTimeout, &QTimer::timeout, this, &MainConnection::slotConnectionTimeoutFired);
-    this->m_pConTimeout->start(SOCKET_TIMEOUT_MS);
 
     return 0;
 }
+
+void MainConnection::slotSendNewMainConRequest(QString username)
+{
+    QByteArray aData;
+    aData.append(username);
+    this->m_userName = username;
+
+    MessageProtocol msg(OP_CODE_CMD_REQ::REQ_CONNECT_USER, aData);
+
+    const char* pData = msg.getNetworkProtocol();
+    this->m_pMasterUdpSocket->writeDatagram(pData, msg.getNetworkSize(), this->m_hMasterReceiver, this->m_pGlobalData->conMasterPort());
+
+    this->m_pConTimeout->start(SOCKET_TIMEOUT_MS);
+}
+
 
 void MainConnection::slotSocketMainError(QAbstractSocket::SocketError socketError)
 {

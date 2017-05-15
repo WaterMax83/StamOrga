@@ -55,6 +55,7 @@ qint32 GlobalData::requestFreeSeasonTicket(quint32 ticketIndex, quint32 gameInde
         return ERROR_CODE_NOT_FOUND;
 
 #undef ENABLE_PAST_CHECK
+//#define ENABLE_PAST_CHECK
 #ifdef ENABLE_PAST_CHECK
     if (pGame->m_timestamp < QDateTime::currentMSecsSinceEpoch())
         return ERROR_CODE_IN_PAST;
@@ -121,11 +122,11 @@ qint32 GlobalData::requestGetAvailableSeasonTicket(const quint32 gameIndex, cons
             for(int i= 0; i < totalCount; i++) {
                 AvailableTicketInfo *info = (AvailableTicketInfo*)ticket->getRequestConfigItemFromListIndex(i);
                 if (info == NULL) {
-                    wFreeTicket << quint16(0x0);
+                    wFreeTicket << quint32(0x0);
                     continue;
                 }
                 if (info->m_state == TICKET_STATE_FREE)
-                    wFreeTicket << info->m_ticketID;
+                    wFreeTicket << quint32(info->m_ticketID);
             }
 
             ticket->stopRequestGetItemList();
@@ -133,12 +134,17 @@ qint32 GlobalData::requestGetAvailableSeasonTicket(const quint32 gameIndex, cons
             QDataStream wData(&data, QIODevice::WriteOnly);
             wData.setByteOrder(QDataStream::BigEndian);
 
-            wData << quint32(ERROR_CODE_SUCCESS) << quint16(freeTicket.size() / 2);
+            wData << quint32(ERROR_CODE_SUCCESS) << quint16(totalCount);
             data.append(freeTicket);
 
             return ERROR_CODE_SUCCESS;
         }
     }
 
-    return ERROR_CODE_NOT_FOUND;
+    QDataStream wData(&data, QIODevice::WriteOnly);
+    wData.setByteOrder(QDataStream::BigEndian);
+
+    wData << quint32(ERROR_CODE_SUCCESS) << quint16(0);
+
+    return ERROR_CODE_SUCCESS;
 }
