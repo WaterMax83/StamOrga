@@ -200,7 +200,7 @@ public:
         return this->m_lSeasonTicket.size();
     }
     Q_INVOKABLE SeasonTicketItem* getSeasonTicketFromArrayIndex(int index);
-    SeasonTicketItem* getSeasonTicket(int ticketIndex);
+    SeasonTicketItem* getSeasonTicket(quint32 ticketIndex);
     Q_INVOKABLE QString getSeasonTicketLastUpdate();
 
 signals:

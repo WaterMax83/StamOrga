@@ -282,7 +282,7 @@ SeasonTicketItem* GlobalData::getSeasonTicketFromArrayIndex(int index)
     return NULL;
 }
 
-SeasonTicketItem* GlobalData::getSeasonTicket(int ticketIndex)
+SeasonTicketItem* GlobalData::getSeasonTicket(quint32 ticketIndex)
 {
     QMutexLocker lock(&this->m_mutexTicket);
 

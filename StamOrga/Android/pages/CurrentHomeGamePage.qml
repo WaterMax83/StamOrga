@@ -292,7 +292,7 @@ Flickable {
             txtInfoCurrentGameFreeTickets.visible = false
         }
 
-        txtInfoCurrentGame.text = "Letzes Update am "
+        txtInfoCurrentGame.text = "Letztes Update am "
                 + globalUserData.getSeasonTicketLastUpdate()
     }
 }

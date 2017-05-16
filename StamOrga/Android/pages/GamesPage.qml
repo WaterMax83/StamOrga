@@ -52,6 +52,7 @@ Flickable {
                     id: txtInfoLoadingGames
                     visible: true
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    bottomPadding: 10
                 }
             }
             Column {
@@ -77,11 +78,12 @@ Flickable {
 
     function notifyUserIntGamesListFinished(result) {
         busyLoadingIndicatorGames.visible = false
-        if (result === 1) {
-            showListedGames()
-        } else {
-            txtInfoLoadingGames.text = userIntGames.getErrorCodeToString(result)
-        }
+        if (result === 1)
+            toastManager.show("Spiele geladen", 2000)
+        else
+            toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
+
+        showListedGames()
     }
 
     function showListedGames() {
@@ -95,7 +97,7 @@ Flickable {
                 var sprite = gameView.createObject(columnLayoutGames)
                 sprite.showGamesInfo(globalUserData.getGamePlay(i))
             }
-            txtInfoLoadingGames.text = "Letzes Update am " + globalUserData.getGamePlayLastUpdate()
+            txtInfoLoadingGames.text = "Letztes Update am " + globalUserData.getGamePlayLastUpdate()
         } else
             txtInfoLoadingGames.text = "Keine Daten zum anzeigen"
     }

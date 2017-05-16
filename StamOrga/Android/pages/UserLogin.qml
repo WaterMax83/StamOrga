@@ -156,7 +156,6 @@ Flickable {
                     implicitWidth: mainColumnLayoutUser.width / 4 * 2
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     transformOrigin: Item.Center
-//                    enabled: globalUserData.bIsConnected
                     onClicked: {
                         var component = Qt.createComponent("../components/EditableTextDialog.qml");
                         if (component.status === Component.Ready) {
@@ -175,7 +174,7 @@ Flickable {
                     function acceptedEditReadableName(text) {
                         busyConnectIndicator.visible = true;
                         txtInfoConnecting.visible = true;
-                        txtInfoConnecting.text = "Ändere Öffentlichen Namen"
+                        txtInfoConnecting.text = "Ändere Nutzernamen"
                         userIntUser.startUpdateReadableName(text)
                     }
                 }
@@ -224,32 +223,43 @@ Flickable {
         btnSendData.enabled = true
         busyConnectIndicator.visible = false;
         if (result === 1) {
-//            btnSendData.background.color = "green"
-            txtInfoConnecting.text = "Verbindung erfolgreich"
+            txtInfoConnecting.text = "Verbindung erfolgreich";
+            toastManager.show("Verbindung erfolgreich", 2000)
             updateUserColumnView(false);
         }
         else {
-//            btnSendData.background.color = "red"
+            txtInfoConnecting.visible = false;
             txtInfoConnecting.text = userIntUser.getErrorCodeToString(result);
+            toastManager.show(userIntUser.getErrorCodeToString(result), 5000)
             updateUserColumnView(true);
         }
     }
 
     function notifyUserIntUpdatePasswordFinished(result) {
         busyConnectIndicator.visible = false;
-        if (result === 1)
-            txtInfoConnecting.text = "Passwort erfolgreich geändert"
-        else
+        txtInfoConnecting.visible = false;
+        if (result === 1) {
+            toastManager.show("Passwort erfolgreich geändert", 2000)
+            txtInfoConnecting.visible = false;
+        }
+        else {
             txtInfoConnecting.text = "Fehler beim Passwort ändern"
+            toastManager.show(userIntUser.getErrorCodeToString(result), 5000)
+        }
     }
 
 
     function notifyUserIntUpdateReadableNameFinished(result) {
         busyConnectIndicator.visible = false;
-        if (result === 1)
-            txtInfoConnecting.text = "Name erfolgreich geändert"
-        else
+
+        if (result === 1) {
+            toastManager.show("Nutzername erfolgreich geändert", 2000)
+            txtInfoConnecting.visible = false;
+        }
+        else {
             txtInfoConnecting.text = "Fehler beim Namen ändern"
+            toastManager.show(userIntUser.getErrorCodeToString(result), 5000)
+        }
     }
 
     function pageOpenedUpdateView() {

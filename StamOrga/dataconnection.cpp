@@ -199,6 +199,7 @@ void DataConnection::startSendLoginRequest(DataConRequest request)
     wPassword.setByteOrder(QDataStream::BigEndian);
     wPassword << quint16(passWord.toUtf8().size());
     aPassw.append(passWord);
+    qDebug() << QString("Password size = %1 %2").arg(passWord.length()).arg(aPassw.length());
     MessageProtocol msg(request.m_request, aPassw);
     this->sendMessageRequest(&msg, request);
 }

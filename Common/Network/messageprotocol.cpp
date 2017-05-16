@@ -19,54 +19,57 @@
 #include <QtCore/QDataStream>
 #include <QtCore/QtEndian>
 
-#include "messageprotocol.h"
 #include "../General/globaltiming.h"
+#include "messageprotocol.h"
 
 MessageProtocol::MessageProtocol()
 {
     this->m_Data.fill(0x00, MSG_HEADER_SIZE);
-    this->m_pHead = (msg_Header *)this->m_Data.constData();
+    this->m_pHead = (msg_Header*)this->m_Data.constData();
 }
 
-MessageProtocol::MessageProtocol(QByteArray &data)
+MessageProtocol::MessageProtocol(QByteArray& data)
 {
     if (data.length() < (int)MSG_HEADER_SIZE)
         return;
 
     this->m_Data.append(data);
-    this->m_pHead = (msg_Header *)this->m_Data.constData();
-
+    this->m_pHead = (msg_Header*)this->m_Data.constData();
 }
 
-MessageProtocol::MessageProtocol(quint32 index) : MessageProtocol()
+MessageProtocol::MessageProtocol(quint32 index)
+    : MessageProtocol()
 {
-    this->m_pHead = (msg_Header *)this->m_Data.constData();
+    this->m_pHead = (msg_Header*)this->m_Data.constData();
 
-    this->m_pHead->index = qToBigEndian(index);
-    this->m_pHead->length = 0;
+    this->m_pHead->index     = qToBigEndian(index);
+    this->m_pHead->length    = 0;
     this->m_pHead->timestamp = qToBigEndian(CalcTimeStamp());
 }
 
-MessageProtocol::MessageProtocol(quint32 index, QByteArray &data) : MessageProtocol()
+MessageProtocol::MessageProtocol(quint32 index, QByteArray& data)
+    : MessageProtocol()
 {
     int length = data.length();
 
     int tmp = length % sizeof(quint32);
-    if (tmp > 0)
-    {
-        this->m_Data.fill(0x0, MSG_HEADER_SIZE + tmp);
-        length += (sizeof(quint32) - tmp);
+    qDebug() << QString("MessageProtocol: %1 %2").arg(length).arg(tmp);
+    if (tmp > 0) {
+        this->m_Data.fill(0x0, MSG_HEADER_SIZE + (sizeof(quint32) - tmp));
+        //        length += (sizeof(quint32) - tmp);
     }
     this->m_Data.insert(MSG_HEADER_SIZE, data);
+    qDebug() << QString("MessageProtocol2: %1 %2").arg(length).arg(this->m_Data.size());
 
-    this->m_pHead = (msg_Header *)this->m_Data.constData();
+    this->m_pHead = (msg_Header*)this->m_Data.constData();
 
-    this->m_pHead->index = qToBigEndian(index);
-    this->m_pHead->length = qToBigEndian(length);
+    this->m_pHead->index     = qToBigEndian(index);
+    this->m_pHead->length    = qToBigEndian(length);
     this->m_pHead->timestamp = qToBigEndian(CalcTimeStamp());
 }
 
-MessageProtocol::MessageProtocol(quint32 index, quint32 data) : MessageProtocol()
+MessageProtocol::MessageProtocol(quint32 index, quint32 data)
+    : MessageProtocol()
 {
     QDataStream wStream(&this->m_Data, QIODevice::WriteOnly);
     wStream.setByteOrder(QDataStream::BigEndian);
@@ -75,15 +78,16 @@ MessageProtocol::MessageProtocol(quint32 index, quint32 data) : MessageProtocol(
 
     wStream << data;
 
-    this->m_pHead = (msg_Header *)this->m_Data.constData();
+    this->m_pHead = (msg_Header*)this->m_Data.constData();
 
-    quint32 size = sizeof(data);
-    this->m_pHead->index = qToBigEndian(index);
-    this->m_pHead->length = qToBigEndian(size);
+    quint32 size             = sizeof(data);
+    this->m_pHead->index     = qToBigEndian(index);
+    this->m_pHead->length    = qToBigEndian(size);
     this->m_pHead->timestamp = qToBigEndian(CalcTimeStamp());
 }
 
-MessageProtocol::MessageProtocol(quint32 index, qint32 data) : MessageProtocol()
+MessageProtocol::MessageProtocol(quint32 index, qint32 data)
+    : MessageProtocol()
 {
     QDataStream wStream(&this->m_Data, QIODevice::WriteOnly);
     wStream.setByteOrder(QDataStream::BigEndian);
@@ -92,13 +96,10 @@ MessageProtocol::MessageProtocol(quint32 index, qint32 data) : MessageProtocol()
 
     wStream << data;
 
-    this->m_pHead = (msg_Header *)this->m_Data.constData();
+    this->m_pHead = (msg_Header*)this->m_Data.constData();
 
-    quint32 size = sizeof(data);
-    this->m_pHead->index = qToBigEndian(index);
-    this->m_pHead->length = qToBigEndian(size);
+    quint32 size             = sizeof(data);
+    this->m_pHead->index     = qToBigEndian(index);
+    this->m_pHead->length    = qToBigEndian(size);
     this->m_pHead->timestamp = qToBigEndian(CalcTimeStamp());
 }
-
-
-

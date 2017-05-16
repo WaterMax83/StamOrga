@@ -131,7 +131,7 @@ Flickable {
 //                sprite.showTicketInfo(globalUserData.getSeasonTicketFromArrayIndex(i))
                 sprite.showTicketInfo(i);
             }
-            txtInfoSeasonTicket.text = "Letzes Update am " + globalUserData.getSeasonTicketLastUpdate()
+            txtInfoSeasonTicket.text = "Letztes Update am " + globalUserData.getSeasonTicketLastUpdate()
         } else
             txtInfoSeasonTicket.text = "Keine Daten zum anzeigen"
 
