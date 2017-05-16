@@ -402,26 +402,36 @@ MessageProtocol* DataConnection::requestNewPlaceSeasonTicket(MessageProtocol* ms
  * 0                Header          12
  * 12   quint32      ticketIndex     4
  * 16   quint32      gameIndex       4
+ * 20   quint32      state           4
+ * 24   quint16      size            2
+ * 26   QString      reserveName     X
  */
-MessageProtocol* DataConnection::requestFreeSeasonTicket(MessageProtocol* msg)
+MessageProtocol* DataConnection::requestChangeStateSeasonTicket(MessageProtocol* msg)
 {
     qint32 rCode;
     if (msg->getDataLength() != 8) {
         qWarning() << QString("Wrong message size for free Season ticket for user %1").arg(this->m_pUserConData->userName);
-        return new MessageProtocol(OP_CODE_CMD_RES::ACK_FREE_SEASON_TICKET, ERROR_CODE_WRONG_SIZE);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_STATE_CHANGE_SEASON_TICKET, ERROR_CODE_WRONG_SIZE);
     }
 
     const char* pData       = msg->getPointerToData();
     quint32     ticketIndex = qFromBigEndian(*((quint32*)pData));
     quint32     gameIndex   = qFromBigEndian(*((quint32*)(pData + 4)));
+    quint32     state       = qFromBigEndian(*((quint32*)(pData + 8)));
+    quint16     actLength   = qFromBigEndian(*((quint16*)(pData + 12)));
+    if (actLength > msg->getDataLength())
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_STATE_CHANGE_SEASON_TICKET, ERROR_CODE_WRONG_SIZE);
 
-    if ((rCode = this->m_pGlobalData->requestFreeSeasonTicket(ticketIndex, gameIndex, this->m_pUserConData->userName)) == ERROR_CODE_SUCCESS) {
-        qInfo().noquote() << QString("User %1 freeded SeasonTicket %2")
+    QString reserveName(QByteArray(pData + 14, actLength));
+
+    if ((rCode = this->m_pGlobalData->requestChangeStateSeasonTicket(ticketIndex, gameIndex, state, reserveName, this->m_pUserConData->userName)) == ERROR_CODE_SUCCESS) {
+        qInfo().noquote() << QString("User %1 set SeasonTicket %2 state to %3")
                                  .arg(this->m_pUserConData->userName)
-                                 .arg(this->m_pGlobalData->m_SeasonTicket.getItemName(ticketIndex));
-        return new MessageProtocol(OP_CODE_CMD_RES::ACK_FREE_SEASON_TICKET, ERROR_CODE_SUCCESS);
+                                 .arg(this->m_pGlobalData->m_SeasonTicket.getItemName(ticketIndex))
+                                 .arg(state);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_STATE_CHANGE_SEASON_TICKET, ERROR_CODE_SUCCESS);
     }
-    return new MessageProtocol(OP_CODE_CMD_RES::ACK_FREE_SEASON_TICKET, rCode);
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_STATE_CHANGE_SEASON_TICKET, rCode);
 }
 
 /*  request

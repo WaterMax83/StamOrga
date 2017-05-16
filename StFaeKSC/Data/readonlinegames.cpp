@@ -66,7 +66,11 @@ int ReadOnlineGames::DoBackgroundWork()
     connect(this->m_networkUpdate, &QTimer::timeout, this, &ReadOnlineGames::slotNetWorkUpdateTimeout);
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
+#ifdef QT_DEBUG
+    qInfo().noquote() << "Did not use ReadOnlineGame because of debugging";
+#else
     this->checkNewNetworkRequest(false);
+#endif
 #else
     qInfo().noquote() << "Did not use ReadOnlineGame because of version problem";
 #endif
@@ -182,12 +186,12 @@ void ReadOnlineGames::checkNewNetworkRequest(bool checkLastItem)
         nextUpdate = this->getNextGameInMilliSeconds(fastUpdate);
     } else {
         nextUpdate          = this->getNextGameInMilliSeconds(fastUpdate);
-        qint64 twoMonthsAgo = QDateTime::currentDateTime().addMonths(-1).toMSecsSinceEpoch();
+        qint64 oneMonthsAgo = QDateTime::currentDateTime().addMonths(-1).toMSecsSinceEpoch();
         while (this->m_currentRequestIndex < this->m_onlineGames.size() - 1) {
-            this->m_currentRequestIndex++;
             OnlineGameInfo* gameInfo = this->m_onlineGames[this->m_currentRequestIndex];
+            this->m_currentRequestIndex++;
             /* if game was 1 month ago, forget it */
-            if (gameInfo->m_gameFinished && gameInfo->m_timeStamp > twoMonthsAgo)
+            if (gameInfo->m_gameFinished && gameInfo->m_timeStamp < oneMonthsAgo)
                 continue;
 
             /* Filter games which are not listed in this period */
@@ -218,6 +222,7 @@ qint64 ReadOnlineGames::getNextGameInMilliSeconds(bool& fastUpdate)
         return now + (15 * MINUTE_IN_MSEC);
 
 #undef DEBUG_UPDATE
+//#define DEBUG_UPDATE
 #ifdef DEBUG_UPDATE
     qint64 rValue = now + (2 * MINUTE_IN_MSEC);
 #else

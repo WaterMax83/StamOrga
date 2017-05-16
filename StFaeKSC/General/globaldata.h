@@ -31,7 +31,8 @@ class GlobalData
 public:
     GlobalData();
 
-    qint32 requestFreeSeasonTicket(quint32 ticketIndex, quint32 gameIndex, const QString userName);
+    qint32 requestChangeStateSeasonTicket(quint32 ticketIndex, quint32 gameIndex, quint32 state, QString reserveName, const QString userName);
+    qint32 requestBlockSeasonTicket(quint32 ticketIndex, quint32 gameIndex, const QString userName);
     qint32 requestGetAvailableSeasonTicket(const quint32 gameIndex, const QString userName, QByteArray& data);
 
     ListedUser                   m_UserList;

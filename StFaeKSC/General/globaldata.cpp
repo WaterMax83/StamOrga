@@ -47,11 +47,14 @@ GlobalData::GlobalData()
     }
 }
 
-qint32 GlobalData::requestFreeSeasonTicket(quint32 ticketIndex, quint32 gameIndex, const QString userName)
+qint32 GlobalData::requestChangeStateSeasonTicket(quint32 ticketIndex, quint32 gameIndex, quint32 newState, QString reserveName, const QString userName)
 {
     GamesPlay*  pGame   = (GamesPlay*)this->m_GamesList.getItem(gameIndex);
     TicketInfo* pTicket = (TicketInfo*)this->m_SeasonTicket.getItem(ticketIndex);
     if (pGame == NULL || pTicket == NULL)
+        return ERROR_CODE_NOT_FOUND;
+
+    if (newState == TICKET_STATE_NOT_POSSIBLE)
         return ERROR_CODE_NOT_FOUND;
 
 #undef ENABLE_PAST_CHECK
@@ -61,21 +64,23 @@ qint32 GlobalData::requestFreeSeasonTicket(quint32 ticketIndex, quint32 gameInde
         return ERROR_CODE_IN_PAST;
 #endif
 
-    qint32  result;
+    qint32  result = ERROR_CODE_SUCCESS;
     quint32 userID = this->m_UserList.getItemIndex(userName);
     foreach (AvailableGameTickets* ticket, this->m_availableTickets) {
         if (ticket->getGameIndex() == gameIndex) {
-            quint32 state = ticket->getTicketState(ticketIndex);
-            if (state == TICKET_STATE_NOT_POSSIBLE) {
-                /* Not found, add new */
-                result = ticket->addNewTicket(ticketIndex, userID, TICKET_STATE_FREE);
-
-            } else if (state == TICKET_STATE_NOT_POSSIBLE) {
-                qInfo().noquote() << QString("Ticket %1 at game %2 already has state %3").arg(pTicket->m_itemName, pGame->m_index).arg(TICKET_STATE_FREE);
-            } else {
-                /* ticket found, just change actual state */
-                result = ticket->changeTicketState(ticketIndex, userID, TICKET_STATE_FREE);
+            quint32 currentState = ticket->getTicketState(ticketIndex);
+            if (currentState == TICKET_STATE_NOT_POSSIBLE)
+                qInfo().noquote() << QString("Ticket %1 at game %2 already has state %3").arg(pTicket->m_itemName, pGame->m_index).arg(newState);
+            else if (newState == TICKET_STATE_FREE) {
+                if (currentState == TICKET_STATE_NOT_POSSIBLE) /* Not found, add new */
+                    result = ticket->addNewTicket(ticketIndex, userID, TICKET_STATE_FREE);
+                else /* ticket found, just change actual state */
+                    result = ticket->changeTicketState(ticketIndex, userID, TICKET_STATE_FREE);
             }
+            dfsdf
+            /*
+             * TODO: add other states
+             */
             if (result == ERROR_CODE_SUCCESS)
                 qInfo().noquote() << QString("Changed ticketState from %1 at game %2 to %3").arg(pTicket->m_itemName).arg(pGame->m_index).arg(TICKET_STATE_FREE);
             else

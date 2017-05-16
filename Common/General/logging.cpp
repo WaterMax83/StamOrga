@@ -222,8 +222,13 @@ void Logging::slotEveryHourTimeout()
             }
 #ifdef Q_OS_UNIX
             QFileInfo info(loggingPath);
-            if (this->m_logFile->link(info.absolutePath() + "/ActualLog.log"))
+            QFile link(info.absolutePath() + "/CurrentLog.log");
+            if (link.exists())
+                link.remove();
+            if (this->m_logFile->link(info.absolutePath() + "/CurrentLog.log"))
                 qInfo().noquote() << QString("Create symbolic link for new actual log file %1").arg(loggingPath);
+            else
+                qWarning().noquote() << QString("Could not create symbolic link for current log file %1").arg(loggingPath);
 #endif
         }
     }
