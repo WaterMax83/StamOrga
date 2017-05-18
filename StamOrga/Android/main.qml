@@ -26,7 +26,7 @@ import "pages" as MyPages
 import "components" as MyComponents
 
 ApplicationWindow {
-    id: window
+    id: mainWindow
     visible: true
     width: userInt.isDeviceMobile() ? 540 : 360
     height: userInt.isDeviceMobile() ? 960 : 600
@@ -102,8 +102,8 @@ ApplicationWindow {
 
     Drawer {
         id: drawer
-        width: Math.min(window.width, window.height) / 4 * 2
-        height: window.height
+        width: Math.min(mainWindow.width, mainWindow.height) / 4 * 2
+        height: mainWindow.height
 
         ColumnLayout {
             implicitWidth: drawer.width
@@ -178,6 +178,16 @@ ApplicationWindow {
             }
         }
     }
+
+//    Image {
+//        id: arrow
+//        source: "../images/refresh.png"
+//        transformOrigin: Item.Center
+////        Behavior on rotation { NumberAnimation { duration: 200 } }
+//        y: 50
+//        x: mainWindow.width / 2
+//        z: 1000
+//    }
 
     function updateHeaderFromMain(text, img) {
         if (img !== "") {
@@ -295,8 +305,8 @@ ApplicationWindow {
             stackView.currentItem.notifyUserIntSeasonTicketNewPlaceFinished(result)
         }
 
-        onNotifyAvailableTicketFreeFinsished: {
-            stackView.currentItem.notifyAvailableTicketFreeFinished(result);
+        onNotifyAvailableTicketStateChangedFinished: {
+            stackView.currentItem.notifyAvailableTicketStateChangedFinished(result);
         }
         onNotifyAvailableTicketListFinsished: {
             stackView.currentItem.notifyAvailableTicketListFinished(result);

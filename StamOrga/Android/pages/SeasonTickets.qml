@@ -197,6 +197,7 @@ Flickable {
                 id: menuItemRemove
                 onClicked: {
                     var component = Qt.createComponent("../components/AcceptDialog.qml");
+                    component
                     if (component.status === Component.Ready) {
                         var dialog = component.createObject(mainPaneTickets,{popupType: 1});
                         dialog.headerText = "Bestätigung";
@@ -253,7 +254,7 @@ Flickable {
                 userIntTicket.startAddSeasonTicket(txtnewSeasonTicketName.text, chBoxDiscount.checked ? 1 : 0);
                 busyConnectIndicatorTicket.visible = true;
                 txtInfoSeasonTicket.text = "Füge Dauerkarte hinzu"
-                addSeasonTicketDlg.close()
+                addSeasonTicketDlg.close();
             }
 
         }

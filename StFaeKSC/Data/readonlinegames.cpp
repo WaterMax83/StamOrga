@@ -180,9 +180,10 @@ void ReadOnlineGames::checkNewNetworkRequest(bool checkLastItem)
                 this->startNetWorkRequest(gameInfo);
                 return;
             }
+        } else {
+            this->m_currentRequestIndex = 0;
+            qInfo().noquote() << "Got all games for internal list";
         }
-        this->m_currentRequestIndex = 0;
-        qInfo().noquote() << "Got all games for internal list";
         nextUpdate = this->getNextGameInMilliSeconds(fastUpdate);
     } else {
         nextUpdate          = this->getNextGameInMilliSeconds(fastUpdate);

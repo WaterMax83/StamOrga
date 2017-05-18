@@ -38,6 +38,8 @@ Dialog {
     modal: true
     focus: true
 
+    Component.onDestruction: { console.log("Destroying cogfgsfdgfsgd") }
+
     standardButtons: Dialog.Ok | Dialog.Cancel
     onAccepted: {
         labelTextTooShort.visible = false
@@ -48,11 +50,13 @@ Dialog {
         } else {
             acceptedTextEdit(txtEditableText.text);
             editableTextDialog.close();
+            editableTextDialog.destroy();
         }
     }
     onRejected: {
         editableTextDialog.close()
         labelTextTooShort.visible = false
+        editableTextDialog.destroy();
     }
 
     contentItem: ColumnLayout {

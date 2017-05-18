@@ -32,13 +32,6 @@ struct AvailableTicketInfo : public ConfigItem {
     quint32 m_state;
 };
 
-enum TICKET_STATE {
-    TICKET_STATE_NOT_POSSIBLE = 0,
-    TICKET_STATE_BLOCKED      = 1,
-    TICKET_STATE_FREE         = 2,
-    TICKET_STATE_RESERVED     = 3,
-};
-
 class AvailableGameTickets : public ConfigList
 {
 public:
@@ -54,6 +47,7 @@ public:
     quint32 getGameIndex() { return this->m_gameIndex; }
 
     qint32 getTicketState(quint32 ticketID);
+    QString getTicketName(quint32 ticketID);
 
 
 private:

@@ -160,11 +160,13 @@ qint32 ConnectionHandling::startListSeasonTickets()
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 ConnectionHandling::startFreeSeasonTicket(quint32 tickedIndex, quint32 gameIndex)
+qint32 ConnectionHandling::startChangeSeasonTicketState(quint32 tickedIndex, quint32 gameIndex, quint32 state, QString name)
 {
-    DataConRequest req(OP_CODE_CMD_REQ::REQ_FREE_SEASON_TICKET);
+    DataConRequest req(OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET);
     req.m_lData.append(QString::number(tickedIndex));
     req.m_lData.append(QString::number(gameIndex));
+    req.m_lData.append(QString::number(state));
+    req.m_lData.append(name);
     this->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
@@ -317,8 +319,8 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
         emit this->sNotifySeasonTicketNewPlace(request.m_result);
         break;
 
-    case OP_CODE_CMD_REQ::REQ_FREE_SEASON_TICKET:
-        emit this->sNotityAvailableTicketFreeRequest(request.m_result);
+    case OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET:
+        emit this->sNotityAvailableTicketStateChangeRequest(request.m_result);
         break;
 
     case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS:

@@ -45,7 +45,7 @@ public:
     qint32 startNewPlaceSeasonTicket(quint32 index, QString place);
     qint32 startAddSeasonTicket(QString name, quint32 discount);
     qint32 startListSeasonTickets();
-    qint32 startFreeSeasonTicket(quint32 tickedIndex, quint32 gameIndex);
+    qint32 startChangeSeasonTicketState(quint32 tickedIndex, quint32 gameIndex, quint32 state, QString name);
     qint32 startListAvailableTicket(quint32 gameIndex);
 
 
@@ -73,7 +73,7 @@ signals:
     void sNotifySeasonTicketAddRequest(quint32 result);
     void sNotifySeasonTicketListRequest(quint32 result);
     void sNotifySeasonTicketNewPlace(quint32 result);
-    void sNotityAvailableTicketFreeRequest(qint32 result);
+    void sNotityAvailableTicketStateChangeRequest(qint32 result);
     void sNotityAvailableTicketListRequest(qint32 result);
 
     void sStartSendMainConRequest(QString name);

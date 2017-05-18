@@ -87,6 +87,8 @@ QString getErrorCodeString(qint32 code)
         return QString("Fehler: existiert bereits: %1").arg(code);
     case ERROR_CODE_IN_PAST:
         return QString("Nicht möglich, liegt in der Vergangenheit: %1").arg(code);
+    case ERROR_CODE_NOT_POSSIBLE:
+        return QString("Nicht möglich: %1").arg(code);
     default:
         return QString("Unbekannter Fehler: %1").arg(code);
     }

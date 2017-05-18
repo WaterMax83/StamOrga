@@ -27,6 +27,14 @@ Flickable {
     id: flickableGames
     property UserInterface userIntGames
     contentHeight: mainPaneGames.height
+
+//    onDragEnded: {
+//        console.log("Drag ended");
+//    }
+//    onDraggingChanged: {
+//        console.log("Dragging changed");
+//    }
+
     Pane {
         id: mainPaneGames
         width: parent.width

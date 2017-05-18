@@ -41,9 +41,11 @@ Dialog {
     onAccepted: {
         acceptedDialog();
         accepptTextDialog.close();
+        accepptTextDialog.destroy();
     }
     onRejected: {
         accepptTextDialog.close()
+        accepptTextDialog.destroy();
     }
 
     contentItem: ColumnLayout {

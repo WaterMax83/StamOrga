@@ -171,7 +171,7 @@ void DataConnection::checkNewOncomingData()
             request.m_result = this->m_pDataHandle->getHandleSeasonTicketListResponse(msg);
             break;
 
-        case OP_CODE_CMD_RES::ACK_FREE_SEASON_TICKET:
+        case OP_CODE_CMD_RES::ACK_STATE_CHANGE_SEASON_TICKET:
             request.m_result = msg->getIntData();
             break;
 
@@ -199,7 +199,6 @@ void DataConnection::startSendLoginRequest(DataConRequest request)
     wPassword.setByteOrder(QDataStream::BigEndian);
     wPassword << quint16(passWord.toUtf8().size());
     aPassw.append(passWord);
-    qDebug() << QString("Password size = %1 %2").arg(passWord.length()).arg(aPassw.length());
     MessageProtocol msg(request.m_request, aPassw);
     this->sendMessageRequest(&msg, request);
 }
@@ -300,13 +299,17 @@ void DataConnection::startSendSeasonTicketListRequest(DataConRequest request)
     this->sendMessageRequest(&msg, request);
 }
 
-void DataConnection::startSendFreeTicket(DataConRequest request)
+void DataConnection::startSendChangeTicketState(DataConRequest request)
 {
     QByteArray  seasonTicket;
+    QString     name = request.m_lData.at(3);
     QDataStream wSeasonTicket(&seasonTicket, QIODevice::WriteOnly);
     wSeasonTicket.setByteOrder(QDataStream::BigEndian);
-    wSeasonTicket << request.m_lData.at(0).toUInt();
-    wSeasonTicket << request.m_lData.at(1).toUInt();
+    wSeasonTicket << request.m_lData.at(0).toUInt(); /* ticketIndex */
+    wSeasonTicket << request.m_lData.at(1).toUInt(); /* game Index */
+    wSeasonTicket << request.m_lData.at(2).toUInt(); /* state */
+    wSeasonTicket << quint16(name.toUtf8().size());
+    seasonTicket.append(name);
 
     MessageProtocol msg(request.m_request, seasonTicket);
     this->sendMessageRequest(&msg, request);
@@ -447,8 +450,8 @@ void DataConnection::startSendNewRequest(DataConRequest request)
         this->startSendNewPlaceTicket(request);
         break;
 
-    case OP_CODE_CMD_REQ::REQ_FREE_SEASON_TICKET:
-        this->startSendFreeTicket(request);
+    case OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET:
+        this->startSendChangeTicketState(request);
         break;
 
     case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS:

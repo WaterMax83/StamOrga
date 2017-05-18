@@ -22,6 +22,8 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QObject>
 
+#include "../../Common/General/globalfunctions.h"
+
 class SeasonTicketItem : public QObject
 {
     Q_OBJECT
@@ -85,10 +87,24 @@ public:
             this->m_ownTicket = false;
     }
 
-    Q_INVOKABLE bool isTicketFree() { return this->m_isTicketFree; }
-    void setTicketFree(bool free)
+    Q_INVOKABLE quint32 getTicketState()
     {
-        this->m_isTicketFree = free;
+        return this->m_ticketState;
+    }
+    void setTicketState(quint32 state)
+    {
+        this->m_ticketState = state;
+        if (state != 3)
+            this->m_ticketReserveName = "";
+    }
+
+    Q_INVOKABLE QString getTicketReserveName()
+    {
+        return this->m_ticketReserveName;
+    }
+    void setReserveName(QString name)
+    {
+        this->m_ticketReserveName = name;
     }
 
 
@@ -108,7 +124,8 @@ private:
     quint32 m_userIndex;
     bool    m_ownTicket;
 
-    bool m_isTicketFree;
+    quint32 m_ticketState;
+    QString m_ticketReserveName;
 };
 
 #endif // SEASONTICKET_H

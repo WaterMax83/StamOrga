@@ -82,6 +82,7 @@ Flickable {
             ListView {
                 id: listViewBlockedTickets
                 focus: false
+                interactive: false
                 implicitWidth: mainColumnLayoutCurrentGame.width
 //                implicitHeight: listViewModelBlockedTickets.count * listViewItemHeight
 
@@ -94,9 +95,8 @@ Flickable {
                         anchors.fill: parent
                         onClicked: {
                             var globalCoordinates = singleBlockedRow.mapToItem(flickableCurrentGame, 0, 0)
-                            menuItemFree.text = "Freigeben";
                             clickedBlockedMenu.y = globalCoordinates.y - singleBlockedRow.height / 2
-                            clickedBlockedMenu.menuTicketIndex = model.index
+                            menuTicketIndex = model.index
                             clickedBlockedMenu.open();
                         }
                     }
@@ -126,7 +126,77 @@ Flickable {
                 }
             }
 
+            Label {
+                id: txtInfoCurrentGameReservedTickets
+                visible: false
+                text: "Karte reserviert:"
+                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+            }
 
+            ListView {
+                id: listViewReservedTickets
+                focus: false
+                interactive: false
+                implicitWidth: mainColumnLayoutCurrentGame.width
+
+                delegate: ColumnLayout {
+                    id: singleReservedRow
+                    width: parent.width
+                    spacing: 0
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            var globalCoordinates = singleReservedRow.mapToItem(flickableCurrentGame, 0, 0)
+                            clickedReservedMenu.y = globalCoordinates.y - singleReservedRow.height / 2
+                            menuTicketIndex = model.index
+                            clickedReservedMenu.open();
+                        }
+                    }
+
+                    RowLayout {
+                        width: parent.width
+                        height: listViewItemHeight
+                        anchors.left: parent.left
+                        anchors.leftMargin: listViewItemHeight
+
+
+                        Rectangle {
+                            id: imageItemReserved
+                            anchors.left: parent.left
+//                            anchors.leftMargin: parent.height
+                            width: parent.height / 4 * 2
+                            height: parent.height / 4 * 2
+                            radius: width * 0.5
+                            color: "yellow"
+                        }
+
+                        Text {
+                            text: model.title
+                            anchors.left: imageItemReserved.right
+                            anchors.leftMargin: 10
+                            anchors.verticalCenter: parent.verticalCenter
+                            Layout.alignment: Qt.AlignVCenter
+                            color: "white"
+                            font.pixelSize: listViewItemHeight / 4 * 2
+                        }
+                    }
+
+                    Text {
+                        text: "-> für " + model.reserve
+                        anchors.left: parent.left
+                        anchors.leftMargin: listViewItemHeight + imageItemReserved.width + 10
+                        bottomPadding: 5
+                        Layout.alignment: Qt.AlignVCenter
+                        color: "white"
+                        font.pixelSize: listViewItemHeight / 4 * 2
+                    }
+                }
+
+                model: ListModel {
+                    id: listViewModelReservedTickets
+                }
+            }
 
 
             Label {
@@ -139,6 +209,7 @@ Flickable {
             ListView {
                 id: listViewFreeTickets
                 focus: false
+                interactive: false
                 implicitWidth: mainColumnLayoutCurrentGame.width
 //                implicitHeight: listViewModelFreeTickets * listViewItemHeight
 
@@ -150,11 +221,10 @@ Flickable {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-//                            var globalCoordinates = singleBlockedRow.mapToItem(flickableCurrentGame, 0, 0)
-//                            menuItemFree.text = "Freigeben";
-//                            clickedBlockedMenu.y = globalCoordinates.y - singleBlockedRow.height / 2
-//                            clickedBlockedMenu.menuTicketIndex = model.index
-//                            clickedBlockedMenu.open();
+                            var globalCoordinates = singleFreeRow.mapToItem(flickableCurrentGame, 0, 0)
+                            clickedFreeMenu.y = globalCoordinates.y - singleFreeRow.height / 2
+                            menuTicketIndex = model.index
+                            clickedFreeMenu.open();
                         }
                     }
                     Rectangle {
@@ -187,11 +257,12 @@ Flickable {
 
     }
 
+    property int menuTicketIndex
+
     Menu {
             id: clickedBlockedMenu
             x: (flickableCurrentGame.width - width) / 2
             y: flickableCurrentGame.height / 6
-            property int menuTicketIndex
 
 
 
@@ -202,14 +273,110 @@ Flickable {
 
             MenuItem {
                 id: menuItemFree
+                text : "Freigeben"
                 onClicked: {
-                    console.log("Freigeben " + clickedBlockedMenu.menuTicketIndex + " " + m_gamePlayCurrentItem.index);
-                    userIntCurrentGame.startFreeAvailableTicket(clickedBlockedMenu.menuTicketIndex, m_gamePlayCurrentItem.index)
+                    userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 2);
                     busyLoadingIndicatorCurrentGames.visible = true
                     txtInfoCurrentGame.text = "Gebe Karte frei"
                 }
             }
         }
+
+    Menu {
+            id: clickedReservedMenu
+            x: (flickableCurrentGame.width - width) / 2
+            y: flickableCurrentGame.height / 6
+
+            background: Rectangle {
+                    implicitWidth: menuItemBlockFromReserve.width
+                    color: "#4f4f4f"
+                }
+
+            MenuItem {
+                id: menuItemFreeFromReserve
+                text: "Freigeben"
+                onClicked: {
+                    userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 2);
+                    busyLoadingIndicatorCurrentGames.visible = true
+                    txtInfoCurrentGame.text = "Gebe Karte frei"
+                }
+            }
+
+            MenuItem {
+                id: menuItemBlockFromReserve
+                text: "Blockieren"
+                onClicked: {
+                    userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 1);
+                    busyLoadingIndicatorCurrentGames.visible = true
+                    txtInfoCurrentGame.text = "Blockiere Karte"
+                }
+            }
+
+            MenuItem {
+                id: menuItemChangeReserve
+                text: "Reservierung ändern"
+                onClicked: {
+
+                    var component = Qt.createComponent("../components/EditableTextDialog.qml");
+                    if (component.status === Component.Ready) {
+                        var dialog = component.createObject(mainPaneCurrentGame,{popupType: 1});
+                        dialog.headerText = "Reservierung ändern";
+                        dialog.parentHeight = mainWindow.height
+                        dialog.parentWidth =  flickableCurrentGame.width
+                        dialog.textMinSize = 5;
+                        dialog.acceptedTextEdit.connect(acceptedEditReserveNameDialog);
+                        dialog.open();
+                    }
+                }
+            }
+        }
+
+    Menu {
+            id: clickedFreeMenu
+            x: (flickableCurrentGame.width - width) / 2
+            y: flickableCurrentGame.height / 6
+
+            background: Rectangle {
+                    implicitWidth: menuItemBlock.width
+                    color: "#4f4f4f"
+                }
+
+            MenuItem {
+                id: menuItemReserve
+                text: "Reservieren"
+                onClicked: {
+
+
+                    var component = Qt.createComponent("../components/EditableTextDialog.qml");
+                    if (component.status === Component.Ready) {
+                        var dialog = component.createObject(mainPaneCurrentGame,{popupType: 1});
+                        dialog.headerText = "Reserviere für";
+                        dialog.parentHeight = mainWindow.height
+                        dialog.parentWidth =  flickableCurrentGame.width
+                        dialog.textMinSize = 5;
+                        dialog.acceptedTextEdit.connect(acceptedEditReserveNameDialog);
+                        dialog.open();
+                    }
+                }
+            }
+
+            MenuItem {
+                id: menuItemBlock
+                text: "Blockieren"
+                onClicked: {
+                    userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 1);
+                    busyLoadingIndicatorCurrentGames.visible = true
+                    txtInfoCurrentGame.text = "Blockiere Karte"
+                }
+            }
+        }
+
+    function acceptedEditReserveNameDialog(text)
+    {
+        userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 3, text);
+        busyLoadingIndicatorCurrentGames.visible = true
+        txtInfoCurrentGame.text = "Reserviere Karte"
+    }
 
     function showAllInfoAboutGame(sender) {
 
@@ -224,26 +391,29 @@ Flickable {
     function pageOpenedUpdateView() {}
 
     function notifyUserIntSeasonTicketListFinished(result) {
-        busyLoadingIndicatorCurrentGames.visible = false
+
         if (result === 1) {
             userIntCurrentGame.startRequestAvailableTickets(m_gamePlayCurrentItem.index);
         } else {
-            txtInfoCurrentGame.text = userIntCurrentGame.getErrorCodeToString(
-                        result)
+            txtInfoCurrentGame.text = userIntCurrentGame.getErrorCodeToString(result)
+            toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
+            busyLoadingIndicatorCurrentGames.visible = false
         }
     }
 
-    function notifyAvailableTicketFreeFinished(result) {
-        busyLoadingIndicatorCurrentGames.visible = false
+    function notifyAvailableTicketStateChangedFinished(result) {
         if (result === 1) {
-            toastManager.show("Karte erfolgreich freigegeben", 2000);
+            toastManager.show("Status erfolgreich geändert", 2000);
             userIntCurrentGame.startRequestAvailableTickets(m_gamePlayCurrentItem.index);
+            txtInfoCurrentGame.text = "Aktualisiere Daten";
         } else {
             toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
+            busyLoadingIndicatorCurrentGames.visible = false;
         }
     }
 
     function notifyAvailableTicketListFinished(result) {
+        busyLoadingIndicatorCurrentGames.visible = false;
         if (result === 1) {
             toastManager.show("Karten geladen", 2000);
         } else {
@@ -256,15 +426,23 @@ Flickable {
 
     function showInternalTicketList() {
         listViewModelBlockedTickets.clear()
+        listViewModelReservedTickets.clear()
         listViewModelFreeTickets.clear()
 
         if (globalUserData.getSeasonTicketLength() > 0) {
             for (var i = 0; i < globalUserData.getSeasonTicketLength(); i++) {
                 var seasonTicketItem = globalUserData.getSeasonTicketFromArrayIndex(i)
-                var discount = seasonTicketItem.discount > 0 ? " *" : ""
-                if (seasonTicketItem.isTicketFree()) {
+                var discount = seasonTicketItem.discount > 0 ? " *" : "";
+                if (seasonTicketItem.getTicketState() === 2) {
                     listViewModelFreeTickets.append({
                                                         title: seasonTicketItem.name + discount,
+                                                        index: seasonTicketItem.index
+                                                    });
+                }
+                else if (seasonTicketItem.getTicketState() === 3) {
+                    listViewModelReservedTickets.append({
+                                                        title: seasonTicketItem.name + discount,
+                                                        reserve: seasonTicketItem.getTicketReserveName(),
                                                         index: seasonTicketItem.index
                                                     });
                 }
@@ -276,12 +454,17 @@ Flickable {
             }
             /* Does not work in defintion for freeTickets, so set it here */
             listViewBlockedTickets.implicitHeight = listViewModelBlockedTickets.count * listViewItemHeight
+            listViewReservedTickets.implicitHeight = listViewModelReservedTickets.count * listViewItemHeight * ( 5 / 4)
             listViewFreeTickets.implicitHeight = listViewModelFreeTickets.count * listViewItemHeight
 
             if (listViewModelFreeTickets.count > 0)
                 txtInfoCurrentGameFreeTickets.visible = true
             else
                 txtInfoCurrentGameFreeTickets.visible = false
+            if (listViewModelReservedTickets.count > 0)
+                txtInfoCurrentGameReservedTickets.visible = true
+            else
+                txtInfoCurrentGameReservedTickets.visible = false
             if (listViewModelBlockedTickets.count > 0)
                 txtInfoCurrentGameBlockedTickets.visible = true
             else
@@ -289,6 +472,7 @@ Flickable {
 
         } else {
             txtInfoCurrentGameBlockedTickets.visible = false
+            txtInfoCurrentGameReservedTickets.visible = false
             txtInfoCurrentGameFreeTickets.visible = false
         }
 

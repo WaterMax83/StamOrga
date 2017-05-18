@@ -21,6 +21,7 @@
 SeasonTicketItem::SeasonTicketItem(QObject* parent)
     : QObject(parent)
 {
-    this->m_ownTicket    = false;
-    this->m_isTicketFree = false;
+    this->m_ownTicket         = false;
+    this->m_ticketState       = TICKET_STATE_BLOCKED;
+    this->m_ticketReserveName = "";
 }

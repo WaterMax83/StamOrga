@@ -51,7 +51,7 @@ public:
 
     Q_INVOKABLE qint32 startRequestAvailableTickets(quint32 gameIndex);
 
-    Q_INVOKABLE qint32 startFreeAvailableTicket(quint32 ticketIndex, quint32 gameIndex);
+    Q_INVOKABLE qint32 startChangeAvailableTicketState(quint32 ticketIndex, quint32 gameIndex, quint32 state, QString name = "");
 
     Q_INVOKABLE bool isDebuggingEnabled()
     {
@@ -96,7 +96,7 @@ signals:
     void notifySeasonTicketRemoveFinished(qint32 result);
     void notifySeasonTicketNewPlaceFinished(qint32 result);
     void notifySeasonTicketListFinished(qint32 result);
-    void notifyAvailableTicketFreeFinsished(qint32 result);
+    void notifyAvailableTicketStateChangedFinished(qint32 result);
     void notifyAvailableTicketListFinsished(qint32 result);
 
 public slots:

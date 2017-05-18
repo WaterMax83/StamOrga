@@ -160,20 +160,33 @@ qint32 AvailableGameTickets::addNewTicket(quint32 ticketID, quint32 userID, quin
 
 qint32 AvailableGameTickets::changeTicketState(quint32 ticketID, quint32 userID, quint32 state, QString name)
 {
-    if (state == TICKET_STATE_BLOCKED) {
-        qWarning().noquote() << QString("Could not change available ticket, state 0 is not allowed ").arg(name);
-        return ERROR_CODE_COMMON;
-    }
+    //    if (state == TICKET_STATE_BLOCKED) {
+    //        qWarning().noquote() << QString("Could not change available ticket, state 0 is not allowed ").arg(state);
+    //        return ERROR_CODE_COMMON;
+    //    }
+
+    qint64 timestamp = QDateTime::currentDateTime().toMSecsSinceEpoch();
 
     for (int i = 0; i < this->getNumberOfInternalList(); i++) {
         AvailableTicketInfo* pTicket = (AvailableTicketInfo*)(this->getItemFromArrayIndex(i));
         if (pTicket->m_ticketID == ticketID) {
-            pTicket->m_userID   = userID;
-            pTicket->m_state    = state;
-            pTicket->m_itemName = name;
-            this->updateItemValue(pTicket, ITEM_NAME, QVariant(name));
-            this->updateItemValue(pTicket, AVAILABLE_USER_ID, QVariant(userID));
-            this->updateItemValue(pTicket, AVAILABLE_STATE, QVariant(state));
+            if (pTicket->m_userID != userID) {
+                pTicket->m_userID    = userID;
+                this->updateItemValue(pTicket, AVAILABLE_USER_ID, QVariant(userID));
+            }
+            if (pTicket->m_state != state) {
+                pTicket->m_state    = state;
+                this->updateItemValue(pTicket, AVAILABLE_STATE, QVariant(state));
+            }
+            if (pTicket->m_itemName != name) {
+                pTicket->m_itemName    = name;
+                this->updateItemValue(pTicket, ITEM_NAME, QVariant(name));
+            }
+            if (pTicket->m_timestamp != timestamp) {
+                pTicket->m_timestamp    = timestamp;
+                this->updateItemValue(pTicket, ITEM_TIMESTAMP, QVariant(timestamp));
+            }
+
             return ERROR_CODE_SUCCESS;
         }
     }
@@ -190,6 +203,18 @@ qint32 AvailableGameTickets::getTicketState(quint32 ticketID)
             return pTicket->m_state;
     }
     return TICKET_STATE_NOT_POSSIBLE;
+}
+
+QString AvailableGameTickets::getTicketName(quint32 ticketID)
+{
+    QMutexLocker locker(&this->m_mInternalInfoMutex);
+
+    for (int i = 0; i < this->getNumberOfInternalList(); i++) {
+        AvailableTicketInfo* pTicket = (AvailableTicketInfo*)(this->getItemFromArrayIndex(i));
+        if (pTicket->m_ticketID == ticketID)
+            return pTicket->m_itemName;
+    }
+    return "";
 }
 
 

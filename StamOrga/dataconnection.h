@@ -83,7 +83,7 @@ private:
     void startSendRemoveSeasonTicket(DataConRequest request);
     void startSendSeasonTicketListRequest(DataConRequest request);
     void startSendNewPlaceTicket(DataConRequest request);
-    void startSendFreeTicket(DataConRequest request);
+    void startSendChangeTicketState(DataConRequest request);
     void startSendAvailableTicketListRequest(DataConRequest request);
 
 
