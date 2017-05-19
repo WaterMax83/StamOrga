@@ -65,16 +65,18 @@ public:
 signals:
     void sNotifyConnectionFinished(qint32 result);
     void sNotifyVersionRequest(qint32 result, QString msg);
-    void sNotifyUserPropertiesRequest(qint32 result);
+    //    void sNotifyUserPropertiesRequest(qint32 result);
     void sNotifyUpdatePasswordRequest(qint32 result, QString newPassWord);
-    void sNotifyUpdateReadableNameRequest(qint32 result);
-    void sNotifyGamesListRequest(qint32 result);
-    void sNotifySeasonTicketRemoveRequest(quint32 result);
-    void sNotifySeasonTicketAddRequest(quint32 result);
-    void sNotifySeasonTicketListRequest(quint32 result);
-    void sNotifySeasonTicketNewPlace(quint32 result);
-    void sNotityAvailableTicketStateChangeRequest(qint32 result);
-    void sNotityAvailableTicketListRequest(qint32 result);
+    //    void sNotifyUpdateReadableNameRequest(qint32 result);
+    //    void sNotifyGamesListRequest(qint32 result);
+    //    void sNotifySeasonTicketRemoveRequest(quint32 result);
+    //    void sNotifySeasonTicketAddRequest(quint32 result);
+    //    void sNotifySeasonTicketListRequest(quint32 result);
+    //    void sNotifySeasonTicketNewPlace(quint32 result);
+    //    void sNotityAvailableTicketStateChangeRequest(qint32 result);
+    //    void sNotityAvailableTicketListRequest(qint32 result);
+
+    void sNotifyCommandFinished(quint32 command, qint32 result);
 
     void sStartSendMainConRequest(QString name);
 

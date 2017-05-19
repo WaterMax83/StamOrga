@@ -53,7 +53,6 @@ bool checkFilePathExistAndCreate(const QString& path)
             qCritical() << "Error creating file\n";
             return false;
         }
-        qInfo().noquote() << "SUCCESS";
     }
     return true;
 }
@@ -89,6 +88,8 @@ QString getErrorCodeString(qint32 code)
         return QString("Nicht möglich, liegt in der Vergangenheit: %1").arg(code);
     case ERROR_CODE_NOT_POSSIBLE:
         return QString("Nicht möglich: %1").arg(code);
+    case ERROR_CODE_MISSING_TICKET:
+        return QString("Karte nicht vorhanden: %1").arg(code);
     default:
         return QString("Unbekannter Fehler: %1").arg(code);
     }

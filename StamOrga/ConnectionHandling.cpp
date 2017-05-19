@@ -173,6 +173,11 @@ qint32 ConnectionHandling::startChangeSeasonTicketState(quint32 tickedIndex, qui
 
 qint32 ConnectionHandling::startListAvailableTicket(quint32 gameIndex)
 {
+    /* check if update was more than one our ago, than update items */
+    qint64 oneHourAgo = QDateTime::currentDateTime().addSecs(-(60 * 60)).toMSecsSinceEpoch();
+    if (oneHourAgo > this->m_pGlobalData->getSeasonTicketLastUpdate())
+        return this->startListSeasonTickets();
+
     DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS);
     req.m_lData.append(QString::number(gameIndex));
     this->sendNewRequest(req);
@@ -278,7 +283,7 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
     case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
         if (request.m_result == ERROR_CODE_SUCCESS)
             this->m_pGlobalData->SetUserProperties(request.m_returnData.toUInt());
-        emit this->sNotifyUserPropertiesRequest(request.m_result);
+        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
         break;
 
     case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
@@ -296,39 +301,19 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
             this->m_pGlobalData->saveGlobalUserSettings();
         }
 
-        emit this->sNotifyUpdateReadableNameRequest(request.m_result);
-        break;
-
-    case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
-        emit this->sNotifyGamesListRequest(request.m_result);
-        break;
-
-    case OP_CODE_CMD_REQ::REQ_ADD_TICKET:
-        emit this->sNotifySeasonTicketAddRequest(request.m_result);
-        break;
-
-    case OP_CODE_CMD_REQ::REQ_REMOVE_TICKET:
-        emit this->sNotifySeasonTicketRemoveRequest(request.m_result);
-        break;
-
-    case OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST:
-        emit this->sNotifySeasonTicketListRequest(request.m_result);
-        break;
-
-    case OP_CODE_CMD_REQ::REQ_NEW_TICKET_PLACE:
-        emit this->sNotifySeasonTicketNewPlace(request.m_result);
-        break;
-
-    case OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET:
-        emit this->sNotityAvailableTicketStateChangeRequest(request.m_result);
+        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
         break;
 
     case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS:
-        emit this->sNotityAvailableTicketListRequest(request.m_result);
+        if (request.m_result == ERROR_CODE_MISSING_TICKET) {
+            this->startListSeasonTickets();
+            return;
+        } else
+            emit this->sNotifyCommandFinished(request.m_request, request.m_result);
         break;
 
     default:
-        qWarning().noquote() << QString("Unknown acknowledge: 0x%1").arg(QString::number(request.m_request, 16));
+        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
         break;
     }
 

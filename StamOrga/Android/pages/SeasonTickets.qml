@@ -30,6 +30,29 @@ Flickable {
 
     contentHeight: mainPaneTickets.height
 
+    onDragEnded: {
+        if (flickableTickets.contentY < -100) {
+            updateSeasonTicketList();
+        }
+    }
+
+    Rectangle {
+        Image {
+            id: refreshImage
+            source: "../images/refresh.png"
+            rotation: (flickableTickets.contentY > -100) ? (flickableTickets.contentY * -1) * 2 : 220
+            transformOrigin: Item.Center
+        }
+        opacity: (flickableTickets.contentY * -1) / 100
+        color: "black"
+        width: refreshImage.width
+        height: refreshImage.height
+        radius: width * 0.5
+        y: 50
+        x: (mainWindow.width / 2) - (width / 2)
+        z: 1000
+    }
+
     Pane {
         id: mainPaneTickets
         width: parent.width
@@ -55,6 +78,7 @@ Flickable {
                     id: txtInfoSeasonTicket
                     text: qsTr("Label")
                     visible: true
+                    horizontalAlignment: Text.AlignHCenter
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }
             }
@@ -72,6 +96,11 @@ Flickable {
     }
 
     function toolButtonClicked() {
+        txtnewSeasonTicketName.text = globalUserData.readableName
+        addSeasonTicketDlg.open()
+    }
+
+    function updateSeasonTicketList(){
         userIntTicket.startListSeasonTickets()
         busyConnectIndicatorTicket.visible = true;
         txtInfoSeasonTicket.text = "Aktualisiere Dauerkarten Liste"
@@ -80,7 +109,7 @@ Flickable {
     function notifyUserIntSeasonTicketAdd(result) {
         busyConnectIndicatorTicket.visible = false;
         if (result === 1) {
-            toolButtonClicked()
+            updateSeasonTicketList()
             toastManager.show("Karte erfolgreich hinzugefügt", 2000);
         }
         else
@@ -89,7 +118,7 @@ Flickable {
 
     function notifyUserIntSeasonTicketRemoveFinished(result) {
         if (result === 1) {
-            toolButtonClicked()
+            updateSeasonTicketList()
             toastManager.show("Karte erfolgreich gelöscht", 2000);
         }
     }
@@ -97,16 +126,17 @@ Flickable {
     function notifyUserIntSeasonTicketListFinished(result) {
         busyConnectIndicatorTicket.visible = false;
         if (result === 1) {
-            showSeasonTickets()
+            toastManager.show("Karten geladen", 2000)
         } else {
-            txtInfoSeasonTicket.text = userIntTicket.getErrorCodeToString(result);
+            toastManager.show(userIntTicket.getErrorCodeToString(result), 5000);
         }
+        showSeasonTickets();
     }
 
     function notifyUserIntSeasonTicketNewPlaceFinished(result) {
         busyConnectIndicatorTicket.visible = false;
         if (result === 1) {
-            toolButtonClicked()
+            updateSeasonTicketList()
             toastManager.show("Ort erfolgreich geändert", 2000);
         }  else {
             txtInfoSeasonTicket.text = userIntTicket.getErrorCodeToString(result);
@@ -131,11 +161,11 @@ Flickable {
 //                sprite.showTicketInfo(globalUserData.getSeasonTicketFromArrayIndex(i))
                 sprite.showTicketInfo(i);
             }
-            txtInfoSeasonTicket.text = "Letztes Update am " + globalUserData.getSeasonTicketLastUpdate()
+            txtInfoSeasonTicket.text = "Letztes Update am " + globalUserData.getSeasonTicketLastUpdateString()
         } else
-            txtInfoSeasonTicket.text = "Keine Daten zum anzeigen"
+            txtInfoSeasonTicket.text = "Keine Daten zum Anzeigen\nZiehen zum Aktualisieren"
 
-        var btn = btnAddSeasonTicket.createObject(columnLayoutTickets)
+//        var btn = btnAddSeasonTicket.createObject(columnLayoutTickets)
     }
 
     Component {
@@ -147,19 +177,19 @@ Flickable {
         }
     }
 
-    Component {
-        id: btnAddSeasonTicket
-        Button {
-            text: qsTr("Dauerkarte hinzufügen")
-            implicitWidth: mainTicketColumnLayout.width / 3 * 2
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            transformOrigin: Item.Center
-            onClicked: {
-                txtnewSeasonTicketName.text = globalUserData.readableName
-                addSeasonTicketDlg.open()
-            }
-        }
-    }
+//    Component {
+//        id: btnAddSeasonTicket
+//        Button {
+//            text: qsTr("Dauerkarte hinzufügen")
+//            implicitWidth: mainTicketColumnLayout.width / 3 * 2
+//            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+//            transformOrigin: Item.Center
+//            onClicked: {
+//                txtnewSeasonTicketName.text = globalUserData.readableName
+//                addSeasonTicketDlg.open()
+//            }
+//        }
+//    }
 
     ScrollIndicator.vertical: ScrollIndicator { }
 

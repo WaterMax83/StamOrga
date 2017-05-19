@@ -201,10 +201,12 @@ public:
     }
     Q_INVOKABLE SeasonTicketItem* getSeasonTicketFromArrayIndex(int index);
     SeasonTicketItem* getSeasonTicket(quint32 ticketIndex);
-    Q_INVOKABLE QString getSeasonTicketLastUpdate();
+    Q_INVOKABLE QString getSeasonTicketLastUpdateString();
+    qint64              getSeasonTicketLastUpdate();
 
 signals:
-    void userNameChanged();
+    void
+    userNameChanged();
     void passWordChanged();
     void readableNameChanged();
     void ipAddrChanged();

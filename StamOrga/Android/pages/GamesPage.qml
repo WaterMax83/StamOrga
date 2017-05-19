@@ -18,6 +18,7 @@
 import QtQuick 2.7
 import QtQuick.Controls 2.1
 import QtQuick.Layouts 1.0
+import QtGraphicalEffects 1.0
 
 import com.watermax.demo 1.0
 
@@ -28,12 +29,30 @@ Flickable {
     property UserInterface userIntGames
     contentHeight: mainPaneGames.height
 
-//    onDragEnded: {
-//        console.log("Drag ended");
-//    }
-//    onDraggingChanged: {
-//        console.log("Dragging changed");
-//    }
+    onDragEnded: {
+        if (flickableGames.contentY < -100) {
+            busyLoadingIndicatorGames.visible = true
+            txtInfoLoadingGames.text = "Lade Spielliste"
+            userIntGames.startListGettingGames()
+        }
+    }
+
+    Rectangle {
+        Image {
+            id: refreshImage
+            source: "../images/refresh.png"
+            rotation: (flickableGames.contentY > -100) ? (flickableGames.contentY * -1) * 2 : 220
+            transformOrigin: Item.Center
+        }
+        opacity: (flickableGames.contentY * -1) / 100
+        color: "black"
+        width: refreshImage.width
+        height: refreshImage.height
+        radius: width * 0.5
+        y: 50
+        x: (mainWindow.width / 2) - (width / 2)
+        z: 1000
+    }
 
     Pane {
         id: mainPaneGames
@@ -59,6 +78,7 @@ Flickable {
                 Label {
                     id: txtInfoLoadingGames
                     visible: true
+                    horizontalAlignment: Text.AlignHCenter
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     bottomPadding: 10
                 }
@@ -75,9 +95,9 @@ Flickable {
     }
 
     function toolButtonClicked() {
-        busyLoadingIndicatorGames.visible = true
-        txtInfoLoadingGames.text = "Lade Spielliste"
-        userIntGames.startListGettingGames()
+//        busyLoadingIndicatorGames.visible = true
+//        txtInfoLoadingGames.text = "Lade Spielliste"
+//        userIntGames.startListGettingGames()
     }
 
     function pageOpenedUpdateView() {
@@ -107,7 +127,7 @@ Flickable {
             }
             txtInfoLoadingGames.text = "Letztes Update am " + globalUserData.getGamePlayLastUpdate()
         } else
-            txtInfoLoadingGames.text = "Keine Daten zum anzeigen"
+            txtInfoLoadingGames.text = "Keine Daten zum Anzeigen\nZiehen zum Aktualisieren"
     }
 
     function notifyUserIntConnectionFinished(result) {}

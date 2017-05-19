@@ -65,7 +65,7 @@ Flickable {
     function showAllInfoAboutGame(sender) {
 
 //        busyLoadingIndicatorCurrentGames.visible = true;
-        txtInfoCurrentGame.text = "Nichts zum anzeigen";
+        txtInfoCurrentGame.text = "Aktuell noch nichts zum Anzeigen beim Auswärtsspiel";
 
         m_gamePlayCurrentItem = sender;
         gameHeader.showGamesInfo(sender)

@@ -272,6 +272,8 @@ qint32 DataHandling::getHandleAvailableTicketListResponse(MessageProtocol* msg)
         SeasonTicketItem* item        = this->m_pGlobalData->getSeasonTicket(ticketIndex);
         if (item != NULL)
             item->setTicketState(TICKET_STATE_FREE);
+        else
+            rValue = ERROR_CODE_MISSING_TICKET;
 
         offset += 4;
     }
@@ -284,6 +286,8 @@ qint32 DataHandling::getHandleAvailableTicketListResponse(MessageProtocol* msg)
         SeasonTicketItem* item        = this->m_pGlobalData->getSeasonTicket(ticketIndex);
         if (item != NULL)
             item->setTicketState(TICKET_STATE_RESERVED);
+        else
+            rValue = ERROR_CODE_MISSING_TICKET;
         offset += 4;
         QString name(pData + offset);
         item->setReserveName(name);

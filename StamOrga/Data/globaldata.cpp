@@ -293,10 +293,16 @@ SeasonTicketItem* GlobalData::getSeasonTicket(quint32 ticketIndex)
     return NULL;
 }
 
-QString GlobalData::getSeasonTicketLastUpdate()
+QString GlobalData::getSeasonTicketLastUpdateString()
 {
     QMutexLocker lock(&this->m_mutexTicket);
     return QDateTime::fromMSecsSinceEpoch(this->m_stLastTimeStamp).toString("dd.MM.yy hh:mm:ss");
+}
+
+qint64 GlobalData::getSeasonTicketLastUpdate()
+{
+    QMutexLocker lock(&this->m_mutexTicket);
+    return this->m_stLastTimeStamp;
 }
 
 void GlobalData::copyTextToClipBoard(QString text)

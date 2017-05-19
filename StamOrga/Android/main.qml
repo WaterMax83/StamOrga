@@ -88,7 +88,7 @@ ApplicationWindow {
                     fillMode: Image.Pad
                     horizontalAlignment: Image.AlignHCenter
                     verticalAlignment: Image.AlignVCenter
-                    source: "images/refresh.png"
+//                    source: "images/refresh.png"
                     //                    visible: stackView.depth > 1 ? false : true
                 }
                 onClicked: {
@@ -162,7 +162,7 @@ ApplicationWindow {
                         append({
                                    title: "Dauerkarten",
                                    element: viewSeasonTickets,
-                                   imgsource: "images/refresh.png"
+                                   imgsource: "images/add.png"
                                })
                         if (userInt.isDebuggingEnabled())
                             append({
@@ -178,16 +178,6 @@ ApplicationWindow {
             }
         }
     }
-
-//    Image {
-//        id: arrow
-//        source: "../images/refresh.png"
-//        transformOrigin: Item.Center
-////        Behavior on rotation { NumberAnimation { duration: 200 } }
-//        y: 50
-//        x: mainWindow.width / 2
-//        z: 1000
-//    }
 
     function updateHeaderFromMain(text, img) {
         if (img !== "") {
@@ -207,8 +197,8 @@ ApplicationWindow {
 
         onCurrentItemChanged: {
             if (stackView.depth === 1) {
-                imageToolButton.visible = true
-                imageToolButton.source = "images/refresh.png"
+                imageToolButton.visible = false
+//                imageToolButton.source = "images/refresh.png"
                 titleLabel.text = "StamOrga"
             }
             stackView.currentItem.pageOpenedUpdateView()

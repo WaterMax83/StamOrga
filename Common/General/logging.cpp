@@ -200,26 +200,34 @@ void Logging::slotNewLogEntries()
 
 void Logging::slotEveryHourTimeout()
 {
-    QMutexLocker lock(&this->m_internalMutex);
-
     /* Check if new path is needed */
     QString loggingPath = this->createLoggingFilePath();
     if (loggingPath.size() > 0) {
         if (this->m_logFile == NULL || this->m_logFile->fileName() != loggingPath) {
 
+            this->m_internalMutex.lock();
             if (this->m_logFile != NULL) {
                 this->m_logFile->close();
                 delete this->m_logFile;
             }
-            if (!checkFilePathExistAndCreate(loggingPath)) {
-                CONSOLE_CRITICAL(QString("Could not create file for Logging"));
-                return;
+
+            QFileInfo checkFileInfo(loggingPath);
+            if (!checkFileInfo.exists()) {
+                /* File is not present, create it */
+                if (!checkFileInfo.dir().exists() && !checkFileInfo.dir().mkpath(checkFileInfo.dir().absolutePath())) {
+                    std::cout << "Error creating directory for logfiles" << std::endl;
+                    return;
+                }
             }
+
             this->m_logFile = new QFile(loggingPath);
             if (!this->m_logFile->open(QFile::ReadWrite | QFile::Text | QFile::Append)) {
-                CONSOLE_CRITICAL(QString("Could not open file for Logging"));
+                this->m_internalMutex.unlock();
+                QString error = QString("Error creating logfile %1").arg(loggingPath);
+                std::cout << error.toStdString() << std::endl;
                 return;
             }
+            this->m_internalMutex.unlock();
 #ifdef Q_OS_UNIX
             QFileInfo info(loggingPath);
             QFile link(info.absolutePath() + "/CurrentLog.log");
@@ -230,6 +238,8 @@ void Logging::slotEveryHourTimeout()
             else
                 qWarning().noquote() << QString("Could not create symbolic link for current log file %1").arg(loggingPath);
 #endif
+            if (!this->m_lastLogFiles.contains(loggingPath))
+                this->m_lastLogFiles.append(loggingPath);
         }
     }
 
@@ -246,7 +256,7 @@ void Logging::slotEveryHourTimeout()
     }
 
     /* Restart Timer to check again in next hour */
-    this->m_hourTimer->start((60 - QTime::currentTime().minute()) * 60 * 1000);
+    this->m_hourTimer->start((60 - QTime::currentTime().minute()) * 1000);// * 60 * 1000);
 }
 
 void Logging::terminate()

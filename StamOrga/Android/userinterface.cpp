@@ -18,6 +18,7 @@
 
 #include <QtCore/QDebug>
 
+#include "../../Common/Network/messagecommand.h"
 #include "userinterface.h"
 
 UserInterface::UserInterface(QObject* parent)
@@ -28,27 +29,12 @@ UserInterface::UserInterface(QObject* parent)
             this, &UserInterface::slConnectionRequestFinished);
     connect(this->m_pConHandle, &ConnectionHandling::sNotifyVersionRequest,
             this, &UserInterface::slVersionRequestFinished);
-    connect(this->m_pConHandle, &ConnectionHandling::sNotifyUserPropertiesRequest,
-            this, &UserInterface::slUserPropertiesFinished);
     connect(this->m_pConHandle, &ConnectionHandling::sNotifyUpdatePasswordRequest,
             this, &UserInterface::slUpdatePasswordRequestFinished);
-    connect(this->m_pConHandle, &ConnectionHandling::sNotifyUpdateReadableNameRequest,
-            this, &UserInterface::slUpdateReadableNameRequestFinished);
-    connect(this->m_pConHandle, &ConnectionHandling::sNotifyGamesListRequest,
-            this, &UserInterface::slGettingGamesListFinished);
-    connect(this->m_pConHandle, &ConnectionHandling::sNotifySeasonTicketAddRequest,
-            this, &UserInterface::slSeasonTicketAddFinished);
-    connect(this->m_pConHandle, &ConnectionHandling::sNotifySeasonTicketRemoveRequest,
-            this, &UserInterface::slSeasonTicketRemoveFinished);
-    connect(this->m_pConHandle, &ConnectionHandling::sNotifySeasonTicketNewPlace,
-            this, &UserInterface::slSeasonTicketNewPlaceFinished);
-    connect(this->m_pConHandle, &ConnectionHandling::sNotifySeasonTicketListRequest,
-            this, &UserInterface::slSeasonTicketListFinished);
 
-    connect(this->m_pConHandle, &ConnectionHandling::sNotityAvailableTicketStateChangeRequest,
-            this, &UserInterface::slAvailableTicketFreeFinished);
-    connect(this->m_pConHandle, &ConnectionHandling::sNotityAvailableTicketListRequest,
-            this, &UserInterface::slAvailableTicketListFinished);
+
+    connect(this->m_pConHandle, &ConnectionHandling::sNotifyCommandFinished,
+            this, &UserInterface::slCommandFinished);
 }
 
 qint32 UserInterface::startMainConnection(QString name, QString passw)
@@ -117,52 +103,97 @@ void UserInterface::slVersionRequestFinished(qint32 result, QString msg)
 }
 
 
-void UserInterface::slUserPropertiesFinished(qint32 result)
-{
-    emit this->notifyUserPropertiesFinished(result);
-}
+//void UserInterface::slUserPropertiesFinished(qint32 result)
+//{
+//    emit this->notifyUserPropertiesFinished(result);
+//}
 
 void UserInterface::slUpdatePasswordRequestFinished(qint32 result, QString newPassWord)
 {
     emit this->notifyUpdatePasswordRequestFinished(result, newPassWord);
 }
 
-void UserInterface::slGettingGamesListFinished(qint32 result)
-{
-    emit this->notifyGamesListFinished(result);
-}
+//void UserInterface::slGettingGamesListFinished(qint32 result)
+//{
+//    emit this->notifyGamesListFinished(result);
+//}
 
-void UserInterface::slUpdateReadableNameRequestFinished(qint32 result)
-{
-    emit this->notifyUpdateReadableNameRequest(result);
-}
+//void UserInterface::slUpdateReadableNameRequestFinished(qint32 result)
+//{
+//    emit this->notifyUpdateReadableNameRequest(result);
+//}
 
-void UserInterface::slSeasonTicketAddFinished(qint32 result)
-{
-    emit this->notifySeasonTicketAddFinished(result);
-}
+//void UserInterface::slSeasonTicketAddFinished(qint32 result)
+//{
+//    emit this->notifySeasonTicketAddFinished(result);
+//}
 
-void UserInterface::slSeasonTicketRemoveFinished(qint32 result)
-{
-    emit this->notifySeasonTicketRemoveFinished(result);
-}
+//void UserInterface::slSeasonTicketRemoveFinished(qint32 result)
+//{
+//    emit this->notifySeasonTicketRemoveFinished(result);
+//}
 
-void UserInterface::slSeasonTicketNewPlaceFinished(qint32 result)
-{
-    emit this->notifySeasonTicketNewPlaceFinished(result);
-}
+//void UserInterface::slSeasonTicketNewPlaceFinished(qint32 result)
+//{
+//    emit this->notifySeasonTicketNewPlaceFinished(result);
+//}
 
-void UserInterface::slSeasonTicketListFinished(qint32 result)
-{
-    emit this->notifySeasonTicketListFinished(result);
-}
+//void UserInterface::slSeasonTicketListFinished(qint32 result)
+//{
+//    emit this->notifySeasonTicketListFinished(result);
+//}
 
-void UserInterface::slAvailableTicketFreeFinished(qint32 result)
-{
-    emit this->notifyAvailableTicketStateChangedFinished(result);
-}
+//void UserInterface::slAvailableTicketFreeFinished(qint32 result)
+//{
+//    emit this->notifyAvailableTicketStateChangedFinished(result);
+//}
 
-void UserInterface::slAvailableTicketListFinished(qint32 result)
+//void UserInterface::slAvailableTicketListFinished(qint32 result)
+//{
+//    emit this->notifyAvailableTicketListFinsished(result);
+//}
+
+void UserInterface::slCommandFinished(quint32 command, qint32 result)
 {
-    emit this->notifyAvailableTicketListFinsished(result);
+    switch (command) {
+    case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
+        emit this->notifyUserPropertiesFinished(result);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME:
+        emit this->notifyUpdateReadableNameRequest(result);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
+        emit this->notifyGamesListFinished(result);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_ADD_TICKET:
+        emit this->notifySeasonTicketAddFinished(result);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_REMOVE_TICKET:
+        emit this->notifySeasonTicketRemoveFinished(result);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST:
+        emit this->notifySeasonTicketListFinished(result);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_NEW_TICKET_PLACE:
+        emit this->notifySeasonTicketNewPlaceFinished(result);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET:
+        emit this->notifyAvailableTicketStateChangedFinished(result);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS:
+        emit this->notifyAvailableTicketListFinsished(result);
+        break;
+
+    default:
+        qWarning().noquote() << QString("Unknown acknowledge: 0x%1").arg(QString::number(command, 16));
+        break;
+    }
 }

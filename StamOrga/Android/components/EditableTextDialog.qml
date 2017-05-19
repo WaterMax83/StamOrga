@@ -38,8 +38,6 @@ Dialog {
     modal: true
     focus: true
 
-    Component.onDestruction: { console.log("Destroying cogfgsfdgfsgd") }
-
     standardButtons: Dialog.Ok | Dialog.Cancel
     onAccepted: {
         labelTextTooShort.visible = false

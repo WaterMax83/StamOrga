@@ -32,6 +32,31 @@ Flickable {
 
     contentHeight: mainPaneCurrentGame.height
 
+    onDragEnded: {
+        if (flickableCurrentGame.contentY < -100) {
+            busyLoadingIndicatorCurrentGames.visible = true
+            txtInfoCurrentGame.text = "Aktualisiere Daten"
+            userIntCurrentGame.startRequestAvailableTickets(m_gamePlayCurrentItem.index);
+        }
+    }
+
+    Rectangle {
+        Image {
+            id: refreshImage
+            source: "../images/refresh.png"
+            rotation: (flickableCurrentGame.contentY > -100) ? (flickableCurrentGame.contentY * -1) * 2 : 220
+            transformOrigin: Item.Center
+        }
+        opacity: (flickableCurrentGame.contentY * -1) / 100
+        color: "black"
+        width: refreshImage.width
+        height: refreshImage.height
+        radius: width * 0.5
+        y: 50
+        x: (mainWindow.width / 2) - (width / 2)
+        z: 1000
+    }
+
     Pane {
         id: mainPaneCurrentGame
         width: parent.width
@@ -74,8 +99,8 @@ Flickable {
 
             Label {
                 id: txtInfoCurrentGameBlockedTickets
-                visible: false
-                text: "Karte geblockt:"
+                visible: true
+                text: "<b>Gesperrte Karten</b> <i>(Besitzer geht selbst)</i><b>:</b>"
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
             }
 
@@ -129,7 +154,7 @@ Flickable {
             Label {
                 id: txtInfoCurrentGameReservedTickets
                 visible: false
-                text: "Karte reserviert:"
+                text: "<b>Reservierte Karten:</b>"
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
             }
 
@@ -202,7 +227,7 @@ Flickable {
             Label {
                 id: txtInfoCurrentGameFreeTickets
                 visible: false
-                text: "Karte frei:"
+                text: "<b>Freie Karten:</b>"
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
             }
 
@@ -304,11 +329,11 @@ Flickable {
 
             MenuItem {
                 id: menuItemBlockFromReserve
-                text: "Blockieren"
+                text: "Sperren"
                 onClicked: {
                     userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 1);
                     busyLoadingIndicatorCurrentGames.visible = true
-                    txtInfoCurrentGame.text = "Blockiere Karte"
+                    txtInfoCurrentGame.text = "Sperre Karte"
                 }
             }
 
@@ -362,11 +387,11 @@ Flickable {
 
             MenuItem {
                 id: menuItemBlock
-                text: "Blockieren"
+                text: "Sperren"
                 onClicked: {
                     userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 1);
                     busyLoadingIndicatorCurrentGames.visible = true
-                    txtInfoCurrentGame.text = "Blockiere Karte"
+                    txtInfoCurrentGame.text = "Sperre Karte"
                 }
             }
         }
@@ -381,10 +406,11 @@ Flickable {
     function showAllInfoAboutGame(sender) {
 
         busyLoadingIndicatorCurrentGames.visible = true
-        txtInfoCurrentGame.text = "Aktualisiere Daten"
-        userIntCurrentGame.startListSeasonTickets()
-
         m_gamePlayCurrentItem = sender
+        txtInfoCurrentGame.text = "Aktualisiere Daten"
+//        userIntCurrentGame.startListSeasonTickets()
+        userIntCurrentGame.startRequestAvailableTickets(m_gamePlayCurrentItem.index);
+
         gameHeader.showGamesInfo(sender)
     }
 
@@ -457,26 +483,31 @@ Flickable {
             listViewReservedTickets.implicitHeight = listViewModelReservedTickets.count * listViewItemHeight * ( 5 / 4)
             listViewFreeTickets.implicitHeight = listViewModelFreeTickets.count * listViewItemHeight
 
-            if (listViewModelFreeTickets.count > 0)
-                txtInfoCurrentGameFreeTickets.visible = true
-            else
-                txtInfoCurrentGameFreeTickets.visible = false
-            if (listViewModelReservedTickets.count > 0)
-                txtInfoCurrentGameReservedTickets.visible = true
-            else
-                txtInfoCurrentGameReservedTickets.visible = false
-            if (listViewModelBlockedTickets.count > 0)
-                txtInfoCurrentGameBlockedTickets.visible = true
-            else
-                txtInfoCurrentGameBlockedTickets.visible = false
+//            if (listViewModelFreeTickets.count > 0)
+//                txtInfoCurrentGameFreeTickets.visible = true
+//            else
+//                txtInfoCurrentGameFreeTickets.visible = false
+//            if (listViewModelReservedTickets.count > 0)
+//                txtInfoCurrentGameReservedTickets.visible = true
+//            else
+//                txtInfoCurrentGameReservedTickets.visible = false
+//            if (listViewModelBlockedTickets.count > 0)
+//                txtInfoCurrentGameBlockedTickets.visible = true
+//            else
+//                txtInfoCurrentGameBlockedTickets.visible = false
+
+            txtInfoCurrentGameBlockedTickets.visible = true
+            txtInfoCurrentGameReservedTickets.visible = true
+            txtInfoCurrentGameFreeTickets.visible = true
 
         } else {
             txtInfoCurrentGameBlockedTickets.visible = false
             txtInfoCurrentGameReservedTickets.visible = false
             txtInfoCurrentGameFreeTickets.visible = false
         }
+        txtInfoCurrentGame.visible = false;
 
-        txtInfoCurrentGame.text = "Letztes Update am "
-                + globalUserData.getSeasonTicketLastUpdate()
+//        txtInfoCurrentGame.text = "Letztes Update am "
+//                + globalUserData.getSeasonTicketLastUpdateString()
     }
 }

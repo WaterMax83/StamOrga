@@ -102,16 +102,9 @@ signals:
 public slots:
     void slConnectionRequestFinished(qint32 result);
     void slVersionRequestFinished(qint32 result, QString msg);
-    void slUserPropertiesFinished(qint32 result);
     void slUpdatePasswordRequestFinished(qint32 result, QString newPassWord);
-    void slUpdateReadableNameRequestFinished(qint32 result);
-    void slGettingGamesListFinished(qint32 result);
-    void slSeasonTicketAddFinished(qint32 result);
-    void slSeasonTicketRemoveFinished(qint32 result);
-    void slSeasonTicketNewPlaceFinished(qint32 result);
-    void slSeasonTicketListFinished(qint32 result);
-    void slAvailableTicketFreeFinished(qint32 result);
-    void slAvailableTicketListFinished(qint32 result);
+
+    void slCommandFinished(quint32 command, qint32 result);
 
 
 private:
