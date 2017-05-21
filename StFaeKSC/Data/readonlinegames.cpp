@@ -188,7 +188,7 @@ void ReadOnlineGames::checkNewNetworkRequest(bool checkLastItem)
     } else {
         nextUpdate          = this->getNextGameInMilliSeconds(fastUpdate);
         qint64 oneMonthsAgo = QDateTime::currentDateTime().addMonths(-1).toMSecsSinceEpoch();
-        while (this->m_currentRequestIndex < this->m_onlineGames.size() - 1) {
+        while (this->m_currentRequestIndex < this->m_onlineGames.size()) {
             OnlineGameInfo* gameInfo = this->m_onlineGames[this->m_currentRequestIndex];
             this->m_currentRequestIndex++;
             /* if game was 1 month ago, forget it */
@@ -227,7 +227,7 @@ qint64 ReadOnlineGames::getNextGameInMilliSeconds(bool& fastUpdate)
 #ifdef DEBUG_UPDATE
     qint64 rValue = now + (2 * MINUTE_IN_MSEC);
 #else
-    qint64 rValue = now + (4 * HOUR_IN_MSEC); // 4h - 1000ms * 60s * 60min * 4
+    qint64 rValue = now + (6 * HOUR_IN_MSEC); // 6h - 1000ms * 60s * 60min * 4
 #endif
 
     fastUpdate = false;

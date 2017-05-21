@@ -104,6 +104,9 @@ Flickable {
         userIntTicket.startListSeasonTickets()
         busyConnectIndicatorTicket.visible = true;
         txtInfoSeasonTicket.text = "Aktualisiere Dauerkarten Liste"
+        for (var j = columnLayoutTickets.children.length; j > 0; j--) {
+            columnLayoutTickets.children[j-1].destroy()
+        }
     }
 
     function notifyUserIntSeasonTicketAdd(result) {
@@ -165,7 +168,6 @@ Flickable {
         } else
             txtInfoSeasonTicket.text = "Keine Daten zum Anzeigen\nZiehen zum Aktualisieren"
 
-//        var btn = btnAddSeasonTicket.createObject(columnLayoutTickets)
     }
 
     Component {
@@ -177,19 +179,7 @@ Flickable {
         }
     }
 
-//    Component {
-//        id: btnAddSeasonTicket
-//        Button {
-//            text: qsTr("Dauerkarte hinzufügen")
-//            implicitWidth: mainTicketColumnLayout.width / 3 * 2
-//            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-//            transformOrigin: Item.Center
-//            onClicked: {
-//                txtnewSeasonTicketName.text = globalUserData.readableName
-//                addSeasonTicketDlg.open()
-//            }
-//        }
-//    }
+
 
     ScrollIndicator.vertical: ScrollIndicator { }
 

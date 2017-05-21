@@ -255,7 +255,7 @@ void DataConnection::startSendReadableNameRequest(DataConRequest request)
 
 void DataConnection::startSendGamesListRequest(DataConRequest request)
 {
-    MessageProtocol msg(request.m_request, 10);
+    MessageProtocol msg(request.m_request, this->m_pGlobalData->lastGamesLoadCount());
     this->sendMessageRequest(&msg, request);
 }
 

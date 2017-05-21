@@ -164,6 +164,11 @@ ApplicationWindow {
                                    element: viewSeasonTickets,
                                    imgsource: "images/add.png"
                                })
+                        append({
+                                   title: "Einstellungen",
+                                   element: viewSettingsPage,
+                                   imgsource: ""
+                               })
                         if (userInt.isDebuggingEnabled())
                             append({
                                        title: "Logging",
@@ -227,6 +232,12 @@ ApplicationWindow {
         id: viewSeasonTickets
         MyPages.SeasonTickets {
             userIntTicket: userInt
+        }
+    }
+
+    Component {
+        id: viewSettingsPage
+        MyPages.Settings {
         }
     }
 

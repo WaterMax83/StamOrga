@@ -38,6 +38,7 @@ class GlobalData : public QObject
     Q_PROPERTY(QString readableName READ readableName WRITE setReadableName NOTIFY readableNameChanged)
     Q_PROPERTY(QString ipAddr READ ipAddr WRITE setIpAddr NOTIFY ipAddrChanged)
     Q_PROPERTY(quint32 conMasterPort READ conMasterPort WRITE setConMasterPort NOTIFY conMasterPortChanged)
+    Q_PROPERTY(quint32 lastGamesLoadCount READ lastGamesLoadCount WRITE setLastGamesLoadCount NOTIFY lastGamesLoadCountChanged)
     Q_PROPERTY(bool bIsConnected READ bIsConnected WRITE setbIsConnected NOTIFY bIsConnectedChanged)
 
 public:
@@ -125,6 +126,23 @@ public:
         }
     }
 
+    quint32 lastGamesLoadCount()
+    {
+        QMutexLocker lock(&this->m_mutexUser);
+        return this->m_ulastGamesLoadCount;
+    }
+    void setLastGamesLoadCount(quint32 count)
+    {
+        if (this->m_ulastGamesLoadCount != count) {
+            {
+                QMutexLocker lock(&this->m_mutexUser);
+                this->m_ulastGamesLoadCount = count;
+            }
+            emit lastGamesLoadCountChanged();
+        }
+    }
+
+
     quint32 conDataPort()
     {
         QMutexLocker lock(&this->m_mutexUser);
@@ -164,6 +182,8 @@ public:
     void SetUserProperties(quint32 value) { this->m_UserProperties = value; }
 
     void saveGlobalUserSettings();
+
+    Q_INVOKABLE void saveGlobalSettings();
 
     Q_INVOKABLE QString getCurrentLoggingList(int index)
     {
@@ -211,6 +231,7 @@ signals:
     void readableNameChanged();
     void ipAddrChanged();
     void conMasterPortChanged();
+    void lastGamesLoadCountChanged();
     void bIsConnectedChanged();
 
 public slots:
@@ -226,6 +247,8 @@ private:
     quint32 m_uMasterPort;
     quint16 m_uDataPort;
     quint32 m_userIndex;
+
+    quint32 m_ulastGamesLoadCount;
 
     quint32 m_UserProperties;
 

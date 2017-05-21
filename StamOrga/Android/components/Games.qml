@@ -79,6 +79,7 @@ Rectangle {
             text: qsTr("Home")
             leftPadding: 5
             topPadding: 5
+            font.bold: true
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
         }
@@ -95,6 +96,7 @@ Rectangle {
                 id: labelLineAway
                 text: qsTr("Away")
                 leftPadding: 5
+                font.bold: true
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
@@ -102,6 +104,7 @@ Rectangle {
             Label {
                 id: labelLineScore
                 text: qsTr("")
+                font.bold: true
                 rightPadding: layoutExplicitGame.width / 100 * 30
                 Layout.alignment: Qt.AlignRight | Qt.AlignHCenter
             }

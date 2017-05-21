@@ -76,6 +76,10 @@ void GlobalData::loadGlobalSettings()
 
     this->m_pMainUserSettings->endGroup();
 
+    this->m_pMainUserSettings->beginGroup("GLOBAL_SETTINGS");
+    this->setLastGamesLoadCount(this->m_pMainUserSettings->value("LastGamesLoadCount", 5).toInt());
+    this->m_pMainUserSettings->endGroup();
+
     /* Getting data from last Games */
     this->m_pMainUserSettings->beginGroup(GAMES_GROUP);
     this->m_gpLastTimeStamp = this->m_pMainUserSettings->value("TIMESTAMP", 0).toLongLong();
@@ -131,6 +135,17 @@ void GlobalData::saveGlobalUserSettings()
     this->m_pMainUserSettings->setValue("ReadableName", this->m_readableName);
     this->m_pMainUserSettings->setValue("IPAddress", this->m_ipAddress);
     this->m_pMainUserSettings->setValue("ConMasterPort", this->m_uMasterPort);
+
+    this->m_pMainUserSettings->endGroup();
+
+    this->m_pMainUserSettings->sync();
+}
+
+void GlobalData::saveGlobalSettings()
+{
+    this->m_pMainUserSettings->beginGroup("GLOBAL_SETTINGS");
+
+    this->m_pMainUserSettings->setValue("LastGamesLoadCount", this->m_ulastGamesLoadCount);
 
     this->m_pMainUserSettings->endGroup();
 

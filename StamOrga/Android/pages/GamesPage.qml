@@ -18,7 +18,7 @@
 import QtQuick 2.7
 import QtQuick.Controls 2.1
 import QtQuick.Layouts 1.0
-import QtGraphicalEffects 1.0
+//import QtGraphicalEffects 1.0
 
 import com.watermax.demo 1.0
 
@@ -34,6 +34,9 @@ Flickable {
             busyLoadingIndicatorGames.visible = true
             txtInfoLoadingGames.text = "Lade Spielliste"
             userIntGames.startListGettingGames()
+            for (var j = columnLayoutGames.children.length; j > 0; j--) {
+                columnLayoutGames.children[j - 1].destroy()
+            }
         }
     }
 

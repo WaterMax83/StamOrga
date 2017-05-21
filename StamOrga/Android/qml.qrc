@@ -33,5 +33,7 @@
         <file>pages/CurrentAwayGamePage.qml</file>
         <file>components/Toast.qml</file>
         <file>components/ToastManager.qml</file>
+        <file>pages/Settings.qml</file>
+        <file>pages/CurrentTicketInfo.qml</file>
     </qresource>
 </RCC>
