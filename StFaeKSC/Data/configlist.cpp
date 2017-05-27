@@ -120,25 +120,12 @@ QString ConfigList::getItemName(quint32 index)
     return "";
 }
 
-
-quint16 ConfigList::startRequestGetItemList()
-{
-    this->m_mInternalInfoMutex.lock();
-    return this->getNumberOfInternalList();
-}
-
-
 ConfigItem* ConfigList::getItemFromArrayIndex(int index)
 {
     if (index >= this->getNumberOfInternalList())
         return NULL;
 
     return this->m_lInteralList[index];
-}
-
-void ConfigList::stopRequestGetItemList()
-{
-    this->m_mInternalInfoMutex.unlock();
 }
 
 ConfigItem* ConfigList::getProblemItemFromArrayIndex(int index)

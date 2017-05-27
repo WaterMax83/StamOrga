@@ -128,8 +128,27 @@ public:
         return "not implemented";
     }
 
+    Q_INVOKABLE quint16 getFreeTickets() { return this->m_freeTickets; }
+    void setFreeTickets(quint16 number)
+    {
+        this->m_freeTickets = number;
+    }
+
+    void setBlockedTickets(quint16 number)
+    {
+        this->m_blockedTickets = number;
+    }
+
+    void setReservedTickets(quint16 number)
+    {
+        this->m_reservedTickets = number;
+    }
+
     Q_INVOKABLE bool isGameInPast();
     Q_INVOKABLE bool isGameRunning();
+
+    Q_INVOKABLE bool isGameAHomeGame();
+    Q_INVOKABLE bool isGameASeasonTicketGame();
 
 
 signals:
@@ -151,6 +170,9 @@ private:
     quint32 m_index;
     quint8  m_seasonIndex;
     qint64  m_timestamp;
+    quint16 m_freeTickets;
+    quint16 m_blockedTickets;
+    quint16 m_reservedTickets;
 };
 
 #endif // GAMEPLAY_H

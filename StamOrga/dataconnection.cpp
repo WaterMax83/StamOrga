@@ -176,7 +176,7 @@ void DataConnection::checkNewOncomingData()
             break;
 
         case OP_CODE_CMD_RES::ACK_GET_AVAILABLE_TICKETS:
-            request.m_result = this->m_pDataHandle->getHandleAvailableTicketListResponse(msg);
+            request.m_result = this->m_pDataHandle->getHandleAvailableTicketListResponse(msg, request.m_lData.at(0).toUInt());
             break;
 
         default:

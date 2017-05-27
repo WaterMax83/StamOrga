@@ -64,14 +64,11 @@ public:
     quint32 getItemIndex(const QString name);
     QString getItemName(quint32 index);
 
-    quint16 startRequestGetItemList();
-
     virtual ConfigItem* getRequestConfigItemFromListIndex(int index)
     {
+        QMutexLocker lock(&this->m_mInternalInfoMutex);
         return this->getItemFromArrayIndex(index);
     }
-
-    void stopRequestGetItemList();
 
 protected:
     QList<ConfigItem*> m_lInteralList;

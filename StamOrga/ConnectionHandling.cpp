@@ -325,9 +325,10 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
 
 void ConnectionHandling::checkTimeoutResult(qint32 result)
 {
-    if (result == ERROR_CODE_TIMEOUT)
+    if (result == ERROR_CODE_TIMEOUT) {
         this->stopDataConnection();
-    else if (this->m_pGlobalData->bIsConnected())
+        this->m_lastSuccessTimeStamp = 0;
+    } else if (this->m_pGlobalData->bIsConnected())
         this->m_lastSuccessTimeStamp = QDateTime::currentMSecsSinceEpoch();
 }
 

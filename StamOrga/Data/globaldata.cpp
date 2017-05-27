@@ -211,7 +211,18 @@ bool GlobalData::existGamePlay(GamePlay* gPlay)
     return false;
 }
 
-GamePlay* GlobalData::getGamePlay(int index)
+GamePlay* GlobalData::getGamePlay(const quint32 gameIndex)
+{
+    QMutexLocker lock(&this->m_mutexGame);
+
+    for (int i = 0; i < this->m_lGamePlay.size(); i++) {
+        if (this->m_lGamePlay[i]->index() == gameIndex)
+            return this->m_lGamePlay[i];
+    }
+    return NULL;
+}
+
+GamePlay* GlobalData::getGamePlayFromArrayIndex(int index)
 {
     QMutexLocker lock(&this->m_mutexGame);
 

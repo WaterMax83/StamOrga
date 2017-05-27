@@ -87,7 +87,10 @@ Item {
         m_gamePlayCurrentItem = sender
         gameHeader.showGamesInfo(sender)
 
-        currentTicketInfo.showAllInfoAboutGame(sender);
+        if (sender.isGameASeasonTicketGame())
+            currentTicketInfo.showAllInfoAboutGame(sender);
+        else
+            currentTicketInfo.visible = false;
     }
 
     function pageOpenedUpdateView() {}
@@ -102,6 +105,8 @@ Item {
 
     function notifyAvailableTicketListFinished(result) {
         currentTicketInfo.notifyAvailableTicketListFinished(result);
+        if (result === 1)
+            gameHeader.showGamesInfo(m_gamePlayCurrentItem)
     }
 
     function notifyUserIntConnectionFinished(result) {}

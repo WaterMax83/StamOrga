@@ -21,11 +21,11 @@
 
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
+#include <QtCore/QList>
 #include <QtCore/QObject>
+#include <QtCore/QTimer>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
-#include <QtCore/QTimer>
-#include <QtCore/QList>
 
 #include "../Common/General/backgroundworker.h"
 #include "../General/globaldata.h"
@@ -38,10 +38,17 @@ struct OnlineGameInfo {
     quint32 m_season;
     quint32 m_index;
     quint32 m_matchID;
-    qint64 m_timeStamp;
-    qint64 m_lastUpdate;
-    bool m_gameFinished;
-//    bool m_checkUpdate;
+    qint64  m_timeStamp;
+    qint64  m_lastUpdate;
+    bool    m_gameFinished;
+
+    OnlineGameInfo()
+    {
+        this->m_competition = "bl";
+        this->m_season      = 2016;
+    }
+
+    //    bool m_checkUpdate;
 };
 
 struct RequestList {
@@ -72,22 +79,22 @@ protected:
 
     GlobalData*            m_globalData;
     QNetworkAccessManager* m_netAccess;
-    QTimer* m_networkTimout;
-    bool m_bRequestCanceled;
-    qint32 m_currentRequestIndex;
+    QTimer*                m_networkTimout;
+    bool                   m_bRequestCanceled;
+    qint32                 m_currentRequestIndex;
 
     QList<OnlineGameInfo*> m_onlineGames;
-    OnlineGameInfo* m_currentGameInfo;
+    OnlineGameInfo*        m_currentGameInfo;
 
     QList<RequestList*> m_requestList;
-    qint32 getTotalCountOfRequest();
+    qint32              getTotalCountOfRequest();
     OnlineGameInfo* getNextRequest(OnlineGameInfo* currentGame);
 
     QTimer* m_networkUpdate;
 
-    void startNetWorkRequest(OnlineGameInfo *info);
+    void startNetWorkRequest(OnlineGameInfo* info);
 
-    OnlineGameInfo* existCurrentGameInfo(OnlineGameInfo *info);
+    OnlineGameInfo* existCurrentGameInfo(OnlineGameInfo* info);
 
     qint64 getNextGameInMilliSeconds(bool& fastUpdate);
 

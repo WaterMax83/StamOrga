@@ -144,6 +144,13 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol* msg)
         play->setIndex(qFromBigEndian(*(quint32*)(pData + offset)));
         offset += 4;
 
+        play->setFreeTickets(qFromBigEndian(*(quint16*)(pData + offset)));
+        offset += 2;
+        play->setBlockedTickets(qFromBigEndian(*(quint16*)(pData + offset)));
+        offset += 2;
+        play->setReservedTickets(qFromBigEndian(*(quint16*)(pData + offset)));
+        offset += 2;
+
         QString playString(QByteArray(pData + offset, size - GAMES_OFFSET));
         offset += (size - GAMES_OFFSET);
         QStringList lplayString = playString.split(";");
@@ -244,7 +251,7 @@ qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol* msg)
  */
 
 #define AVAILABLE_HEAD_OFFSET 2
-qint32 DataHandling::getHandleAvailableTicketListResponse(MessageProtocol* msg)
+qint32 DataHandling::getHandleAvailableTicketListResponse(MessageProtocol* msg, const quint32 gameIndex)
 {
     if (msg->getDataLength() < 4)
         return ERROR_CODE_WRONG_SIZE;
@@ -292,6 +299,13 @@ qint32 DataHandling::getHandleAvailableTicketListResponse(MessageProtocol* msg)
         QString name(pData + offset);
         item->setReserveName(name);
         offset += name.size() + 1;
+    }
+
+    GamePlay* game = this->m_pGlobalData->getGamePlay(gameIndex);
+    if (game != NULL) {
+        game->setFreeTickets(countOfFreeTickets);
+        game->setReservedTickets(countOfReservedTickets);
+        game->setBlockedTickets(this->m_pGlobalData->getSeasonTicketLength() - countOfFreeTickets - countOfReservedTickets);
     }
 
     return rValue;

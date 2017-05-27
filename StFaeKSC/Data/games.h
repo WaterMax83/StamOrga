@@ -23,16 +23,18 @@
 #include <QtCore/QList>
 
 
+#include "../Common/General/globalfunctions.h"
 #include "configlist.h"
+
 
 class GamesPlay : public ConfigItem
 {
 public:
-    QString away;
-    quint8  m_saisonIndex;
-    quint8  m_competition;
-    quint16 m_saison;
-    QString score;
+    QString          away;
+    quint8           m_saisonIndex;
+    CompetitionIndex m_competition;
+    quint16          m_saison;
+    QString          score;
 };
 
 #define PLAY_AWAY "away"
@@ -47,11 +49,11 @@ public:
     Games();
     ~Games();
 
-    int addNewGame(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, quint8 comp, quint16 season);
+    int addNewGame(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, CompetitionIndex comp, quint16 season);
     int showAllGames();
 
 
-    GamesPlay* gameExists(quint8 sIndex, quint8 comp, quint16 saison, qint64 timestamp);
+    GamesPlay* gameExists(quint8 sIndex, CompetitionIndex comp, quint16 saison, qint64 timestamp);
 
     void sortGamesListByTime();
 
@@ -59,8 +61,8 @@ public:
 private:
     void saveCurrentInteralList() override;
 
-    bool addNewGamesPlay(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, quint8 comp, quint16 season, quint32 index, bool checkGame = true);
-    void addNewGamesPlay(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, quint8 comp, quint16 season, quint32 index, QList<ConfigItem*>* pList);
+    bool addNewGamesPlay(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, CompetitionIndex comp, quint16 season, quint32 index, bool checkGame = true);
+    void addNewGamesPlay(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, CompetitionIndex comp, quint16 season, quint32 index, QList<ConfigItem*>* pList);
 };
 
 #endif // GAMES_H

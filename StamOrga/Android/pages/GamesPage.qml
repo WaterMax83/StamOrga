@@ -126,7 +126,7 @@ Flickable {
         if (globalUserData.getGamePlayLength() > 0) {
             for (var i = 0; i < globalUserData.getGamePlayLength(); i++) {
                 var sprite = gameView.createObject(columnLayoutGames)
-                sprite.showGamesInfo(globalUserData.getGamePlay(i))
+                sprite.showGamesInfo(globalUserData.getGamePlayFromArrayIndex(i))
             }
             txtInfoLoadingGames.text = "Letztes Update am " + globalUserData.getGamePlayLastUpdate()
         } else
@@ -141,7 +141,7 @@ Flickable {
         MyComponents.Games {
             onClickedCurrentGame: {
                 var component
-                if (sender.home === "KSC")
+                if (sender.isGameAHomeGame())
                     component = Qt.createComponent("../pages/CurrentHomeGamePage.qml")
                 else
                     component = Qt.createComponent("../pages/CurrentAwayGamePage.qml")
@@ -150,7 +150,7 @@ Flickable {
                     //                   userIntGames.startListSeasonTickets();
                     sprite.userIntCurrentGame = userIntGames
                     sprite.showAllInfoAboutGame(sender)
-                    if (sender.home === "KSC")
+                    if (sender.isGameAHomeGame())
                         updateHeaderFromMain("Heimspiel", "")
                     else
                         updateHeaderFromMain("Auswärts", "")

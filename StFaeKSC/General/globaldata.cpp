@@ -136,7 +136,7 @@ qint32 GlobalData::requestGetAvailableSeasonTicket(const quint32 gameIndex, cons
 
     foreach (AvailableGameTickets* ticket, this->m_availableTickets) {
         if (ticket->getGameIndex() == gameIndex) {
-            quint16 totalCount = ticket->startRequestGetItemList();
+            quint16 totalCount = ticket->getNumberOfInternalList();
 
             QByteArray  freeTickets;
             QDataStream wFreeTickets(&freeTickets, QIODevice::WriteOnly);
@@ -166,8 +166,6 @@ qint32 GlobalData::requestGetAvailableSeasonTicket(const quint32 gameIndex, cons
                 }
             }
 
-            ticket->stopRequestGetItemList();
-
             QDataStream wData(&data, QIODevice::WriteOnly);
             wData.setByteOrder(QDataStream::BigEndian);
 
@@ -185,4 +183,17 @@ qint32 GlobalData::requestGetAvailableSeasonTicket(const quint32 gameIndex, cons
     wData << quint32(ERROR_CODE_SUCCESS) << quint16(0);
 
     return ERROR_CODE_SUCCESS;
+}
+
+quint16 GlobalData::getTicketNumber(const quint32 gamesIndex, const quint32 state)
+{
+    GamesPlay* pGame = (GamesPlay*)this->m_GamesList.getItem(gamesIndex);
+    if (pGame == NULL)
+        return 0;
+
+    foreach (AvailableGameTickets* ticket, this->m_availableTickets) {
+        if (ticket->getGameIndex() == gamesIndex)
+            return ticket->getTicketNumber(state);
+    }
+    return 0;
 }

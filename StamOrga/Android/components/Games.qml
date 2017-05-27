@@ -59,12 +59,43 @@ Rectangle {
             }
         }
 
-        Label {
-            id: labelLineDate
-            text: qsTr("Date")
-            leftPadding: 5
-            topPadding: 3
-            Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
+        RowLayout {
+            id: layoutDateLine
+
+            anchors.right: parent.right
+            anchors.left: parent.left
+            Layout.preferredWidth: columnLayout.width
+            Layout.fillWidth: true
+
+            Label {
+                id: labelLineDate
+                text: qsTr("Date")
+                leftPadding: 5
+                topPadding: 3
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
+            }
+
+            Label {
+                id: labelFreeTickets
+                topPadding: 3
+                rightPadding: 1
+                Layout.alignment: Qt.AlignRight
+                text : "5"
+            }
+
+            Rectangle {
+                id: imageFreeTickets
+                anchors.top : parent.top
+                anchors.right: parent. right
+                anchors.rightMargin: 5
+                anchors.topMargin: 5
+                Layout.alignment: Qt.AlignRight
+                width: labelFreeTickets.height / 1.5
+                height: labelFreeTickets.height / 1.5
+                radius: width * 0.5
+                color: "green"
+            }
         }
 
         Label {
@@ -132,6 +163,18 @@ Rectangle {
             } else if (gamePlayItem.isGameRunning()) {
                 mainRectangleGame.gradColorStart = "#f30707"
                 mainRectangleGame.gradColorStop = "#ff4747"
+            }
+
+            if (!gamePlayItem.isGameASeasonTicketGame())
+                return;
+
+            var freeTickets = gamePlayItem.getFreeTickets();
+            if (freeTickets > 0) {
+                labelFreeTickets.text = freeTickets;
+                imageFreeTickets.visible = true;
+            } else {
+                labelFreeTickets.text = "";
+                imageFreeTickets.visible = false;
             }
 
         }

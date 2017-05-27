@@ -46,6 +46,8 @@ public:
 
     quint32 getGameIndex() { return this->m_gameIndex; }
 
+    quint16 getTicketNumber(const quint32 state);
+
     qint32 getTicketState(quint32 ticketID);
     QString getTicketName(quint32 ticketID);
 

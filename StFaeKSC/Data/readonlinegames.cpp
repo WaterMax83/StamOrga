@@ -65,15 +65,29 @@ int ReadOnlineGames::DoBackgroundWork()
     this->m_networkUpdate->setSingleShot(true);
     connect(this->m_networkUpdate, &QTimer::timeout, this, &ReadOnlineGames::slotNetWorkUpdateTimeout);
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
 #ifdef QT_DEBUG
+    OnlineGameInfo* gameInfo = new OnlineGameInfo();
+    gameInfo->m_index        = 1;
+    gameInfo->m_timeStamp    = QDateTime::currentDateTime().addMonths(-2).toMSecsSinceEpoch();
+    gameInfo->m_gameFinished = true;
+    this->m_onlineGames.append(gameInfo);
+
+    gameInfo                 = new OnlineGameInfo();
+    gameInfo->m_index        = 2;
+    gameInfo->m_timeStamp    = QDateTime::currentDateTime().addDays(-5).toMSecsSinceEpoch();
+    gameInfo->m_gameFinished = true;
+    this->m_onlineGames.append(gameInfo);
+
+    gameInfo              = new OnlineGameInfo();
+    gameInfo->m_index     = 3;
+    gameInfo->m_timeStamp = QDateTime::currentDateTime().addSecs(10).toMSecsSinceEpoch();
+    this->m_onlineGames.append(gameInfo);
+
+    this->m_currentRequestIndex = 0;
     qInfo().noquote() << "Did not use ReadOnlineGame because of debugging";
-#else
+#endif
+
     this->checkNewNetworkRequest(false);
-#endif
-#else
-    qInfo().noquote() << "Did not use ReadOnlineGame because of version problem";
-#endif
 
     return 0;
 }
@@ -139,12 +153,26 @@ void ReadOnlineGames::startNetWorkRequest(OnlineGameInfo* info)
         request                 = QString("%1/%2/%3/%4").arg(GETMATCH_DATA, info->m_competition).arg(info->m_season).arg(info->m_index);
     }
 
-
-    this->m_networkTimout->start();
     this->m_bRequestCanceled = false;
 
-    qInfo().noquote() << QString("Request for game %1").arg(info->m_index);
-    this->m_netAccess->get(QNetworkRequest(QUrl(request)));
+    qInfo().noquote() << QString("Request for game %1").arg(this->m_currentGameInfo->m_index);
+
+#ifdef QT_DEBUG
+    qInfo().noquote() << QString("Single game answer for game %1").arg(this->m_currentGameInfo->m_index);
+    this->checkNewNetworkRequest(true);
+#else
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
+    qInfo().noquote() << "Did not use ReadOnlineGame because of version problem";
+#else
+    if (this->m_currentGameInfo->m_index == 35) {
+        qInfo().noquote() << QString("Single game answer for game %1").arg(this->m_currentGameInfo->m_index);
+        this->checkNewNetworkRequest(true);
+    } else {
+        this->m_networkTimout->start();
+        this->m_netAccess->get(QNetworkRequest(QUrl(request)));
+    }
+#endif
+#endif
 }
 
 OnlineGameInfo* ReadOnlineGames::existCurrentGameInfo(OnlineGameInfo* info)
@@ -182,6 +210,11 @@ void ReadOnlineGames::checkNewNetworkRequest(bool checkLastItem)
             }
         } else {
             this->m_currentRequestIndex = 0;
+            OnlineGameInfo* gameInfo    = new OnlineGameInfo();
+            gameInfo->m_index           = 35;
+            gameInfo->m_timeStamp       = QDateTime::currentDateTime().addSecs(60 * 60).toMSecsSinceEpoch();
+            gameInfo->m_gameFinished    = true;
+            this->m_onlineGames.append(gameInfo);
             qInfo().noquote() << "Got all games for internal list";
         }
         nextUpdate = this->getNextGameInMilliSeconds(fastUpdate);
@@ -195,10 +228,10 @@ void ReadOnlineGames::checkNewNetworkRequest(bool checkLastItem)
             if (gameInfo->m_gameFinished && gameInfo->m_timeStamp < oneMonthsAgo)
                 continue;
 
-            /* Filter games which are not listed in this period */
+            /* Filter games which are not listed in this fast period */
             if (fastUpdate) {
                 qint64 diffTime = nextUpdate - gameInfo->m_timeStamp;
-                if (diffTime > 8 * HOUR_IN_MSEC || diffTime < 8 * HOUR_IN_MSEC)
+                if (diffTime > 8 * HOUR_IN_MSEC || diffTime < 0)
                     continue;
             }
             this->startNetWorkRequest(gameInfo);
@@ -208,9 +241,10 @@ void ReadOnlineGames::checkNewNetworkRequest(bool checkLastItem)
     }
 
     qint64 now = QDateTime::currentMSecsSinceEpoch();
-    if (nextUpdate > now)
+    if (nextUpdate > now) {
+        qInfo() << QString("Sleeping and reading again in %1 seconds").arg((nextUpdate - now) / 1000);
         this->m_networkUpdate->start(nextUpdate - now);
-    else
+    } else
         this->slotNetWorkUpdateTimeout();
 }
 
@@ -242,13 +276,14 @@ qint64 ReadOnlineGames::getNextGameInMilliSeconds(bool& fastUpdate)
             if ((now - timestamp) < (8 * HOUR_IN_MSEC)) {
                 rValue     = now + (5 * MINUTE_IN_MSEC);
                 fastUpdate = true;
+                return rValue;
             }
             continue;
         }
 
-        /* If game is less than 4 hours in future, take start of game */
-        if ((timestamp - now) < (4 * HOUR_IN_MSEC))
-            rValue = timestamp;
+        /* If game is less than 6 hours in future, take start of game (plus 10msec) */
+        if ((timestamp - now) < (6 * HOUR_IN_MSEC))
+            rValue = timestamp + 10;
     }
     return rValue;
 }
@@ -362,11 +397,13 @@ bool ReadOnlineGames::readSingleGame(QJsonObject& json)
     if (!this->m_onlineGames.contains(this->m_currentGameInfo))
         this->m_onlineGames.append(this->m_currentGameInfo);
 
-    quint8 comp = 0;
-    if (this->m_currentGameInfo->m_competition == "bl2")
-        comp = 2;
+    CompetitionIndex comp = NO_COMPETITION;
+    if (this->m_currentGameInfo->m_competition == "bl1")
+        comp = BUNDESLIGA_1;
+    else if (this->m_currentGameInfo->m_competition == "bl2")
+        comp = BUNDESLIGA_2;
     else if (this->m_currentGameInfo->m_competition == "bl3")
-        comp = 3;
+        comp = LIGA_3;
     this->m_globalData->m_GamesList.addNewGame(this->m_currentGameInfo->m_team1,
                                                this->m_currentGameInfo->m_team2,
                                                this->m_currentGameInfo->m_timeStamp,

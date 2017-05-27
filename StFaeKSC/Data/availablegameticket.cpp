@@ -171,19 +171,19 @@ qint32 AvailableGameTickets::changeTicketState(quint32 ticketID, quint32 userID,
         AvailableTicketInfo* pTicket = (AvailableTicketInfo*)(this->getItemFromArrayIndex(i));
         if (pTicket->m_ticketID == ticketID) {
             if (pTicket->m_userID != userID) {
-                pTicket->m_userID    = userID;
+                pTicket->m_userID = userID;
                 this->updateItemValue(pTicket, AVAILABLE_USER_ID, QVariant(userID));
             }
             if (pTicket->m_state != state) {
-                pTicket->m_state    = state;
+                pTicket->m_state = state;
                 this->updateItemValue(pTicket, AVAILABLE_STATE, QVariant(state));
             }
             if (pTicket->m_itemName != name) {
-                pTicket->m_itemName    = name;
+                pTicket->m_itemName = name;
                 this->updateItemValue(pTicket, ITEM_NAME, QVariant(name));
             }
             if (pTicket->m_timestamp != timestamp) {
-                pTicket->m_timestamp    = timestamp;
+                pTicket->m_timestamp = timestamp;
                 this->updateItemValue(pTicket, ITEM_TIMESTAMP, QVariant(timestamp));
             }
 
@@ -215,6 +215,19 @@ QString AvailableGameTickets::getTicketName(quint32 ticketID)
             return pTicket->m_itemName;
     }
     return "";
+}
+
+quint16 AvailableGameTickets::getTicketNumber(const quint32 state)
+{
+    QMutexLocker locker(&this->m_mInternalInfoMutex);
+
+    quint16 rValue = 0;
+    for (int i = 0; i < this->getNumberOfInternalList(); i++) {
+        AvailableTicketInfo* pTicket = (AvailableTicketInfo*)(this->getItemFromArrayIndex(i));
+        if (pTicket->m_state == state)
+            rValue++;
+    }
+    return rValue;
 }
 
 

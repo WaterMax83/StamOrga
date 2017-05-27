@@ -205,8 +205,11 @@ MessageProtocol* DataConnection::requestGetProgramVersion(MessageProtocol* msg)
  * 23   quint8      comp            1
  * 24   quint64     datetime        8
  * 32   quint32     index           4
- * 36   QString     infoGame        X
- * 36+X qutin16     sizePack2       2
+ * 36   quint16     freeGames       2
+ * 38   quint16     blockedGames    2
+ * 40   quint16     reserveGames    2
+ * 42   QString     infoGame        X
+ * 42+X qutin16     sizePack2       2
  */
 
 #define GAMES_OFFSET (1 + 1 + 8 + 4) // sIndex + comp + datetime + index
@@ -219,7 +222,7 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
 
     qint32 maxPastGames = msg->getIntData();
 
-    quint16 numbOfGames = this->m_pGlobalData->m_GamesList.startRequestGetItemList();
+    quint16 numbOfGames = this->m_pGlobalData->m_GamesList.getNumberOfInternalList();
 
     qint32 gamesInPast = 0;
     qint64 now         = QDateTime::currentMSecsSinceEpoch();
@@ -241,7 +244,9 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
             continue;
 
         QString game(pGame->m_itemName + ";" + pGame->away + ";" + pGame->score);
-
+        quint16 freeTickets     = this->m_pGlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_FREE);
+        quint16 blockTickets    = this->m_pGlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_BLOCKED);
+        quint16 reservedTickets = this->m_pGlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_RESERVED);
 
         wAckArray.device()->seek(ackArray.size());
         wAckArray << quint16(game.toUtf8().size() + GAMES_OFFSET);
@@ -249,12 +254,10 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
         wAckArray << quint8(pGame->m_competition);
         wAckArray << pGame->m_timestamp;
         wAckArray << pGame->m_index;
+        wAckArray << freeTickets << blockTickets << reservedTickets;
 
         ackArray.append(game);
     }
-
-
-    this->m_pGlobalData->m_GamesList.stopRequestGetItemList();
 
     qInfo().noquote() << QString("User %1 request Games List with %2 entries").arg(this->m_pUserConData->userName).arg(numbOfGames);
 
@@ -282,7 +285,7 @@ MessageProtocol* DataConnection::requestGetTicketsList(/*MessageProtocol *msg*/)
     QDataStream wAckArray(&ackArray, QIODevice::WriteOnly);
     wAckArray.setByteOrder(QDataStream::BigEndian);
 
-    quint16 numbOfTickets = this->m_pGlobalData->m_SeasonTicket.startRequestGetItemList();
+    quint16 numbOfTickets = this->m_pGlobalData->m_SeasonTicket.getNumberOfInternalList();
     wAckArray << (quint32)ERROR_CODE_SUCCESS;
     wAckArray << quint16(0x1) << numbOfTickets; //Version
 
@@ -304,8 +307,6 @@ MessageProtocol* DataConnection::requestGetTicketsList(/*MessageProtocol *msg*/)
     }
 
     qInfo().noquote() << QString("User %1 request Ticket List with %2 entries").arg(this->m_pUserConData->userName).arg(numbOfTickets);
-
-    this->m_pGlobalData->m_SeasonTicket.stopRequestGetItemList();
 
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_TICKETS_LIST, ackArray);
 }

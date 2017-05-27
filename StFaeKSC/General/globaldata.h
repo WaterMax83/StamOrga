@@ -35,6 +35,8 @@ public:
     qint32 requestBlockSeasonTicket(quint32 ticketIndex, quint32 gameIndex, const QString userName);
     qint32 requestGetAvailableSeasonTicket(const quint32 gameIndex, const QString userName, QByteArray& data);
 
+    quint16 getTicketNumber(const quint32 gamesIndex, const quint32 state);
+
     ListedUser                   m_UserList;
     Games                        m_GamesList;
     SeasonTicket                 m_SeasonTicket;

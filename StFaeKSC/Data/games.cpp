@@ -50,11 +50,11 @@ Games::Games()
             qint64  timestamp = this->m_pConfigSettings->value(ITEM_TIMESTAMP, 0x0).toULongLong();
             quint32 index     = this->m_pConfigSettings->value(ITEM_INDEX, 0).toInt();
 
-            QString away        = this->m_pConfigSettings->value(PLAY_AWAY, "").toString();
-            quint8  saisonIndex = quint8(this->m_pConfigSettings->value(PLAY_SAISON_INDEX, 0).toUInt());
-            quint16 saison      = quint16(this->m_pConfigSettings->value(PLAY_SAISON, 0).toUInt());
-            QString score       = this->m_pConfigSettings->value(PLAY_SCORE, "").toString();
-            quint8  competition = quint8(this->m_pConfigSettings->value(PLAY_COMPETITION, 0).toUInt());
+            QString          away        = this->m_pConfigSettings->value(PLAY_AWAY, "").toString();
+            quint8           saisonIndex = quint8(this->m_pConfigSettings->value(PLAY_SAISON_INDEX, 0).toUInt());
+            quint16          saison      = quint16(this->m_pConfigSettings->value(PLAY_SAISON, 0).toUInt());
+            QString          score       = this->m_pConfigSettings->value(PLAY_SCORE, "").toString();
+            CompetitionIndex competition = CompetitionIndex(this->m_pConfigSettings->value(PLAY_COMPETITION, 0).toUInt());
 
             if (saison == 0) {
                 bProblems  = true;
@@ -93,9 +93,9 @@ Games::Games()
         this->saveCurrentInteralList();
 }
 
-int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, quint8 comp, quint16 saison)
+int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, CompetitionIndex comp, quint16 saison)
 {
-    if (sIndex == 0 || comp == 0) {
+    if (sIndex == 0 || comp == NO_COMPETITION) {
         qWarning().noquote() << "Could not add game because saisonIndex or competition were zero";
         return ERROR_CODE_COMMON;
     }
@@ -220,7 +220,7 @@ void Games::saveCurrentInteralList()
     qDebug().noquote() << QString("saved actual Games List with %1 entries").arg(this->getNumberOfInternalList());
 }
 
-GamesPlay* Games::gameExists(quint8 sIndex, quint8 comp, quint16 saison, qint64 timestamp)
+GamesPlay* Games::gameExists(quint8 sIndex, CompetitionIndex comp, quint16 saison, qint64 timestamp)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
@@ -240,10 +240,10 @@ GamesPlay* Games::gameExists(quint8 sIndex, quint8 comp, quint16 saison, qint64 
 
 
 //bool ListedUser::addNewUserLogin(QString name, QString password, quint32 prop, quint32 index, bool checkUser)
-bool Games::addNewGamesPlay(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, quint8 comp, quint16 saison, quint32 index, bool checkGame)
+bool Games::addNewGamesPlay(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, CompetitionIndex comp, quint16 saison, quint32 index, bool checkGame)
 {
     if (checkGame) {
-        if (sIndex == 0 || comp == 0) {
+        if (sIndex == 0 || comp == NO_COMPETITION) {
             qWarning().noquote() << "Could not add game because saisonIndex or competition were zero";
             return false;
         }
@@ -258,7 +258,7 @@ bool Games::addNewGamesPlay(QString home, QString away, qint64 timestamp, quint8
     return true;
 }
 
-void Games::addNewGamesPlay(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, quint8 comp, quint16 saison, quint32 index, QList<ConfigItem*>* pList)
+void Games::addNewGamesPlay(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, CompetitionIndex comp, quint16 saison, quint32 index, QList<ConfigItem*>* pList)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 

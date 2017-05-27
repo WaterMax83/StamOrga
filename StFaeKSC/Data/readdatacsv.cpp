@@ -16,14 +16,14 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <QtCore/QFile>
 #include <QtCore/QDateTime>
+#include <QtCore/QFile>
 
 
-#include "readdatacsv.h"
 #include "../Common/General/globalfunctions.h"
+#include "readdatacsv.h"
 
-ReadDataCSV::ReadDataCSV(GlobalData *pGlobalData)
+ReadDataCSV::ReadDataCSV(GlobalData* pGlobalData)
 {
     this->m_pGlobalData = pGlobalData;
 }
@@ -31,8 +31,8 @@ ReadDataCSV::ReadDataCSV(GlobalData *pGlobalData)
 
 enum CSV_IMPORT_GROUP {
     NOTHING = 0,
-    USER = 1,
-    GAME = 2
+    USER    = 1,
+    GAME    = 2
 };
 
 int ReadDataCSV::readNewCSVData(QString path)
@@ -52,7 +52,7 @@ int ReadDataCSV::readNewCSVData(QString path)
     CSV_IMPORT_GROUP actGroup = CSV_IMPORT_GROUP::NOTHING;
     while (!csvFile.atEnd()) {
         QByteArray aline = csvFile.readLine();
-        QString line(aline);
+        QString    line(aline);
 
         if (line.trimmed() == "GAMES")
             actGroup = CSV_IMPORT_GROUP::GAME;
@@ -61,7 +61,7 @@ int ReadDataCSV::readNewCSVData(QString path)
         else {
             QStringList lline = line.trimmed().split(";");
 
-            switch(actGroup) {
+            switch (actGroup) {
             case CSV_IMPORT_GROUP::GAME:
                 this->readNewGameData(lline);
                 break;
@@ -73,7 +73,6 @@ int ReadDataCSV::readNewCSVData(QString path)
             default:
                 break;
             }
-
         }
     }
     return 0;
@@ -81,7 +80,7 @@ int ReadDataCSV::readNewCSVData(QString path)
 
 int ReadDataCSV::readNewGameData(QStringList line)
 {
-    bool ok;
+    bool   ok;
     quint8 sIndex = 0;
     if (line.size() > 0) {
         sIndex = line.value(0).toUShort(&ok);
@@ -91,9 +90,9 @@ int ReadDataCSV::readNewGameData(QStringList line)
         }
     }
 
-    quint8 competition = 0;
+    CompetitionIndex competition = NO_COMPETITION;
     if (line.size() > 1) {
-        competition = line.value(1).toUShort(&ok);
+        competition = CompetitionIndex(line.value(1).toUInt(&ok));
         if (!ok) {
             qWarning().noquote() << QString("Could not read %1 as integer value").arg(line.value(1));
             return ERROR_CODE_COMMON;
@@ -103,7 +102,7 @@ int ReadDataCSV::readNewGameData(QStringList line)
     qint64 datetime = 0;
     if (line.size() > 2) {
         QDateTime time = QDateTime::fromString(line.value(2), "dd.MM.yyyy hh:mm");
-        datetime = time.toMSecsSinceEpoch();
+        datetime       = time.toMSecsSinceEpoch();
     }
 
     QString home;

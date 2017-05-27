@@ -23,6 +23,9 @@
 GamePlay::GamePlay(QObject* parent)
     : QObject(parent)
 {
+    this->m_freeTickets     = 0;
+    this->m_blockedTickets  = 0;
+    this->m_reservedTickets = 0;
 }
 
 
@@ -42,5 +45,23 @@ bool GamePlay::isGameRunning()
         if (now.toMSecsSinceEpoch() < this->m_timestamp + (2 * 60 * 60 * qint64(1000)))
             return true;
     }
+    return false;
+}
+
+bool GamePlay::isGameAHomeGame()
+{
+    if (this->m_home == "KSC")
+        return true;
+    return false;
+}
+
+bool GamePlay::isGameASeasonTicketGame()
+{
+    if (!this->isGameAHomeGame())
+        return false;
+
+    if (this->m_comp >= 1 && this->m_comp <= 3)
+        return true;
+
     return false;
 }

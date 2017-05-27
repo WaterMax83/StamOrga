@@ -66,7 +66,7 @@ Flickable {
 
             Label {
                 id: txtInfoCurrentGameBlockedTickets
-                visible: true
+                visible: false
                 text: "<b>Gesperrte Karten</b> <i>(Besitzer geht selbst)</i><b>:</b>"
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
             }
@@ -398,7 +398,11 @@ Flickable {
         listViewModelBlockedTickets.clear()
         listViewModelReservedTickets.clear()
         listViewModelFreeTickets.clear()
+        listViewBlockedTickets.implicitHeight = 0;
+        listViewReservedTickets.implicitHeight = 0;
+        listViewFreeTickets.implicitHeight = 0;
         busyLoadingIndicatorCurrentGames.visible = true
+        txtInfoCurrentGame.visible = true;
         txtInfoCurrentGame.text = "Aktualisiere Daten"
         userIntCurrentGame.startRequestAvailableTickets(m_gamePlayCurrentItem.index);
     }
@@ -409,16 +413,17 @@ Flickable {
             toastManager.show("Karten geladen", 2000);
         } else {
             toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
+            txtInfoCurrentGame.text = "Karten konnten nicht geladen werden"
         }
-        showInternalTicketList();
+        showInternalTicketList(result);
     }
 
-    function showInternalTicketList() {
+    function showInternalTicketList(result) {
         listViewModelBlockedTickets.clear()
         listViewModelReservedTickets.clear()
         listViewModelFreeTickets.clear()
 
-        if (globalUserData.getSeasonTicketLength() > 0) {
+        if (result === 1 && globalUserData.getSeasonTicketLength() > 0) {
             for (var i = 0; i < globalUserData.getSeasonTicketLength(); i++) {
                 var seasonTicketItem = globalUserData.getSeasonTicketFromArrayIndex(i)
                 var discount = seasonTicketItem.discount > 0 ? " *" : "";
@@ -463,12 +468,19 @@ Flickable {
             txtInfoCurrentGameReservedTickets.visible = true
             txtInfoCurrentGameFreeTickets.visible = true
 
+            txtInfoCurrentGame.visible = false;
+
         } else {
             txtInfoCurrentGameBlockedTickets.visible = false
             txtInfoCurrentGameReservedTickets.visible = false
             txtInfoCurrentGameFreeTickets.visible = false
+            listViewBlockedTickets.implicitHeight = 0;
+            listViewReservedTickets.implicitHeight = 0;
+            listViewFreeTickets.implicitHeight = 0;
+
+            txtInfoCurrentGame.visible = true;
         }
-        txtInfoCurrentGame.visible = false;
+
 
 //        txtInfoCurrentGame.text = "Letztes Update am "
 //                + globalUserData.getSeasonTicketLastUpdateString()

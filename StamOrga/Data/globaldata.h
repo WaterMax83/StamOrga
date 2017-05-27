@@ -206,7 +206,8 @@ public:
         QMutexLocker lock(&this->m_mutexGame);
         return this->m_lGamePlay.size();
     }
-    Q_INVOKABLE GamePlay* getGamePlay(int index);
+    GamePlay* getGamePlay(const quint32 gameIndex);
+    Q_INVOKABLE GamePlay* getGamePlayFromArrayIndex(int index);
     Q_INVOKABLE QString getGamePlayLastUpdate();
 
 
