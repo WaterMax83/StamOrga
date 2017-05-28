@@ -49,7 +49,7 @@ public:
     Games();
     ~Games();
 
-    int addNewGame(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, CompetitionIndex comp, quint16 season);
+    int addNewGame(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, CompetitionIndex comp, quint16 season = 0);
     int showAllGames();
 
 

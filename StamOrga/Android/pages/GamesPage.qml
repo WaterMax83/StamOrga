@@ -97,13 +97,44 @@ Flickable {
         }
     }
 
+    property var addGameDialog;
+
     function toolButtonClicked() {
-//        busyLoadingIndicatorGames.visible = true
-//        txtInfoLoadingGames.text = "Lade Spielliste"
-//        userIntGames.startListGettingGames()
+        if (globalUserData.userIsGameAddingEnabled() || userIntGames.isDebuggingEnabled()) {
+            var component = Qt.createComponent("../components/ChangeGameDialog.qml");
+            if (component.status === Component.Ready) {
+                var dialog = component.createObject(mainPaneGames,{popupType: 1});
+                dialog.headerText = "Neues Spiel";
+                dialog.parentHeight = flickableGames.height
+                dialog.parentWidth = flickableGames.width
+                dialog.homeTeam = "";
+                dialog.awayTeam = "";
+                dialog.score = "";
+                dialog.seasonIndex = 1;
+                dialog.competitionIndex = 2;
+                dialog.date = "";
+                dialog.acceptedDialog.connect(acceptedAddGameDialog);
+                addGameDialog = dialog
+                dialog.open();
+            }
+        }
     }
 
+    function acceptedAddGameDialog() {
+        var result = userIntGames.startChangeGame(0, addGameDialog.seasonIndex, addGameDialog.competition,
+                                     addGameDialog.homeTeam, addGameDialog.awayTeam, addGameDialog.date,
+                                                  addGameDialog.score);
+        if (result !== 1)
+            toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
+    }
+
+
     function pageOpenedUpdateView() {
+
+        if (globalUserData.userIsGameAddingEnabled() || userIntGames.isDebuggingEnabled())
+            updateHeaderFromMain("StamOrga", "images/add.png")
+        else
+            updateHeaderFromMain("StamOrga", "")
         showListedGames()
     }
 
@@ -131,6 +162,19 @@ Flickable {
             txtInfoLoadingGames.text = "Letztes Update am " + globalUserData.getGamePlayLastUpdate()
         } else
             txtInfoLoadingGames.text = "Keine Daten zum Anzeigen\nZiehen zum Aktualisieren"
+    }
+
+    function notifyGameChangedFinished(result) {
+        if (result === 1) {
+            busyLoadingIndicatorGames.visible = true
+            txtInfoLoadingGames.text = "Lade Spielliste"
+            userIntGames.startListGettingGames()
+            for (var j = columnLayoutGames.children.length; j > 0; j--) {
+                columnLayoutGames.children[j - 1].destroy()
+            }
+        }
+        else
+            toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
     }
 
     function notifyUserIntConnectionFinished(result) {}

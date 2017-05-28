@@ -85,6 +85,7 @@ private:
     void startSendNewPlaceTicket(DataConRequest request);
     void startSendChangeTicketState(DataConRequest request);
     void startSendAvailableTicketListRequest(DataConRequest request);
+    void startSendChangeGameRequest(DataConRequest request);
 
 
     void   checkNewOncomingData();

@@ -128,7 +128,7 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol* msg)
 
         play->setSeasonIndex(*(qint8*)(pData + offset));
         offset += 1;
-        play->setCompetition(*(qint8*)(pData + offset));
+        play->setCompetition(CompetitionIndex(*(qint8*)(pData + offset)));
         offset += 1;
 
         /* On Android there are problems reading from qint64 pointers???? SIGBUS*/

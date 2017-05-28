@@ -93,7 +93,7 @@ void GlobalData::loadGlobalSettings()
         play->setSeasonIndex(quint8(this->m_pMainUserSettings->value(PLAY_SAISON_INDEX, 0).toUInt()));
         play->setIndex(this->m_pMainUserSettings->value(ITEM_INDEX, 0).toUInt());
         play->setScore(this->m_pMainUserSettings->value(PLAY_SCORE, "").toString());
-        play->setCompetition(quint8(this->m_pMainUserSettings->value(PLAY_COMPETITION, 0).toUInt()));
+        play->setCompetition(CompetitionIndex(quint8(this->m_pMainUserSettings->value(PLAY_COMPETITION, 0).toUInt())));
 
         QQmlEngine::setObjectOwnership(play, QQmlEngine::CppOwnership);
         this->addNewGamePlay(play);

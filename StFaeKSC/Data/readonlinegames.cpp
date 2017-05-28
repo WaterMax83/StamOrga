@@ -66,25 +66,26 @@ int ReadOnlineGames::DoBackgroundWork()
     connect(this->m_networkUpdate, &QTimer::timeout, this, &ReadOnlineGames::slotNetWorkUpdateTimeout);
 
 #ifdef QT_DEBUG
-    OnlineGameInfo* gameInfo = new OnlineGameInfo();
-    gameInfo->m_index        = 1;
-    gameInfo->m_timeStamp    = QDateTime::currentDateTime().addMonths(-2).toMSecsSinceEpoch();
-    gameInfo->m_gameFinished = true;
-    this->m_onlineGames.append(gameInfo);
+//    OnlineGameInfo* gameInfo = new OnlineGameInfo();
+//    gameInfo->m_index        = 1;
+//    gameInfo->m_timeStamp    = QDateTime::currentDateTime().addMonths(-2).toMSecsSinceEpoch();
+//    gameInfo->m_gameFinished = true;
+//    this->m_onlineGames.append(gameInfo);
 
-    gameInfo                 = new OnlineGameInfo();
-    gameInfo->m_index        = 2;
-    gameInfo->m_timeStamp    = QDateTime::currentDateTime().addDays(-5).toMSecsSinceEpoch();
-    gameInfo->m_gameFinished = true;
-    this->m_onlineGames.append(gameInfo);
+//    gameInfo                 = new OnlineGameInfo();
+//    gameInfo->m_index        = 2;
+//    gameInfo->m_timeStamp    = QDateTime::currentDateTime().addDays(-5).toMSecsSinceEpoch();
+//    gameInfo->m_gameFinished = true;
+//    this->m_onlineGames.append(gameInfo);
 
-    gameInfo              = new OnlineGameInfo();
-    gameInfo->m_index     = 3;
-    gameInfo->m_timeStamp = QDateTime::currentDateTime().addSecs(10).toMSecsSinceEpoch();
-    this->m_onlineGames.append(gameInfo);
+//    gameInfo              = new OnlineGameInfo();
+//    gameInfo->m_index     = 3;
+//    gameInfo->m_timeStamp = QDateTime::currentDateTime().addSecs(10).toMSecsSinceEpoch();
+//    this->m_onlineGames.append(gameInfo);
 
-    this->m_currentRequestIndex = 0;
+//    this->m_currentRequestIndex = 0;
     qInfo().noquote() << "Did not use ReadOnlineGame because of debugging";
+    return 0;
 #endif
 
     this->checkNewNetworkRequest(false);

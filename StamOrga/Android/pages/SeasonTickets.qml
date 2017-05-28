@@ -217,7 +217,6 @@ Flickable {
                 id: menuItemRemove
                 onClicked: {
                     var component = Qt.createComponent("../components/AcceptDialog.qml");
-                    component
                     if (component.status === Component.Ready) {
                         var dialog = component.createObject(mainPaneTickets,{popupType: 1});
                         dialog.headerText = "Bestätigung";

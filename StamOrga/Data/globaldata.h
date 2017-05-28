@@ -26,9 +26,13 @@
 #include <QtNetwork/QHostInfo>
 
 #include "../../Common/General/backgroundcontroller.h"
+#include "../../Common/General/globalfunctions.h"
 #include "../../Common/General/logging.h"
 #include "gameplay.h"
 #include "seasonticket.h"
+
+
+#define USER_IS_ENABLED(val) ((this->m_UserProperties & val) > 0 ? true : false)
 
 class GlobalData : public QObject
 {
@@ -178,7 +182,8 @@ public:
         }
     }
 
-    Q_INVOKABLE bool userIsDebugEnabled() { return (this->m_UserProperties & 0x1) > 0 ? true : false; }
+    Q_INVOKABLE bool userIsDebugEnabled() { return USER_IS_ENABLED(USER_ENABLE_LOG); }
+    Q_INVOKABLE bool userIsGameAddingEnabled() { return USER_IS_ENABLED(USER_ENABLE_ADD_GAME); }
     void SetUserProperties(quint32 value) { this->m_UserProperties = value; }
 
     void saveGlobalUserSettings();

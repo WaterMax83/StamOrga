@@ -184,6 +184,27 @@ qint32 ConnectionHandling::startListAvailableTicket(quint32 gameIndex)
     return ERROR_CODE_SUCCESS;
 }
 
+qint32 ConnectionHandling::startChangeGame(const quint32 index, const quint32 sIndex,
+                                           const QString competition, const QString home,
+                                           const QString away, const QString date,
+                                           const QString score)
+{
+    if (sIndex > 34 || competition == "" || home == "" || away == "" || date == "")
+        return ERROR_CODE_WRONG_PARAMETER;
+    if (home.contains(";") || away.contains(";") || date.contains(";"))
+        return ERROR_CODE_WRONG_PARAMETER;
+
+    CompetitionIndex compIndex = getCompetitionIndex(competition);
+    if (compIndex == NO_COMPETITION)
+        return ERROR_CODE_WRONG_PARAMETER;
+
+    QString        val = QString("%1;%2;%3;%4;%5;%6;%7").arg(home, away, date, score).arg(index).arg(sIndex).arg(compIndex);
+    DataConRequest req(OP_CODE_CMD_REQ::REQ_CHANGE_GAME);
+    req.m_lData.append(val);
+    this->sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
+}
+
 
 /*
  * Answer function after connection with username

@@ -87,6 +87,12 @@ qint32 UserInterface::startRequestAvailableTickets(quint32 gameIndex)
     return this->m_pConHandle->startListAvailableTicket(gameIndex);
 }
 
+qint32 UserInterface::startChangeGame(const quint32 index, const quint32 sIndex, const QString competition,
+                                      const QString home, const QString away, const QString date, const QString score)
+{
+    return this->m_pConHandle->startChangeGame(index, sIndex, competition, home, away, date, score);
+}
+
 void UserInterface::slConnectionRequestFinished(qint32 result)
 {
     //this->ui->btnSendData->setEnabled(true);
@@ -103,55 +109,11 @@ void UserInterface::slVersionRequestFinished(qint32 result, QString msg)
 }
 
 
-//void UserInterface::slUserPropertiesFinished(qint32 result)
-//{
-//    emit this->notifyUserPropertiesFinished(result);
-//}
-
 void UserInterface::slUpdatePasswordRequestFinished(qint32 result, QString newPassWord)
 {
     emit this->notifyUpdatePasswordRequestFinished(result, newPassWord);
 }
 
-//void UserInterface::slGettingGamesListFinished(qint32 result)
-//{
-//    emit this->notifyGamesListFinished(result);
-//}
-
-//void UserInterface::slUpdateReadableNameRequestFinished(qint32 result)
-//{
-//    emit this->notifyUpdateReadableNameRequest(result);
-//}
-
-//void UserInterface::slSeasonTicketAddFinished(qint32 result)
-//{
-//    emit this->notifySeasonTicketAddFinished(result);
-//}
-
-//void UserInterface::slSeasonTicketRemoveFinished(qint32 result)
-//{
-//    emit this->notifySeasonTicketRemoveFinished(result);
-//}
-
-//void UserInterface::slSeasonTicketNewPlaceFinished(qint32 result)
-//{
-//    emit this->notifySeasonTicketNewPlaceFinished(result);
-//}
-
-//void UserInterface::slSeasonTicketListFinished(qint32 result)
-//{
-//    emit this->notifySeasonTicketListFinished(result);
-//}
-
-//void UserInterface::slAvailableTicketFreeFinished(qint32 result)
-//{
-//    emit this->notifyAvailableTicketStateChangedFinished(result);
-//}
-
-//void UserInterface::slAvailableTicketListFinished(qint32 result)
-//{
-//    emit this->notifyAvailableTicketListFinsished(result);
-//}
 
 void UserInterface::slCommandFinished(quint32 command, qint32 result)
 {
@@ -190,6 +152,10 @@ void UserInterface::slCommandFinished(quint32 command, qint32 result)
 
     case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS:
         emit this->notifyAvailableTicketListFinsished(result);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_CHANGE_GAME:
+        emit this->notifyChangedGameFinished(result);
         break;
 
     default:

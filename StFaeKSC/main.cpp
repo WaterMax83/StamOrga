@@ -18,6 +18,7 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDataStream>
+#include <QtCore/QDateTime>
 #include <QtCore/QFile>
 
 
@@ -41,21 +42,8 @@ int main(int argc, char* argv[])
     GlobalData globalData;
     Console*    con = new Console(&globalData);
 
-    //    QString logginPath = getUserHomeConfigPath() + "/Log/Actual.log";
-
-    //    if (!checkFilePathExistAndCreate(logginPath)) {
-    //        CONSOLE_CRITICAL(QString("Could not create file for Logging"));
-    //    } else {
-    //        QFile* logFile = new QFile(logginPath);
-    //        if (logFile->open(QFile::ReadWrite | QFile::Text | QFile::Append))
-    //            logSetLogFile(logFile);
-    //    }
-
-    //    qInstallMessageHandler(logMyMessageLogginOutPut);
-
     qInfo() << "*************************************************************";
     qInfo() << "Starting StFaeKSC";
-
 
     BackgroundController ctrlUdp;
     if (argc > 1 && QString(argv[1]) == "-noServer") {

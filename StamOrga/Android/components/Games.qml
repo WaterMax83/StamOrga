@@ -57,6 +57,9 @@ Rectangle {
             onClicked: {
                 mainRectangleGame.clickedCurrentGame(m_gamePlayItem);
             }
+            onPressAndHold: {
+                console.log("Press and hold clicked");
+            }
         }
 
         RowLayout {
@@ -82,6 +85,7 @@ Rectangle {
                 rightPadding: 1
                 Layout.alignment: Qt.AlignRight
                 text : "5"
+                visible: false
             }
 
             Rectangle {
@@ -95,6 +99,7 @@ Rectangle {
                 height: labelFreeTickets.height / 1.5
                 radius: width * 0.5
                 color: "green"
+                visible: false
             }
         }
 
@@ -148,7 +153,7 @@ Rectangle {
         if (gamePlayItem !== null) {
             m_gamePlayItem = gamePlayItem
             labelLineDate.text = gamePlayItem.timestamp;
-            labelLineWhat.text = gamePlayItem.getCompetitionIndex() + " - " + gamePlayItem.competition
+            labelLineWhat.text = gamePlayItem.getCompetitionLine() + " - " + gamePlayItem.competition
             labelLineHome.text = gamePlayItem.home;
             if (gamePlayItem.home === "KSC")
                 labelLineHome.font.letterSpacing = 2

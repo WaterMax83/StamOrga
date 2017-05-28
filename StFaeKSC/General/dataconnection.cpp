@@ -459,3 +459,40 @@ MessageProtocol* DataConnection::requestGetAvailableTicketList(MessageProtocol* 
     }
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_AVAILABLE_TICKETS, rCode);
 }
+
+MessageProtocol* DataConnection::requestChangeGame(MessageProtocol *msg)
+{
+    if (msg->getDataLength() < 4) {
+        qWarning() << QString("Wrong message size for request change game for user %1").arg(this->m_pUserConData->userName);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME, ERROR_CODE_WRONG_SIZE);
+    }
+
+    QString info(msg->getPointerToData());
+    QStringList parts = info.split(";");
+    if (parts.length() < 7) {
+        qWarning() << QString("Wrong message content count %1 for request change game for user %2").arg(parts.length()).arg(this->m_pUserConData->userName);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME, ERROR_CODE_WRONG_PARAMETER);
+    }
+
+
+    QString home = parts[0];
+    QString away = parts[1];
+    QDateTime test = QDateTime::fromString(parts[2], "dd.MM.yyyy hh:mm");
+    qint64 timestamp = test.toMSecsSinceEpoch();
+    if (timestamp < 0) {
+        qWarning() << QString("Wrong timestamp %1 for request change game for user %2").arg(parts[2], this->m_pUserConData->userName);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME, ERROR_CODE_WRONG_PARAMETER);
+    }
+    QString score = parts[3];
+    qint32 index = parts[4].toInt();
+    quint32 sIndex = parts[5].toUInt();
+    CompetitionIndex comp = CompetitionIndex(parts[6].toUInt());
+
+    qint32 result = this->m_pGlobalData->m_GamesList.addNewGame(home, away, timestamp, sIndex, score, comp);
+    if (result < 0)
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME, result);
+    if (index > 0 && index != result) {
+        qWarning().noquote() << QString("user %1 tried to changed game %2, but added game %3").arg(this->m_pUserConData->userName).arg(index).arg(result);
+    }
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME, ERROR_CODE_SUCCESS);
+}

@@ -168,6 +168,10 @@ MessageProtocol* UdpDataServer::checkNewMessage(MessageProtocol* msg)
             ack = this->m_pDataConnection->requestGetAvailableTicketList(msg);
             break;
 
+        case OP_CODE_CMD_REQ::REQ_CHANGE_GAME:
+            ack = this->m_pDataConnection->requestChangeGame(msg);
+            break;
+
         default:
             qWarning().noquote() << QString("Unkown command 0x%1").arg(QString::number(msg->getIndex()));
             break;

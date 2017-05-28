@@ -20,7 +20,10 @@
 #define GAMEPLAY_H
 
 #include <QtCore/QDateTime>
+#include <QtCore/QDebug>
 #include <QtCore/QObject>
+
+#include "../../Common/General/globalfunctions.h"
 
 class GamePlay : public QObject
 {
@@ -78,23 +81,14 @@ public:
         }
     }
 
-    QString competition()
-    {
-        switch (this->m_comp) {
-        case 1:
-            return "1 Bundesliga";
-        case 2:
-            return "2 Bundesliga";
-        default:
-            return "Unknown";
-        }
-    }
+    QString competition() { return getCompetitionString(this->m_comp); }
+
     quint8 compValue()
     {
         return this->m_comp;
     }
 
-    void setCompetition(quint8 co)
+    void setCompetition(CompetitionIndex co)
     {
         if (this->m_comp != co) {
             this->m_comp = co;
@@ -120,17 +114,22 @@ public:
         }
     }
 
-    Q_INVOKABLE QString getCompetitionIndex()
+    Q_INVOKABLE QString getCompetitionLine()
     {
-        if (this->m_comp == 1 || this->m_comp == 2) {
+        if (this->m_comp == BUNDESLIGA_1 || this->m_comp == BUNDESLIGA_2 || this->m_comp == LIGA_3)
             return QString("%1. Spieltag").arg(this->m_seasonIndex);
-        }
+        else if (this->m_comp == DFB_POKAL || this->m_comp == KROMBACHER_POKAL)
+            return QString("%1 Runde").arg(this->m_seasonIndex);
+        else if (this->m_comp == TESTSPIEL)
+            return "";
+
         return "not implemented";
     }
 
     Q_INVOKABLE quint16 getFreeTickets() { return this->m_freeTickets; }
     void setFreeTickets(quint16 number)
     {
+        qDebug() << QString("Set Free Tickets").arg(number);
         this->m_freeTickets = number;
     }
 
@@ -163,16 +162,16 @@ signals:
 public slots:
 
 private:
-    QString m_home;
-    QString m_away;
-    QString m_score;
-    quint8  m_comp;
-    quint32 m_index;
-    quint8  m_seasonIndex;
-    qint64  m_timestamp;
-    quint16 m_freeTickets;
-    quint16 m_blockedTickets;
-    quint16 m_reservedTickets;
+    QString          m_home;
+    QString          m_away;
+    QString          m_score;
+    CompetitionIndex m_comp;
+    quint32          m_index;
+    quint8           m_seasonIndex;
+    qint64           m_timestamp;
+    quint16          m_freeTickets;
+    quint16          m_blockedTickets;
+    quint16          m_reservedTickets;
 };
 
 #endif // GAMEPLAY_H

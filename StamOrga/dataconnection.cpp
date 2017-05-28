@@ -179,6 +179,10 @@ void DataConnection::checkNewOncomingData()
             request.m_result = this->m_pDataHandle->getHandleAvailableTicketListResponse(msg, request.m_lData.at(0).toUInt());
             break;
 
+        case OP_CODE_CMD_RES::ACK_CHANGE_GAME:
+            request.m_result = msg->getIntData();
+            break;
+
         default:
             delete msg;
             continue;
@@ -323,6 +327,16 @@ void DataConnection::startSendAvailableTicketListRequest(DataConRequest request)
     this->sendMessageRequest(&msg, request);
 }
 
+void DataConnection::startSendChangeGameRequest(DataConRequest request)
+{
+    QByteArray data;
+    data.append(request.m_lData.at(0));
+    data.append(char(0x00));
+
+    MessageProtocol msg(request.m_request, data);
+    this->sendMessageRequest(&msg, request);
+}
+
 void DataConnection::slotConnectionTimeoutFired()
 {
     qDebug() << "DataConnection: Timeout from Data UdpServer";
@@ -456,6 +470,10 @@ void DataConnection::startSendNewRequest(DataConRequest request)
 
     case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS:
         this->startSendAvailableTicketListRequest(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_CHANGE_GAME:
+        this->startSendChangeGameRequest(request);
         break;
 
     default:

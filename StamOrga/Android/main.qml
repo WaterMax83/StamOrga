@@ -201,11 +201,6 @@ ApplicationWindow {
         initialItem: viewGames
 
         onCurrentItemChanged: {
-            if (stackView.depth === 1) {
-                imageToolButton.visible = false
-//                imageToolButton.source = "images/refresh.png"
-                titleLabel.text = "StamOrga"
-            }
             stackView.currentItem.pageOpenedUpdateView()
         }
     }
@@ -311,6 +306,9 @@ ApplicationWindow {
         }
         onNotifyAvailableTicketListFinsished: {
             stackView.currentItem.notifyAvailableTicketListFinished(result);
+        }
+        onNotifyChangedGameFinished: {
+            stackView.currentItem.notifyGameChangedFinished(result);
         }
     }
 

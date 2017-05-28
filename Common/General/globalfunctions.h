@@ -69,6 +69,7 @@ extern bool checkFilePathExistAndCreate(const QString& path);
 #define ERROR_CODE_IN_PAST -8
 #define ERROR_CODE_NOT_POSSIBLE -9
 #define ERROR_CODE_MISSING_TICKET -10
+#define ERROR_CODE_WRONG_PARAMETER -11
 #define ERROR_CODE_NO_USER -20
 #define ERROR_CODE_WRONG_PASSWORD -21
 
@@ -90,8 +91,16 @@ enum CompetitionIndex {
     LIGA_3           = 3,
     DFB_POKAL        = 10,
     KROMBACHER_POKAL = 11,
-    TESTSPIEL        = 20
+    TESTSPIEL        = 20,
+    MAX_COMPETITION  = 21,
 };
+
+extern CompetitionIndex getCompetitionIndex(QString comp);
+extern QString getCompetitionString(CompetitionIndex index);
+
+
+#define USER_ENABLE_LOG 0x1
+#define USER_ENABLE_ADD_GAME 0x2
 
 
 #endif // GLOBALFUNCTIONS_H

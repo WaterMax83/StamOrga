@@ -47,6 +47,8 @@ public:
     qint32 startListSeasonTickets();
     qint32 startChangeSeasonTicketState(quint32 tickedIndex, quint32 gameIndex, quint32 state, QString name);
     qint32 startListAvailableTicket(quint32 gameIndex);
+    qint32 startChangeGame(const quint32 index, const quint32 sIndex, const QString competition,
+                           const QString home, const QString away, const QString date, const QString score);
 
 
     void setGlobalData(GlobalData* pData)

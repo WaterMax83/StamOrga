@@ -88,6 +88,8 @@ QString getErrorCodeString(qint32 code)
         return QString("Nicht möglich, liegt in der Vergangenheit: %1").arg(code);
     case ERROR_CODE_NOT_POSSIBLE:
         return QString("Nicht möglich: %1").arg(code);
+    case ERROR_CODE_WRONG_PARAMETER:
+        return QString("Falsche Parameter: %1").arg(code);
     case ERROR_CODE_MISSING_TICKET:
         return QString("Karte nicht vorhanden: %1").arg(code);
     default:
@@ -104,4 +106,42 @@ inline uint CalculatePaddingSize(uint uLength)
         return DEFAULT_PADDING_SIZE - nRem;
     else
         return 0;
+}
+
+CompetitionIndex getCompetitionIndex(QString comp)
+{
+    if (comp == "1.Bundesliga")
+        return BUNDESLIGA_1;
+    if (comp == "2.Bundesliga")
+        return BUNDESLIGA_2;
+    if (comp == "3.Liga")
+        return LIGA_3;
+    if (comp == "DFB Pokal")
+        return DFB_POKAL;
+    if (comp == "Badischer Pokal")
+        return KROMBACHER_POKAL;
+    if (comp == "TestSpiel")
+        return TESTSPIEL;
+
+    return NO_COMPETITION;
+}
+
+QString getCompetitionString(CompetitionIndex index)
+{
+    switch (index) {
+    case BUNDESLIGA_1:
+        return "1.Bundesliga";
+    case BUNDESLIGA_2:
+        return "2.Bundesliga";
+    case LIGA_3:
+        return "3.Liga";
+    case DFB_POKAL:
+        return "DFB Pokal";
+    case KROMBACHER_POKAL:
+        return "Badischer Pokal";
+    case TESTSPIEL:
+        return "TestSpiel";
+    }
+
+    return "not implemented";
 }
