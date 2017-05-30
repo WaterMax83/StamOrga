@@ -25,7 +25,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
 
-
 #ifdef STAMORGA_APP
 #include "../../Common/General/backgroundworker.h"
 #else

@@ -27,6 +27,7 @@ Rectangle {
     property var m_gamePlayItem
 
     signal clickedCurrentGame(var sender)
+    signal pressedAndHoldCurrentGame(var sender)
 
     width: parent.width
     height: childrenRect.height * 1.05
@@ -58,7 +59,7 @@ Rectangle {
                 mainRectangleGame.clickedCurrentGame(m_gamePlayItem);
             }
             onPressAndHold: {
-                console.log("Press and hold clicked");
+                mainRectangleGame.pressedAndHoldCurrentGame(m_gamePlayItem);
             }
         }
 
@@ -152,8 +153,8 @@ Rectangle {
     function showGamesInfo(gamePlayItem) {
         if (gamePlayItem !== null) {
             m_gamePlayItem = gamePlayItem
-            labelLineDate.text = gamePlayItem.timestamp;
-            labelLineWhat.text = gamePlayItem.getCompetitionLine() + " - " + gamePlayItem.competition
+            labelLineDate.text = gamePlayItem.timestampReadableLine();
+            labelLineWhat.text = gamePlayItem.getCompetitionLine() + gamePlayItem.competition
             labelLineHome.text = gamePlayItem.home;
             if (gamePlayItem.home === "KSC")
                 labelLineHome.font.letterSpacing = 2
@@ -175,6 +176,7 @@ Rectangle {
 
             var freeTickets = gamePlayItem.getFreeTickets();
             if (freeTickets > 0) {
+                labelFreeTickets.visible = true;
                 labelFreeTickets.text = freeTickets;
                 imageFreeTickets.visible = true;
             } else {

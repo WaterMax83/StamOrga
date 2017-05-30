@@ -28,6 +28,13 @@ Flickable {
     id: flickableGames
     property UserInterface userIntGames
     contentHeight: mainPaneGames.height
+    rebound: Transition {
+            NumberAnimation {
+                properties: "y"
+                duration: 1000
+                easing.type: Easing.OutBounce
+            }
+        }
 
     onDragEnded: {
         if (flickableGames.contentY < -100) {
@@ -60,6 +67,7 @@ Flickable {
     Pane {
         id: mainPaneGames
         width: parent.width
+        anchors.top: parent.top
 
         ColumnLayout {
             id: mainColumnLayoutGames
@@ -97,13 +105,13 @@ Flickable {
         }
     }
 
-    property var addGameDialog;
+    property var changeGameDialog;
 
     function toolButtonClicked() {
         if (globalUserData.userIsGameAddingEnabled() || userIntGames.isDebuggingEnabled()) {
             var component = Qt.createComponent("../components/ChangeGameDialog.qml");
             if (component.status === Component.Ready) {
-                var dialog = component.createObject(mainPaneGames,{popupType: 1});
+                var dialog = component.createObject(flickableGames,{popupType: 1});
                 dialog.headerText = "Neues Spiel";
                 dialog.parentHeight = flickableGames.height
                 dialog.parentWidth = flickableGames.width
@@ -113,19 +121,27 @@ Flickable {
                 dialog.seasonIndex = 1;
                 dialog.competitionIndex = 2;
                 dialog.date = "";
-                dialog.acceptedDialog.connect(acceptedAddGameDialog);
-                addGameDialog = dialog
+                dialog.index = 0;
+                dialog.acceptedDialog.connect(acceptedChangeGameDialog);
+                changeGameDialog = dialog
                 dialog.open();
             }
         }
     }
 
-    function acceptedAddGameDialog() {
-        var result = userIntGames.startChangeGame(0, addGameDialog.seasonIndex, addGameDialog.competition,
-                                     addGameDialog.homeTeam, addGameDialog.awayTeam, addGameDialog.date,
-                                                  addGameDialog.score);
-        if (result !== 1)
+    function acceptedChangeGameDialog() {
+        var result = userIntGames.startChangeGame(changeGameDialog.index, changeGameDialog.seasonIndex,
+                                                  changeGameDialog.competition, changeGameDialog.homeTeam,
+                                                  changeGameDialog.awayTeam, changeGameDialog.date,
+                                                  changeGameDialog.score);
+        if (result !== 1) {
             toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
+            busyLoadingIndicatorGames.visible = true
+            if (changeGameDialog.index === 0)
+                txtInfoLoadingGames.text = "Füge Spiel hinzu"
+            else
+                txtInfoLoadingGames.text = "Ändere Spiel"
+        }
     }
 
 
@@ -200,6 +216,27 @@ Flickable {
                         updateHeaderFromMain("Auswärts", "")
                 } else
                     console.log("Fehler beim laden " + component.errorString())
+            }
+            onPressedAndHoldCurrentGame: {
+                if (globalUserData.userIsGameAddingEnabled() || userIntGames.isDebuggingEnabled()) {
+                    var component = Qt.createComponent("../components/ChangeGameDialog.qml");
+                    if (component.status === Component.Ready) {
+                        var dialog = component.createObject(flickableGames,{popupType: 1});
+                        dialog.headerText = "Spiel ändern";
+                        dialog.parentHeight = flickableGames.height
+                        dialog.parentWidth = flickableGames.width
+                        dialog.homeTeam = sender.home;
+                        dialog.awayTeam = sender.away;
+                        dialog.score = sender.score;
+                        dialog.seasonIndex = sender.seasonIndex;
+                        dialog.competitionIndex = sender.competitionValue() - 1;
+                        dialog.date = sender.timestamp;
+                        dialog.index = sender.index;
+                        dialog.acceptedDialog.connect(acceptedChangeGameDialog);
+                        changeGameDialog = dialog
+                        dialog.open();
+                    }
+                }
             }
         }
     }

@@ -31,15 +31,18 @@ Item {
     Pane {
         id: mainPaneCurrentGame
         width: parent.width
-
-
+        height: parent.height
 
         ColumnLayout {
             id: mainColumnLayoutCurrentGame
             width: parent.width
+            height: parent.height
+            Layout.alignment: Qt.AlignTop
+
             MyComponents.Games {
                 id: gameHeader
                 width: parent.width
+                Layout.alignment: Qt.AlignTop
             }
 
             ColumnLayout {
@@ -67,14 +70,38 @@ Item {
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             }
 
-            CurrentTicketInfo {
-                id: currentTicketInfo
+            SwipeView {
+                id: swipeViewCurrentHomeGame
+                anchors.top : toolSeparator1.bottom
+                anchors.bottom: parent.bottom
                 width: parent.width
-                implicitHeight: itemCurrentGame.height
+                currentIndex: 0
+                Layout.alignment: Qt.AlignTop
             }
+
         }
     }
 
+    PageIndicator {
+        count: swipeViewCurrentHomeGame.count
+        currentIndex: swipeViewCurrentHomeGame.currentIndex
+        anchors.bottom: parent.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+    }
+
+
+    CurrentTicketInfo {
+        id: currentTicketInfo
+    }
+
+    Pane {
+        id: testPane
+        width: swipeViewCurrentHomeGame.width
+        height: swipeViewCurrentHomeGame.height
+        Label  {
+            text: "Hallo Welt0";
+        }
+    }
 
 
     function acceptedEditReserveNameDialog(text)
@@ -83,6 +110,9 @@ Item {
     }
 
     function showAllInfoAboutGame(sender) {
+
+        swipeViewCurrentHomeGame.addItem(currentTicketInfo)
+        swipeViewCurrentHomeGame.addItem(testPane)
 
         m_gamePlayCurrentItem = sender
         gameHeader.showGamesInfo(sender)

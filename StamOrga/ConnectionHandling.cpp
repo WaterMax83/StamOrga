@@ -189,10 +189,14 @@ qint32 ConnectionHandling::startChangeGame(const quint32 index, const quint32 sI
                                            const QString away, const QString date,
                                            const QString score)
 {
-    if (sIndex > 34 || competition == "" || home == "" || away == "" || date == "")
+    if (sIndex > 34 || competition == "" || home == "" || away == "" || date == "") {
+        qWarning() << "Standart parameter for changing game are wrong";
         return ERROR_CODE_WRONG_PARAMETER;
-    if (home.contains(";") || away.contains(";") || date.contains(";"))
+    }
+    if (home.contains(";") || away.contains(";") || date.contains(";")) {
+        qWarning() << "String parameter for changing game contain semicolons";
         return ERROR_CODE_WRONG_PARAMETER;
+    }
 
     CompetitionIndex compIndex = getCompetitionIndex(competition);
     if (compIndex == NO_COMPETITION)

@@ -35,6 +35,7 @@ Dialog {
     property alias competitionIndex : comboBoxCompetition.currentIndex
     property alias competition : comboBoxCompetition.currentText
     property alias date : inputDate.text
+    property var index
 
 
     signal acceptedDialog()

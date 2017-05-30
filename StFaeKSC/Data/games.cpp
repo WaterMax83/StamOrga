@@ -102,7 +102,7 @@ int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sInde
 
     if (saison == 0) {
         QDate date = QDateTime::fromMSecsSinceEpoch(timestamp).date();
-        if (date.month() >= 7)
+        if (date.month() >= 6)
             saison = date.year();
         else
             saison = date.year() - 1;
@@ -113,7 +113,7 @@ int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sInde
         //        QString info = QString("%1 : %2").arg(sIndex).arg(comp);
         //        qInfo() << (QString("Game \"%1\" already exists, updating info").arg(info));
 
-        QMutexLocker locker(&this->m_mInternalInfoMutex);
+        this->m_mInternalInfoMutex.lock();
 
         if (pGame->m_itemName != home) {
             if (this->updateItemValue(pGame, ITEM_NAME, QVariant(home)))
@@ -128,13 +128,16 @@ int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sInde
                 pGame->m_timestamp = timestamp;
             }
 
+            this->m_mInternalInfoMutex.unlock();
             this->sortGamesListByTime();
+            this->m_mInternalInfoMutex.lock();
         }
         if (pGame->score != score && score.size() > 0) {
             if (this->updateItemValue(pGame, PLAY_SCORE, QVariant(score)))
                 pGame->score = score;
         }
 
+        this->m_mInternalInfoMutex.unlock();
         return pGame->m_index;
     }
 

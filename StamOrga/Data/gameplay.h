@@ -65,9 +65,13 @@ public:
         }
     }
 
-    QString timestamp()
+    Q_INVOKABLE QString timestampReadableLine()
     {
         return QDateTime::fromMSecsSinceEpoch(this->m_timestamp).toString("ddd, dd.MM.yy hh:mm");
+    }
+    QString timestamp()
+    {
+        return QDateTime::fromMSecsSinceEpoch(this->m_timestamp).toString("dd.MM.yyyy hh:mm");
     }
     qint64 timestamp64Bit()
     {
@@ -83,7 +87,7 @@ public:
 
     QString competition() { return getCompetitionString(this->m_comp); }
 
-    quint8 compValue()
+    Q_INVOKABLE quint8 competitionValue()
     {
         return this->m_comp;
     }
@@ -117,9 +121,9 @@ public:
     Q_INVOKABLE QString getCompetitionLine()
     {
         if (this->m_comp == BUNDESLIGA_1 || this->m_comp == BUNDESLIGA_2 || this->m_comp == LIGA_3)
-            return QString("%1. Spieltag").arg(this->m_seasonIndex);
+            return QString("%1. Spieltag - ").arg(this->m_seasonIndex);
         else if (this->m_comp == DFB_POKAL || this->m_comp == KROMBACHER_POKAL)
-            return QString("%1 Runde").arg(this->m_seasonIndex);
+            return QString("%1 Runde - ").arg(this->m_seasonIndex);
         else if (this->m_comp == TESTSPIEL)
             return "";
 
@@ -129,7 +133,6 @@ public:
     Q_INVOKABLE quint16 getFreeTickets() { return this->m_freeTickets; }
     void setFreeTickets(quint16 number)
     {
-        qDebug() << QString("Set Free Tickets").arg(number);
         this->m_freeTickets = number;
     }
 

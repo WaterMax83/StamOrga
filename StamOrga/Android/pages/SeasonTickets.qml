@@ -30,6 +30,14 @@ Flickable {
 
     contentHeight: mainPaneTickets.height
 
+    rebound: Transition {
+            NumberAnimation {
+                properties: "y"
+                duration: 1000
+                easing.type: Easing.OutBounce
+            }
+        }
+
     onDragEnded: {
         if (flickableTickets.contentY < -100) {
             updateSeasonTicketList();
@@ -159,9 +167,10 @@ Flickable {
         }
 
         if (globalUserData.getSeasonTicketLength() > 0) {
+            /* Somehow the first element is not visible, so create an not used item */
+            var test = seasonTicketItem.createObject(columnLayoutTickets)
             for (var i=0; i<globalUserData.getSeasonTicketLength(); i++) {
                 var sprite = seasonTicketItem.createObject(columnLayoutTickets)
-//                sprite.showTicketInfo(globalUserData.getSeasonTicketFromArrayIndex(i))
                 sprite.showTicketInfo(i);
             }
             txtInfoSeasonTicket.text = "Letztes Update am " + globalUserData.getSeasonTicketLastUpdateString()

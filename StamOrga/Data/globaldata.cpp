@@ -170,7 +170,7 @@ void GlobalData::saveActualGamesList()
         this->m_pMainUserSettings->setValue(PLAY_SAISON_INDEX, this->m_lGamePlay[i]->seasonIndex());
         this->m_pMainUserSettings->setValue(ITEM_INDEX, this->m_lGamePlay[i]->index());
         this->m_pMainUserSettings->setValue(PLAY_SCORE, this->m_lGamePlay[i]->score());
-        this->m_pMainUserSettings->setValue(PLAY_COMPETITION, this->m_lGamePlay[i]->compValue());
+        this->m_pMainUserSettings->setValue(PLAY_COMPETITION, this->m_lGamePlay[i]->competitionValue());
     }
 
     this->m_pMainUserSettings->endArray();

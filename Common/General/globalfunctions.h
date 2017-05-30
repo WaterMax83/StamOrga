@@ -89,10 +89,10 @@ enum CompetitionIndex {
     BUNDESLIGA_1     = 1,
     BUNDESLIGA_2     = 2,
     LIGA_3           = 3,
-    DFB_POKAL        = 10,
-    KROMBACHER_POKAL = 11,
-    TESTSPIEL        = 20,
-    MAX_COMPETITION  = 21,
+    DFB_POKAL        = 4,
+    KROMBACHER_POKAL = 5,
+    TESTSPIEL        = 6,
+    MAX_COMPETITION  = 7,
 };
 
 extern CompetitionIndex getCompetitionIndex(QString comp);

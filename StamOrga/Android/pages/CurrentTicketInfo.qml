@@ -25,13 +25,21 @@ import com.watermax.demo 1.0
 
 Flickable {
     id: flickableCurrentTicketInfo
-//    interactive: true
-//    clip: true
     height: parent.height * 1.2
+    contentHeight: mainPaneCurrentTicketInfo.height
+
+    flickableDirection: Flickable.VerticalFlick
+    rebound: Transition {
+            NumberAnimation {
+                properties: "y"
+                duration: 1000
+                easing.type: Easing.OutBounce
+            }
+        }
 
     property int listViewItemHeight : 30
 
-    contentHeight: mainPaneCurrentTicketInfo.height
+
 
     onDragEnded: {
         if (flickableCurrentTicketInfo.contentY < -100) {
@@ -450,19 +458,6 @@ Flickable {
             listViewBlockedTickets.implicitHeight = listViewModelBlockedTickets.count * listViewItemHeight
             listViewReservedTickets.implicitHeight = listViewModelReservedTickets.count * listViewItemHeight * ( 5 / 4)
             listViewFreeTickets.implicitHeight = listViewModelFreeTickets.count * listViewItemHeight
-
-//            if (listViewModelFreeTickets.count > 0)
-//                txtInfoCurrentGameFreeTickets.visible = true
-//            else
-//                txtInfoCurrentGameFreeTickets.visible = false
-//            if (listViewModelReservedTickets.count > 0)
-//                txtInfoCurrentGameReservedTickets.visible = true
-//            else
-//                txtInfoCurrentGameReservedTickets.visible = false
-//            if (listViewModelBlockedTickets.count > 0)
-//                txtInfoCurrentGameBlockedTickets.visible = true
-//            else
-//                txtInfoCurrentGameBlockedTickets.visible = false
 
             txtInfoCurrentGameBlockedTickets.visible = true
             txtInfoCurrentGameReservedTickets.visible = true
