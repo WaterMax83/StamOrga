@@ -75,7 +75,6 @@ Item {
                 anchors.top : toolSeparator1.bottom
                 anchors.bottom: parent.bottom
                 width: parent.width
-                currentIndex: 0
                 Layout.alignment: Qt.AlignTop
             }
 
@@ -94,13 +93,8 @@ Item {
         id: currentTicketInfo
     }
 
-    Pane {
-        id: testPane
-        width: swipeViewCurrentHomeGame.width
-        height: swipeViewCurrentHomeGame.height
-        Label  {
-            text: "Hallo Welt0";
-        }
+    CurrentMeetInfo {
+        id: currentMeetInfo
     }
 
 
@@ -111,16 +105,17 @@ Item {
 
     function showAllInfoAboutGame(sender) {
 
-        swipeViewCurrentHomeGame.addItem(currentTicketInfo)
-        swipeViewCurrentHomeGame.addItem(testPane)
-
         m_gamePlayCurrentItem = sender
         gameHeader.showGamesInfo(sender)
 
-        if (sender.isGameASeasonTicketGame())
+        if (sender.isGameASeasonTicketGame()) {
+            swipeViewCurrentHomeGame.addItem(currentTicketInfo)
             currentTicketInfo.showAllInfoAboutGame(sender);
-        else
-            currentTicketInfo.visible = false;
+        }
+
+        swipeViewCurrentHomeGame.addItem(currentMeetInfo)
+        swipeViewCurrentHomeGame.currentIndex = swipeViewCurrentHomeGame.count - 1
+        currentMeetInfo.showAllInfoAboutGame(sender);
     }
 
     function pageOpenedUpdateView() {}

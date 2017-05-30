@@ -36,5 +36,7 @@
         <file>pages/Settings.qml</file>
         <file>pages/CurrentTicketInfo.qml</file>
         <file>components/ChangeGameDialog.qml</file>
+        <file>pages/CurrentMeetInfo.qml</file>
+        <file>components/EditableTextWithHint.qml</file>
     </qresource>
 </RCC>
