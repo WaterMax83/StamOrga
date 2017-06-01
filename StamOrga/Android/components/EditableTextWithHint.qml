@@ -29,6 +29,7 @@ Rectangle {
 
     signal textInputChanged();
 
+
     implicitWidth: parent.width
     implicitHeight: 30
     Text {

@@ -38,11 +38,15 @@ Item {
             width: parent.width
             height: parent.height
             Layout.alignment: Qt.AlignTop
+            spacing: 0
 
             MyComponents.Games {
                 id: gameHeader
                 width: parent.width
                 Layout.alignment: Qt.AlignTop
+//                Layout.leftMargin: 10
+//                Layout.rightMargin: 10
+//                Layout.topMargin: 10
             }
 
             ColumnLayout {
@@ -63,31 +67,48 @@ Item {
                 }
             }
 
-            ToolSeparator {
-                id: toolSeparator1
-                orientation: "Horizontal"
-                implicitWidth: mainPaneCurrentGame.width / 3 * 1
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            }
+            TabBar {
+                  id: tabBar
+                  currentIndex: swipeViewCurrentHomeGame.currentIndex
+                  width: parent.width
+                  height: tabButton1.height - 10
+
+                  TabButton {
+                      id: tabButton1
+                      text: "Karten"
+                  }
+                  TabButton {
+                      text: "Treffen"
+                  }
+              }
 
             SwipeView {
                 id: swipeViewCurrentHomeGame
-                anchors.top : toolSeparator1.bottom
+                anchors.top : tabBar.bottom
                 anchors.bottom: parent.bottom
                 width: parent.width
                 Layout.alignment: Qt.AlignTop
+                currentIndex: tabBar.currentIndex
+                onCurrentItemChanged: {
+                    if (currentItem == currentMeetInfo) {
+                        if (currentMeetInfo.isInputAlreadyChanged)
+                            updateHeaderFromMain("", "images/save.png");
+                        else
+                            updateHeaderFromMain("", "images/edit.png");
+                    }
+                    else
+                        updateHeaderFromMain("", "")
+                }
             }
-
         }
     }
 
-    PageIndicator {
-        count: swipeViewCurrentHomeGame.count
-        currentIndex: swipeViewCurrentHomeGame.currentIndex
-        anchors.bottom: parent.bottom
-        anchors.horizontalCenter: parent.horizontalCenter
-    }
-
+//    PageIndicator {
+//        count: swipeViewCurrentHomeGame.count
+//        currentIndex: swipeViewCurrentHomeGame.currentIndex
+//        anchors.bottom: parent.bottom
+//        anchors.horizontalCenter: parent.horizontalCenter
+//    }
 
     CurrentTicketInfo {
         id: currentTicketInfo
@@ -95,6 +116,10 @@ Item {
 
     CurrentMeetInfo {
         id: currentMeetInfo
+    }
+
+    function toolButtonClicked() {
+
     }
 
 
@@ -114,7 +139,8 @@ Item {
         }
 
         swipeViewCurrentHomeGame.addItem(currentMeetInfo)
-        swipeViewCurrentHomeGame.currentIndex = swipeViewCurrentHomeGame.count - 1
+
+//        swipeViewCurrentHomeGame.currentIndex = swipeViewCurrentHomeGame.count - 1
         currentMeetInfo.showAllInfoAboutGame(sender);
     }
 

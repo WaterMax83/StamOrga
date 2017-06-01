@@ -37,20 +37,18 @@ Item {
                 Layout.preferredWidth: parent.width
                 Layout.fillWidth: true
 
-                Text {
-                    id: text1
-                    text: qsTr("Lade beendete Spiele:")
-                    font.bold: true
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                    font.pixelSize: 12
-                }
-                SpinBox {
-                    id: spBoxPort
-                    to: 50
-                    from: 1
-                    //                           value: globalUserData.conMasterPort
-                    Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                MouseArea {
+                    width: imageEditMeetInfo.width
+                    height: imageEditMeetInfo.height
+                    Rectangle {
+                        width: imageEditMeetInfo.width
+                        height: imageEditMeetInfo.height
+                        color: "red"
+                        Image {
+                            id: imageEditMeetInfo
+                            source: "../images/play.png"
+                        }
+                    }
                 }
             }
         }

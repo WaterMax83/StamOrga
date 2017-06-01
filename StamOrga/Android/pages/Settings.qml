@@ -26,10 +26,24 @@ Item {
    id: itemSettings
 
    Component.onDestruction: {
+       var saveSettings = false;
        if (globalUserData.lastGamesLoadCount !== spBoxLoadPastGames.value) {
            globalUserData.lastGamesLoadCount = spBoxLoadPastGames.value;
-           globalUserData.saveGlobalSettings();
+            saveSettings = true;
        }
+
+       if (globalUserData.debugIP !== txtOtherIPAddr.text) {
+            globalUserData.debugIP = txtOtherIPAddr.text;
+            saveSettings = true;
+       }
+
+       if (globalUserData.debugIPWifi !== txtOtherIPAddrWifi.text) {
+            globalUserData.debugIPWifi = txtOtherIPAddrWifi.text;
+            saveSettings = true;
+       }
+
+       if (saveSettings)
+           globalUserData.saveGlobalSettings();
    }
 
    Pane {
@@ -38,6 +52,7 @@ Item {
 
        ColumnLayout {
            width: parent.width
+           spacing: 20
 
            RowLayout {
 //               width: parent.width
@@ -58,6 +73,46 @@ Item {
                    from: 0
                    value: globalUserData.lastGamesLoadCount
                    Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+               }
+           }
+
+           RowLayout {
+//               spacing: 5
+               width: parent.width
+               Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+               visible: userInt.isDebuggingEnabled()
+
+               Label {
+                   text: qsTr("Nutze andere IP:")
+                   Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+               }
+
+               TextField {
+                   id: txtOtherIPAddr
+                   text: globalUserData.debugIP
+                   implicitWidth: parent.width
+                   Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                   Layout.fillWidth: true
+               }
+           }
+
+           ColumnLayout {
+               spacing: 5
+               width: parent.width
+               Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+               visible: userInt.isDebuggingEnabled() && userInt.isDeviceMobile()
+
+               Label {
+                   text: qsTr("Nutze andere IP im Wlan")
+                   Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+               }
+
+               TextField {
+                   id: txtOtherIPAddrWifi
+                   text: globalUserData.debugIPWifi
+                   implicitWidth: parent.width
+                   Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+
                }
            }
        }

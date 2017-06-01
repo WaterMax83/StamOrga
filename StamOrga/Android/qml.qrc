@@ -38,5 +38,12 @@
         <file>components/ChangeGameDialog.qml</file>
         <file>pages/CurrentMeetInfo.qml</file>
         <file>components/EditableTextWithHint.qml</file>
+        <file>images/+material/edit.png</file>
+        <file>images/+material/save.png</file>
+        <file>images/edit.png</file>
+        <file>images/save.png</file>
+        <file>images/+material/play.png</file>
+        <file>images/play.png</file>
+        <file>components/GraphicalButton.qml</file>
     </qresource>
 </RCC>

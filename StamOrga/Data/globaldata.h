@@ -43,6 +43,8 @@ class GlobalData : public QObject
     Q_PROPERTY(QString ipAddr READ ipAddr WRITE setIpAddr NOTIFY ipAddrChanged)
     Q_PROPERTY(quint32 conMasterPort READ conMasterPort WRITE setConMasterPort NOTIFY conMasterPortChanged)
     Q_PROPERTY(quint32 lastGamesLoadCount READ lastGamesLoadCount WRITE setLastGamesLoadCount NOTIFY lastGamesLoadCountChanged)
+    Q_PROPERTY(QString debugIP READ debugIP WRITE setDebugIP NOTIFY debugIPChanged)
+    Q_PROPERTY(QString debugIPWifi READ debugIPWifi WRITE setDebugIPWifi NOTIFY debugIPWifiChanged)
     Q_PROPERTY(bool bIsConnected READ bIsConnected WRITE setbIsConnected NOTIFY bIsConnectedChanged)
 
 public:
@@ -146,6 +148,37 @@ public:
         }
     }
 
+    QString debugIP()
+    {
+        QMutexLocker lock(&this->m_mutexUser);
+        return this->m_debugIP;
+    }
+    void setDebugIP(QString ip)
+    {
+        if (this->m_debugIP != ip) {
+            {
+                QMutexLocker lock(&this->m_mutexUser);
+                this->m_debugIP = ip;
+            }
+            emit debugIPChanged();
+        }
+    }
+
+    QString debugIPWifi()
+    {
+        QMutexLocker lock(&this->m_mutexUser);
+        return this->m_debugIPWifi;
+    }
+    void setDebugIPWifi(QString ip)
+    {
+        if (this->m_debugIPWifi != ip) {
+            {
+                QMutexLocker lock(&this->m_mutexUser);
+                this->m_debugIPWifi = ip;
+            }
+            emit debugIPWifiChanged();
+        }
+    }
 
     quint32 conDataPort()
     {
@@ -238,7 +271,10 @@ signals:
     void ipAddrChanged();
     void conMasterPortChanged();
     void lastGamesLoadCountChanged();
+    void debugIPChanged();
+    void debugIPWifiChanged();
     void bIsConnectedChanged();
+
 
 public slots:
 
@@ -255,6 +291,9 @@ private:
     quint32 m_userIndex;
 
     quint32 m_ulastGamesLoadCount;
+
+    QString m_debugIP;
+    QString m_debugIPWifi;
 
     quint32 m_UserProperties;
 

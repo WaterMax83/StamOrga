@@ -39,8 +39,6 @@ Flickable {
 
     property int listViewItemHeight : 30
 
-
-
     onDragEnded: {
         if (flickableCurrentMeetInfo.contentY < -100) {
 //            loadAvailableTicketList();
@@ -67,38 +65,133 @@ Flickable {
     Pane {
         id: mainPaneCurrentMeetInfo
         width: parent.width
+//        padding: 0
 
         ColumnLayout {
             id: mainColumnLayoutCurrentMeetInfo
             width: parent.width
 
+            RowLayout {
+                width: parent.width
+
+                MyComponents.GraphicalButton {
+                    imageSource: "../images/edit.png"
+                    enabled: isEditMode ? false : true
+                    onClickedButton: {
+                        isEditMode = true;
+                    }
+                    Layout.alignment: Qt.AlignLeft
+                }
+
+                MyComponents.GraphicalButton {
+                    imageSource: "../images/save.png"
+                    enabled: isEditMode ? true : false
+                    onClickedButton: {
+                        isEditMode = false;
+                    }
+                    Layout.alignment: Qt.AlignRight
+                }
+            }
+
+            Button {
+                text: "Test"
+
+            }
+
             MyComponents.EditableTextWithHint {
-                id: whenText
+                id: textWhen
                 hint: "Wann"
                 width: parent.width
+                enabled: isEditMode
+                color: isEditMode ? "#FFFFFF" : "#BBBBBB";
                 onTextInputChanged: checkNewTextInput()
             }
 
             MyComponents.EditableTextWithHint {
-                id: whereText
+                id: textWhere
                 hint: "Wo"
                 width: parent.width
+                enabled: isEditMode
+                color: isEditMode ? "#FFFFFF" : "#BBBBBB";
                 onTextInputChanged: checkNewTextInput()
+            }
+
+            RowLayout {
+                width: parent.width
+
+                MouseArea {
+                    width: clipInfoUpImage.width
+                    height: clipInfoUpImage.height
+                    Image {
+                        id: clipInfoUpImage
+                        source: "../images/play.png"
+                        rotation: isInfoVisible ? 90 : 0
+                    }
+                    onClicked: {
+                        if (isInfoVisible)
+                            isInfoVisible = false
+                        else
+                            isInfoVisible = true;
+                    }
+                }
+
+                Label {
+                    text: "Info"
+                }
+
+                ToolSeparator {
+                    id: toolSeparator1
+                    orientation: "Horizontal"
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    Layout.fillWidth: true
+                }
+            }
+
+            Rectangle {
+                implicitWidth: parent.width
+                implicitHeight: textInfo.height > 0 ? textInfo.height : 30
+                color: isEditMode ? "#FFFFFF" : "#BBBBBB";
+                visible: isInfoVisible
+                Text {
+                    id: hintTextInfo
+                    anchors { fill: parent; leftMargin: 14 }
+                    verticalAlignment: Text.AlignVCenter
+                    color: "#707070"
+                    text: "Info"
+                    opacity: textInfo.text.length ? 0 : 1
+                }
+                TextArea {
+                    id: textInfo
+                    width: parent.width
+                    color: "#505050"
+                    leftPadding: 5
+                    enabled: isEditMode
+                    onTextChanged: checkNewTextInput()
+                }
             }
 
         }
     }
 
+    function toolButtonClicked() {
+
+    }
+
+    property bool isEditMode: false
     property bool isInputAlreadyChanged: false
+    property bool isInfoVisible: false
 
     function showAllInfoAboutGame(sender) {
-//          whenText.init("hallo");
+    //          whenText.init("hallo");
     }
 
     function checkNewTextInput() {
         if (isInputAlreadyChanged)
             return;
         isInputAlreadyChanged = true;
-        updateHeaderFromMain("Hallo Welt", "")
     }
+
 }
+
+
+

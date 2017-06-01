@@ -78,6 +78,10 @@ void GlobalData::loadGlobalSettings()
 
     this->m_pMainUserSettings->beginGroup("GLOBAL_SETTINGS");
     this->setLastGamesLoadCount(this->m_pMainUserSettings->value("LastGamesLoadCount", 5).toInt());
+    this->setDebugIP(this->m_pMainUserSettings->value("DebugIP", "").toString());
+    this->setDebugIPWifi(this->m_pMainUserSettings->value("DebugIPWifi", "").toString());
+
+
     this->m_pMainUserSettings->endGroup();
 
     /* Getting data from last Games */
@@ -146,6 +150,8 @@ void GlobalData::saveGlobalSettings()
     this->m_pMainUserSettings->beginGroup("GLOBAL_SETTINGS");
 
     this->m_pMainUserSettings->setValue("LastGamesLoadCount", this->m_ulastGamesLoadCount);
+    this->m_pMainUserSettings->setValue("DebugIP", this->m_debugIP);
+    this->m_pMainUserSettings->setValue("DebugIPWifi", this->m_debugIPWifi);
 
     this->m_pMainUserSettings->endGroup();
 
@@ -339,29 +345,35 @@ void GlobalData::copyTextToClipBoard(QString text)
 
 void GlobalData::callBackLookUpHost(const QHostInfo& host)
 {
-#ifdef Q_OS_ANDROID
-    if (host.addresses().size() > 0)
+    QString lastIP;
+    if (host.addresses().size() > 0) {
         this->setIpAddr(host.addresses().value(0).toString());
-
-#ifdef QT_DEBUG
-    QNetworkConfigurationManager ncm;
-    QList<QNetworkConfiguration> nc = ncm.allConfigurations();
-
-    foreach (QNetworkConfiguration item, nc) {
-        if (item.bearerType() == QNetworkConfiguration::BearerWLAN) {
-            if (item.state() == QNetworkConfiguration::StateFlag::Active)
-                this->setIpAddr("192.168.0.35");
-            //                 qDebug() << "Wifi " << item.name();
-            //                 qDebug() << "state " << item.state();
-        }
-        //       else {
-        //           qDebug() << "Network " << item.name();
-        //           qDebug() << "state " << item.state();
-        //       }
+        lastIP = host.addresses().value(0).toString();
     }
-#endif
-#endif
+#ifdef QT_DEBUG
+    if (this->m_debugIP != "") {
+        this->setIpAddr(this->m_debugIP);
+        lastIP = this->m_debugIP;
+    }
+#ifdef Q_OS_ANDROID
+
+    if (this->m_debugIPWifi != "") {
+        QNetworkConfigurationManager ncm;
+        QList<QNetworkConfiguration> nc = ncm.allConfigurations();
+        foreach (QNetworkConfiguration item, nc) {
+            if (item.bearerType() == QNetworkConfiguration::BearerWLAN) {
+                if (item.state() == QNetworkConfiguration::StateFlag::Active) {
+                    this->setIpAddr(this->m_debugIPWifi);
+                    lastIP = this->m_debugIPWifi;
+                }
+                //                 qDebug() << "Wifi " << item.name();
+                //                 qDebug() << "state " << item.state();
+            }
+        }
+    }
+#endif // ANDROID
+#endif // DEBUG
 
     if (host.addresses().size() > 0)
-        qDebug().noquote() << QString("Getting host info ip: %1").arg(host.addresses().value(0).toString());
+        qDebug().noquote() << QString("Setting IP Address: %1").arg(lastIP);
 }

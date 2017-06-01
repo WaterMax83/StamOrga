@@ -191,7 +191,9 @@ ApplicationWindow {
         } else {
             imageToolButton.visible = false
         }
-        titleLabel.text = text
+
+        if (text !== "")
+            titleLabel.text = text
     }
 
     StackView {
