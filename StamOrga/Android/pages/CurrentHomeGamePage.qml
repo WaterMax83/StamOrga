@@ -90,14 +90,6 @@ Item {
                 Layout.alignment: Qt.AlignTop
                 currentIndex: tabBar.currentIndex
                 onCurrentItemChanged: {
-                    if (currentItem == currentMeetInfo) {
-                        if (currentMeetInfo.isInputAlreadyChanged)
-                            updateHeaderFromMain("", "images/save.png");
-                        else
-                            updateHeaderFromMain("", "images/edit.png");
-                    }
-                    else
-                        updateHeaderFromMain("", "")
                 }
             }
         }
@@ -141,7 +133,7 @@ Item {
         swipeViewCurrentHomeGame.addItem(currentMeetInfo)
 
 //        swipeViewCurrentHomeGame.currentIndex = swipeViewCurrentHomeGame.count - 1
-        currentMeetInfo.showAllInfoAboutGame(sender);
+        currentMeetInfo.showAllInfoAboutGame();
     }
 
     function pageOpenedUpdateView() {}
@@ -158,6 +150,10 @@ Item {
         currentTicketInfo.notifyAvailableTicketListFinished(result);
         if (result === 1)
             gameHeader.showGamesInfo(m_gamePlayCurrentItem)
+    }
+
+    function notifyChangedMeetingInfoFinished(result) {
+        currentMeetInfo.notifyChangedMeetingInfoFinished(result);
     }
 
     function notifyUserIntConnectionFinished(result) {}

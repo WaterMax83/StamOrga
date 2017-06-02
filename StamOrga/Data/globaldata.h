@@ -29,6 +29,7 @@
 #include "../../Common/General/globalfunctions.h"
 #include "../../Common/General/logging.h"
 #include "gameplay.h"
+#include "meetinginfo.h"
 #include "seasonticket.h"
 
 
@@ -263,6 +264,8 @@ public:
     Q_INVOKABLE QString getSeasonTicketLastUpdateString();
     qint64              getSeasonTicketLastUpdate();
 
+    Q_INVOKABLE MeetingInfo* getMeetingInfo() { return &this->m_meetingInfo; }
+
 signals:
     void
     userNameChanged();
@@ -313,6 +316,8 @@ private:
     QList<SeasonTicketItem*> m_lSeasonTicket;
     qint64                   m_stLastTimeStamp;
     bool existSeasonTicket(SeasonTicketItem* sTicket);
+
+    MeetingInfo m_meetingInfo;
 
     Logging*             m_logApp;
     BackgroundController m_ctrlLog;

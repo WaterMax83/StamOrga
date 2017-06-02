@@ -43,7 +43,7 @@ DataConnection::DataConnection(GlobalData* pGData, QObject* parent)
 MessageProtocol* DataConnection::requestCheckUserLogin(MessageProtocol* msg)
 {
     const char* pData = msg->getPointerToData();
-    quint16     size  = qFromBigEndian(*((quint16*)pData));
+    quint16     size  = qFromLittleEndian(*((quint16*)pData));
     qint32      result;
     if (size > msg->getDataLength())
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_LOGIN_USER, ERROR_CODE_WRONG_SIZE);
@@ -74,7 +74,7 @@ MessageProtocol* DataConnection::requestGetUserProperties()
 {
     QByteArray  answer;
     QDataStream wAnswer(&answer, QIODevice::WriteOnly);
-    wAnswer.setByteOrder(QDataStream::BigEndian);
+    wAnswer.setByteOrder(QDataStream::LittleEndian);
     wAnswer << ERROR_CODE_SUCCESS;
     wAnswer << this->m_pGlobalData->m_UserList.getUserProperties(this->m_pUserConData->userName);
     wAnswer << this->m_pGlobalData->m_UserList.getItemIndex(this->m_pUserConData->userName);
@@ -107,12 +107,12 @@ MessageProtocol* DataConnection::requestUserChangeLogin(MessageProtocol* msg)
     qint32      totalLength = (qint32)msg->getDataLength();
     const char* pData       = msg->getPointerToData();
 
-    quint16 actLength = qFromBigEndian(*((quint16*)pData));
+    quint16 actLength = qFromLittleEndian(*((quint16*)pData));
     if (actLength + 2 > totalLength)
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN, ERROR_CODE_WRONG_SIZE);
     QString actPassw(QByteArray(pData + 2, actLength));
 
-    quint16 newLength = qFromBigEndian(*((quint16*)(pData + 2 + actLength)));
+    quint16 newLength = qFromLittleEndian(*((quint16*)(pData + 2 + actLength)));
     if (newLength + actLength + 2 + 2 > totalLength)
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN, ERROR_CODE_WRONG_SIZE);
     QString newPassw(QByteArray(pData + 2 + actLength + 2, newLength));
@@ -141,7 +141,7 @@ MessageProtocol* DataConnection::requestUserChangeReadname(MessageProtocol* msg)
     qint32      totalLength = (qint32)msg->getDataLength();
     const char* pData       = msg->getPointerToData();
 
-    quint16 actLength = qFromBigEndian(*((quint16*)pData));
+    quint16 actLength = qFromLittleEndian(*((quint16*)pData));
     if (actLength + 2 > totalLength)
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN, ERROR_CODE_WRONG_SIZE);
     QString newReadName(QByteArray(pData + 2, actLength));
@@ -167,14 +167,14 @@ MessageProtocol* DataConnection::requestGetProgramVersion(MessageProtocol* msg)
     }
 
     const char* pData     = msg->getPointerToData();
-    quint16     actLength = qFromBigEndian(*((quint16*)(pData + 4)));
+    quint16     actLength = qFromLittleEndian(*((quint16*)(pData + 4)));
     if (actLength > msg->getDataLength())
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_VERSION, ERROR_CODE_WRONG_SIZE);
     QString remVersion(QByteArray(pData + 6, actLength));
     qInfo().noquote() << QString("Version from %1 = %2").arg(this->m_pUserConData->userName).arg(remVersion);
     QByteArray  ownVersion;
     QDataStream wVersion(&ownVersion, QIODevice::WriteOnly);
-    wVersion.setByteOrder(QDataStream::BigEndian);
+    wVersion.setByteOrder(QDataStream::LittleEndian);
     wVersion << ERROR_CODE_SUCCESS;
 
 //#define VERSION_TEST
@@ -218,7 +218,7 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
 {
     QByteArray  ackArray;
     QDataStream wAckArray(&ackArray, QIODevice::WriteOnly);
-    wAckArray.setByteOrder(QDataStream::BigEndian);
+    wAckArray.setByteOrder(QDataStream::LittleEndian);
 
     qint32 maxPastGames = msg->getIntData();
 
@@ -283,7 +283,7 @@ MessageProtocol* DataConnection::requestGetTicketsList(/*MessageProtocol *msg*/)
 {
     QByteArray  ackArray;
     QDataStream wAckArray(&ackArray, QIODevice::WriteOnly);
-    wAckArray.setByteOrder(QDataStream::BigEndian);
+    wAckArray.setByteOrder(QDataStream::LittleEndian);
 
     quint16 numbOfTickets = this->m_pGlobalData->m_SeasonTicket.getNumberOfInternalList();
     wAckArray << (quint32)ERROR_CODE_SUCCESS;
@@ -325,8 +325,8 @@ MessageProtocol* DataConnection::requestAddSeasonTicket(MessageProtocol* msg)
     }
 
     const char* pData     = msg->getPointerToData();
-    quint32     discount  = qFromBigEndian(*((quint32*)(pData)));
-    quint16     actLength = qFromBigEndian(*((quint16*)(pData + 4)));
+    quint32     discount  = qFromLittleEndian(*((quint32*)(pData)));
+    quint16     actLength = qFromLittleEndian(*((quint16*)(pData + 4)));
     if (actLength > msg->getDataLength())
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_ADD_TICKET, ERROR_CODE_WRONG_SIZE);
     QString ticketName(QByteArray(pData + 6, actLength));
@@ -357,7 +357,7 @@ MessageProtocol* DataConnection::requestRemoveSeasonTicket(MessageProtocol* msg)
     }
 
     const char* pData = msg->getPointerToData();
-    quint32     index = qFromBigEndian(*((quint32*)pData));
+    quint32     index = qFromLittleEndian(*((quint32*)pData));
 
     if ((rCode = this->m_pGlobalData->m_SeasonTicket.removeItem(index)) == ERROR_CODE_SUCCESS) {
         qInfo().noquote() << QString("User %1 removed SeasonTicket %2")
@@ -383,8 +383,8 @@ MessageProtocol* DataConnection::requestNewPlaceSeasonTicket(MessageProtocol* ms
     }
 
     const char* pData     = msg->getPointerToData();
-    quint32     index     = qFromBigEndian(*((quint32*)pData));
-    quint16     actLength = qFromBigEndian(*((quint16*)(pData + 4)));
+    quint32     index     = qFromLittleEndian(*((quint32*)pData));
+    quint16     actLength = qFromLittleEndian(*((quint16*)(pData + 4)));
     if (actLength > msg->getDataLength())
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_ADD_TICKET, ERROR_CODE_WRONG_SIZE);
     QString newPlace(QByteArray(pData + 6, actLength));
@@ -416,10 +416,10 @@ MessageProtocol* DataConnection::requestChangeStateSeasonTicket(MessageProtocol*
     }
 
     const char* pData       = msg->getPointerToData();
-    quint32     ticketIndex = qFromBigEndian(*((quint32*)pData));
-    quint32     gameIndex   = qFromBigEndian(*((quint32*)(pData + 4)));
-    quint32     state       = qFromBigEndian(*((quint32*)(pData + 8)));
-    quint16     actLength   = qFromBigEndian(*((quint16*)(pData + 12)));
+    quint32     ticketIndex = qFromLittleEndian(*((quint32*)pData));
+    quint32     gameIndex   = qFromLittleEndian(*((quint32*)(pData + 4)));
+    quint32     state       = qFromLittleEndian(*((quint32*)(pData + 8)));
+    quint16     actLength   = qFromLittleEndian(*((quint16*)(pData + 12)));
     if (actLength > msg->getDataLength())
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_STATE_CHANGE_SEASON_TICKET, ERROR_CODE_WRONG_SIZE);
 
@@ -448,7 +448,7 @@ MessageProtocol* DataConnection::requestGetAvailableTicketList(MessageProtocol* 
     }
 
     const char* pData     = msg->getPointerToData();
-    quint32     gameIndex = qFromBigEndian(*((quint32*)pData));
+    quint32     gameIndex = qFromLittleEndian(*((quint32*)pData));
 
     QByteArray data;
     if ((rCode = this->m_pGlobalData->requestGetAvailableSeasonTicket(gameIndex, this->m_pUserConData->userName, data)) == ERROR_CODE_SUCCESS) {
@@ -495,4 +495,10 @@ MessageProtocol* DataConnection::requestChangeGame(MessageProtocol *msg)
         qWarning().noquote() << QString("user %1 tried to changed game %2, but added game %3").arg(this->m_pUserConData->userName).arg(index).arg(result);
     }
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME, ERROR_CODE_SUCCESS);
+}
+
+MessageProtocol *DataConnection::requestChangeMeetingInfo(MessageProtocol *msg)
+{
+    Q_UNUSED(msg);
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_MEETING_INFO, ERROR_CODE_NOT_IMPLEMENTED);
 }

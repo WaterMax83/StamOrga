@@ -54,6 +54,8 @@ GlobalData::GlobalData(QObject* parent)
     this->m_logApp = new Logging();
     this->m_logApp->initialize();
     this->m_ctrlLog.Start(this->m_logApp, false);
+
+    QQmlEngine::setObjectOwnership(&this->m_meetingInfo, QQmlEngine::CppOwnership);
 }
 
 void GlobalData::loadGlobalSettings()

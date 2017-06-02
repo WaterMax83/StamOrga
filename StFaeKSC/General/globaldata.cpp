@@ -140,11 +140,11 @@ qint32 GlobalData::requestGetAvailableSeasonTicket(const quint32 gameIndex, cons
 
             QByteArray  freeTickets;
             QDataStream wFreeTickets(&freeTickets, QIODevice::WriteOnly);
-            wFreeTickets.setByteOrder(QDataStream::BigEndian);
+            wFreeTickets.setByteOrder(QDataStream::LittleEndian);
 
             QByteArray  reservedTickets;
             QDataStream wReserveds(&reservedTickets, QIODevice::WriteOnly);
-            wReserveds.setByteOrder(QDataStream::BigEndian);
+            wReserveds.setByteOrder(QDataStream::LittleEndian);
 
             quint16 freeTicktetCount    = 0;
             quint16 reservedTicketCount = 0;
@@ -167,7 +167,7 @@ qint32 GlobalData::requestGetAvailableSeasonTicket(const quint32 gameIndex, cons
             }
 
             QDataStream wData(&data, QIODevice::WriteOnly);
-            wData.setByteOrder(QDataStream::BigEndian);
+            wData.setByteOrder(QDataStream::LittleEndian);
 
             wData << quint32(ERROR_CODE_SUCCESS) << quint16(freeTicktetCount) << quint16(reservedTicketCount);
             data.append(freeTickets);
@@ -178,7 +178,7 @@ qint32 GlobalData::requestGetAvailableSeasonTicket(const quint32 gameIndex, cons
     }
 
     QDataStream wData(&data, QIODevice::WriteOnly);
-    wData.setByteOrder(QDataStream::BigEndian);
+    wData.setByteOrder(QDataStream::LittleEndian);
 
     wData << quint32(ERROR_CODE_SUCCESS) << quint16(0);
 

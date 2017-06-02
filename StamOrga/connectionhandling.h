@@ -49,6 +49,7 @@ public:
     qint32 startListAvailableTicket(quint32 gameIndex);
     qint32 startChangeGame(const quint32 index, const quint32 sIndex, const QString competition,
                            const QString home, const QString away, const QString date, const QString score);
+    qint32 startSaveMeetingInfo(const QString when, const QString where, const QString info);
 
 
     void setGlobalData(GlobalData* pData)

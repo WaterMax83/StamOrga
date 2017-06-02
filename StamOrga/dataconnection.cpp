@@ -183,6 +183,10 @@ void DataConnection::checkNewOncomingData()
             request.m_result = msg->getIntData();
             break;
 
+        case OP_CODE_CMD_RES::ACK_CHANGE_MEETING_INFO:
+            request.m_result = msg->getIntData();
+            break;
+
         default:
             delete msg;
             continue;
@@ -200,7 +204,7 @@ void DataConnection::startSendLoginRequest(DataConRequest request)
     QString     passWord = request.m_lData.at(0);
     QByteArray  aPassw;
     QDataStream wPassword(&aPassw, QIODevice::WriteOnly);
-    wPassword.setByteOrder(QDataStream::BigEndian);
+    wPassword.setByteOrder(QDataStream::LittleEndian);
     wPassword << quint16(passWord.toUtf8().size());
     aPassw.append(passWord);
     MessageProtocol msg(request.m_request, aPassw);
@@ -211,7 +215,7 @@ void DataConnection::startSendVersionRequest(DataConRequest request)
 {
     QByteArray  version;
     QDataStream wVersion(&version, QIODevice::WriteOnly);
-    wVersion.setByteOrder(QDataStream::BigEndian);
+    wVersion.setByteOrder(QDataStream::LittleEndian);
     wVersion << (quint32)STAM_ORGA_VERSION_I;
     wVersion << quint16(QString(STAM_ORGA_VERSION_S).toUtf8().size());
 
@@ -230,7 +234,7 @@ void DataConnection::startSendUpdPassRequest(DataConRequest request)
 {
     QByteArray  passReq;
     QDataStream wPassReq(&passReq, QIODevice::WriteOnly);
-    wPassReq.setByteOrder(QDataStream::BigEndian);
+    wPassReq.setByteOrder(QDataStream::LittleEndian);
 
     QString newPassWord = request.m_lData.at(0);
 
@@ -249,7 +253,7 @@ void DataConnection::startSendReadableNameRequest(DataConRequest request)
     QString     name = request.m_lData.at(0);
     QByteArray  readName;
     QDataStream wReadName(&readName, QIODevice::WriteOnly);
-    wReadName.setByteOrder(QDataStream::BigEndian);
+    wReadName.setByteOrder(QDataStream::LittleEndian);
     wReadName << quint16(name.toUtf8().size());
     readName.append(name);
 
@@ -268,7 +272,7 @@ void DataConnection::startSendAddSeasonTicket(DataConRequest request)
     QString     name = request.m_lData.at(1);
     QByteArray  seasonTicket;
     QDataStream wSeasonTicket(&seasonTicket, QIODevice::WriteOnly);
-    wSeasonTicket.setByteOrder(QDataStream::BigEndian);
+    wSeasonTicket.setByteOrder(QDataStream::LittleEndian);
     wSeasonTicket << request.m_lData.at(0).toUInt();
     wSeasonTicket << quint16(name.toUtf8().size());
     seasonTicket.append(name);
@@ -289,7 +293,7 @@ void DataConnection::startSendNewPlaceTicket(DataConRequest request)
     QString     place = request.m_lData.at(1);
     QByteArray  seasonTicket;
     QDataStream wSeasonTicket(&seasonTicket, QIODevice::WriteOnly);
-    wSeasonTicket.setByteOrder(QDataStream::BigEndian);
+    wSeasonTicket.setByteOrder(QDataStream::LittleEndian);
     wSeasonTicket << request.m_lData.at(0).toUInt();
     wSeasonTicket << quint16(place.toUtf8().size());
     seasonTicket.append(place);
@@ -308,7 +312,7 @@ void DataConnection::startSendChangeTicketState(DataConRequest request)
     QByteArray  seasonTicket;
     QString     name = request.m_lData.at(3);
     QDataStream wSeasonTicket(&seasonTicket, QIODevice::WriteOnly);
-    wSeasonTicket.setByteOrder(QDataStream::BigEndian);
+    wSeasonTicket.setByteOrder(QDataStream::LittleEndian);
     wSeasonTicket << request.m_lData.at(0).toUInt(); /* ticketIndex */
     wSeasonTicket << request.m_lData.at(1).toUInt(); /* game Index */
     wSeasonTicket << request.m_lData.at(2).toUInt(); /* state */
@@ -331,6 +335,20 @@ void DataConnection::startSendChangeGameRequest(DataConRequest request)
 {
     QByteArray data;
     data.append(request.m_lData.at(0));
+    data.append(char(0x00));
+
+    MessageProtocol msg(request.m_request, data);
+    this->sendMessageRequest(&msg, request);
+}
+
+void DataConnection::startSendChangeMeetingInfo(DataConRequest request)
+{
+    QByteArray data;
+    data.append(request.m_lData.at(0));
+    data.append(char(0x00));
+    data.append(request.m_lData.at(1));
+    data.append(char(0x00));
+    data.append(request.m_lData.at(2));
     data.append(char(0x00));
 
     MessageProtocol msg(request.m_request, data);
@@ -474,6 +492,10 @@ void DataConnection::startSendNewRequest(DataConRequest request)
 
     case OP_CODE_CMD_REQ::REQ_CHANGE_GAME:
         this->startSendChangeGameRequest(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_CHANGE_MEETING_INFO:
+        this->startSendChangeMeetingInfo(request);
         break;
 
     default:

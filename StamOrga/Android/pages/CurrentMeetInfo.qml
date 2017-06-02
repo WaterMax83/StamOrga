@@ -73,6 +73,7 @@ Flickable {
 
             RowLayout {
                 width: parent.width
+                spacing: 20
 
                 MyComponents.GraphicalButton {
                     imageSource: "../images/edit.png"
@@ -88,31 +89,42 @@ Flickable {
                     enabled: isEditMode ? true : false
                     onClickedButton: {
                         isEditMode = false;
+                        var result = userIntCurrentGame.startSaveMeetingInfo(textWhen.input, textWhere.input, textInfo.text);
+                        if (result === 0)
+                            toastManager.show("Keine Änderung, nichts gespeichert", 2000);
+                        else {
+                            busyLoadingIndicatorCurrentGames.visible = true;
+                            txtInfoCurrentGame.visible = true
+                            txtInfoCurrentGame.text = "Speichere Infos"
+                        }
+
                     }
                     Layout.alignment: Qt.AlignRight
                 }
             }
 
-            Button {
-                text: "Test"
+//            Button {
+//                text: "Test"
 
+//            }
+
+            MyComponents.EditableTextWithHint {
+                id: textWhere
+                hint: "Wo"
+                imageSource: "../images/place.png"
+                width: parent.width
+                enabled: isEditMode
+                color: isEditMode ? "#FFFFFF" : "#AAAAAA";
+                onTextInputChanged: checkNewTextInput()
             }
 
             MyComponents.EditableTextWithHint {
                 id: textWhen
                 hint: "Wann"
+                imageSource: "../images/time.png"
                 width: parent.width
                 enabled: isEditMode
-                color: isEditMode ? "#FFFFFF" : "#BBBBBB";
-                onTextInputChanged: checkNewTextInput()
-            }
-
-            MyComponents.EditableTextWithHint {
-                id: textWhere
-                hint: "Wo"
-                width: parent.width
-                enabled: isEditMode
-                color: isEditMode ? "#FFFFFF" : "#BBBBBB";
+                color: isEditMode ? "#FFFFFF" : "#AAAAAA";
                 onTextInputChanged: checkNewTextInput()
             }
 
@@ -150,13 +162,13 @@ Flickable {
             Rectangle {
                 implicitWidth: parent.width
                 implicitHeight: textInfo.height > 0 ? textInfo.height : 30
-                color: isEditMode ? "#FFFFFF" : "#BBBBBB";
+                color: isEditMode ? "#FFFFFF" : "#AAAAAA";
                 visible: isInfoVisible
                 Text {
                     id: hintTextInfo
                     anchors { fill: parent; leftMargin: 14 }
                     verticalAlignment: Text.AlignVCenter
-                    color: "#707070"
+                    color: "#808080"
                     text: "Info"
                     opacity: textInfo.text.length ? 0 : 1
                 }
@@ -177,18 +189,35 @@ Flickable {
 
     }
 
+    property var  meetingInfo;
     property bool isEditMode: false
     property bool isInputAlreadyChanged: false
     property bool isInfoVisible: false
 
-    function showAllInfoAboutGame(sender) {
-    //          whenText.init("hallo");
+    function showAllInfoAboutGame() {
+        meetingInfo = globalUserData.getMeetingInfo();
+        textInfo.text = meetingInfo.info();
+        textWhen.init(meetingInfo.when())
+        textWhere.init(meetingInfo.where())
     }
 
     function checkNewTextInput() {
         if (isInputAlreadyChanged)
             return;
         isInputAlreadyChanged = true;
+    }
+
+    function notifyChangedMeetingInfoFinished(result) {
+        if (result === 1) {
+            toastManager.show("Info erfolgreich gespeichert", 2000);
+//            loadAvailableTicketList()
+
+        } else {
+            toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
+
+        }
+        busyLoadingIndicatorCurrentGames.visible = false;
+        txtInfoCurrentGame.visible = false
     }
 
 }

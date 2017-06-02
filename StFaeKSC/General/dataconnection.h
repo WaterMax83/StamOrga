@@ -44,6 +44,7 @@ public:
     MessageProtocol* requestChangeStateSeasonTicket(MessageProtocol* msg);
     MessageProtocol* requestGetAvailableTicketList(MessageProtocol* msg);
     MessageProtocol* requestChangeGame(MessageProtocol* msg);
+    MessageProtocol* requestChangeMeetingInfo(MessageProtocol* msg);
 
     void setUserConnectionData(UserConData* pUsrConData) { this->m_pUserConData = pUsrConData; }
 

@@ -45,5 +45,9 @@
         <file>images/+material/play.png</file>
         <file>images/play.png</file>
         <file>components/GraphicalButton.qml</file>
+        <file>images/+material/place.png</file>
+        <file>images/+material/time.png</file>
+        <file>images/place.png</file>
+        <file>images/time.png</file>
     </qresource>
 </RCC>

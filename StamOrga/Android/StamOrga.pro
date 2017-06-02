@@ -21,6 +21,7 @@ SOURCES += main.cpp \
     ../Data/globaldata.cpp \
     ../Data/gameplay.cpp \
     ../Data/seasonticket.cpp \
+    ../Data/meetinginfo.cpp
 
 
 RESOURCES += qml.qrc
@@ -65,6 +66,7 @@ HEADERS += \
     ../Data/globaldata.h \
     ../Data/gameplay.h \
     ../Data/seasonticket.h \
+    ../Data/meetinginfo.h
 
 DISTFILES += \
     android/AndroidManifest.xml \

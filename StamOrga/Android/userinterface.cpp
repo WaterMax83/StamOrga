@@ -93,6 +93,11 @@ qint32 UserInterface::startChangeGame(const quint32 index, const quint32 sIndex,
     return this->m_pConHandle->startChangeGame(index, sIndex, competition, home, away, date, score);
 }
 
+qint32 UserInterface::startSaveMeetingInfo(const QString when, const QString where, const QString info)
+{
+    return this->m_pConHandle->startSaveMeetingInfo(when, where, info);
+}
+
 void UserInterface::slConnectionRequestFinished(qint32 result)
 {
     //this->ui->btnSendData->setEnabled(true);
@@ -156,6 +161,10 @@ void UserInterface::slCommandFinished(quint32 command, qint32 result)
 
     case OP_CODE_CMD_REQ::REQ_CHANGE_GAME:
         emit this->notifyChangedGameFinished(result);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_CHANGE_MEETING_INFO:
+        emit this->notifyChangedMeetingInfoFinished(result);
         break;
 
     default:

@@ -209,6 +209,22 @@ qint32 ConnectionHandling::startChangeGame(const quint32 index, const quint32 sI
     return ERROR_CODE_SUCCESS;
 }
 
+qint32 ConnectionHandling::startSaveMeetingInfo(const QString when, const QString where, const QString info)
+{
+    MeetingInfo* pInfo = this->m_pGlobalData->getMeetingInfo();
+
+    if (pInfo->when() != when || pInfo->where() != where || pInfo->info() != info) {
+        DataConRequest req(OP_CODE_CMD_REQ::REQ_CHANGE_MEETING_INFO);
+        req.m_lData.append(when);
+        req.m_lData.append(where);
+        req.m_lData.append(info);
+        this->sendNewRequest(req);
+
+        return ERROR_CODE_SUCCESS;
+    }
+    return ERROR_CODE_NO_ERROR;
+}
+
 
 /*
  * Answer function after connection with username

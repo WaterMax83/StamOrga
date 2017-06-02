@@ -36,7 +36,7 @@ qint32 DataHandling::getHandleLoginResponse(MessageProtocol* msg)
         return ERROR_CODE_WRONG_SIZE;
     const char* pData = msg->getPointerToData();
 
-    result = qFromBigEndian(*((qint32*)pData));
+    result = qFromLittleEndian(*((qint32*)pData));
 
     return result;
 }
@@ -47,10 +47,10 @@ qint32 DataHandling::getHandleVersionResponse(MessageProtocol* msg, QString* ver
         return ERROR_CODE_WRONG_SIZE;
 
     const char* pData    = msg->getPointerToData();
-    qint32      result   = qFromBigEndian(*((qint32*)pData));
-    quint32     uVersion = qFromBigEndian(*((quint32*)(pData + 4)));
+    qint32      result   = qFromLittleEndian(*((qint32*)pData));
+    quint32     uVersion = qFromLittleEndian(*((quint32*)(pData + 4)));
 
-    quint16 size = qFromBigEndian(*((quint16*)(pData + 8)));
+    quint16 size = qFromLittleEndian(*((quint16*)(pData + 8)));
     if (size > msg->getDataLength())
         return ERROR_CODE_WRONG_SIZE;
 
@@ -70,8 +70,8 @@ qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol* msg, QString* p
         return ERROR_CODE_WRONG_SIZE;
 
     const char* pData  = msg->getPointerToData();
-    qint32      rValue = qFromBigEndian(*((qint32*)pData));
-    qint32      index  = qFromBigEndian(*((qint32*)(pData + 8)));
+    qint32      rValue = qFromLittleEndian(*((qint32*)pData));
+    qint32      index  = qFromLittleEndian(*((qint32*)(pData + 8)));
     this->m_pGlobalData->setUserIndex(index);
 
     SeasonTicketItem* seasonTicket;
@@ -79,9 +79,9 @@ qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol* msg, QString* p
     while ((seasonTicket = this->m_pGlobalData->getSeasonTicketFromArrayIndex(i++)) != NULL)
         seasonTicket->checkTicketOwn(index);
 
-    *props = QString::number(qFromBigEndian(*((quint32*)(pData + 8))));
+    *props = QString::number(qFromLittleEndian(*((quint32*)(pData + 8))));
 
-    quint16 readableNameSize = qFromBigEndian(*((quint16*)(pData + 12)));
+    quint16 readableNameSize = qFromLittleEndian(*((quint16*)(pData + 12)));
     QString readableName(QByteArray(pData + 14, readableNameSize));
 
     this->m_pGlobalData->setReadableName(readableName);
@@ -97,27 +97,27 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol* msg)
         return ERROR_CODE_WRONG_SIZE;
 
     const char* pData  = msg->getPointerToData();
-    qint32      rValue = qFromBigEndian(*((qint32*)pData));
+    qint32      rValue = qFromLittleEndian(*((qint32*)pData));
 
     if (rValue != ERROR_CODE_SUCCESS)
         return rValue;
 
     quint32 totalSize = msg->getDataLength();
     quint32 offset    = 4;
-    quint16 version   = qFromBigEndian(*(qint16*)(pData + offset));
+    quint16 version   = qFromLittleEndian(*(qint16*)(pData + offset));
     if (version > 0x3) {
         qWarning().noquote() << QString("Unknown game version %1").arg(version);
         return -1;
     }
     offset += 2;
 
-    quint16 totalPacks = qFromBigEndian(*(quint16*)(pData + offset));
+    quint16 totalPacks = qFromLittleEndian(*(quint16*)(pData + offset));
     offset += 2;
 
     this->m_pGlobalData->startUpdateGamesPlay();
     while (offset < totalSize && totalPacks > 0) {
         GamePlay* play = new GamePlay();
-        quint16   size = qFromBigEndian(*(qint16*)(pData + offset));
+        quint16   size = qFromLittleEndian(*(qint16*)(pData + offset));
         offset += 2;
 
         if (size <= 8) {
@@ -132,23 +132,23 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol* msg)
         offset += 1;
 
         /* On Android there are problems reading from qint64 pointers???? SIGBUS*/
-        //        play->setTimeStamp(qFromBigEndian(*(qint64 *)(pData + offset)));
-        quint32 tmp       = qFromBigEndian(*(qint32*)(pData + offset));
-        qint64  timeStamp = qint64(tmp) << 32;
-        tmp               = qFromBigEndian(*(quint32*)(pData + offset + 4));
-        timeStamp |= qint64(tmp);
+        //        play->setTimeStamp(qFromLittleEndian(*(qint64 *)(pData + offset)));
+        quint32 tmp       = qFromLittleEndian(*(qint32*)(pData + offset));
+        qint64  timeStamp = qint64(tmp);
+        tmp               = qFromLittleEndian(*(quint32*)(pData + offset + 4));
+        timeStamp |= qint64(tmp) << 32;
 
         play->setTimeStamp(timeStamp);
         offset += 8;
 
-        play->setIndex(qFromBigEndian(*(quint32*)(pData + offset)));
+        play->setIndex(qFromLittleEndian(*(quint32*)(pData + offset)));
         offset += 4;
 
-        play->setFreeTickets(qFromBigEndian(*(quint16*)(pData + offset)));
+        play->setFreeTickets(qFromLittleEndian(*(quint16*)(pData + offset)));
         offset += 2;
-        play->setBlockedTickets(qFromBigEndian(*(quint16*)(pData + offset)));
+        play->setBlockedTickets(qFromLittleEndian(*(quint16*)(pData + offset)));
         offset += 2;
-        play->setReservedTickets(qFromBigEndian(*(quint16*)(pData + offset)));
+        play->setReservedTickets(qFromLittleEndian(*(quint16*)(pData + offset)));
         offset += 2;
 
         QString playString(QByteArray(pData + offset, size - GAMES_OFFSET));
@@ -181,27 +181,27 @@ qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol* msg)
 
     quint32     userIndex = this->m_pGlobalData->userIndex();
     const char* pData     = msg->getPointerToData();
-    qint32      rValue    = qFromBigEndian(*((qint32*)pData));
+    qint32      rValue    = qFromLittleEndian(*((qint32*)pData));
 
     if (rValue != ERROR_CODE_SUCCESS)
         return rValue;
 
     quint32 totalSize = msg->getDataLength();
     quint32 offset    = 4;
-    quint16 version   = qFromBigEndian(*(qint16*)(pData + offset));
+    quint16 version   = qFromLittleEndian(*(qint16*)(pData + offset));
     if (version != 0x1) {
         qWarning().noquote() << QString("Unknown season ticket version %1").arg(version);
         return -1;
     }
     offset += 2;
 
-    quint16 totalPacks = qFromBigEndian(*(quint16*)(pData + offset));
+    quint16 totalPacks = qFromLittleEndian(*(quint16*)(pData + offset));
     offset += 2;
 
     this->m_pGlobalData->startUpdateSeasonTickets();
     while (offset < totalSize && totalPacks > 0) {
         SeasonTicketItem* sTicket = new SeasonTicketItem();
-        quint16           size    = qFromBigEndian(*(qint16*)(pData + offset));
+        quint16           size    = qFromLittleEndian(*(qint16*)(pData + offset));
         offset += 2;
 
         if (size <= 8) {
@@ -212,9 +212,9 @@ qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol* msg)
 
         sTicket->setDiscount(*(quint8*)(pData + offset));
         offset += 1;
-        sTicket->setIndex(qFromBigEndian(*(quint32*)(pData + offset)));
+        sTicket->setIndex(qFromLittleEndian(*(quint32*)(pData + offset)));
         offset += 4;
-        sTicket->setUserIndex(qFromBigEndian(*(quint32*)(pData + offset)));
+        sTicket->setUserIndex(qFromLittleEndian(*(quint32*)(pData + offset)));
         offset += 4;
         sTicket->checkTicketOwn(userIndex);
 
@@ -257,7 +257,7 @@ qint32 DataHandling::getHandleAvailableTicketListResponse(MessageProtocol* msg, 
         return ERROR_CODE_WRONG_SIZE;
 
     const char* pData  = msg->getPointerToData();
-    qint32      rValue = qFromBigEndian(*((qint32*)pData));
+    qint32      rValue = qFromLittleEndian(*((qint32*)pData));
     if (rValue != ERROR_CODE_SUCCESS)
         return rValue;
 
@@ -267,15 +267,15 @@ qint32 DataHandling::getHandleAvailableTicketListResponse(MessageProtocol* msg, 
             item->setTicketState(TICKET_STATE_BLOCKED);
     }
 
-    qint16  countOfFreeTickets     = qFromBigEndian(*((qint16*)(pData + 4)));
-    qint16  countOfReservedTickets = qFromBigEndian(*((qint16*)(pData + 6)));
+    qint16  countOfFreeTickets     = qFromLittleEndian(*((qint16*)(pData + 4)));
+    qint16  countOfReservedTickets = qFromLittleEndian(*((qint16*)(pData + 6)));
     quint32 offset                 = 8;
     for (int i = 0; i < countOfFreeTickets; i++) {
         if (offset + AVAILABLE_HEAD_OFFSET > msg->getDataLength()) {
             qWarning() << "Error in message for get available ticket list";
             return rValue;
         }
-        quint32           ticketIndex = qFromBigEndian(*((quint32*)(pData + offset)));
+        quint32           ticketIndex = qFromLittleEndian(*((quint32*)(pData + offset)));
         SeasonTicketItem* item        = this->m_pGlobalData->getSeasonTicket(ticketIndex);
         if (item != NULL)
             item->setTicketState(TICKET_STATE_FREE);
@@ -289,7 +289,7 @@ qint32 DataHandling::getHandleAvailableTicketListResponse(MessageProtocol* msg, 
             qWarning() << "Error in message for get available ticket list";
             return rValue;
         }
-        quint32           ticketIndex = qFromBigEndian(*((quint32*)(pData + offset)));
+        quint32           ticketIndex = qFromLittleEndian(*((quint32*)(pData + offset)));
         SeasonTicketItem* item        = this->m_pGlobalData->getSeasonTicket(ticketIndex);
         if (item != NULL)
             item->setTicketState(TICKET_STATE_RESERVED);

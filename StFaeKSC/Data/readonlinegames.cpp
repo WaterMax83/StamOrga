@@ -162,7 +162,7 @@ void ReadOnlineGames::startNetWorkRequest(OnlineGameInfo* info)
     qInfo().noquote() << QString("Single game answer for game %1").arg(this->m_currentGameInfo->m_index);
     this->checkNewNetworkRequest(true);
 #else
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
+#if (QT_VERSION < QT_VERSION_CHECK(5, 8, 0))
     qInfo().noquote() << "Did not use ReadOnlineGame because of version problem";
 #else
     if (this->m_currentGameInfo->m_index == 35) {

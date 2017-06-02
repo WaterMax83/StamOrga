@@ -81,7 +81,7 @@ Flickable {
 
             ListView {
                 id: listViewBlockedTickets
-                focus: false
+//                focus: false
                 interactive: false
                 implicitWidth: mainColumnLayoutCurrentGame.width
 
@@ -134,7 +134,7 @@ Flickable {
 
             ListView {
                 id: listViewReservedTickets
-                focus: false
+//                focus: false
                 interactive: false
                 implicitWidth: mainColumnLayoutCurrentGame.width
 
@@ -206,7 +206,7 @@ Flickable {
 
             ListView {
                 id: listViewFreeTickets
-                focus: false
+//                focus: false
                 interactive: false
                 implicitWidth: mainColumnLayoutCurrentGame.width
 
@@ -276,6 +276,7 @@ Flickable {
                     userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 2);
                     busyLoadingIndicatorCurrentGames.visible = true
                     txtInfoCurrentGame.text = "Gebe Karte frei"
+                    txtInfoCurrentGame.visible = true
                 }
             }
         }
@@ -297,6 +298,7 @@ Flickable {
                     userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 2);
                     busyLoadingIndicatorCurrentGames.visible = true
                     txtInfoCurrentGame.text = "Gebe Karte frei"
+                    txtInfoCurrentGame.visible = true
                 }
             }
 
@@ -307,6 +309,7 @@ Flickable {
                     userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 1);
                     busyLoadingIndicatorCurrentGames.visible = true
                     txtInfoCurrentGame.text = "Sperre Karte"
+                    txtInfoCurrentGame.visible = true
                 }
             }
 
@@ -365,6 +368,7 @@ Flickable {
                     userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 1);
                     busyLoadingIndicatorCurrentGames.visible = true
                     txtInfoCurrentGame.text = "Sperre Karte"
+                    txtInfoCurrentGame.visible = true
                 }
             }
         }
@@ -374,6 +378,7 @@ Flickable {
         userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 3, text);
         busyLoadingIndicatorCurrentGames.visible = true
         txtInfoCurrentGame.text = "Reserviere Karte"
+        txtInfoCurrentGame.visible = true
     }
 
     function showAllInfoAboutGame(sender) {
@@ -399,6 +404,7 @@ Flickable {
         } else {
             toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
             busyLoadingIndicatorCurrentGames.visible = false;
+            txtInfoCurrentGame.visible = false
         }
     }
 

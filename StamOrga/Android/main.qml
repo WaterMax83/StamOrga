@@ -312,6 +312,9 @@ ApplicationWindow {
         onNotifyChangedGameFinished: {
             stackView.currentItem.notifyGameChangedFinished(result);
         }
+        onNotifyChangedMeetingInfoFinished: {
+            stackView.currentItem.notifyChangedMeetingInfoFinished(result);
+        }
     }
 
     function openUserLogin(open) {

@@ -77,13 +77,13 @@ Item {
            }
 
            RowLayout {
-//               spacing: 5
+               spacing: 5
                width: parent.width
                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                visible: userInt.isDebuggingEnabled()
 
                Label {
-                   text: qsTr("Nutze andere IP:")
+                   text: qsTr("Alternative IP:")
                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                }
 
@@ -96,14 +96,14 @@ Item {
                }
            }
 
-           ColumnLayout {
+           RowLayout {
                spacing: 5
                width: parent.width
                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                visible: userInt.isDebuggingEnabled() && userInt.isDeviceMobile()
 
                Label {
-                   text: qsTr("Nutze andere IP im Wlan")
+                   text: qsTr("Alternative IP Wlan")
                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                }
 
@@ -112,6 +112,7 @@ Item {
                    text: globalUserData.debugIPWifi
                    implicitWidth: parent.width
                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                   Layout.fillWidth: true
 
                }
            }

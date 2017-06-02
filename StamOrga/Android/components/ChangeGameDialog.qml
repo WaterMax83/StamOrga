@@ -77,11 +77,11 @@ Dialog {
 
             TextInput {
                 id: inputHome
-                focus: true
                 anchors { fill:parent; leftMargin: 5 }
                 verticalAlignment: Text.AlignVCenter
                 font.pixelSize: 16
                 color: "#505050"
+                KeyNavigation.tab: inputAway
             }
         }
 
@@ -99,11 +99,11 @@ Dialog {
 
             TextInput {
                 id: inputAway
-                focus: true
                 anchors { fill:parent; leftMargin: 5 }
                 verticalAlignment: Text.AlignVCenter
                 font.pixelSize: 16
                 color: "#505050"
+                KeyNavigation.tab: inputScore
             }
         }
 
@@ -121,11 +121,11 @@ Dialog {
 
             TextInput {
                 id: inputScore
-                focus: true
                 anchors { fill:parent; leftMargin: 5 }
                 verticalAlignment: Text.AlignVCenter
                 font.pixelSize: 16
                 color: "#505050"
+                KeyNavigation.tab: spBoxSeasonIndex
             }
         }
 
@@ -135,12 +135,14 @@ Dialog {
             from: 1
 //            value: globalUserData.conMasterPort
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            KeyNavigation.tab: comboBoxCompetition
         }
 
         ComboBox {
             id: comboBoxCompetition
             implicitWidth: parent.width
             model: ["1.Bundesliga", "2.Bundesliga", "3.Liga", "DFB Pokal", "Badischer Pokal", "TestSpiel"]
+            KeyNavigation.tab: inputDate
         }
 
         Rectangle {
@@ -157,7 +159,6 @@ Dialog {
 
             TextInput {
                 id: inputDate
-                focus: true
                 anchors { fill:parent; leftMargin: 5 }
                 verticalAlignment: Text.AlignVCenter
                 font.pixelSize: 16

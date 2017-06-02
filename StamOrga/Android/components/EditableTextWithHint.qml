@@ -19,6 +19,7 @@
 import QtQuick 2.7
 import QtQuick.Controls 2.1
 import QtQuick.Layouts 1.0
+import QtGraphicalEffects 1.0
 
 import com.watermax.demo 1.0
 
@@ -26,9 +27,9 @@ import com.watermax.demo 1.0
 Rectangle {
     property alias hint: hintText.text
     property alias input: inputText.displayText
+    property alias imageSource: rightImage.source
 
     signal textInputChanged();
-
 
     implicitWidth: parent.width
     implicitHeight: 30
@@ -42,16 +43,28 @@ Rectangle {
 
     TextInput {
         id: inputText
-        focus: true
         anchors { fill:parent; leftMargin: 5 }
         verticalAlignment: Text.AlignVCenter
         font.pixelSize: 16
         color: "#505050"
+        Layout.fillWidth: true
         onTextChanged: {
             if (isInit)
                 return;
             textInputChanged();
         }
+    }
+
+    Image {
+        id: rightImage
+        width: parent.height
+        height: parent.height
+        anchors.right: parent.right
+    }
+    ColorOverlay {
+        anchors.fill: rightImage
+        source: rightImage
+        color: "#000000"
     }
 
     property bool isInit: false
