@@ -89,7 +89,7 @@ Flickable {
                     enabled: isEditMode ? true : false
                     onClickedButton: {
                         isEditMode = false;
-                        var result = userIntCurrentGame.startSaveMeetingInfo(textWhen.input, textWhere.input, textInfo.text);
+                        var result = userIntCurrentGame.startSaveMeetingInfo(m_gamePlayCurrentItem.index, textWhen.input, textWhere.input, textInfo.text);
                         if (result === 0)
                             toastManager.show("Keine Änderung, nichts gespeichert", 2000);
                         else {

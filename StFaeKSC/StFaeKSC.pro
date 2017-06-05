@@ -28,7 +28,8 @@ SOURCES += main.cpp \
     Data/seasonticket.cpp \
     Data/configlist.cpp \
     Data/readonlinegames.cpp \
-    Data/availablegameticket.cpp
+    Data/availablegameticket.cpp \
+    Data/meetinginfo.cpp
 
 HEADERS += \
     ../Common/General/backgroundcontroller.h \
@@ -53,7 +54,8 @@ HEADERS += \
     Data/seasonticket.h \
     Data/configlist.h \
     Data/readonlinegames.h \
-    Data/availablegameticket.h
+    Data/availablegameticket.h \
+    Data/meetinginfo.h
 
 
 unix {

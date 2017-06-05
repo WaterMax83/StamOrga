@@ -243,7 +243,7 @@ void ReadOnlineGames::checkNewNetworkRequest(bool checkLastItem)
 
     qint64 now = QDateTime::currentMSecsSinceEpoch();
     if (nextUpdate > now) {
-        qInfo() << QString("Sleeping and reading again in %1 seconds").arg((nextUpdate - now) / 1000);
+        qInfo().noquote() << QString("Sleeping and reading again in %1 seconds").arg((nextUpdate - now) / 1000);
         this->m_networkUpdate->start(nextUpdate - now);
     } else
         this->slotNetWorkUpdateTimeout();

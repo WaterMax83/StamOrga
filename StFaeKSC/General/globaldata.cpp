@@ -18,6 +18,7 @@
 
 #include <QtCore/QDataStream>
 #include <QtCore/QDateTime>
+#include <QtCore/QtEndian>
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 
@@ -33,10 +34,9 @@ GlobalData::GlobalData()
         return;
 
     QStringList nameFilter;
+
     nameFilter << "Tickets_Game_*.ini";
-
     QStringList infoConfigList = userSetDir.entryList(nameFilter, QDir::Files | QDir::Readable);
-
     foreach (QString file, infoConfigList) {
         AvailableGameTickets* tickets = new AvailableGameTickets();
 
@@ -44,6 +44,19 @@ GlobalData::GlobalData()
             this->m_availableTickets.append(tickets);
         else
             delete tickets;
+    }
+
+    nameFilter.clear();
+
+    nameFilter << "Meetings_Game_*.ini";
+    infoConfigList = userSetDir.entryList(nameFilter, QDir::Files | QDir::Readable);
+    foreach (QString file, infoConfigList) {
+        MeetingInfo* mInfo = new MeetingInfo();
+
+        if (mInfo->initialize(userSetDirPath + file) >= 0)
+            this->m_meetingInfos.append(mInfo);
+        else
+            delete mInfo;
     }
 }
 
@@ -196,4 +209,60 @@ quint16 GlobalData::getTicketNumber(const quint32 gamesIndex, const quint32 stat
             return ticket->getTicketNumber(state);
     }
     return 0;
+}
+
+qint32 GlobalData::requestChangeMeetingInfo(const quint32 gameIndex, const QString when, const QString where, const QString info)
+{
+    GamesPlay*  pGame   = (GamesPlay*)this->m_GamesList.getItem(gameIndex);
+    if (pGame == NULL)
+        return ERROR_CODE_NOT_FOUND;
+
+#ifdef ENABLE_PAST_CHECK
+    if (pGame->m_timestamp < QDateTime::currentMSecsSinceEpoch())
+        return ERROR_CODE_IN_PAST;
+#endif
+
+    qint32  result = ERROR_CODE_SUCCESS;
+//    quint32 userID = this->m_UserList.getItemIndex(userName);
+    foreach (MeetingInfo* mInfo, this->m_meetingInfos) {
+        if (mInfo->getGameIndex() == gameIndex) {
+            result = mInfo->changeMeetingInfo(when, where, info);
+            if (result == ERROR_CODE_SUCCESS)
+                qInfo().noquote() << QString("Changed Meeting infoat game %1").arg(pGame->m_index);
+            else
+                qWarning().noquote() << QString("Error setting meeting info at game %1: %2").arg(pGame->m_index).arg(result);
+            return result;
+        }
+    }
+
+    MeetingInfo* mInfo = new MeetingInfo();
+    if (mInfo->initialize(pGame->m_saison, pGame->m_competition, pGame->m_saisonIndex, pGame->m_index)) {
+        this->m_meetingInfos.append(mInfo);
+        result = mInfo->changeMeetingInfo(when, where, info);
+        qInfo().noquote() << QString("Changed MeetingInfo at game %1").arg(pGame->m_index);
+    } else {
+        delete mInfo;
+        qWarning().noquote() << QString("Error creating meeting info file for game %1").arg(pGame->m_index);
+        return ERROR_CODE_NOT_POSSIBLE;
+    }
+
+    return ERROR_CODE_SUCCESS;
+}
+
+/*  answer
+ * 0                Header          12
+ * 12   quint32     result          4
+ */
+qint32 GlobalData::requestGetMeetingInfo(const quint32 gameIndex, const quint32 version, char *pData, const quint32 size)
+{
+//    quint32 result;
+    Q_UNUSED(version);
+    Q_UNUSED(pData);
+    Q_UNUSED(size);
+    GamesPlay*  pGame   = (GamesPlay*)this->m_GamesList.getItem(gameIndex);
+    if (pGame == NULL)
+        return ERROR_CODE_NOT_FOUND;
+
+
+    return ERROR_CODE_NOT_IMPLEMENTED;
 }

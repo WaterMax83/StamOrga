@@ -22,6 +22,7 @@
 #include <QtCore/QList>
 
 #include "../Data/availablegameticket.h"
+#include "../Data/meetinginfo.h"
 #include "../Data/games.h"
 #include "../Data/listeduser.h"
 #include "../Data/seasonticket.h"
@@ -35,12 +36,16 @@ public:
     qint32 requestBlockSeasonTicket(quint32 ticketIndex, quint32 gameIndex, const QString userName);
     qint32 requestGetAvailableSeasonTicket(const quint32 gameIndex, const QString userName, QByteArray& data);
 
+    qint32 requestChangeMeetingInfo(const quint32 gameIndex, const QString when, const QString where, const QString info);
+    qint32 requestGetMeetingInfo(const quint32 gameIndex, const quint32 version, char* pData, const quint32 size);
+
     quint16 getTicketNumber(const quint32 gamesIndex, const quint32 state);
 
     ListedUser                   m_UserList;
     Games                        m_GamesList;
     SeasonTicket                 m_SeasonTicket;
     QList<AvailableGameTickets*> m_availableTickets;
+    QList<MeetingInfo*>          m_meetingInfos;
 };
 
 #endif // GLOBALDATA_H

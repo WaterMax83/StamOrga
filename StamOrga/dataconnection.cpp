@@ -343,12 +343,15 @@ void DataConnection::startSendChangeGameRequest(DataConRequest request)
 
 void DataConnection::startSendChangeMeetingInfo(DataConRequest request)
 {
-    QByteArray data;
-    data.append(request.m_lData.at(0));
+    QByteArray  data;
+    QDataStream wData(&data, QIODevice::WriteOnly);
+    wData.setByteOrder(QDataStream::LittleEndian);
+    wData << request.m_lData.at(0).toUInt(); /* game Index */
+    data.append(request.m_lData.at(1));      /* when */
     data.append(char(0x00));
-    data.append(request.m_lData.at(1));
+    data.append(request.m_lData.at(2)); /* where */
     data.append(char(0x00));
-    data.append(request.m_lData.at(2));
+    data.append(request.m_lData.at(3)); /* info */
     data.append(char(0x00));
 
     MessageProtocol msg(request.m_request, data);

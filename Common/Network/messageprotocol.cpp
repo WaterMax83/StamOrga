@@ -37,7 +37,7 @@ MessageProtocol::MessageProtocol(QByteArray& data)
     this->m_pHead = (msg_Header*)this->m_Data.constData();
 }
 
-MessageProtocol::MessageProtocol(quint32 index)
+MessageProtocol::MessageProtocol(const quint32 index)
     : MessageProtocol()
 {
     this->m_pHead = (msg_Header*)this->m_Data.constData();
@@ -47,19 +47,16 @@ MessageProtocol::MessageProtocol(quint32 index)
     this->m_pHead->timestamp = qToLittleEndian(CalcTimeStamp());
 }
 
-MessageProtocol::MessageProtocol(quint32 index, QByteArray& data)
+MessageProtocol::MessageProtocol(const quint32 index, QByteArray& data)
     : MessageProtocol()
 {
     int length = data.length();
 
     int tmp = length % sizeof(quint32);
-    //    qDebug() << QString("MessageProtocol: %1 %2").arg(length).arg(tmp);
     if (tmp > 0) {
         this->m_Data.fill(0x0, MSG_HEADER_SIZE + (sizeof(quint32) - tmp));
-        //        length += (sizeof(quint32) - tmp);
     }
     this->m_Data.insert(MSG_HEADER_SIZE, data);
-    //    qDebug() << QString("MessageProtocol2: %1 %2").arg(length).arg(this->m_Data.size());
 
     this->m_pHead = (msg_Header*)this->m_Data.constData();
 
@@ -68,7 +65,7 @@ MessageProtocol::MessageProtocol(quint32 index, QByteArray& data)
     this->m_pHead->timestamp = qToLittleEndian(CalcTimeStamp());
 }
 
-MessageProtocol::MessageProtocol(quint32 index, quint32 data)
+MessageProtocol::MessageProtocol(const quint32 index, quint32 data)
     : MessageProtocol()
 {
     QDataStream wStream(&this->m_Data, QIODevice::WriteOnly);
@@ -86,7 +83,7 @@ MessageProtocol::MessageProtocol(quint32 index, quint32 data)
     this->m_pHead->timestamp = qToLittleEndian(CalcTimeStamp());
 }
 
-MessageProtocol::MessageProtocol(quint32 index, qint32 data)
+MessageProtocol::MessageProtocol(const quint32 index, qint32 data)
     : MessageProtocol()
 {
     QDataStream wStream(&this->m_Data, QIODevice::WriteOnly);
@@ -99,6 +96,21 @@ MessageProtocol::MessageProtocol(quint32 index, qint32 data)
     this->m_pHead = (msg_Header*)this->m_Data.constData();
 
     quint32 size             = sizeof(data);
+    this->m_pHead->index     = qToLittleEndian(index);
+    this->m_pHead->length    = qToLittleEndian(size);
+    this->m_pHead->timestamp = qToLittleEndian(CalcTimeStamp());
+}
+
+MessageProtocol::MessageProtocol(const quint32 index, char *data, const quint32 size)
+{
+    int tmp = size % sizeof(quint32);
+    if (tmp > 0) {
+        this->m_Data.fill(0x0, MSG_HEADER_SIZE + (sizeof(quint32) - tmp));
+    }
+    this->m_Data.insert(MSG_HEADER_SIZE, data, size);
+
+    this->m_pHead = (msg_Header*)this->m_Data.constData();
+
     this->m_pHead->index     = qToLittleEndian(index);
     this->m_pHead->length    = qToLittleEndian(size);
     this->m_pHead->timestamp = qToLittleEndian(CalcTimeStamp());

@@ -39,10 +39,11 @@ class MessageProtocol
 public:
     MessageProtocol();
     MessageProtocol(QByteArray &data);
-    MessageProtocol(quint32 index);
-    MessageProtocol(quint32 index, QByteArray &data);
-    MessageProtocol(quint32 index, quint32 data);
-    MessageProtocol(quint32 index, qint32 data);
+    MessageProtocol(const quint32 index);
+    MessageProtocol(const quint32 index, QByteArray &data);
+    MessageProtocol(const quint32 index, quint32 data);
+    MessageProtocol(const quint32 index, qint32 data);
+    MessageProtocol(const quint32 index, char* data, const quint32 size);
 
 //    void SetTimeStamp(quint32 time) { this->m_pHead->timestamp = time; }
 //    void SetIndex(quint32 index) { this->m_pHead->index = index; }

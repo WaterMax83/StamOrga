@@ -93,9 +93,9 @@ qint32 UserInterface::startChangeGame(const quint32 index, const quint32 sIndex,
     return this->m_pConHandle->startChangeGame(index, sIndex, competition, home, away, date, score);
 }
 
-qint32 UserInterface::startSaveMeetingInfo(const QString when, const QString where, const QString info)
+qint32 UserInterface::startSaveMeetingInfo(const quint32 gameIndex, const QString when, const QString where, const QString info)
 {
-    return this->m_pConHandle->startSaveMeetingInfo(when, where, info);
+    return this->m_pConHandle->startSaveMeetingInfo(gameIndex, when, where, info);
 }
 
 void UserInterface::slConnectionRequestFinished(qint32 result)

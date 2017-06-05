@@ -56,7 +56,7 @@ public:
     Q_INVOKABLE qint32 startChangeGame(const quint32 index, const quint32 sIndex, const QString competition,
                                        const QString home, const QString away, const QString date, const QString score);
 
-    Q_INVOKABLE qint32 startSaveMeetingInfo(const QString when, const QString where, const QString info);
+    Q_INVOKABLE qint32 startSaveMeetingInfo(const quint32 gameIndex, const QString when, const QString where, const QString info);
 
     Q_INVOKABLE bool isDebuggingEnabled()
     {
