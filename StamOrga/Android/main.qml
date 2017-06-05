@@ -315,6 +315,9 @@ ApplicationWindow {
         onNotifyChangedMeetingInfoFinished: {
             stackView.currentItem.notifyChangedMeetingInfoFinished(result);
         }
+        onNotifyLoadMeetingInfoFinished: {
+            stackView.currentItem.notifyLoadMeetingInfoFinished(result);
+        }
     }
 
     function openUserLogin(open) {

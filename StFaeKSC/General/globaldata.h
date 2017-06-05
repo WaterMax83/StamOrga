@@ -36,7 +36,7 @@ public:
     qint32 requestBlockSeasonTicket(quint32 ticketIndex, quint32 gameIndex, const QString userName);
     qint32 requestGetAvailableSeasonTicket(const quint32 gameIndex, const QString userName, QByteArray& data);
 
-    qint32 requestChangeMeetingInfo(const quint32 gameIndex, const QString when, const QString where, const QString info);
+    qint32 requestChangeMeetingInfo(const quint32 gameIndex, const quint32 version, const QString when, const QString where, const QString info);
     qint32 requestGetMeetingInfo(const quint32 gameIndex, const quint32 version, char* pData, const quint32 size);
 
     quint16 getTicketNumber(const quint32 gamesIndex, const quint32 state);

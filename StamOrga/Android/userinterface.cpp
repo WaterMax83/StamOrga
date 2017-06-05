@@ -98,6 +98,11 @@ qint32 UserInterface::startSaveMeetingInfo(const quint32 gameIndex, const QStrin
     return this->m_pConHandle->startSaveMeetingInfo(gameIndex, when, where, info);
 }
 
+qint32 UserInterface::startLoadMeetingInfo(const quint32 gameIndex)
+{
+    return this->m_pConHandle->startLoadMeetingInfo(gameIndex);
+}
+
 void UserInterface::slConnectionRequestFinished(qint32 result)
 {
     //this->ui->btnSendData->setEnabled(true);
@@ -165,6 +170,10 @@ void UserInterface::slCommandFinished(quint32 command, qint32 result)
 
     case OP_CODE_CMD_REQ::REQ_CHANGE_MEETING_INFO:
         emit this->notifyChangedMeetingInfoFinished(result);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO:
+        emit this->notifyLoadMeetingInfoFinished(result);
         break;
 
     default:

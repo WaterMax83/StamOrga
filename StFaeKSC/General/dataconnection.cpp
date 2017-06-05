@@ -520,14 +520,14 @@ MessageProtocol *DataConnection::requestChangeMeetingInfo(MessageProtocol *msg)
     version = qFromLittleEndian(version);
     gameIndex = qFromLittleEndian(gameIndex);
 
-    quint32 offset = 4;
+    quint32 offset = 8;
     QString when(QByteArray(pData + offset));
     offset += when.toLatin1().size() + 1;
     QString where(QByteArray(pData + offset));
     offset += where.toLatin1().size() + 1;
     QString info(QByteArray(pData + offset));
 
-    if ((rCode = this->m_pGlobalData->requestChangeMeetingInfo(gameIndex, when, where, info)) == ERROR_CODE_SUCCESS) {
+    if ((rCode = this->m_pGlobalData->requestChangeMeetingInfo(gameIndex, version, when, where, info)) == ERROR_CODE_SUCCESS) {
         qInfo().noquote() << QString("User %1 set MeetingInfo of game %2")
                                  .arg(this->m_pUserConData->userName)
                                  .arg(this->m_pGlobalData->m_GamesList.getItemName(gameIndex));

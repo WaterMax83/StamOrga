@@ -211,8 +211,9 @@ quint16 GlobalData::getTicketNumber(const quint32 gamesIndex, const quint32 stat
     return 0;
 }
 
-qint32 GlobalData::requestChangeMeetingInfo(const quint32 gameIndex, const QString when, const QString where, const QString info)
+qint32 GlobalData::requestChangeMeetingInfo(const quint32 gameIndex, const quint32 version, const QString when, const QString where, const QString info)
 {
+    Q_UNUSED(version);
     GamesPlay*  pGame   = (GamesPlay*)this->m_GamesList.getItem(gameIndex);
     if (pGame == NULL)
         return ERROR_CODE_NOT_FOUND;
@@ -252,17 +253,59 @@ qint32 GlobalData::requestChangeMeetingInfo(const quint32 gameIndex, const QStri
 /*  answer
  * 0                Header          12
  * 12   quint32     result          4
+ * 16   quint32     version         4
+ * 20   quint32     gameIndex       4
+ * 24   QString     when
+ * X    Qstring     where
+ * Y    QString     info
  */
 qint32 GlobalData::requestGetMeetingInfo(const quint32 gameIndex, const quint32 version, char *pData, const quint32 size)
 {
-//    quint32 result;
     Q_UNUSED(version);
-    Q_UNUSED(pData);
-    Q_UNUSED(size);
     GamesPlay*  pGame   = (GamesPlay*)this->m_GamesList.getItem(gameIndex);
     if (pGame == NULL)
         return ERROR_CODE_NOT_FOUND;
 
+    QString when;
+    QString where;
+    QString info;
+    qint32 result = ERROR_CODE_NOT_FOUND;
+    foreach (MeetingInfo* mInfo, this->m_meetingInfos) {
+        if (mInfo->getGameIndex() == gameIndex) {
+            result = mInfo->getMeetingInfo(when, where, info);
+            break;
+        }
+    }
+    if (result != ERROR_CODE_SUCCESS)
+        return result;
 
-    return ERROR_CODE_NOT_IMPLEMENTED;
+    quint32 offset = 0;
+    QByteArray tmp;
+    memset(pData, 0x0, size);
+
+    result = qToLittleEndian(result);
+    memcpy(pData + offset, &result, sizeof(quint32));
+    offset += sizeof(quint32);
+
+    quint32 vers = qToLittleEndian(0x1);
+    memcpy(pData + offset, &vers, sizeof(quint32));
+    offset += sizeof(quint32);
+
+    vers = qToLittleEndian(gameIndex);
+    memcpy(pData + offset, &vers, sizeof(quint32));
+    offset += sizeof(quint32);
+
+    tmp = when.toLatin1();
+    memcpy(pData + offset, tmp.constData(), tmp.size());
+    offset += tmp.size() + 1;
+
+    tmp = where.toLatin1();
+    memcpy(pData + offset, tmp.constData(), tmp.size());
+    offset += tmp.size() + 1;
+
+    tmp = info.toLatin1();
+    memcpy(pData + offset, tmp.constData(), tmp.size());
+    offset += tmp.size() + 1;
+
+    return ERROR_CODE_SUCCESS;
 }

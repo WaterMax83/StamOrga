@@ -28,6 +28,8 @@ Flickable {
     height: parent.height * 1.2
     contentHeight: mainPaneCurrentTicketInfo.height
 
+    signal showInfoHeader(var text, var load)
+
     flickableDirection: Flickable.VerticalFlick
     rebound: Transition {
             NumberAnimation {
@@ -274,9 +276,7 @@ Flickable {
                 text : "Freigeben"
                 onClicked: {
                     userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 2);
-                    busyLoadingIndicatorCurrentGames.visible = true
-                    txtInfoCurrentGame.text = "Gebe Karte frei"
-                    txtInfoCurrentGame.visible = true
+                    showInfoHeader("Gebe Karte frei", true)
                 }
             }
         }
@@ -296,9 +296,7 @@ Flickable {
                 text: "Freigeben"
                 onClicked: {
                     userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 2);
-                    busyLoadingIndicatorCurrentGames.visible = true
-                    txtInfoCurrentGame.text = "Gebe Karte frei"
-                    txtInfoCurrentGame.visible = true
+                    showInfoHeader("Gebe Karte frei", true)
                 }
             }
 
@@ -307,9 +305,7 @@ Flickable {
                 text: "Sperren"
                 onClicked: {
                     userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 1);
-                    busyLoadingIndicatorCurrentGames.visible = true
-                    txtInfoCurrentGame.text = "Sperre Karte"
-                    txtInfoCurrentGame.visible = true
+                    showInfoHeader("Sperre Karte", true)
                 }
             }
 
@@ -366,9 +362,7 @@ Flickable {
                 text: "Sperren"
                 onClicked: {
                     userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 1);
-                    busyLoadingIndicatorCurrentGames.visible = true
-                    txtInfoCurrentGame.text = "Sperre Karte"
-                    txtInfoCurrentGame.visible = true
+                    showInfoHeader("Sperre Karte", true)
                 }
             }
         }
@@ -376,9 +370,7 @@ Flickable {
     function acceptedEditReserveNameDialog(text)
     {
         userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 3, text);
-        busyLoadingIndicatorCurrentGames.visible = true
-        txtInfoCurrentGame.text = "Reserviere Karte"
-        txtInfoCurrentGame.visible = true
+        showInfoHeader("Reserviere Karte", true)
     }
 
     function showAllInfoAboutGame(sender) {
@@ -391,9 +383,8 @@ Flickable {
         if (result === 1) {
             loadAvailableTicketList()
         } else {
-            txtInfoCurrentGame.text = userIntCurrentGame.getErrorCodeToString(result)
             toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
-            busyLoadingIndicatorCurrentGames.visible = false
+            showInfoHeader(userIntCurrentGame.getErrorCodeToString(result), false)
         }
     }
 
@@ -403,8 +394,7 @@ Flickable {
             loadAvailableTicketList()
         } else {
             toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
-            busyLoadingIndicatorCurrentGames.visible = false;
-            txtInfoCurrentGame.visible = false
+            showInfoHeader("", false);
         }
     }
 
@@ -415,19 +405,18 @@ Flickable {
         listViewBlockedTickets.implicitHeight = 0;
         listViewReservedTickets.implicitHeight = 0;
         listViewFreeTickets.implicitHeight = 0;
-        busyLoadingIndicatorCurrentGames.visible = true
-        txtInfoCurrentGame.visible = true;
-        txtInfoCurrentGame.text = "Aktualisiere Daten"
+        showInfoHeader("Aktualisiere Daten", true);
         userIntCurrentGame.startRequestAvailableTickets(m_gamePlayCurrentItem.index);
     }
 
     function notifyAvailableTicketListFinished(result) {
-        busyLoadingIndicatorCurrentGames.visible = false;
         if (result === 1) {
             toastManager.show("Karten geladen", 2000);
+            showInfoHeader("", false)
         } else {
             toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
             txtInfoCurrentGame.text = "Karten konnten nicht geladen werden"
+            showInfoHeader("Karten konnten nicht geladen werden", false)
         }
         showInternalTicketList(result);
     }

@@ -32,6 +32,10 @@ public:
     Q_INVOKABLE QString where() { return this->m_where; }
     Q_INVOKABLE QString info() { return this->m_info; }
 
+    void setWhen(QString when) { this->m_when = when; }
+    void setWhere(QString where) { this->m_where = where; }
+    void setInfo(QString info) { this->m_info = info; }
+
 private:
     QString m_when;
     QString m_where;

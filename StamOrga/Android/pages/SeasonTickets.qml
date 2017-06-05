@@ -91,7 +91,7 @@ Flickable {
                 }
             }
 
-            ColumnLayout {
+            Column {
                 id: columnLayoutTickets
                 anchors.right: parent.right
                 anchors.left: parent.left

@@ -134,15 +134,29 @@ qint32 MeetingInfo::initialize(QString filePath)
 
 qint32 MeetingInfo::changeMeetingInfo(const QString when, const QString where, const QString info)
 {
-    if (this->m_when != when)
+    if (this->m_when != when) {
         this->updateHeaderValue(MEET_INFO_HEAD_WHEN, when);
+        this->m_when = when;
+    }
 
-    if (this->m_where != where)
+    if (this->m_where != where) {
         this->updateHeaderValue(MEET_INFO_HEAD_WHERE, where);
+        this->m_where = where;
+    }
 
-    if (this->m_info != info)
+    if (this->m_info != info) {
         this->updateHeaderValue(MEET_INFO_HEAD_INFO, info);
+        this->m_info = info;
+    }
 
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 MeetingInfo::getMeetingInfo(QString &when, QString &where, QString &info)
+{
+    when = this->m_when;
+    where = this->m_where;
+    info = this->m_info;
     return ERROR_CODE_SUCCESS;
 }
 

@@ -28,6 +28,8 @@ Flickable {
     height: parent.height * 1.2
     contentHeight: mainPaneCurrentMeetInfo.height
 
+    signal showInfoHeader(var text, var load);
+
     flickableDirection: Flickable.VerticalFlick
     rebound: Transition {
             NumberAnimation {
@@ -41,7 +43,8 @@ Flickable {
 
     onDragEnded: {
         if (flickableCurrentMeetInfo.contentY < -100) {
-//            loadAvailableTicketList();
+            showInfoHeader("Aktualisiere Daten", true)
+            userIntCurrentGame.startLoadMeetingInfo(m_gamePlayCurrentItem.index);
         }
     }
 
@@ -93,9 +96,7 @@ Flickable {
                         if (result === 0)
                             toastManager.show("Keine Änderung, nichts gespeichert", 2000);
                         else {
-                            busyLoadingIndicatorCurrentGames.visible = true;
-                            txtInfoCurrentGame.visible = true
-                            txtInfoCurrentGame.text = "Speichere Infos"
+                            showInfoHeader("Speichere Infos", false)
                         }
 
                     }
@@ -196,9 +197,7 @@ Flickable {
 
     function showAllInfoAboutGame() {
         meetingInfo = globalUserData.getMeetingInfo();
-        textInfo.text = meetingInfo.info();
-        textWhen.init(meetingInfo.when())
-        textWhere.init(meetingInfo.where())
+        userIntCurrentGame.startLoadMeetingInfo(m_gamePlayCurrentItem.index);
     }
 
     function checkNewTextInput() {
@@ -210,14 +209,31 @@ Flickable {
     function notifyChangedMeetingInfoFinished(result) {
         if (result === 1) {
             toastManager.show("Info erfolgreich gespeichert", 2000);
-//            loadAvailableTicketList()
+            showInfoHeader("Aktualisiere Daten", true)
+            userIntCurrentGame.startLoadMeetingInfo(m_gamePlayCurrentItem.index);
 
         } else {
             toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
-
+            showInfoHeader("Infos speichern hat nicht funktioniert", false)
         }
-        busyLoadingIndicatorCurrentGames.visible = false;
-        txtInfoCurrentGame.visible = false
+    }
+
+    function notifyLoadMeetingInfoFinished(result) {
+        if (result === 1) {
+            toastManager.show("Info übers Treffen geladen", 2000);
+            textInfo.text = meetingInfo.info();
+            textWhen.init(meetingInfo.when())
+            textWhere.init(meetingInfo.where())
+            showInfoHeader("", false)
+        } else if (result === -2) {
+            toastManager.show("Bisher noch kein Treffen gespeichert", 2000);
+            textInfo.text = "";
+            textWhen.init("")
+            textWhere.init("")
+            showInfoHeader("", false)
+        } else {
+            showInfoHeader("Infos laden hat nicht funktioniert", false)
+        }
     }
 
 }

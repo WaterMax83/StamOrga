@@ -187,6 +187,10 @@ void DataConnection::checkNewOncomingData()
             request.m_result = msg->getIntData();
             break;
 
+        case OP_CODE_CMD_RES::ACK_GET_MEETING_INFO:
+            request.m_result = this->m_pDataHandle->getHandleLoadMeetingInfo(msg);
+            break;
+
         default:
             delete msg;
             continue;
@@ -346,6 +350,7 @@ void DataConnection::startSendChangeMeetingInfo(DataConRequest request)
     QByteArray  data;
     QDataStream wData(&data, QIODevice::WriteOnly);
     wData.setByteOrder(QDataStream::LittleEndian);
+    wData << quint32(0x1);                   /* version */
     wData << request.m_lData.at(0).toUInt(); /* game Index */
     data.append(request.m_lData.at(1));      /* when */
     data.append(char(0x00));
@@ -353,6 +358,18 @@ void DataConnection::startSendChangeMeetingInfo(DataConRequest request)
     data.append(char(0x00));
     data.append(request.m_lData.at(3)); /* info */
     data.append(char(0x00));
+
+    MessageProtocol msg(request.m_request, data);
+    this->sendMessageRequest(&msg, request);
+}
+
+void DataConnection::startSendGetMeetingInfo(DataConRequest request)
+{
+    QByteArray  data;
+    QDataStream wData(&data, QIODevice::WriteOnly);
+    wData.setByteOrder(QDataStream::LittleEndian);
+    wData << quint32(0x1);                   /* version */
+    wData << request.m_lData.at(0).toUInt(); /* game Index */
 
     MessageProtocol msg(request.m_request, data);
     this->sendMessageRequest(&msg, request);
@@ -499,6 +516,10 @@ void DataConnection::startSendNewRequest(DataConRequest request)
 
     case OP_CODE_CMD_REQ::REQ_CHANGE_MEETING_INFO:
         this->startSendChangeMeetingInfo(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO:
+        this->startSendGetMeetingInfo(request);
         break;
 
     default:

@@ -310,3 +310,42 @@ qint32 DataHandling::getHandleAvailableTicketListResponse(MessageProtocol* msg, 
 
     return rValue;
 }
+
+/*  answer
+ * 0                Header          12
+ * 12   quint32     result          4
+ * 16   quint32     version         4
+ * 20   quint32     gameIndex       4
+ * 24   QString     when
+ * X    Qstring     where
+ * Y    QString     info
+ */
+qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg)
+{
+    if (msg->getDataLength() < 12)
+        return ERROR_CODE_WRONG_SIZE;
+
+    const char* pData = msg->getPointerToData();
+    quint32     gameIndex, version;
+    qint32      result;
+    memcpy(&result, pData, sizeof(quint32));
+    memcpy(&version, pData + 4, sizeof(quint32));
+    memcpy(&gameIndex, pData + 8, sizeof(quint32));
+    result    = qFromLittleEndian(result);
+    version   = qFromLittleEndian(version);
+    gameIndex = qFromLittleEndian(gameIndex);
+
+    quint32 offset = 12;
+    QString when(QByteArray(pData + offset));
+    offset += when.toLatin1().size() + 1;
+    QString where(QByteArray(pData + offset));
+    offset += where.toLatin1().size() + 1;
+    QString info(QByteArray(pData + offset));
+
+    MeetingInfo* pInfo = this->m_pGlobalData->getMeetingInfo();
+    pInfo->setWhen(when);
+    pInfo->setWhere(where);
+    pInfo->setInfo(info);
+
+    return result;
+}

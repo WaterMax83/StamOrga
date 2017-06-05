@@ -35,6 +35,7 @@ public:
     qint32 getHandleGamesListResponse(MessageProtocol* msg);
     qint32 getHandleSeasonTicketListResponse(MessageProtocol* msg);
     qint32 getHandleAvailableTicketListResponse(MessageProtocol* msg, const quint32 gameIndex);
+    qint32 getHandleLoadMeetingInfo(MessageProtocol* msg);
 
 private:
     GlobalData* m_pGlobalData;

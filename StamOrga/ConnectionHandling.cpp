@@ -226,6 +226,14 @@ qint32 ConnectionHandling::startSaveMeetingInfo(const quint32 gameIndex, const Q
     return ERROR_CODE_NO_ERROR;
 }
 
+qint32 ConnectionHandling::startLoadMeetingInfo(const quint32 gameIndex)
+{
+    DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO);
+    req.m_lData.append(QString::number(gameIndex));
+    this->sendNewRequest(req);
+
+    return ERROR_CODE_SUCCESS;
+}
 
 /*
  * Answer function after connection with username

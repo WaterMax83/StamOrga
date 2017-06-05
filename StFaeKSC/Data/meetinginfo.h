@@ -45,6 +45,7 @@ public:
 //    qint32 changeTicketState(quint32 ticketID, quint32 userID, quint32 state, QString name = "");
 
     qint32 changeMeetingInfo(const QString when, const QString where, const QString info);
+    qint32 getMeetingInfo(QString& when, QString& where, QString& info);
 
     quint32 getGameIndex() { return this->m_gameIndex; }
 

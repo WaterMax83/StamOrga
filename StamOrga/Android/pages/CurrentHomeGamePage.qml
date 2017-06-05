@@ -35,14 +35,14 @@ Item {
 
         ColumnLayout {
             id: mainColumnLayoutCurrentGame
-            width: parent.width
-            height: parent.height
-            Layout.alignment: Qt.AlignTop
+            anchors.fill: parent
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
             spacing: 0
 
             MyComponents.Games {
                 id: gameHeader
-                width: parent.width
+                anchors.left: parent.left
+                anchors.right: parent.right
                 Layout.alignment: Qt.AlignTop
 //                Layout.leftMargin: 10
 //                Layout.rightMargin: 10
@@ -52,7 +52,10 @@ Item {
             ColumnLayout {
                 id: columnLayoutBusyInfoCurrGame
                 spacing: 0
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                anchors.left: parent.left
+                anchors.right: parent.right
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                visible: txtInfoCurrentGame.visible
 
                 BusyIndicator {
                     id: busyLoadingIndicatorCurrentGames
@@ -62,15 +65,17 @@ Item {
 
                 Label {
                     id: txtInfoCurrentGame
-                    visible: true
+                    visible: false
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }
             }
 
             TabBar {
                   id: tabBar
-                  currentIndex: swipeViewCurrentHomeGame.currentIndex
-                  width: parent.width
+//                  currentIndex: swipeViewCurrentHomeGame.currentIndex
+                  anchors.left: parent.left
+                  anchors.right: parent.right
+                  Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
                   height: tabButton1.height - 10
 
                   TabButton {
@@ -86,8 +91,10 @@ Item {
                 id: swipeViewCurrentHomeGame
                 anchors.top : tabBar.bottom
                 anchors.bottom: parent.bottom
-                width: parent.width
-                Layout.alignment: Qt.AlignTop
+                anchors.left: parent.left
+                anchors.right: parent.right
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                Layout.fillHeight: true
                 currentIndex: tabBar.currentIndex
                 onCurrentItemChanged: {
                 }
@@ -106,8 +113,30 @@ Item {
         id: currentTicketInfo
     }
 
+    function currentTicketInfoNewHeaderInfo(text, load) {
+        if (swipeViewCurrentHomeGame.currentItem === currentTicketInfo) {
+            busyLoadingIndicatorCurrentGames.visible = load;
+            if (text === "")
+                txtInfoCurrentGame.visible = false
+            else
+                txtInfoCurrentGame.visible = true;
+            txtInfoCurrentGame.text = text;
+        }
+    }
+
     CurrentMeetInfo {
         id: currentMeetInfo
+    }
+
+    function currentMeetInfoNewHeaderInfo(text, load) {
+        if (swipeViewCurrentHomeGame.currentItem === currentMeetInfo) {
+            busyLoadingIndicatorCurrentGames.visible = load;
+            if (text === "")
+                txtInfoCurrentGame.visible = false
+            else
+                txtInfoCurrentGame.visible = true;
+            txtInfoCurrentGame.text = text;
+        }
     }
 
     function toolButtonClicked() {
@@ -128,12 +157,14 @@ Item {
         if (sender.isGameASeasonTicketGame()) {
             swipeViewCurrentHomeGame.addItem(currentTicketInfo)
             currentTicketInfo.showAllInfoAboutGame(sender);
+            currentTicketInfo.showInfoHeader.connect(currentTicketInfoNewHeaderInfo);
         }
 
         swipeViewCurrentHomeGame.addItem(currentMeetInfo)
 
-//        swipeViewCurrentHomeGame.currentIndex = swipeViewCurrentHomeGame.count - 1
         currentMeetInfo.showAllInfoAboutGame();
+        currentMeetInfo.showInfoHeader.connect(currentMeetInfoNewHeaderInfo);
+        console.log("Höhe = " + columnLayoutBusyInfoCurrGame.height)
     }
 
     function pageOpenedUpdateView() {}
@@ -154,6 +185,10 @@ Item {
 
     function notifyChangedMeetingInfoFinished(result) {
         currentMeetInfo.notifyChangedMeetingInfoFinished(result);
+    }
+
+    function notifyLoadMeetingInfoFinished(result) {
+        currentMeetInfo.notifyLoadMeetingInfoFinished(result);
     }
 
     function notifyUserIntConnectionFinished(result) {}
