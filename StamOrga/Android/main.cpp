@@ -18,7 +18,6 @@
 
 #include <QtCore/QDateTime>
 #include <QtCore/QMetaObject>
-#include <QtCore/QSettings>
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/QQmlContext>

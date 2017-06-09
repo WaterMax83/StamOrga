@@ -49,5 +49,11 @@
         <file>images/+material/time.png</file>
         <file>images/place.png</file>
         <file>images/time.png</file>
+        <file>images/+material/close.png</file>
+        <file>images/+material/done.png</file>
+        <file>images/+material/help.png</file>
+        <file>images/close.png</file>
+        <file>images/done.png</file>
+        <file>images/help.png</file>
     </qresource>
 </RCC>

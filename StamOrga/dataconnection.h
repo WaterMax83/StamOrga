@@ -88,6 +88,7 @@ private:
     void startSendChangeGameRequest(DataConRequest request);
     void startSendChangeMeetingInfo(DataConRequest request);
     void startSendGetMeetingInfo(DataConRequest request);
+    void startSendAcceptMeeting(DataConRequest request);
 
 
     void   checkNewOncomingData();

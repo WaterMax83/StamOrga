@@ -77,6 +77,7 @@ Flickable {
             RowLayout {
                 width: parent.width
                 spacing: 20
+                Layout.fillWidth: true
 
                 MyComponents.GraphicalButton {
                     imageSource: "../images/edit.png"
@@ -102,12 +103,37 @@ Flickable {
                     }
                     Layout.alignment: Qt.AlignRight
                 }
+
+                MyComponents.GraphicalButton {
+                    imageSource: "../images/done.png"
+                    enabled: isEditMode ? false : true
+                    onClickedButton: {
+                        acceptValue = 1;
+                        showTextDialogAccept("Zusagen");
+                    }
+                    Layout.alignment: Qt.AlignRight
+                }
+
+                MyComponents.GraphicalButton {
+                    imageSource: "../images/help.png"
+                    enabled: isEditMode ? false : true
+                    onClickedButton: {
+                        acceptValue = 2;
+                        showTextDialogAccept("Interesse/Vorbehalt");
+                    }
+                    Layout.alignment: Qt.AlignRight
+                }
+
+                MyComponents.GraphicalButton {
+                    imageSource: "../images/close.png"
+                    enabled: isEditMode ? false : true
+                    onClickedButton: {
+                        acceptValue = 3;
+                        showTextDialogAccept("Absagen");
+                    }
+                    Layout.alignment: Qt.AlignRight
+                }
             }
-
-//            Button {
-//                text: "Test"
-
-//            }
 
             MyComponents.EditableTextWithHint {
                 id: textWhere
@@ -131,7 +157,6 @@ Flickable {
 
             RowLayout {
                 width: parent.width
-
                 MouseArea {
                     width: clipInfoUpImage.width
                     height: clipInfoUpImage.height
@@ -147,11 +172,9 @@ Flickable {
                             isInfoVisible = true;
                     }
                 }
-
                 Label {
                     text: "Info"
                 }
-
                 ToolSeparator {
                     id: toolSeparator1
                     orientation: "Horizontal"
@@ -183,17 +206,65 @@ Flickable {
                 }
             }
 
+            RowLayout {
+                width: parent.width
+                MouseArea {
+                    width: clipAcceptUpImage.width
+                    height: clipAcceptUpImage.height
+                    Image {
+                        id: clipAcceptUpImage
+                        source: "../images/play.png"
+                        rotation: isAcceptVisible ? 90 : 0
+                    }
+                    onClicked: {
+                        if (isAcceptVisible)
+                            isAcceptVisible = false
+                        else
+                            isAcceptVisible = true;
+                    }
+                }
+                Label {
+                    text: "Zusagen"
+                }
+                ToolSeparator {
+                    id: toolSeparator2
+                    orientation: "Horizontal"
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    Layout.fillWidth: true
+                }
+            }
+
         }
+    }
+
+    function showTextDialogAccept(header) {
+        var component = Qt.createComponent("../components/EditableTextDialog.qml");
+        if (component.status === Component.Ready) {
+            var dialog = component.createObject(mainPaneCurrentGame,{popupType: 1});
+            dialog.headerText = header;
+            dialog.parentHeight = mainWindow.height
+            dialog.parentWidth =  mainPaneCurrentGame.width
+            dialog.textMinSize = 5;
+            dialog.acceptedTextEdit.connect(acceptedEditTextDialogAccept);
+            dialog.open();
+        }
+    }
+
+    function acceptedEditTextDialogAccept(text) {
+        userIntCurrentGame.startAcceptMeetingInfo(m_gamePlayCurrentItem.index, acceptValue, text);
+        showInfoHeader("Ändere Teilnahme", true)
     }
 
     function toolButtonClicked() {
 
     }
 
+    property int  acceptValue;
     property var  meetingInfo;
     property bool isEditMode: false
     property bool isInputAlreadyChanged: false
     property bool isInfoVisible: false
+    property bool isAcceptVisible: false
 
     function showAllInfoAboutGame() {
         meetingInfo = globalUserData.getMeetingInfo();
@@ -225,7 +296,7 @@ Flickable {
             textWhen.init(meetingInfo.when())
             textWhere.init(meetingInfo.where())
             showInfoHeader("", false)
-        } else if (result === -2) {
+        } else if (result === -5) {
             toastManager.show("Bisher noch kein Treffen gespeichert", 2000);
             textInfo.text = "";
             textWhen.init("")
@@ -233,6 +304,18 @@ Flickable {
             showInfoHeader("", false)
         } else {
             showInfoHeader("Infos laden hat nicht funktioniert", false)
+        }
+    }
+
+    function notifyAcceptMeetingFinished(result) {
+        if (result === 1) {
+            toastManager.show("Teilnahme erfolgreich geändert", 2000);
+            showInfoHeader("Aktualisiere Daten", true)
+            userIntCurrentGame.startLoadMeetingInfo(m_gamePlayCurrentItem.index);
+
+        } else {
+            toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
+            showInfoHeader("Teilnehmen hat nicht funktioniert", false)
         }
     }
 

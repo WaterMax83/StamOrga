@@ -167,8 +167,8 @@ Flickable {
         }
 
         if (globalUserData.getSeasonTicketLength() > 0) {
-            /* Somehow the first element is not visible, so create an not used item */
-            var test = seasonTicketItem.createObject(columnLayoutTickets)
+//            /* Somehow the first element is not visible, so create an not used item */
+//            var test = seasonTicketItem.createObject(columnLayoutTickets)
             for (var i=0; i<globalUserData.getSeasonTicketLength(); i++) {
                 var sprite = seasonTicketItem.createObject(columnLayoutTickets)
                 sprite.showTicketInfo(i);

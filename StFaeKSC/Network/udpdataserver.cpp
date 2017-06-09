@@ -180,6 +180,10 @@ MessageProtocol* UdpDataServer::checkNewMessage(MessageProtocol* msg)
             ack = this->m_pDataConnection->requestGetMeetingInfo(msg);
             break;
 
+        case OP_CODE_CMD_REQ::REQ_ACCEPT_MEETING:
+            ack = this->m_pDataConnection->requestAcceptMeeting(msg);
+            break;
+
         default:
             qWarning().noquote() << QString("Unkown command 0x%1").arg(QString::number(msg->getIndex()));
             break;

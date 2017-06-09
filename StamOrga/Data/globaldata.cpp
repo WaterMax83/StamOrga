@@ -65,6 +65,7 @@ void GlobalData::loadGlobalSettings()
     QHostInfo::lookupHost("watermax83.ddns.net", this, SLOT(callBackLookUpHost(QHostInfo)));
 
     this->m_pMainUserSettings = new QSettings();
+    this->m_pMainUserSettings->setIniCodec(("UTF-8"));
 
     qInfo() << this->m_pMainUserSettings->fileName();
 

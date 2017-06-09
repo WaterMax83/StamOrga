@@ -85,6 +85,13 @@ enum TICKET_STATE {
     TICKET_STATE_RESERVED     = 3,
 };
 
+enum ACCEPT_STATE {
+    ACCEPT_STATE_NOT_POSSIBLE = 0,
+    ACCEPT_STATE_ACCEPT       = 1,
+    ACCEPT_STATE_MAYBE        = 2,
+    ACCEPT_STATE_DECLINE      = 3,
+};
+
 enum CompetitionIndex {
     NO_COMPETITION   = 0,
     BUNDESLIGA_1     = 1,
@@ -98,7 +105,6 @@ enum CompetitionIndex {
 
 extern CompetitionIndex getCompetitionIndex(QString comp);
 extern QString getCompetitionString(CompetitionIndex index);
-
 
 #define USER_ENABLE_LOG 0x1
 #define USER_ENABLE_ADD_GAME 0x2

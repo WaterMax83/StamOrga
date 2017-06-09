@@ -318,6 +318,9 @@ ApplicationWindow {
         onNotifyLoadMeetingInfoFinished: {
             stackView.currentItem.notifyLoadMeetingInfoFinished(result);
         }
+        onNotifyAcceptMeetingFinished: {
+            stackView.currentItem.notifyAcceptMeetingFinished(result);
+        }
     }
 
     function openUserLogin(open) {

@@ -103,9 +103,13 @@ qint32 UserInterface::startLoadMeetingInfo(const quint32 gameIndex)
     return this->m_pConHandle->startLoadMeetingInfo(gameIndex);
 }
 
+qint32 UserInterface::startAcceptMeetingInfo(const quint32 gameIndex, const quint32 accept, const QString name, const quint32 acceptIndex)
+{
+    return this->m_pConHandle->startAcceptMeetingInfo(gameIndex, accept, name, acceptIndex);
+}
+
 void UserInterface::slConnectionRequestFinished(qint32 result)
 {
-    //this->ui->btnSendData->setEnabled(true);
     emit this->notifyConnectionFinished(result);
     if (result > ERROR_CODE_NO_ERROR) {
         this->m_pConHandle->startGettingVersionInfo();
@@ -174,6 +178,10 @@ void UserInterface::slCommandFinished(quint32 command, qint32 result)
 
     case OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO:
         emit this->notifyLoadMeetingInfoFinished(result);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_ACCEPT_MEETING:
+        emit this->notifyAcceptMeetingFinished(result);
         break;
 
     default:

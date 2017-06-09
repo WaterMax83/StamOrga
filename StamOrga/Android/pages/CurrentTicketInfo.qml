@@ -319,7 +319,7 @@ Flickable {
                         var dialog = component.createObject(mainPaneCurrentGame,{popupType: 1});
                         dialog.headerText = "Reservierung ändern";
                         dialog.parentHeight = mainWindow.height
-                        dialog.parentWidth =  flickableCurrentTicketInfo.width
+                        dialog.parentWidth =  mainPaneCurrentGame.width
                         dialog.textMinSize = 5;
                         dialog.acceptedTextEdit.connect(acceptedEditReserveNameDialog);
                         dialog.open();
@@ -349,7 +349,7 @@ Flickable {
                         var dialog = component.createObject(mainPaneCurrentGame,{popupType: 1});
                         dialog.headerText = "Reserviere für";
                         dialog.parentHeight = mainWindow.height
-                        dialog.parentWidth =  flickableCurrentTicketInfo.width
+                        dialog.parentWidth =  mainPaneCurrentGame.width
                         dialog.textMinSize = 5;
                         dialog.acceptedTextEdit.connect(acceptedEditReserveNameDialog);
                         dialog.open();

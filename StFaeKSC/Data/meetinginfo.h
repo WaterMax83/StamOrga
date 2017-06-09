@@ -26,11 +26,10 @@
 
 #include "configlist.h"
 
-//struct AvailableTicketInfo : public ConfigItem {
-//    quint32 m_ticketID;
-//    quint32 m_userID;
-//    quint32 m_state;
-//};
+struct AcceptMeetingInfo : public ConfigItem {
+    quint32 m_state;
+    quint32 m_userID;
+};
 
 class MeetingInfo : public ConfigList
 {
@@ -41,18 +40,18 @@ public:
     qint32 initialize(quint32 year, quint32 competition, quint32 seasonIndex, quint32 index);
     qint32 initialize(QString filePath);
 
-//    qint32 addNewTicket(quint32 ticketID, quint32 userID, quint32 state, QString name = "");
-//    qint32 changeTicketState(quint32 ticketID, quint32 userID, quint32 state, QString name = "");
+    qint32 addNewAcceptation(const quint32 acceptState, const quint32 userID, QString name = "");
+    //    qint32 changeTicketState(quint32 ticketID, quint32 userID, quint32 state, QString name = "");
 
     qint32 changeMeetingInfo(const QString when, const QString where, const QString info);
     qint32 getMeetingInfo(QString& when, QString& where, QString& info);
 
     quint32 getGameIndex() { return this->m_gameIndex; }
 
-//    quint16 getTicketNumber(const quint32 state);
+    //    quint16 getTicketNumber(const quint32 state);
 
-//    qint32 getTicketState(quint32 ticketID);
-//    QString getTicketName(quint32 ticketID);
+    //    qint32 getTicketState(quint32 ticketID);
+    //    QString getTicketName(quint32 ticketID);
 
 
 private:
@@ -69,9 +68,8 @@ private:
 
     bool updateHeaderValue(QString key, QVariant value);
 
-//    bool addNewAvailableTicket(QString name, qint64 timestamp, quint32 index, quint32 ticketID, quint32 userID, quint32 state, bool checkTicket = true);
-//    void addNewAvailableTicket(QString name, qint64 timestamp, quint32 index, quint32 ticketID, quint32 userID, quint32 state, QList<ConfigItem*>* pList);
-
+    bool addNewAcceptInfo(QString name, qint64 timestamp, quint32 index, quint32 state, quint32 userID, bool checkAccept = true);
+    void addNewAcceptInfo(QString name, qint64 timestamp, quint32 index, quint32 state, quint32 userID, QList<ConfigItem*>* pList);
 };
 
 #endif // MEETINGINFO_H

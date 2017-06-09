@@ -52,20 +52,23 @@ Item {
             ColumnLayout {
                 id: columnLayoutBusyInfoCurrGame
                 spacing: 0
-                anchors.left: parent.left
-                anchors.right: parent.right
+                width: parent.width
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                visible: txtInfoCurrentGame.visible
+//                visible: txtInfoCurrentGame.visible
 
                 BusyIndicator {
                     id: busyLoadingIndicatorCurrentGames
                     visible: false
+//                    anchors.left: parent.left
+//                    anchors.right: parent.right
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }
 
                 Label {
                     id: txtInfoCurrentGame
                     visible: false
+//                    anchors.left: parent.left
+//                    anchors.right: parent.right
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }
             }
@@ -156,15 +159,14 @@ Item {
 
         if (sender.isGameASeasonTicketGame()) {
             swipeViewCurrentHomeGame.addItem(currentTicketInfo)
-            currentTicketInfo.showAllInfoAboutGame(sender);
             currentTicketInfo.showInfoHeader.connect(currentTicketInfoNewHeaderInfo);
+            currentTicketInfo.showAllInfoAboutGame(sender);
         }
 
         swipeViewCurrentHomeGame.addItem(currentMeetInfo)
 
-        currentMeetInfo.showAllInfoAboutGame();
         currentMeetInfo.showInfoHeader.connect(currentMeetInfoNewHeaderInfo);
-        console.log("Höhe = " + columnLayoutBusyInfoCurrGame.height)
+        currentMeetInfo.showAllInfoAboutGame();
     }
 
     function pageOpenedUpdateView() {}
@@ -189,6 +191,10 @@ Item {
 
     function notifyLoadMeetingInfoFinished(result) {
         currentMeetInfo.notifyLoadMeetingInfoFinished(result);
+    }
+
+    function notifyAcceptMeetingFinished(result) {
+        currentMeetInfo.notifyAcceptMeetingFinished(result);
     }
 
     function notifyUserIntConnectionFinished(result) {}

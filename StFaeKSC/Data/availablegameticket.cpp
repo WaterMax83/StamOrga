@@ -38,7 +38,7 @@ qint32 AvailableGameTickets::initialize(quint32 year, quint32 competition, quint
     this->m_seasonIndex = seasonIndex;
     this->m_gameIndex   = index;
 
-    QString userSetFilePath = getUserHomeConfigPath() + "/Settings/";
+    QString userSetFilePath = getUserHomeConfigPath() + "/Settings/AvailableTickets/";
     userSetFilePath.append(QString("Tickets_Game_%1.ini").arg(index));
 
     if (!checkFilePathExistAndCreate(userSetFilePath)) {
@@ -47,6 +47,7 @@ qint32 AvailableGameTickets::initialize(quint32 year, quint32 competition, quint
     }
 
     this->m_pConfigSettings = new QSettings(userSetFilePath, QSettings::IniFormat);
+    this->m_pConfigSettings->setIniCodec(("UTF-8"));
 
     this->m_pConfigSettings->beginGroup("TicketHeader");
 
@@ -63,6 +64,7 @@ qint32 AvailableGameTickets::initialize(quint32 year, quint32 competition, quint
 qint32 AvailableGameTickets::initialize(QString filePath)
 {
     this->m_pConfigSettings = new QSettings(filePath, QSettings::IniFormat);
+    this->m_pConfigSettings->setIniCodec(("UTF-8"));
 
     this->m_pConfigSettings->beginGroup("TicketHeader");
 
@@ -127,7 +129,7 @@ qint32 AvailableGameTickets::initialize(QString filePath)
 qint32 AvailableGameTickets::addNewTicket(quint32 ticketID, quint32 userID, quint32 state, QString name)
 {
     if (state == TICKET_STATE_BLOCKED) {
-        qWarning().noquote() << QString("Could not add available ticket, state 0 is not allowed ").arg(name);
+        qWarning().noquote() << QString("Could not add available ticket \"%1\", state 0 is not allowed ").arg(name);
         return ERROR_CODE_COMMON;
     }
 

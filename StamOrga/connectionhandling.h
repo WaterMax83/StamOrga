@@ -51,6 +51,8 @@ public:
                            const QString home, const QString away, const QString date, const QString score);
     qint32 startSaveMeetingInfo(const quint32 gameIndex, const QString when, const QString where, const QString info);
     qint32 startLoadMeetingInfo(const quint32 gameIndex);
+    qint32 startAcceptMeetingInfo(const quint32 gameIndex, const quint32 accept,
+                                  const QString name, const quint32 acceptIndex = 0);
 
 
     void setGlobalData(GlobalData* pData)

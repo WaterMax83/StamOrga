@@ -35,6 +35,7 @@ Games::Games()
     }
 
     this->m_pConfigSettings = new QSettings(gamesSetFilePath, QSettings::IniFormat);
+    this->m_pConfigSettings->setIniCodec(("UTF-8"));
 
     /* Check wheter we have to save data after reading again */
     bool bProblems = false;

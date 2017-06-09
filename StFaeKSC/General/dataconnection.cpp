@@ -460,14 +460,14 @@ MessageProtocol* DataConnection::requestGetAvailableTicketList(MessageProtocol* 
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_AVAILABLE_TICKETS, rCode);
 }
 
-MessageProtocol* DataConnection::requestChangeGame(MessageProtocol *msg)
+MessageProtocol* DataConnection::requestChangeGame(MessageProtocol* msg)
 {
     if (msg->getDataLength() < 4) {
         qWarning() << QString("Wrong message size for request change game for user %1").arg(this->m_pUserConData->userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME, ERROR_CODE_WRONG_SIZE);
     }
 
-    QString info(msg->getPointerToData());
+    QString     info(msg->getPointerToData());
     QStringList parts = info.split(";");
     if (parts.length() < 7) {
         qWarning() << QString("Wrong message content count %1 for request change game for user %2").arg(parts.length()).arg(this->m_pUserConData->userName);
@@ -475,18 +475,18 @@ MessageProtocol* DataConnection::requestChangeGame(MessageProtocol *msg)
     }
 
 
-    QString home = parts[0];
-    QString away = parts[1];
-    QDateTime test = QDateTime::fromString(parts[2], "dd.MM.yyyy hh:mm");
-    qint64 timestamp = test.toMSecsSinceEpoch();
+    QString   home      = parts[0];
+    QString   away      = parts[1];
+    QDateTime test      = QDateTime::fromString(parts[2], "dd.MM.yyyy hh:mm");
+    qint64    timestamp = test.toMSecsSinceEpoch();
     if (timestamp < 0) {
         qWarning() << QString("Wrong timestamp %1 for request change game for user %2").arg(parts[2], this->m_pUserConData->userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME, ERROR_CODE_WRONG_PARAMETER);
     }
-    QString score = parts[3];
-    qint32 index = parts[4].toInt();
-    quint32 sIndex = parts[5].toUInt();
-    CompetitionIndex comp = CompetitionIndex(parts[6].toUInt());
+    QString          score  = parts[3];
+    qint32           index  = parts[4].toInt();
+    quint32          sIndex = parts[5].toUInt();
+    CompetitionIndex comp   = CompetitionIndex(parts[6].toUInt());
 
     qint32 result = this->m_pGlobalData->m_GamesList.addNewGame(home, away, timestamp, sIndex, score, comp);
     if (result < 0)
@@ -505,7 +505,7 @@ MessageProtocol* DataConnection::requestChangeGame(MessageProtocol *msg)
  * X   QString       where
  * Y   QString       info
  */
-MessageProtocol *DataConnection::requestChangeMeetingInfo(MessageProtocol *msg)
+MessageProtocol* DataConnection::requestChangeMeetingInfo(MessageProtocol* msg)
 {
     qint32 rCode;
     if (msg->getDataLength() <= 4) {
@@ -513,25 +513,24 @@ MessageProtocol *DataConnection::requestChangeMeetingInfo(MessageProtocol *msg)
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_MEETING_INFO, ERROR_CODE_WRONG_SIZE);
     }
 
-    const char* pData       = msg->getPointerToData();
+    const char* pData = msg->getPointerToData();
     quint32     gameIndex, version;
     memcpy(&version, pData, sizeof(quint32));
     memcpy(&gameIndex, pData + 4, sizeof(quint32));
-    version = qFromLittleEndian(version);
+    version   = qFromLittleEndian(version);
     gameIndex = qFromLittleEndian(gameIndex);
 
     quint32 offset = 8;
     QString when(QByteArray(pData + offset));
-    offset += when.toLatin1().size() + 1;
+    offset += when.toUtf8().size() + 1;
     QString where(QByteArray(pData + offset));
-    offset += where.toLatin1().size() + 1;
+    offset += where.toUtf8().size() + 1;
     QString info(QByteArray(pData + offset));
 
     if ((rCode = this->m_pGlobalData->requestChangeMeetingInfo(gameIndex, version, when, where, info)) == ERROR_CODE_SUCCESS) {
         qInfo().noquote() << QString("User %1 set MeetingInfo of game %2")
                                  .arg(this->m_pUserConData->userName)
                                  .arg(this->m_pGlobalData->m_GamesList.getItemName(gameIndex));
-        return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_MEETING_INFO, ERROR_CODE_SUCCESS);
     }
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_MEETING_INFO, rCode);
 }
@@ -541,7 +540,7 @@ MessageProtocol *DataConnection::requestChangeMeetingInfo(MessageProtocol *msg)
  * 12   quint32      version         4
  * 16   quint32      gameIndex       4
  */
-MessageProtocol *DataConnection::requestGetMeetingInfo(MessageProtocol *msg)
+MessageProtocol* DataConnection::requestGetMeetingInfo(MessageProtocol* msg)
 {
     qint32 rCode;
     if (msg->getDataLength() != 8) {
@@ -549,15 +548,15 @@ MessageProtocol *DataConnection::requestGetMeetingInfo(MessageProtocol *msg)
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_MEETING_INFO, ERROR_CODE_WRONG_SIZE);
     }
 
-    const char* pData       = msg->getPointerToData();
+    const char* pData = msg->getPointerToData();
     quint32     gameIndex, version;
     memcpy(&version, pData, sizeof(quint32));
     memcpy(&gameIndex, pData + 4, sizeof(quint32));
-    version = qFromLittleEndian(version);
+    version   = qFromLittleEndian(version);
     gameIndex = qFromLittleEndian(gameIndex);
 
-    quint32 size = 5000;
-    char buffer[5000];
+    quint32 size = 10000;
+    char    buffer[10000];
 
     if ((rCode = this->m_pGlobalData->requestGetMeetingInfo(gameIndex, version, &buffer[0], size)) == ERROR_CODE_SUCCESS) {
         qInfo().noquote() << QString("User %1 get MeetingInfo of game %2")
@@ -566,4 +565,39 @@ MessageProtocol *DataConnection::requestGetMeetingInfo(MessageProtocol *msg)
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_MEETING_INFO, &buffer[0], size);
     }
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_MEETING_INFO, rCode);
+}
+
+/*  request
+ * 0                Header          12
+ * 12   quint32      version         4
+ * 16   quint32      gameIndex       4
+ * 20   quint32      acceptValue     4
+ * 24   quint32      acceptIndex     4
+ * 28   QString      name            4
+ */
+MessageProtocol* DataConnection::requestAcceptMeeting(MessageProtocol* msg)
+{
+    qint32 rCode;
+    if (msg->getDataLength() < 16) {
+        qWarning() << QString("Wrong message size for accept meeting for user %1").arg(this->m_pUserConData->userName);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_ACCEPT_MEETING, ERROR_CODE_WRONG_SIZE);
+    }
+
+    const quint32* pData = (quint32*)msg->getPointerToData();
+    quint32        gameIndex, version, acceptValue, acceptIndex;
+
+    version     = qFromLittleEndian(pData[0]);
+    gameIndex   = qFromLittleEndian(pData[1]);
+    acceptValue = qFromLittleEndian(pData[2]);
+    acceptIndex = qFromLittleEndian(pData[3]);
+
+    QString name(QByteArray((char*)(pData + 4)));
+
+    if ((rCode = this->m_pGlobalData->requestAcceptMeetingInfo(gameIndex, version, acceptValue, acceptIndex, name, this->m_pUserConData->userName)) == ERROR_CODE_SUCCESS) {
+        qInfo().noquote() << QString("User %1 accepted MeetingInfo of game %2 with value %3")
+                                 .arg(this->m_pUserConData->userName)
+                                 .arg(this->m_pGlobalData->m_GamesList.getItemName(gameIndex))
+                                 .arg(acceptValue);
+    }
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_ACCEPT_MEETING, rCode);
 }

@@ -235,6 +235,18 @@ qint32 ConnectionHandling::startLoadMeetingInfo(const quint32 gameIndex)
     return ERROR_CODE_SUCCESS;
 }
 
+qint32 ConnectionHandling::startAcceptMeetingInfo(const quint32 gameIndex, const quint32 accept, const QString name, const quint32 acceptIndex)
+{
+    DataConRequest req(OP_CODE_CMD_REQ::REQ_ACCEPT_MEETING);
+    req.m_lData.append(QString::number(gameIndex));
+    req.m_lData.append(QString::number(accept));
+    req.m_lData.append(QString::number(acceptIndex));
+    req.m_lData.append(name);
+    this->sendNewRequest(req);
+
+    return ERROR_CODE_SUCCESS;
+}
+
 /*
  * Answer function after connection with username
  */
@@ -361,6 +373,13 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
         } else
             emit this->sNotifyCommandFinished(request.m_request, request.m_result);
         break;
+
+    case OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO:
+        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
+        if (request.m_result == ERROR_CODE_NOT_FOUND)
+            return;
+        break;
+
 
     default:
         emit this->sNotifyCommandFinished(request.m_request, request.m_result);

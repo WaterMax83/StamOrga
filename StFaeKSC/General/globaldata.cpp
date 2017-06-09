@@ -18,9 +18,9 @@
 
 #include <QtCore/QDataStream>
 #include <QtCore/QDateTime>
-#include <QtCore/QtEndian>
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
+#include <QtCore/QtEndian>
 
 #include "../Common/General/globalfunctions.h"
 #include "globaldata.h"
@@ -29,9 +29,7 @@ GlobalData::GlobalData()
 {
     QString userSetDirPath = getUserHomeConfigPath() + "/Settings/";
 
-    QDir userSetDir(userSetDirPath);
-    if (!userSetDir.exists())
-        return;
+    QDir userSetDir(userSetDirPath + "AvailableTickets/");
 
     QStringList nameFilter;
 
@@ -40,7 +38,7 @@ GlobalData::GlobalData()
     foreach (QString file, infoConfigList) {
         AvailableGameTickets* tickets = new AvailableGameTickets();
 
-        if (tickets->initialize(userSetDirPath + file) >= 0)
+        if (tickets->initialize(userSetDir.path() + "/" + file) >= 0)
             this->m_availableTickets.append(tickets);
         else
             delete tickets;
@@ -48,12 +46,13 @@ GlobalData::GlobalData()
 
     nameFilter.clear();
 
+    userSetDir.setPath(userSetDirPath + "Meetings/");
     nameFilter << "Meetings_Game_*.ini";
     infoConfigList = userSetDir.entryList(nameFilter, QDir::Files | QDir::Readable);
     foreach (QString file, infoConfigList) {
         MeetingInfo* mInfo = new MeetingInfo();
 
-        if (mInfo->initialize(userSetDirPath + file) >= 0)
+        if (mInfo->initialize(userSetDir.path() + "/" + file) >= 0)
             this->m_meetingInfos.append(mInfo);
         else
             delete mInfo;
@@ -214,7 +213,7 @@ quint16 GlobalData::getTicketNumber(const quint32 gamesIndex, const quint32 stat
 qint32 GlobalData::requestChangeMeetingInfo(const quint32 gameIndex, const quint32 version, const QString when, const QString where, const QString info)
 {
     Q_UNUSED(version);
-    GamesPlay*  pGame   = (GamesPlay*)this->m_GamesList.getItem(gameIndex);
+    GamesPlay* pGame = (GamesPlay*)this->m_GamesList.getItem(gameIndex);
     if (pGame == NULL)
         return ERROR_CODE_NOT_FOUND;
 
@@ -223,13 +222,13 @@ qint32 GlobalData::requestChangeMeetingInfo(const quint32 gameIndex, const quint
         return ERROR_CODE_IN_PAST;
 #endif
 
-    qint32  result = ERROR_CODE_SUCCESS;
-//    quint32 userID = this->m_UserList.getItemIndex(userName);
+    qint32 result = ERROR_CODE_SUCCESS;
+    //    quint32 userID = this->m_UserList.getItemIndex(userName);
     foreach (MeetingInfo* mInfo, this->m_meetingInfos) {
         if (mInfo->getGameIndex() == gameIndex) {
             result = mInfo->changeMeetingInfo(when, where, info);
             if (result == ERROR_CODE_SUCCESS)
-                qInfo().noquote() << QString("Changed Meeting infoat game %1").arg(pGame->m_index);
+                qInfo().noquote() << QString("Changed Meeting info at game %1").arg(pGame->m_index);
             else
                 qWarning().noquote() << QString("Error setting meeting info at game %1: %2").arg(pGame->m_index).arg(result);
             return result;
@@ -258,29 +257,34 @@ qint32 GlobalData::requestChangeMeetingInfo(const quint32 gameIndex, const quint
  * 24   QString     when
  * X    Qstring     where
  * Y    QString     info
+ *      quint32     acceptIndex     4
+ *      quint32     acceptValue     4
+ *      QString     name            Z
  */
-qint32 GlobalData::requestGetMeetingInfo(const quint32 gameIndex, const quint32 version, char *pData, const quint32 size)
+qint32 GlobalData::requestGetMeetingInfo(const quint32 gameIndex, const quint32 version, char* pData, quint32& size)
 {
     Q_UNUSED(version);
-    GamesPlay*  pGame   = (GamesPlay*)this->m_GamesList.getItem(gameIndex);
+    GamesPlay* pGame = (GamesPlay*)this->m_GamesList.getItem(gameIndex);
     if (pGame == NULL)
         return ERROR_CODE_NOT_FOUND;
 
-    QString when;
-    QString where;
-    QString info;
-    qint32 result = ERROR_CODE_NOT_FOUND;
-    foreach (MeetingInfo* mInfo, this->m_meetingInfos) {
-        if (mInfo->getGameIndex() == gameIndex) {
-            result = mInfo->getMeetingInfo(when, where, info);
+    QString      when;
+    QString      where;
+    QString      info;
+    qint32       result = ERROR_CODE_NOT_FOUND;
+    MeetingInfo* mInfo  = NULL;
+    foreach (MeetingInfo* mi, this->m_meetingInfos) {
+        if (mi->getGameIndex() == gameIndex) {
+            result = mi->getMeetingInfo(when, where, info);
+            mInfo  = mi;
             break;
         }
     }
     if (result != ERROR_CODE_SUCCESS)
         return result;
 
-    quint32 offset = 0;
-    QByteArray tmp;
+    quint32    offset = 0;
+    QByteArray tmpA;
     memset(pData, 0x0, size);
 
     result = qToLittleEndian(result);
@@ -295,17 +299,85 @@ qint32 GlobalData::requestGetMeetingInfo(const quint32 gameIndex, const quint32 
     memcpy(pData + offset, &vers, sizeof(quint32));
     offset += sizeof(quint32);
 
-    tmp = when.toLatin1();
-    memcpy(pData + offset, tmp.constData(), tmp.size());
-    offset += tmp.size() + 1;
+    tmpA = when.toUtf8();
+    memcpy(pData + offset, tmpA.constData(), tmpA.size());
+    offset += tmpA.size() + 1;
 
-    tmp = where.toLatin1();
-    memcpy(pData + offset, tmp.constData(), tmp.size());
-    offset += tmp.size() + 1;
+    tmpA = where.toUtf8();
+    memcpy(pData + offset, tmpA.constData(), tmpA.size());
+    offset += tmpA.size() + 1;
 
-    tmp = info.toLatin1();
-    memcpy(pData + offset, tmp.constData(), tmp.size());
-    offset += tmp.size() + 1;
+    tmpA = info.toUtf8();
+    memcpy(pData + offset, tmpA.constData(), tmpA.size());
+    offset += tmpA.size() + 1;
+
+    quint32 tmp;
+    qint32  acceptCount = mInfo->getNumberOfInternalList();
+    for (int i = 0; i < acceptCount; i++) {
+        AcceptMeetingInfo* ami = (AcceptMeetingInfo*)mInfo->getRequestConfigItemFromListIndex(i);
+
+        tmp = qToLittleEndian(ami->m_index);
+        memcpy(pData + offset, &tmp, sizeof(quint32));
+        offset += sizeof(quint32);
+
+        tmp = qToLittleEndian(ami->m_state);
+        memcpy(pData + offset, &tmp, sizeof(quint32));
+        offset += sizeof(quint32);
+
+        tmpA = ami->m_itemName.toUtf8();
+        memcpy(pData + offset, tmpA.constData(), tmpA.size());
+        offset += tmpA.size() + 1;
+    }
+
+    size = offset;
+
+    return ERROR_CODE_SUCCESS;
+}
+
+/*  answer
+ * 0                Header          12
+ * 12   quint32     result          4
+ */
+qint32 GlobalData::requestAcceptMeetingInfo(const quint32 gameIndex, const quint32 version,
+                                            const quint32 acceptValue, const quint32 acceptIndex,
+                                            const QString name, const QString userName)
+{
+    Q_UNUSED(version);
+    GamesPlay* pGame = (GamesPlay*)this->m_GamesList.getItem(gameIndex);
+    if (pGame == NULL)
+        return ERROR_CODE_NOT_FOUND;
+
+#ifdef ENABLE_PAST_CHECK
+    if (pGame->m_timestamp < QDateTime::currentMSecsSinceEpoch())
+        return ERROR_CODE_IN_PAST;
+#endif
+
+    qint32  result = ERROR_CODE_SUCCESS;
+    quint32 userID = this->m_UserList.getItemIndex(userName);
+    foreach (MeetingInfo* mInfo, this->m_meetingInfos) {
+        if (mInfo->getGameIndex() == gameIndex) {
+            if (acceptIndex == 0)
+                result = mInfo->addNewAcceptation(acceptValue, userID, name);
+            else
+                result = ERROR_CODE_NOT_IMPLEMENTED;
+            if (result == ERROR_CODE_SUCCESS)
+                qInfo().noquote() << QString("Changed Acceptation of %2 at game %1").arg(pGame->m_index).arg(name);
+            else
+                qWarning().noquote() << QString("Error setting Acceptation at game %1: %2").arg(pGame->m_index).arg(result);
+            return result;
+        }
+    }
+
+    MeetingInfo* mInfo = new MeetingInfo();
+    if (mInfo->initialize(pGame->m_saison, pGame->m_competition, pGame->m_saisonIndex, pGame->m_index)) {
+        this->m_meetingInfos.append(mInfo);
+        result = mInfo->addNewAcceptation(acceptValue, userID, name);
+        qInfo().noquote() << QString("Changed Acceptation of %2 at game %1").arg(pGame->m_index).arg(name);
+    } else {
+        delete mInfo;
+        qWarning().noquote() << QString("Error creating meeting info file for game %1").arg(pGame->m_index);
+        return ERROR_CODE_NOT_POSSIBLE;
+    }
 
     return ERROR_CODE_SUCCESS;
 }

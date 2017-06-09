@@ -191,6 +191,10 @@ void DataConnection::checkNewOncomingData()
             request.m_result = this->m_pDataHandle->getHandleLoadMeetingInfo(msg);
             break;
 
+        case OP_CODE_CMD_RES::ACK_ACCEPT_MEETING:
+            request.m_result = msg->getIntData();
+            break;
+
         default:
             delete msg;
             continue;
@@ -375,6 +379,26 @@ void DataConnection::startSendGetMeetingInfo(DataConRequest request)
     this->sendMessageRequest(&msg, request);
 }
 
+
+#define BUFFER_SIZE 1000
+void DataConnection::startSendAcceptMeeting(DataConRequest request)
+{
+    quint32 data[BUFFER_SIZE / sizeof(quint32)];
+    data[0] = qToLittleEndian(0x1);                            /* version */
+    data[1] = qToLittleEndian(request.m_lData.at(0).toUInt()); /* game Index */
+    data[2] = qToLittleEndian(request.m_lData.at(1).toUInt()); /* accept */
+    data[3] = qToLittleEndian(request.m_lData.at(2).toUInt()); /* acceptIndex */
+
+    QByteArray tmp = request.m_lData.at(3).toUtf8();
+    if (tmp.size() > (BUFFER_SIZE - 16))
+        tmp.resize(BUFFER_SIZE - 16);
+    memcpy(&data[4], tmp.constData(), tmp.size());
+
+
+    MessageProtocol msg(request.m_request, (char*)(&data[0]), 16 + tmp.size());
+    this->sendMessageRequest(&msg, request);
+}
+
 void DataConnection::slotConnectionTimeoutFired()
 {
     qDebug() << "DataConnection: Timeout from Data UdpServer";
@@ -520,6 +544,10 @@ void DataConnection::startSendNewRequest(DataConRequest request)
 
     case OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO:
         this->startSendGetMeetingInfo(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_ACCEPT_MEETING:
+        this->startSendAcceptMeeting(request);
         break;
 
     default:

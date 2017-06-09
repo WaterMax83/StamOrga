@@ -322,30 +322,59 @@ qint32 DataHandling::getHandleAvailableTicketListResponse(MessageProtocol* msg, 
  */
 qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg)
 {
-    if (msg->getDataLength() < 12)
+    if (msg->getDataLength() < 4)
         return ERROR_CODE_WRONG_SIZE;
 
     const char* pData = msg->getPointerToData();
     quint32     gameIndex, version;
     qint32      result;
     memcpy(&result, pData, sizeof(quint32));
-    memcpy(&version, pData + 4, sizeof(quint32));
-    memcpy(&gameIndex, pData + 8, sizeof(quint32));
-    result    = qFromLittleEndian(result);
+    if (msg->getDataLength() >= 12) {
+        memcpy(&version, pData + 4, sizeof(quint32));
+        memcpy(&gameIndex, pData + 8, sizeof(quint32));
+    }
+    result = qFromLittleEndian(result);
+    if (result != ERROR_CODE_SUCCESS)
+        return result;
+
     version   = qFromLittleEndian(version);
     gameIndex = qFromLittleEndian(gameIndex);
 
     quint32 offset = 12;
     QString when(QByteArray(pData + offset));
-    offset += when.toLatin1().size() + 1;
+    offset += when.toUtf8().size() + 1;
     QString where(QByteArray(pData + offset));
-    offset += where.toLatin1().size() + 1;
+    offset += where.toUtf8().size() + 1;
     QString info(QByteArray(pData + offset));
+    offset += info.toUtf8().size() + 1;
 
     MeetingInfo* pInfo = this->m_pGlobalData->getMeetingInfo();
     pInfo->setWhen(when);
     pInfo->setWhere(where);
     pInfo->setInfo(info);
+
+    quint32 size = msg->getDataLength();
+    quint32 index, value;
+    pInfo->clearAcceptInfoList();
+    quint32 counter = 0;
+    while (offset + 9 < size) {
+        AcceptMeetingInfo* ami = new AcceptMeetingInfo();
+        memcpy(&index, pData + offset, sizeof(quint32));
+        offset += sizeof(quint32);
+        memcpy(&value, pData + offset, sizeof(quint32));
+        offset += sizeof(quint32);
+
+        ami->setIndex(qFromLittleEndian(index));
+        ami->setValue(qFromLittleEndian(value));
+        ami->setName(QString(QByteArray(pData + offset)));
+        offset += ami->name().toUtf8().size() + 1;
+
+        pInfo->addNewAcceptInfo(ami);
+        counter++;
+        qDebug() << QString("added %1").arg(ami->name());
+    }
+
+    qDebug() << QString("Added %1 new acceptMeetingInfo %2").arg(counter).arg(size);
 
     return result;
 }

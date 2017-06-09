@@ -66,7 +66,8 @@ HEADERS += \
     ../Data/globaldata.h \
     ../Data/gameplay.h \
     ../Data/seasonticket.h \
-    ../Data/meetinginfo.h
+    ../Data/meetinginfo.h \
+    ../Data/acceptmeetinginfo.h
 
 DISTFILES += \
     android/AndroidManifest.xml \
