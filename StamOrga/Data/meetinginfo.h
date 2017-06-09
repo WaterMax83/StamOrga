@@ -63,11 +63,18 @@ public:
         return 1;
     }
 
-    void clearAcceptInfoList()
+    Q_INVOKABLE void clearAcceptInfoList()
     {
         QMutexLocker lock(&this->m_listMutex);
 
         this->m_acceptInfo.clear();
+    }
+
+    Q_INVOKABLE qint32 getAcceptedListCount()
+    {
+        QMutexLocker lock(&this->m_listMutex);
+
+        return this->m_acceptInfo.size();
     }
 
 

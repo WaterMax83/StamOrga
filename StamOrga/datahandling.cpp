@@ -369,6 +369,7 @@ qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg)
         ami->setName(QString(QByteArray(pData + offset)));
         offset += ami->name().toUtf8().size() + 1;
 
+        QQmlEngine::setObjectOwnership(ami, QQmlEngine::CppOwnership);
         pInfo->addNewAcceptInfo(ami);
         counter++;
         qDebug() << QString("added %1").arg(ami->name());

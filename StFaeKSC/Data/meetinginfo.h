@@ -41,7 +41,7 @@ public:
     qint32 initialize(QString filePath);
 
     qint32 addNewAcceptation(const quint32 acceptState, const quint32 userID, QString name = "");
-    //    qint32 changeTicketState(quint32 ticketID, quint32 userID, quint32 state, QString name = "");
+    qint32 changeAcceptation(const quint32 acceptIndex, const quint32 acceptState, const quint32 userID, QString name = "");
 
     qint32 changeMeetingInfo(const QString when, const QString where, const QString info);
     qint32 getMeetingInfo(QString& when, QString& where, QString& info);

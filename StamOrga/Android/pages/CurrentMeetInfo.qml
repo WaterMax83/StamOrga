@@ -234,8 +234,129 @@ Flickable {
                 }
             }
 
+            Item {
+                width: parent.width
+                visible: isAcceptVisible
+
+                ListView {
+                    id: listViewAcceptedUsers
+                    interactive: false
+                    implicitWidth: mainColumnLayoutCurrentGame.width
+
+                    delegate: RowLayout {
+                        id: singleRowAccepted
+                        width: parent.width
+                        height: listViewItemHeight
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                var globalCoordinates = singleRowAccepted.mapToItem(flickableCurrentMeetInfo, 0, 0)
+                                clickedAcceptedUserMenu.y = globalCoordinates.y - singleRowAccepted.height / 2
+                                menuAcceptIndex = model.index
+                                menuAcceptValue = model.value
+                                menuAcceptText = model.title
+                                clickedAcceptedUserMenu.open();
+                            }
+                        }
+                        Rectangle {
+                            id: imageItemAccepted
+                            anchors.left: parent.left
+                            anchors.leftMargin: parent.height
+                            width: parent.height / 4 * 3
+                            height: parent.height / 4 * 3
+                            radius: width * 0.5
+                            color: model.color
+                            Image {
+                                anchors.fill: parent
+                                source: model.source
+                            }
+                        }
+
+                        Text {
+                            text: model.title
+                            anchors.left: imageItemAccepted.right
+                            anchors.leftMargin: 10
+                            anchors.verticalCenter: parent.verticalCenter
+                            Layout.alignment: Qt.AlignVCenter
+                            color: "white"
+                            font.pixelSize: parent.height / 4 * 2
+                        }
+                    }
+
+                    model: ListModel {
+                        id: listViewModelAcceptedUsers
+                    }
+                }
+            }
         }
     }
+
+    property int menuAcceptIndex
+    property int menuAcceptValue
+    property string menuAcceptText
+
+
+    Menu {
+            id: clickedAcceptedUserMenu
+            x: (flickableCurrentMeetInfo.width - width) / 2
+            y: flickableCurrentMeetInfo.height / 6
+
+            background: Rectangle {
+                    implicitWidth: menuItemAccept.width
+                    color: "#4f4f4f"
+                }
+
+            MenuItem {
+                id: menuItemAccept
+                visible: menuAcceptValue !== 1 ? true : false
+                height: visible ? implicitHeight : 0
+                text: "Zusagen"
+                onClicked: {
+                    userIntCurrentGame.startAcceptMeetingInfo(m_gamePlayCurrentItem.index, 1, menuAcceptText, menuAcceptIndex);
+                    showInfoHeader("Ändere Teilnahme", true)
+                }
+            }
+
+            MenuItem {
+                id: menuItemInterest
+                text: "Interesse/Vorbehalt"
+                visible: menuAcceptValue !== 2 ? true : false
+                height: visible ? implicitHeight : 0
+                onClicked: {
+                    userIntCurrentGame.startAcceptMeetingInfo(m_gamePlayCurrentItem.index, 2, menuAcceptText, menuAcceptIndex);
+                    showInfoHeader("Ändere Teilnahme", true)
+                }
+            }
+
+            MenuItem {
+                id: menuItemDecline
+                text: "Absagen"
+                visible: menuAcceptValue !== 3 ? true : false
+                height: visible ? implicitHeight : 0
+                onClicked: {
+                    userIntCurrentGame.startAcceptMeetingInfo(m_gamePlayCurrentItem.index, 3, menuAcceptText, menuAcceptIndex);
+                    showInfoHeader("Ändere Teilnahme", true)
+                }
+            }
+
+            MenuItem {
+                id: menuItemEdit
+                text: "Ändern"
+                onClicked: {
+                    //                    var component = Qt.createComponent("../components/EditableTextDialog.qml");
+                    //                    if (component.status === Component.Ready) {
+                    //                        var dialog = component.createObject(mainPaneCurrentGame,{popupType: 1});
+                    //                        dialog.headerText = "Reserviere für";
+                    //                        dialog.parentHeight = mainWindow.height
+                    //                        dialog.parentWidth =  mainPaneCurrentGame.width
+                    //                        dialog.textMinSize = 5;
+                    //                        dialog.acceptedTextEdit.connect(acceptedEditReserveNameDialog);
+                    //                        dialog.open();
+                    //                    }
+                }
+            }
+        }
 
     function showTextDialogAccept(header) {
         var component = Qt.createComponent("../components/EditableTextDialog.qml");
@@ -268,7 +389,7 @@ Flickable {
 
     function showAllInfoAboutGame() {
         meetingInfo = globalUserData.getMeetingInfo();
-        userIntCurrentGame.startLoadMeetingInfo(m_gamePlayCurrentItem.index);
+        loadMeetingInfo();
     }
 
     function checkNewTextInput() {
@@ -280,9 +401,7 @@ Flickable {
     function notifyChangedMeetingInfoFinished(result) {
         if (result === 1) {
             toastManager.show("Info erfolgreich gespeichert", 2000);
-            showInfoHeader("Aktualisiere Daten", true)
-            userIntCurrentGame.startLoadMeetingInfo(m_gamePlayCurrentItem.index);
-
+            loadMeetingInfo();
         } else {
             toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
             showInfoHeader("Infos speichern hat nicht funktioniert", false)
@@ -305,18 +424,60 @@ Flickable {
         } else {
             showInfoHeader("Infos laden hat nicht funktioniert", false)
         }
+
+        listViewModelAcceptedUsers.clear();
+
+        if (result === 1 && meetingInfo.getAcceptedListCount() > 0) {
+            for (var i = 0; i < meetingInfo.getAcceptedListCount(); i++) {
+                var acceptInfo = meetingInfo.getAcceptInfoFromIndex(i)
+                var btnColor;
+                var imgSource;
+                if (acceptInfo.value() === 1) {
+                    btnColor = "green";
+                    imgSource = "../images/done.png";
+                }
+                else if (acceptInfo.value() === 2) {
+                    btnColor = "orange";
+                    imgSource = "../images/help.png";
+                }
+                else if (acceptInfo.value() === 3) {
+                    btnColor = "red";
+                    imgSource = "../images/close.png";
+                }
+                listViewModelAcceptedUsers.append({
+                                                    title: acceptInfo.name(),
+                                                    index: acceptInfo.index(),
+                                                    color: btnColor,
+                                                    source: imgSource,
+                                                    value: acceptInfo.value()
+                                                });
+
+            }
+            /* Does not work in defintion for freeTickets, so set it here */
+            listViewAcceptedUsers.implicitHeight = listViewModelAcceptedUsers.count * listViewItemHeight
+
+        } else {
+            listViewAcceptedUsers.implicitHeight = 0;
+        }
     }
 
     function notifyAcceptMeetingFinished(result) {
         if (result === 1) {
             toastManager.show("Teilnahme erfolgreich geändert", 2000);
-            showInfoHeader("Aktualisiere Daten", true)
-            userIntCurrentGame.startLoadMeetingInfo(m_gamePlayCurrentItem.index);
+            loadMeetingInfo();
 
         } else {
             toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
             showInfoHeader("Teilnehmen hat nicht funktioniert", false)
         }
+    }
+
+    function loadMeetingInfo()
+    {
+        listViewModelAcceptedUsers.clear();
+        meetingInfo.clearAcceptInfoList();
+        showInfoHeader("Aktualisiere Daten", true)
+        userIntCurrentGame.startLoadMeetingInfo(m_gamePlayCurrentItem.index);
     }
 
 }

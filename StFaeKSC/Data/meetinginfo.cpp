@@ -196,6 +196,39 @@ qint32 MeetingInfo::addNewAcceptation(const quint32 acceptState, const quint32 u
 
     this->addNewAcceptInfo(name, timestamp, newIndex, acceptState, userID, false);
 
+    qInfo().noquote() << QString("Added meeting accept %1:%2 for game %3").arg(name).arg(acceptState).arg(this->m_gameIndex);
+
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 MeetingInfo::changeAcceptation(const quint32 acceptIndex, const quint32 acceptState, const quint32 userID, QString name)
+{
+    AcceptMeetingInfo* aInfo = (AcceptMeetingInfo*)this->getItem(acceptIndex);
+    if (aInfo == NULL) {
+        qWarning().noquote() << QString("Could not found a accept meeting info to change with index %1").arg(acceptIndex);
+        return ERROR_CODE_NOT_FOUND;
+    }
+
+    QMutexLocker locker(&this->m_mInternalInfoMutex);
+
+    if (aInfo->m_state != acceptState) {
+        if (this->updateItemValue(aInfo, MEET_INFO_STATE, QVariant(acceptState))) {
+            aInfo->m_state = acceptState;
+            qInfo().noquote() << QString("Changed accept state from game %1 to %2").arg(this->m_gameIndex).arg(acceptState);
+        }
+    }
+    if (aInfo->m_itemName != name) {
+        if (this->updateItemValue(aInfo, ITEM_NAME, QVariant(name))) {
+            aInfo->m_itemName = name;
+            qInfo().noquote() << QString("Changed accept name from game %1 to %2").arg(this->m_gameIndex).arg(name);
+        }
+    }
+    if (aInfo->m_userID != userID) {
+        if (this->updateItemValue(aInfo, MEET_INFO_USER_ID, QVariant(userID))) {
+            aInfo->m_userID = userID;
+        }
+    }
+
     return ERROR_CODE_SUCCESS;
 }
 

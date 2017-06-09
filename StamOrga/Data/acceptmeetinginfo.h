@@ -44,7 +44,7 @@ public:
             this->m_value = value;
     }
 
-    QString name() { return this->m_name; }
+    Q_INVOKABLE QString name() { return this->m_name; }
     void setName(const QString& name)
     {
         if (this->m_name != name)

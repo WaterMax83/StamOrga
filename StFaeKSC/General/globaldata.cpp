@@ -359,7 +359,7 @@ qint32 GlobalData::requestAcceptMeetingInfo(const quint32 gameIndex, const quint
             if (acceptIndex == 0)
                 result = mInfo->addNewAcceptation(acceptValue, userID, name);
             else
-                result = ERROR_CODE_NOT_IMPLEMENTED;
+                result = mInfo->changeAcceptation(acceptIndex, acceptValue, userID, name);
             if (result == ERROR_CODE_SUCCESS)
                 qInfo().noquote() << QString("Changed Acceptation of %2 at game %1").arg(pGame->m_index).arg(name);
             else

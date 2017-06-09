@@ -458,7 +458,7 @@ Flickable {
             txtInfoCurrentGameReservedTickets.visible = true
             txtInfoCurrentGameFreeTickets.visible = true
 
-            txtInfoCurrentGame.visible = false;
+//            txtInfoCurrentGame.visible = false;
 
         } else {
             txtInfoCurrentGameBlockedTickets.visible = false
@@ -468,7 +468,7 @@ Flickable {
             listViewReservedTickets.implicitHeight = 0;
             listViewFreeTickets.implicitHeight = 0;
 
-            txtInfoCurrentGame.visible = true;
+//            txtInfoCurrentGame.visible = true;
         }
 
 

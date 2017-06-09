@@ -67,14 +67,12 @@ Flickable {
     Pane {
         id: mainPaneGames
         width: parent.width
-        anchors.top: parent.top
 
         ColumnLayout {
             id: mainColumnLayoutGames
-            //           anchors.right: parent.right
-            //           anchors.left: parent.left
+
             width: parent.width
-            spacing: 0
+            spacing: 10
             ColumnLayout {
                 id: columnLayoutBusyInfo
                 spacing: 5
@@ -90,8 +88,7 @@ Flickable {
                     id: txtInfoLoadingGames
                     visible: true
                     horizontalAlignment: Text.AlignHCenter
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                    bottomPadding: 10
+                    Layout.alignment:  Qt.AlignHCenter | Qt.AlignVCenter
                 }
             }
             Column {
