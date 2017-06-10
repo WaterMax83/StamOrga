@@ -51,6 +51,11 @@ public:
             this->m_name = name;
     }
 
+    void setUserIndex(const quint32 userID)
+    {
+        Q_UNUSED(userID);
+    }
+
 
 signals:
 

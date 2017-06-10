@@ -195,7 +195,7 @@ MessageProtocol* DataConnection::requestGetProgramVersion(MessageProtocol* msg)
 }
 
 
-/*
+/* answer
  * 0                Header          12
  * 12   quint32     result          4
  * 16   quint16     version         2
@@ -216,15 +216,25 @@ MessageProtocol* DataConnection::requestGetProgramVersion(MessageProtocol* msg)
 
 MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
 {
+    if (msg->getDataLength() != 8) {
+        qWarning() << QString("Error getting wrong message size %1 for get games list from %2")
+                      .arg(msg->getDataLength()).arg(this->m_pUserConData->userName);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_GAMES_LIST, ERROR_CODE_WRONG_SIZE);
+    }
+    const char* pData     = msg->getPointerToData();
+    quint32     maxPastGames, version;
+    memcpy(&version, pData, sizeof(quint32));
+    memcpy(&maxPastGames, pData + 4, sizeof(quint32));
+    version   = qFromLittleEndian(version);
+    maxPastGames = qFromLittleEndian(maxPastGames);
+
     QByteArray  ackArray;
     QDataStream wAckArray(&ackArray, QIODevice::WriteOnly);
     wAckArray.setByteOrder(QDataStream::LittleEndian);
 
-    qint32 maxPastGames = msg->getIntData();
-
     quint16 numbOfGames = this->m_pGlobalData->m_GamesList.getNumberOfInternalList();
 
-    qint32 gamesInPast = 0;
+    quint32 gamesInPast = 0;
     qint64 now         = QDateTime::currentMSecsSinceEpoch();
     for (quint32 i = 0; i < numbOfGames; i++) {
         GamesPlay* pGame = (GamesPlay*)(this->m_pGlobalData->m_GamesList.getRequestConfigItemFromListIndex(i));
@@ -279,8 +289,19 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
 
 #define TICKET_OFFSET (1 + 4 + 4) // discount + isOwnUser + index + userIndex
 
-MessageProtocol* DataConnection::requestGetTicketsList(/*MessageProtocol *msg*/)
+MessageProtocol* DataConnection::requestGetTicketsList(MessageProtocol *msg)
 {
+    if (msg->getDataLength() != 4) {
+        qWarning() << QString("Error getting wrong message size %1 for get ticket list from %2")
+                      .arg(msg->getDataLength()).arg(this->m_pUserConData->userName);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_TICKETS_LIST, ERROR_CODE_WRONG_SIZE);
+    }
+
+    const char* pData     = msg->getPointerToData();
+    quint32     version;
+    memcpy(&version, pData, sizeof(quint32));
+    version   = qFromLittleEndian(version);
+
     QByteArray  ackArray;
     QDataStream wAckArray(&ackArray, QIODevice::WriteOnly);
     wAckArray.setByteOrder(QDataStream::LittleEndian);
@@ -321,7 +342,7 @@ MessageProtocol* DataConnection::requestAddSeasonTicket(MessageProtocol* msg)
 {
     if (msg->getDataLength() <= 6) {
         qWarning() << QString("Message for adding season ticket to short for user %1").arg(this->m_pUserConData->userName);
-        return NULL;
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_ADD_TICKET, ERROR_CODE_WRONG_SIZE);
     }
 
     const char* pData     = msg->getPointerToData();

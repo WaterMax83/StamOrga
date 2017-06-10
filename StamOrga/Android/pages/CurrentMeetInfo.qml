@@ -108,8 +108,9 @@ Flickable {
                     imageSource: "../images/done.png"
                     enabled: isEditMode ? false : true
                     onClickedButton: {
-                        acceptValue = 1;
-                        showTextDialogAccept("Zusagen");
+                        menuAcceptValue = 1;
+                        menuAcceptIndex = 0;
+                        showTextDialogAccept("Zusagen", globalUserData.readableName);
                     }
                     Layout.alignment: Qt.AlignRight
                 }
@@ -118,8 +119,9 @@ Flickable {
                     imageSource: "../images/help.png"
                     enabled: isEditMode ? false : true
                     onClickedButton: {
-                        acceptValue = 2;
-                        showTextDialogAccept("Interesse/Vorbehalt");
+                        menuAcceptValue = 2;
+                        menuAcceptIndex = 0;
+                        showTextDialogAccept("Interesse/Vorbehalt", globalUserData.readableName);
                     }
                     Layout.alignment: Qt.AlignRight
                 }
@@ -128,8 +130,9 @@ Flickable {
                     imageSource: "../images/close.png"
                     enabled: isEditMode ? false : true
                     onClickedButton: {
-                        acceptValue = 3;
-                        showTextDialogAccept("Absagen");
+                        menuAcceptValue = 3;
+                        menuAcceptIndex = 0;
+                        showTextDialogAccept("Absagen", globalUserData.readableName);
                     }
                     Layout.alignment: Qt.AlignRight
                 }
@@ -344,21 +347,17 @@ Flickable {
                 id: menuItemEdit
                 text: "Ändern"
                 onClicked: {
-                    //                    var component = Qt.createComponent("../components/EditableTextDialog.qml");
-                    //                    if (component.status === Component.Ready) {
-                    //                        var dialog = component.createObject(mainPaneCurrentGame,{popupType: 1});
-                    //                        dialog.headerText = "Reserviere für";
-                    //                        dialog.parentHeight = mainWindow.height
-                    //                        dialog.parentWidth =  mainPaneCurrentGame.width
-                    //                        dialog.textMinSize = 5;
-                    //                        dialog.acceptedTextEdit.connect(acceptedEditReserveNameDialog);
-                    //                        dialog.open();
-                    //                    }
+                    if (menuAcceptValue == 1)
+                        showTextDialogAccept("Zusagen", menuAcceptText);
+                    else if (menuAcceptValue == 2)
+                        showTextDialogAccept("Interesse/Vorbehalt", menuAcceptText);
+                    else if (menuAcceptValue == 3)
+                        showTextDialogAccept("Absagen", menuAcceptText);
                 }
             }
         }
 
-    function showTextDialogAccept(header) {
+    function showTextDialogAccept(header, text) {
         var component = Qt.createComponent("../components/EditableTextDialog.qml");
         if (component.status === Component.Ready) {
             var dialog = component.createObject(mainPaneCurrentGame,{popupType: 1});
@@ -366,13 +365,14 @@ Flickable {
             dialog.parentHeight = mainWindow.height
             dialog.parentWidth =  mainPaneCurrentGame.width
             dialog.textMinSize = 5;
+            dialog.editableText = text;
             dialog.acceptedTextEdit.connect(acceptedEditTextDialogAccept);
             dialog.open();
         }
     }
 
     function acceptedEditTextDialogAccept(text) {
-        userIntCurrentGame.startAcceptMeetingInfo(m_gamePlayCurrentItem.index, acceptValue, text);
+        userIntCurrentGame.startAcceptMeetingInfo(m_gamePlayCurrentItem.index, menuAcceptValue, text, menuAcceptIndex);
         showInfoHeader("Ändere Teilnahme", true)
     }
 
@@ -380,7 +380,6 @@ Flickable {
 
     }
 
-    property int  acceptValue;
     property var  meetingInfo;
     property bool isEditMode: false
     property bool isInputAlreadyChanged: false

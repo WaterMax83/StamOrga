@@ -29,6 +29,19 @@
 struct AcceptMeetingInfo : public ConfigItem {
     quint32 m_state;
     quint32 m_userID;
+
+    static bool compareAcceptMeetingInfo(ConfigItem* p1, ConfigItem* p2)
+    {
+        AcceptMeetingInfo* a1 = (AcceptMeetingInfo*)p1;
+        AcceptMeetingInfo* a2 = (AcceptMeetingInfo*)p2;
+        if (a1->m_state > a2->m_state)
+            return false;
+        else if (a1->m_state < a2->m_state)
+            return true;
+        if (a1->m_itemName.compare(a2->m_itemName, Qt::CaseInsensitive) >= 0)
+            return false;
+        return true;
+    }
 };
 
 class MeetingInfo : public ConfigList
@@ -65,6 +78,8 @@ private:
     QString m_info;
 
     void saveCurrentInteralList() override;
+
+    void sortAcceptations();
 
     bool updateHeaderValue(QString key, QVariant value);
 

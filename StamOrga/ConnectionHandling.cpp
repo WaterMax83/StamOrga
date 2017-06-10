@@ -180,6 +180,7 @@ qint32 ConnectionHandling::startListAvailableTicket(quint32 gameIndex)
 
     DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS);
     req.m_lData.append(QString::number(gameIndex));
+    //    qDebug() << "Ask Available Ticket List";
     this->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
@@ -367,11 +368,17 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
         break;
 
     case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS:
+
+        static quint32 retryGetTicketCount = 0;
         if (request.m_result == ERROR_CODE_MISSING_TICKET) {
-            this->startListSeasonTickets();
-            return;
-        } else
-            emit this->sNotifyCommandFinished(request.m_request, request.m_result);
+            if (retryGetTicketCount < 5) {
+                this->startListSeasonTickets();
+                retryGetTicketCount++;
+                return;
+            }
+        }
+        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
+        retryGetTicketCount = 0;
         break;
 
     case OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO:

@@ -240,10 +240,11 @@ qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol* msg)
 /*  answer
  * 0                Header          12
  * 12   quint32     result          4
- * 16   quint16     freeCount       2
- * 18   quint16     reserveCount    2
- * 20   quint32     fticketIndex1   4
- * 24   quint32     fticketIndex2   4
+ * 16   quint32     version         4
+ * 20   quint16     freeCount       2
+ * 22   quint16     reserveCount    2
+ * 24   quint32     fticketIndex1   4
+ * 28   quint32     fticketIndex2   4
  *
  * X    quint32     rticketIndex1   4
  * X+4  quint32     rTicketName     Y
@@ -256,10 +257,21 @@ qint32 DataHandling::getHandleAvailableTicketListResponse(MessageProtocol* msg, 
     if (msg->getDataLength() < 4)
         return ERROR_CODE_WRONG_SIZE;
 
-    const char* pData  = msg->getPointerToData();
-    qint32      rValue = qFromLittleEndian(*((qint32*)pData));
-    if (rValue != ERROR_CODE_SUCCESS)
-        return rValue;
+    const char* pData = msg->getPointerToData();
+    quint32     version;
+    qint32      result;
+    memcpy(&result, pData, sizeof(quint32));
+    result = qFromLittleEndian(result);
+    if (result != ERROR_CODE_SUCCESS)
+        return result;
+
+    quint32 offset = 4;
+    if (msg->getDataLength() >= 12)
+        memcpy(&version, pData + offset, sizeof(quint32));
+    else
+        return ERROR_CODE_WRONG_SIZE;
+    version = qFromLittleEndian(version);
+    offset += sizeof(quint32);
 
     for (uint i = 0; i < this->m_pGlobalData->getSeasonTicketLength(); i++) {
         SeasonTicketItem* item = this->m_pGlobalData->getSeasonTicketFromArrayIndex(i);
@@ -267,34 +279,35 @@ qint32 DataHandling::getHandleAvailableTicketListResponse(MessageProtocol* msg, 
             item->setTicketState(TICKET_STATE_BLOCKED);
     }
 
-    qint16  countOfFreeTickets     = qFromLittleEndian(*((qint16*)(pData + 4)));
-    qint16  countOfReservedTickets = qFromLittleEndian(*((qint16*)(pData + 6)));
-    quint32 offset                 = 8;
+    qint16 countOfFreeTickets = qFromLittleEndian(*((qint16*)(pData + offset)));
+    offset += sizeof(qint16);
+    qint16 countOfReservedTickets = qFromLittleEndian(*((qint16*)(pData + offset)));
+    offset += sizeof(qint16);
     for (int i = 0; i < countOfFreeTickets; i++) {
         if (offset + AVAILABLE_HEAD_OFFSET > msg->getDataLength()) {
             qWarning() << "Error in message for get available ticket list";
-            return rValue;
+            return result;
         }
         quint32           ticketIndex = qFromLittleEndian(*((quint32*)(pData + offset)));
         SeasonTicketItem* item        = this->m_pGlobalData->getSeasonTicket(ticketIndex);
         if (item != NULL)
             item->setTicketState(TICKET_STATE_FREE);
         else
-            rValue = ERROR_CODE_MISSING_TICKET;
+            result = ERROR_CODE_MISSING_TICKET;
 
         offset += 4;
     }
     for (int i = 0; i < countOfReservedTickets; i++) {
         if (offset + AVAILABLE_HEAD_OFFSET > msg->getDataLength()) {
             qWarning() << "Error in message for get available ticket list";
-            return rValue;
+            return result;
         }
         quint32           ticketIndex = qFromLittleEndian(*((quint32*)(pData + offset)));
         SeasonTicketItem* item        = this->m_pGlobalData->getSeasonTicket(ticketIndex);
         if (item != NULL)
             item->setTicketState(TICKET_STATE_RESERVED);
         else
-            rValue = ERROR_CODE_MISSING_TICKET;
+            result = ERROR_CODE_MISSING_TICKET;
         offset += 4;
         QString name(pData + offset);
         item->setReserveName(name);
@@ -308,7 +321,7 @@ qint32 DataHandling::getHandleAvailableTicketListResponse(MessageProtocol* msg, 
         game->setBlockedTickets(this->m_pGlobalData->getSeasonTicketLength() - countOfFreeTickets - countOfReservedTickets);
     }
 
-    return rValue;
+    return result;
 }
 
 /*  answer
@@ -354,7 +367,7 @@ qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg)
     pInfo->setInfo(info);
 
     quint32 size = msg->getDataLength();
-    quint32 index, value;
+    quint32 index, value, userID;
     pInfo->clearAcceptInfoList();
     quint32 counter = 0;
     while (offset + 9 < size) {
@@ -363,19 +376,19 @@ qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg)
         offset += sizeof(quint32);
         memcpy(&value, pData + offset, sizeof(quint32));
         offset += sizeof(quint32);
+        memcpy(&userID, pData + offset, sizeof(quint32));
+        offset += sizeof(quint32);
 
         ami->setIndex(qFromLittleEndian(index));
         ami->setValue(qFromLittleEndian(value));
+        ami->setUserIndex(qFromLittleEndian(userID));
         ami->setName(QString(QByteArray(pData + offset)));
         offset += ami->name().toUtf8().size() + 1;
 
         QQmlEngine::setObjectOwnership(ami, QQmlEngine::CppOwnership);
         pInfo->addNewAcceptInfo(ami);
         counter++;
-        qDebug() << QString("added %1").arg(ami->name());
     }
-
-    qDebug() << QString("Added %1 new acceptMeetingInfo %2").arg(counter).arg(size);
 
     return result;
 }

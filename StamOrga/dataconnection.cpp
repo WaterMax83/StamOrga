@@ -271,7 +271,10 @@ void DataConnection::startSendReadableNameRequest(DataConRequest request)
 
 void DataConnection::startSendGamesListRequest(DataConRequest request)
 {
-    MessageProtocol msg(request.m_request, this->m_pGlobalData->lastGamesLoadCount());
+    quint32 data[2];
+    data[0] = qToLittleEndian(0x1);                      /* version */
+    data[1] = this->m_pGlobalData->lastGamesLoadCount(); /* game numbers */
+    MessageProtocol msg(request.m_request, (char*)(&data[0]), 8);
     this->sendMessageRequest(&msg, request);
 }
 
@@ -311,7 +314,9 @@ void DataConnection::startSendNewPlaceTicket(DataConRequest request)
 
 void DataConnection::startSendSeasonTicketListRequest(DataConRequest request)
 {
-    MessageProtocol msg(request.m_request);
+    quint32 data = qToLittleEndian(0x1); /* version */
+
+    MessageProtocol msg(request.m_request, data);
     this->sendMessageRequest(&msg, request);
 }
 

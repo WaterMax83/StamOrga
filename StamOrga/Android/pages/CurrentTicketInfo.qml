@@ -406,6 +406,7 @@ Flickable {
         listViewReservedTickets.implicitHeight = 0;
         listViewFreeTickets.implicitHeight = 0;
         showInfoHeader("Aktualisiere Daten", true);
+//        console.log("Aktualisisere Daten")
         userIntCurrentGame.startRequestAvailableTickets(m_gamePlayCurrentItem.index);
     }
 

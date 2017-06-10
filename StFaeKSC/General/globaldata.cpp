@@ -181,7 +181,7 @@ qint32 GlobalData::requestGetAvailableSeasonTicket(const quint32 gameIndex, cons
             QDataStream wData(&data, QIODevice::WriteOnly);
             wData.setByteOrder(QDataStream::LittleEndian);
 
-            wData << quint32(ERROR_CODE_SUCCESS) << quint16(freeTicktetCount) << quint16(reservedTicketCount);
+            wData << quint32(ERROR_CODE_SUCCESS) << quint32(0x1) << quint16(freeTicktetCount) << quint16(reservedTicketCount);
             data.append(freeTickets);
             data.append(reservedTickets);
 
@@ -321,6 +321,10 @@ qint32 GlobalData::requestGetMeetingInfo(const quint32 gameIndex, const quint32 
         offset += sizeof(quint32);
 
         tmp = qToLittleEndian(ami->m_state);
+        memcpy(pData + offset, &tmp, sizeof(quint32));
+        offset += sizeof(quint32);
+
+        tmp = qToLittleEndian(ami->m_userID);
         memcpy(pData + offset, &tmp, sizeof(quint32));
         offset += sizeof(quint32);
 

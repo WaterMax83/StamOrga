@@ -145,7 +145,7 @@ MessageProtocol* UdpDataServer::checkNewMessage(MessageProtocol* msg)
             break;
 
         case OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST:
-            ack = this->m_pDataConnection->requestGetTicketsList();
+            ack = this->m_pDataConnection->requestGetTicketsList(msg);
             break;
 
         case OP_CODE_CMD_REQ::REQ_ADD_TICKET:
