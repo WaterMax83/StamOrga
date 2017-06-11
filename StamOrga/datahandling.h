@@ -31,7 +31,7 @@ public:
 
     qint32 getHandleLoginResponse(MessageProtocol* msg);
     qint32 getHandleVersionResponse(MessageProtocol* msg, QString* version);
-    qint32 getHandleUserPropsResponse(MessageProtocol* msg, QString* props);
+    qint32 getHandleUserPropsResponse(MessageProtocol* msg);
     qint32 getHandleGamesListResponse(MessageProtocol* msg);
     qint32 getHandleSeasonTicketListResponse(MessageProtocol* msg);
     qint32 getHandleAvailableTicketListResponse(MessageProtocol* msg, const quint32 gameIndex);

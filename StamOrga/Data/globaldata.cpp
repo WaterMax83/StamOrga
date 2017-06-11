@@ -67,7 +67,7 @@ void GlobalData::loadGlobalSettings()
     this->m_pMainUserSettings = new QSettings();
     this->m_pMainUserSettings->setIniCodec(("UTF-8"));
 
-    qInfo() << this->m_pMainUserSettings->fileName();
+    qInfo().noquote() << this->m_pMainUserSettings->fileName();
 
     this->m_pMainUserSettings->beginGroup("USER_LOGIN");
 
@@ -201,7 +201,8 @@ void GlobalData::addNewGamePlay(GamePlay* gPlay)
 {
     if (!this->existGamePlay(gPlay)) {
         QMutexLocker lock(&this->m_mutexGame);
-        //        qDebug() << QString("Add new game play %1:%2 = %3").arg(gPlay->home(), gPlay->away(), gPlay->score());
+
+        gPlay->setEnableAddGame(this->userIsGameAddingEnabled());
         this->m_lGamePlay.append(gPlay);
     }
 }
@@ -287,7 +288,6 @@ void GlobalData::addNewSeasonTicket(SeasonTicketItem* sTicket)
 {
     if (!this->existSeasonTicket(sTicket)) {
         QMutexLocker lock(&this->m_mutexTicket);
-        //        qDebug() << QString("Add new game play %1:%2 = %3").arg(gPlay->home(), gPlay->away(), gPlay->score());
         this->m_lSeasonTicket.append(sTicket);
     }
 }
@@ -353,6 +353,11 @@ void GlobalData::callBackLookUpHost(const QHostInfo& host)
         this->setIpAddr(host.addresses().value(0).toString());
         lastIP = host.addresses().value(0).toString();
     }
+
+    if (this->m_debugIP != "") {
+        this->setIpAddr(this->m_debugIP);
+        lastIP = this->m_debugIP;
+    }
 #ifdef QT_DEBUG
     if (this->m_debugIP != "") {
         this->setIpAddr(this->m_debugIP);
@@ -378,5 +383,18 @@ void GlobalData::callBackLookUpHost(const QHostInfo& host)
 #endif // DEBUG
 
     if (host.addresses().size() > 0)
-        qDebug().noquote() << QString("Setting IP Address: %1").arg(lastIP);
+        qInfo().noquote() << QString("Setting IP Address: %1").arg(lastIP);
+}
+
+bool GlobalData::userIsDebugEnabled()
+{
+    return USER_IS_ENABLED(USER_ENABLE_LOG);
+}
+bool GlobalData::userIsGameAddingEnabled()
+{
+    return USER_IS_ENABLED(USER_ENABLE_ADD_GAME);
+}
+void GlobalData::SetUserProperties(quint32 value)
+{
+    this->m_UserProperties = value;
 }

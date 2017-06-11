@@ -64,14 +64,26 @@ qint32 DataHandling::getHandleVersionResponse(MessageProtocol* msg, QString* ver
     return result;
 }
 
-qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol* msg, QString* props)
+qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol* msg)
 {
     if (msg->getDataLength() < 12)
         return ERROR_CODE_WRONG_SIZE;
 
-    const char* pData  = msg->getPointerToData();
-    qint32      rValue = qFromLittleEndian(*((qint32*)pData));
-    qint32      index  = qFromLittleEndian(*((qint32*)(pData + 8)));
+    const char* pData = msg->getPointerToData();
+    quint32     properties, offset = 0;
+    qint32      rValue, index;
+    memcpy(&rValue, pData, sizeof(quint32));
+    offset += sizeof(qint32);
+    if (msg->getDataLength() >= 12) {
+        memcpy(&properties, pData + offset, sizeof(quint32));
+        offset += sizeof(quint32);
+        memcpy(&index, pData + offset, sizeof(quint32));
+        offset += sizeof(qint32);
+    }
+    rValue     = qFromLittleEndian(rValue);
+    properties = qFromLittleEndian(properties);
+    index      = qFromLittleEndian(index);
+
     this->m_pGlobalData->setUserIndex(index);
 
     SeasonTicketItem* seasonTicket;
@@ -79,10 +91,12 @@ qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol* msg, QString* p
     while ((seasonTicket = this->m_pGlobalData->getSeasonTicketFromArrayIndex(i++)) != NULL)
         seasonTicket->checkTicketOwn(index);
 
-    *props = QString::number(qFromLittleEndian(*((quint32*)(pData + 8))));
+    if (rValue == ERROR_CODE_SUCCESS)
+        this->m_pGlobalData->SetUserProperties(properties);
+    else
+        this->m_pGlobalData->SetUserProperties(0x0);
 
-    quint16 readableNameSize = qFromLittleEndian(*((quint16*)(pData + 12)));
-    QString readableName(QByteArray(pData + 14, readableNameSize));
+    QString readableName(QByteArray(pData + offset));
 
     this->m_pGlobalData->setReadableName(readableName);
 
@@ -338,17 +352,22 @@ qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg)
     if (msg->getDataLength() < 4)
         return ERROR_CODE_WRONG_SIZE;
 
-    const char* pData = msg->getPointerToData();
-    quint32     gameIndex, version;
-    qint32      result;
+    const char*  pData = msg->getPointerToData();
+    MeetingInfo* pInfo = this->m_pGlobalData->getMeetingInfo();
+    quint32      gameIndex, version;
+    qint32       result;
     memcpy(&result, pData, sizeof(quint32));
     if (msg->getDataLength() >= 12) {
         memcpy(&version, pData + 4, sizeof(quint32));
         memcpy(&gameIndex, pData + 8, sizeof(quint32));
     }
     result = qFromLittleEndian(result);
-    if (result != ERROR_CODE_SUCCESS)
+    if (result != ERROR_CODE_SUCCESS) {
+        pInfo->setWhen("");
+        pInfo->setWhere("");
+        pInfo->setInfo("");
         return result;
+    }
 
     version   = qFromLittleEndian(version);
     gameIndex = qFromLittleEndian(gameIndex);
@@ -361,7 +380,6 @@ qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg)
     QString info(QByteArray(pData + offset));
     offset += info.toUtf8().size() + 1;
 
-    MeetingInfo* pInfo = this->m_pGlobalData->getMeetingInfo();
     pInfo->setWhen(when);
     pInfo->setWhere(where);
     pInfo->setInfo(info);

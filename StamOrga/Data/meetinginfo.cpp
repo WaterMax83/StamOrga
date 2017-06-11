@@ -22,7 +22,7 @@
 MeetingInfo::MeetingInfo(QObject* parent)
     : QObject(parent)
 {
-    //    this->m_info  = "Neue Info";
-    //    this->m_when  = "Dann";
-    //    this->m_where = "Dort";
+    this->m_info  = "";
+    this->m_when  = "";
+    this->m_where = "";
 }

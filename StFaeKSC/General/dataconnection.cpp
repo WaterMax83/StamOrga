@@ -67,8 +67,7 @@ MessageProtocol* DataConnection::requestCheckUserLogin(MessageProtocol* msg)
  * 12               SUCCESS         4
  * 16               PROPS           4
  * 20               index           4
- * 24               size            2
- * 26               readableName    X
+ * 24               readableName    X
  */
 MessageProtocol* DataConnection::requestGetUserProperties()
 {
@@ -80,8 +79,9 @@ MessageProtocol* DataConnection::requestGetUserProperties()
     wAnswer << this->m_pGlobalData->m_UserList.getItemIndex(this->m_pUserConData->userName);
 
     QString readableName = this->m_pGlobalData->m_UserList.getReadableName(this->m_pUserConData->userName);
-    wAnswer << quint16(readableName.toUtf8().size());
-    answer.append(readableName);
+    answer.append(readableName.toUtf8());
+    answer.append((char)0x00);
+
 
     qInfo().noquote() << QString("User %1 getting user properties %2").arg(this->m_pUserConData->userName, readableName);
 

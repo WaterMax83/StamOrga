@@ -124,7 +124,7 @@ void DataConnection::checkNewOncomingData()
             break;
 
         case OP_CODE_CMD_RES::ACK_GET_USER_PROPS:
-            request.m_result = this->m_pDataHandle->getHandleUserPropsResponse(msg, &request.m_returnData);
+            request.m_result = this->m_pDataHandle->getHandleUserPropsResponse(msg);
             break;
 
         case OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN:

@@ -214,7 +214,7 @@ void ReadOnlineGames::checkNewNetworkRequest(bool checkLastItem)
             OnlineGameInfo* gameInfo    = new OnlineGameInfo();
             gameInfo->m_index           = 35;
             gameInfo->m_timeStamp       = QDateTime::currentDateTime().addSecs(60 * 60).toMSecsSinceEpoch();
-            gameInfo->m_gameFinished    = true;
+            gameInfo->m_gameFinished    = false;
             this->m_onlineGames.append(gameInfo);
             qInfo().noquote() << "Got all games for internal list";
         }

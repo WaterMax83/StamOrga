@@ -111,10 +111,6 @@ qint32 UserInterface::startAcceptMeetingInfo(const quint32 gameIndex, const quin
 void UserInterface::slConnectionRequestFinished(qint32 result)
 {
     emit this->notifyConnectionFinished(result);
-    if (result > ERROR_CODE_NO_ERROR) {
-        this->m_pConHandle->startGettingVersionInfo();
-        this->m_pConHandle->startGettingUserProps();
-    }
 }
 
 void UserInterface::slVersionRequestFinished(qint32 result, QString msg)

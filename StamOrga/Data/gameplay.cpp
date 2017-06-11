@@ -23,9 +23,10 @@
 GamePlay::GamePlay(QObject* parent)
     : QObject(parent)
 {
-    this->m_freeTickets     = 0;
-    this->m_blockedTickets  = 0;
-    this->m_reservedTickets = 0;
+    this->m_freeTickets              = 0;
+    this->m_blockedTickets           = 0;
+    this->m_reservedTickets          = 0;
+    this->m_bIsUserGameAddingEnabled = false;
 }
 
 
@@ -64,4 +65,25 @@ bool GamePlay::isGameASeasonTicketGame()
         return true;
 
     return false;
+}
+
+QString GamePlay::getCompetitionLine()
+{
+    if (this->m_comp == BUNDESLIGA_1 || this->m_comp == BUNDESLIGA_2 || this->m_comp == LIGA_3)
+        return QString("%1. Spieltag - ").arg(this->m_seasonIndex);
+    else if (this->m_comp == DFB_POKAL || this->m_comp == KROMBACHER_POKAL)
+        return QString("%1 Runde - ").arg(this->m_seasonIndex);
+    else if (this->m_comp == TESTSPIEL) {
+        if (this->m_bIsUserGameAddingEnabled)
+            return QString("%1. ").arg(this->m_seasonIndex);
+        else
+            return "";
+    }
+
+    return "not implemented";
+}
+
+void GamePlay::setEnableAddGame(bool enable)
+{
+    this->m_bIsUserGameAddingEnabled = enable;
 }

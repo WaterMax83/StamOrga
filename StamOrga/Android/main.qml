@@ -278,6 +278,10 @@ ApplicationWindow {
                                         })
                 }
             }
+            if (globalUserData.userIsGameAddingEnabled() || userIntGames.isDebuggingEnabled())
+                updateHeaderFromMain("StamOrga", "images/add.png")
+            else
+                updateHeaderFromMain("StamOrga", "")
         }
 
         onNotifyUpdatePasswordRequestFinished: {

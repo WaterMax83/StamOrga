@@ -216,9 +216,9 @@ public:
         }
     }
 
-    Q_INVOKABLE bool userIsDebugEnabled() { return USER_IS_ENABLED(USER_ENABLE_LOG); }
-    Q_INVOKABLE bool userIsGameAddingEnabled() { return USER_IS_ENABLED(USER_ENABLE_ADD_GAME); }
-    void SetUserProperties(quint32 value) { this->m_UserProperties = value; }
+    Q_INVOKABLE bool userIsDebugEnabled();
+    Q_INVOKABLE bool userIsGameAddingEnabled();
+    void SetUserProperties(quint32 value);
 
     void saveGlobalUserSettings();
 

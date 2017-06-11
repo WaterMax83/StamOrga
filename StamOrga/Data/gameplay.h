@@ -118,17 +118,7 @@ public:
         }
     }
 
-    Q_INVOKABLE QString getCompetitionLine()
-    {
-        if (this->m_comp == BUNDESLIGA_1 || this->m_comp == BUNDESLIGA_2 || this->m_comp == LIGA_3)
-            return QString("%1. Spieltag - ").arg(this->m_seasonIndex);
-        else if (this->m_comp == DFB_POKAL || this->m_comp == KROMBACHER_POKAL)
-            return QString("%1 Runde - ").arg(this->m_seasonIndex);
-        else if (this->m_comp == TESTSPIEL)
-            return "";
-
-        return "not implemented";
-    }
+    Q_INVOKABLE QString getCompetitionLine();
 
     Q_INVOKABLE quint16 getFreeTickets() { return this->m_freeTickets; }
     void setFreeTickets(quint16 number)
@@ -151,6 +141,8 @@ public:
 
     Q_INVOKABLE bool isGameAHomeGame();
     Q_INVOKABLE bool isGameASeasonTicketGame();
+
+    void setEnableAddGame(bool enable);
 
 
 signals:
@@ -175,6 +167,7 @@ private:
     quint16          m_freeTickets;
     quint16          m_blockedTickets;
     quint16          m_reservedTickets;
+    bool             m_bIsUserGameAddingEnabled;
 };
 
 #endif // GAMEPLAY_H

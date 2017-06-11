@@ -466,6 +466,8 @@ Flickable {
             loadMeetingInfo();
 
         } else {
+            if (result === -7) // already exist
+                isAcceptVisible = true
             toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
             showInfoHeader("Teilnehmen hat nicht funktioniert", false)
         }

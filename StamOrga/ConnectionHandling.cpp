@@ -180,7 +180,6 @@ qint32 ConnectionHandling::startListAvailableTicket(quint32 gameIndex)
 
     DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS);
     req.m_lData.append(QString::number(gameIndex));
-    //    qDebug() << "Ask Available Ticket List";
     this->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
@@ -191,11 +190,11 @@ qint32 ConnectionHandling::startChangeGame(const quint32 index, const quint32 sI
                                            const QString score)
 {
     if (sIndex > 34 || competition == "" || home == "" || away == "" || date == "") {
-        qWarning() << "Standart parameter for changing game are wrong";
+        qWarning().noquote() << "Standart parameter for changing game are wrong";
         return ERROR_CODE_WRONG_PARAMETER;
     }
     if (home.contains(";") || away.contains(";") || date.contains(";")) {
-        qWarning() << "String parameter for changing game contain semicolons";
+        qWarning().noquote() << "String parameter for changing game contain semicolons";
         return ERROR_CODE_WRONG_PARAMETER;
     }
 
@@ -254,14 +253,14 @@ qint32 ConnectionHandling::startAcceptMeetingInfo(const quint32 gameIndex, const
 void ConnectionHandling::slMainConReqFin(qint32 result, const QString& msg)
 {
     if (result > ERROR_CODE_NO_ERROR) {
-        qDebug() << QString("Trying login request with port %1").arg(result);
+        qInfo().noquote() << QString("Trying login request with port %1").arg(result);
         this->m_pGlobalData->setConDataPort((quint16)result);
         this->startDataConnection();
         QThread::msleep(20);
         this->sendLoginRequest(mainConRequestPassWord);
         this->m_lastSuccessTimeStamp = QDateTime::currentMSecsSinceEpoch();
     } else {
-        qWarning() << "Error main connecting: " << msg;
+        qWarning().noquote() << QString("Error main connecting: %1").arg(msg);
         this->m_ctrlMainCon.Stop();
         this->m_pMainCon = NULL;
         this->stopDataConnection();
@@ -300,13 +299,13 @@ void ConnectionHandling::sendNewRequest(DataConRequest request)
             emit this->sStartSendNewRequest(request);
             return;
         } else {
-            qDebug() << QString("Trying to reconnect from ConnectionHandling");
+            qInfo().noquote() << QString("Trying to reconnect from ConnectionHandling");
             this->m_pGlobalData->setbIsConnected(false);
             this->sendLoginRequest(this->m_pGlobalData->passWord());
             this->m_lErrorMainCon.prepend(request);
         }
     } else {
-        qDebug() << QString("Trying to restart connection from ConnectionHandling");
+        qInfo().noquote() << QString("Trying to restart connection from ConnectionHandling");
         this->m_lErrorMainCon.prepend(request);
         this->startMainConnection(this->m_pGlobalData->userName(), this->m_pGlobalData->passWord());
     }
@@ -320,6 +319,9 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
     switch (request.m_request) {
     case OP_CODE_CMD_REQ::REQ_LOGIN_USER:
         if (request.m_result == ERROR_CODE_SUCCESS) {
+            this->startGettingVersionInfo();
+            this->startGettingUserProps();
+            QThread::msleep(10);
             this->m_pGlobalData->setbIsConnected(true);
             this->checkTimeoutResult(request.m_result); // call again to set last successfull timer
             while (this->m_lErrorMainCon.size() > 0) {
@@ -341,12 +343,6 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
 
     case OP_CODE_CMD_REQ::REQ_GET_VERSION:
         emit this->sNotifyVersionRequest(request.m_result, request.m_returnData);
-        break;
-
-    case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
-        if (request.m_result == ERROR_CODE_SUCCESS)
-            this->m_pGlobalData->SetUserProperties(request.m_returnData.toUInt());
-        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
         break;
 
     case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
