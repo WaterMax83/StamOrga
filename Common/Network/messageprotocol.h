@@ -24,38 +24,40 @@
 
 #include "../../Common/General/globalfunctions.h"
 
-struct msg_Header
-{
-    quint32 timestamp;
-    quint32 length;
-    quint32 index;
+struct msg_Header {
+    quint32 m_timestamp;
+    quint32 m_length;
+    quint32 m_index;
+    quint32 m_version;
 };
 
 
-#define MSG_HEADER_SIZE     sizeof(msg_Header)
+#define MSG_HEADER_SIZE sizeof(msg_Header)
+
+#define MSG_HEADER_VERSION_START 0x1
+
+#define MSG_HEADER_VERSION MSG_HEADER_VERSION_START
 
 class MessageProtocol
 {
 public:
     MessageProtocol();
-    MessageProtocol(QByteArray &data);
+    MessageProtocol(QByteArray& data);
     MessageProtocol(const quint32 index);
-    MessageProtocol(const quint32 index, QByteArray &data);
+    MessageProtocol(const quint32 index, QByteArray& data);
     MessageProtocol(const quint32 index, quint32 data);
     MessageProtocol(const quint32 index, qint32 data);
     MessageProtocol(const quint32 index, char* data, const quint32 size);
 
-//    void SetTimeStamp(quint32 time) { this->m_pHead->timestamp = time; }
-//    void SetIndex(quint32 index) { this->m_pHead->index = index; }
+    quint32 getTimeStamp() { return qFromLittleEndian(this->m_pHead->m_timestamp); }
+    quint32 getIndex() { return qFromLittleEndian(this->m_pHead->m_index); }
+    quint32 getDataLength() { return qFromLittleEndian(this->m_pHead->m_length); }
+    quint32 getVersion() { return qFromLittleEndian(this->m_pHead->m_version); }
 
-    quint32 getTimeStamp() { return qFromLittleEndian(this->m_pHead->timestamp); }
-    quint32 getIndex() { return qFromLittleEndian(this->m_pHead->index); }
-    quint32 getDataLength() { return qFromLittleEndian(this->m_pHead->length); }
+    quint32     getNetworkSize() { return this->m_Data.size(); }
+    const char* getNetworkProtocol() { return this->m_Data.constData(); }
 
-    quint32 getNetworkSize() { return this->m_Data.size(); }
-    const char *getNetworkProtocol() { return this->m_Data.constData();}
-
-    const char *getPointerToData()
+    const char* getPointerToData()
     {
         if (this->getDataLength() == 0)
             return NULL;
@@ -72,7 +74,7 @@ public:
 private:
     QByteArray m_Data;
 
-    msg_Header *m_pHead;
+    msg_Header* m_pHead;
 };
 
 #endif // MESSAGEPROTOCOL_H

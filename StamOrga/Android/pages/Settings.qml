@@ -32,6 +32,11 @@ Item {
             saveSettings = true;
        }
 
+       if (globalUserData.useReadableName !== useReadableName.checked) {
+            globalUserData.useReadableName = useReadableName.checked;
+            saveSettings = true;
+       }
+
        if (globalUserData.debugIP !== txtOtherIPAddr.text) {
             globalUserData.debugIP = txtOtherIPAddr.text;
             saveSettings = true;
@@ -75,6 +80,26 @@ Item {
                    Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
                }
            }
+
+           RowLayout {
+               Layout.preferredWidth: parent.width
+               Layout.fillWidth: true
+
+               Label {
+                   id: text2
+                   text: qsTr("Benutze Nutzername:")
+                   Layout.fillWidth: true
+                   Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                   font.pixelSize: 14
+                   color: "white"
+               }
+               CheckBox {
+                    id: useReadableName
+                    checked: globalUserData.useReadableName
+               }
+           }
+
+
 
            RowLayout {
                spacing: 5

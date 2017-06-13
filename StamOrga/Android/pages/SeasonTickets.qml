@@ -104,7 +104,10 @@ Flickable {
     }
 
     function toolButtonClicked() {
-        txtnewSeasonTicketName.text = globalUserData.readableName
+        if (globalUserData.useReadableName)
+            txtnewSeasonTicketName.text = globalUserData.readableName
+        else
+            txtnewSeasonTicketName.text = ""
         addSeasonTicketDlg.open()
     }
 
@@ -260,6 +263,7 @@ Flickable {
         txtInfoSeasonTicket.visible = true;
         txtInfoSeasonTicket.text = "Lösche Dauerkarte"
         userIntTicket.startRemoveSeasonTicket(m_ticketNameToChangeIndex)
+        console.log("Lösche Dauerkarte")
     }
 
 

@@ -278,7 +278,7 @@ ApplicationWindow {
                                         })
                 }
             }
-            if (globalUserData.userIsGameAddingEnabled() || userIntGames.isDebuggingEnabled())
+            if (globalUserData.userIsGameAddingEnabled() || userInt.isDebuggingEnabled())
                 updateHeaderFromMain("StamOrga", "images/add.png")
             else
                 updateHeaderFromMain("StamOrga", "")

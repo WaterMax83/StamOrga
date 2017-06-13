@@ -42,9 +42,10 @@ MessageProtocol::MessageProtocol(const quint32 index)
 {
     this->m_pHead = (msg_Header*)this->m_Data.constData();
 
-    this->m_pHead->index     = qToLittleEndian(index);
-    this->m_pHead->length    = 0;
-    this->m_pHead->timestamp = qToLittleEndian(CalcTimeStamp());
+    this->m_pHead->m_index     = qToLittleEndian(index);
+    this->m_pHead->m_length    = 0;
+    this->m_pHead->m_timestamp = qToLittleEndian(CalcTimeStamp());
+    this->m_pHead->m_version   = qToLittleEndian(MSG_HEADER_VERSION);
 }
 
 MessageProtocol::MessageProtocol(const quint32 index, QByteArray& data)
@@ -60,9 +61,10 @@ MessageProtocol::MessageProtocol(const quint32 index, QByteArray& data)
 
     this->m_pHead = (msg_Header*)this->m_Data.constData();
 
-    this->m_pHead->index     = qToLittleEndian(index);
-    this->m_pHead->length    = qToLittleEndian(length);
-    this->m_pHead->timestamp = qToLittleEndian(CalcTimeStamp());
+    this->m_pHead->m_index     = qToLittleEndian(index);
+    this->m_pHead->m_length    = qToLittleEndian(length);
+    this->m_pHead->m_timestamp = qToLittleEndian(CalcTimeStamp());
+    this->m_pHead->m_version   = qToLittleEndian(MSG_HEADER_VERSION);
 }
 
 MessageProtocol::MessageProtocol(const quint32 index, quint32 data)
@@ -77,10 +79,11 @@ MessageProtocol::MessageProtocol(const quint32 index, quint32 data)
 
     this->m_pHead = (msg_Header*)this->m_Data.constData();
 
-    quint32 size             = sizeof(data);
-    this->m_pHead->index     = qToLittleEndian(index);
-    this->m_pHead->length    = qToLittleEndian(size);
-    this->m_pHead->timestamp = qToLittleEndian(CalcTimeStamp());
+    quint32 size               = sizeof(data);
+    this->m_pHead->m_index     = qToLittleEndian(index);
+    this->m_pHead->m_length    = qToLittleEndian(size);
+    this->m_pHead->m_timestamp = qToLittleEndian(CalcTimeStamp());
+    this->m_pHead->m_version   = qToLittleEndian(MSG_HEADER_VERSION);
 }
 
 MessageProtocol::MessageProtocol(const quint32 index, qint32 data)
@@ -95,13 +98,14 @@ MessageProtocol::MessageProtocol(const quint32 index, qint32 data)
 
     this->m_pHead = (msg_Header*)this->m_Data.constData();
 
-    quint32 size             = sizeof(data);
-    this->m_pHead->index     = qToLittleEndian(index);
-    this->m_pHead->length    = qToLittleEndian(size);
-    this->m_pHead->timestamp = qToLittleEndian(CalcTimeStamp());
+    quint32 size               = sizeof(data);
+    this->m_pHead->m_index     = qToLittleEndian(index);
+    this->m_pHead->m_length    = qToLittleEndian(size);
+    this->m_pHead->m_timestamp = qToLittleEndian(CalcTimeStamp());
+    this->m_pHead->m_version   = qToLittleEndian(MSG_HEADER_VERSION);
 }
 
-MessageProtocol::MessageProtocol(const quint32 index, char *data, const quint32 size)
+MessageProtocol::MessageProtocol(const quint32 index, char* data, const quint32 size)
 {
     int tmp = size % sizeof(quint32);
     if (tmp > 0) {
@@ -111,7 +115,8 @@ MessageProtocol::MessageProtocol(const quint32 index, char *data, const quint32 
 
     this->m_pHead = (msg_Header*)this->m_Data.constData();
 
-    this->m_pHead->index     = qToLittleEndian(index);
-    this->m_pHead->length    = qToLittleEndian(size);
-    this->m_pHead->timestamp = qToLittleEndian(CalcTimeStamp());
+    this->m_pHead->m_index     = qToLittleEndian(index);
+    this->m_pHead->m_length    = qToLittleEndian(size);
+    this->m_pHead->m_timestamp = qToLittleEndian(CalcTimeStamp());
+    this->m_pHead->m_version   = qToLittleEndian(MSG_HEADER_VERSION);
 }

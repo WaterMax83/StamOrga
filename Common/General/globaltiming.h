@@ -36,9 +36,9 @@
 #endif
 
 #ifdef QT_DEBUG
-#define SOCKET_TIMEOUT_MS 3000
+#define SOCKET_TIMEOUT_MS 5000
 #else
-#define SOCKET_TIMEOUT_MS 10000
+#define SOCKET_TIMEOUT_MS 30000
 #endif
 
 

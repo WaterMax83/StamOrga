@@ -127,12 +127,11 @@ qint32 GlobalData::requestChangeStateSeasonTicket(quint32 ticketIndex, quint32 g
 
 
 /*  answer
- * 0                Header          12
- * 12   quint32     result          4
- * 16   quint16     freeCount       2
- * 18   quint16     reserveCount    2
- * 20   quint32     fticketIndex1   4
- * 24   quint32     fticketIndex2   4
+ * 0   quint32     result          4
+ * 4   quint16     freeCount       2
+ * 6   quint16     reserveCount    2
+ * 8   quint32     fticketIndex1   4
+ * 12   quint32     fticketIndex2   4
  *
  * X    quint32     rticketIndex1   4
  * X+4  quint32     rTicketName     Y
@@ -181,7 +180,7 @@ qint32 GlobalData::requestGetAvailableSeasonTicket(const quint32 gameIndex, cons
             QDataStream wData(&data, QIODevice::WriteOnly);
             wData.setByteOrder(QDataStream::LittleEndian);
 
-            wData << quint32(ERROR_CODE_SUCCESS) << quint32(0x1) << quint16(freeTicktetCount) << quint16(reservedTicketCount);
+            wData << quint32(ERROR_CODE_SUCCESS) << quint16(freeTicktetCount) << quint16(reservedTicketCount);
             data.append(freeTickets);
             data.append(reservedTickets);
 
@@ -250,11 +249,9 @@ qint32 GlobalData::requestChangeMeetingInfo(const quint32 gameIndex, const quint
 }
 
 /*  answer
- * 0                Header          12
- * 12   quint32     result          4
- * 16   quint32     version         4
- * 20   quint32     gameIndex       4
- * 24   QString     when
+ * 0   quint32     result          4
+ * 4   quint32     gameIndex       4
+ * 8   QString     when
  * X    Qstring     where
  * Y    QString     info
  *      quint32     acceptIndex     4
@@ -283,7 +280,7 @@ qint32 GlobalData::requestGetMeetingInfo(const quint32 gameIndex, const quint32 
     if (result != ERROR_CODE_SUCCESS)
         return result;
 
-    quint32    offset = 0;
+    quint32    offset = 0, gIndex;
     QByteArray tmpA;
     memset(pData, 0x0, size);
 
@@ -291,12 +288,8 @@ qint32 GlobalData::requestGetMeetingInfo(const quint32 gameIndex, const quint32 
     memcpy(pData + offset, &result, sizeof(quint32));
     offset += sizeof(quint32);
 
-    quint32 vers = qToLittleEndian(0x1);
-    memcpy(pData + offset, &vers, sizeof(quint32));
-    offset += sizeof(quint32);
-
-    vers = qToLittleEndian(gameIndex);
-    memcpy(pData + offset, &vers, sizeof(quint32));
+    gIndex = qToLittleEndian(gameIndex);
+    memcpy(pData + offset, &gIndex, sizeof(quint32));
     offset += sizeof(quint32);
 
     tmpA = when.toUtf8();

@@ -118,12 +118,6 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol* msg)
 
     quint32 totalSize = msg->getDataLength();
     quint32 offset    = 4;
-    quint16 version   = qFromLittleEndian(*(qint16*)(pData + offset));
-    if (version > 0x3) {
-        qWarning().noquote() << QString("Unknown game version %1").arg(version);
-        return -1;
-    }
-    offset += 2;
 
     quint16 totalPacks = qFromLittleEndian(*(quint16*)(pData + offset));
     offset += 2;
@@ -202,12 +196,6 @@ qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol* msg)
 
     quint32 totalSize = msg->getDataLength();
     quint32 offset    = 4;
-    quint16 version   = qFromLittleEndian(*(qint16*)(pData + offset));
-    if (version != 0x1) {
-        qWarning().noquote() << QString("Unknown season ticket version %1").arg(version);
-        return -1;
-    }
-    offset += 2;
 
     quint16 totalPacks = qFromLittleEndian(*(quint16*)(pData + offset));
     offset += 2;
@@ -252,13 +240,11 @@ qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol* msg)
 }
 
 /*  answer
- * 0                Header          12
- * 12   quint32     result          4
- * 16   quint32     version         4
- * 20   quint16     freeCount       2
- * 22   quint16     reserveCount    2
- * 24   quint32     fticketIndex1   4
- * 28   quint32     fticketIndex2   4
+ * 0   quint32     result          4
+ * 4   quint16     freeCount       2
+ * 6   quint16     reserveCount    2
+ * 8   quint32     fticketIndex1   4
+ * 12   quint32     fticketIndex2   4
  *
  * X    quint32     rticketIndex1   4
  * X+4  quint32     rTicketName     Y
@@ -272,7 +258,6 @@ qint32 DataHandling::getHandleAvailableTicketListResponse(MessageProtocol* msg, 
         return ERROR_CODE_WRONG_SIZE;
 
     const char* pData = msg->getPointerToData();
-    quint32     version;
     qint32      result;
     memcpy(&result, pData, sizeof(quint32));
     result = qFromLittleEndian(result);
@@ -280,12 +265,8 @@ qint32 DataHandling::getHandleAvailableTicketListResponse(MessageProtocol* msg, 
         return result;
 
     quint32 offset = 4;
-    if (msg->getDataLength() >= 12)
-        memcpy(&version, pData + offset, sizeof(quint32));
-    else
+    if (msg->getDataLength() <= 4)
         return ERROR_CODE_WRONG_SIZE;
-    version = qFromLittleEndian(version);
-    offset += sizeof(quint32);
 
     for (uint i = 0; i < this->m_pGlobalData->getSeasonTicketLength(); i++) {
         SeasonTicketItem* item = this->m_pGlobalData->getSeasonTicketFromArrayIndex(i);
@@ -339,13 +320,14 @@ qint32 DataHandling::getHandleAvailableTicketListResponse(MessageProtocol* msg, 
 }
 
 /*  answer
- * 0                Header          12
- * 12   quint32     result          4
- * 16   quint32     version         4
- * 20   quint32     gameIndex       4
- * 24   QString     when
+ * 0   quint32     result          4
+ * 4   quint32     gameIndex       4
+ * 8   QString     when
  * X    Qstring     where
  * Y    QString     info
+ *      quint32     acceptIndex     4
+ *      quint32     acceptValue     4
+ *      QString     name            Z
  */
 qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg)
 {
@@ -354,12 +336,11 @@ qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg)
 
     const char*  pData = msg->getPointerToData();
     MeetingInfo* pInfo = this->m_pGlobalData->getMeetingInfo();
-    quint32      gameIndex, version;
+    quint32      gameIndex;
     qint32       result;
     memcpy(&result, pData, sizeof(quint32));
-    if (msg->getDataLength() >= 12) {
-        memcpy(&version, pData + 4, sizeof(quint32));
-        memcpy(&gameIndex, pData + 8, sizeof(quint32));
+    if (msg->getDataLength() >= 8) {
+        memcpy(&gameIndex, pData + 4, sizeof(quint32));
     }
     result = qFromLittleEndian(result);
     if (result != ERROR_CODE_SUCCESS) {
@@ -369,10 +350,9 @@ qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg)
         return result;
     }
 
-    version   = qFromLittleEndian(version);
     gameIndex = qFromLittleEndian(gameIndex);
 
-    quint32 offset = 12;
+    quint32 offset = 8;
     QString when(QByteArray(pData + offset));
     offset += when.toUtf8().size() + 1;
     QString where(QByteArray(pData + offset));

@@ -271,10 +271,9 @@ void DataConnection::startSendReadableNameRequest(DataConRequest request)
 
 void DataConnection::startSendGamesListRequest(DataConRequest request)
 {
-    quint32 data[2];
-    data[0] = qToLittleEndian(0x1);                      /* version */
-    data[1] = this->m_pGlobalData->lastGamesLoadCount(); /* game numbers */
-    MessageProtocol msg(request.m_request, (char*)(&data[0]), 8);
+    quint32 data;
+    data = qToLittleEndian(this->m_pGlobalData->lastGamesLoadCount()); /* game numbers */
+    MessageProtocol msg(request.m_request, (char*)(&data), sizeof(quint32));
     this->sendMessageRequest(&msg, request);
 }
 
@@ -314,9 +313,7 @@ void DataConnection::startSendNewPlaceTicket(DataConRequest request)
 
 void DataConnection::startSendSeasonTicketListRequest(DataConRequest request)
 {
-    quint32 data = qToLittleEndian(0x1); /* version */
-
-    MessageProtocol msg(request.m_request, data);
+    MessageProtocol msg(request.m_request);
     this->sendMessageRequest(&msg, request);
 }
 
@@ -359,7 +356,6 @@ void DataConnection::startSendChangeMeetingInfo(DataConRequest request)
     QByteArray  data;
     QDataStream wData(&data, QIODevice::WriteOnly);
     wData.setByteOrder(QDataStream::LittleEndian);
-    wData << quint32(0x1);                   /* version */
     wData << request.m_lData.at(0).toUInt(); /* game Index */
     data.append(request.m_lData.at(1));      /* when */
     data.append(char(0x00));
@@ -374,11 +370,8 @@ void DataConnection::startSendChangeMeetingInfo(DataConRequest request)
 
 void DataConnection::startSendGetMeetingInfo(DataConRequest request)
 {
-    QByteArray  data;
-    QDataStream wData(&data, QIODevice::WriteOnly);
-    wData.setByteOrder(QDataStream::LittleEndian);
-    wData << quint32(0x1);                   /* version */
-    wData << request.m_lData.at(0).toUInt(); /* game Index */
+    quint32 data;
+    data = qToLittleEndian(request.m_lData.at(0).toUInt()); /* game Index */
 
     MessageProtocol msg(request.m_request, data);
     this->sendMessageRequest(&msg, request);
@@ -389,15 +382,14 @@ void DataConnection::startSendGetMeetingInfo(DataConRequest request)
 void DataConnection::startSendAcceptMeeting(DataConRequest request)
 {
     quint32 data[BUFFER_SIZE / sizeof(quint32)];
-    data[0] = qToLittleEndian(0x1);                            /* version */
-    data[1] = qToLittleEndian(request.m_lData.at(0).toUInt()); /* game Index */
-    data[2] = qToLittleEndian(request.m_lData.at(1).toUInt()); /* accept */
-    data[3] = qToLittleEndian(request.m_lData.at(2).toUInt()); /* acceptIndex */
+    data[0] = qToLittleEndian(request.m_lData.at(0).toUInt()); /* game Index */
+    data[1] = qToLittleEndian(request.m_lData.at(1).toUInt()); /* accept */
+    data[2] = qToLittleEndian(request.m_lData.at(2).toUInt()); /* acceptIndex */
 
     QByteArray tmp = request.m_lData.at(3).toUtf8();
-    if (tmp.size() > (BUFFER_SIZE - 16))
-        tmp.resize(BUFFER_SIZE - 16);
-    memcpy(&data[4], tmp.constData(), tmp.size());
+    if (tmp.size() > (BUFFER_SIZE - 12))
+        tmp.resize(BUFFER_SIZE - 12);
+    memcpy(&data[3], tmp.constData(), tmp.size());
 
 
     MessageProtocol msg(request.m_request, (char*)(&data[0]), 16 + tmp.size());

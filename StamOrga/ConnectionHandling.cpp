@@ -363,7 +363,7 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
         emit this->sNotifyCommandFinished(request.m_request, request.m_result);
         break;
 
-    case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS:
+    case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS: {
 
         static quint32 retryGetTicketCount = 0;
         if (request.m_result == ERROR_CODE_MISSING_TICKET) {
@@ -376,7 +376,7 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
         emit this->sNotifyCommandFinished(request.m_request, request.m_result);
         retryGetTicketCount = 0;
         break;
-
+    }
     case OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO:
         emit this->sNotifyCommandFinished(request.m_request, request.m_result);
         if (request.m_result == ERROR_CODE_NOT_FOUND)

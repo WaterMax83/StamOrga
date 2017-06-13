@@ -110,7 +110,10 @@ Flickable {
                     onClickedButton: {
                         menuAcceptValue = 1;
                         menuAcceptIndex = 0;
-                        showTextDialogAccept("Zusagen", globalUserData.readableName);
+                        if (globalUserData.useReadableName)
+                            showTextDialogAccept("Zusagen", globalUserData.readableName);
+                        else
+                            showTextDialogAccept("Zusagen", "");
                     }
                     Layout.alignment: Qt.AlignRight
                 }
@@ -121,7 +124,10 @@ Flickable {
                     onClickedButton: {
                         menuAcceptValue = 2;
                         menuAcceptIndex = 0;
-                        showTextDialogAccept("Interesse/Vorbehalt", globalUserData.readableName);
+                        if (globalUserData.useReadableName)
+                            showTextDialogAccept("Interesse/Vorbehalt", globalUserData.readableName);
+                        else
+                            showTextDialogAccept("Interesse/Vorbehalt", "");
                     }
                     Layout.alignment: Qt.AlignRight
                 }
@@ -132,7 +138,10 @@ Flickable {
                     onClickedButton: {
                         menuAcceptValue = 3;
                         menuAcceptIndex = 0;
-                        showTextDialogAccept("Absagen", globalUserData.readableName);
+                        if (globalUserData.useReadableName)
+                            showTextDialogAccept("Absagen", globalUserData.readableName);
+                        else
+                            showTextDialogAccept("Absagen", "");
                     }
                     Layout.alignment: Qt.AlignRight
                 }
@@ -466,11 +475,10 @@ Flickable {
             loadMeetingInfo();
 
         } else {
-            if (result === -7) // already exist
-                isAcceptVisible = true
             toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
             showInfoHeader("Teilnehmen hat nicht funktioniert", false)
         }
+        isAcceptVisible = true
     }
 
     function loadMeetingInfo()

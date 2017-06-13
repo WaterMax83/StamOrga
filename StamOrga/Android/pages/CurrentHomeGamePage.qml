@@ -54,21 +54,16 @@ Item {
                 spacing: 0
                 width: parent.width
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-//                visible: txtInfoCurrentGame.visible
 
                 BusyIndicator {
                     id: busyLoadingIndicatorCurrentGames
                     visible: false
-//                    anchors.left: parent.left
-//                    anchors.right: parent.right
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }
 
                 Label {
                     id: txtInfoCurrentGame
                     visible: false
-//                    anchors.left: parent.left
-//                    anchors.right: parent.right
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }
             }
@@ -147,10 +142,10 @@ Item {
     }
 
 
-    function acceptedEditReserveNameDialog(text)
-    {
-        currentTicketInfo.acceptedEditReserveNameDialog(text);
-    }
+//    function acceptedEditReserveNameDialog(text)
+//    {
+//        currentTicketInfo.acceptedEditReserveNameDialog(text);
+//    }
 
     function showAllInfoAboutGame(sender) {
 

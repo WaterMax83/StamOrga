@@ -34,18 +34,29 @@ Flickable {
     Pane {
         id: mainPaneCurrentGame
         width: parent.width
+        height: parent.height
 
         ColumnLayout {
             id: mainColumnLayoutCurrentGame
-            width: parent.width
-                MyComponents.Games {
-                    id: gameHeader
+            anchors.fill: parent
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+            spacing: 0
+
+            MyComponents.Games {
+                id: gameHeader
+                anchors.left: parent.left
+                anchors.right: parent.right
+                Layout.alignment: Qt.AlignTop
+//                Layout.leftMargin: 10
+//                Layout.rightMargin: 10
+//                Layout.topMargin: 10
             }
 
             ColumnLayout {
                 id: columnLayoutBusyInfoCurrGame
                 spacing: 0
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                width: parent.width
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
 
                 BusyIndicator {
                     id: busyLoadingIndicatorCurrentGames
@@ -55,28 +66,54 @@ Flickable {
 
                 Label {
                     id: txtInfoCurrentGame
-                    visible: true
+                    visible: false
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }
+            }
+
+            CurrentMeetInfo {
+                id: currentMeetInfo
+                width: parent.width
             }
         }
     }
 
+    function currentMeetInfoNewHeaderInfo(text, load) {
+        busyLoadingIndicatorCurrentGames.visible = load;
+        if (text === "")
+            txtInfoCurrentGame.visible = false
+        else
+            txtInfoCurrentGame.visible = true;
+        txtInfoCurrentGame.text = text;
+    }
+
     function showAllInfoAboutGame(sender) {
 
-//        busyLoadingIndicatorCurrentGames.visible = true;
-        txtInfoCurrentGame.text = "Aktuell noch nichts zum Anzeigen beim Auswärtsspiel";
-
-        m_gamePlayCurrentItem = sender;
+        m_gamePlayCurrentItem = sender
         gameHeader.showGamesInfo(sender)
+
+        currentMeetInfo.showInfoHeader.connect(currentMeetInfoNewHeaderInfo);
+        currentMeetInfo.showAllInfoAboutGame();
     }
 
-    function pageOpenedUpdateView() {
+    function pageOpenedUpdateView() {}
 
+    function notifyUserIntSeasonTicketListFinished(result) {}
+
+    function notifyAvailableTicketStateChangedFinished(result) {}
+
+    function notifyAvailableTicketListFinished(result) {}
+
+    function notifyChangedMeetingInfoFinished(result) {
+        currentMeetInfo.notifyChangedMeetingInfoFinished(result);
     }
 
-    function notifyUserIntSeasonTicketListFinished(result) {
+    function notifyLoadMeetingInfoFinished(result) {
+        currentMeetInfo.notifyLoadMeetingInfoFinished(result);
+    }
 
+    function notifyAcceptMeetingFinished(result) {
+        currentMeetInfo.notifyAcceptMeetingFinished(result);
     }
 
     function notifyUserIntConnectionFinished(result) {}

@@ -81,6 +81,7 @@ void GlobalData::loadGlobalSettings()
 
     this->m_pMainUserSettings->beginGroup("GLOBAL_SETTINGS");
     this->setLastGamesLoadCount(this->m_pMainUserSettings->value("LastGamesLoadCount", 5).toInt());
+    this->setUseReadableName(this->m_pMainUserSettings->value("UseReadableName", true).toBool());
     this->setDebugIP(this->m_pMainUserSettings->value("DebugIP", "").toString());
     this->setDebugIPWifi(this->m_pMainUserSettings->value("DebugIPWifi", "").toString());
 
@@ -153,6 +154,7 @@ void GlobalData::saveGlobalSettings()
     this->m_pMainUserSettings->beginGroup("GLOBAL_SETTINGS");
 
     this->m_pMainUserSettings->setValue("LastGamesLoadCount", this->m_ulastGamesLoadCount);
+    this->m_pMainUserSettings->setValue("UseReadableName", this->m_useReadableName);
     this->m_pMainUserSettings->setValue("DebugIP", this->m_debugIP);
     this->m_pMainUserSettings->setValue("DebugIPWifi", this->m_debugIPWifi);
 
