@@ -1,4 +1,3 @@
-
 /*
 *	This file is part of StamOrga
 *   Copyright (C) 2017 Markus Schneider
@@ -50,6 +49,16 @@ Item {
                         }
                     }
                 }
+            }
+
+            Label {
+                id: text1
+                text: qsTr("Hallo Welt dies ist ein langer Text der hoffentlich irgendwann umschlägt")
+                horizontalAlignment: Text.AlignHCenter
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                wrapMode: Text.WordWrap
+                Layout.maximumWidth: parent.width
+                font.pixelSize: 12
             }
         }
     }

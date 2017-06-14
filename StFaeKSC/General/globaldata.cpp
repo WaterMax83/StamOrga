@@ -191,7 +191,7 @@ qint32 GlobalData::requestGetAvailableSeasonTicket(const quint32 gameIndex, cons
     QDataStream wData(&data, QIODevice::WriteOnly);
     wData.setByteOrder(QDataStream::LittleEndian);
 
-    wData << quint32(ERROR_CODE_SUCCESS) << quint32(0x1) << quint16(0x0) << quint16(0x0);
+    wData << quint32(ERROR_CODE_SUCCESS) << quint16(0x0) << quint16(0x0);
 
     return ERROR_CODE_SUCCESS;
 }

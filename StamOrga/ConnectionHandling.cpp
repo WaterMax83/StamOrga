@@ -369,6 +369,7 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
         if (request.m_result == ERROR_CODE_MISSING_TICKET) {
             if (retryGetTicketCount < 5) {
                 this->startListSeasonTickets();
+                qDebug() << "Start again";
                 retryGetTicketCount++;
                 return;
             }

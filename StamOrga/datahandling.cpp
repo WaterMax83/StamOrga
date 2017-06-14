@@ -57,7 +57,15 @@ qint32 DataHandling::getHandleVersionResponse(MessageProtocol* msg, QString* ver
     QString remVersion(QByteArray(pData + 10, size));
 
     if (uVersion > STAM_ORGA_VERSION_I) {
-        version->append(QString("Deine Version: %2\nAktuelle Version: %1").arg(remVersion, STAM_ORGA_VERSION_S));
+        version->append(QString("Deine Version: %2<br>Aktuelle Version: %1<br><br>").arg(remVersion, STAM_ORGA_VERSION_S));
+#ifdef Q_OS_WIN
+        version->append(QString("<a href=\"https://github.com/WaterMax83/StamOrga/releases/download/%1/StamOrga.%1.exe\">Lade %2</a>\n")
+                            .arg(remVersion.toLower(), remVersion));
+#endif
+#ifdef Q_OS_ANDROID
+        version->append(QString("<a href=\"https://github.com/WaterMax83/StamOrga/releases/download/%1/StamOrga.App.%1.apk\">Lade %2</a>\n")
+                            .arg(remVersion.toLower(), remVersion));
+#endif
         return ERROR_CODE_NEW_VERSION;
     }
     version->append(remVersion);
@@ -278,6 +286,7 @@ qint32 DataHandling::getHandleAvailableTicketListResponse(MessageProtocol* msg, 
     offset += sizeof(qint16);
     qint16 countOfReservedTickets = qFromLittleEndian(*((qint16*)(pData + offset)));
     offset += sizeof(qint16);
+
     for (int i = 0; i < countOfFreeTickets; i++) {
         if (offset + AVAILABLE_HEAD_OFFSET > msg->getDataLength()) {
             qWarning() << "Error in message for get available ticket list";
@@ -287,8 +296,10 @@ qint32 DataHandling::getHandleAvailableTicketListResponse(MessageProtocol* msg, 
         SeasonTicketItem* item        = this->m_pGlobalData->getSeasonTicket(ticketIndex);
         if (item != NULL)
             item->setTicketState(TICKET_STATE_FREE);
-        else
+        else {
+            qWarning().noquote() << QString("Ticket with number %1 is missing for availableTicket Free").arg(ticketIndex);
             result = ERROR_CODE_MISSING_TICKET;
+        }
 
         offset += 4;
     }
@@ -301,8 +312,10 @@ qint32 DataHandling::getHandleAvailableTicketListResponse(MessageProtocol* msg, 
         SeasonTicketItem* item        = this->m_pGlobalData->getSeasonTicket(ticketIndex);
         if (item != NULL)
             item->setTicketState(TICKET_STATE_RESERVED);
-        else
+        else {
+            qWarning().noquote() << QString("Ticket with number %1 is missing for availableTicket Reserved").arg(ticketIndex);
             result = ERROR_CODE_MISSING_TICKET;
+        }
         offset += 4;
         QString name(pData + offset);
         item->setReserveName(name);

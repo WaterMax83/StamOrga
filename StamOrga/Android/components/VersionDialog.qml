@@ -46,11 +46,14 @@ Dialog {
             font.pixelSize: 12
         }
 
-        Label {
+        Text {
             id: versionDialogTextUpdate
             width: versionDialog.availableWidth
+            textFormat: Text.RichText
             wrapMode: Label.Wrap
             font.pixelSize: 12
+            color: "white"
+            onLinkActivated: Qt.openUrlExternally(link)
         }
     }
 }
