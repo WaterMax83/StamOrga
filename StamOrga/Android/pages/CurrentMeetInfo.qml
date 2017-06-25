@@ -176,6 +176,8 @@ Flickable {
                         id: clipInfoUpImage
                         source: "../images/play.png"
                         rotation: isInfoVisible ? 90 : 0
+                        width: listViewItemHeight
+                        height: listViewItemHeight
                     }
                     onClicked: {
                         if (isInfoVisible)
@@ -197,7 +199,7 @@ Flickable {
 
             Rectangle {
                 implicitWidth: parent.width
-                implicitHeight: textInfo.height > 0 ? textInfo.height : 30
+                implicitHeight: textInfo.height > 0 ? textInfo.height : listViewItemHeight
                 color: isEditMode ? "#FFFFFF" : "#AAAAAA";
                 visible: isInfoVisible
                 Text {
@@ -227,6 +229,8 @@ Flickable {
                         id: clipAcceptUpImage
                         source: "../images/play.png"
                         rotation: isAcceptVisible ? 90 : 0
+                        width: listViewItemHeight
+                        height: listViewItemHeight
                     }
                     onClicked: {
                         if (isAcceptVisible)
@@ -260,17 +264,6 @@ Flickable {
                         width: parent.width
                         height: listViewItemHeight
 
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: {
-                                var globalCoordinates = singleRowAccepted.mapToItem(flickableCurrentMeetInfo, 0, 0)
-                                clickedAcceptedUserMenu.y = globalCoordinates.y - singleRowAccepted.height / 2
-                                menuAcceptIndex = model.index
-                                menuAcceptValue = model.value
-                                menuAcceptText = model.title
-                                clickedAcceptedUserMenu.open();
-                            }
-                        }
                         Rectangle {
                             id: imageItemAccepted
                             anchors.left: parent.left
@@ -286,6 +279,7 @@ Flickable {
                         }
 
                         Text {
+                            id: textItemAccepted
                             text: model.title
                             anchors.left: imageItemAccepted.right
                             anchors.leftMargin: 10
@@ -293,6 +287,20 @@ Flickable {
                             Layout.alignment: Qt.AlignVCenter
                             color: "white"
                             font.pixelSize: parent.height / 4 * 2
+                        }
+                        MouseArea {
+                            anchors.top: parent.top
+                            anchors.bottom: parent.bottom
+                            anchors.left: imageItemAccepted.left
+                            anchors.right: textItemAccepted.right
+                            onClicked: {
+                                var globalCoordinates = singleRowAccepted.mapToItem(flickableCurrentMeetInfo, 0, 0)
+                                clickedAcceptedUserMenu.y = globalCoordinates.y - singleRowAccepted.height / 2
+                                menuAcceptIndex = model.index
+                                menuAcceptValue = model.value
+                                menuAcceptText = model.title
+                                clickedAcceptedUserMenu.open();
+                            }
                         }
                     }
 

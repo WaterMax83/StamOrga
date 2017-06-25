@@ -389,8 +389,9 @@ void DataConnection::startSendAcceptMeeting(DataConRequest request)
     QByteArray tmp = request.m_lData.at(3).toUtf8();
     if (tmp.size() > (BUFFER_SIZE - 12))
         tmp.resize(BUFFER_SIZE - 12);
-    memcpy(&data[3], tmp.constData(), tmp.size());
-
+    char* pName = (char*)&data[3];
+    memcpy(pName, tmp.constData(), tmp.size());
+    pName[tmp.size()] = 0x00;
 
     MessageProtocol msg(request.m_request, (char*)(&data[0]), 16 + tmp.size());
     this->sendMessageRequest(&msg, request);

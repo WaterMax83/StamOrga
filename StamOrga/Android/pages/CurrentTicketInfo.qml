@@ -92,15 +92,6 @@ Flickable {
                     width: parent.width
                     height: listViewItemHeight
 
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            var globalCoordinates = singleBlockedRow.mapToItem(flickableCurrentTicketInfo, 0, 0)
-                            clickedBlockedMenu.y = globalCoordinates.y - singleBlockedRow.height / 2
-                            menuTicketIndex = model.index
-                            clickedBlockedMenu.open();
-                        }
-                    }
                     Rectangle {
                         id: imageItemBlocked
                         anchors.left: parent.left
@@ -112,6 +103,7 @@ Flickable {
                     }
 
                     Text {
+                        id: textItemBlocked
                         text: model.title
                         anchors.left: imageItemBlocked.right
                         anchors.leftMargin: 10
@@ -119,6 +111,19 @@ Flickable {
                         Layout.alignment: Qt.AlignVCenter
                         color: "white"
                         font.pixelSize: parent.height / 4 * 2
+                    }
+
+                    MouseArea {
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.left: imageItemBlocked.left
+                        anchors.right: textItemBlocked.right
+                        onClicked: {
+                            var globalCoordinates = singleBlockedRow.mapToItem(flickableCurrentTicketInfo, 0, 0)
+                            clickedBlockedMenu.y = globalCoordinates.y - singleBlockedRow.height / 2
+                            menuTicketIndex = model.index
+                            clickedBlockedMenu.open();
+                        }
                     }
                 }
 
@@ -145,17 +150,8 @@ Flickable {
                     width: parent.width
                     spacing: 0
 
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            var globalCoordinates = singleReservedRow.mapToItem(flickableCurrentTicketInfo, 0, 0)
-                            clickedReservedMenu.y = globalCoordinates.y - singleReservedRow.height / 2
-                            menuTicketIndex = model.index
-                            clickedReservedMenu.open();
-                        }
-                    }
-
                     RowLayout {
+                        id: rowItemReserved
                         width: parent.width
                         height: listViewItemHeight
                         anchors.left: parent.left
@@ -191,6 +187,19 @@ Flickable {
                         color: "white"
                         font.pixelSize: listViewItemHeight / 4 * 2
                     }
+
+                    MouseArea {
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.left: rowItemReserved.left
+                        anchors.right: parent.right
+                        onClicked: {
+                            var globalCoordinates = singleReservedRow.mapToItem(flickableCurrentTicketInfo, 0, 0)
+                            clickedReservedMenu.y = globalCoordinates.y - singleReservedRow.height / 2
+                            menuTicketIndex = model.index
+                            clickedReservedMenu.open();
+                        }
+                    }
                 }
 
                 model: ListModel {
@@ -216,16 +225,6 @@ Flickable {
                     id: singleFreeRow
                     width: parent.width
                     height: listViewItemHeight
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            var globalCoordinates = singleFreeRow.mapToItem(flickableCurrentTicketInfo, 0, 0)
-                            clickedFreeMenu.y = globalCoordinates.y - singleFreeRow.height / 2
-                            menuTicketIndex = model.index
-                            clickedFreeMenu.open();
-                        }
-                    }
                     Rectangle {
                         id: imageItemFree
                         anchors.left: parent.left
@@ -237,6 +236,7 @@ Flickable {
                     }
 
                     Text {
+                        id: textItemFree
                         text: model.title
                         anchors.left: imageItemFree.right
                         anchors.leftMargin: 10
@@ -244,6 +244,18 @@ Flickable {
                         Layout.alignment: Qt.AlignVCenter
                         color: "white"
                         font.pixelSize: parent.height / 4 * 2
+                    }
+                    MouseArea {
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.left: imageItemFree.left
+                        anchors.right: textItemFree.right
+                        onClicked: {
+                            var globalCoordinates = singleFreeRow.mapToItem(flickableCurrentTicketInfo, 0, 0)
+                            clickedFreeMenu.y = globalCoordinates.y - singleFreeRow.height / 2
+                            menuTicketIndex = model.index
+                            clickedFreeMenu.open();
+                        }
                     }
                 }
 
