@@ -192,7 +192,7 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol* msg)
 
 qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol* msg)
 {
-    if (msg->getDataLength() < 8)
+    if (msg->getDataLength() < 6)
         return ERROR_CODE_WRONG_SIZE;
 
     quint32     userIndex = this->m_pGlobalData->userIndex();

@@ -127,5 +127,24 @@ int ReadDataCSV::readNewUserData(QStringList line)
 {
     if (line.length() < 2)
         return -1;
-    return 0;
+
+    bool    ok;
+    QString name = line.at(0);
+    quint32 prop = line.at(1).toInt(&ok, 16);
+    if (!ok)
+        return ERROR_CODE_COMMON;
+
+    if (this->m_pGlobalData->m_UserList.itemExists(name)) {
+        if (!this->m_pGlobalData->m_UserList.userChangeProperties(name, prop)) {
+            qWarning() << QString("Error changing property from user %1 to 0x%2").arg(name, QString::number(prop, 16));
+            return ERROR_CODE_COMMON;
+        }
+    } else {
+        if (this->m_pGlobalData->m_UserList.addNewUser(name, name, prop) <= 0) {
+            qInfo() << QString("Error adding user %1").arg(name);
+            return ERROR_CODE_COMMON;
+        }
+        this->m_pGlobalData->m_UserList.userChangeProperties(name, prop);
+    }
+    return ERROR_CODE_SUCCESS;
 }

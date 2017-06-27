@@ -42,7 +42,7 @@ public:
         if (list.value(1) == "add" && list.size() == 3) {
             int result = pUsers->addNewUser(list.value(2));
             if (result > 0)
-                std::cout << QString("Added new user: %1").arg(list.value(2)).toStdString();
+                std::cout << QString("Added new user: %1").arg(list.value(2)).toStdString() <<  std::endl;
             return result;
         } else if (list.value(1) == "remove" && list.size() == 3)
             return pUsers->removeItem(list.value(2));
