@@ -411,6 +411,8 @@ bool ReadOnlineGames::readSingleGame(QJsonObject& json)
         comp = BUNDESLIGA_2;
     else if (this->m_currentGameInfo->m_competition == "bl3")
         comp = LIGA_3;
+    else if (this->m_currentGameInfo->m_competition == "dfb2017")
+        comp = DFB_POKAL;
     this->m_globalData->m_GamesList.addNewGame(this->m_currentGameInfo->m_team1,
                                                this->m_currentGameInfo->m_team2,
                                                this->m_currentGameInfo->m_timeStamp,
