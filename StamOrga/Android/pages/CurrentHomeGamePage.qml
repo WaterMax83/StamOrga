@@ -70,19 +70,10 @@ Item {
 
             TabBar {
                   id: tabBar
-//                  currentIndex: swipeViewCurrentHomeGame.currentIndex
+                  currentIndex: swipeViewCurrentHomeGame.currentIndex
                   anchors.left: parent.left
                   anchors.right: parent.right
                   Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                  height: tabButton1.height - 10
-
-                  TabButton {
-                      id: tabButton1
-                      text: "Karten"
-                  }
-                  TabButton {
-                      text: "Treffen"
-                  }
               }
 
             SwipeView {
@@ -109,6 +100,16 @@ Item {
 
     CurrentTicketInfo {
         id: currentTicketInfo
+    }
+
+    TabButton {
+        id: tabButtonTickets
+        text: "Karten"
+    }
+
+    TabButton {
+        id: tabButtonMeeting
+        text: "Treffen"
     }
 
     function currentTicketInfoNewHeaderInfo(text, load) {
@@ -141,23 +142,19 @@ Item {
 
     }
 
-
-//    function acceptedEditReserveNameDialog(text)
-//    {
-//        currentTicketInfo.acceptedEditReserveNameDialog(text);
-//    }
-
     function showAllInfoAboutGame(sender) {
 
         m_gamePlayCurrentItem = sender
         gameHeader.showGamesInfo(sender)
 
         if (sender.isGameASeasonTicketGame()) {
+            tabBar.addItem(tabButtonTickets);
             swipeViewCurrentHomeGame.addItem(currentTicketInfo)
             currentTicketInfo.showInfoHeader.connect(currentTicketInfoNewHeaderInfo);
             currentTicketInfo.showAllInfoAboutGame(sender);
         }
 
+        tabBar.addItem(tabButtonMeeting);
         swipeViewCurrentHomeGame.addItem(currentMeetInfo)
 
         currentMeetInfo.showInfoHeader.connect(currentMeetInfoNewHeaderInfo);

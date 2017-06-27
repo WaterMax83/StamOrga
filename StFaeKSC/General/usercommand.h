@@ -39,9 +39,12 @@ public:
         if (list.size() < 2 || list.value(0) != "user")
             return ShowUserCommandHelp();
 
-        if (list.value(1) == "add" && list.size() == 3)
-            return pUsers->addNewUser(list.value(2));
-        else if (list.value(1) == "remove" && list.size() == 3)
+        if (list.value(1) == "add" && list.size() == 3) {
+            int result = pUsers->addNewUser(list.value(2));
+            if (result > 0)
+                std::cout << QString("Added new user: %1").arg(list.value(2)).toStdString();
+            return result;
+        } else if (list.value(1) == "remove" && list.size() == 3)
             return pUsers->removeItem(list.value(2));
         else if (list.value(1) == "change" && list.size() == 4) {
             if (pUsers->itemExists(list.value(2))) {

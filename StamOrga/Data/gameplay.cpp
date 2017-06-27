@@ -61,8 +61,15 @@ bool GamePlay::isGameASeasonTicketGame()
     if (!this->isGameAHomeGame())
         return false;
 
-    if (this->m_comp >= 1 && this->m_comp <= 3)
+    switch (this->m_comp) {
+    case BUNDESLIGA_1:
+    case BUNDESLIGA_2:
+    case LIGA_3:
+    case DFB_POKAL:
         return true;
+    default:
+        return false;
+    }
 
     return false;
 }
@@ -72,7 +79,7 @@ QString GamePlay::getCompetitionLine()
     if (this->m_comp == BUNDESLIGA_1 || this->m_comp == BUNDESLIGA_2 || this->m_comp == LIGA_3)
         return QString("%1. Spieltag - ").arg(this->m_seasonIndex);
     else if (this->m_comp == DFB_POKAL || this->m_comp == KROMBACHER_POKAL)
-        return QString("%1 Runde - ").arg(this->m_seasonIndex);
+        return QString("%1. Runde - ").arg(this->m_seasonIndex);
     else if (this->m_comp == TESTSPIEL) {
         if (this->m_bIsUserGameAddingEnabled)
             return QString("%1. ").arg(this->m_seasonIndex);

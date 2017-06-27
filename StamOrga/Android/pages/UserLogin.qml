@@ -199,7 +199,7 @@ Flickable {
 
                 Button {
                     id: btnChangePassWord
-                    text: qsTr("Password ändern")
+                    text: qsTr("Passwort ändern")
                     implicitWidth: parent.width / 4 * 2
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     transformOrigin: Item.Center

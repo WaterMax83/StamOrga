@@ -47,11 +47,17 @@ int ReadOnlineGames::DoBackgroundWork()
 {
     this->m_currentRequestIndex = -1;
 
-    RequestList* list1 = new RequestList();
-    list1->m_comp      = "bl2";
-    list1->m_maxIndex  = 34;
-    list1->m_season    = 2016;
-    this->m_requestList.append(list1);
+    //    RequestList* list1 = new RequestList();
+    //    list1->m_comp      = "bl3";
+    //    list1->m_maxIndex  = 38;
+    //    list1->m_season    = 2017;
+    //    this->m_requestList.append(list1);
+
+    RequestList* list2 = new RequestList();
+    list2->m_comp      = "dfb2017";
+    list2->m_maxIndex  = 1;
+    list2->m_season    = 2017;
+    this->m_requestList.append(list2);
 
     this->m_netAccess = new QNetworkAccessManager();
     connect(this->m_netAccess, &QNetworkAccessManager::finished, this, &ReadOnlineGames::slotNetWorkRequestFinished);
@@ -66,24 +72,24 @@ int ReadOnlineGames::DoBackgroundWork()
     connect(this->m_networkUpdate, &QTimer::timeout, this, &ReadOnlineGames::slotNetWorkUpdateTimeout);
 
 #ifdef QT_DEBUG
-//    OnlineGameInfo* gameInfo = new OnlineGameInfo();
-//    gameInfo->m_index        = 1;
-//    gameInfo->m_timeStamp    = QDateTime::currentDateTime().addMonths(-2).toMSecsSinceEpoch();
-//    gameInfo->m_gameFinished = true;
-//    this->m_onlineGames.append(gameInfo);
+    //    OnlineGameInfo* gameInfo = new OnlineGameInfo();
+    //    gameInfo->m_index        = 1;
+    //    gameInfo->m_timeStamp    = QDateTime::currentDateTime().addMonths(-2).toMSecsSinceEpoch();
+    //    gameInfo->m_gameFinished = true;
+    //    this->m_onlineGames.append(gameInfo);
 
-//    gameInfo                 = new OnlineGameInfo();
-//    gameInfo->m_index        = 2;
-//    gameInfo->m_timeStamp    = QDateTime::currentDateTime().addDays(-5).toMSecsSinceEpoch();
-//    gameInfo->m_gameFinished = true;
-//    this->m_onlineGames.append(gameInfo);
+    //    gameInfo                 = new OnlineGameInfo();
+    //    gameInfo->m_index        = 2;
+    //    gameInfo->m_timeStamp    = QDateTime::currentDateTime().addDays(-5).toMSecsSinceEpoch();
+    //    gameInfo->m_gameFinished = true;
+    //    this->m_onlineGames.append(gameInfo);
 
-//    gameInfo              = new OnlineGameInfo();
-//    gameInfo->m_index     = 3;
-//    gameInfo->m_timeStamp = QDateTime::currentDateTime().addSecs(10).toMSecsSinceEpoch();
-//    this->m_onlineGames.append(gameInfo);
+    //    gameInfo              = new OnlineGameInfo();
+    //    gameInfo->m_index     = 3;
+    //    gameInfo->m_timeStamp = QDateTime::currentDateTime().addSecs(10).toMSecsSinceEpoch();
+    //    this->m_onlineGames.append(gameInfo);
 
-//    this->m_currentRequestIndex = 0;
+    //    this->m_currentRequestIndex = 0;
     qInfo().noquote() << "Did not use ReadOnlineGame because of debugging";
     return 0;
 #endif

@@ -104,6 +104,11 @@ Flickable {
                     Layout.alignment: Qt.AlignRight
                 }
 
+                Text {
+                    text: " - "
+                    font.bold: true
+                }
+
                 MyComponents.GraphicalButton {
                     imageSource: "../images/done.png"
                     enabled: isEditMode ? false : true

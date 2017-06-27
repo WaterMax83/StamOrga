@@ -70,7 +70,7 @@ qint32 GlobalData::requestChangeStateSeasonTicket(quint32 ticketIndex, quint32 g
         return ERROR_CODE_NOT_FOUND;
 
 #undef ENABLE_PAST_CHECK
-//#define ENABLE_PAST_CHECK
+#define ENABLE_PAST_CHECK
 #ifdef ENABLE_PAST_CHECK
     if (pGame->m_timestamp < QDateTime::currentMSecsSinceEpoch())
         return ERROR_CODE_IN_PAST;

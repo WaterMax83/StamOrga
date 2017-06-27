@@ -36,7 +36,7 @@ qint32 ConfigList::removeItem(const QString name)
             this->m_lInteralList.removeAt(i);
             this->saveCurrentInteralList();
 
-            CONSOLE_INFO(QString("removed Item \"%1\"").arg(name));
+            qInfo(QString("removed Item \"%1\"").arg(name));
             return ERROR_CODE_SUCCESS;
         }
     }
@@ -55,7 +55,7 @@ qint32 ConfigList::removeItem(const quint32 index)
             this->m_lInteralList.removeAt(i);
             this->saveCurrentInteralList();
 
-            CONSOLE_INFO(QString("removed Item \"%1\"").arg(name));
+            qInfo(QString("removed Item \"%1\"").arg(name));
             return ERROR_CODE_SUCCESS;
         }
     }
