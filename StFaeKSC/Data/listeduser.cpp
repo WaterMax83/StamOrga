@@ -120,7 +120,7 @@ int ListedUser::addNewUser(const QString& name, const QString& password, quint32
 
     this->addNewUserLogin(name, timestamp, newIndex, name, 0x0, "", false);
 
-    qInfo(QString("Added new user: %1").arg(name));
+    qInfo() << QString("Added new user: %1").arg(name);
     return newIndex;
 }
 

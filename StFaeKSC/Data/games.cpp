@@ -169,7 +169,7 @@ int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sInde
 
     this->addNewGamesPlay(home, away, timestamp, sIndex, score, comp, saison, newIndex, false);
 
-    qInfo(QString("Added new game: %1").arg(home + " : " + away));
+    qInfo() << QString("Added new game: %1").arg(home + " : " + away);
     return newIndex;
 }
 
