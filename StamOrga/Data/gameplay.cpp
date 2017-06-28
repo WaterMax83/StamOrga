@@ -81,10 +81,14 @@ QString GamePlay::getCompetitionLine()
     else if (this->m_comp == DFB_POKAL || this->m_comp == KROMBACHER_POKAL)
         return QString("%1. Runde - ").arg(this->m_seasonIndex);
     else if (this->m_comp == TESTSPIEL) {
+#ifdef QT_DEBUG
+        return QString("%1. ").arg(this->m_seasonIndex);
+#else
         if (this->m_bIsUserGameAddingEnabled)
             return QString("%1. ").arg(this->m_seasonIndex);
         else
             return "";
+#endif
     }
 
     return "not implemented";

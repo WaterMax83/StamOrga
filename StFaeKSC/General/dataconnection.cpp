@@ -250,7 +250,7 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
         if (pGame == NULL)
             continue;
 
-        QString game(pGame->m_itemName + ";" + pGame->away + ";" + pGame->score);
+        QString game(pGame->m_itemName + ";" + pGame->away + ";" + pGame->m_score);
         quint16 freeTickets     = this->m_pGlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_FREE);
         quint16 blockTickets    = this->m_pGlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_BLOCKED);
         quint16 reservedTickets = this->m_pGlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_RESERVED);
@@ -500,6 +500,21 @@ MessageProtocol* DataConnection::requestChangeGame(MessageProtocol* msg)
     qint32           index  = parts[4].toInt();
     quint32          sIndex = parts[5].toUInt();
     CompetitionIndex comp   = CompetitionIndex(parts[6].toUInt());
+
+    /* game already exists, shouls only be changed */
+    if (index > 0) {
+        quint16 saison;
+        QDate   date = QDateTime::fromMSecsSinceEpoch(timestamp).date();
+        if (date.month() >= 6)
+            saison = date.year();
+        else
+            saison       = date.year() - 1;
+        GamesPlay* pGame = this->m_pGlobalData->m_GamesList.gameExists(sIndex, comp, saison, timestamp);
+        if (pGame == NULL) {
+            qWarning().noquote() << QString("user %1 tried to change game %2, but game would be added, abort it").arg(this->m_pUserConData->userName).arg(index);
+            return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME, ERROR_CODE_NOT_FOUND);
+        }
+    }
 
     qint32 result = this->m_pGlobalData->m_GamesList.addNewGame(home, away, timestamp, sIndex, score, comp);
     if (result < 0)

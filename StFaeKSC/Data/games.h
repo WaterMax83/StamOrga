@@ -34,7 +34,7 @@ public:
     quint8           m_saisonIndex;
     CompetitionIndex m_competition;
     quint16          m_saison;
-    QString          score;
+    QString          m_score;
 };
 
 #define PLAY_AWAY "away"
