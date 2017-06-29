@@ -60,6 +60,15 @@ Item {
                 Layout.maximumWidth: parent.width
                 font.pixelSize: 12
             }
+
+            Text {
+                width: parent.width
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                text: "Treffen"
+                font.capitalization: Font.AllUppercase
+                font.pixelSize: 20
+                color: "#0894c1"
+            }
         }
     }
 }

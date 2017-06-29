@@ -152,14 +152,17 @@ Flickable {
 
                 Button {
                     id: btnChangeReadableName
-                    implicitWidth: parent.width / 4 * 2
+                    implicitWidth: parent.width / 4 * 3
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     transformOrigin: Item.Center
                     onClicked: {
                         var component = Qt.createComponent("../components/EditableTextDialog.qml");
                         if (component.status === Component.Ready) {
                             var dialog = component.createObject(flickableUser,{popupType: 1});
-                            dialog.headerText = "Nutzername ändern";
+                            if (globalUserData.readableName === "")
+                                dialog.headerText = "Nutzername anlegen";
+                            else
+                                dialog.headerText = "Nutzername ändern";
                             dialog.parentHeight = flickableUser.height
                             dialog.parentWidth = flickableUser.width
                             dialog.textMinSize = 6

@@ -52,6 +52,17 @@ Flickable {
 //                Layout.topMargin: 10
             }
 
+            Text {
+                width: parent.width
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                text: "Treffen"
+                font.capitalization: Font.AllUppercase
+                font.pixelSize: 20
+                color: "#0894c1"
+                Layout.bottomMargin: 3
+                Layout.topMargin: 3
+            }
+
             ColumnLayout {
                 id: columnLayoutBusyInfoCurrGame
                 spacing: 0

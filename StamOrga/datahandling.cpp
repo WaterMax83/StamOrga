@@ -56,14 +56,16 @@ qint32 DataHandling::getHandleVersionResponse(MessageProtocol* msg, QString* ver
 
     QString remVersion(QByteArray(pData + 10, size));
 
-    if (uVersion > STAM_ORGA_VERSION_I) {
+    qInfo().noquote() << QString("Version from server %1:0x%2").arg(remVersion, QString::number(uVersion, 16));
+
+    if ((uVersion & 0xFFFFFF00) > (STAM_ORGA_VERSION_I & 0xFFFFFF00)) {
         version->append(QString("Deine Version: %2<br>Aktuelle Version: %1<br><br>").arg(remVersion, STAM_ORGA_VERSION_S));
 #ifdef Q_OS_WIN
-        version->append(QString("<a href=\"https://github.com/WaterMax83/StamOrga/releases/download/%1/StamOrga.%1.exe\">Lade %2</a>\n")
+        version->append(QString("<a href=\"https://github.com/WaterMax83/StamOrga/releases/download/%1/StamOrga.Winx64.%1.exe\">Lade %2</a>\n")
                             .arg(remVersion.toLower(), remVersion));
 #endif
 #ifdef Q_OS_ANDROID
-        version->append(QString("<a href=\"https://github.com/WaterMax83/StamOrga/releases/download/%1/StamOrga.App.%1.apk\">Lade %2</a>\n")
+        version->append(QString("<a href=\"https://github.com/WaterMax83/StamOrga/releases/download/%1/StamOrga.Android.%1.apk\">Lade %2</a>\n")
                             .arg(remVersion.toLower(), remVersion));
 #endif
         return ERROR_CODE_NEW_VERSION;
