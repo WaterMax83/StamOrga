@@ -464,12 +464,8 @@ MessageProtocol* DataConnection::requestGetAvailableTicketList(MessageProtocol* 
     quint32     gameIndex = qFromLittleEndian(*((quint32*)pData));
 
     QByteArray data;
-    if ((rCode = this->m_pGlobalData->requestGetAvailableSeasonTicket(gameIndex, this->m_pUserConData->userName, data)) == ERROR_CODE_SUCCESS) {
-        qInfo().noquote() << QString("User %1 got available SeasonTicket List for game %2")
-                                 .arg(this->m_pUserConData->userName)
-                                 .arg(gameIndex);
+    if ((rCode = this->m_pGlobalData->requestGetAvailableSeasonTicket(gameIndex, this->m_pUserConData->userName, data)) == ERROR_CODE_SUCCESS)
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_AVAILABLE_TICKETS, data);
-    }
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_AVAILABLE_TICKETS, rCode);
 }
 
@@ -579,11 +575,18 @@ MessageProtocol* DataConnection::requestGetMeetingInfo(MessageProtocol* msg)
     char    buffer[10000];
 
     if ((rCode = this->m_pGlobalData->requestGetMeetingInfo(gameIndex, 0, &buffer[0], size)) == ERROR_CODE_SUCCESS) {
-        qInfo().noquote() << QString("User %1 get MeetingInfo of game %2")
+        GamesPlay* pGame = (GamesPlay*)this->m_pGlobalData->m_GamesList.getItem(gameIndex);
+        qInfo().noquote() << QString("User %1 got MeetingInfo of game %2:%3:%4")
                                  .arg(this->m_pUserConData->userName)
-                                 .arg(this->m_pGlobalData->m_GamesList.getItemName(gameIndex));
+                                 .arg(gameIndex)
+                                 .arg(pGame->m_competition)
+                                 .arg(pGame->m_saisonIndex);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_MEETING_INFO, &buffer[0], size);
     }
+    qInfo().noquote() << QString("User %1 got MeetingInfo of game %2 with result %3")
+                             .arg(this->m_pUserConData->userName)
+                             .arg(this->m_pGlobalData->m_GamesList.getItemName(gameIndex))
+                             .arg(rCode);
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_MEETING_INFO, rCode);
 }
 
