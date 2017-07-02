@@ -260,6 +260,19 @@ bool MeetingInfo::updateHeaderValue(QString key, QVariant value)
     return rValue;
 }
 
+quint16 MeetingInfo::getAcceptedNumber(const quint32 state)
+{
+    QMutexLocker locker(&this->m_mInternalInfoMutex);
+
+    quint16 rValue = 0;
+    for (int i = 0; i < this->getNumberOfInternalList(); i++) {
+        AcceptMeetingInfo* pInfo = (AcceptMeetingInfo*)(this->getItemFromArrayIndex(i));
+        if (pInfo->m_state == state)
+            rValue++;
+    }
+    return rValue;
+}
+
 
 void MeetingInfo::saveCurrentInteralList()
 {

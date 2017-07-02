@@ -223,6 +223,19 @@ quint16 GlobalData::getTicketNumber(const quint32 gamesIndex, const quint32 stat
     return 0;
 }
 
+quint16 GlobalData::getAcceptedNumber(const quint32 gamesIndex, const quint32 state)
+{
+    GamesPlay* pGame = (GamesPlay*)this->m_GamesList.getItem(gamesIndex);
+    if (pGame == NULL)
+        return 0;
+
+    foreach (MeetingInfo* info, this->m_meetingInfos) {
+        if (info->getGameIndex() == gamesIndex)
+            return info->getAcceptedNumber(state);
+    }
+    return 0;
+}
+
 qint32 GlobalData::requestChangeMeetingInfo(const quint32 gameIndex, const quint32 version, const QString when, const QString where, const QString info)
 {
     Q_UNUSED(version);

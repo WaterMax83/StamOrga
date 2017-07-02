@@ -144,6 +144,10 @@ MessageProtocol* UdpDataServer::checkNewMessage(MessageProtocol* msg)
             ack = this->m_pDataConnection->requestGetGamesList(msg);
             break;
 
+        case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST:
+            ack = this->m_pDataConnection->requestGetGamesInfoList(msg);
+            break;
+
         case OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST:
             ack = this->m_pDataConnection->requestGetTicketsList(msg);
             break;
