@@ -299,15 +299,19 @@ void ConnectionHandling::sendNewRequest(DataConRequest request)
             emit this->sStartSendNewRequest(request);
             return;
         } else {
-            qInfo().noquote() << QString("Trying to reconnect from ConnectionHandling");
-            this->m_pGlobalData->setbIsConnected(false);
-            this->sendLoginRequest(this->m_pGlobalData->passWord());
             this->m_lErrorMainCon.prepend(request);
+            if (this->m_lErrorMainCon.size() == 1) {
+                qInfo().noquote() << QString("Trying to reconnect from ConnectionHandling");
+                this->m_pGlobalData->setbIsConnected(false);
+                this->sendLoginRequest(this->m_pGlobalData->passWord());
+            }
         }
     } else {
-        qInfo().noquote() << QString("Trying to restart connection from ConnectionHandling");
         this->m_lErrorMainCon.prepend(request);
-        this->startMainConnection(this->m_pGlobalData->userName(), this->m_pGlobalData->passWord());
+        if (this->m_lErrorMainCon.size() == 1) {
+            qInfo().noquote() << QString("Trying to restart connection from ConnectionHandling");
+            this->startMainConnection(this->m_pGlobalData->userName(), this->m_pGlobalData->passWord());
+        }
     }
 }
 

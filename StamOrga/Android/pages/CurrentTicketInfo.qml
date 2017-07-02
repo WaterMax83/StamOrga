@@ -332,7 +332,7 @@ Flickable {
                         dialog.headerText = "Reservierung ändern";
                         dialog.parentHeight = mainWindow.height
                         dialog.parentWidth =  mainPaneCurrentGame.width
-                        dialog.textMinSize = 5;
+                        dialog.textMinSize = 4;
                         dialog.acceptedTextEdit.connect(acceptedEditReserveNameDialog);
                         dialog.open();
                     }
@@ -362,7 +362,7 @@ Flickable {
                         dialog.headerText = "Reserviere für";
                         dialog.parentHeight = mainWindow.height
                         dialog.parentWidth =  mainPaneCurrentGame.width
-                        dialog.textMinSize = 5;
+                        dialog.textMinSize = 4;
                         dialog.acceptedTextEdit.connect(acceptedEditReserveNameDialog);
                         dialog.open();
                     }

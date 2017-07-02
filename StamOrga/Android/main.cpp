@@ -25,6 +25,7 @@
 #include <iostream>
 
 #include "../../Common/General/backgroundcontroller.h"
+#include "../../Common/General/config.h"
 #include "../../Common/General/globalfunctions.h"
 #include "../Data/globaldata.h"
 #include "../dataconnection.h"
@@ -59,6 +60,8 @@ int main(int argc, char* argv[])
         qCritical() << "Warning no root qml object loaded, end programm";
         return -1;
     }
+
+    qInfo().noquote() << QString("Started StamOrga %1").arg(STAM_ORGA_VERSION_S);
 
 #ifdef QT_DEBUG
 

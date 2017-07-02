@@ -217,11 +217,11 @@ void ReadOnlineGames::checkNewNetworkRequest(bool checkLastItem)
             }
         } else {
             this->m_currentRequestIndex = 0;
-            OnlineGameInfo* gameInfo    = new OnlineGameInfo();
-            gameInfo->m_index           = 35;
-            gameInfo->m_timeStamp       = QDateTime::currentDateTime().addSecs(60 * 60).toMSecsSinceEpoch();
-            gameInfo->m_gameFinished    = false;
-            this->m_onlineGames.append(gameInfo);
+//            OnlineGameInfo* gameInfo    = new OnlineGameInfo();
+//            gameInfo->m_index           = 35;
+//            gameInfo->m_timeStamp       = QDateTime::currentDateTime().addSecs(60 * 60).toMSecsSinceEpoch();
+//            gameInfo->m_gameFinished    = false;
+//            this->m_onlineGames.append(gameInfo);
             qInfo().noquote() << "Got all games for internal list";
         }
         nextUpdate = this->getNextGameInMilliSeconds(fastUpdate);

@@ -386,7 +386,7 @@ Flickable {
             dialog.headerText = header;
             dialog.parentHeight = mainWindow.height
             dialog.parentWidth =  mainPaneCurrentGame.width
-            dialog.textMinSize = 5;
+            dialog.textMinSize = 4;
             dialog.editableText = text;
             dialog.acceptedTextEdit.connect(acceptedEditTextDialogAccept);
             dialog.open();

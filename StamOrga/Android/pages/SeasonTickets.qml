@@ -219,7 +219,7 @@ Flickable {
                         dialog.headerText = "Neuer Ort für " + m_ticketNameToChange;
                         dialog.parentHeight = flickableTickets.height
                         dialog.parentWidth = flickableTickets.width
-                        dialog.textMinSize = 6;
+                        dialog.textMinSize = 4;
                         dialog.acceptedTextEdit.connect(acceptedEditNewSeasonTicketPlace);
                         dialog.open();
                     }
