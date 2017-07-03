@@ -246,11 +246,11 @@ void DataConnection::startSendUpdPassRequest(DataConRequest request)
 
     QString newPassWord = request.m_lData.at(0);
 
-    wPassReq << (qint16)this->m_pGlobalData->passWord().size();
-    passReq.append(this->m_pGlobalData->passWord());
+    wPassReq << (qint16)this->m_pGlobalData->passWord().toUtf8().size();
+    passReq.append(this->m_pGlobalData->passWord().toUtf8());
     wPassReq.device()->seek(passReq.length());
-    wPassReq << (qint16)newPassWord.size();
-    passReq.append(newPassWord);
+    wPassReq << (qint16)newPassWord.toUtf8().size();
+    passReq.append(newPassWord.toUtf8());
 
     MessageProtocol msg(request.m_request, passReq);
     this->sendMessageRequest(&msg, request);

@@ -227,8 +227,8 @@ void Logging::slotEveryHourTimeout()
                 std::cout << error.toStdString() << std::endl;
                 return;
             }
-            qInfo().noquote() << QString("Current Loggin Path = %1").arg(loggingPath);
             this->m_internalMutex.unlock();
+            qInfo().noquote() << QString("Current Loggin Path = %1").arg(loggingPath);
 #ifdef Q_OS_UNIX
             QFileInfo info(loggingPath);
             QFile     link(info.absolutePath() + "/CurrentLog.log");
@@ -257,7 +257,7 @@ void Logging::slotEveryHourTimeout()
     }
 
     /* Restart Timer to check again in next hour */
-    this->m_hourTimer->start((60 - QTime::currentTime().minute()) * 1000); // * 60 * 1000);
+    this->m_hourTimer->start((60 - QTime::currentTime().minute()) * 60 * 1000);
 }
 
 void Logging::terminate()

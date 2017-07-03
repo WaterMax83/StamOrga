@@ -19,6 +19,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDateTime>
 #include <QtCore/QSettings>
+#include <QtCore/QUuid>
 
 #include <iostream>
 
@@ -33,6 +34,8 @@ ListedUser::ListedUser()
         CONSOLE_CRITICAL(QString("Could not create File for UserSettings"));
         return;
     }
+
+    this->m_hash = new QCryptographicHash(QCryptographicHash::Sha3_512);
 
     this->m_pConfigSettings = new QSettings(userSetFilePath, QSettings::IniFormat);
     this->m_pConfigSettings->setIniCodec(("UTF-8"));
@@ -52,10 +55,17 @@ ListedUser::ListedUser()
             qint64  timestamp = this->m_pConfigSettings->value(ITEM_TIMESTAMP, 0x0).toULongLong();
 
             QString passw    = this->m_pConfigSettings->value(LOGIN_PASSWORD, "").toString();
+            QString salt     = this->m_pConfigSettings->value(LOGIN_SALT, "").toString();
             QString readname = this->m_pConfigSettings->value(LOGIN_READNAME, "").toString();
             quint32 prop     = this->m_pConfigSettings->value(LOGIN_PROPERTIES, 0x0).toUInt();
 
-            if (!this->addNewUserLogin(name, timestamp, index, passw, prop, readname))
+            if (salt == "") {
+                salt      = this->createSalt();
+                passw     = this->createHashPassword(passw, salt);
+                bProblems = true;
+            }
+
+            if (!this->addNewUserLogin(name, timestamp, index, passw, salt, prop, readname))
                 bProblems = true;
         }
         this->m_pConfigSettings->endArray();
@@ -70,8 +80,9 @@ ListedUser::ListedUser()
             continue;
         pLogin->m_index = this->getNextInternalIndex();
         this->addNewUserLogin(pLogin->m_itemName, pLogin->m_timestamp,
-                              pLogin->m_index, pLogin->password,
-                              pLogin->properties, pLogin->readName);
+                              pLogin->m_index, pLogin->m_password,
+                              pLogin->m_salt,
+                              pLogin->m_properties, pLogin->m_readName);
 
         delete pLogin;
     }
@@ -97,11 +108,13 @@ int ListedUser::addNewUser(const QString& name, const QString& password, quint32
 
     QMutexLocker locker(&this->m_mConfigIniMutex);
 
-    QString lPassword = password;
-    if (password == "")
-        lPassword = name;
+    qint64  timestamp = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    QString salt      = this->createSalt();
 
-    qint64 timestamp = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    QString passWord;
+    if (password == "")
+        passWord         = name;
+    QString hashPassword = this->createHashPassword(passWord, salt);
 
     this->m_pConfigSettings->beginGroup(GROUP_LIST_ITEM);
     this->m_pConfigSettings->beginWriteArray(CONFIG_LIST_ARRAY);
@@ -111,14 +124,15 @@ int ListedUser::addNewUser(const QString& name, const QString& password, quint32
     this->m_pConfigSettings->setValue(ITEM_TIMESTAMP, timestamp);
     this->m_pConfigSettings->setValue(ITEM_INDEX, newIndex);
 
-    this->m_pConfigSettings->setValue(LOGIN_PASSWORD, lPassword);
+    this->m_pConfigSettings->setValue(LOGIN_PASSWORD, hashPassword);
+    this->m_pConfigSettings->setValue(LOGIN_SALT, salt);
     this->m_pConfigSettings->setValue(LOGIN_PROPERTIES, props);
 
     this->m_pConfigSettings->endArray();
     this->m_pConfigSettings->endGroup();
     this->m_pConfigSettings->sync();
 
-    this->addNewUserLogin(name, timestamp, newIndex, name, 0x0, "", false);
+    this->addNewUserLogin(name, timestamp, newIndex, hashPassword, salt, 0x0, "", false);
 
     qInfo() << QString("Added new user: %1").arg(name);
     return newIndex;
@@ -133,8 +147,8 @@ int ListedUser::showAllUsers()
         if (pLogin == NULL)
             continue;
         std::cout << pLogin->m_itemName.toStdString()
-                  << " - " << pLogin->readName.toStdString()
-                  << " : 0x" << QString::number(pLogin->properties, 16).toStdString()
+                  << " - " << pLogin->m_readName.toStdString()
+                  << " : 0x" << QString::number(pLogin->m_properties, 16).toStdString()
                   << std::endl;
     }
 
@@ -160,9 +174,10 @@ void ListedUser::saveCurrentInteralList()
         this->m_pConfigSettings->setValue(ITEM_TIMESTAMP, pLogin->m_timestamp);
         this->m_pConfigSettings->setValue(ITEM_INDEX, pLogin->m_index);
 
-        this->m_pConfigSettings->setValue(LOGIN_PASSWORD, pLogin->password);
-        this->m_pConfigSettings->setValue(LOGIN_READNAME, pLogin->readName);
-        this->m_pConfigSettings->setValue(LOGIN_PROPERTIES, pLogin->properties);
+        this->m_pConfigSettings->setValue(LOGIN_PASSWORD, pLogin->m_password);
+        this->m_pConfigSettings->setValue(LOGIN_SALT, pLogin->m_salt);
+        this->m_pConfigSettings->setValue(LOGIN_READNAME, pLogin->m_readName);
+        this->m_pConfigSettings->setValue(LOGIN_PROPERTIES, pLogin->m_properties);
     }
 
     this->m_pConfigSettings->endArray();
@@ -183,7 +198,9 @@ bool ListedUser::userCheckPassword(QString name, QString passw)
         if (pLogin == NULL)
             continue;
         if (pLogin->m_itemName == name) {
-            if (pLogin->password == passw)
+
+            QString hashPassWord = this->createHashPassword(passw, pLogin->m_salt);
+            if (pLogin->m_password == hashPassWord)
                 return true;
             return false;
         }
@@ -204,8 +221,10 @@ bool ListedUser::userChangePassword(QString name, QString passw)
             continue;
 
         if (pLogin->m_itemName == name) {
-            if (this->updateItemValue(pLogin, LOGIN_PASSWORD, QVariant(passw))) {
-                pLogin->password = passw;
+
+            QString hashPassWord = this->createHashPassword(passw, pLogin->m_salt);
+            if (this->updateItemValue(pLogin, LOGIN_PASSWORD, QVariant(hashPassWord))) {
+                pLogin->m_password = hashPassWord;
                 return true;
             }
         }
@@ -227,7 +246,7 @@ bool ListedUser::userChangeProperties(QString name, quint32 props)
 
         if (pLogin->m_itemName == name) {
             if (this->updateItemValue(pLogin, LOGIN_PROPERTIES, QVariant(props))) {
-                pLogin->properties = props;
+                pLogin->m_properties = props;
                 return true;
             } else
                 return false;
@@ -250,7 +269,7 @@ bool ListedUser::userChangeReadName(QString name, QString readName)
 
         if (pLogin->m_itemName == name) {
             if (this->updateItemValue(pLogin, LOGIN_READNAME, QVariant(readName))) {
-                pLogin->readName = readName;
+                pLogin->m_readName = readName;
                 return true;
             } else
                 return false;
@@ -268,7 +287,7 @@ quint32 ListedUser::getUserProperties(QString name)
         if (pLogin == NULL)
             continue;
         if (pLogin->m_itemName == name)
-            return pLogin->properties;
+            return pLogin->m_properties;
     }
     return 0;
 }
@@ -282,12 +301,12 @@ QString ListedUser::getReadableName(QString name)
         if (pLogin == NULL)
             continue;
         if (pLogin->m_itemName == name)
-            return pLogin->readName;
+            return pLogin->m_readName;
     }
     return "";
 }
 
-bool ListedUser::addNewUserLogin(QString name, qint64 timestamp, quint32 index, QString password, quint32 prop, QString readname, bool checkUser)
+bool ListedUser::addNewUserLogin(QString name, qint64 timestamp, quint32 index, QString password, QString salt, quint32 prop, QString readname, bool checkUser)
 {
     if (checkUser) {
         if (itemExists(name)) {
@@ -297,33 +316,59 @@ bool ListedUser::addNewUserLogin(QString name, qint64 timestamp, quint32 index, 
 
         if (index == 0 || itemExists(index)) {
             qWarning().noquote() << QString("User \"%1\" with index \"%2\" already exists, saving with new index").arg(name).arg(index);
-            this->addNewUserLogin(name, timestamp, index, password, prop, readname, &this->m_lAddItemProblems);
+            this->addNewUserLogin(name, timestamp, index, password, salt, prop, readname, &this->m_lAddItemProblems);
             return false;
         }
     }
 
-    this->addNewUserLogin(name, timestamp, index, password, prop, readname, &this->m_lInteralList);
+    this->addNewUserLogin(name, timestamp, index, password, salt, prop, readname, &this->m_lInteralList);
     return true;
 }
 
-void ListedUser::addNewUserLogin(QString name, qint64 timestamp, quint32 index, QString password, quint32 prop, QString readname, QList<ConfigItem*>* pList)
+void ListedUser::addNewUserLogin(QString name, qint64 timestamp, quint32 index, QString password, QString salt, quint32 prop, QString readname, QList<ConfigItem*>* pList)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
-    UserLogin* login   = new UserLogin();
-    login->m_itemName  = name;
-    login->m_timestamp = timestamp;
-    login->m_index     = index;
-    login->password    = password;
-    login->readName    = readname;
-    login->properties  = prop;
+    UserLogin* login    = new UserLogin();
+    login->m_itemName   = name;
+    login->m_timestamp  = timestamp;
+    login->m_index      = index;
+    login->m_password   = password;
+    login->m_salt       = salt;
+    login->m_readName   = readname;
+    login->m_properties = prop;
 
     pList->append(login);
 }
 
+QString ListedUser::createSalt()
+{
+    QString rValue = QUuid::createUuid().toString();
+    if (rValue.length() > 12)
+        rValue.remove(0, 4);
+    if (rValue.length() > 8)
+        rValue = rValue.left(8);
+
+    return rValue;
+}
+
+QString ListedUser::createHashPassword(const QString passWord, const QString salt)
+{
+    this->m_hash->reset();
+    QByteArray tmp = passWord.toUtf8();
+    this->m_hash->addData(tmp.constData(), tmp.length());
+    tmp = salt.toUtf8();
+    this->m_hash->addData(tmp.constData(), tmp.length());
+
+    QString hashPassword(this->m_hash->result());
+
+    return hashPassword;
+}
 
 ListedUser::~ListedUser()
 {
+    delete this->m_hash;
+
     if (this->m_pConfigSettings != NULL)
         delete this->m_pConfigSettings;
 }
