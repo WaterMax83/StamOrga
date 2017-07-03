@@ -20,7 +20,7 @@
 #include <QtCore/QDataStream>
 #include <QtCore/QDateTime>
 #include <QtCore/QFile>
-
+#include <QtCore/QUuid>
 
 #include "../Common/General/backgroundcontroller.h"
 #include "../Common/General/backgroundworker.h"
@@ -40,7 +40,8 @@ int main(int argc, char* argv[])
     QCoreApplication::setApplicationName("StFaeKSC");
 
     GlobalData globalData;
-    Console*    con = new Console(&globalData);
+    Console*   con = new Console(&globalData);
+    globalData.initialize();
 
     qInfo() << "*************************************************************";
     qInfo() << "Starting StFaeKSC";

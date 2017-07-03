@@ -20,6 +20,7 @@
 #define LISTEDUSER_H
 
 
+#include <QtCore/QCryptographicHash>
 #include <QtCore/QList>
 #include <QtCore/QMutex>
 #include <QtCore/QSettings>
@@ -29,21 +30,25 @@
 class UserLogin : public ConfigItem
 {
 public:
-    QString password;
-    QString readName;
-    quint32 properties;
+    QString m_password;
+    QString m_salt;
+    QString m_readName;
+    quint32 m_properties;
 };
 
-#define LOGIN_PASSWORD "password"
-#define LOGIN_READNAME "readname"
-#define LOGIN_PROPERTIES "properties"
+// clang-format off
+#define LOGIN_PASSWORD      "password"
+#define LOGIN_SALT          "salt"
+#define LOGIN_READNAME      "readname"
+#define LOGIN_PROPERTIES    "properties"
 
-#define USER_INDEX_GROUP "IndexCount"
-#define USER_MAX_COUNT "CurrentCount"
+#define USER_INDEX_GROUP    "IndexCount"
+#define USER_MAX_COUNT      "CurrentCount"
 
 #define DEFAULT_LOGIN_PROPS 0x0
 
-#define MIN_SIZE_USERNAME 5
+#define MIN_SIZE_USERNAME   5
+// clang-format on
 
 class ListedUser : public ConfigList
 {
@@ -70,8 +75,12 @@ public:
 private:
     void saveCurrentInteralList() override;
 
-    bool addNewUserLogin(QString name, qint64 timestamp, quint32 index, QString password, quint32 prop, QString readname, bool checkUser = true);
-    void addNewUserLogin(QString name, qint64 timestamp, quint32 index, QString password, quint32 prop, QString readname, QList<ConfigItem*>* pList);
+    bool addNewUserLogin(QString name, qint64 timestamp, quint32 index, QString password, QString salt, quint32 prop, QString readname, bool checkUser = true);
+    void addNewUserLogin(QString name, qint64 timestamp, quint32 index, QString password, QString salt, quint32 prop, QString readname, QList<ConfigItem*>* pList);
+
+    QString createSalt();
+    QString createHashPassword(const QString passWord, const QString salt);
+    QCryptographicHash* m_hash;
 };
 
 #endif // LISTEDUSER_H

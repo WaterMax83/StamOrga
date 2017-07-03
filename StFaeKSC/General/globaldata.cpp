@@ -27,6 +27,10 @@
 
 GlobalData::GlobalData()
 {
+}
+
+void GlobalData::initialize()
+{
     QString userSetDirPath = getUserHomeConfigPath() + "/Settings/";
 
     QDir userSetDir(userSetDirPath + "AvailableTickets/");
@@ -187,10 +191,10 @@ qint32 GlobalData::requestGetAvailableSeasonTicket(const quint32 gameIndex, cons
             data.append(reservedTickets);
 
             qInfo().noquote() << QString("User %1 got available SeasonTicket List for game %2:%3:%4")
-                                         .arg(userName)
-                                         .arg(gameIndex)
-                                         .arg(pGame->m_competition)
-                                         .arg(pGame->m_saisonIndex);
+                                     .arg(userName)
+                                     .arg(gameIndex)
+                                     .arg(pGame->m_competition)
+                                     .arg(pGame->m_saisonIndex);
 
             return ERROR_CODE_SUCCESS;
         }
@@ -202,10 +206,10 @@ qint32 GlobalData::requestGetAvailableSeasonTicket(const quint32 gameIndex, cons
     wData << quint32(ERROR_CODE_SUCCESS) << quint16(0x0) << quint16(0x0);
 
     qInfo().noquote() << QString("User %1 got available SeasonTicket List for game %2:%3:%4 with no entries")
-                                 .arg(userName)
-                                 .arg(gameIndex)
-                                 .arg(pGame->m_competition)
-                                 .arg(pGame->m_saisonIndex);
+                             .arg(userName)
+                             .arg(gameIndex)
+                             .arg(pGame->m_competition)
+                             .arg(pGame->m_saisonIndex);
 
     return ERROR_CODE_SUCCESS;
 }
