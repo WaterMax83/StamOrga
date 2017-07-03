@@ -138,6 +138,12 @@ void UserInterface::slCommandFinished(quint32 command, qint32 result)
 
     case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
         emit this->notifyGamesListFinished(result);
+        if (result == ERROR_CODE_SUCCESS)
+            this->m_pConHandle->startListGettingGamesInfo();
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST:
+        emit this->notifyGamesInfoListFinished(result);
         break;
 
     case OP_CODE_CMD_REQ::REQ_ADD_TICKET:

@@ -294,6 +294,9 @@ ApplicationWindow {
         onNotifyGamesListFinished: {
             stackView.currentItem.notifyUserIntGamesListFinished(result)
         }
+        onNotifyGamesInfoListFinished: {
+            stackView.currentItem.notifyUserIntGamesInfoListFinished(result)
+        }
         onNotifySeasonTicketAddFinished: {
             stackView.currentItem.notifyUserIntSeasonTicketAdd(result)
         }

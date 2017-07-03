@@ -41,6 +41,7 @@ public:
     bool startUpdatePassword(QString newPassWord);
     qint32 startUpdateReadableName(QString name);
     qint32 startListGettingGames();
+    qint32 startListGettingGamesInfo();
     qint32 startRemoveSeasonTicket(quint32 index);
     qint32 startNewPlaceSeasonTicket(quint32 index, QString place);
     qint32 startAddSeasonTicket(QString name, quint32 discount);
@@ -73,14 +74,6 @@ signals:
     void sNotifyVersionRequest(qint32 result, QString msg);
     //    void sNotifyUserPropertiesRequest(qint32 result);
     void sNotifyUpdatePasswordRequest(qint32 result, QString newPassWord);
-    //    void sNotifyUpdateReadableNameRequest(qint32 result);
-    //    void sNotifyGamesListRequest(qint32 result);
-    //    void sNotifySeasonTicketRemoveRequest(quint32 result);
-    //    void sNotifySeasonTicketAddRequest(quint32 result);
-    //    void sNotifySeasonTicketListRequest(quint32 result);
-    //    void sNotifySeasonTicketNewPlace(quint32 result);
-    //    void sNotityAvailableTicketStateChangeRequest(qint32 result);
-    //    void sNotityAvailableTicketListRequest(qint32 result);
 
     void sNotifyCommandFinished(quint32 command, qint32 result);
 
@@ -95,9 +88,6 @@ private slots:
 
     void slDataConLastRequestFinished(DataConRequest request);
 
-    //    void slTimerConResetFired();
-    //    void slTimerConLoginFired();
-
 private:
     BackgroundController m_ctrlMainCon;
     MainConnection*      m_pMainCon = NULL;
@@ -107,8 +97,6 @@ private:
 
     GlobalData* m_pGlobalData = NULL;
 
-    //    QTimer* m_pTimerConReset;
-    //    QTimer* m_pTimerLoginReset;
     qint64 m_lastSuccessTimeStamp;
 
     QList<DataConRequest> m_lErrorMainCon;

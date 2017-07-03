@@ -154,6 +154,10 @@ void DataConnection::checkNewOncomingData()
             request.m_result = this->m_pDataHandle->getHandleGamesListResponse(msg);
             break;
 
+        case OP_CODE_CMD_RES::ACK_GET_GAMES_INFO_LIST:
+            request.m_result = this->m_pDataHandle->getHandleGamesInfoListResponse(msg);
+            break;
+
         case OP_CODE_CMD_RES::ACK_ADD_TICKET:
             request.m_result = msg->getIntData();
             ;
@@ -274,6 +278,12 @@ void DataConnection::startSendGamesListRequest(DataConRequest request)
     quint32 data;
     data = qToLittleEndian(this->m_pGlobalData->lastGamesLoadCount()); /* game numbers */
     MessageProtocol msg(request.m_request, (char*)(&data), sizeof(quint32));
+    this->sendMessageRequest(&msg, request);
+}
+
+void DataConnection::startSendGamesInfoListRequest(DataConRequest request)
+{
+    MessageProtocol msg(request.m_request);
     this->sendMessageRequest(&msg, request);
 }
 
@@ -504,6 +514,10 @@ void DataConnection::startSendNewRequest(DataConRequest request)
 
     case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
         this->startSendGamesListRequest(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST:
+        this->startSendGamesInfoListRequest(request);
         break;
 
     case OP_CODE_CMD_REQ::REQ_ADD_TICKET:

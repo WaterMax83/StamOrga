@@ -151,7 +151,15 @@ Flickable {
         showListedGames()
     }
 
-    function notifyUserIntGamesListFinished(result) {
+    function notifyUserIntGamesListFinished(result) {        
+        if (result !== 1) {
+            toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
+            busyLoadingIndicatorGames.visible = false
+            showListedGames()
+        }
+    }
+
+    function notifyUserIntGamesInfoListFinished(result) {
         busyLoadingIndicatorGames.visible = false
         if (result === 1)
             toastManager.show("Spiele geladen", 2000)

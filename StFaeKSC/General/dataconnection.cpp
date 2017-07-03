@@ -282,7 +282,7 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
  * 14  quint16     interestMeeting 2
  * 16  quint16     declineMeeting  2
  */
-MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol *msg)
+MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol* msg)
 {
 
     if (msg->getDataLength() > 0) {
@@ -292,9 +292,9 @@ MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol *msg)
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_GAMES_INFO_LIST, ERROR_CODE_WRONG_SIZE);
     }
 
-    char buffer[5000];
+    char    buffer[5000];
     quint32 offset = 0;
-    qint32 result = ERROR_CODE_SUCCESS;
+    qint32  result = ERROR_CODE_SUCCESS;
 
     result = qToLittleEndian(result);
     memcpy(&buffer[offset], &result, sizeof(qint32));
@@ -305,15 +305,25 @@ MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol *msg)
     offset += sizeof(qint32);
 
     qint32 numbOfGames = this->m_pGlobalData->m_GamesList.getNumberOfInternalList();
+#ifndef QT_DEBUG
+    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+#endif
 
     for (qint32 i = 0; i < numbOfGames; i++) {
 
-        if (offset + 12 > 5000)
+        if (offset + 16 > 5000)
             break;
 
         GamesPlay* pGame = (GamesPlay*)(this->m_pGlobalData->m_GamesList.getRequestConfigItemFromListIndex(i));
         if (pGame == NULL)
             continue;
+#ifndef QT_DEBUG
+        if (pGame->m_timestamp < currentTime)
+            continue;
+#endif
+        quint32 gameIndex = qToLittleEndian(pGame->m_index);
+        memcpy(&buffer[offset], &gameIndex, sizeof(quint16));
+        offset += sizeof(quint32);
 
         quint16 freeTickets     = this->m_pGlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_FREE);
         quint16 blockTickets    = this->m_pGlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_BLOCKED);

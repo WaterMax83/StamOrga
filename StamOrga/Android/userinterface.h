@@ -102,6 +102,7 @@ signals:
     void notifyUpdatePasswordRequestFinished(qint32 result, QString newPassWord);
     void notifyUpdateReadableNameRequest(qint32 result);
     void notifyGamesListFinished(qint32 result);
+    void notifyGamesInfoListFinished(qint32 result);
     void notifySeasonTicketAddFinished(qint32 result);
     void notifySeasonTicketRemoveFinished(qint32 result);
     void notifySeasonTicketNewPlaceFinished(qint32 result);

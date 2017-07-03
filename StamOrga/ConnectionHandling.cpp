@@ -127,6 +127,13 @@ qint32 ConnectionHandling::startListGettingGames()
     return ERROR_CODE_SUCCESS;
 }
 
+qint32 ConnectionHandling::startListGettingGamesInfo()
+{
+    DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST);
+    this->sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
+}
+
 qint32 ConnectionHandling::startRemoveSeasonTicket(quint32 index)
 {
     DataConRequest req(OP_CODE_CMD_REQ::REQ_REMOVE_TICKET);
