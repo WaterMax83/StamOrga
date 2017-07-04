@@ -47,11 +47,11 @@ int ReadOnlineGames::DoBackgroundWork()
 {
     this->m_currentRequestIndex = -1;
 
-    //    RequestList* list1 = new RequestList();
-    //    list1->m_comp      = "bl3";
-    //    list1->m_maxIndex  = 38;
-    //    list1->m_season    = 2017;
-    //    this->m_requestList.append(list1);
+    RequestList* list1 = new RequestList();
+    list1->m_comp      = "bl3";
+    list1->m_maxIndex  = 38;
+    list1->m_season    = 2017;
+    this->m_requestList.append(list1);
 
     RequestList* list2 = new RequestList();
     list2->m_comp      = "dfb2017";
@@ -72,24 +72,6 @@ int ReadOnlineGames::DoBackgroundWork()
     connect(this->m_networkUpdate, &QTimer::timeout, this, &ReadOnlineGames::slotNetWorkUpdateTimeout);
 
 #ifdef QT_DEBUG
-    //    OnlineGameInfo* gameInfo = new OnlineGameInfo();
-    //    gameInfo->m_index        = 1;
-    //    gameInfo->m_timeStamp    = QDateTime::currentDateTime().addMonths(-2).toMSecsSinceEpoch();
-    //    gameInfo->m_gameFinished = true;
-    //    this->m_onlineGames.append(gameInfo);
-
-    //    gameInfo                 = new OnlineGameInfo();
-    //    gameInfo->m_index        = 2;
-    //    gameInfo->m_timeStamp    = QDateTime::currentDateTime().addDays(-5).toMSecsSinceEpoch();
-    //    gameInfo->m_gameFinished = true;
-    //    this->m_onlineGames.append(gameInfo);
-
-    //    gameInfo              = new OnlineGameInfo();
-    //    gameInfo->m_index     = 3;
-    //    gameInfo->m_timeStamp = QDateTime::currentDateTime().addSecs(10).toMSecsSinceEpoch();
-    //    this->m_onlineGames.append(gameInfo);
-
-    //    this->m_currentRequestIndex = 0;
     qInfo().noquote() << "Did not use ReadOnlineGame because of debugging";
     return 0;
 #endif
@@ -165,19 +147,16 @@ void ReadOnlineGames::startNetWorkRequest(OnlineGameInfo* info)
     qInfo().noquote() << QString("Request for game %1").arg(this->m_currentGameInfo->m_index);
 
 #ifdef QT_DEBUG
-    qInfo().noquote() << QString("Single game answer for game %1").arg(this->m_currentGameInfo->m_index);
+    qInfo().noquote() << QString("Single game answer for game %1:%2")
+                         .arg(this->m_currentGameInfo->m_index)
+                         .arg(this->m_currentGameInfo->m_competition);
     this->checkNewNetworkRequest(true);
 #else
 #if (QT_VERSION < QT_VERSION_CHECK(5, 8, 0))
     qInfo().noquote() << "Did not use ReadOnlineGame because of version problem";
 #else
-    if (this->m_currentGameInfo->m_index == 35) {
-        qInfo().noquote() << QString("Single game answer for game %1").arg(this->m_currentGameInfo->m_index);
-        this->checkNewNetworkRequest(true);
-    } else {
-        this->m_networkTimout->start();
-        this->m_netAccess->get(QNetworkRequest(QUrl(request)));
-    }
+    this->m_networkTimout->start();
+    this->m_netAccess->get(QNetworkRequest(QUrl(request)));
 #endif
 #endif
 }
@@ -217,11 +196,6 @@ void ReadOnlineGames::checkNewNetworkRequest(bool checkLastItem)
             }
         } else {
             this->m_currentRequestIndex = 0;
-//            OnlineGameInfo* gameInfo    = new OnlineGameInfo();
-//            gameInfo->m_index           = 35;
-//            gameInfo->m_timeStamp       = QDateTime::currentDateTime().addSecs(60 * 60).toMSecsSinceEpoch();
-//            gameInfo->m_gameFinished    = false;
-//            this->m_onlineGames.append(gameInfo);
             qInfo().noquote() << "Got all games for internal list";
         }
         nextUpdate = this->getNextGameInMilliSeconds(fastUpdate);
@@ -319,7 +293,9 @@ void ReadOnlineGames::slotNetWorkRequestFinished(QNetworkReply* reply)
     QJsonDocument d   = QJsonDocument::fromJson(arr);
 
     if (d.isArray()) { /* all Games */
-        qInfo().noquote() << QString("Request answer for game %1").arg(this->m_currentGameInfo->m_index);
+        qInfo().noquote() << QString("Request answer for game %1:%2")
+                             .arg(this->m_currentGameInfo->m_index)
+                             .arg(this->m_currentGameInfo->m_competition);
         QJsonArray array = d.array();
         for (int i = 0; i < array.size(); i++) {
             QJsonObject gameObj = array[i].toObject();
@@ -328,7 +304,9 @@ void ReadOnlineGames::slotNetWorkRequestFinished(QNetworkReply* reply)
         }
     } else { /* just single game */
         QJsonObject gameObj = d.object();
-        qInfo().noquote() << QString("Single game answer for game %1").arg(this->m_currentGameInfo->m_index);
+        qInfo().noquote() << QString("Single game answer for game %1:%2")
+                             .arg(this->m_currentGameInfo->m_index)
+                             .arg(this->m_currentGameInfo->m_competition);
         this->readSingleGame(gameObj);
     }
 

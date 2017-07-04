@@ -179,7 +179,7 @@ int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sInde
 
     this->sortGamesListByTime();
 
-    qInfo() << QString("Added new game: %1").arg(home + " : " + away);
+    qInfo().noquote() << QString("Added new game: %1").arg(home + " : " + away);
     return newIndex;
 }
 
