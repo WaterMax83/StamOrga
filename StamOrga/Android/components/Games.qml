@@ -19,6 +19,7 @@
 import QtQuick 2.7
 import QtQuick.Controls 2.1
 import QtQuick.Layouts 1.0
+import QtGraphicalEffects 1.0
 
 import com.watermax.demo 1.0
 
@@ -70,6 +71,7 @@ Rectangle {
             anchors.left: parent.left
             Layout.preferredWidth: columnLayout.width
             Layout.fillWidth: true
+            spacing: 5
 
             Label {
                 id: labelLineDate
@@ -80,27 +82,72 @@ Rectangle {
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
 
-            Label {
-                id: labelFreeTickets
-                topPadding: 3
-                rightPadding: 1
+            Image {
+                id: imageMeetingIsPresent
+                anchors.top : parent.top
+                Layout.rightMargin: acceptedMeetingItem.visible ? 0 : 5
+                anchors.topMargin: 3
                 Layout.alignment: Qt.AlignRight
-                text : "5"
+                Layout.preferredWidth: labelLineDate.height / 1.2
+                Layout.preferredHeight: labelLineDate.height / 1.2
+                source: "../images/place.png";
                 visible: false
             }
 
-            Rectangle {
-                id: imageFreeTickets
-                anchors.top : parent.top
-                anchors.right: parent. right
-                anchors.rightMargin: 5
-                anchors.topMargin: 5
-                Layout.alignment: Qt.AlignRight
-                width: labelFreeTickets.height / 1.5
-                height: labelFreeTickets.height / 1.5
-                radius: width * 0.5
-                color: "green"
+
+            RowLayout {
+                id: acceptedMeetingItem
                 visible: false
+                spacing: 0
+                Layout.rightMargin: freeTicketsItem.visible ? 10 : 5
+                Label {
+                    id: labelAcceptedMeeting
+                    topPadding: 3
+                    Layout.alignment: Qt.AlignRight
+                }
+
+                Item {
+                    Layout.preferredHeight: labelAcceptedMeeting.height / 1.2
+                    Layout.preferredWidth: labelAcceptedMeeting.height / 1.2
+                    anchors.top : parent.top
+                    anchors.right: parent. right
+
+                    anchors.topMargin: 3
+                    Layout.alignment: Qt.AlignRight
+                    Image {
+                        id: imageAccpetedMeeting
+                        anchors.fill: parent
+                        source: "../images/done.png";
+                    }
+                    ColorOverlay {
+                        anchors.fill: imageAccpetedMeeting
+                        source: imageAccpetedMeeting
+                        color: "green"
+                    }
+                }
+            }
+
+            RowLayout {
+                id: freeTicketsItem
+                visible: false
+                spacing: 4
+                Label {
+                    id: labelFreeTickets
+                    topPadding: 3
+                    Layout.alignment: Qt.AlignRight
+                }
+
+                Rectangle {
+                    anchors.top : parent.top
+                    anchors.right: parent. right
+                    anchors.rightMargin: 5
+                    anchors.topMargin: 5
+                    Layout.alignment: Qt.AlignRight
+                    width: labelFreeTickets.height / 1.5
+                    height: labelFreeTickets.height / 1.5
+                    radius: width * 0.5
+                    color: "green"
+                }
             }
         }
 
@@ -171,17 +218,25 @@ Rectangle {
                 mainRectangleGame.gradColorStop = "#ff4747"
             }
 
+            var meetingPresent = gamePlayItem.getMeetingInfo();
+            if (meetingPresent > 0) {
+                imageMeetingIsPresent.visible = true
+                var acceptedMeeting = gamePlayItem.getAcceptedMeetingCount();
+                if (acceptedMeeting > 0) {
+                    acceptedMeetingItem.visible = true;
+                    labelAcceptedMeeting.text = acceptedMeeting;
+                }
+            }
+
             if (!gamePlayItem.isGameASeasonTicketGame())
                 return;
 
             var freeTickets = gamePlayItem.getFreeTickets();
             if (freeTickets > 0) {
-                labelFreeTickets.visible = true;
+                freeTicketsItem.visible = true;
                 labelFreeTickets.text = freeTickets;
-                imageFreeTickets.visible = true;
             } else {
-                labelFreeTickets.text = "";
-                imageFreeTickets.visible = false;
+                freeTicketsItem.visible = false;
             }
 
         }

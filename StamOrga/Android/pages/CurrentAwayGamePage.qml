@@ -121,6 +121,8 @@ Flickable {
 
     function notifyLoadMeetingInfoFinished(result) {
         currentMeetInfo.notifyLoadMeetingInfoFinished(result);
+        if (result === 1)
+            gameHeader.showGamesInfo(m_gamePlayCurrentItem)
     }
 
     function notifyAcceptMeetingFinished(result) {

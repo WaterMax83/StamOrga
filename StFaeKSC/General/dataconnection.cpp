@@ -281,6 +281,7 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
  * 12  quint16     acceptMeeting   2
  * 14  quint16     interestMeeting 2
  * 16  quint16     declineMeeting  2
+ * 18  quint16     meetingInfo     2
  */
 MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol* msg)
 {
@@ -311,7 +312,7 @@ MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol* msg)
 
     for (qint32 i = 0; i < numbOfGames; i++) {
 
-        if (offset + 16 > 5000)
+        if (offset + 18 > 5000)
             break;
 
         GamesPlay* pGame = (GamesPlay*)(this->m_pGlobalData->m_GamesList.getRequestConfigItemFromListIndex(i));
@@ -355,6 +356,10 @@ MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol* msg)
 
         declinedMeeting = qToLittleEndian(declinedMeeting);
         memcpy(&buffer[offset], &declinedMeeting, sizeof(quint16));
+        offset += sizeof(quint16);
+
+        quint16 meetInfo = qToLittleEndian(this->m_pGlobalData->getMeetingInfoValue(pGame->m_index));
+        memcpy(&buffer[offset], &meetInfo, sizeof(quint16));
         offset += sizeof(quint16);
     }
 

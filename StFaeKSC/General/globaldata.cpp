@@ -240,6 +240,20 @@ quint16 GlobalData::getAcceptedNumber(const quint32 gamesIndex, const quint32 st
     return 0;
 }
 
+quint16 GlobalData::getMeetingInfoValue(const quint32 gamesIndex)
+{
+    GamesPlay* pGame = (GamesPlay*)this->m_GamesList.getItem(gamesIndex);
+    if (pGame == NULL)
+        return 0;
+
+    foreach (MeetingInfo* info, this->m_meetingInfos) {
+        if (info->getGameIndex() == gamesIndex) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 qint32 GlobalData::requestChangeMeetingInfo(const quint32 gameIndex, const quint32 version, const QString when, const QString where, const QString info)
 {
     Q_UNUSED(version);

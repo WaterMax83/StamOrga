@@ -26,6 +26,10 @@ GamePlay::GamePlay(QObject* parent)
     this->m_freeTickets              = 0;
     this->m_blockedTickets           = 0;
     this->m_reservedTickets          = 0;
+    this->m_acceptedMeeting          = 0;
+    this->m_interestedMeeting        = 0;
+    this->m_declinedMeeting          = 0;
+    this->m_meetingInfo              = 0;
     this->m_bIsUserGameAddingEnabled = false;
 }
 

@@ -222,15 +222,15 @@ qint32 DataHandling::getHandleGamesInfoListResponse(MessageProtocol* msg)
 
     quint32 gameIndex;
     quint16 freeTicks, reservTicks, blockTicks;
-    quint16 acceptMeet, interestMeet, declineMeet;
-    while (offset + 12 < totalSize) {
+    quint16 acceptMeet, interestMeet, declineMeet, meetInfo;
+    while (offset + 18 <= totalSize) {
 
         memcpy(&gameIndex, pData + offset, sizeof(quint32));
         gameIndex = qFromLittleEndian(gameIndex);
 
         GamePlay* play = this->m_pGlobalData->getGamePlay(gameIndex);
         if (play == NULL) {
-            offset += 16;
+            offset += 18;
             continue;
         }
         offset += sizeof(quint32);
@@ -266,6 +266,12 @@ qint32 DataHandling::getHandleGamesInfoListResponse(MessageProtocol* msg)
         play->setAcceptedMeetingCount(acceptMeet);
         play->setInterestedMeetingCount(interestMeet);
         play->setDeclinedMeetingCount(declineMeet);
+
+        memcpy(&meetInfo, pData + offset, sizeof(quint16));
+        meetInfo = qFromLittleEndian(meetInfo);
+        offset += sizeof(quint16);
+
+        play->setMeetingInfo(meetInfo);
     }
 
     return rValue;
@@ -463,7 +469,8 @@ qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg)
     quint32 size = msg->getDataLength();
     quint32 index, value, userID;
     pInfo->clearAcceptInfoList();
-    quint32 counter = 0;
+    quint32 counter       = 0;
+    quint32 acceptMeeting = 0, interestMeeting = 0, declineMeeting = 0;
     while (offset + 9 < size) {
         AcceptMeetingInfo* ami = new AcceptMeetingInfo();
         memcpy(&index, pData + offset, sizeof(quint32));
@@ -482,6 +489,20 @@ qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg)
         QQmlEngine::setObjectOwnership(ami, QQmlEngine::CppOwnership);
         pInfo->addNewAcceptInfo(ami);
         counter++;
+
+        if (value == ACCEPT_STATE_ACCEPT)
+            acceptMeeting++;
+        else if (value == ACCEPT_STATE_MAYBE)
+            interestMeeting++;
+        else if (value == ACCEPT_STATE_DECLINE)
+            declineMeeting++;
+    }
+
+    GamePlay* game = this->m_pGlobalData->getGamePlay(gameIndex);
+    if (game != NULL) {
+        game->setAcceptedMeetingCount(acceptMeeting);
+        game->setInterestedMeetingCount(interestMeeting);
+        game->setDeclinedMeetingCount(declineMeeting);
     }
 
     return result;

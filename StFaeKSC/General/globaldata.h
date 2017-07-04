@@ -45,6 +45,7 @@ public:
 
     quint16 getTicketNumber(const quint32 gamesIndex, const quint32 state);
     quint16 getAcceptedNumber(const quint32 gamesIndex, const quint32 state);
+    quint16 getMeetingInfoValue(const quint32 gamesIndex);
 
     ListedUser                   m_UserList;
     Games                        m_GamesList;

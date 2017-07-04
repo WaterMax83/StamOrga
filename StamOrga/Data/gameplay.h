@@ -154,6 +154,12 @@ public:
         this->m_declinedMeeting = number;
     }
 
+    Q_INVOKABLE quint16 getMeetingInfo() { return this->m_meetingInfo; }
+    void setMeetingInfo(quint16 number)
+    {
+        this->m_meetingInfo = number;
+    }
+
     Q_INVOKABLE bool isGameInPast();
     Q_INVOKABLE bool isGameRunning();
 
@@ -188,6 +194,7 @@ private:
     quint16          m_acceptedMeeting;
     quint16          m_interestedMeeting;
     quint16          m_declinedMeeting;
+    quint16          m_meetingInfo;
     bool             m_bIsUserGameAddingEnabled;
 };
 
