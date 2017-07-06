@@ -63,7 +63,6 @@ void UdpDataServer::readyReadSocketPort()
 {
     this->m_pConResetTimer->start();
 
-
     while (this->m_pUdpSocket->hasPendingDatagrams()) {
         QHostAddress sender;
         quint16      port;
@@ -103,10 +102,27 @@ void UdpDataServer::checkNewOncomingData()
 
         if (ack != NULL) {
 
-            const char* pData = ack->getNetworkProtocol();
-            this->m_pUdpSocket->writeDatagram(pData, ack->getNetworkSize(),
-                                              this->m_pUsrConData->sender,
-                                              this->m_pUsrConData->srcDataPort);
+            quint32     sendBytes       = 0;
+            quint32     totalPacketSize = ack->getNetworkSize();
+            const char* pData           = ack->getNetworkProtocol();
+
+            do {
+                quint32 currentSendSize;
+                if ((totalPacketSize - sendBytes) > MAX_DATAGRAMM_SIZE)
+                    currentSendSize = MAX_DATAGRAMM_SIZE;
+                else
+                    currentSendSize = totalPacketSize - sendBytes;
+
+                qint64 rValue = this->m_pUdpSocket->writeDatagram(pData + sendBytes,
+                                                                  currentSendSize,
+                                                                  this->m_pUsrConData->sender,
+                                                                  this->m_pUsrConData->srcDataPort);
+                if (rValue < 0)
+                    break;
+                sendBytes += rValue;
+                //                QThread::msleep(25);
+            } while (sendBytes < totalPacketSize);
+
             delete ack;
         }
         delete msg;

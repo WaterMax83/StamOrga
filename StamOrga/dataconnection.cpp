@@ -414,11 +414,31 @@ qint32 DataConnection::sendMessageRequest(MessageProtocol* msg, DataConRequest r
     if (this->m_pDataUdpSocket == NULL)
         return -1;
 
-    const char* pData  = msg->getNetworkProtocol();
-    qint32      rValue = this->m_pDataUdpSocket->writeDatagram(pData,
-                                                          msg->getNetworkSize(),
-                                                          this->m_hDataReceiver,
-                                                          this->m_pGlobalData->conDataPort());
+    quint32     sendBytes       = 0;
+    quint32     totalPacketSize = msg->getNetworkSize();
+    const char* pData           = msg->getNetworkProtocol();
+
+    do {
+        quint32 currentSendSize;
+        if ((totalPacketSize - sendBytes) > MAX_DATAGRAMM_SIZE)
+            currentSendSize = MAX_DATAGRAMM_SIZE;
+        else
+            currentSendSize = totalPacketSize - sendBytes;
+
+        qint64 rValue = this->m_pDataUdpSocket->writeDatagram(pData + sendBytes,
+                                                              currentSendSize,
+                                                              this->m_hDataReceiver,
+                                                              this->m_pGlobalData->conDataPort());
+        if (rValue < 0) {
+            request.m_result = ERROR_CODE_ERR_SEND;
+            emit this->notifyLastRequestFinished(request);
+
+            return rValue;
+        }
+        sendBytes += rValue;
+        //                QThread::msleep(25);
+    } while (sendBytes < totalPacketSize);
+
     this->m_pConTimeout->start();
 
     /* Only add when not sending request again */
@@ -426,14 +446,9 @@ qint32 DataConnection::sendMessageRequest(MessageProtocol* msg, DataConRequest r
         this->m_lActualRequest.append(request);
     }
 
-    if (rValue < 0) {
-        request.m_result = ERROR_CODE_ERR_SEND;
-        emit this->notifyLastRequestFinished(request);
-    }
-
     //    qDebug().noquote() << QString("Send request 0x%1").arg(QString::number(msg->getIndex(), 16));
 
-    return rValue;
+    return sendBytes;
 }
 
 void DataConnection::removeActualRequest(quint32 req)

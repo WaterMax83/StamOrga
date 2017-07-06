@@ -38,6 +38,8 @@ struct msg_Header {
 
 #define MSG_HEADER_VERSION MSG_HEADER_VERSION_START
 
+#define MAX_DATAGRAMM_SIZE 512
+
 class MessageProtocol
 {
 public:
