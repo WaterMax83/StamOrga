@@ -104,7 +104,7 @@ Flickable {
     }
 
     function toolButtonClicked() {
-        if (globalUserData.useReadableName)
+        if (globalSettings.useReadableName)
             txtnewSeasonTicketName.text = globalUserData.readableName
         else
             txtnewSeasonTicketName.text = ""
@@ -279,11 +279,11 @@ Flickable {
         standardButtons: Dialog.Ok | Dialog.Cancel
         onAccepted: {
             labelTicketNameTooShort.visible = false
-            if (txtnewSeasonTicketName.text.length < 6) {
+            if (txtnewSeasonTicketName.text.trim().length < 4) {
                 labelTicketNameTooShort.visible = true
                 addSeasonTicketDlg.open()
             } else {
-                userIntTicket.startAddSeasonTicket(txtnewSeasonTicketName.text, chBoxDiscount.checked ? 1 : 0);
+                userIntTicket.startAddSeasonTicket(txtnewSeasonTicketName.text.trim(), chBoxDiscount.checked ? 1 : 0);
                 busyConnectIndicatorTicket.visible = true;
                 txtInfoSeasonTicket.text = "Füge Dauerkarte hinzu"
                 addSeasonTicketDlg.close();

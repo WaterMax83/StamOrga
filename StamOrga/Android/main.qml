@@ -178,8 +178,7 @@ ApplicationWindow {
                     }
                 }
 
-                ScrollIndicator.vertical: ScrollIndicator {
-                }
+                ScrollIndicator.vertical: ScrollIndicator {}
             }
         }
     }
@@ -270,7 +269,7 @@ ApplicationWindow {
         onNotifyUserPropertiesFinished: {
             if (result > 0 && !userInt.isDebuggingEnabled() && !isDebugWindowEnabled) {
                 isDebugWindowEnabled = true;
-                if (globalUserData.userIsDebugEnabled) {
+                if (globalUserData.userIsDebugEnabled()) {
                     listViewListModel.append({
                                             title: "Logging",
                                             element: viewLoggingPage,
@@ -335,7 +334,15 @@ ApplicationWindow {
         if (open === true) {
             stackView.push(viewUserLogin)
             imageToolButton.visible = false
-        } else
+        } else {
             stackView.currentItem.showListedGames()
+
+            if (!globalSettings.isVersionChangeAlreadyShown()) {
+                var component = Qt.createComponent("../pages/newVersionInfo.qml");
+                if (component.status === Component.Ready) {
+                    stackView.push(component);
+                }
+            }
+        }
     }
 }

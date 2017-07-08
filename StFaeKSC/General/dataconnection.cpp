@@ -273,27 +273,32 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
 
 /* answer
  * 0   quint32     result          4
- * 4   quint32     numbofGames     4
- * 8   quint32     gameIndex       4
- * 12  quint16     freeTicket      2
- * 14  quint16     blockedTicket   2
- * 16  quint16     reservedTicket  2
- * 12  quint16     acceptMeeting   2
- * 14  quint16     interestMeeting 2
- * 16  quint16     declineMeeting  2
- * 18  quint16     meetingInfo     2
+ * 4   quint32     status          4
+ * 8   quint16     gameSize        2
+ * 10  quint16     reserved        2
+ * 12  quint32     gameIndex       4
+ * 16  quint16     freeTicket      2
+ * 18  quint16     blockedTicket   2
+ * 20  quint16     reservedTicket  2
+ * 22  quint16     acceptMeeting   2
+ * 24  quint16     interestMeeting 2
+ * 26  quint16     declineMeeting  2
+ * 28  quint16     meetingInfo     2
  */
+
+#define GAME_INFO_SIZE 18
 MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol* msg)
 {
 
-    if (msg->getDataLength() > 0) {
+    if (msg->getDataLength() != 8) {
         qWarning() << QString("Error getting wrong message size %1 for get games info list from %2")
                           .arg(msg->getDataLength())
                           .arg(this->m_pUserConData->userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_GAMES_INFO_LIST, ERROR_CODE_WRONG_SIZE);
     }
 
-    char    buffer[5000];
+    char buffer[5000];
+    memset(&buffer[0], 0x0, 5000);
     quint32 offset = 0;
     qint32  result = ERROR_CODE_SUCCESS;
 
@@ -301,9 +306,11 @@ MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol* msg)
     memcpy(&buffer[offset], &result, sizeof(qint32));
     offset += sizeof(qint32);
 
-    result = qToLittleEndian(0x0); // numb of games not used
-    memcpy(&buffer[offset], &result, sizeof(qint32));
-    offset += sizeof(qint32);
+    offset += sizeof(quint32); // status is not yet used
+
+    quint16 size = qToLittleEndian(GAME_INFO_SIZE);
+    memcpy(&buffer[offset], &size, sizeof(quint16));
+    offset += sizeof(quint32); // reserved is not yet used
 
     qint32 numbOfGames = this->m_pGlobalData->m_GamesList.getNumberOfInternalList();
 #ifndef QT_DEBUG
@@ -312,7 +319,7 @@ MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol* msg)
 
     for (qint32 i = 0; i < numbOfGames; i++) {
 
-        if (offset + 18 > 5000)
+        if (offset + GAME_INFO_SIZE > 5000)
             break;
 
         GamesPlay* pGame = (GamesPlay*)(this->m_pGlobalData->m_GamesList.getRequestConfigItemFromListIndex(i));

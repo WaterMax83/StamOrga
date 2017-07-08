@@ -74,6 +74,13 @@ Item {
                   anchors.left: parent.left
                   anchors.right: parent.right
                   Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+
+                  Repeater {
+                      model: tabModel
+                      delegate: TabButton {
+                          text: model.text
+                      }
+                  }
               }
 
             SwipeView {
@@ -102,14 +109,8 @@ Item {
         id: currentTicketInfo
     }
 
-    TabButton {
-        id: tabButtonTickets
-        text: "Karten"
-    }
-
-    TabButton {
-        id: tabButtonMeeting
-        text: "Treffen"
+    ListModel {
+        id: tabModel
     }
 
     function currentTicketInfoNewHeaderInfo(text, load) {
@@ -148,13 +149,13 @@ Item {
         gameHeader.showGamesInfo(sender)
 
         if (sender.isGameASeasonTicketGame()) {
-            tabBar.addItem(tabButtonTickets);
+            tabModel.append({ "text": "Karten"});
             swipeViewCurrentHomeGame.addItem(currentTicketInfo)
             currentTicketInfo.showInfoHeader.connect(currentTicketInfoNewHeaderInfo);
             currentTicketInfo.showAllInfoAboutGame(sender);
         }
 
-        tabBar.addItem(tabButtonMeeting);
+        tabModel.append({ "text": "Treffen"});
         swipeViewCurrentHomeGame.addItem(currentMeetInfo)
 
         currentMeetInfo.showInfoHeader.connect(currentMeetInfoNewHeaderInfo);

@@ -28,8 +28,12 @@
 #include "../../Common/General/config.h"
 #include "../../Common/General/globalfunctions.h"
 #include "../Data/globaldata.h"
+#include "../Data/globalsettings.h"
 #include "../dataconnection.h"
 #include "userinterface.h"
+
+
+GlobalSettings g_GlobalSettings;
 
 int main(int argc, char* argv[])
 {
@@ -47,10 +51,12 @@ int main(int argc, char* argv[])
     qRegisterMetaType<DataConRequest>("DataConRequest");
 
     GlobalData globalUserData;
+    g_GlobalSettings.initialize(&globalUserData);
 
     // engine to start qml display -> takes about half a second
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("globalUserData", &globalUserData);
+    engine.rootContext()->setContextProperty("globalSettings", &g_GlobalSettings);
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));
 
     // load settings to update data

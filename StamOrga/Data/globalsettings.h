@@ -1,0 +1,124 @@
+/*
+*	This file is part of StamOrga
+*   Copyright (C) 2017 Markus Schneider
+*
+*	This program is free software; you can redistribute it and/or modify
+*   it under the terms of the GNU General Public License as published by
+*   the Free Software Foundation; either version 3 of the License, or
+*   (at your option) any later version.
+*
+*	StamOrga is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+
+*    You should have received a copy of the GNU General Public License
+*    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#ifndef GLOBALSETTINGS_H
+#define GLOBALSETTINGS_H
+
+#include <QObject>
+#include <QSettings>
+
+#include "globaldata.h"
+
+class GlobalSettings : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(quint32 lastGamesLoadCount READ lastGamesLoadCount WRITE setLastGamesLoadCount NOTIFY lastGamesLoadCountChanged)
+    Q_PROPERTY(QString debugIP READ debugIP WRITE setDebugIP NOTIFY debugIPChanged)
+    Q_PROPERTY(QString debugIPWifi READ debugIPWifi WRITE setDebugIPWifi NOTIFY debugIPWifiChanged)
+    Q_PROPERTY(bool useReadableName READ useReadableName WRITE setUseReadableName NOTIFY useReadableNameChanged)
+public:
+    explicit GlobalSettings(QObject* parent = 0);
+
+    void initialize(GlobalData* pGlobalData);
+
+    Q_INVOKABLE void saveGlobalSettings();
+
+    quint32 lastGamesLoadCount()
+    {
+        QMutexLocker lock(&this->m_mutex);
+        return this->m_ulastGamesLoadCount;
+    }
+    void setLastGamesLoadCount(quint32 count)
+    {
+        if (this->m_ulastGamesLoadCount != count) {
+            {
+                QMutexLocker lock(&this->m_mutex);
+                this->m_ulastGamesLoadCount = count;
+            }
+            emit lastGamesLoadCountChanged();
+        }
+    }
+
+    QString debugIP()
+    {
+        QMutexLocker lock(&this->m_mutex);
+        return this->m_debugIP;
+    }
+    void setDebugIP(QString ip)
+    {
+        if (this->m_debugIP != ip) {
+            {
+                QMutexLocker lock(&this->m_mutex);
+                this->m_debugIP = ip;
+            }
+            emit debugIPChanged();
+        }
+    }
+
+    QString debugIPWifi()
+    {
+        QMutexLocker lock(&this->m_mutex);
+        return this->m_debugIPWifi;
+    }
+    void setDebugIPWifi(QString ip)
+    {
+        if (this->m_debugIPWifi != ip) {
+            {
+                QMutexLocker lock(&this->m_mutex);
+                this->m_debugIPWifi = ip;
+            }
+            emit debugIPWifiChanged();
+        }
+    }
+
+    bool useReadableName() { return this->m_useReadableName; }
+    void setUseReadableName(bool enable)
+    {
+        this->m_useReadableName = enable;
+        emit this->useReadableNameChanged();
+    }
+
+    Q_INVOKABLE QString getCurrentVersion();
+
+    Q_INVOKABLE QString getVersionChangeInfo();
+
+    Q_INVOKABLE bool isVersionChangeAlreadyShown();
+
+signals:
+    void lastGamesLoadCountChanged();
+    void debugIPChanged();
+    void debugIPWifiChanged();
+    void useReadableNameChanged();
+
+public slots:
+
+private:
+    GlobalData* m_pGlobalData;
+    quint32     m_ulastGamesLoadCount;
+    bool        m_useReadableName;
+    QString     m_debugIP;
+    QString     m_debugIPWifi;
+    QMutex      m_mutex;
+
+    QString m_lastShownVersion;
+};
+
+
+extern GlobalSettings g_GlobalSettings;
+
+#endif // GLOBALSETTINGS_H

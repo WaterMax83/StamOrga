@@ -128,9 +128,9 @@ Flickable {
 
     function acceptedChangeGameDialog() {
         var result = userIntGames.startChangeGame(changeGameDialog.index, changeGameDialog.seasonIndex,
-                                                  changeGameDialog.competition, changeGameDialog.homeTeam,
-                                                  changeGameDialog.awayTeam, changeGameDialog.date,
-                                                  changeGameDialog.score);
+                                                  changeGameDialog.competition, changeGameDialog.homeTeam.trim(),
+                                                  changeGameDialog.awayTeam.trim(), changeGameDialog.date.trim(),
+                                                  changeGameDialog.score.trim());
         if (result !== 1) {
             toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
             busyLoadingIndicatorGames.visible = true

@@ -41,12 +41,12 @@ Dialog {
     standardButtons: Dialog.Ok | Dialog.Cancel
     onAccepted: {
         labelTextTooShort.visible = false
-        if (txtEditableText.text.length < textMinSize) {
+        if (txtEditableText.text.trim().length < textMinSize) {
             labelTextTooShort.visible = true
             labelTextTooShort.text = "Der Text muss mindestens " + textMinSize + " Zeichen lang sein";
             editableTextDialog.open()
         } else {
-            acceptedTextEdit(txtEditableText.text);
+            acceptedTextEdit(txtEditableText.text.trim());
             editableTextDialog.close();
             editableTextDialog.destroy();
         }

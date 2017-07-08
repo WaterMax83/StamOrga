@@ -23,6 +23,7 @@
 #include "../Common/General/globaltiming.h"
 #include "../Common/Network/messagecommand.h"
 #include "../Common/Network/messageprotocol.h"
+#include "../Data/globalsettings.h"
 #include "dataconnection.h"
 
 DataConnection::DataConnection(GlobalData* pData)
@@ -276,14 +277,17 @@ void DataConnection::startSendReadableNameRequest(DataConRequest request)
 void DataConnection::startSendGamesListRequest(DataConRequest request)
 {
     quint32 data;
-    data = qToLittleEndian(this->m_pGlobalData->lastGamesLoadCount()); /* game numbers */
+    data = qToLittleEndian(g_GlobalSettings.lastGamesLoadCount()); /* game numbers */
     MessageProtocol msg(request.m_request, (char*)(&data), sizeof(quint32));
     this->sendMessageRequest(&msg, request);
 }
 
 void DataConnection::startSendGamesInfoListRequest(DataConRequest request)
 {
-    MessageProtocol msg(request.m_request);
+    quint32 data[2];
+    data[0] = 0x00;
+    data[1] = 0x00;
+    MessageProtocol msg(request.m_request, (char*)&data[0], 8);
     this->sendMessageRequest(&msg, request);
 }
 

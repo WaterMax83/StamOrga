@@ -115,7 +115,7 @@ Flickable {
                     onClickedButton: {
                         menuAcceptValue = 1;
                         menuAcceptIndex = 0;
-                        if (globalUserData.useReadableName)
+                        if (globalSettings.useReadableName)
                             showTextDialogAccept("Zusagen", globalUserData.readableName);
                         else
                             showTextDialogAccept("Zusagen", "");
@@ -129,7 +129,7 @@ Flickable {
                     onClickedButton: {
                         menuAcceptValue = 2;
                         menuAcceptIndex = 0;
-                        if (globalUserData.useReadableName)
+                        if (globalSettings.useReadableName)
                             showTextDialogAccept("Interesse/Vorbehalt", globalUserData.readableName);
                         else
                             showTextDialogAccept("Interesse/Vorbehalt", "");
@@ -143,7 +143,7 @@ Flickable {
                     onClickedButton: {
                         menuAcceptValue = 3;
                         menuAcceptIndex = 0;
-                        if (globalUserData.useReadableName)
+                        if (globalSettings.useReadableName)
                             showTextDialogAccept("Absagen", globalUserData.readableName);
                         else
                             showTextDialogAccept("Absagen", "");
