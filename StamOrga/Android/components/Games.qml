@@ -99,7 +99,7 @@ Rectangle {
                 id: acceptedMeetingItem
                 visible: false
                 spacing: 0
-                Layout.rightMargin: freeTicketsItem.visible ? 10 : 5
+                Layout.rightMargin: interestMeetingItem.visible ? 0 : freeTicketsItem.visible ? 10 : 5
                 Label {
                     id: labelAcceptedMeeting
                     topPadding: 3
@@ -123,6 +123,38 @@ Rectangle {
                         anchors.fill: imageAccpetedMeeting
                         source: imageAccpetedMeeting
                         color: "green"
+                    }
+                }
+            }
+
+            RowLayout {
+                id: interestMeetingItem
+                visible: false
+                spacing: 0
+                Layout.rightMargin: freeTicketsItem.visible ? 10 : 5
+                Label {
+                    id: labelInterestMeeting
+                    topPadding: 3
+                    Layout.alignment: Qt.AlignRight
+                }
+
+                Item {
+                    Layout.preferredHeight: labelInterestMeeting.height / 1.2
+                    Layout.preferredWidth: labelInterestMeeting.height / 1.2
+                    anchors.top : parent.top
+                    anchors.right: parent. right
+
+                    anchors.topMargin: 3
+                    Layout.alignment: Qt.AlignRight
+                    Image {
+                        id: imageInterestMeeting
+                        anchors.fill: parent
+                        source: "../images/done.png";
+                    }
+                    ColorOverlay {
+                        anchors.fill: imageInterestMeeting
+                        source: imageInterestMeeting
+                        color: "orange"
                     }
                 }
             }
@@ -225,6 +257,11 @@ Rectangle {
                 if (acceptedMeeting > 0) {
                     acceptedMeetingItem.visible = true;
                     labelAcceptedMeeting.text = acceptedMeeting;
+                }
+                var interestMeeting = gamePlayItem.getInterestedMeetingCount();
+                if (interestMeeting > 0) {
+                    interestMeetingItem.visible = true;
+                    labelInterestMeeting.text = interestMeeting;
                 }
             }
 

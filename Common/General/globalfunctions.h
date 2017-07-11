@@ -105,6 +105,7 @@ enum CompetitionIndex {
 
 extern CompetitionIndex getCompetitionIndex(QString comp);
 extern QString getCompetitionString(CompetitionIndex index);
+extern QString createRandomString(qint32 size);
 
 #define USER_ENABLE_LOG 0x1
 #define USER_ENABLE_ADD_GAME 0x2

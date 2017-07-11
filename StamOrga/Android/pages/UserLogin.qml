@@ -95,6 +95,9 @@ Flickable {
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     onTextChanged: {
                         globalUserData.bIsConnected = false;
+                        if (text != globalUserData.userName) {
+                            txtPassWord.text = "";
+                        }
                     }
                     Layout.bottomMargin: 35
                 }
@@ -108,7 +111,7 @@ Flickable {
 
                 TextField {
                     id: txtPassWord
-                    text: globalUserData.passWord
+                    text: globalUserData.passWord.length === 0 ? "" : "dEf1AuLt"
                     padding: 10
                     implicitWidth: parent.width / 3 * 2
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
@@ -242,6 +245,8 @@ Flickable {
             updateUserColumnView(false);
         }
         else {
+            if (result === -21)
+                txtPassWord.text = "";
             txtInfoConnecting.visible = false;
             txtInfoConnecting.text = userIntUser.getErrorCodeToString(result);
             toastManager.show(userIntUser.getErrorCodeToString(result), 5000)

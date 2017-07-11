@@ -82,8 +82,8 @@ qint32 GlobalData::requestChangeStateSeasonTicket(quint32 ticketIndex, quint32 g
         return ERROR_CODE_IN_PAST;
 #endif
 
-    qint32  result = ERROR_CODE_SUCCESS;
-    quint32 userID = this->m_UserList.getItemIndex(userName);
+    qint32 result = ERROR_CODE_SUCCESS;
+    qint32 userID = this->m_UserList.getItemIndex(userName);
     foreach (AvailableGameTickets* ticket, this->m_availableTickets) {
         if (ticket->getGameIndex() == gameIndex) {
             quint32 currentState = ticket->getTicketState(ticketIndex);
@@ -394,8 +394,8 @@ qint32 GlobalData::requestAcceptMeetingInfo(const quint32 gameIndex, const quint
         return ERROR_CODE_IN_PAST;
 #endif
 
-    qint32  result = ERROR_CODE_SUCCESS;
-    quint32 userID = this->m_UserList.getItemIndex(userName);
+    qint32 result = ERROR_CODE_SUCCESS;
+    qint32 userID = this->m_UserList.getItemIndex(userName);
     foreach (MeetingInfo* mInfo, this->m_meetingInfos) {
         if (mInfo->getGameIndex() == gameIndex) {
             if (acceptIndex == 0)

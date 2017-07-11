@@ -39,10 +39,11 @@ public:
     QString m_workerName = "MainConnection";
 
 signals:
-    void connectionRequestFinished(qint32 result, const QString& msg);
+    void connectionRequestFinished(qint32 result, const QString msg, const QString salt, const QString random);
 
 public slots:
     void slotSendNewMainConRequest(QString username);
+    void slotNewBindingPortRequest();
 
 private slots:
     void slotConnectionTimeoutFired();

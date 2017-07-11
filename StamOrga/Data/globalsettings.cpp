@@ -68,7 +68,8 @@ QString GlobalSettings::getVersionChangeInfo()
     QString rValue;
 
     rValue.append("<b>V1.0.1:</b><br>");
-    rValue.append("Mehr Informationen in der Spielübersicht an<br>");
+    rValue.append("Mehr Informationen in der Spielübersicht<br>");
+    rValue.append("Passwörter gehasht<br>");
     rValue.append("Versionshistorie<br>");
     rValue.append("Diverse Bug fixes<br>");
 

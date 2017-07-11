@@ -32,6 +32,7 @@ DataConnection::DataConnection(GlobalData* pData)
     this->SetWorkerName("DataConnection");
     this->m_pGlobalData        = pData;
     this->m_bRequestLoginAgain = false;
+    this->m_hash               = new QCryptographicHash(QCryptographicHash::Sha3_512);
 }
 
 
@@ -48,7 +49,6 @@ int DataConnection::DoBackgroundWork()
     this->m_pDataUdpSocket = new QUdpSocket();
     if (!this->m_pDataUdpSocket->bind()) {
         qCritical().noquote() << QString("Could not bin socket for dataconnection");
-        //        emit this->connectionRequestFinished(0, this->m_pDataUdpSocket->errorString());
         return -1;
     }
     connect(this->m_pDataUdpSocket, &QUdpSocket::readyRead, this, &DataConnection::slotReadyReadDataPort);
@@ -104,17 +104,26 @@ void DataConnection::checkNewOncomingData()
         switch (msg->getIndex()) {
         case OP_CODE_CMD_RES::ACK_LOGIN_USER:
             if (this->m_bRequestLoginAgain) {
-                this->sendActualRequestsAgain();
+                this->sendActualRequestsAgain(this->m_pDataHandle->getHandleLoginResponse(msg));
+
                 this->m_bRequestLoginAgain = false;
                 continue;
             } else {
                 request.m_result = this->m_pDataHandle->getHandleLoginResponse(msg);
                 if (request.m_result == ERROR_CODE_SUCCESS) {
                     QString passWord = request.m_lData.at(0);
-                    if (this->m_pGlobalData->passWord() != passWord) {
+                    QString salt     = request.m_lData.at(1);
+                    if (this->m_pGlobalData->getSalt() == "")
+                        passWord = this->createHashValue(passWord, salt);
+                    if (this->m_pGlobalData->passWord() != passWord || this->m_pGlobalData->getSalt() != salt) {
                         this->m_pGlobalData->setPassWord(passWord);
+                        this->m_pGlobalData->setSalt(salt);
                         this->m_pGlobalData->saveGlobalUserSettings();
                     }
+                } else if (request.m_result == ERROR_CODE_WRONG_PASSWORD && this->m_pGlobalData->passWord() != "") {
+                    this->m_pGlobalData->setPassWord("");
+                    this->m_pGlobalData->setSalt("");
+                    this->m_pGlobalData->saveGlobalUserSettings();
                 }
             }
 
@@ -130,8 +139,9 @@ void DataConnection::checkNewOncomingData()
 
         case OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN:
             request.m_result = msg->getIntData();
-            if (request.m_lData.size() > 0)
-                request.m_returnData = request.m_lData.at(0);
+            if (request.m_lData.size() > 0 && request.m_result == ERROR_CODE_SUCCESS) {
+                request.m_returnData = this->createHashValue(request.m_lData.at(0), this->m_pGlobalData->getSalt());
+            }
             break;
 
         case OP_CODE_CMD_RES::ACK_USER_CHANGE_READNAME:
@@ -142,12 +152,14 @@ void DataConnection::checkNewOncomingData()
 
         case OP_CODE_CMD_RES::ACK_NOT_LOGGED_IN:
             if (!this->m_bRequestLoginAgain) {
-                this->m_bRequestLoginAgain = true;
                 DataConRequest conReq;
                 conReq.m_request = OP_CODE_CMD_REQ::REQ_LOGIN_USER;
                 conReq.m_lData.append(this->m_pGlobalData->passWord());
+                conReq.m_lData.append(this->m_pGlobalData->getSalt());
                 this->startSendLoginRequest(conReq);
-                return;
+                this->m_bRequestLoginAgain = true;
+                delete msg;
+                continue;
             }
             break;
 
@@ -214,7 +226,12 @@ void DataConnection::checkNewOncomingData()
 
 void DataConnection::startSendLoginRequest(DataConRequest request)
 {
-    QString     passWord = request.m_lData.at(0);
+    QString passWord = request.m_lData.at(0);
+    QString salt     = request.m_lData.at(1);
+    if (this->m_pGlobalData->getSalt() == "")
+        passWord = this->createHashValue(passWord, salt);
+
+    passWord = this->createHashValue(passWord, this->m_randomLoginValue);
     QByteArray  aPassw;
     QDataStream wPassword(&aPassw, QIODevice::WriteOnly);
     wPassword.setByteOrder(QDataStream::LittleEndian);
@@ -249,11 +266,13 @@ void DataConnection::startSendUpdPassRequest(DataConRequest request)
     QDataStream wPassReq(&passReq, QIODevice::WriteOnly);
     wPassReq.setByteOrder(QDataStream::LittleEndian);
 
-    QString newPassWord = request.m_lData.at(0);
+    QString newPassWord     = this->createHashValue(request.m_lData.at(0), this->m_pGlobalData->getSalt());
+    QString currentPassWord = this->createHashValue(this->m_pGlobalData->passWord(), this->m_randomLoginValue);
 
-    wPassReq << (qint16)this->m_pGlobalData->passWord().toUtf8().size();
-    passReq.append(this->m_pGlobalData->passWord().toUtf8());
+    wPassReq << (qint16)currentPassWord.toUtf8().size();
+    passReq.append(currentPassWord.toUtf8());
     wPassReq.device()->seek(passReq.length());
+
     wPassReq << (qint16)newPassWord.toUtf8().size();
     passReq.append(newPassWord.toUtf8());
 
@@ -483,11 +502,20 @@ QString DataConnection::getActualRequestData(quint32 req, qint32 index)
     return NULL;
 }
 
-void DataConnection::sendActualRequestsAgain()
+void DataConnection::sendActualRequestsAgain(qint32 result)
 {
-    qDebug() << "DataConnection: Trying to send the requests again";
-    for (int i = 0; i < this->m_lActualRequest.size(); i++) {
-        this->startSendNewRequest(this->m_lActualRequest[i]);
+    if (result == ERROR_CODE_SUCCESS) {
+        qDebug() << "DataConnection: Trying to send the requests again";
+        for (int i = 0; i < this->m_lActualRequest.size(); i++) {
+            this->startSendNewRequest(this->m_lActualRequest[i]);
+        }
+    } else {
+        while (this->m_lActualRequest.size() > 0) {
+            DataConRequest request = this->m_lActualRequest.last();
+            request.m_result       = result;
+            emit this->notifyLastRequestFinished(request);
+            this->m_lActualRequest.removeLast();
+        }
     }
 }
 
@@ -571,6 +599,19 @@ void DataConnection::startSendNewRequest(DataConRequest request)
     }
 }
 
+QString DataConnection::createHashValue(const QString first, const QString second)
+{
+    this->m_hash->reset();
+    QByteArray tmp = first.toUtf8();
+    this->m_hash->addData(tmp.constData(), tmp.length());
+    tmp = second.toUtf8();
+    this->m_hash->addData(tmp.constData(), tmp.length());
+
+    QString hashPassword(this->m_hash->result());
+
+    return hashPassword;
+}
+
 DataConnection::~DataConnection()
 {
     if (this->m_pDataUdpSocket != NULL)
@@ -578,4 +619,6 @@ DataConnection::~DataConnection()
 
     if (this->m_pDataHandle != NULL)
         delete this->m_pDataHandle;
+
+    delete this->m_hash;
 }

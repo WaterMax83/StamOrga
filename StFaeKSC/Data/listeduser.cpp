@@ -19,7 +19,6 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDateTime>
 #include <QtCore/QSettings>
-#include <QtCore/QUuid>
 
 #include <iostream>
 
@@ -60,7 +59,7 @@ ListedUser::ListedUser()
             quint32 prop     = this->m_pConfigSettings->value(LOGIN_PROPERTIES, 0x0).toUInt();
 
             if (salt == "") {
-                salt      = this->createSalt();
+                salt      = createRandomString(8);
                 passw     = this->createHashPassword(passw, salt);
                 bProblems = true;
             }
@@ -109,7 +108,7 @@ int ListedUser::addNewUser(const QString& name, const QString& password, quint32
     QMutexLocker locker(&this->m_mConfigIniMutex);
 
     qint64  timestamp = QDateTime::currentDateTime().toMSecsSinceEpoch();
-    QString salt      = this->createSalt();
+    QString salt      = createRandomString(8);
 
     QString passWord;
     if (password == "")
@@ -208,6 +207,28 @@ bool ListedUser::userCheckPassword(QString name, QString passw)
     return false;
 }
 
+bool ListedUser::userCheckPasswordHash(QString name, QString hash, QString random)
+{
+    QMutexLocker locker(&this->m_mInternalInfoMutex);
+
+    if (name.length() < MIN_SIZE_USERNAME)
+        return false;
+
+    for (int i = 0; i < this->getNumberOfInternalList(); i++) {
+        UserLogin* pLogin = (UserLogin*)(this->getItemFromArrayIndex(i));
+        if (pLogin == NULL)
+            continue;
+        if (pLogin->m_itemName == name) {
+
+            QString passWordWithRandowm = this->createHashPassword(pLogin->m_password, random);
+            if (passWordWithRandowm == hash)
+                return true;
+            return false;
+        }
+    }
+    return false;
+}
+
 bool ListedUser::userChangePassword(QString name, QString passw)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
@@ -225,6 +246,28 @@ bool ListedUser::userChangePassword(QString name, QString passw)
             QString hashPassWord = this->createHashPassword(passw, pLogin->m_salt);
             if (this->updateItemValue(pLogin, LOGIN_PASSWORD, QVariant(hashPassWord))) {
                 pLogin->m_password = hashPassWord;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool ListedUser::userChangePasswordHash(QString name, QString passw)
+{
+    QMutexLocker locker(&this->m_mInternalInfoMutex);
+
+    if (name.length() < MIN_SIZE_USERNAME)
+        return false;
+
+    for (int i = 0; i < this->getNumberOfInternalList(); i++) {
+        UserLogin* pLogin = (UserLogin*)(this->getItemFromArrayIndex(i));
+        if (pLogin == NULL)
+            continue;
+
+        if (pLogin->m_itemName == name) {
+            if (this->updateItemValue(pLogin, LOGIN_PASSWORD, QVariant(passw))) {
+                pLogin->m_password = passw;
                 return true;
             }
         }
@@ -305,6 +348,19 @@ QString ListedUser::getReadableName(QString name)
     }
     return "";
 }
+QString ListedUser::getSalt(QString name)
+{
+    QMutexLocker locker(&this->m_mInternalInfoMutex);
+
+    for (int i = 0; i < this->getNumberOfInternalList(); i++) {
+        UserLogin* pLogin = (UserLogin*)(this->getItemFromArrayIndex(i));
+        if (pLogin == NULL)
+            continue;
+        if (pLogin->m_itemName == name)
+            return pLogin->m_salt;
+    }
+    return "";
+}
 
 bool ListedUser::addNewUserLogin(QString name, qint64 timestamp, quint32 index, QString password, QString salt, quint32 prop, QString readname, bool checkUser)
 {
@@ -339,17 +395,6 @@ void ListedUser::addNewUserLogin(QString name, qint64 timestamp, quint32 index, 
     login->m_properties = prop;
 
     pList->append(login);
-}
-
-QString ListedUser::createSalt()
-{
-    QString rValue = QUuid::createUuid().toString();
-    if (rValue.length() > 12)
-        rValue.remove(0, 4);
-    if (rValue.length() > 8)
-        rValue = rValue.left(8);
-
-    return rValue;
 }
 
 QString ListedUser::createHashPassword(const QString passWord, const QString salt)

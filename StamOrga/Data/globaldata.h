@@ -68,6 +68,9 @@ public:
         }
     }
 
+    QString getSalt() { return this->m_salt; }
+    void setSalt(QString salt) { this->m_salt = salt; }
+
     QString readableName()
     {
         QMutexLocker lock(&this->m_mutexUser);
@@ -233,6 +236,7 @@ private slots:
 private:
     QString m_userName;
     QString m_passWord;
+    QString m_salt;
     QString m_readableName;
     QString m_ipAddress;
     quint32 m_uMasterPort;

@@ -17,6 +17,7 @@
 */
 
 #include <QtCore/QStandardPaths>
+#include <QtCore/QUuid>
 
 #include "globalfunctions.h"
 
@@ -146,4 +147,15 @@ QString getCompetitionString(CompetitionIndex index)
     default:
         return "not implemented";
     }
+}
+
+QString createRandomString(qint32 size)
+{
+    QString rValue = QUuid::createUuid().toString();
+    qint32  rand   = qrand() % (rValue.size() - size);
+    rValue.remove(0, rand);
+    if (rValue.length() > size)
+        rValue = rValue.left(size);
+
+    return rValue;
 }

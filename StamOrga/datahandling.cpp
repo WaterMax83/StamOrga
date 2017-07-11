@@ -511,6 +511,7 @@ qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg)
         game->setAcceptedMeetingCount(acceptMeeting);
         game->setInterestedMeetingCount(interestMeeting);
         game->setDeclinedMeetingCount(declineMeeting);
+        game->setMeetingInfo(1);
     }
 
     return result;

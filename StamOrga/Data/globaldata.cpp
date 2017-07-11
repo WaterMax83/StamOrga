@@ -74,6 +74,7 @@ void GlobalData::loadGlobalSettings()
 
     this->setUserName(this->m_pMainUserSettings->value("UserName", "").toString());
     this->setPassWord(this->m_pMainUserSettings->value("Password", "").toString());
+    this->setSalt(this->m_pMainUserSettings->value("Salt", "").toString());
     this->setReadableName(this->m_pMainUserSettings->value("ReadableName", "").toString());
     this->setIpAddr(this->m_pMainUserSettings->value("IPAddress", "140.80.61.57").toString());
     this->setConMasterPort(this->m_pMainUserSettings->value("ConMasterPort", 55000).toInt());
@@ -132,6 +133,7 @@ void GlobalData::saveGlobalUserSettings()
 
     this->m_pMainUserSettings->setValue("UserName", this->m_userName);
     this->m_pMainUserSettings->setValue("Password", this->m_passWord);
+    this->m_pMainUserSettings->setValue("Salt", this->m_salt);
     this->m_pMainUserSettings->setValue("ReadableName", this->m_readableName);
     this->m_pMainUserSettings->setValue("IPAddress", this->m_ipAddress);
     this->m_pMainUserSettings->setValue("ConMasterPort", this->m_uMasterPort);

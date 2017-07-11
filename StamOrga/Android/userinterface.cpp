@@ -39,6 +39,24 @@ UserInterface::UserInterface(QObject* parent)
 
 qint32 UserInterface::startMainConnection(QString name, QString passw)
 {
+    bool saveSettings = false;
+    if (name != this->m_pConHandle->getGlobalData()->userName()) {
+        saveSettings = true;
+        this->m_pConHandle->getGlobalData()->setUserName("");
+        this->m_pConHandle->getGlobalData()->setPassWord("");
+        this->m_pConHandle->getGlobalData()->setSalt("");
+    }
+    if (passw == "dEf1AuLt") {
+        passw = this->m_pConHandle->getGlobalData()->passWord();
+    } else {
+        this->m_pConHandle->getGlobalData()->setPassWord("");
+        this->m_pConHandle->getGlobalData()->setSalt("");
+        saveSettings = true;
+    }
+
+    if (saveSettings)
+        this->m_pConHandle->getGlobalData()->saveGlobalUserSettings();
+
     return this->m_pConHandle->startMainConnection(name, passw);
 }
 

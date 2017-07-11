@@ -79,12 +79,14 @@ signals:
 
     void sStartSendMainConRequest(QString name);
 
+    void sSendNewBindingPortRequest();
+
     void sStartSendNewRequest(DataConRequest request);
 
 public slots:
 
 private slots:
-    void slMainConReqFin(qint32 result, const QString& msg);
+    void slMainConReqFin(qint32 result, const QString msg, const QString salt, const QString random);
 
     void slDataConLastRequestFinished(DataConRequest request);
 
