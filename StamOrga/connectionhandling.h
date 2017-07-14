@@ -43,7 +43,7 @@ public:
     qint32 startListGettingGames();
     qint32 startListGettingGamesInfo();
     qint32 startRemoveSeasonTicket(quint32 index);
-    qint32 startNewPlaceSeasonTicket(quint32 index, QString place);
+    qint32 startEditSeasonTicket(quint32 index, QString name, QString place, quint32 discount);
     qint32 startAddSeasonTicket(QString name, quint32 discount);
     qint32 startListSeasonTickets();
     qint32 startChangeSeasonTicketState(quint32 tickedIndex, quint32 gameIndex, quint32 state, QString name);

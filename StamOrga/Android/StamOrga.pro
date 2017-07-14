@@ -1,9 +1,23 @@
+##########################################################################################
+#	File:		StamOrga.pro
+#	Project:	StamOrga
+#
+#	Brief:		project file for StamOrga app
+#	Author:		msc
+#	Date:		05.04.2017
+#
+###########################################################################################
+
 
 QT += qml quick network
 
 CONFIG += c++11
 
 DEFINES += STAMORGA_APP
+
+include (../../StamOrga.pri)
+
+VERSION=$${STAMORGA_VERSION}
 
 SOURCES += main.cpp \
 	userinterface.cpp \

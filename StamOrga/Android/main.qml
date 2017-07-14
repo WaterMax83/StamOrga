@@ -307,8 +307,8 @@ ApplicationWindow {
         onNotifySeasonTicketRemoveFinished: {
             stackView.currentItem.notifyUserIntSeasonTicketRemoveFinished(result)
         }
-        onNotifySeasonTicketNewPlaceFinished: {
-            stackView.currentItem.notifyUserIntSeasonTicketNewPlaceFinished(result)
+        onNotifySeasonTicketEditFinished: {
+            stackView.currentItem.notifyUserIntSeasonTicketEditFinished(result)
         }
 
         onNotifyAvailableTicketStateChangedFinished: {

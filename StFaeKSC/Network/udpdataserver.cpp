@@ -164,6 +164,10 @@ MessageProtocol* UdpDataServer::checkNewMessage(MessageProtocol* msg)
             ack = this->m_pDataConnection->requestNewPlaceSeasonTicket(msg);
             break;
 
+        case OP_CODE_CMD_REQ::REQ_CHANGE_TICKET:
+            ack = this->m_pDataConnection->requestChangeSeasonTicket(msg);
+            break;
+
         case OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET:
             ack = this->m_pDataConnection->requestChangeStateSeasonTicket(msg);
             break;

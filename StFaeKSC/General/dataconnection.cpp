@@ -181,12 +181,13 @@ MessageProtocol* DataConnection::requestGetProgramVersion(MessageProtocol* msg)
         return NULL;
     }
 
-    const char* pData     = msg->getPointerToData();
-    quint16     actLength = qFromLittleEndian(*((quint16*)(pData + 4)));
+    const char* pData      = msg->getPointerToData();
+    quint32     intVersion = qFromLittleEndian(*((quint32*)pData));
+    quint16     actLength  = qFromLittleEndian(*((quint16*)(pData + 4)));
     if (actLength > msg->getDataLength())
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_VERSION, ERROR_CODE_WRONG_SIZE);
     QString remVersion(QByteArray(pData + 6, actLength));
-    qInfo().noquote() << QString("Version from %1 = %2").arg(this->m_pUserConData->m_userName).arg(remVersion);
+    qInfo().noquote() << QString("Version from %1 = %2:0x%3").arg(this->m_pUserConData->m_userName).arg(remVersion, QString::number(intVersion, 16));
     QByteArray  ownVersion;
     QDataStream wVersion(&ownVersion, QIODevice::WriteOnly);
     wVersion.setByteOrder(QDataStream::LittleEndian);
@@ -429,14 +430,14 @@ MessageProtocol* DataConnection::requestGetTicketsList(MessageProtocol* msg)
         if (pTicket == NULL)
             continue;
 
-        QString ticket(pTicket->m_itemName + ";" + pTicket->place);
+        QString ticket(pTicket->m_itemName + ";" + pTicket->m_place);
 
 
         wAckArray.device()->seek(ackArray.size());
         wAckArray << quint16(ticket.toUtf8().size() + TICKET_OFFSET);
-        wAckArray << quint8(pTicket->discount);
+        wAckArray << quint8(pTicket->m_discount);
         wAckArray << pTicket->m_index;
-        wAckArray << pTicket->userIndex;
+        wAckArray << pTicket->m_userIndex;
 
         ackArray.append(ticket);
     }
@@ -508,6 +509,7 @@ MessageProtocol* DataConnection::requestRemoveSeasonTicket(MessageProtocol* msg)
  * 16   quint16      size            2
  * 18   QString      newPlace        X
  */
+/* OBSOLETE, MAYBE REMOVE IN FUTURE */
 MessageProtocol* DataConnection::requestNewPlaceSeasonTicket(MessageProtocol* msg)
 {
     qint32 rCode;
@@ -523,13 +525,49 @@ MessageProtocol* DataConnection::requestNewPlaceSeasonTicket(MessageProtocol* ms
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_ADD_TICKET, ERROR_CODE_WRONG_SIZE);
     QString newPlace(QByteArray(pData + 6, actLength));
 
-    if ((rCode = this->m_pGlobalData->m_SeasonTicket.changePlaceFromTicket(index, newPlace)) == ERROR_CODE_SUCCESS) {
+    if ((rCode = this->m_pGlobalData->m_SeasonTicket.changeSeasonTicketInfos(index, -1, "", newPlace)) == ERROR_CODE_SUCCESS) {
         qInfo().noquote() << QString("User %1 changed SeasonTicket place to %2")
                                  .arg(this->m_pUserConData->m_userName)
                                  .arg(newPlace);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_NEW_TICKET_PLACE, ERROR_CODE_SUCCESS);
     }
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_NEW_TICKET_PLACE, rCode);
+}
+
+/*  request
+ * 0                Header          Z
+ * 0    quint32     index           4
+ * 4    quint32     discount        4
+ * 8    QString     name            X
+ * 9+X  QString     place           Y
+ */
+MessageProtocol* DataConnection::requestChangeSeasonTicket(MessageProtocol* msg)
+{
+    qint32 rCode;
+    if (msg->getDataLength() < 10) {
+        qWarning() << QString("Wrong message size for chance season ticket for user %1").arg(this->m_pUserConData->m_userName);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_TICKET, ERROR_CODE_WRONG_SIZE);
+    }
+
+    const char* pData = msg->getPointerToData();
+    quint32     ticketIndex, discount;
+    memcpy(&ticketIndex, pData, sizeof(quint32));
+    ticketIndex = qFromLittleEndian(ticketIndex);
+    memcpy(&discount, pData + 4, sizeof(quint32));
+    discount       = qFromLittleEndian(discount);
+    quint32 offset = 8;
+
+    QString name(QByteArray(pData + offset));
+    offset += name.toUtf8().size() + 1;
+    QString place(QByteArray(pData + offset));
+
+    if ((rCode = this->m_pGlobalData->m_SeasonTicket.changeSeasonTicketInfos(ticketIndex, discount, name, place)) == ERROR_CODE_SUCCESS) {
+        qInfo().noquote() << QString("User %1 changed SeasonTicket infos from index %2")
+                                 .arg(this->m_pUserConData->m_userName)
+                                 .arg(ticketIndex);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_TICKET, ERROR_CODE_SUCCESS);
+    }
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_TICKET, rCode);
 }
 
 

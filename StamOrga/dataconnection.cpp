@@ -180,7 +180,7 @@ void DataConnection::checkNewOncomingData()
             request.m_result = msg->getIntData();
             break;
 
-        case OP_CODE_CMD_RES::ACK_NEW_TICKET_PLACE:
+        case OP_CODE_CMD_RES::ACK_CHANGE_TICKET:
             request.m_result = msg->getIntData();
             break;
 
@@ -247,9 +247,17 @@ void DataConnection::startSendVersionRequest(DataConRequest request)
     QDataStream wVersion(&version, QIODevice::WriteOnly);
     wVersion.setByteOrder(QDataStream::LittleEndian);
     wVersion << (quint32)STAM_ORGA_VERSION_I;
-    wVersion << quint16(QString(STAM_ORGA_VERSION_S).toUtf8().size());
+    QString sVersion = STAM_ORGA_VERSION_S;
+#ifdef Q_OS_WIN
+    sVersion.append("_Win");
+#else
+#ifdef Q_OS_ANDROID
+    sVersion.append("_Android");
+#endif
+#endif
+    wVersion << quint16(sVersion.toUtf8().size());
 
-    version.append(QString(STAM_ORGA_VERSION_S));
+    version.append(sVersion);
     MessageProtocol msg(request.m_request, version);
     this->sendMessageRequest(&msg, request);
 }
@@ -331,16 +339,22 @@ void DataConnection::startSendRemoveSeasonTicket(DataConRequest request)
     this->sendMessageRequest(&msg, request);
 }
 
-void DataConnection::startSendNewPlaceTicket(DataConRequest request)
+void DataConnection::startSendEditSeasonTicket(DataConRequest request)
 {
-    QString     place = request.m_lData.at(1);
-    QByteArray  seasonTicket;
-    QDataStream wSeasonTicket(&seasonTicket, QIODevice::WriteOnly);
-    wSeasonTicket.setByteOrder(QDataStream::LittleEndian);
-    wSeasonTicket << request.m_lData.at(0).toUInt();
-    wSeasonTicket << quint16(place.toUtf8().size());
-    seasonTicket.append(place);
-    MessageProtocol msg(request.m_request, seasonTicket);
+    quint32    index    = qToLittleEndian(request.m_lData.at(0).toUInt());
+    QByteArray name     = request.m_lData.at(1).toUtf8();
+    QByteArray place    = request.m_lData.at(2).toUtf8();
+    quint32    discount = qToLittleEndian(request.m_lData.at(3).toUInt());
+    char       data[200];
+    memset(&data[0], 0x0, 200);
+    memcpy(&data[0], &index, sizeof(quint32));
+    memcpy(&data[4], &discount, sizeof(quint32));
+    memcpy(&data[8], name.constData(), name.length());
+    memcpy(&data[9 + name.length()], place.constData(), place.length());
+
+    quint32 size = 8 + name.length() + place.length() + 2;
+
+    MessageProtocol msg(request.m_request, &data[0], size);
     this->sendMessageRequest(&msg, request);
 }
 
@@ -566,8 +580,8 @@ void DataConnection::startSendNewRequest(DataConRequest request)
         this->startSendSeasonTicketListRequest(request);
         break;
 
-    case OP_CODE_CMD_REQ::REQ_NEW_TICKET_PLACE:
-        this->startSendNewPlaceTicket(request);
+    case OP_CODE_CMD_REQ::REQ_CHANGE_TICKET:
+        this->startSendEditSeasonTicket(request);
         break;
 
     case OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET:

@@ -85,9 +85,9 @@ qint32 UserInterface::startRemoveSeasonTicket(quint32 index)
     return this->m_pConHandle->startRemoveSeasonTicket(index);
 }
 
-qint32 UserInterface::startNewPlaceSeasonTicket(quint32 index, QString place)
+qint32 UserInterface::startEditSeasonTicket(quint32 index, QString name, QString place, quint32 discount)
 {
-    return this->m_pConHandle->startNewPlaceSeasonTicket(index, place);
+    return this->m_pConHandle->startEditSeasonTicket(index, name, place, discount);
 }
 
 qint32 UserInterface::startListSeasonTickets()
@@ -176,8 +176,8 @@ void UserInterface::slCommandFinished(quint32 command, qint32 result)
         emit this->notifySeasonTicketListFinished(result);
         break;
 
-    case OP_CODE_CMD_REQ::REQ_NEW_TICKET_PLACE:
-        emit this->notifySeasonTicketNewPlaceFinished(result);
+    case OP_CODE_CMD_REQ::REQ_CHANGE_TICKET:
+        emit this->notifySeasonTicketEditFinished(result);
         break;
 
     case OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET:

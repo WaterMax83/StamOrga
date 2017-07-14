@@ -24,6 +24,7 @@
 
 #include "../Common/General/backgroundcontroller.h"
 #include "../Common/General/backgroundworker.h"
+#include "../Common/General/config.h"
 #include "../Common/General/globalfunctions.h"
 #include "../Common/General/logging.h"
 #include "Data/readonlinegames.h"
@@ -44,7 +45,7 @@ int main(int argc, char* argv[])
     globalData.initialize();
 
     qInfo() << "*************************************************************";
-    qInfo() << "Starting StFaeKSC";
+    qInfo() << QString("Starting StFaeKSC %1").arg(STAM_ORGA_VERSION_S);
 
     BackgroundController ctrlUdp;
     if (argc > 1 && QString(argv[1]) == "-noServer") {

@@ -45,7 +45,7 @@ public:
 
     Q_INVOKABLE qint32 startRemoveSeasonTicket(quint32 index);
 
-    Q_INVOKABLE qint32 startNewPlaceSeasonTicket(quint32 index, QString place);
+    Q_INVOKABLE qint32 startEditSeasonTicket(quint32 index, QString name, QString place, quint32 discount);
 
     Q_INVOKABLE qint32 startListSeasonTickets();
 
@@ -105,7 +105,7 @@ signals:
     void notifyGamesInfoListFinished(qint32 result);
     void notifySeasonTicketAddFinished(qint32 result);
     void notifySeasonTicketRemoveFinished(qint32 result);
-    void notifySeasonTicketNewPlaceFinished(qint32 result);
+    void notifySeasonTicketEditFinished(qint32 result);
     void notifySeasonTicketListFinished(qint32 result);
     void notifyAvailableTicketStateChangedFinished(qint32 result);
     void notifyAvailableTicketListFinsished(qint32 result);

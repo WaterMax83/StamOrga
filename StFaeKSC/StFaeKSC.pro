@@ -1,3 +1,15 @@
+##########################################################################################
+#	File:		StFaeKSC.pro
+#	Project:	StamOrga
+#
+#	Brief:		project file for StFaeKSC server
+#	Author:		msc
+#	Date:		05.04.2017
+#
+###########################################################################################
+
+
+
 QT += core network
 QT -= gui
 
@@ -8,6 +20,12 @@ CONFIG += console
 CONFIG -= app_bundle
 
 TEMPLATE = app
+
+
+include (../StamOrga.pri)
+
+VERSION=$${STAMORGA_VERSION}
+
 
 SOURCES += main.cpp \
     ../Common/General/backgroundcontroller.cpp \

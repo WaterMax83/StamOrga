@@ -66,10 +66,10 @@ SeasonTicket::SeasonTicket()
         if (pTicket == NULL)
             continue;
         pTicket->m_index = this->getNextInternalIndex();
-        this->addNewTicketInfo(pTicket->user, pTicket->userIndex,
+        this->addNewTicketInfo(pTicket->m_user, pTicket->m_userIndex,
                                pTicket->m_itemName,
-                               pTicket->m_timestamp, pTicket->discount,
-                               pTicket->place, pTicket->m_index);
+                               pTicket->m_timestamp, pTicket->m_discount,
+                               pTicket->m_place, pTicket->m_index);
 
         delete pTicket;
     }
@@ -117,7 +117,7 @@ int SeasonTicket::addNewSeasonTicket(QString user, quint32 userIndex, QString ti
     return newIndex;
 }
 
-int SeasonTicket::changePlaceFromTicket(const quint32 index, QString newPlace)
+int SeasonTicket::changeSeasonTicketInfos(const quint32 index, const qint32 discount, const QString name, const QString place)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
@@ -126,16 +126,23 @@ int SeasonTicket::changePlaceFromTicket(const quint32 index, QString newPlace)
         if (pTicket == NULL)
             continue;
         if (pTicket->m_index == index) {
-            QString ticketName = pTicket->m_itemName;
-            if (this->updateItemValue(pTicket, TICKET_PLACE, QVariant(newPlace))) {
-                pTicket->place = newPlace;
-                qInfo().noquote() << (QString("changed Place of Ticket %1 to %2").arg(ticketName, newPlace));
-                return ERROR_CODE_SUCCESS;
+            if (name != "" && pTicket->m_itemName != name && this->updateItemValue(pTicket, ITEM_NAME, QVariant(name))) {
+                pTicket->m_itemName = name;
+                qInfo().noquote() << (QString("changed name of Ticket %1 to %2").arg(index).arg(name));
             }
+            if (place != "" && pTicket->m_place != place && this->updateItemValue(pTicket, TICKET_PLACE, QVariant(place))) {
+                pTicket->m_place = place;
+                qInfo().noquote() << (QString("changed place of Ticket %1 to %2").arg(index).arg(place));
+            }
+            if (discount >= 0 && pTicket->m_discount != discount && this->updateItemValue(pTicket, TICKET_DISCOUNT, QVariant(quint32(discount)))) {
+                pTicket->m_discount = discount;
+                qInfo().noquote() << (QString("changed name of Ticket %1 to %2").arg(index).arg(name));
+            }
+            return ERROR_CODE_SUCCESS;
         }
     }
 
-    qWarning() << (QString("Could not find season ticket with \"%1\" to change place").arg(index));
+    qWarning() << (QString("Could not find season ticket with \"%1\" to change infos").arg(index));
     return ERROR_CODE_NOT_FOUND;
 }
 
@@ -149,7 +156,7 @@ int SeasonTicket::showAllSeasonTickets()
             continue;
         QString date = QDateTime::fromMSecsSinceEpoch(pTicket->m_timestamp).toString("dd.MM.yyyy hh:mm");
         QString output;
-        output = QString("%1: %2 - %3 - %4 - %5").arg(pTicket->m_itemName).arg(pTicket->discount).arg(pTicket->place, date, pTicket->user);
+        output = QString("%1: %2 - %3 - %4 - %5").arg(pTicket->m_itemName).arg(pTicket->m_discount).arg(pTicket->m_place, date, pTicket->m_user);
         std::cout << output.toStdString() << std::endl;
     }
     return 0;
@@ -173,10 +180,10 @@ void SeasonTicket::saveCurrentInteralList()
         this->m_pConfigSettings->setValue(ITEM_TIMESTAMP, pTicket->m_timestamp);
         this->m_pConfigSettings->setValue(ITEM_INDEX, pTicket->m_index);
 
-        this->m_pConfigSettings->setValue(TICKET_USER, pTicket->user);
-        this->m_pConfigSettings->setValue(TICKET_USER_INDEX, pTicket->userIndex);
-        this->m_pConfigSettings->setValue(TICKET_PLACE, pTicket->place);
-        this->m_pConfigSettings->setValue(TICKET_DISCOUNT, pTicket->discount);
+        this->m_pConfigSettings->setValue(TICKET_USER, pTicket->m_user);
+        this->m_pConfigSettings->setValue(TICKET_USER_INDEX, pTicket->m_userIndex);
+        this->m_pConfigSettings->setValue(TICKET_PLACE, pTicket->m_place);
+        this->m_pConfigSettings->setValue(TICKET_DISCOUNT, pTicket->m_discount);
     }
 
     this->m_pConfigSettings->endArray();
@@ -212,10 +219,10 @@ void SeasonTicket::addNewTicketInfo(QString user, quint32 userIndex, QString tic
     ticket->m_timestamp = datetime;
     ticket->m_index     = index;
 
-    ticket->user      = user;
-    ticket->userIndex = userIndex;
-    ticket->discount  = discount;
-    ticket->place     = place;
+    ticket->m_user      = user;
+    ticket->m_userIndex = userIndex;
+    ticket->m_discount  = discount;
+    ticket->m_place     = place;
 
     pList->append(ticket);
 }

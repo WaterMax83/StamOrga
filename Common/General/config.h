@@ -19,7 +19,12 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define STAM_ORGA_VERSION_I 0x01000000 // VX.Y.Z => 0xXXYYZZBB
-#define STAM_ORGA_VERSION_S "V1.0.0"
+#include <QtCore/QString>
+
+//#define STAM_ORGA_VERSION_I 0x01000000 // VX.Y.Z => 0xXXYYZZBB
+//#define STAM_ORGA_VERSION_S "V1.0.0"
+
+#define STAM_ORGA_VERSION_S "V" + QString(STAMORGA_VERSION)
+#define STAM_ORGA_VERSION_I QString("0x0" + QString(STAMORGA_VERSION).replace(".", "0") + "00").toUInt(NULL, 16)
 
 #endif // CONFIG_H

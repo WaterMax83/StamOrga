@@ -134,11 +134,13 @@ qint32 ConnectionHandling::startRemoveSeasonTicket(quint32 index)
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 ConnectionHandling::startNewPlaceSeasonTicket(quint32 index, QString place)
+qint32 ConnectionHandling::startEditSeasonTicket(quint32 index, QString name, QString place, quint32 discount)
 {
-    DataConRequest req(OP_CODE_CMD_REQ::REQ_NEW_TICKET_PLACE);
+    DataConRequest req(OP_CODE_CMD_REQ::REQ_CHANGE_TICKET);
     req.m_lData.append(QString::number(index));
+    req.m_lData.append(name);
     req.m_lData.append(place);
+    req.m_lData.append(QString::number(discount));
     this->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
