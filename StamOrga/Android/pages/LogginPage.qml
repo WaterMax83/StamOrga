@@ -60,6 +60,15 @@ Flickable {
                 globalUserData.copyTextToClipBoard(txtLogging.text);
                }
            }
+
+           Button {
+               text: "Löschen"
+               implicitWidth: parent.width / 3 * 2
+               Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+               onClicked: {
+                globalUserData.copyTextToClipBoard(txtLogging.text);
+               }
+           }
        }
    }
 
@@ -72,6 +81,8 @@ Flickable {
            txtLogging.text = globalUserData.getCurrentLoggingList(0);
        }
    }
+
+   function notifyUserIntConnectionFinished(result) {}
 
 
    ScrollIndicator.vertical: ScrollIndicator { }

@@ -55,5 +55,7 @@
         <file>images/close.png</file>
         <file>images/done.png</file>
         <file>images/help.png</file>
+        <file>pages/newVersionInfo.qml</file>
+        <file>components/EditSeasonTicketDialog.qml</file>
     </qresource>
 </RCC>

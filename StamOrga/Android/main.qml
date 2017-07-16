@@ -178,8 +178,7 @@ ApplicationWindow {
                     }
                 }
 
-                ScrollIndicator.vertical: ScrollIndicator {
-                }
+                ScrollIndicator.vertical: ScrollIndicator {}
             }
         }
     }
@@ -207,11 +206,10 @@ ApplicationWindow {
         }
     }
 
-    Component {
+
+    MyPages.GamesPage {
         id: viewGames
-        MyPages.GamesPage {
-            userIntGames: userInt
-        }
+        userIntGames: userInt
     }
 
     MyComponents.ToastManager {
@@ -270,7 +268,7 @@ ApplicationWindow {
         onNotifyUserPropertiesFinished: {
             if (result > 0 && !userInt.isDebuggingEnabled() && !isDebugWindowEnabled) {
                 isDebugWindowEnabled = true;
-                if (globalUserData.userIsDebugEnabled) {
+                if (globalUserData.userIsDebugEnabled()) {
                     listViewListModel.append({
                                             title: "Logging",
                                             element: viewLoggingPage,
@@ -278,21 +276,25 @@ ApplicationWindow {
                                         })
                 }
             }
-            if (globalUserData.userIsGameAddingEnabled() || userInt.isDebuggingEnabled())
-                updateHeaderFromMain("StamOrga", "images/add.png")
-            else
-                updateHeaderFromMain("StamOrga", "")
+            if (stackView.currentItem === viewGames) {
+                if (globalUserData.userIsGameAddingEnabled() || userInt.isDebuggingEnabled())
+                    updateHeaderFromMain("StamOrga", "images/add.png")
+                else
+                    updateHeaderFromMain("StamOrga", "")
+            }
         }
 
         onNotifyUpdatePasswordRequestFinished: {
             stackView.currentItem.notifyUserIntUpdatePasswordFinished(result)
         }
         onNotifyUpdateReadableNameRequest: {
-            stackView.currentItem.notifyUserIntUpdateReadableNameFinished(
-                        result)
+            stackView.currentItem.notifyUserIntUpdateReadableNameFinished(result)
         }
         onNotifyGamesListFinished: {
-            stackView.currentItem.notifyUserIntGamesListFinished(result)
+            viewGames.notifyUserIntGamesListFinished(result)
+        }
+        onNotifyGamesInfoListFinished: {
+            viewGames.notifyUserIntGamesInfoListFinished(result);
         }
         onNotifySeasonTicketAddFinished: {
             stackView.currentItem.notifyUserIntSeasonTicketAdd(result)
@@ -303,8 +305,8 @@ ApplicationWindow {
         onNotifySeasonTicketRemoveFinished: {
             stackView.currentItem.notifyUserIntSeasonTicketRemoveFinished(result)
         }
-        onNotifySeasonTicketNewPlaceFinished: {
-            stackView.currentItem.notifyUserIntSeasonTicketNewPlaceFinished(result)
+        onNotifySeasonTicketEditFinished: {
+            stackView.currentItem.notifyUserIntSeasonTicketEditFinished(result)
         }
 
         onNotifyAvailableTicketStateChangedFinished: {
@@ -327,12 +329,33 @@ ApplicationWindow {
         }
     }
 
+    Connections {
+       target: globalSettings
+       onSendAppStateChangedToActive: {
+           console.log("App State changed in qml: " + value);
+           viewGames.showLoadingGameInfos()
+           if (value === 1)
+               userInt.startListGettingGamesInfo();
+           else if (value === 2)
+               userInt.startListGettingGames();
+       }
+    }
+
     function openUserLogin(open) {
 
         if (open === true) {
             stackView.push(viewUserLogin)
             imageToolButton.visible = false
-        } else
+        } else {
             stackView.currentItem.showListedGames()
+            globalSettings.checkNewStateChangedAtStart();
+
+            if (!globalSettings.isVersionChangeAlreadyShown()) {
+                var component = Qt.createComponent("../pages/newVersionInfo.qml");
+                if (component.status === Component.Ready) {
+                    stackView.push(component);
+                }
+            }
+        }
     }
 }

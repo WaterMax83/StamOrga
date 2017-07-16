@@ -115,7 +115,7 @@ Flickable {
                     onClickedButton: {
                         menuAcceptValue = 1;
                         menuAcceptIndex = 0;
-                        if (globalUserData.useReadableName)
+                        if (globalSettings.useReadableName)
                             showTextDialogAccept("Zusagen", globalUserData.readableName);
                         else
                             showTextDialogAccept("Zusagen", "");
@@ -129,7 +129,7 @@ Flickable {
                     onClickedButton: {
                         menuAcceptValue = 2;
                         menuAcceptIndex = 0;
-                        if (globalUserData.useReadableName)
+                        if (globalSettings.useReadableName)
                             showTextDialogAccept("Interesse/Vorbehalt", globalUserData.readableName);
                         else
                             showTextDialogAccept("Interesse/Vorbehalt", "");
@@ -143,7 +143,7 @@ Flickable {
                     onClickedButton: {
                         menuAcceptValue = 3;
                         menuAcceptIndex = 0;
-                        if (globalUserData.useReadableName)
+                        if (globalSettings.useReadableName)
                             showTextDialogAccept("Absagen", globalUserData.readableName);
                         else
                             showTextDialogAccept("Absagen", "");
@@ -185,9 +185,10 @@ Flickable {
                         height: listViewItemHeight
                     }
                     onClicked: {
-                        if (isInfoVisible)
+                        if (isInfoVisible) {
                             isInfoVisible = false
-                        else
+                            userClosedInfo = true;
+                        } else
                             isInfoVisible = true;
                     }
                 }
@@ -238,9 +239,10 @@ Flickable {
                         height: listViewItemHeight
                     }
                     onClicked: {
-                        if (isAcceptVisible)
+                        if (isAcceptVisible) {
                             isAcceptVisible = false
-                        else
+                            userClosedAccept = true;
+                        } else
                             isAcceptVisible = true;
                     }
                 }
@@ -406,7 +408,9 @@ Flickable {
     property bool isEditMode: false
     property bool isInputAlreadyChanged: false
     property bool isInfoVisible: false
+    property bool userClosedInfo: false
     property bool isAcceptVisible: false
+    property bool userClosedAccept: false
 
     function showAllInfoAboutGame() {
         meetingInfo = globalUserData.getMeetingInfo();
@@ -435,6 +439,8 @@ Flickable {
             textInfo.text = meetingInfo.info();
             textWhen.init(meetingInfo.when())
             textWhere.init(meetingInfo.where())
+            if (textInfo.text.length > 0 && !userClosedInfo)
+                isInfoVisible = true;
             showInfoHeader("", false)
         } else if (result === -5) {
             toastManager.show("Bisher noch kein Treffen gespeichert", 2000);
@@ -449,6 +455,8 @@ Flickable {
         listViewModelAcceptedUsers.clear();
 
         if (result === 1 && meetingInfo.getAcceptedListCount() > 0) {
+            if (!userClosedAccept)
+                isAcceptVisible = true;
             for (var i = 0; i < meetingInfo.getAcceptedListCount(); i++) {
                 var acceptInfo = meetingInfo.getAcceptInfoFromIndex(i)
                 var btnColor;

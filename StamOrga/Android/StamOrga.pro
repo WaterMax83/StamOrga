@@ -1,9 +1,23 @@
+##########################################################################################
+#	File:		StamOrga.pro
+#	Project:	StamOrga
+#
+#	Brief:		project file for StamOrga app
+#	Author:		msc
+#	Date:		05.04.2017
+#
+###########################################################################################
+
 
 QT += qml quick network
 
 CONFIG += c++11
 
 DEFINES += STAMORGA_APP
+
+include (../../StamOrga.pri)
+
+VERSION=$${STAMORGA_VERSION}
 
 SOURCES += main.cpp \
 	userinterface.cpp \
@@ -21,7 +35,8 @@ SOURCES += main.cpp \
     ../Data/globaldata.cpp \
     ../Data/gameplay.cpp \
     ../Data/seasonticket.cpp \
-    ../Data/meetinginfo.cpp
+    ../Data/meetinginfo.cpp \
+    ../Data/globalsettings.cpp
 
 
 RESOURCES += qml.qrc
@@ -67,7 +82,8 @@ HEADERS += \
     ../Data/gameplay.h \
     ../Data/seasonticket.h \
     ../Data/meetinginfo.h \
-    ../Data/acceptmeetinginfo.h
+    ../Data/acceptmeetinginfo.h \
+    ../Data/globalsettings.h
 
 DISTFILES += \
     android/AndroidManifest.xml \

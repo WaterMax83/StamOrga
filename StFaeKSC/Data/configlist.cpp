@@ -27,12 +27,14 @@ ConfigList::ConfigList()
 
 qint32 ConfigList::removeItem(const QString name)
 {
-    quint32 index = this->getItemIndex(name);
+    qint32 index = this->getItemIndex(name);
+    if (index <= 0)
+        return ERROR_CODE_COMMON;
 
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
     for (int i = 0; i < this->m_lInteralList.size(); i++) {
-        if (this->m_lInteralList[i]->m_index == index) {
+        if (this->m_lInteralList[i]->m_index == (quint32)index) {
             this->m_lInteralList.removeAt(i);
             this->saveCurrentInteralList();
 
@@ -98,15 +100,15 @@ ConfigItem* ConfigList::getItem(quint32 index)
     return NULL;
 }
 
-quint32 ConfigList::getItemIndex(const QString name)
+qint32 ConfigList::getItemIndex(const QString name)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
     for (int i = 0; i < this->getNumberOfInternalList(); i++) {
         if (this->m_lInteralList[i]->m_itemName == name)
-            return this->m_lInteralList[i]->m_index;
+            return (qint32) this->m_lInteralList[i]->m_index;
     }
-    return 0;
+    return -1;
 }
 
 QString ConfigList::getItemName(quint32 index)

@@ -22,12 +22,13 @@
 #include <QtNetwork/QUdpSocket>
 
 struct UserConData {
-    QHostAddress            sender;
-    quint16                 srcMasterPort;
-    quint16                 dstDataPort;
-    quint16                 srcDataPort;
-    QString                 userName;
-    bool                    bIsConnected;
+    QHostAddress m_sender;
+    quint16      m_srcMasterPort;
+    quint16      m_dstDataPort;
+    quint16      m_srcDataPort;
+    QString      m_userName;
+    QString      m_randomLogin;
+    bool         m_bIsConnected;
 };
 
 #endif // CONNECTIONDATA_H

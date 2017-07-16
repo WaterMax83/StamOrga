@@ -43,11 +43,9 @@ class GlobalData : public QObject
     Q_PROPERTY(QString readableName READ readableName WRITE setReadableName NOTIFY readableNameChanged)
     Q_PROPERTY(QString ipAddr READ ipAddr WRITE setIpAddr NOTIFY ipAddrChanged)
     Q_PROPERTY(quint32 conMasterPort READ conMasterPort WRITE setConMasterPort NOTIFY conMasterPortChanged)
-    Q_PROPERTY(quint32 lastGamesLoadCount READ lastGamesLoadCount WRITE setLastGamesLoadCount NOTIFY lastGamesLoadCountChanged)
-    Q_PROPERTY(bool useReadableName READ useReadableName WRITE setUseReadableName NOTIFY useReadableNameChanged)
-    Q_PROPERTY(QString debugIP READ debugIP WRITE setDebugIP NOTIFY debugIPChanged)
-    Q_PROPERTY(QString debugIPWifi READ debugIPWifi WRITE setDebugIPWifi NOTIFY debugIPWifiChanged)
     Q_PROPERTY(bool bIsConnected READ bIsConnected WRITE setbIsConnected NOTIFY bIsConnectedChanged)
+
+    friend class GlobalSettings;
 
 public:
     explicit GlobalData(QObject* parent = 0);
@@ -69,6 +67,9 @@ public:
             emit userNameChanged();
         }
     }
+
+    QString getSalt() { return this->m_salt; }
+    void setSalt(QString salt) { this->m_salt = salt; }
 
     QString readableName()
     {
@@ -134,61 +135,6 @@ public:
         }
     }
 
-    quint32 lastGamesLoadCount()
-    {
-        QMutexLocker lock(&this->m_mutexUser);
-        return this->m_ulastGamesLoadCount;
-    }
-    void setLastGamesLoadCount(quint32 count)
-    {
-        if (this->m_ulastGamesLoadCount != count) {
-            {
-                QMutexLocker lock(&this->m_mutexUser);
-                this->m_ulastGamesLoadCount = count;
-            }
-            emit lastGamesLoadCountChanged();
-        }
-    }
-
-    bool useReadableName() { return this->m_useReadableName; }
-    void setUseReadableName(bool enable)
-    {
-        this->m_useReadableName = enable;
-        emit this->useReadableNameChanged();
-    }
-
-    QString debugIP()
-    {
-        QMutexLocker lock(&this->m_mutexUser);
-        return this->m_debugIP;
-    }
-    void setDebugIP(QString ip)
-    {
-        if (this->m_debugIP != ip) {
-            {
-                QMutexLocker lock(&this->m_mutexUser);
-                this->m_debugIP = ip;
-            }
-            emit debugIPChanged();
-        }
-    }
-
-    QString debugIPWifi()
-    {
-        QMutexLocker lock(&this->m_mutexUser);
-        return this->m_debugIPWifi;
-    }
-    void setDebugIPWifi(QString ip)
-    {
-        if (this->m_debugIPWifi != ip) {
-            {
-                QMutexLocker lock(&this->m_mutexUser);
-                this->m_debugIPWifi = ip;
-            }
-            emit debugIPWifiChanged();
-        }
-    }
-
     quint32 conDataPort()
     {
         QMutexLocker lock(&this->m_mutexUser);
@@ -229,8 +175,6 @@ public:
     void SetUserProperties(quint32 value);
 
     void saveGlobalUserSettings();
-
-    Q_INVOKABLE void saveGlobalSettings();
 
     Q_INVOKABLE QString getCurrentLoggingList(int index)
     {
@@ -281,10 +225,6 @@ signals:
     void readableNameChanged();
     void ipAddrChanged();
     void conMasterPortChanged();
-    void lastGamesLoadCountChanged();
-    void useReadableNameChanged();
-    void debugIPChanged();
-    void debugIPWifiChanged();
     void bIsConnectedChanged();
 
 
@@ -296,16 +236,12 @@ private slots:
 private:
     QString m_userName;
     QString m_passWord;
+    QString m_salt;
     QString m_readableName;
     QString m_ipAddress;
     quint32 m_uMasterPort;
     quint16 m_uDataPort;
     quint32 m_userIndex;
-
-    quint32 m_ulastGamesLoadCount;
-    bool    m_useReadableName;
-    QString m_debugIP;
-    QString m_debugIPWifi;
 
     quint32 m_UserProperties;
 

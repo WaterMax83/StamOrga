@@ -27,10 +27,10 @@
 #include "configlist.h"
 
 struct TicketInfo : public ConfigItem {
-    QString user;
-    quint32 userIndex;
-    quint8  discount;
-    QString place;
+    QString m_user;
+    quint32 m_userIndex;
+    quint8  m_discount;
+    QString m_place;
 };
 
 
@@ -50,7 +50,7 @@ public:
 
 
     int addNewSeasonTicket(QString user, quint32 userIndex, QString ticketName, quint8 discount);
-    int changePlaceFromTicket(const quint32 index, QString newPlace);
+    int changeSeasonTicketInfos(const quint32 index, const qint32 discount, const QString name, const QString place);
     int showAllSeasonTickets();
 
 

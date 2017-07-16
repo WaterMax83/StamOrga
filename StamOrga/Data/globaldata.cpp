@@ -24,6 +24,7 @@
 #include <QtQml/QQmlEngine>
 
 #include "globaldata.h"
+#include "globalsettings.h"
 
 #define GROUP_ARRAY_ITEM "item"
 #define ITEM_INDEX "index"
@@ -56,6 +57,9 @@ GlobalData::GlobalData(QObject* parent)
     this->m_ctrlLog.Start(this->m_logApp, false);
 
     QQmlEngine::setObjectOwnership(&this->m_meetingInfo, QQmlEngine::CppOwnership);
+
+    this->m_pMainUserSettings = new QSettings();
+    this->m_pMainUserSettings->setIniCodec(("UTF-8"));
 }
 
 void GlobalData::loadGlobalSettings()
@@ -64,27 +68,16 @@ void GlobalData::loadGlobalSettings()
 
     QHostInfo::lookupHost("watermax83.ddns.net", this, SLOT(callBackLookUpHost(QHostInfo)));
 
-    this->m_pMainUserSettings = new QSettings();
-    this->m_pMainUserSettings->setIniCodec(("UTF-8"));
-
     qInfo().noquote() << this->m_pMainUserSettings->fileName();
 
     this->m_pMainUserSettings->beginGroup("USER_LOGIN");
 
     this->setUserName(this->m_pMainUserSettings->value("UserName", "").toString());
     this->setPassWord(this->m_pMainUserSettings->value("Password", "").toString());
+    this->setSalt(this->m_pMainUserSettings->value("Salt", "").toString());
     this->setReadableName(this->m_pMainUserSettings->value("ReadableName", "").toString());
     this->setIpAddr(this->m_pMainUserSettings->value("IPAddress", "140.80.61.57").toString());
     this->setConMasterPort(this->m_pMainUserSettings->value("ConMasterPort", 55000).toInt());
-
-    this->m_pMainUserSettings->endGroup();
-
-    this->m_pMainUserSettings->beginGroup("GLOBAL_SETTINGS");
-    this->setLastGamesLoadCount(this->m_pMainUserSettings->value("LastGamesLoadCount", 5).toInt());
-    this->setUseReadableName(this->m_pMainUserSettings->value("UseReadableName", true).toBool());
-    this->setDebugIP(this->m_pMainUserSettings->value("DebugIP", "").toString());
-    this->setDebugIPWifi(this->m_pMainUserSettings->value("DebugIPWifi", "").toString());
-
 
     this->m_pMainUserSettings->endGroup();
 
@@ -140,23 +133,10 @@ void GlobalData::saveGlobalUserSettings()
 
     this->m_pMainUserSettings->setValue("UserName", this->m_userName);
     this->m_pMainUserSettings->setValue("Password", this->m_passWord);
+    this->m_pMainUserSettings->setValue("Salt", this->m_salt);
     this->m_pMainUserSettings->setValue("ReadableName", this->m_readableName);
     this->m_pMainUserSettings->setValue("IPAddress", this->m_ipAddress);
     this->m_pMainUserSettings->setValue("ConMasterPort", this->m_uMasterPort);
-
-    this->m_pMainUserSettings->endGroup();
-
-    this->m_pMainUserSettings->sync();
-}
-
-void GlobalData::saveGlobalSettings()
-{
-    this->m_pMainUserSettings->beginGroup("GLOBAL_SETTINGS");
-
-    this->m_pMainUserSettings->setValue("LastGamesLoadCount", this->m_ulastGamesLoadCount);
-    this->m_pMainUserSettings->setValue("UseReadableName", this->m_useReadableName);
-    this->m_pMainUserSettings->setValue("DebugIP", this->m_debugIP);
-    this->m_pMainUserSettings->setValue("DebugIPWifi", this->m_debugIPWifi);
 
     this->m_pMainUserSettings->endGroup();
 
@@ -196,6 +176,7 @@ void GlobalData::startUpdateGamesPlay()
     for (int i = 0; i < this->m_lGamePlay.size(); i++)
         delete this->m_lGamePlay[i];
     this->m_lGamePlay.clear();
+
     this->m_gpLastTimeStamp = QDateTime::currentDateTime().toMSecsSinceEpoch();
 }
 
@@ -356,25 +337,25 @@ void GlobalData::callBackLookUpHost(const QHostInfo& host)
         lastIP = host.addresses().value(0).toString();
     }
 
-    if (this->m_debugIP != "") {
-        this->setIpAddr(this->m_debugIP);
-        lastIP = this->m_debugIP;
+    if (g_GlobalSettings->debugIP() != "") {
+        this->setIpAddr(g_GlobalSettings->debugIP());
+        lastIP = g_GlobalSettings->debugIP();
     }
 #ifdef QT_DEBUG
-    if (this->m_debugIP != "") {
-        this->setIpAddr(this->m_debugIP);
-        lastIP = this->m_debugIP;
-    }
+//    if (this->m_debugIP != "") {
+//        this->setIpAddr(this->m_debugIP);
+//        lastIP = this->m_debugIP;
+//    }
 #ifdef Q_OS_ANDROID
 
-    if (this->m_debugIPWifi != "") {
+    if (g_GlobalSettings->debugIPWifi() != "") {
         QNetworkConfigurationManager ncm;
         QList<QNetworkConfiguration> nc = ncm.allConfigurations();
         foreach (QNetworkConfiguration item, nc) {
             if (item.bearerType() == QNetworkConfiguration::BearerWLAN) {
                 if (item.state() == QNetworkConfiguration::StateFlag::Active) {
-                    this->setIpAddr(this->m_debugIPWifi);
-                    lastIP = this->m_debugIPWifi;
+                    this->setIpAddr(g_GlobalSettings->debugIPWifi());
+                    lastIP = g_GlobalSettings->debugIPWifi();
                 }
                 //                 qDebug() << "Wifi " << item.name();
                 //                 qDebug() << "state " << item.state();

@@ -60,11 +60,14 @@ public:
     int showAllUsers();
 
     bool userCheckPassword(QString name, QString passw);
+    bool userCheckPasswordHash(QString name, QString hash, QString random);
     bool userChangePassword(QString name, QString passw);
+    bool userChangePasswordHash(QString name, QString passw);
     bool userChangeProperties(QString name, quint32 props);
     bool userChangeReadName(QString name, QString readName);
     quint32 getUserProperties(QString name);
     QString getReadableName(QString name);
+    QString getSalt(QString name);
 
     ConfigItem* getRequestConfigItemFromListIndex(int index)
     {
@@ -78,7 +81,6 @@ private:
     bool addNewUserLogin(QString name, qint64 timestamp, quint32 index, QString password, QString salt, quint32 prop, QString readname, bool checkUser = true);
     void addNewUserLogin(QString name, qint64 timestamp, quint32 index, QString password, QString salt, quint32 prop, QString readname, QList<ConfigItem*>* pList);
 
-    QString createSalt();
     QString createHashPassword(const QString passWord, const QString salt);
     QCryptographicHash* m_hash;
 };

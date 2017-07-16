@@ -34,6 +34,7 @@ Dialog {
     x: Math.round((parentWidth - width) / 2)
     y: Math.round(parentHeight / 6)
     width: Math.round(Math.min(parentWidth, parentHeight) / 3 * 2)
+    Layout.maximumHeight: parentHeight / 4 * 3
     modal: true
     focus: true
 
@@ -53,16 +54,8 @@ Dialog {
         width: accepptTextDialog.width
         spacing: 20
 
-        TextField {
-            id: txtEditableText
-            implicitWidth: accepptTextDialogColumn.width / 4 * 3
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            visible: false
-        }
-
         Label {
             id: labelAcceptText
-//            implicitWidth: accepptTextDialogColumn.width / 4 * 3
             wrapMode: Text.WordWrap
             Layout.maximumWidth: parent.width
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter

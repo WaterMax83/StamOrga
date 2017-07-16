@@ -39,7 +39,7 @@ int MainConnection::DoBackgroundWork()
     this->m_pMasterUdpSocket = new QUdpSocket();
 
     if (!this->m_pMasterUdpSocket->bind()) {
-        emit this->connectionRequestFinished(0, this->m_pMasterUdpSocket->errorString());
+        emit this->connectionRequestFinished(0, this->m_pMasterUdpSocket->errorString(), "", "");
         return -1;
     }
 
@@ -54,6 +54,14 @@ int MainConnection::DoBackgroundWork()
     connect(this->m_pConTimeout, &QTimer::timeout, this, &MainConnection::slotConnectionTimeoutFired);
 
     return 0;
+}
+
+void MainConnection::slotNewBindingPortRequest()
+{
+    if (this->m_pMasterUdpSocket->state() != QAbstractSocket::UnconnectedState)
+        this->m_pMasterUdpSocket->disconnectFromHost();
+    bool test = this->m_pMasterUdpSocket->bind();
+    QString("new Binding for port %1").arg(test);
 }
 
 void MainConnection::slotSendNewMainConRequest(QString username)
@@ -73,13 +81,13 @@ void MainConnection::slotSendNewMainConRequest(QString username)
 
 void MainConnection::slotSocketMainError(QAbstractSocket::SocketError socketError)
 {
-    qDebug().noquote() << QString("Socket Error %1 - %2 ").arg(socketError).arg(this->m_pMasterUdpSocket->errorString());
+    qCritical().noquote() << QString("Socket Error %1 - %2 ").arg(socketError).arg(this->m_pMasterUdpSocket->errorString());
 }
 
 void MainConnection::slotConnectionTimeoutFired()
 {
-    emit this->connectionRequestFinished(ERROR_CODE_TIMEOUT, "Timeout");
-    qDebug() << QString("Main Con Timeout %1").arg(this->m_pMasterUdpSocket->errorString());
+    emit this->connectionRequestFinished(ERROR_CODE_TIMEOUT, "Timeout", "", "");
+    qInfo().noquote() << QString("Main Con Timeout %1").arg(this->m_pMasterUdpSocket->errorString());
 }
 
 void MainConnection::slotReadyReadMasterPort()
@@ -108,20 +116,29 @@ void MainConnection::checkNewOncomingData()
 
         if (msg->getIndex() == OP_CODE_CMD_RES::ACK_CONNECT_USER) {
             this->m_pConTimeout->stop();
-            if (msg->getDataLength() != 4)
-                emit this->connectionRequestFinished(ERROR_CODE_WRONG_SIZE, QString("Datalength is wrong, expected 4").arg(msg->getDataLength()));
+            if (msg->getDataLength() < 4)
+                emit this->connectionRequestFinished(ERROR_CODE_WRONG_SIZE, QString("Datalength %1 is wrong, expected >4").arg(msg->getDataLength()), "", "");
             else {
-                qint32 rValue = msg->getIntData();
-                if (rValue > ERROR_CODE_NO_ERROR) {
-                    if (this->m_pGlobalData->userName() != this->m_userName) {
-                        this->m_pGlobalData->setUserName(this->m_userName);
-                        this->m_pGlobalData->saveGlobalUserSettings();
+                const char* pData = msg->getPointerToData();
+                qint32      rValue;
+                memcpy(&rValue, pData, sizeof(qint32));
+                if (qToLittleEndian(rValue) > ERROR_CODE_NO_ERROR) {
+                    if (msg->getDataLength() < 4 + 8 + 1)
+                        emit this->connectionRequestFinished(ERROR_CODE_WRONG_SIZE, QString("Datalength %1 is wrong, expected >13").arg(msg->getDataLength()), "", "");
+                    else {
+                        QString salt(pData + sizeof(qint32));
+                        QString random(pData + sizeof(qint32) + 1 + salt.toUtf8().size());
+
+                        if (this->m_pGlobalData->userName() != this->m_userName) {
+                            this->m_pGlobalData->setUserName(this->m_userName);
+                            this->m_pGlobalData->saveGlobalUserSettings();
+                        }
+                        emit this->connectionRequestFinished(qToLittleEndian(rValue), "", salt, random);
                     }
-                    emit this->connectionRequestFinished(rValue, "");
-                } else if (rValue == ERROR_CODE_NO_USER)
-                    emit this->connectionRequestFinished(rValue, QString("Wrong user %1").arg(this->m_userName));
+                } else if (qToLittleEndian(rValue) == ERROR_CODE_NO_USER)
+                    emit this->connectionRequestFinished(qToLittleEndian(rValue), QString("Wrong user %1").arg(this->m_userName), "", "");
                 else
-                    emit this->connectionRequestFinished(rValue, QString("unkown error %1").arg(rValue));
+                    emit this->connectionRequestFinished(qToLittleEndian(rValue), QString("unkown error %1").arg(qToLittleEndian(rValue)), "", "");
             }
         }
         delete msg;

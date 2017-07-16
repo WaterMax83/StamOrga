@@ -23,6 +23,7 @@
 #include "../Common/General/globaltiming.h"
 #include "../Common/Network/messagecommand.h"
 #include "../Common/Network/messageprotocol.h"
+#include "../Data/globalsettings.h"
 #include "dataconnection.h"
 
 DataConnection::DataConnection(GlobalData* pData)
@@ -31,6 +32,7 @@ DataConnection::DataConnection(GlobalData* pData)
     this->SetWorkerName("DataConnection");
     this->m_pGlobalData        = pData;
     this->m_bRequestLoginAgain = false;
+    this->m_hash               = new QCryptographicHash(QCryptographicHash::Sha3_512);
 }
 
 
@@ -47,7 +49,6 @@ int DataConnection::DoBackgroundWork()
     this->m_pDataUdpSocket = new QUdpSocket();
     if (!this->m_pDataUdpSocket->bind()) {
         qCritical().noquote() << QString("Could not bin socket for dataconnection");
-        //        emit this->connectionRequestFinished(0, this->m_pDataUdpSocket->errorString());
         return -1;
     }
     connect(this->m_pDataUdpSocket, &QUdpSocket::readyRead, this, &DataConnection::slotReadyReadDataPort);
@@ -61,7 +62,7 @@ int DataConnection::DoBackgroundWork()
 
 void DataConnection::slotSocketDataError(QAbstractSocket::SocketError socketError)
 {
-    qDebug().noquote() << QString("Socket Error %1 - %2 ").arg(socketError).arg(this->m_pDataUdpSocket->errorString());
+    qCritical().noquote() << QString("Socket Error %1 - %2 ").arg(socketError).arg(this->m_pDataUdpSocket->errorString());
 }
 
 /*
@@ -103,17 +104,26 @@ void DataConnection::checkNewOncomingData()
         switch (msg->getIndex()) {
         case OP_CODE_CMD_RES::ACK_LOGIN_USER:
             if (this->m_bRequestLoginAgain) {
-                this->sendActualRequestsAgain();
+                this->sendActualRequestsAgain(this->m_pDataHandle->getHandleLoginResponse(msg));
+
                 this->m_bRequestLoginAgain = false;
                 continue;
             } else {
                 request.m_result = this->m_pDataHandle->getHandleLoginResponse(msg);
                 if (request.m_result == ERROR_CODE_SUCCESS) {
                     QString passWord = request.m_lData.at(0);
-                    if (this->m_pGlobalData->passWord() != passWord) {
+                    QString salt     = request.m_lData.at(1);
+                    if (this->m_pGlobalData->getSalt() == "")
+                        passWord = this->createHashValue(passWord, salt);
+                    if (this->m_pGlobalData->passWord() != passWord || this->m_pGlobalData->getSalt() != salt) {
                         this->m_pGlobalData->setPassWord(passWord);
+                        this->m_pGlobalData->setSalt(salt);
                         this->m_pGlobalData->saveGlobalUserSettings();
                     }
+                } else if (request.m_result == ERROR_CODE_WRONG_PASSWORD && this->m_pGlobalData->passWord() != "") {
+                    this->m_pGlobalData->setPassWord("");
+                    this->m_pGlobalData->setSalt("");
+                    this->m_pGlobalData->saveGlobalUserSettings();
                 }
             }
 
@@ -129,8 +139,9 @@ void DataConnection::checkNewOncomingData()
 
         case OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN:
             request.m_result = msg->getIntData();
-            if (request.m_lData.size() > 0)
-                request.m_returnData = request.m_lData.at(0);
+            if (request.m_lData.size() > 0 && request.m_result == ERROR_CODE_SUCCESS) {
+                request.m_returnData = this->createHashValue(request.m_lData.at(0), this->m_pGlobalData->getSalt());
+            }
             break;
 
         case OP_CODE_CMD_RES::ACK_USER_CHANGE_READNAME:
@@ -141,17 +152,23 @@ void DataConnection::checkNewOncomingData()
 
         case OP_CODE_CMD_RES::ACK_NOT_LOGGED_IN:
             if (!this->m_bRequestLoginAgain) {
-                this->m_bRequestLoginAgain = true;
                 DataConRequest conReq;
                 conReq.m_request = OP_CODE_CMD_REQ::REQ_LOGIN_USER;
                 conReq.m_lData.append(this->m_pGlobalData->passWord());
+                conReq.m_lData.append(this->m_pGlobalData->getSalt());
                 this->startSendLoginRequest(conReq);
-                return;
+                this->m_bRequestLoginAgain = true;
+                delete msg;
+                continue;
             }
             break;
 
         case OP_CODE_CMD_RES::ACK_GET_GAMES_LIST:
             request.m_result = this->m_pDataHandle->getHandleGamesListResponse(msg);
+            break;
+
+        case OP_CODE_CMD_RES::ACK_GET_GAMES_INFO_LIST:
+            request.m_result = this->m_pDataHandle->getHandleGamesInfoListResponse(msg);
             break;
 
         case OP_CODE_CMD_RES::ACK_ADD_TICKET:
@@ -163,7 +180,7 @@ void DataConnection::checkNewOncomingData()
             request.m_result = msg->getIntData();
             break;
 
-        case OP_CODE_CMD_RES::ACK_NEW_TICKET_PLACE:
+        case OP_CODE_CMD_RES::ACK_CHANGE_TICKET:
             request.m_result = msg->getIntData();
             break;
 
@@ -209,7 +226,12 @@ void DataConnection::checkNewOncomingData()
 
 void DataConnection::startSendLoginRequest(DataConRequest request)
 {
-    QString     passWord = request.m_lData.at(0);
+    QString passWord = request.m_lData.at(0);
+    QString salt     = request.m_lData.at(1);
+    if (this->m_pGlobalData->getSalt() == "")
+        passWord = this->createHashValue(passWord, salt);
+
+    passWord = this->createHashValue(passWord, this->m_randomLoginValue);
     QByteArray  aPassw;
     QDataStream wPassword(&aPassw, QIODevice::WriteOnly);
     wPassword.setByteOrder(QDataStream::LittleEndian);
@@ -225,9 +247,17 @@ void DataConnection::startSendVersionRequest(DataConRequest request)
     QDataStream wVersion(&version, QIODevice::WriteOnly);
     wVersion.setByteOrder(QDataStream::LittleEndian);
     wVersion << (quint32)STAM_ORGA_VERSION_I;
-    wVersion << quint16(QString(STAM_ORGA_VERSION_S).toUtf8().size());
+    QString sVersion = STAM_ORGA_VERSION_S;
+#ifdef Q_OS_WIN
+    sVersion.append("_Win");
+#else
+#ifdef Q_OS_ANDROID
+    sVersion.append("_Android");
+#endif
+#endif
+    wVersion << quint16(sVersion.toUtf8().size());
 
-    version.append(QString(STAM_ORGA_VERSION_S));
+    version.append(sVersion);
     MessageProtocol msg(request.m_request, version);
     this->sendMessageRequest(&msg, request);
 }
@@ -244,11 +274,13 @@ void DataConnection::startSendUpdPassRequest(DataConRequest request)
     QDataStream wPassReq(&passReq, QIODevice::WriteOnly);
     wPassReq.setByteOrder(QDataStream::LittleEndian);
 
-    QString newPassWord = request.m_lData.at(0);
+    QString newPassWord     = this->createHashValue(request.m_lData.at(0), this->m_pGlobalData->getSalt());
+    QString currentPassWord = this->createHashValue(this->m_pGlobalData->passWord(), this->m_randomLoginValue);
 
-    wPassReq << (qint16)this->m_pGlobalData->passWord().toUtf8().size();
-    passReq.append(this->m_pGlobalData->passWord().toUtf8());
+    wPassReq << (qint16)currentPassWord.toUtf8().size();
+    passReq.append(currentPassWord.toUtf8());
     wPassReq.device()->seek(passReq.length());
+
     wPassReq << (qint16)newPassWord.toUtf8().size();
     passReq.append(newPassWord.toUtf8());
 
@@ -272,8 +304,17 @@ void DataConnection::startSendReadableNameRequest(DataConRequest request)
 void DataConnection::startSendGamesListRequest(DataConRequest request)
 {
     quint32 data;
-    data = qToLittleEndian(this->m_pGlobalData->lastGamesLoadCount()); /* game numbers */
+    data = qToLittleEndian(g_GlobalSettings->lastGamesLoadCount()); /* game numbers */
     MessageProtocol msg(request.m_request, (char*)(&data), sizeof(quint32));
+    this->sendMessageRequest(&msg, request);
+}
+
+void DataConnection::startSendGamesInfoListRequest(DataConRequest request)
+{
+    quint32 data[2];
+    data[0] = 0x00;
+    data[1] = 0x00;
+    MessageProtocol msg(request.m_request, (char*)&data[0], 8);
     this->sendMessageRequest(&msg, request);
 }
 
@@ -298,16 +339,22 @@ void DataConnection::startSendRemoveSeasonTicket(DataConRequest request)
     this->sendMessageRequest(&msg, request);
 }
 
-void DataConnection::startSendNewPlaceTicket(DataConRequest request)
+void DataConnection::startSendEditSeasonTicket(DataConRequest request)
 {
-    QString     place = request.m_lData.at(1);
-    QByteArray  seasonTicket;
-    QDataStream wSeasonTicket(&seasonTicket, QIODevice::WriteOnly);
-    wSeasonTicket.setByteOrder(QDataStream::LittleEndian);
-    wSeasonTicket << request.m_lData.at(0).toUInt();
-    wSeasonTicket << quint16(place.toUtf8().size());
-    seasonTicket.append(place);
-    MessageProtocol msg(request.m_request, seasonTicket);
+    quint32    index    = qToLittleEndian(request.m_lData.at(0).toUInt());
+    QByteArray name     = request.m_lData.at(1).toUtf8();
+    QByteArray place    = request.m_lData.at(2).toUtf8();
+    quint32    discount = qToLittleEndian(request.m_lData.at(3).toUInt());
+    char       data[200];
+    memset(&data[0], 0x0, 200);
+    memcpy(&data[0], &index, sizeof(quint32));
+    memcpy(&data[4], &discount, sizeof(quint32));
+    memcpy(&data[8], name.constData(), name.length());
+    memcpy(&data[9 + name.length()], place.constData(), place.length());
+
+    quint32 size = 8 + name.length() + place.length() + 2;
+
+    MessageProtocol msg(request.m_request, &data[0], size);
     this->sendMessageRequest(&msg, request);
 }
 
@@ -399,7 +446,7 @@ void DataConnection::startSendAcceptMeeting(DataConRequest request)
 
 void DataConnection::slotConnectionTimeoutFired()
 {
-    qDebug() << "DataConnection: Timeout from Data UdpServer";
+    qInfo().noquote() << "DataConnection: Timeout from Data UdpServer";
     while (this->m_lActualRequest.size() > 0) {
         DataConRequest request = this->m_lActualRequest.last();
         request.m_result       = ERROR_CODE_TIMEOUT;
@@ -446,8 +493,6 @@ qint32 DataConnection::sendMessageRequest(MessageProtocol* msg, DataConRequest r
         this->m_lActualRequest.append(request);
     }
 
-    //    qDebug().noquote() << QString("Send request 0x%1").arg(QString::number(msg->getIndex(), 16));
-
     return sendBytes;
 }
 
@@ -484,11 +529,20 @@ QString DataConnection::getActualRequestData(quint32 req, qint32 index)
     return NULL;
 }
 
-void DataConnection::sendActualRequestsAgain()
+void DataConnection::sendActualRequestsAgain(qint32 result)
 {
-    qDebug() << "DataConnection: Trying to send the requests again";
-    for (int i = 0; i < this->m_lActualRequest.size(); i++) {
-        this->startSendNewRequest(this->m_lActualRequest[i]);
+    if (result == ERROR_CODE_SUCCESS) {
+        qInfo().noquote() << "DataConnection: Trying to send the requests again";
+        for (int i = 0; i < this->m_lActualRequest.size(); i++) {
+            this->startSendNewRequest(this->m_lActualRequest[i]);
+        }
+    } else {
+        while (this->m_lActualRequest.size() > 0) {
+            DataConRequest request = this->m_lActualRequest.last();
+            request.m_result       = result;
+            emit this->notifyLastRequestFinished(request);
+            this->m_lActualRequest.removeLast();
+        }
     }
 }
 
@@ -521,6 +575,10 @@ void DataConnection::startSendNewRequest(DataConRequest request)
         this->startSendGamesListRequest(request);
         break;
 
+    case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST:
+        this->startSendGamesInfoListRequest(request);
+        break;
+
     case OP_CODE_CMD_REQ::REQ_ADD_TICKET:
         if (request.m_lData.size() > 1)
             this->startSendAddSeasonTicket(request);
@@ -535,8 +593,8 @@ void DataConnection::startSendNewRequest(DataConRequest request)
         this->startSendSeasonTicketListRequest(request);
         break;
 
-    case OP_CODE_CMD_REQ::REQ_NEW_TICKET_PLACE:
-        this->startSendNewPlaceTicket(request);
+    case OP_CODE_CMD_REQ::REQ_CHANGE_TICKET:
+        this->startSendEditSeasonTicket(request);
         break;
 
     case OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET:
@@ -568,6 +626,19 @@ void DataConnection::startSendNewRequest(DataConRequest request)
     }
 }
 
+QString DataConnection::createHashValue(const QString first, const QString second)
+{
+    this->m_hash->reset();
+    QByteArray tmp = first.toUtf8();
+    this->m_hash->addData(tmp.constData(), tmp.length());
+    tmp = second.toUtf8();
+    this->m_hash->addData(tmp.constData(), tmp.length());
+
+    QString hashPassword(this->m_hash->result());
+
+    return hashPassword;
+}
+
 DataConnection::~DataConnection()
 {
     if (this->m_pDataUdpSocket != NULL)
@@ -575,4 +646,6 @@ DataConnection::~DataConnection()
 
     if (this->m_pDataHandle != NULL)
         delete this->m_pDataHandle;
+
+    delete this->m_hash;
 }

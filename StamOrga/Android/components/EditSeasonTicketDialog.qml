@@ -26,51 +26,69 @@ Dialog {
     property int parentWidth : 540
     property int parentHeight : 960
     property int textMinSize : 3
-    property alias editableText : txtEditableText.text
-    property alias headerText: editableTextDialog.title
+    property alias editableText : txtnewSeasonTicketName.text
+    property alias checkBoxState : chBoxDiscount.checked
+    property alias headerText: editSeasonTicketDlg.title
 
-    signal acceptedTextEdit(var text)
+    signal acceptedSeasonTicketEdit(var text, var discount)
 
-    id: editableTextDialog
+    id: editSeasonTicketDlg
+    modal: true
+    focus: true
     x: Math.round((parentWidth - width) / 2)
     y: Math.round(parentHeight / 6)
     width: Math.round(Math.min(parentWidth, parentHeight) / 3 * 2)
-    modal: true
-    focus: true
 
     standardButtons: Dialog.Ok | Dialog.Cancel
     onAccepted: {
-        labelTextTooShort.visible = false
-        if (txtEditableText.text.trim().length < textMinSize) {
-            labelTextTooShort.visible = true
-            labelTextTooShort.text = "Der Text muss mindestens " + textMinSize + " Zeichen lang sein";
-            editableTextDialog.open()
+        labelTicketNameTooShort.visible = false
+        if (txtnewSeasonTicketName.text.trim().length < 4) {
+            labelTicketNameTooShort.visible = true
+            editSeasonTicketDlg.open()
         } else {
-            acceptedTextEdit(txtEditableText.text.trim());
-            editableTextDialog.close();
-            editableTextDialog.destroy();
+            acceptedSeasonTicketEdit(txtnewSeasonTicketName.text.trim(), chBoxDiscount.checked ? 1 : 0);
+            editSeasonTicketDlg.close();
+            editSeasonTicketDlg.destroy();
         }
+
     }
     onRejected: {
-        editableTextDialog.close()
-        labelTextTooShort.visible = false
-        editableTextDialog.destroy();
+        editSeasonTicketDlg.close()
+        labelTicketNameTooShort.visible = false
     }
 
     contentItem: ColumnLayout {
-        id: editableTextDialogColumn
-        width: editableTextDialog.width
+        id: addSeasonTicketColumn
         spacing: 20
+        width: editSeasonTicketDlg.width
 
-        TextField {
-            id: txtEditableText
-            implicitWidth: editableTextDialogColumn.width / 4 * 3
+        ColumnLayout {
+            id: columnLayoutAddTicketName
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+
+            Label {
+                id: labelAddTicketName
+                text: qsTr("Name")
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            }
+
+            TextField {
+                id: txtnewSeasonTicketName
+                implicitWidth: addSeasonTicketColumn.width / 4 * 3
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            }
+        }
+
+        CheckBox {
+            id: chBoxDiscount
+            text: "ermäßigt"
+            checked: false
         }
 
         Label {
-            id: labelTextTooShort
+            id: labelTicketNameTooShort
             visible: false
+            text: qsTr("Der Name muss mindestens " + textMinSize + " Zeichen lang sein")
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             wrapMode: Text.WordWrap
             Layout.maximumWidth: parent.width

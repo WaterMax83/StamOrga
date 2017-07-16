@@ -29,48 +29,39 @@
 ConnectionHandling::ConnectionHandling(QObject* parent)
     : QObject(parent)
 {
-    //    this->m_pTimerConReset = new QTimer();
-    //    this->m_pTimerConReset->setSingleShot(true);
-    //    this->m_pTimerConReset->setInterval(CON_RESET_TIMEOUT_MSEC - TIMER_DIFF_MSEC);
-    //    connect(this->m_pTimerConReset, &QTimer::timeout, this, &ConnectionHandling::slTimerConResetFired);
-
-    //    this->m_pTimerLoginReset = new QTimer();
-    //    this->m_pTimerLoginReset->setSingleShot(true);
-    //    this->m_pTimerLoginReset->setInterval(CON_LOGIN_TIMEOUT_MSEC - TIMER_DIFF_MSEC);
-    //    connect(this->m_pTimerLoginReset, &QTimer::timeout, this, &ConnectionHandling::slTimerConLoginFired);
     this->m_pMainCon             = NULL;
     this->m_lastSuccessTimeStamp = 0;
 }
 
 QString mainConRequestPassWord;
+QString mainConRequestSalt;
+QString mainConRequestRandom;
 
 qint32 ConnectionHandling::startMainConnection(QString name, QString passw)
 {
-    bool bChangedUserName = false;
-    bool bChangedPassword = false;
-
-    if (name != this->m_pGlobalData->userName())
-        bChangedUserName = true;
+    if (name != this->m_pGlobalData->userName()) {
+        this->m_lastSuccessTimeStamp = 0;
+        emit this->sSendNewBindingPortRequest();
+        QThread::msleep(10);
+    }
 
     if (passw != this->m_pGlobalData->passWord())
-        bChangedPassword = true;
+        this->stopDataConnection();
 
     qint64 now = QDateTime::currentMSecsSinceEpoch();
     if (this->isMainConnectionActive()
         && (now - this->m_lastSuccessTimeStamp) < (CON_RESET_TIMEOUT_MSEC - TIMER_DIFF_MSEC)) {
 
-        if (!bChangedUserName) {
-            if (this->m_pGlobalData->bIsConnected() && !bChangedPassword
-                && (now - this->m_lastSuccessTimeStamp) < (CON_LOGIN_TIMEOUT_MSEC - TIMER_DIFF_MSEC)) {
-                emit this->sNotifyConnectionFinished(ERROR_CODE_SUCCESS);
-                qDebug() << "Did not log in again, should already be succesfull";
-                return ERROR_CODE_NO_ERROR;
-            }
-            this->startDataConnection();
-            QThread::msleep(10);
-            this->sendLoginRequest(passw);
-            return ERROR_CODE_SUCCESS;
+        if (this->m_pGlobalData->bIsConnected()
+            && (now - this->m_lastSuccessTimeStamp) < (CON_LOGIN_TIMEOUT_MSEC - TIMER_DIFF_MSEC)) {
+            emit this->sNotifyConnectionFinished(ERROR_CODE_SUCCESS);
+            qInfo().noquote() << "Did not log in again, should already be succesfull";
+            return ERROR_CODE_NO_ERROR;
         }
+        this->startDataConnection();
+        QThread::msleep(10);
+        this->sendLoginRequest(passw);
+        return ERROR_CODE_SUCCESS;
     }
 
     this->stopDataConnection();
@@ -80,6 +71,7 @@ qint32 ConnectionHandling::startMainConnection(QString name, QString passw)
         this->m_pMainCon = new MainConnection(this->m_pGlobalData);
         connect(this->m_pMainCon, &MainConnection::connectionRequestFinished, this, &ConnectionHandling::slMainConReqFin);
         connect(this, &ConnectionHandling::sStartSendMainConRequest, this->m_pMainCon, &MainConnection::slotSendNewMainConRequest);
+        connect(this, &ConnectionHandling::sSendNewBindingPortRequest, this->m_pMainCon, &MainConnection::slotNewBindingPortRequest);
         this->m_ctrlMainCon.Start(this->m_pMainCon, false);
         QThread::msleep(20);
     }
@@ -127,6 +119,13 @@ qint32 ConnectionHandling::startListGettingGames()
     return ERROR_CODE_SUCCESS;
 }
 
+qint32 ConnectionHandling::startListGettingGamesInfo()
+{
+    DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST);
+    this->sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
+}
+
 qint32 ConnectionHandling::startRemoveSeasonTicket(quint32 index)
 {
     DataConRequest req(OP_CODE_CMD_REQ::REQ_REMOVE_TICKET);
@@ -135,11 +134,13 @@ qint32 ConnectionHandling::startRemoveSeasonTicket(quint32 index)
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 ConnectionHandling::startNewPlaceSeasonTicket(quint32 index, QString place)
+qint32 ConnectionHandling::startEditSeasonTicket(quint32 index, QString name, QString place, quint32 discount)
 {
-    DataConRequest req(OP_CODE_CMD_REQ::REQ_NEW_TICKET_PLACE);
+    DataConRequest req(OP_CODE_CMD_REQ::REQ_CHANGE_TICKET);
     req.m_lData.append(QString::number(index));
+    req.m_lData.append(name);
     req.m_lData.append(place);
+    req.m_lData.append(QString::number(discount));
     this->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
@@ -250,13 +251,15 @@ qint32 ConnectionHandling::startAcceptMeetingInfo(const quint32 gameIndex, const
 /*
  * Answer function after connection with username
  */
-void ConnectionHandling::slMainConReqFin(qint32 result, const QString& msg)
+void ConnectionHandling::slMainConReqFin(qint32 result, const QString msg, const QString salt, const QString random)
 {
     if (result > ERROR_CODE_NO_ERROR) {
         qInfo().noquote() << QString("Trying login request with port %1").arg(result);
         this->m_pGlobalData->setConDataPort((quint16)result);
         this->startDataConnection();
         QThread::msleep(20);
+        mainConRequestSalt   = salt;
+        mainConRequestRandom = random;
         this->sendLoginRequest(mainConRequestPassWord);
         this->m_lastSuccessTimeStamp = QDateTime::currentMSecsSinceEpoch();
     } else {
@@ -285,6 +288,7 @@ void ConnectionHandling::sendLoginRequest(QString password)
     DataConRequest req;
     req.m_request = OP_CODE_CMD_REQ::REQ_LOGIN_USER;
     req.m_lData.append(password);
+    req.m_lData.append(mainConRequestSalt);
 
     emit this->sStartSendNewRequest(req);
 }
@@ -373,7 +377,6 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
         if (request.m_result == ERROR_CODE_MISSING_TICKET) {
             if (retryGetTicketCount < 5) {
                 this->startListSeasonTickets();
-                qDebug() << "Start again";
                 retryGetTicketCount++;
                 return;
             }
@@ -411,8 +414,10 @@ void ConnectionHandling::checkTimeoutResult(qint32 result)
 
 void ConnectionHandling::startDataConnection()
 {
-    if (this->isDataConnectionActive())
+    if (this->isDataConnectionActive()) {
+        this->m_pDataCon->setRandomLoginValue(mainConRequestRandom);
         return;
+    }
 
     this->m_pDataCon = new DataConnection(this->m_pGlobalData);
 

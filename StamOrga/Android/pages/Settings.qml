@@ -25,32 +25,6 @@ import com.watermax.demo 1.0
 Item {
    id: itemSettings
 
-   Component.onDestruction: {
-       var saveSettings = false;
-       if (globalUserData.lastGamesLoadCount !== spBoxLoadPastGames.value) {
-           globalUserData.lastGamesLoadCount = spBoxLoadPastGames.value;
-            saveSettings = true;
-       }
-
-       if (globalUserData.useReadableName !== useReadableName.checked) {
-            globalUserData.useReadableName = useReadableName.checked;
-            saveSettings = true;
-       }
-
-       if (globalUserData.debugIP !== txtOtherIPAddr.text) {
-            globalUserData.debugIP = txtOtherIPAddr.text;
-            saveSettings = true;
-       }
-
-       if (globalUserData.debugIPWifi !== txtOtherIPAddrWifi.text) {
-            globalUserData.debugIPWifi = txtOtherIPAddrWifi.text;
-            saveSettings = true;
-       }
-
-       if (saveSettings)
-           globalUserData.saveGlobalSettings();
-   }
-
    Pane {
        id: mainPaneSettings
        width: parent.width
@@ -76,8 +50,9 @@ Item {
                    id: spBoxLoadPastGames
                    to: 50
                    from: 0
-                   value: globalUserData.lastGamesLoadCount
+                   value: globalSettings.lastGamesLoadCount
                    Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+                   onValueChanged: valueWasEditedEnableSave()
                }
            }
 
@@ -95,7 +70,27 @@ Item {
                }
                CheckBox {
                     id: useReadableName
-                    checked: globalUserData.useReadableName
+                    checked: globalSettings.useReadableName
+                    onCheckedChanged: valueWasEditedEnableSave()
+               }
+           }
+
+           RowLayout {
+               Layout.preferredWidth: parent.width
+               Layout.fillWidth: true
+
+               Label {
+                   id: text3
+                   text: qsTr("Lade Spiel Infos beim Start:")
+                   Layout.fillWidth: true
+                   Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                   font.pixelSize: 14
+                   color: "white"
+               }
+               CheckBox {
+                    id: loadGameInfo
+                    checked: globalSettings.loadGameInfo
+                    onCheckedChanged: valueWasEditedEnableSave()
                }
            }
 
@@ -114,10 +109,11 @@ Item {
 
                TextField {
                    id: txtOtherIPAddr
-                   text: globalUserData.debugIP
+                   text: globalSettings.debugIP
                    implicitWidth: parent.width
                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                    Layout.fillWidth: true
+                   onTextChanged: valueWasEditedEnableSave()
                }
            }
 
@@ -134,16 +130,87 @@ Item {
 
                TextField {
                    id: txtOtherIPAddrWifi
-                   text: globalUserData.debugIPWifi
+                   text: globalSettings.debugIPWifi
                    implicitWidth: parent.width
                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                    Layout.fillWidth: true
+                    onTextChanged: valueWasEditedEnableSave()
+               }
+           }
 
+           Text {
+               id: labelAcceptText
+               textFormat: Text.RichText
+               wrapMode: Text.WordWrap
+               Layout.maximumWidth: parent.width
+               Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+               font.pixelSize: 14
+               color: "white"
+               text: "Aktuelle Version: <a href=\"tmp\">" + globalSettings.getCurrentVersion() + "</a>"
+               onLinkActivated: {
+                   var component = Qt.createComponent("../pages/newVersionInfo.qml");
+                   if (component.status === Component.Ready) {
+                       stackView.push(component);
+                   }
                }
            }
        }
    }
 
-   function pageOpenedUpdateView() {
+   function toolButtonClicked() {
+              var saveSettings = false;
+              if (globalSettings.lastGamesLoadCount !== spBoxLoadPastGames.value) {
+                  globalSettings.lastGamesLoadCount = spBoxLoadPastGames.value;
+                   saveSettings = true;
+              }
+
+              if (globalSettings.useReadableName !== useReadableName.checked) {
+                   globalSettings.useReadableName = useReadableName.checked;
+                   saveSettings = true;
+              }
+
+              if (globalSettings.loadGameInfo !== loadGameInfo.checked) {
+                   globalSettings.loadGameInfo = loadGameInfo.checked;
+                   saveSettings = true;
+              }
+
+              if (globalSettings.debugIP !== txtOtherIPAddr.text) {
+                   globalSettings.debugIP = txtOtherIPAddr.text;
+                   saveSettings = true;
+              }
+
+              if (globalSettings.debugIPWifi !== txtOtherIPAddrWifi.text) {
+                   globalSettings.debugIPWifi = txtOtherIPAddrWifi.text;
+                   saveSettings = true;
+              }
+
+              if (saveSettings)
+                  globalSettings.saveGlobalSettings();
+
+              updateHeaderFromMain("", "");
+
+              toastManager.show("Daten erfolgreich gespeichert", 3000)
    }
+
+   property bool isSavePossible : false;
+   property bool isStartupDone : false
+   function valueWasEditedEnableSave() {
+
+       if (!isStartupDone)
+           return;
+
+       if (isSavePossible)
+           return;
+
+       console.log("Hallo Welt");
+
+       isSavePossible = true;
+       updateHeaderFromMain("", "images/save.png");
+   }
+
+   function pageOpenedUpdateView() {
+       isStartupDone = true;
+   }
+
+   function notifyUserIntConnectionFinished(result) {}
 }

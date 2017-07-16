@@ -17,6 +17,7 @@
 */
 
 #include <QtCore/QStandardPaths>
+#include <QtCore/QUuid>
 
 #include "globalfunctions.h"
 
@@ -121,7 +122,7 @@ CompetitionIndex getCompetitionIndex(QString comp)
     if (comp == "DFB Pokal")
         return DFB_POKAL;
     if (comp == "Badischer Pokal")
-        return KROMBACHER_POKAL;
+        return BADISCHER_POKAL;
     if (comp == "TestSpiel")
         return TESTSPIEL;
 
@@ -139,11 +140,22 @@ QString getCompetitionString(CompetitionIndex index)
         return "3.Liga";
     case DFB_POKAL:
         return "DFB Pokal";
-    case KROMBACHER_POKAL:
+    case BADISCHER_POKAL:
         return "Badischer Pokal";
     case TESTSPIEL:
         return "TestSpiel";
     default:
         return "not implemented";
     }
+}
+
+QString createRandomString(qint32 size)
+{
+    QString rValue = QUuid::createUuid().toString();
+    qint32  rand   = qrand() % (rValue.size() - size);
+    rValue.remove(0, rand);
+    if (rValue.length() > size)
+        rValue = rValue.left(size);
+
+    return rValue;
 }

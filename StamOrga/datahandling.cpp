@@ -101,9 +101,10 @@ qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol* msg)
     while ((seasonTicket = this->m_pGlobalData->getSeasonTicketFromArrayIndex(i++)) != NULL)
         seasonTicket->checkTicketOwn(index);
 
-    if (rValue == ERROR_CODE_SUCCESS)
+    if (rValue == ERROR_CODE_SUCCESS) {
         this->m_pGlobalData->SetUserProperties(properties);
-    else
+        qInfo().noquote() << QString("Setting user properties to 0x%1").arg(QString::number(properties, 16));
+    } else
         this->m_pGlobalData->SetUserProperties(0x0);
 
     QString readableName(QByteArray(pData + offset));
@@ -162,11 +163,11 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol* msg)
         play->setIndex(qFromLittleEndian(*(quint32*)(pData + offset)));
         offset += 4;
 
-        play->setFreeTickets(qFromLittleEndian(*(quint16*)(pData + offset)));
+        //        play->setFreeTickets(qFromLittleEndian(*(quint16*)(pData + offset)));
         offset += 2;
-        play->setBlockedTickets(qFromLittleEndian(*(quint16*)(pData + offset)));
+        //        play->setBlockedTickets(qFromLittleEndian(*(quint16*)(pData + offset)));
         offset += 2;
-        play->setReservedTickets(qFromLittleEndian(*(quint16*)(pData + offset)));
+        //        play->setReservedTickets(qFromLittleEndian(*(quint16*)(pData + offset)));
         offset += 2;
 
         QString playString(QByteArray(pData + offset, size - GAMES_OFFSET));
@@ -186,6 +187,100 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol* msg)
     }
 
     this->m_pGlobalData->saveActualGamesList();
+
+    return rValue;
+}
+
+qint32 DataHandling::getHandleGamesInfoListResponse(MessageProtocol* msg)
+{
+    if (msg->getDataLength() < 8)
+        return ERROR_CODE_WRONG_SIZE;
+
+    const char* pData = msg->getPointerToData();
+    qint32      rValue;
+    memcpy(&rValue, pData, sizeof(qint32));
+    rValue = qFromLittleEndian(rValue);
+
+    if (rValue != ERROR_CODE_SUCCESS)
+        return rValue;
+    /* Status is not yet used */
+    quint32 offset = 8;
+    quint16 gameSize, readInfo;
+    memcpy(&gameSize, pData + offset, sizeof(quint16));
+    memcpy(&readInfo, pData + offset + 2, sizeof(quint16));
+    offset += 2 * sizeof(quint16);
+    gameSize = qFromLittleEndian(gameSize);
+    readInfo = qFromLittleEndian(readInfo);
+
+    if ((readInfo & 0x1) == 0x0) {
+        quint32 numbOfGames = this->m_pGlobalData->getGamePlayLength();
+        for (quint32 i = 0; i < numbOfGames; i++) {
+            GamePlay* play = this->m_pGlobalData->getGamePlayFromArrayIndex(i);
+            if (play == NULL)
+                continue;
+            play->setFreeTickets(0);
+            play->setBlockedTickets(0);
+            play->setReservedTickets(0);
+            play->setAcceptedMeetingCount(0);
+            play->setInterestedMeetingCount(0);
+            play->setDeclinedMeetingCount(0);
+        }
+    }
+
+    quint32 totalSize = msg->getDataLength();
+    quint32 gameIndex;
+    quint16 freeTicks, reservTicks, blockTicks;
+    quint16 acceptMeet, interestMeet, declineMeet, meetInfo;
+    while (offset + gameSize <= totalSize) {
+
+        memcpy(&gameIndex, pData + offset, sizeof(quint32));
+        gameIndex = qFromLittleEndian(gameIndex);
+
+        GamePlay* play = this->m_pGlobalData->getGamePlay(gameIndex);
+        if (play == NULL) {
+            offset += gameSize;
+            continue;
+        }
+        offset += sizeof(quint32);
+
+        memcpy(&freeTicks, pData + offset, sizeof(quint16));
+        freeTicks = qFromLittleEndian(freeTicks);
+        offset += sizeof(quint16);
+
+        memcpy(&blockTicks, pData + offset, sizeof(quint16));
+        blockTicks = qFromLittleEndian(blockTicks);
+        offset += sizeof(quint16);
+
+        memcpy(&reservTicks, pData + offset, sizeof(quint16));
+        reservTicks = qFromLittleEndian(reservTicks);
+        offset += sizeof(quint16);
+
+        play->setFreeTickets(freeTicks);
+        play->setBlockedTickets(blockTicks);
+        play->setReservedTickets(reservTicks);
+
+        memcpy(&acceptMeet, pData + offset, sizeof(quint16));
+        acceptMeet = qFromLittleEndian(acceptMeet);
+        offset += sizeof(quint16);
+
+        memcpy(&interestMeet, pData + offset, sizeof(quint16));
+        interestMeet = qFromLittleEndian(interestMeet);
+        offset += sizeof(quint16);
+
+        memcpy(&declineMeet, pData + offset, sizeof(quint16));
+        declineMeet = qFromLittleEndian(declineMeet);
+        offset += sizeof(quint16);
+
+        play->setAcceptedMeetingCount(acceptMeet);
+        play->setInterestedMeetingCount(interestMeet);
+        play->setDeclinedMeetingCount(declineMeet);
+
+        memcpy(&meetInfo, pData + offset, sizeof(quint16));
+        meetInfo = qFromLittleEndian(meetInfo);
+        offset += sizeof(quint16);
+
+        play->setMeetingInfo(meetInfo);
+    }
 
     return rValue;
 }
@@ -382,7 +477,8 @@ qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg)
     quint32 size = msg->getDataLength();
     quint32 index, value, userID;
     pInfo->clearAcceptInfoList();
-    quint32 counter = 0;
+    quint32 counter       = 0;
+    quint32 acceptMeeting = 0, interestMeeting = 0, declineMeeting = 0;
     while (offset + 9 < size) {
         AcceptMeetingInfo* ami = new AcceptMeetingInfo();
         memcpy(&index, pData + offset, sizeof(quint32));
@@ -401,6 +497,21 @@ qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg)
         QQmlEngine::setObjectOwnership(ami, QQmlEngine::CppOwnership);
         pInfo->addNewAcceptInfo(ami);
         counter++;
+
+        if (value == ACCEPT_STATE_ACCEPT)
+            acceptMeeting++;
+        else if (value == ACCEPT_STATE_MAYBE)
+            interestMeeting++;
+        else if (value == ACCEPT_STATE_DECLINE)
+            declineMeeting++;
+    }
+
+    GamePlay* game = this->m_pGlobalData->getGamePlay(gameIndex);
+    if (game != NULL) {
+        game->setAcceptedMeetingCount(acceptMeeting);
+        game->setInterestedMeetingCount(interestMeeting);
+        game->setDeclinedMeetingCount(declineMeeting);
+        game->setMeetingInfo(1);
     }
 
     return result;

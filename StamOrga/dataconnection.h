@@ -19,6 +19,7 @@
 #ifndef DATACONNECTION_H
 #define DATACONNECTION_H
 
+#include <QtCore/QCryptographicHash>
 #include <QtCore/QList>
 #include <QtCore/QTimer>
 #include <QtNetwork/QUdpSocket>
@@ -52,6 +53,8 @@ public:
 
     QString m_workerName = "DataConnection";
 
+    void setRandomLoginValue(QString val) { this->m_randomLoginValue = val; }
+
 
 signals:
     void notifyLastRequestFinished(DataConRequest request);
@@ -68,6 +71,7 @@ private:
     GlobalData*   m_pGlobalData;
     MessageBuffer m_messageBuffer;
     DataHandling* m_pDataHandle;
+    QString       m_randomLoginValue;
 
     QTimer*      m_pConTimeout;
     QUdpSocket*  m_pDataUdpSocket = NULL;
@@ -79,10 +83,11 @@ private:
     void startSendUpdPassRequest(DataConRequest request);
     void startSendReadableNameRequest(DataConRequest request);
     void startSendGamesListRequest(DataConRequest request);
+    void startSendGamesInfoListRequest(DataConRequest request);
     void startSendAddSeasonTicket(DataConRequest request);
     void startSendRemoveSeasonTicket(DataConRequest request);
     void startSendSeasonTicketListRequest(DataConRequest request);
-    void startSendNewPlaceTicket(DataConRequest request);
+    void startSendEditSeasonTicket(DataConRequest request);
     void startSendChangeTicketState(DataConRequest request);
     void startSendAvailableTicketListRequest(DataConRequest request);
     void startSendChangeGameRequest(DataConRequest request);
@@ -96,11 +101,13 @@ private:
     void removeActualRequest(quint32 req);
     DataConRequest getActualRequest(quint32 req);
     QString getActualRequestData(quint32 req, qint32 index);
+    QString createHashValue(const QString first, const QString second);
 
     bool m_bRequestLoginAgain;
-    void sendActualRequestsAgain();
+    void sendActualRequestsAgain(qint32 result);
 
     QList<DataConRequest> m_lActualRequest;
+    QCryptographicHash*   m_hash;
 };
 
 #endif // DATACONNECTION_H

@@ -104,11 +104,28 @@ Flickable {
     }
 
     function toolButtonClicked() {
-        if (globalUserData.useReadableName)
-            txtnewSeasonTicketName.text = globalUserData.readableName
-        else
-            txtnewSeasonTicketName.text = ""
-        addSeasonTicketDlg.open()
+        var component = Qt.createComponent("../components/EditSeasonTicketDialog.qml");
+        if (component.status === Component.Ready) {
+            var dialog = component.createObject(flickableTickets,{popupType: 1});
+            dialog.headerText = "Neue Dauerkarte";
+            dialog.parentHeight = flickableTickets.height
+            dialog.parentWidth =  flickableTickets.width
+            dialog.textMinSize = 4;
+            if (globalSettings.useReadableName)
+                dialog.editableText = globalUserData.readableName;
+            else
+                dialog.editableText = "";
+            dialog.checkBoxState = false
+            dialog.acceptedSeasonTicketEdit.connect(acceptedAddSeasonTicketDialog);
+            dialog.open();
+        } else
+            console.log(component.errorString());
+    }
+
+    function acceptedAddSeasonTicketDialog(text, discount) {
+        userIntTicket.startAddSeasonTicket(text, discount);
+        busyConnectIndicatorTicket.visible = true;
+        txtInfoSeasonTicket.text = "Füge Dauerkarte hinzu"
     }
 
     function updateSeasonTicketList(){
@@ -147,11 +164,11 @@ Flickable {
         showSeasonTickets();
     }
 
-    function notifyUserIntSeasonTicketNewPlaceFinished(result) {
+    function notifyUserIntSeasonTicketEditFinished(result) {
         busyConnectIndicatorTicket.visible = false;
         if (result === 1) {
             updateSeasonTicketList()
-            toastManager.show("Ort erfolgreich geändert", 2000);
+            toastManager.show("Erfolgreich geändert", 2000);
         }  else {
             txtInfoSeasonTicket.text = userIntTicket.getErrorCodeToString(result);
         }
@@ -178,7 +195,7 @@ Flickable {
             }
             txtInfoSeasonTicket.text = "Letztes Update am " + globalUserData.getSeasonTicketLastUpdateString()
         } else
-            txtInfoSeasonTicket.text = "Keine Daten zum Anzeigen\nZiehen zum Aktualisieren"
+            txtInfoSeasonTicket.text = "Keine Daten gespeichert\nZiehen zum Aktualisieren"
 
     }
 
@@ -186,7 +203,7 @@ Flickable {
         id: seasonTicketItem
         MyComponents.SeasonTicket {
             onClickedSeasonTicket: {
-                seasonTicketClickedMenu.openWithNameAndIndex(sender.name, sender.index)
+                seasonTicketClickedMenu.openWithNameAndIndex(sender.name, sender.discount, sender.index)
             }
         }
     }
@@ -197,6 +214,7 @@ Flickable {
 
     property var m_ticketNameToChangeIndex
     property var m_ticketNameToChange
+    property var m_ticketDiscountToChange
 
     Menu {
             id: seasonTicketClickedMenu
@@ -206,12 +224,33 @@ Flickable {
 //            implicitHeight: mainPaneTickets.height
 
             background: Rectangle {
-                    implicitWidth: menuItemChange.width
+                    implicitWidth: menuItemChangePlace.width
                     color: "#4f4f4f"
                 }
 
             MenuItem {
-                id: menuItemChange
+                id: menuItemEdit
+                onClicked: {
+                    var component = Qt.createComponent("../components/EditSeasonTicketDialog.qml");
+                    if (component.status === Component.Ready) {
+                        var dialog = component.createObject(flickableTickets,{popupType: 1});
+                        dialog.headerText = "Editiere Dauerkarte";
+                        dialog.parentHeight = flickableTickets.height
+                        dialog.parentWidth =  flickableTickets.width
+                        dialog.textMinSize = 4;
+                        dialog.editableText = m_ticketNameToChange;
+                        if (m_ticketDiscountToChange === 0)
+                            dialog.checkBoxState = false
+                        else
+                            dialog.checkBoxState = true
+                        dialog.acceptedSeasonTicketEdit.connect(acceptedEditSeasonTicketDialog);
+                        dialog.open();
+                    } else
+                        console.log(component.errorString());
+                }
+            }
+            MenuItem {
+                id: menuItemChangePlace
                 onClicked: {
                     var component = Qt.createComponent("../components/EditableTextDialog.qml");
                     if (component.status === Component.Ready) {
@@ -241,11 +280,13 @@ Flickable {
                 }
             }
 
-            function openWithNameAndIndex(name, index)
+            function openWithNameAndIndex(name, discount, index)
             {
                 m_ticketNameToChangeIndex = index
                 m_ticketNameToChange = name
-                menuItemChange.text = "Neuer Ort für " + name
+                m_ticketDiscountToChange = discount
+                menuItemEdit.text = "Editiere " + name
+                menuItemChangePlace.text = "Neuer Ort für " + name
                 menuItemRemove.text = "Lösche " + name
                 seasonTicketClickedMenu.open()
             }
@@ -255,7 +296,7 @@ Flickable {
         busyConnectIndicatorTicket.visible = true;
         txtInfoSeasonTicket.visible = true;
         txtInfoSeasonTicket.text = "Ändere Ort für " + m_ticketNameToChange;
-        userIntTicket.startNewPlaceSeasonTicket(m_ticketNameToChangeIndex, text);
+        userIntTicket.startEditSeasonTicket(m_ticketNameToChangeIndex, "", text, m_ticketDiscountToChange);
     }
 
     function acceptedDeletingTicket() {
@@ -266,72 +307,10 @@ Flickable {
         console.log("Lösche Dauerkarte")
     }
 
-
-    Dialog {
-        id: addSeasonTicketDlg
-        modal: true
-        focus: true
-        title: "Neue Dauerkarte"
-        x: (flickableTickets.width - width) / 2
-        y: flickableTickets.height / 6
-        width: Math.min(flickableTickets.width, flickableTickets.height) / 3 * 2
-
-        standardButtons: Dialog.Ok | Dialog.Cancel
-        onAccepted: {
-            labelTicketNameTooShort.visible = false
-            if (txtnewSeasonTicketName.text.length < 6) {
-                labelTicketNameTooShort.visible = true
-                addSeasonTicketDlg.open()
-            } else {
-                userIntTicket.startAddSeasonTicket(txtnewSeasonTicketName.text, chBoxDiscount.checked ? 1 : 0);
-                busyConnectIndicatorTicket.visible = true;
-                txtInfoSeasonTicket.text = "Füge Dauerkarte hinzu"
-                addSeasonTicketDlg.close();
-            }
-
-        }
-        onRejected: {
-            addSeasonTicketDlg.close()
-            labelTicketNameTooShort.visible = false
-        }
-
-        contentItem: ColumnLayout {
-            id: addSeasonTicketColumn
-            spacing: 20
-            width: addSeasonTicketDlg.width
-
-            ColumnLayout {
-                id: columnLayoutAddTicketName
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-
-                Label {
-                    id: labelAddTicketName
-                    text: qsTr("Name")
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                }
-
-                TextField {
-                    id: txtnewSeasonTicketName
-                    implicitWidth: addSeasonTicketColumn.width / 4 * 3
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                }
-            }
-
-            CheckBox {
-                id: chBoxDiscount
-                text: "ermäßigt"
-                checked: false
-            }
-
-            Label {
-                id: labelTicketNameTooShort
-                visible: false
-                text: qsTr("Der Name muss mindestens 6 Zeichen lang sein")
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                wrapMode: Text.WordWrap
-                Layout.maximumWidth: parent.width
-                color: "orange"
-            }
-        }
+    function acceptedEditSeasonTicketDialog(text, discount) {
+        busyConnectIndicatorTicket.visible = true;
+        txtInfoSeasonTicket.visible = true;
+        txtInfoSeasonTicket.text = "Editiere " + m_ticketNameToChange;
+        userIntTicket.startEditSeasonTicket(m_ticketNameToChangeIndex, text, "", discount);
     }
 }

@@ -38,8 +38,7 @@ Flickable {
 
     onDragEnded: {
         if (flickableGames.contentY < -100) {
-            busyLoadingIndicatorGames.visible = true
-            txtInfoLoadingGames.text = "Lade Spielliste"
+            showLoadingGameInfos()
             userIntGames.startListGettingGames()
             for (var j = columnLayoutGames.children.length; j > 0; j--) {
                 columnLayoutGames.children[j - 1].destroy()
@@ -128,9 +127,9 @@ Flickable {
 
     function acceptedChangeGameDialog() {
         var result = userIntGames.startChangeGame(changeGameDialog.index, changeGameDialog.seasonIndex,
-                                                  changeGameDialog.competition, changeGameDialog.homeTeam,
-                                                  changeGameDialog.awayTeam, changeGameDialog.date,
-                                                  changeGameDialog.score);
+                                                  changeGameDialog.competition, changeGameDialog.homeTeam.trim(),
+                                                  changeGameDialog.awayTeam.trim(), changeGameDialog.date.trim(),
+                                                  changeGameDialog.score.trim());
         if (result !== 1) {
             toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
             busyLoadingIndicatorGames.visible = true
@@ -151,7 +150,15 @@ Flickable {
         showListedGames()
     }
 
-    function notifyUserIntGamesListFinished(result) {
+    function notifyUserIntGamesListFinished(result) {        
+        if (result !== 1) {
+            toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
+            busyLoadingIndicatorGames.visible = false
+            showListedGames()
+        }
+    }
+
+    function notifyUserIntGamesInfoListFinished(result) {
         busyLoadingIndicatorGames.visible = false
         if (result === 1)
             toastManager.show("Spiele geladen", 2000)
@@ -174,13 +181,12 @@ Flickable {
             }
             txtInfoLoadingGames.text = "Letztes Update am " + globalUserData.getGamePlayLastUpdate()
         } else
-            txtInfoLoadingGames.text = "Keine Daten zum Anzeigen\nZiehen zum Aktualisieren"
+            txtInfoLoadingGames.text = "Keine Daten gespeichert\nZiehen zum Aktualisieren"
     }
 
     function notifyGameChangedFinished(result) {
         if (result === 1) {
-            busyLoadingIndicatorGames.visible = true
-            txtInfoLoadingGames.text = "Lade Spielliste"
+            showLoadingGameInfos()
             userIntGames.startListGettingGames()
             for (var j = columnLayoutGames.children.length; j > 0; j--) {
                 columnLayoutGames.children[j - 1].destroy()
@@ -191,6 +197,12 @@ Flickable {
     }
 
     function notifyUserIntConnectionFinished(result) {}
+
+    function showLoadingGameInfos()
+    {
+        busyLoadingIndicatorGames.visible = true
+        txtInfoLoadingGames.text = "Lade Spielinfos"
+    }
 
     Component {
         id: gameView

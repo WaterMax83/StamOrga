@@ -136,6 +136,30 @@ public:
         this->m_reservedTickets = number;
     }
 
+    Q_INVOKABLE quint16 getAcceptedMeetingCount() { return this->m_acceptedMeeting; }
+    void setAcceptedMeetingCount(quint16 number)
+    {
+        this->m_acceptedMeeting = number;
+    }
+
+    Q_INVOKABLE quint16 getInterestedMeetingCount() { return this->m_interestedMeeting; }
+    void setInterestedMeetingCount(quint16 number)
+    {
+        this->m_interestedMeeting = number;
+    }
+
+    Q_INVOKABLE quint16 getDeclinedMeetingCount() { return this->m_declinedMeeting; }
+    void setDeclinedMeetingCount(quint16 number)
+    {
+        this->m_declinedMeeting = number;
+    }
+
+    Q_INVOKABLE quint16 getMeetingInfo() { return this->m_meetingInfo; }
+    void setMeetingInfo(quint16 number)
+    {
+        this->m_meetingInfo = number;
+    }
+
     Q_INVOKABLE bool isGameInPast();
     Q_INVOKABLE bool isGameRunning();
 
@@ -167,6 +191,10 @@ private:
     quint16          m_freeTickets;
     quint16          m_blockedTickets;
     quint16          m_reservedTickets;
+    quint16          m_acceptedMeeting;
+    quint16          m_interestedMeeting;
+    quint16          m_declinedMeeting;
+    quint16          m_meetingInfo;
     bool             m_bIsUserGameAddingEnabled;
 };
 

@@ -39,6 +39,24 @@ UserInterface::UserInterface(QObject* parent)
 
 qint32 UserInterface::startMainConnection(QString name, QString passw)
 {
+    bool saveSettings = false;
+    if (name != this->m_pConHandle->getGlobalData()->userName()) {
+        saveSettings = true;
+        this->m_pConHandle->getGlobalData()->setUserName("");
+        this->m_pConHandle->getGlobalData()->setPassWord("");
+        this->m_pConHandle->getGlobalData()->setSalt("");
+    }
+    if (passw == "dEf1AuLt") {
+        passw = this->m_pConHandle->getGlobalData()->passWord();
+    } else {
+        this->m_pConHandle->getGlobalData()->setPassWord("");
+        this->m_pConHandle->getGlobalData()->setSalt("");
+        saveSettings = true;
+    }
+
+    if (saveSettings)
+        this->m_pConHandle->getGlobalData()->saveGlobalUserSettings();
+
     return this->m_pConHandle->startMainConnection(name, passw);
 }
 
@@ -57,6 +75,11 @@ qint32 UserInterface::startListGettingGames()
     return this->m_pConHandle->startListGettingGames();
 }
 
+qint32 UserInterface::startListGettingGamesInfo()
+{
+    return this->m_pConHandle->startListGettingGamesInfo();
+}
+
 qint32 UserInterface::startAddSeasonTicket(QString name, quint32 discount)
 {
     return this->m_pConHandle->startAddSeasonTicket(name, discount);
@@ -67,9 +90,9 @@ qint32 UserInterface::startRemoveSeasonTicket(quint32 index)
     return this->m_pConHandle->startRemoveSeasonTicket(index);
 }
 
-qint32 UserInterface::startNewPlaceSeasonTicket(quint32 index, QString place)
+qint32 UserInterface::startEditSeasonTicket(quint32 index, QString name, QString place, quint32 discount)
 {
-    return this->m_pConHandle->startNewPlaceSeasonTicket(index, place);
+    return this->m_pConHandle->startEditSeasonTicket(index, name, place, discount);
 }
 
 qint32 UserInterface::startListSeasonTickets()
@@ -138,6 +161,12 @@ void UserInterface::slCommandFinished(quint32 command, qint32 result)
 
     case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
         emit this->notifyGamesListFinished(result);
+        if (result == ERROR_CODE_SUCCESS)
+            this->m_pConHandle->startListGettingGamesInfo();
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST:
+        emit this->notifyGamesInfoListFinished(result);
         break;
 
     case OP_CODE_CMD_REQ::REQ_ADD_TICKET:
@@ -152,8 +181,8 @@ void UserInterface::slCommandFinished(quint32 command, qint32 result)
         emit this->notifySeasonTicketListFinished(result);
         break;
 
-    case OP_CODE_CMD_REQ::REQ_NEW_TICKET_PLACE:
-        emit this->notifySeasonTicketNewPlaceFinished(result);
+    case OP_CODE_CMD_REQ::REQ_CHANGE_TICKET:
+        emit this->notifySeasonTicketEditFinished(result);
         break;
 
     case OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET:

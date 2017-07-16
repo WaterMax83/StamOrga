@@ -34,9 +34,12 @@ struct msg_Header {
 
 #define MSG_HEADER_SIZE sizeof(msg_Header)
 
-#define MSG_HEADER_VERSION_START 0x1
+// clang-format off
+#define MSG_HEADER_VERSION_START        0x1
+#define MSG_HEADER_VERSION_PASSWORD     0x2
+// clang-format on
 
-#define MSG_HEADER_VERSION MSG_HEADER_VERSION_START
+#define MSG_HEADER_VERSION MSG_HEADER_VERSION_PASSWORD
 
 #define MAX_DATAGRAMM_SIZE 512
 

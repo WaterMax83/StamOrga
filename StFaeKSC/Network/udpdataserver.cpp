@@ -26,7 +26,7 @@
 UdpDataServer::UdpDataServer(UserConData* pUsrConData, GlobalData* pGlobalData)
     : BackgroundWorker()
 {
-    this->SetWorkerName(QString("UDP Data Server %1").arg(pUsrConData->dstDataPort));
+    this->SetWorkerName(QString("UDP Data Server %1").arg(pUsrConData->m_dstDataPort));
 
     this->m_pUsrConData = pUsrConData;
     this->m_pGlobalData = pGlobalData;
@@ -36,8 +36,8 @@ UdpDataServer::UdpDataServer(UserConData* pUsrConData, GlobalData* pGlobalData)
 int UdpDataServer::DoBackgroundWork()
 {
     this->m_pUdpSocket = new QUdpSocket();
-    if (!this->m_pUdpSocket->bind(QHostAddress::Any, this->m_pUsrConData->dstDataPort)) {
-        qDebug() << QString("Error binding socket  for port %1: %2\n").arg(this->m_pUsrConData->dstDataPort).arg(this->m_pUdpSocket->errorString());
+    if (!this->m_pUdpSocket->bind(QHostAddress::Any, this->m_pUsrConData->m_dstDataPort)) {
+        qDebug() << QString("Error binding socket  for port %1: %2\n").arg(this->m_pUsrConData->m_dstDataPort).arg(this->m_pUdpSocket->errorString());
         return -1;
     }
     connect(this->m_pUdpSocket, &QUdpSocket::readyRead, this, &UdpDataServer::readyReadSocketPort);
@@ -70,9 +70,9 @@ void UdpDataServer::readyReadSocketPort()
         datagram.resize(this->m_pUdpSocket->pendingDatagramSize());
 
         if (this->m_pUdpSocket->readDatagram(datagram.data(), datagram.size(), &sender, &port)) {
-            if (sender.toIPv4Address() == this->m_pUsrConData->sender.toIPv4Address()) {
+            if (sender.toIPv4Address() == this->m_pUsrConData->m_sender.toIPv4Address()) {
                 this->m_msgBuffer.StoreNewData(datagram);
-                this->m_pUsrConData->srcDataPort = port;
+                this->m_pUsrConData->m_srcDataPort = port;
             }
         }
     }
@@ -82,15 +82,15 @@ void UdpDataServer::readyReadSocketPort()
 
 void UdpDataServer::onConnectionLoginTimeout()
 {
-    this->m_pUsrConData->bIsConnected = false;
+    this->m_pUsrConData->m_bIsConnected = false;
     qDebug().noquote() << QString("User %1 with Port %2 was inactive, logged out")
-                              .arg(this->m_pUsrConData->userName)
-                              .arg(this->m_pUsrConData->dstDataPort);
+                              .arg(this->m_pUsrConData->m_userName)
+                              .arg(this->m_pUsrConData->m_dstDataPort);
 }
 
 void UdpDataServer::onConnectionResetTimeout()
 {
-    emit this->notifyConnectionTimedOut(this->m_pUsrConData->dstDataPort);
+    emit this->notifyConnectionTimedOut(this->m_pUsrConData->m_dstDataPort);
 }
 
 void UdpDataServer::checkNewOncomingData()
@@ -115,8 +115,8 @@ void UdpDataServer::checkNewOncomingData()
 
                 qint64 rValue = this->m_pUdpSocket->writeDatagram(pData + sendBytes,
                                                                   currentSendSize,
-                                                                  this->m_pUsrConData->sender,
-                                                                  this->m_pUsrConData->srcDataPort);
+                                                                  this->m_pUsrConData->m_sender,
+                                                                  this->m_pUsrConData->m_srcDataPort);
                 if (rValue < 0)
                     break;
                 sendBytes += rValue;
@@ -133,7 +133,7 @@ MessageProtocol* UdpDataServer::checkNewMessage(MessageProtocol* msg)
 {
     MessageProtocol* ack = NULL;
 
-    if (this->m_pUsrConData->bIsConnected) {
+    if (this->m_pUsrConData->m_bIsConnected) {
 
         switch (msg->getIndex()) {
         case OP_CODE_CMD_REQ::REQ_LOGIN_USER:
@@ -160,6 +160,10 @@ MessageProtocol* UdpDataServer::checkNewMessage(MessageProtocol* msg)
             ack = this->m_pDataConnection->requestGetGamesList(msg);
             break;
 
+        case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST:
+            ack = this->m_pDataConnection->requestGetGamesInfoList(msg);
+            break;
+
         case OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST:
             ack = this->m_pDataConnection->requestGetTicketsList(msg);
             break;
@@ -174,6 +178,10 @@ MessageProtocol* UdpDataServer::checkNewMessage(MessageProtocol* msg)
 
         case OP_CODE_CMD_REQ::REQ_NEW_TICKET_PLACE:
             ack = this->m_pDataConnection->requestNewPlaceSeasonTicket(msg);
+            break;
+
+        case OP_CODE_CMD_REQ::REQ_CHANGE_TICKET:
+            ack = this->m_pDataConnection->requestChangeSeasonTicket(msg);
             break;
 
         case OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET:
@@ -204,12 +212,12 @@ MessageProtocol* UdpDataServer::checkNewMessage(MessageProtocol* msg)
             qWarning().noquote() << QString("Unkown command 0x%1").arg(QString::number(msg->getIndex()));
             break;
         }
-        if (ack != NULL && this->m_pUsrConData->bIsConnected)
+        if (ack != NULL && this->m_pUsrConData->m_bIsConnected)
             this->m_pConLoginTimer->start(); // reset Timer
     } else if (msg->getIndex() == OP_CODE_CMD_REQ::REQ_LOGIN_USER) {
 
         ack = this->m_pDataConnection->requestCheckUserLogin(msg);
-        if (this->m_pUsrConData->bIsConnected)
+        if (this->m_pUsrConData->m_bIsConnected)
             this->m_pConLoginTimer->start(); // start Timer
     } else
         ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_NOT_LOGGED_IN);

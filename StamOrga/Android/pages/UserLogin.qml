@@ -95,6 +95,9 @@ Flickable {
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     onTextChanged: {
                         globalUserData.bIsConnected = false;
+                        if (text != globalUserData.userName) {
+                            txtPassWord.text = "";
+                        }
                     }
                     Layout.bottomMargin: 35
                 }
@@ -108,7 +111,7 @@ Flickable {
 
                 TextField {
                     id: txtPassWord
-                    text: globalUserData.passWord
+                    text: globalUserData.passWord.length === 0 ? "" : "dEf1AuLt"
                     padding: 10
                     implicitWidth: parent.width / 3 * 2
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
@@ -130,12 +133,12 @@ Flickable {
                             globalUserData.ipAddr = txtIPAddress.text
                         }
 
-                        if (txtUserName.text === "" || txtPassWord.text === "") {
+                        if (txtUserName.text.trim() === "" || txtPassWord.text.trim() === "") {
                             toastManager.show("Bitte Verbindungsdaten ausfüllen", 4000)
                             return;
                         }
 
-                        if (userIntUser.startMainConnection(txtUserName.text, txtPassWord.text) > 0) {
+                        if (userIntUser.startMainConnection(txtUserName.text.trim(), txtPassWord.text.trim()) > 0) {
                             btnSendData.enabled = false
                             busyConnectIndicator.visible = true;
                             txtInfoConnecting.text = "Verbinde ..."
@@ -242,6 +245,8 @@ Flickable {
             updateUserColumnView(false);
         }
         else {
+            if (result === -21)
+                txtPassWord.text = "";
             txtInfoConnecting.visible = false;
             txtInfoConnecting.text = userIntUser.getErrorCodeToString(result);
             toastManager.show(userIntUser.getErrorCodeToString(result), 5000)
@@ -310,11 +315,11 @@ Flickable {
         onAccepted: {
             labelPasswordTooShort.visible = false
             labelPasswordDiffer.visible = false
-            if (txtnewPassWord.text.length < 6) {
+            if (txtnewPassWord.text.trim().length < 6) {
                 labelPasswordTooShort.visible = true
                 changePassWordDialog.open()
-            } else if (txtnewPassWord.text == txtnewPassWordReplay.text) {
-                userIntUser.startUpdateUserPassword(txtnewPassWord.text)
+            } else if (txtnewPassWord.text.trim() == txtnewPassWordReplay.text.trim()) {
+                userIntUser.startUpdateUserPassword(txtnewPassWord.text.trim())
                 busyConnectIndicator.visible = true;
                 txtInfoConnecting.visible = true;
                 txtInfoConnecting.text = "Ändere Passwort"

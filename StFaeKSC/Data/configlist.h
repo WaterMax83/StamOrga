@@ -61,7 +61,7 @@ public:
     bool itemExists(QString name);
     bool itemExists(quint32 index);
     ConfigItem* getItem(quint32 index);
-    quint32 getItemIndex(const QString name);
+    qint32 getItemIndex(const QString name);
     QString getItemName(quint32 index);
 
     virtual ConfigItem* getRequestConfigItemFromListIndex(int index)
