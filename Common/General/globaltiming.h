@@ -41,6 +41,10 @@
 #define SOCKET_TIMEOUT_MS 30000
 #endif
 
+// clang-format off
+#define TIMEOUT_LOAD_GAMEINFO   (10 * 60 * 1000) // 10min
+#define TIMEOUT_LOAD_GAMES      (60 * 60 * 1000) // 60min
+// clang-format on
 
 inline uint CalcMSecEpochToUsHour(quint64 msec64)
 {

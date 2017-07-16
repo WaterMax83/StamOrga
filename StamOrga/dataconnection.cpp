@@ -62,7 +62,7 @@ int DataConnection::DoBackgroundWork()
 
 void DataConnection::slotSocketDataError(QAbstractSocket::SocketError socketError)
 {
-    qDebug().noquote() << QString("Socket Error %1 - %2 ").arg(socketError).arg(this->m_pDataUdpSocket->errorString());
+    qCritical().noquote() << QString("Socket Error %1 - %2 ").arg(socketError).arg(this->m_pDataUdpSocket->errorString());
 }
 
 /*
@@ -304,7 +304,7 @@ void DataConnection::startSendReadableNameRequest(DataConRequest request)
 void DataConnection::startSendGamesListRequest(DataConRequest request)
 {
     quint32 data;
-    data = qToLittleEndian(g_GlobalSettings.lastGamesLoadCount()); /* game numbers */
+    data = qToLittleEndian(g_GlobalSettings->lastGamesLoadCount()); /* game numbers */
     MessageProtocol msg(request.m_request, (char*)(&data), sizeof(quint32));
     this->sendMessageRequest(&msg, request);
 }
@@ -446,7 +446,7 @@ void DataConnection::startSendAcceptMeeting(DataConRequest request)
 
 void DataConnection::slotConnectionTimeoutFired()
 {
-    qDebug() << "DataConnection: Timeout from Data UdpServer";
+    qInfo().noquote() << "DataConnection: Timeout from Data UdpServer";
     while (this->m_lActualRequest.size() > 0) {
         DataConRequest request = this->m_lActualRequest.last();
         request.m_result       = ERROR_CODE_TIMEOUT;
@@ -477,8 +477,6 @@ qint32 DataConnection::sendMessageRequest(MessageProtocol* msg, DataConRequest r
         request.m_result = ERROR_CODE_ERR_SEND;
         emit this->notifyLastRequestFinished(request);
     }
-
-    //    qDebug().noquote() << QString("Send request 0x%1").arg(QString::number(msg->getIndex(), 16));
 
     return rValue;
 }
@@ -519,7 +517,7 @@ QString DataConnection::getActualRequestData(quint32 req, qint32 index)
 void DataConnection::sendActualRequestsAgain(qint32 result)
 {
     if (result == ERROR_CODE_SUCCESS) {
-        qDebug() << "DataConnection: Trying to send the requests again";
+        qInfo().noquote() << "DataConnection: Trying to send the requests again";
         for (int i = 0; i < this->m_lActualRequest.size(); i++) {
             this->startSendNewRequest(this->m_lActualRequest[i]);
         }

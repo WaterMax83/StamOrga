@@ -82,7 +82,7 @@ QString GamePlay::getCompetitionLine()
 {
     if (this->m_comp == BUNDESLIGA_1 || this->m_comp == BUNDESLIGA_2 || this->m_comp == LIGA_3)
         return QString("%1. Spieltag - ").arg(this->m_seasonIndex);
-    else if (this->m_comp == DFB_POKAL || this->m_comp == KROMBACHER_POKAL)
+    else if (this->m_comp == DFB_POKAL || this->m_comp == BADISCHER_POKAL)
         return QString("%1. Runde - ").arg(this->m_seasonIndex);
     else if (this->m_comp == TESTSPIEL) {
 #ifdef QT_DEBUG

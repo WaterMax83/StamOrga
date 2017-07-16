@@ -81,13 +81,13 @@ void MainConnection::slotSendNewMainConRequest(QString username)
 
 void MainConnection::slotSocketMainError(QAbstractSocket::SocketError socketError)
 {
-    qDebug().noquote() << QString("Socket Error %1 - %2 ").arg(socketError).arg(this->m_pMasterUdpSocket->errorString());
+    qCritical().noquote() << QString("Socket Error %1 - %2 ").arg(socketError).arg(this->m_pMasterUdpSocket->errorString());
 }
 
 void MainConnection::slotConnectionTimeoutFired()
 {
     emit this->connectionRequestFinished(ERROR_CODE_TIMEOUT, "Timeout", "", "");
-    qDebug() << QString("Main Con Timeout %1").arg(this->m_pMasterUdpSocket->errorString());
+    qInfo().noquote() << QString("Main Con Timeout %1").arg(this->m_pMasterUdpSocket->errorString());
 }
 
 void MainConnection::slotReadyReadMasterPort()
@@ -130,7 +130,6 @@ void MainConnection::checkNewOncomingData()
                         QString random(pData + sizeof(qint32) + 1 + salt.toUtf8().size());
 
                         if (this->m_pGlobalData->userName() != this->m_userName) {
-                            qDebug() << QString("Setting UserName %1").arg(this->m_userName);
                             this->m_pGlobalData->setUserName(this->m_userName);
                             this->m_pGlobalData->saveGlobalUserSettings();
                         }

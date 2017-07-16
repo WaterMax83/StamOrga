@@ -98,7 +98,7 @@ enum CompetitionIndex {
     BUNDESLIGA_2     = 2,
     LIGA_3           = 3,
     DFB_POKAL        = 4,
-    KROMBACHER_POKAL = 5,
+    BADISCHER_POKAL = 5,
     TESTSPIEL        = 6,
     MAX_COMPETITION  = 7,
 };

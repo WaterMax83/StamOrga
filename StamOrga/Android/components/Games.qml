@@ -248,6 +248,18 @@ Rectangle {
             } else if (gamePlayItem.isGameRunning()) {
                 mainRectangleGame.gradColorStart = "#f30707"
                 mainRectangleGame.gradColorStop = "#ff4747"
+            } else {
+                var comp = gamePlayItem.competitionValue();
+                if (comp === 4) { // dfb pokal
+                    mainRectangleGame.gradColorStart = "#105010"
+                    mainRectangleGame.gradColorStop = "#509050"
+                }else if (comp === 5) { // badischer pokal
+                    mainRectangleGame.gradColorStart = "#103050"
+                    mainRectangleGame.gradColorStop = "#507090"
+                } else if (comp === 6) { // TestSpiel
+                    mainRectangleGame.gradColorStart = "#101050"
+                    mainRectangleGame.gradColorStop = "#905090"
+                }
             }
 
             var meetingPresent = gamePlayItem.getMeetingInfo();

@@ -37,6 +37,8 @@ public:
 
     Q_INVOKABLE qint32 startListGettingGames();
 
+    Q_INVOKABLE qint32 startListGettingGamesInfo();
+
     Q_INVOKABLE qint32 startUpdateUserPassword(QString newPassw);
 
     Q_INVOKABLE qint32 startUpdateReadableName(QString name);

@@ -75,6 +75,25 @@ Item {
                }
            }
 
+           RowLayout {
+               Layout.preferredWidth: parent.width
+               Layout.fillWidth: true
+
+               Label {
+                   id: text3
+                   text: qsTr("Lade Spiel Infos beim Start:")
+                   Layout.fillWidth: true
+                   Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                   font.pixelSize: 14
+                   color: "white"
+               }
+               CheckBox {
+                    id: loadGameInfo
+                    checked: globalSettings.loadGameInfo
+                    onCheckedChanged: valueWasEditedEnableSave()
+               }
+           }
+
 
 
            RowLayout {
@@ -150,6 +169,11 @@ Item {
                    saveSettings = true;
               }
 
+              if (globalSettings.loadGameInfo !== loadGameInfo.checked) {
+                   globalSettings.loadGameInfo = loadGameInfo.checked;
+                   saveSettings = true;
+              }
+
               if (globalSettings.debugIP !== txtOtherIPAddr.text) {
                    globalSettings.debugIP = txtOtherIPAddr.text;
                    saveSettings = true;
@@ -187,4 +211,6 @@ Item {
    function pageOpenedUpdateView() {
        isStartupDone = true;
    }
+
+   function notifyUserIntConnectionFinished(result) {}
 }

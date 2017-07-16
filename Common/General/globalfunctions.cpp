@@ -122,7 +122,7 @@ CompetitionIndex getCompetitionIndex(QString comp)
     if (comp == "DFB Pokal")
         return DFB_POKAL;
     if (comp == "Badischer Pokal")
-        return KROMBACHER_POKAL;
+        return BADISCHER_POKAL;
     if (comp == "TestSpiel")
         return TESTSPIEL;
 
@@ -140,7 +140,7 @@ QString getCompetitionString(CompetitionIndex index)
         return "3.Liga";
     case DFB_POKAL:
         return "DFB Pokal";
-    case KROMBACHER_POKAL:
+    case BADISCHER_POKAL:
         return "Badischer Pokal";
     case TESTSPIEL:
         return "TestSpiel";

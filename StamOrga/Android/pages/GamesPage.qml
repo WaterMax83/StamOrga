@@ -38,8 +38,7 @@ Flickable {
 
     onDragEnded: {
         if (flickableGames.contentY < -100) {
-            busyLoadingIndicatorGames.visible = true
-            txtInfoLoadingGames.text = "Lade Spielliste"
+            showLoadingGameInfos()
             userIntGames.startListGettingGames()
             for (var j = columnLayoutGames.children.length; j > 0; j--) {
                 columnLayoutGames.children[j - 1].destroy()
@@ -182,13 +181,12 @@ Flickable {
             }
             txtInfoLoadingGames.text = "Letztes Update am " + globalUserData.getGamePlayLastUpdate()
         } else
-            txtInfoLoadingGames.text = "Keine Daten zum Anzeigen\nZiehen zum Aktualisieren"
+            txtInfoLoadingGames.text = "Keine Daten gespeichert\nZiehen zum Aktualisieren"
     }
 
     function notifyGameChangedFinished(result) {
         if (result === 1) {
-            busyLoadingIndicatorGames.visible = true
-            txtInfoLoadingGames.text = "Lade Spielliste"
+            showLoadingGameInfos()
             userIntGames.startListGettingGames()
             for (var j = columnLayoutGames.children.length; j > 0; j--) {
                 columnLayoutGames.children[j - 1].destroy()
@@ -199,6 +197,12 @@ Flickable {
     }
 
     function notifyUserIntConnectionFinished(result) {}
+
+    function showLoadingGameInfos()
+    {
+        busyLoadingIndicatorGames.visible = true
+        txtInfoLoadingGames.text = "Lade Spielinfos"
+    }
 
     Component {
         id: gameView

@@ -55,7 +55,7 @@ qint32 ConnectionHandling::startMainConnection(QString name, QString passw)
         if (this->m_pGlobalData->bIsConnected()
             && (now - this->m_lastSuccessTimeStamp) < (CON_LOGIN_TIMEOUT_MSEC - TIMER_DIFF_MSEC)) {
             emit this->sNotifyConnectionFinished(ERROR_CODE_SUCCESS);
-            qDebug() << "Did not log in again, should already be succesfull";
+            qInfo().noquote() << "Did not log in again, should already be succesfull";
             return ERROR_CODE_NO_ERROR;
         }
         this->startDataConnection();

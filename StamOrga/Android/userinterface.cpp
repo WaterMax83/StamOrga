@@ -75,6 +75,11 @@ qint32 UserInterface::startListGettingGames()
     return this->m_pConHandle->startListGettingGames();
 }
 
+qint32 UserInterface::startListGettingGamesInfo()
+{
+    return this->m_pConHandle->startListGettingGamesInfo();
+}
+
 qint32 UserInterface::startAddSeasonTicket(QString name, quint32 discount)
 {
     return this->m_pConHandle->startAddSeasonTicket(name, discount);

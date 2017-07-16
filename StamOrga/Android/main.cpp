@@ -33,7 +33,7 @@
 #include "userinterface.h"
 
 
-GlobalSettings g_GlobalSettings;
+GlobalSettings* g_GlobalSettings;
 
 int main(int argc, char* argv[])
 {
@@ -50,13 +50,17 @@ int main(int argc, char* argv[])
     qRegisterMetaType<AcceptMeetingInfo*>("AcceptMeetingInfo*");
     qRegisterMetaType<DataConRequest>("DataConRequest");
 
+    GlobalSettings globalSettings;
+    g_GlobalSettings = &globalSettings;
+
     GlobalData globalUserData;
-    g_GlobalSettings.initialize(&globalUserData);
+    globalSettings.initialize(&globalUserData, &app);
+
 
     // engine to start qml display -> takes about half a second
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("globalUserData", &globalUserData);
-    engine.rootContext()->setContextProperty("globalSettings", &g_GlobalSettings);
+    engine.rootContext()->setContextProperty("globalSettings", &globalSettings);
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));
 
     // load settings to update data
@@ -73,7 +77,8 @@ int main(int argc, char* argv[])
 
 #endif
 
-    QObject* pRootObject = engine.rootObjects().first();
+    QObject* pRootObject
+        = engine.rootObjects().first();
     if (globalUserData.userName().size() == 0 || globalUserData.passWord().size() == 0)
         QMetaObject::invokeMethod(pRootObject, "openUserLogin", Q_ARG(QVariant, true));
     else

@@ -30,13 +30,13 @@ Rectangle {
 
     width: 340
     height: childrenRect.height * 1.05
-    property color gradColorStart: "#105050"
+    property color gradColorStart: "#101010"
 //    property color colorTest: "#f30707"
-    property color gradColorStop: "#509090"
+    property color gradColorStop: "#501050"
     gradient: Gradient {
         GradientStop {
             position: 0
-            color: gradColorStart
+            color: "#ffffff"
         }
 
         GradientStop {
@@ -45,7 +45,7 @@ Rectangle {
         }
     }
     radius: 8
-    border.color: "grey"
+    border.color: "#b049f1"
     border.width: 2
     ColumnLayout {
         id: columnLayout

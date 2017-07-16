@@ -195,7 +195,7 @@ Flickable {
             }
             txtInfoSeasonTicket.text = "Letztes Update am " + globalUserData.getSeasonTicketLastUpdateString()
         } else
-            txtInfoSeasonTicket.text = "Keine Daten zum Anzeigen\nZiehen zum Aktualisieren"
+            txtInfoSeasonTicket.text = "Keine Daten gespeichert\nZiehen zum Aktualisieren"
 
     }
 

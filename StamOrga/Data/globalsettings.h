@@ -21,6 +21,7 @@
 
 #include <QObject>
 #include <QSettings>
+#include <QtGui/QGuiApplication>
 
 #include "globaldata.h"
 
@@ -31,10 +32,11 @@ class GlobalSettings : public QObject
     Q_PROPERTY(QString debugIP READ debugIP WRITE setDebugIP NOTIFY debugIPChanged)
     Q_PROPERTY(QString debugIPWifi READ debugIPWifi WRITE setDebugIPWifi NOTIFY debugIPWifiChanged)
     Q_PROPERTY(bool useReadableName READ useReadableName WRITE setUseReadableName NOTIFY useReadableNameChanged)
+    Q_PROPERTY(bool loadGameInfo READ loadGameInfo WRITE setLoadGameInfo NOTIFY loadGameInfoChanged)
 public:
     explicit GlobalSettings(QObject* parent = 0);
 
-    void initialize(GlobalData* pGlobalData);
+    void initialize(GlobalData* pGlobalData, QGuiApplication* app);
 
     Q_INVOKABLE void saveGlobalSettings();
 
@@ -93,32 +95,46 @@ public:
         emit this->useReadableNameChanged();
     }
 
+    bool loadGameInfo() { return this->m_loadGameInfo; }
+    void setLoadGameInfo(bool load)
+    {
+        this->m_loadGameInfo = load;
+        emit this->loadGameInfoChanged();
+    }
+
     Q_INVOKABLE QString getCurrentVersion();
 
     Q_INVOKABLE QString getVersionChangeInfo();
 
     Q_INVOKABLE bool isVersionChangeAlreadyShown();
 
+    Q_INVOKABLE void checkNewStateChangedAtStart();
+
 signals:
     void lastGamesLoadCountChanged();
     void debugIPChanged();
     void debugIPWifiChanged();
     void useReadableNameChanged();
+    void loadGameInfoChanged();
+    void sendAppStateChangedToActive(quint32 value);
 
 public slots:
+    void stateFromAppChanged(Qt::ApplicationState state);
 
 private:
     GlobalData* m_pGlobalData;
     quint32     m_ulastGamesLoadCount;
     bool        m_useReadableName;
+    bool        m_loadGameInfo;
     QString     m_debugIP;
     QString     m_debugIPWifi;
     QMutex      m_mutex;
+    qint64      m_lastGameInfoUpdate;
 
     QString m_lastShownVersion;
 };
 
 
-extern GlobalSettings g_GlobalSettings;
+extern GlobalSettings* g_GlobalSettings;
 
 #endif // GLOBALSETTINGS_H

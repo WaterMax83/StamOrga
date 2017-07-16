@@ -206,11 +206,10 @@ ApplicationWindow {
         }
     }
 
-    Component {
+
+    MyPages.GamesPage {
         id: viewGames
-        MyPages.GamesPage {
-            userIntGames: userInt
-        }
+        userIntGames: userInt
     }
 
     MyComponents.ToastManager {
@@ -289,14 +288,13 @@ ApplicationWindow {
             stackView.currentItem.notifyUserIntUpdatePasswordFinished(result)
         }
         onNotifyUpdateReadableNameRequest: {
-            stackView.currentItem.notifyUserIntUpdateReadableNameFinished(
-                        result)
+            stackView.currentItem.notifyUserIntUpdateReadableNameFinished(result)
         }
         onNotifyGamesListFinished: {
-            stackView.currentItem.notifyUserIntGamesListFinished(result)
+            viewGames.notifyUserIntGamesListFinished(result)
         }
         onNotifyGamesInfoListFinished: {
-            stackView.currentItem.notifyUserIntGamesInfoListFinished(result)
+            viewGames.notifyUserIntGamesInfoListFinished(result);
         }
         onNotifySeasonTicketAddFinished: {
             stackView.currentItem.notifyUserIntSeasonTicketAdd(result)
@@ -331,6 +329,18 @@ ApplicationWindow {
         }
     }
 
+    Connections {
+       target: globalSettings
+       onSendAppStateChangedToActive: {
+           console.log("App State changed in qml: " + value);
+           viewGames.showLoadingGameInfos()
+           if (value === 1)
+               userInt.startListGettingGamesInfo();
+           else if (value === 2)
+               userInt.startListGettingGames();
+       }
+    }
+
     function openUserLogin(open) {
 
         if (open === true) {
@@ -338,6 +348,7 @@ ApplicationWindow {
             imageToolButton.visible = false
         } else {
             stackView.currentItem.showListedGames()
+            globalSettings.checkNewStateChangedAtStart();
 
             if (!globalSettings.isVersionChangeAlreadyShown()) {
                 var component = Qt.createComponent("../pages/newVersionInfo.qml");

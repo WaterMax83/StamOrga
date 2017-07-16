@@ -176,6 +176,7 @@ void GlobalData::startUpdateGamesPlay()
     for (int i = 0; i < this->m_lGamePlay.size(); i++)
         delete this->m_lGamePlay[i];
     this->m_lGamePlay.clear();
+
     this->m_gpLastTimeStamp = QDateTime::currentDateTime().toMSecsSinceEpoch();
 }
 
@@ -336,9 +337,9 @@ void GlobalData::callBackLookUpHost(const QHostInfo& host)
         lastIP = host.addresses().value(0).toString();
     }
 
-    if (g_GlobalSettings.debugIP() != "") {
-        this->setIpAddr(g_GlobalSettings.debugIP());
-        lastIP = g_GlobalSettings.debugIP();
+    if (g_GlobalSettings->debugIP() != "") {
+        this->setIpAddr(g_GlobalSettings->debugIP());
+        lastIP = g_GlobalSettings->debugIP();
     }
 #ifdef QT_DEBUG
 //    if (this->m_debugIP != "") {
@@ -347,14 +348,14 @@ void GlobalData::callBackLookUpHost(const QHostInfo& host)
 //    }
 #ifdef Q_OS_ANDROID
 
-    if (g_GlobalSettings.debugIPWifi() != "") {
+    if (g_GlobalSettings->debugIPWifi() != "") {
         QNetworkConfigurationManager ncm;
         QList<QNetworkConfiguration> nc = ncm.allConfigurations();
         foreach (QNetworkConfiguration item, nc) {
             if (item.bearerType() == QNetworkConfiguration::BearerWLAN) {
                 if (item.state() == QNetworkConfiguration::StateFlag::Active) {
-                    this->setIpAddr(g_GlobalSettings.debugIPWifi());
-                    lastIP = g_GlobalSettings.debugIPWifi();
+                    this->setIpAddr(g_GlobalSettings->debugIPWifi());
+                    lastIP = g_GlobalSettings->debugIPWifi();
                 }
                 //                 qDebug() << "Wifi " << item.name();
                 //                 qDebug() << "state " << item.state();
