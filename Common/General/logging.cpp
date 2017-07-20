@@ -26,7 +26,9 @@
 
 #define LOG_FILE_DATE_FORMAT "yyyy_MM_dd"
 
-#ifdef Q_OS_ANDROID
+#define TEST
+
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
 #define MAX_DAYS_LOG_FILES 5
 #else
 #define MAX_DAYS_LOG_FILES 30
@@ -140,7 +142,7 @@ QStringList Logging::getLogFileDates()
 QString Logging::createLoggingFilePath()
 {
     QString loggingPath = "";
-#ifdef Q_OS_ANDROID
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
     loggingPath = getUserAppDataLocation() + "/Log/";
 #else
 #ifdef Q_OS_WIN

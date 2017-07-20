@@ -209,11 +209,7 @@ Flickable {
 
         MyComponents.Games {
             onClickedCurrentGame: {
-                var component
-                if (sender.isGameAHomeGame())
-                    component = Qt.createComponent("../pages/CurrentHomeGamePage.qml")
-                else
-                    component = Qt.createComponent("../pages/CurrentAwayGamePage.qml")
+                var component = Qt.createComponent("../pages/CurrentGamePage.qml")
                 if (component.status === Component.Ready) {
                     var sprite = stackView.push(component)
                     //                   userIntGames.startListSeasonTickets();
@@ -224,7 +220,7 @@ Flickable {
                     else
                         updateHeaderFromMain("Auswärts", "")
                 } else
-                    console.log("Fehler beim laden " + component.errorString())
+                    console.error("Fehler beim laden von der Spielseite " + component.errorString())
             }
             onPressedAndHoldCurrentGame: {
                 if (globalUserData.userIsGameAddingEnabled() || userIntGames.isDebuggingEnabled()) {

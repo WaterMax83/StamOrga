@@ -148,8 +148,8 @@ void ReadOnlineGames::startNetWorkRequest(OnlineGameInfo* info)
 
 #ifdef QT_DEBUG
     qInfo().noquote() << QString("Single game answer for game %1:%2")
-                         .arg(this->m_currentGameInfo->m_index)
-                         .arg(this->m_currentGameInfo->m_competition);
+                             .arg(this->m_currentGameInfo->m_index)
+                             .arg(this->m_currentGameInfo->m_competition);
     this->checkNewNetworkRequest(true);
 #else
 #if (QT_VERSION < QT_VERSION_CHECK(5, 8, 0))
@@ -294,8 +294,8 @@ void ReadOnlineGames::slotNetWorkRequestFinished(QNetworkReply* reply)
 
     if (d.isArray()) { /* all Games */
         qInfo().noquote() << QString("Request answer for game %1:%2")
-                             .arg(this->m_currentGameInfo->m_index)
-                             .arg(this->m_currentGameInfo->m_competition);
+                                 .arg(this->m_currentGameInfo->m_index)
+                                 .arg(this->m_currentGameInfo->m_competition);
         QJsonArray array = d.array();
         for (int i = 0; i < array.size(); i++) {
             QJsonObject gameObj = array[i].toObject();
@@ -305,8 +305,8 @@ void ReadOnlineGames::slotNetWorkRequestFinished(QNetworkReply* reply)
     } else { /* just single game */
         QJsonObject gameObj = d.object();
         qInfo().noquote() << QString("Single game answer for game %1:%2")
-                             .arg(this->m_currentGameInfo->m_index)
-                             .arg(this->m_currentGameInfo->m_competition);
+                                 .arg(this->m_currentGameInfo->m_index)
+                                 .arg(this->m_currentGameInfo->m_competition);
         this->readSingleGame(gameObj);
     }
 
@@ -397,7 +397,8 @@ bool ReadOnlineGames::readSingleGame(QJsonObject& json)
                                                this->m_currentGameInfo->m_index,
                                                this->m_currentGameInfo->m_score,
                                                comp,
-                                               this->m_currentGameInfo->m_season);
+                                               this->m_currentGameInfo->m_season,
+                                               this->m_currentGameInfo->m_lastUpdate);
 
     return true;
     /*

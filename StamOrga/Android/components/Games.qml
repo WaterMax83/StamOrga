@@ -149,7 +149,7 @@ Rectangle {
                     Image {
                         id: imageInterestMeeting
                         anchors.fill: parent
-                        source: "../images/done.png";
+                        source: "../images/help.png";
                     }
                     ColorOverlay {
                         anchors.fill: imageInterestMeeting
@@ -162,7 +162,7 @@ Rectangle {
             RowLayout {
                 id: freeTicketsItem
                 visible: false
-                spacing: 4
+                spacing: 5
                 Label {
                     id: labelFreeTickets
                     topPadding: 3

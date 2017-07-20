@@ -29,8 +29,7 @@
         <file>pages/LogginPage.qml</file>
         <file>components/AcceptDialog.qml</file>
         <file>images/StammtischLogo.png</file>
-        <file>pages/CurrentHomeGamePage.qml</file>
-        <file>pages/CurrentAwayGamePage.qml</file>
+        <file>pages/CurrentGamePage.qml</file>
         <file>components/Toast.qml</file>
         <file>components/ToastManager.qml</file>
         <file>pages/Settings.qml</file>

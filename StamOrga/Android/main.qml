@@ -216,31 +216,30 @@ ApplicationWindow {
         id: toastManager
     }
 
+    /* Need components because otherwise they will be shown in main view */
     Component {
         id: viewUserLogin
         MyPages.UserLogin {
             userIntUser: userInt
         }
     }
-
     Component {
         id: viewSeasonTickets
         MyPages.SeasonTickets {
             userIntTicket: userInt
         }
     }
-
     Component {
         id: viewSettingsPage
         MyPages.Settings {
         }
     }
-
-    Component {
+    Component{
         id: viewLoggingPage
         MyPages.LogginPage {
         }
     }
+
 
     UserInterface {
         id: userInt

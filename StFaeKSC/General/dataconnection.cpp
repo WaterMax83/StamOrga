@@ -211,9 +211,17 @@ MessageProtocol* DataConnection::requestGetProgramVersion(MessageProtocol* msg)
 }
 
 
+/* request
+ * 0    qint32      maxPastGames    4   // updateIndex since MSG_HEADER_VERSION_GAME_LIST
+ * 4    qint64      lastUpdate      8
+ */
+
+// updateIndex = 0 => getAll
+// updateIndex = 1 => only Update
+
 /* answer
  * 0   quint32     result          4
- * 4   quint16     numbofGames     2
+ * 4   quint16     numbofGames     2   // updateIndex since MSG_HEADER_VERSION_GAME_LIST
  * 6   quint16     sizePack1       2
  * 8   quint8      sIndex          1
  * 9   quint8      comp            1
@@ -230,16 +238,26 @@ MessageProtocol* DataConnection::requestGetProgramVersion(MessageProtocol* msg)
 
 MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
 {
-    if (msg->getDataLength() != 4) {
-        qWarning() << QString("Error getting wrong message size %1 for get games list from %2")
+    if (msg->getDataLength() != 4 && msg->getVersion() < MSG_HEADER_VERSION_GAME_LIST) {
+        qWarning() << QString("Error getting wrong message size %1 for get games list from %2, expected 4")
+                          .arg(msg->getDataLength())
+                          .arg(this->m_pUserConData->m_userName);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_GAMES_LIST, ERROR_CODE_WRONG_SIZE);
+    } else if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST && msg->getDataLength() != 12) {
+        qWarning() << QString("Error getting wrong message size %1 for get games list from %2, expected 12")
                           .arg(msg->getDataLength())
                           .arg(this->m_pUserConData->m_userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_GAMES_LIST, ERROR_CODE_WRONG_SIZE);
     }
+
     const char* pData = msg->getPointerToData();
-    quint32     maxPastGames;
-    memcpy(&maxPastGames, pData, sizeof(quint32));
-    maxPastGames = qFromLittleEndian(maxPastGames);
+    qint32      updateIndex;
+    qint64      lastUpdateGamesFromApp = 0;
+    memcpy(&updateIndex, pData, sizeof(qint32));
+    if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST)
+        memcpy(&lastUpdateGamesFromApp, pData + 4, sizeof(qint64));
+    updateIndex            = qFromLittleEndian(updateIndex);
+    lastUpdateGamesFromApp = qFromLittleEndian(lastUpdateGamesFromApp);
 
     QByteArray  ackArray;
     QDataStream wAckArray(&ackArray, QIODevice::WriteOnly);
@@ -247,26 +265,38 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
 
     quint16 numbOfGames = this->m_pGlobalData->m_GamesList.getNumberOfInternalList();
 
-    quint32 gamesInPast = 0;
-    qint64  now         = QDateTime::currentMSecsSinceEpoch();
-    for (quint32 i = 0; i < numbOfGames; i++) {
-        GamesPlay* pGame = (GamesPlay*)(this->m_pGlobalData->m_GamesList.getRequestConfigItemFromListIndex(i));
-        if (pGame->m_timestamp < now)
-            gamesInPast++;
-    }
-
-    qint32 startValue = 0;
-    if (gamesInPast > maxPastGames)
-        startValue = gamesInPast - maxPastGames;
     wAckArray << (quint32)ERROR_CODE_SUCCESS;
-    wAckArray << quint16(numbOfGames - startValue);
 
+    qint64 now2HoursAgo = QDateTime::currentDateTime().addSecs(-(2 * 60 * 60)).toMSecsSinceEpoch();
+    qint32 startValue   = 0;
+    if (msg->getVersion() < MSG_HEADER_VERSION_GAME_LIST) {
+        /* Number of past game were only checked and send in first versions, now only games which were not already loaded are send */
+        qint32 gamesInPast = 0;
+        for (quint32 i = 0; i < numbOfGames; i++) {
+            GamesPlay* pGame = (GamesPlay*)(this->m_pGlobalData->m_GamesList.getRequestConfigItemFromListIndex(i));
+            if (pGame->m_timestamp < now2HoursAgo)
+                gamesInPast++;
+        }
+
+        if (gamesInPast > updateIndex)
+            startValue = gamesInPast - updateIndex;
+        wAckArray << quint16(numbOfGames - startValue);
+    } else
+        wAckArray << qint16(updateIndex);
+
+    qint64 lastUpdateGameFromServer = 0;
     for (qint32 i = startValue; i < numbOfGames; i++) {
         GamesPlay* pGame = (GamesPlay*)(this->m_pGlobalData->m_GamesList.getRequestConfigItemFromListIndex(i));
         if (pGame == NULL)
             continue;
+        if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST && updateIndex == 1) {
+            if (pGame->m_lastUpdate <= lastUpdateGamesFromApp)
+                continue;   // Skip game because user already has all info
+        }
+        if (pGame->m_lastUpdate > lastUpdateGameFromServer)
+            lastUpdateGameFromServer = pGame->m_lastUpdate;
 
-        QString game(pGame->m_itemName + ";" + pGame->away + ";" + pGame->m_score);
+        QString game(pGame->m_itemName + ";" + pGame->m_away + ";" + pGame->m_score);
         quint16 freeTickets     = this->m_pGlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_FREE);
         quint16 blockTickets    = this->m_pGlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_BLOCKED);
         quint16 reservedTickets = this->m_pGlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_RESERVED);
@@ -274,12 +304,19 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
         wAckArray.device()->seek(ackArray.size());
         wAckArray << quint16(game.toUtf8().size() + GAMES_OFFSET);
         wAckArray << quint8(pGame->m_saisonIndex);
-        wAckArray << quint8(pGame->m_competition);
+        if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST)
+            wAckArray << quint8(quint8(pGame->m_competition) || quint8(pGame->m_scheduled ? 0x80 : 0x0));
+        else
+            wAckArray << quint8(pGame->m_competition);
         wAckArray << pGame->m_timestamp;
         wAckArray << pGame->m_index;
         wAckArray << freeTickets << blockTickets << reservedTickets;
 
         ackArray.append(game);
+    }
+    if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST) {
+        wAckArray.device()->seek(ackArray.size());
+        wAckArray << lastUpdateGameFromServer;
     }
 
     qInfo().noquote() << QString("User %1 request Games List with %2 entries").arg(this->m_pUserConData->m_userName).arg(numbOfGames);

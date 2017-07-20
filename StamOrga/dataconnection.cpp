@@ -250,10 +250,10 @@ void DataConnection::startSendVersionRequest(DataConRequest request)
     QString sVersion = STAM_ORGA_VERSION_S;
 #ifdef Q_OS_WIN
     sVersion.append("_Win");
-#else
-#ifdef Q_OS_ANDROID
+#elif defined(Q_OS_ANDROID)
     sVersion.append("_Android");
-#endif
+#elif defined(Q_OS_IOS)
+    sVersion.append(("_iOS");
 #endif
     wVersion << quint16(sVersion.toUtf8().size());
 
