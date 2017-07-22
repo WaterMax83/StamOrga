@@ -199,7 +199,7 @@ ApplicationWindow {
         id: stackView
         anchors.fill: parent
 
-        initialItem: viewGames
+        initialItem: viewMainGames
 
         onCurrentItemChanged: {
             stackView.currentItem.pageOpenedUpdateView()
@@ -207,8 +207,8 @@ ApplicationWindow {
     }
 
 
-    MyPages.GamesPage {
-        id: viewGames
+    MyPages.GamesMainPage {
+        id: viewMainGames
         userIntGames: userInt
     }
 
@@ -275,7 +275,7 @@ ApplicationWindow {
                                         })
                 }
             }
-            if (stackView.currentItem === viewGames) {
+            if (stackView.currentItem === viewMainGames) {
                 if (globalUserData.userIsGameAddingEnabled() || userInt.isDebuggingEnabled())
                     updateHeaderFromMain("StamOrga", "images/add.png")
                 else
@@ -290,10 +290,10 @@ ApplicationWindow {
             stackView.currentItem.notifyUserIntUpdateReadableNameFinished(result)
         }
         onNotifyGamesListFinished: {
-            viewGames.notifyUserIntGamesListFinished(result)
+            viewMainGames.notifyUserIntGamesListFinished(result)
         }
         onNotifyGamesInfoListFinished: {
-            viewGames.notifyUserIntGamesInfoListFinished(result);
+            viewMainGames.notifyUserIntGamesInfoListFinished(result);
         }
         onNotifySeasonTicketAddFinished: {
             stackView.currentItem.notifyUserIntSeasonTicketAdd(result)
@@ -331,7 +331,7 @@ ApplicationWindow {
     Connections {
        target: globalSettings
        onSendAppStateChangedToActive: {
-           viewGames.showLoadingGameInfos()
+           viewMainGames.showLoadingGameInfos("Lade Spielinfos")
            if (value === 1)
                userInt.startListGettingGamesInfo();
            else if (value === 2)

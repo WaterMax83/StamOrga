@@ -148,6 +148,8 @@ void GlobalData::saveActualGamesList()
 {
     QMutexLocker lock(&this->m_mutexGame);
 
+    std::sort(this->m_lGamePlay.begin(), this->m_lGamePlay.end(), GamePlay::compareTimeStampFunction);
+
     this->m_pMainUserSettings->beginGroup(GAMES_GROUP);
     this->m_pMainUserSettings->remove(""); // clear all elements
 

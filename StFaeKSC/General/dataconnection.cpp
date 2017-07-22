@@ -305,7 +305,7 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
         wAckArray << quint16(game.toUtf8().size() + GAMES_OFFSET);
         wAckArray << quint8(pGame->m_saisonIndex);
         if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST)
-            wAckArray << quint8(quint8(pGame->m_competition) || quint8(pGame->m_scheduled ? 0x80 : 0x0));
+            wAckArray << quint8(quint8(pGame->m_competition) | quint8(pGame->m_scheduled ? 0x80 : 0x0));
         else
             wAckArray << quint8(pGame->m_competition);
         wAckArray << pGame->m_timestamp;

@@ -220,8 +220,6 @@ Flickable {
             id: seasonTicketClickedMenu
             x: (flickableTickets.width - width) / 2
             y: flickableTickets.height / 6
-            title : "Test"
-//            implicitHeight: mainPaneTickets.height
 
             background: Rectangle {
                     implicitWidth: menuItemChangePlace.width
@@ -254,7 +252,7 @@ Flickable {
                 onClicked: {
                     var component = Qt.createComponent("../components/EditableTextDialog.qml");
                     if (component.status === Component.Ready) {
-                        var dialog = component.createObject(mainPaneTickets,{popupType: 1});
+                        var dialog = component.createObject(flickableTickets,{popupType: 1});
                         dialog.headerText = "Neuer Ort für " + m_ticketNameToChange;
                         dialog.parentHeight = flickableTickets.height
                         dialog.parentWidth = flickableTickets.width
@@ -269,7 +267,7 @@ Flickable {
                 onClicked: {
                     var component = Qt.createComponent("../components/AcceptDialog.qml");
                     if (component.status === Component.Ready) {
-                        var dialog = component.createObject(mainPaneTickets,{popupType: 1});
+                        var dialog = component.createObject(flickableTickets,{popupType: 1});
                         dialog.headerText = "Bestätigung";
                         dialog.parentHeight = flickableTickets.height
                         dialog.parentWidth = flickableTickets.width

@@ -22,7 +22,7 @@
         <file>pages/SeasonTickets.qml</file>
         <file>images/+material/add.png</file>
         <file>images/add.png</file>
-        <file>pages/GamesPage.qml</file>
+        <file>pages/GamesListPage.qml</file>
         <file>components/VersionDialog.qml</file>
         <file>components/SeasonTicket.qml</file>
         <file>components/EditableTextDialog.qml</file>
@@ -56,5 +56,6 @@
         <file>images/help.png</file>
         <file>pages/newVersionInfo.qml</file>
         <file>components/EditSeasonTicketDialog.qml</file>
+        <file>pages/GamesMainPage.qml</file>
     </qresource>
 </RCC>

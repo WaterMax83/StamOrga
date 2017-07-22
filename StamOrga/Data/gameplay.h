@@ -168,6 +168,7 @@ public:
 
     void setEnableAddGame(bool enable);
 
+    static bool compareTimeStampFunction(GamePlay* p1, GamePlay* p2);
 
 signals:
     void homeChanged();

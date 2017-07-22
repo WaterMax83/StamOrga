@@ -92,8 +92,6 @@ Item {
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
                 Layout.fillHeight: true
                 currentIndex: tabBar.currentIndex
-                onCurrentItemChanged: {
-                }
             }
         }
     }

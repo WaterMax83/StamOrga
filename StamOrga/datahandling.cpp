@@ -154,15 +154,16 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol* msg)
         play->setSeasonIndex(qFromLittleEndian(tmp));
         offset += sizeof(quint8);
         memcpy(&tmp, pData + offset, sizeof(quint8));
-        play->setCompetition(CompetitionIndex(qFromLittleEndian(tmp) & 0x7F));
+        tmp = qFromLittleEndian(tmp);
+        play->setCompetition(CompetitionIndex(tmp & 0x7F));
         offset += 1;
 
         /* On Android there are problems reading from qint64 pointers???? SIGBUS*/
         //        play->setTimeStamp(qFromLittleEndian(*(qint64 *)(pData + offset)));
-        quint32 tmp = qFromLittleEndian(*(qint32*)(pData + offset));
-        timeStamp   = qint64(tmp);
-        tmp         = qFromLittleEndian(*(quint32*)(pData + offset + 4));
-        timeStamp |= qint64(tmp) << 32;
+        quint32 tmp32 = qFromLittleEndian(*(qint32*)(pData + offset));
+        timeStamp     = qint64(tmp32);
+        tmp32         = qFromLittleEndian(*(quint32*)(pData + offset + 4));
+        timeStamp |= qint64(tmp32) << 32;
 
         play->setTimeStamp(timeStamp);
         offset += 8;
@@ -189,7 +190,7 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol* msg)
             play->setScore(lplayString.value(2));
 
         QQmlEngine::setObjectOwnership(play, QQmlEngine::CppOwnership);
-        this->m_pGlobalData->addNewGamePlay(play);
+        this->m_pGlobalData->addNewGamePlay(play, updateIndex);
     }
     memcpy(&timeStamp, pData + offset, sizeof(qint64));
     this->m_pGlobalData->setGamePlayLastServerUpdate(qFromLittleEndian(timeStamp));
