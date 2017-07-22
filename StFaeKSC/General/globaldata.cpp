@@ -40,12 +40,22 @@ void GlobalData::initialize()
     nameFilter << "Tickets_Game_*.ini";
     QStringList infoConfigList = userSetDir.entryList(nameFilter, QDir::Files | QDir::Readable);
     foreach (QString file, infoConfigList) {
-        AvailableGameTickets* tickets = new AvailableGameTickets();
+        AvailableGameTickets* ticket = new AvailableGameTickets();
 
-        if (tickets->initialize(userSetDir.path() + "/" + file) >= 0)
-            this->m_availableTickets.append(tickets);
-        else
-            delete tickets;
+        if (ticket->initialize(userSetDir.path() + "/" + file) >= 0) {
+            quint16 totalCount = ticket->getNumberOfInternalList();
+
+            for (int i = 0; i < totalCount; i++) {
+                AvailableTicketInfo* info = (AvailableTicketInfo*)ticket->getRequestConfigItemFromListIndex(i);
+                if (info == NULL)
+                    continue;
+                TicketInfo* tInfo = (TicketInfo*) this->m_SeasonTicket.getItem(info->m_ticketID);
+                if (tInfo == NULL)
+                    ticket->removeItem(info->m_index); /* Ticket is no longer present, remove it */
+            }
+            this->m_availableTickets.append(ticket);
+        } else
+            delete ticket;
     }
 
     nameFilter.clear();
@@ -170,6 +180,11 @@ qint32 GlobalData::requestGetAvailableSeasonTicket(const quint32 gameIndex, cons
                 if (info == NULL) {
                     wFreeTickets << quint32(0x0);
                     continue;
+                }
+                TicketInfo* tInfo = (TicketInfo*) this->m_SeasonTicket.getItem(info->m_ticketID);
+                if (tInfo == NULL) {
+                    ticket->removeItem(info->m_index);
+                    continue;   /* Ticket is no longer present, remove it */
                 }
                 if (info->m_state == TICKET_STATE_FREE) {
                     wFreeTickets << quint32(info->m_ticketID);
