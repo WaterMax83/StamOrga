@@ -245,6 +245,7 @@ Rectangle {
             if (gamePlayItem.isGameInPast()) {
                 mainRectangleGame.gradColorStart = "#505050"
                 mainRectangleGame.gradColorStop = "#909090"
+                return;
             } else if (gamePlayItem.isGameRunning()) {
                 mainRectangleGame.gradColorStart = "#f30707"
                 mainRectangleGame.gradColorStop = "#ff4747"

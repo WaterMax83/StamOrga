@@ -190,8 +190,8 @@ public:
 
     void saveActualGamesList();
 
-    void startUpdateGamesPlay();
-    void addNewGamePlay(GamePlay* gPlay);
+    void startUpdateGamesPlay(qint16 updateIndex);
+    void addNewGamePlay(GamePlay* gPlay, qint16 updateIndex = 0);
     Q_INVOKABLE quint32 getGamePlayLength()
     {
         QMutexLocker lock(&this->m_mutexGame);
@@ -200,6 +200,9 @@ public:
     GamePlay* getGamePlay(const quint32 gameIndex);
     Q_INVOKABLE GamePlay* getGamePlayFromArrayIndex(int index);
     Q_INVOKABLE QString getGamePlayLastUpdate();
+    qint64              getGamePlayLastLocalUpdate();
+    qint64              getGamePlayLastServerUpdate();
+    void setGamePlayLastServerUpdate(qint64 timestamp);
 
 
     void saveCurrentSeasonTickets();
@@ -255,8 +258,9 @@ private:
     QSettings* m_pMainUserSettings;
 
     QList<GamePlay*> m_lGamePlay;
-    qint64           m_gpLastTimeStamp;
-    bool existGamePlay(GamePlay* gPlay);
+    qint64           m_gpLastLocalUpdateTimeStamp;
+    qint64           m_gpLastServerUpdateTimeStamp;
+    //    bool existGamePlay(GamePlay* gPlay);
 
     QList<SeasonTicketItem*> m_lSeasonTicket;
     qint64                   m_stLastTimeStamp;

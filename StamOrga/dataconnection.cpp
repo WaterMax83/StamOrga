@@ -303,9 +303,17 @@ void DataConnection::startSendReadableNameRequest(DataConRequest request)
 
 void DataConnection::startSendGamesListRequest(DataConRequest request)
 {
-    quint32 data;
-    data = qToLittleEndian(g_GlobalSettings->lastGamesLoadCount()); /* game numbers */
-    MessageProtocol msg(request.m_request, (char*)(&data), sizeof(quint32));
+    quint32 data[3];
+    qint64  timeStamp = this->m_pGlobalData->getGamePlayLastLocalUpdate();
+
+    if (timeStamp + TIMEOUT_UPDATE_GAMES > QDateTime::currentMSecsSinceEpoch())
+        data[0] = qToLittleEndian(GameUpdateIndex::GameUpdateDiff);
+    else
+        data[0] = qToLittleEndian(GameUpdateIndex::GameUpdateAll);
+    timeStamp   = qToLittleEndian(this->m_pGlobalData->getGamePlayLastServerUpdate());
+    memcpy(&data[1], &timeStamp, sizeof(qint64));
+
+    MessageProtocol msg(request.m_request, (char*)(&data[0]), sizeof(quint32) * 3);
     this->sendMessageRequest(&msg, request);
 }
 

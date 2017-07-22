@@ -82,7 +82,10 @@ QString GlobalSettings::getVersionChangeInfo()
 {
     QString rValue;
 
-    rValue.append("<b>V1.0.1:</b><br>");
+    rValue.append("<b>V1.0.2:</b>(XX.YY.2017)<br>");
+
+
+    rValue.append("<br><b>V1.0.1:</b>(17.07.2017)<br>");
     rValue.append("- Mehr Informationen in der Spielübersicht<br>");
     rValue.append("- automatisches Laden der Spielinformationen<br>");
     rValue.append("- Dauerkarten editierbar<br>");
@@ -122,7 +125,6 @@ void GlobalSettings::checkNewStateChangedAtStart()
 
 void GlobalSettings::stateFromAppChanged(Qt::ApplicationState state)
 {
-    qDebug() << QString("State changed %1 %2").arg(state).arg(this->loadGameInfo());
     if (state != Qt::ApplicationState::ApplicationActive)
         return;
 
@@ -136,7 +138,7 @@ void GlobalSettings::stateFromAppChanged(Qt::ApplicationState state)
     if ((now - this->m_lastGameInfoUpdate) < TIMEOUT_LOAD_GAMEINFO)
         return;
 
-    if ((now - this->m_pGlobalData->m_gpLastTimeStamp) < TIMEOUT_LOAD_GAMES)
+    if ((now - this->m_pGlobalData->m_gpLastLocalUpdateTimeStamp) < TIMEOUT_LOAD_GAMES)
         emit this->sendAppStateChangedToActive(1);
     else
         emit this->sendAppStateChangedToActive(2);

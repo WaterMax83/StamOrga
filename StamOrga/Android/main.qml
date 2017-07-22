@@ -331,7 +331,6 @@ ApplicationWindow {
     Connections {
        target: globalSettings
        onSendAppStateChangedToActive: {
-           console.log("App State changed in qml: " + value);
            viewGames.showLoadingGameInfos()
            if (value === 1)
                userInt.startListGettingGamesInfo();

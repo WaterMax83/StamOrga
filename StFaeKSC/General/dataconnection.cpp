@@ -289,9 +289,9 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
         GamesPlay* pGame = (GamesPlay*)(this->m_pGlobalData->m_GamesList.getRequestConfigItemFromListIndex(i));
         if (pGame == NULL)
             continue;
-        if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST && updateIndex == 1) {
+        if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST && updateIndex == GameUpdateIndex::GameUpdateDiff) {
             if (pGame->m_lastUpdate <= lastUpdateGamesFromApp)
-                continue;   // Skip game because user already has all info
+                continue; // Skip game because user already has all info
         }
         if (pGame->m_lastUpdate > lastUpdateGameFromServer)
             lastUpdateGameFromServer = pGame->m_lastUpdate;
@@ -315,6 +315,8 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
         ackArray.append(game);
     }
     if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST) {
+        if (lastUpdateGameFromServer == 0)
+            lastUpdateGameFromServer = lastUpdateGamesFromApp;
         wAckArray.device()->seek(ackArray.size());
         wAckArray << lastUpdateGameFromServer;
     }

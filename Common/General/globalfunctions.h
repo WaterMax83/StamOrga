@@ -93,14 +93,19 @@ enum ACCEPT_STATE {
 };
 
 enum CompetitionIndex {
-    NO_COMPETITION   = 0,
-    BUNDESLIGA_1     = 1,
-    BUNDESLIGA_2     = 2,
-    LIGA_3           = 3,
-    DFB_POKAL        = 4,
+    NO_COMPETITION  = 0,
+    BUNDESLIGA_1    = 1,
+    BUNDESLIGA_2    = 2,
+    LIGA_3          = 3,
+    DFB_POKAL       = 4,
     BADISCHER_POKAL = 5,
-    TESTSPIEL        = 6,
-    MAX_COMPETITION  = 7,
+    TESTSPIEL       = 6,
+    MAX_COMPETITION = 7,
+};
+
+enum GameUpdateIndex {
+    GameUpdateAll  = 0,
+    GameUpdateDiff = 1,
 };
 
 extern CompetitionIndex getCompetitionIndex(QString comp);

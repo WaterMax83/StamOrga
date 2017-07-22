@@ -83,8 +83,9 @@ void GlobalData::loadGlobalSettings()
 
     /* Getting data from last Games */
     this->m_pMainUserSettings->beginGroup(GAMES_GROUP);
-    this->m_gpLastTimeStamp = this->m_pMainUserSettings->value("TIMESTAMP", 0).toLongLong();
-    int count               = this->m_pMainUserSettings->beginReadArray(GROUP_ARRAY_ITEM);
+    this->m_gpLastLocalUpdateTimeStamp  = this->m_pMainUserSettings->value("LocalGamesUpdateTime", 0).toLongLong();
+    this->m_gpLastServerUpdateTimeStamp = this->m_pMainUserSettings->value("ServerGamesUpdateTime", 0).toLongLong();
+    int count                           = this->m_pMainUserSettings->beginReadArray(GROUP_ARRAY_ITEM);
     for (int i = 0; i < count; i++) {
         this->m_pMainUserSettings->setArrayIndex(i);
         GamePlay* play = new GamePlay();
@@ -150,7 +151,8 @@ void GlobalData::saveActualGamesList()
     this->m_pMainUserSettings->beginGroup(GAMES_GROUP);
     this->m_pMainUserSettings->remove(""); // clear all elements
 
-    this->m_pMainUserSettings->setValue("TIMESTAMP", this->m_gpLastTimeStamp);
+    this->m_pMainUserSettings->setValue("LocalGamesUpdateTime", this->m_gpLastLocalUpdateTimeStamp);
+    this->m_pMainUserSettings->setValue("ServerGamesUpdateTime", this->m_gpLastServerUpdateTimeStamp);
 
     this->m_pMainUserSettings->beginWriteArray(GROUP_ARRAY_ITEM);
     for (int i = 0; i < this->m_lGamePlay.size(); i++) {
@@ -168,41 +170,54 @@ void GlobalData::saveActualGamesList()
     this->m_pMainUserSettings->endGroup();
 }
 
-void GlobalData::startUpdateGamesPlay()
+void GlobalData::startUpdateGamesPlay(qint16 updateIndex)
 {
     QMutexLocker lock(&this->m_mutexGame);
 
     /* need to delet, because they are all pointers */
-    for (int i = 0; i < this->m_lGamePlay.size(); i++)
-        delete this->m_lGamePlay[i];
-    this->m_lGamePlay.clear();
+    if (updateIndex == GameUpdateIndex::GameUpdateAll) {
+        for (int i = 0; i < this->m_lGamePlay.size(); i++)
+            delete this->m_lGamePlay[i];
+        this->m_lGamePlay.clear();
+    }
 
-    this->m_gpLastTimeStamp = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    this->m_gpLastLocalUpdateTimeStamp = QDateTime::currentDateTime().toMSecsSinceEpoch();
 }
 
-void GlobalData::addNewGamePlay(GamePlay* gPlay)
+void GlobalData::addNewGamePlay(GamePlay* gPlay, qint16 updateIndex)
 {
-    if (!this->existGamePlay(gPlay)) {
+    GamePlay* play = this->getGamePlay(gPlay->index());
+    if (play == NULL) {
         QMutexLocker lock(&this->m_mutexGame);
 
         gPlay->setEnableAddGame(this->userIsGameAddingEnabled());
         this->m_lGamePlay.append(gPlay);
+        return;
+    } else if (updateIndex == GameUpdateIndex::GameUpdateDiff) {
+        play->setHome(gPlay->home());
+        play->setAway(gPlay->away());
+        play->setScore(gPlay->score());
+        play->setTimeStamp(gPlay->timestamp64Bit());
+        play->setSeasonIndex(gPlay->seasonIndex());
+        play->setCompetition((CompetitionIndex)gPlay->competitionValue());
     }
+
+    delete gPlay;
 }
 
-bool GlobalData::existGamePlay(GamePlay* gPlay)
-{
-    QMutexLocker lock(&this->m_mutexGame);
+//bool GlobalData::existGamePlay(GamePlay* gPlay)
+//{
+//    QMutexLocker lock(&this->m_mutexGame);
 
-    if (gPlay->index() == 0 || gPlay->competition() == 0)
-        return false;
+//    if (gPlay->index() == 0 || gPlay->competition() == 0)
+//        return false;
 
-    for (int i = 0; i < this->m_lGamePlay.size(); i++) {
-        if (this->m_lGamePlay[i]->index() == gPlay->index() && this->m_lGamePlay[i]->competition() == gPlay->competition() && this->m_lGamePlay[i]->timestamp() == gPlay->timestamp())
-            return true;
-    }
-    return false;
-}
+//    for (int i = 0; i < this->m_lGamePlay.size(); i++) {
+//        if (this->m_lGamePlay[i]->index() == gPlay->index() && this->m_lGamePlay[i]->competition() == gPlay->competition() && this->m_lGamePlay[i]->timestamp() == gPlay->timestamp())
+//            return true;
+//    }
+//    return false;
+//}
 
 GamePlay* GlobalData::getGamePlay(const quint32 gameIndex)
 {
@@ -227,7 +242,22 @@ GamePlay* GlobalData::getGamePlayFromArrayIndex(int index)
 QString GlobalData::getGamePlayLastUpdate()
 {
     QMutexLocker lock(&this->m_mutexGame);
-    return QDateTime::fromMSecsSinceEpoch(this->m_gpLastTimeStamp).toString("dd.MM.yy hh:mm:ss");
+    return QDateTime::fromMSecsSinceEpoch(this->m_gpLastLocalUpdateTimeStamp).toString("dd.MM.yy hh:mm:ss");
+}
+
+qint64 GlobalData::getGamePlayLastLocalUpdate()
+{
+    return this->m_gpLastLocalUpdateTimeStamp;
+}
+
+qint64 GlobalData::getGamePlayLastServerUpdate()
+{
+    return this->m_gpLastServerUpdateTimeStamp;
+}
+
+void GlobalData::setGamePlayLastServerUpdate(qint64 timestamp)
+{
+    this->m_gpLastServerUpdateTimeStamp = timestamp;
 }
 
 void GlobalData::saveCurrentSeasonTickets()
