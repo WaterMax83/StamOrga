@@ -41,7 +41,6 @@ void GlobalSettings::initialize(GlobalData* pGlobalData, QGuiApplication* app)
 
     this->m_pGlobalData->m_pMainUserSettings->beginGroup("GLOBAL_SETTINGS");
 
-    this->setLastGamesLoadCount(this->m_pGlobalData->m_pMainUserSettings->value(SETT_LOAD_LAST_GAMES, 5).toInt());
     this->setUseReadableName(this->m_pGlobalData->m_pMainUserSettings->value(SETT_USE_READABLE_NAME, true).toBool());
     this->setLoadGameInfo(this->m_pGlobalData->m_pMainUserSettings->value(SETT_LOAD_GAME_INFO, true).toBool());
     this->setDebugIP(this->m_pGlobalData->m_pMainUserSettings->value(SETT_DEBUG_IP, "").toString());
@@ -60,7 +59,6 @@ void GlobalSettings::saveGlobalSettings()
 
     this->m_pGlobalData->m_pMainUserSettings->beginGroup("GLOBAL_SETTINGS");
 
-    this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_LOAD_LAST_GAMES, this->m_ulastGamesLoadCount);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_USE_READABLE_NAME, this->m_useReadableName);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_LOAD_GAME_INFO, this->m_loadGameInfo);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_DEBUG_IP, this->m_debugIP);
@@ -83,7 +81,8 @@ QString GlobalSettings::getVersionChangeInfo()
     QString rValue;
 
     rValue.append("<b>V1.0.2:</b>(XX.YY.2017)<br>");
-
+    rValue.append("- Spielterminierung hinzugefügt<br>");
+    rValue.append("- Spielliste in Aktuell/Vergangenheit aufgeteilt<br>");
 
     rValue.append("<br><b>V1.0.1:</b>(17.07.2017)<br>");
     rValue.append("- Mehr Informationen in der Spielübersicht<br>");

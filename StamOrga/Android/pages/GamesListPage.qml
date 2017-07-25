@@ -86,73 +86,6 @@ Flickable {
         }
     }
 
-
-
-//    function toolButtonClicked() {
-//        if (globalUserData.userIsGameAddingEnabled() || userIntGames.isDebuggingEnabled()) {
-//            var component = Qt.createComponent("../components/ChangeGameDialog.qml");
-//            if (component.status === Component.Ready) {
-//                var dialog = component.createObject(flickableGames,{popupType: 1});
-//                dialog.headerText = "Neues Spiel";
-//                dialog.parentHeight = flickableGames.height
-//                dialog.parentWidth = flickableGames.width
-//                dialog.homeTeam = "";
-//                dialog.awayTeam = "";
-//                dialog.score = "";
-//                dialog.seasonIndex = 1;
-//                dialog.competitionIndex = 2;
-//                dialog.date = "";
-//                dialog.index = 0;
-//                dialog.acceptedDialog.connect(acceptedChangeGameDialog);
-//                changeGameDialog = dialog
-//                dialog.open();
-//            }
-//        }
-//    }
-
-//    function acceptedChangeGameDialog() {
-//        var result = userIntGames.startChangeGame(changeGameDialog.index, changeGameDialog.seasonIndex,
-//                                                  changeGameDialog.competition, changeGameDialog.homeTeam.trim(),
-//                                                  changeGameDialog.awayTeam.trim(), changeGameDialog.date.trim(),
-//                                                  changeGameDialog.score.trim());
-//        if (result !== 1) {
-//            toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
-//            busyLoadingIndicatorGames.visible = true
-//            if (changeGameDialog.index === 0)
-//                txtInfoLoadingGames.text = "Füge Spiel hinzu"
-//            else
-//                txtInfoLoadingGames.text = "Ändere Spiel"
-//        }
-//    }
-
-
-//    function pageOpenedUpdateView() {
-
-//        if (globalUserData.userIsGameAddingEnabled() || userIntGames.isDebuggingEnabled())
-//            updateHeaderFromMain("StamOrga", "images/add.png")
-//        else
-//            updateHeaderFromMain("StamOrga", "")
-//        showListedGames()
-//    }
-
-//    function notifyUserIntGamesListFinished(result) {
-//        if (result !== 1) {
-//            toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
-//            busyLoadingIndicatorGames.visible = false
-//            showListedGames()
-//        }
-//    }
-
-//    function notifyUserIntGamesInfoListFinished(result) {
-//        busyLoadingIndicatorGames.visible = false
-//        if (result === 1)
-//            toastManager.show("Spiele geladen", 2000)
-//        else
-//            toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
-
-//        showListedGames()
-//    }
-
     function showListedGames() {
 
         cleanGameLayout();
@@ -175,10 +108,7 @@ Flickable {
                     }
                 }
             }
-
-//            txtInfoLoadingGames.text = "Letztes Update am " + globalUserData.getGamePlayLastUpdate()
-        } //else
-//            txtInfoLoadingGames.text = "Keine Daten gespeichert\nZiehen zum Aktualisieren"
+        }
     }
 
     function cleanGameLayout()
@@ -187,26 +117,6 @@ Flickable {
             columnLayoutGames.children[j - 1].destroy()
         }
     }
-
-//    function notifyGameChangedFinished(result) {
-//        if (result === 1) {
-//            showLoadingGameInfos()
-//            userIntGames.startListGettingGames()
-//            for (var j = columnLayoutGames.children.length; j > 0; j--) {
-//                columnLayoutGames.children[j - 1].destroy()
-//            }
-//        }
-//        else
-//            toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
-//    }
-
-//    function notifyUserIntConnectionFinished(result) {}
-
-//    function showLoadingGameInfos()
-//    {
-//        busyLoadingIndicatorGames.visible = true
-//        txtInfoLoadingGames.text = "Lade Spielinfos"
-//    }
 
     Component {
         id: gameView
@@ -227,30 +137,79 @@ Flickable {
                     console.error("Fehler beim laden von der Spielseite " + component.errorString())
             }
             onPressedAndHoldCurrentGame: {
-                if (globalUserData.userIsGameAddingEnabled() || userIntGames.isDebuggingEnabled()) {
-                    var component = Qt.createComponent("../components/ChangeGameDialog.qml");
-                    if (component.status === Component.Ready) {
-                        var dialog = component.createObject(flickableGames,{popupType: 1});
-                        dialog.headerText = "Spiel ändern";
-                        dialog.parentHeight = flickableGames.height
-                        dialog.parentWidth = flickableGames.width
-                        dialog.homeTeam = sender.home;
-                        dialog.awayTeam = sender.away;
-                        dialog.score = sender.score;
-                        dialog.seasonIndex = sender.seasonIndex;
-                        dialog.competitionIndex = sender.competitionValue() - 1;
-                        dialog.date = sender.timestamp;
-                        dialog.index = sender.index;
-                        dialog.acceptedDialog.connect(acceptedChangeGameDialog);
-                        changeGameDialog = dialog
-                        dialog.open();
-                    }
+                menuSender = sender;
+                menuItemEditGame.visible = false;
+                menuItemFixedGameTime.visible = false;
+                menuItemNotFixedGameTime.visible = false;
+                if (globalUserData.userIsGameAddingEnabled() || userIntGames.isDebuggingEnabled())
+                    menuItemEditGame.visible = true;
+
+                if (globalUserData.userIsGameFixedTimeEnabled() && !sender.isGameInPast()) {
+                    if(sender.timeFixed)
+                        menuItemNotFixedGameTime.visible = true;
+                    else
+                        menuItemFixedGameTime.visible = true;
                 }
+
+                var globalCoordinates = mapToItem(mainItemGamesMainPage, 0, 0)
+                pressAndHoldCurrentGameMenu.y = globalCoordinates.y - height / 2
+                pressAndHoldCurrentGameMenu.open();
             }
         }
     }
 
+    Menu {
+        id: pressAndHoldCurrentGameMenu
+        x: (mainItemGamesMainPage.width - width) / 2
+        y: mainItemGamesMainPage.height / 6
+
+        background: Rectangle {
+                implicitWidth: menuItemFixedGameTime.width
+                color: "#4f4f4f"
+            }
+
+        MenuItem {
+            id: menuItemEditGame
+            height: visible ? implicitHeight : 0
+            text: "Spiel editieren"
+            onClicked: {
+                var component = Qt.createComponent("../components/ChangeGameDialog.qml");
+                if (component.status === Component.Ready) {
+                    var dialog = component.createObject(mainItemGamesMainPage,{popupType: 1});
+                    dialog.headerText = "Spiel ändern";
+                    dialog.parentHeight = mainItemGamesMainPage.height
+                    dialog.parentWidth = mainItemGamesMainPage.width
+                    dialog.homeTeam = menuSender.home;
+                    dialog.awayTeam = menuSender.away;
+                    dialog.score = menuSender.score;
+                    dialog.seasonIndex = menuSender.seasonIndex;
+                    dialog.competitionIndex = menuSender.competitionValue() - 1;
+                    dialog.date = menuSender.timestamp;
+                    dialog.index = menuSender.index;
+                    dialog.acceptedDialog.connect(acceptedChangeGameDialog);
+                    changeGameDialog = dialog
+                    dialog.open();
+                }
+            }
+        }
+
+        MenuItem {
+            id: menuItemFixedGameTime
+            height: visible ? implicitHeight : 0
+            text: "Spiel fest terminieren"
+            onClicked: userIntGames.startSetFixedGameTime(menuSender.index, 1)
+        }
+
+        MenuItem {
+            id: menuItemNotFixedGameTime
+            height: visible ? implicitHeight : 0
+            text: "Spiel nicht fest terminieren"
+            onClicked: userIntGames.startSetFixedGameTime(menuSender.index, 0)
+        }
+    }
+
     property var changeGameDialog;
+    property var menuSender;
 
     function acceptedChangeGameDialog()
     {

@@ -36,6 +36,7 @@
 #define PLAY_SAISON_INDEX "sIndex"
 #define PLAY_SCORE "score"
 #define PLAY_COMPETITION "competition"
+#define PLAY_TIME_FIXED "timeFixed"
 
 #define SEASONTICKET_GROUP "SEASONTICKET_LIST"
 #define TICKET_NAME "name"
@@ -96,6 +97,7 @@ void GlobalData::loadGlobalSettings()
         play->setIndex(this->m_pMainUserSettings->value(ITEM_INDEX, 0).toUInt());
         play->setScore(this->m_pMainUserSettings->value(PLAY_SCORE, "").toString());
         play->setCompetition(CompetitionIndex(quint8(this->m_pMainUserSettings->value(PLAY_COMPETITION, 0).toUInt())));
+        play->setTimeFixed(this->m_pMainUserSettings->value(PLAY_TIME_FIXED, false).toBool());
 
         QQmlEngine::setObjectOwnership(play, QQmlEngine::CppOwnership);
         this->addNewGamePlay(play);
@@ -166,6 +168,7 @@ void GlobalData::saveActualGamesList()
         this->m_pMainUserSettings->setValue(ITEM_INDEX, this->m_lGamePlay[i]->index());
         this->m_pMainUserSettings->setValue(PLAY_SCORE, this->m_lGamePlay[i]->score());
         this->m_pMainUserSettings->setValue(PLAY_COMPETITION, this->m_lGamePlay[i]->competitionValue());
+        this->m_pMainUserSettings->setValue(PLAY_TIME_FIXED, this->m_lGamePlay[i]->timeFixed());
     }
 
     this->m_pMainUserSettings->endArray();
@@ -202,6 +205,7 @@ void GlobalData::addNewGamePlay(GamePlay* gPlay, qint16 updateIndex)
         play->setTimeStamp(gPlay->timestamp64Bit());
         play->setSeasonIndex(gPlay->seasonIndex());
         play->setCompetition((CompetitionIndex)gPlay->competitionValue());
+        play->setTimeFixed(gPlay->timeFixed());
     }
 
     delete gPlay;
@@ -409,6 +413,11 @@ bool GlobalData::userIsGameAddingEnabled()
 {
     return USER_IS_ENABLED(USER_ENABLE_ADD_GAME);
 }
+bool GlobalData::userIsGameFixedTimeEnabled()
+{
+    return USER_IS_ENABLED(USER_ENABLE_FIXED_GAME_TIME);
+}
+
 void GlobalData::SetUserProperties(quint32 value)
 {
     this->m_UserProperties = value;

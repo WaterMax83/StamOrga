@@ -156,6 +156,7 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol* msg)
         memcpy(&tmp, pData + offset, sizeof(quint8));
         tmp = qFromLittleEndian(tmp);
         play->setCompetition(CompetitionIndex(tmp & 0x7F));
+        play->setTimeFixed((tmp & 0x80) > 0 ? true : false);
         offset += 1;
 
         /* On Android there are problems reading from qint64 pointers???? SIGBUS*/
@@ -170,13 +171,6 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol* msg)
 
         play->setIndex(qFromLittleEndian(*(quint32*)(pData + offset)));
         offset += 4;
-
-        //        play->setFreeTickets(qFromLittleEndian(*(quint16*)(pData + offset)));
-        offset += 2;
-        //        play->setBlockedTickets(qFromLittleEndian(*(quint16*)(pData + offset)));
-        offset += 2;
-        //        play->setReservedTickets(qFromLittleEndian(*(quint16*)(pData + offset)));
-        offset += 2;
 
         QString playString(QByteArray(pData + offset, size - GAMES_OFFSET));
         offset += (size - GAMES_OFFSET);

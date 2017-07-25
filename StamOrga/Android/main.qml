@@ -289,24 +289,15 @@ ApplicationWindow {
         onNotifyUpdateReadableNameRequest: {
             stackView.currentItem.notifyUserIntUpdateReadableNameFinished(result)
         }
-        onNotifyGamesListFinished: {
-            viewMainGames.notifyUserIntGamesListFinished(result)
-        }
-        onNotifyGamesInfoListFinished: {
-            viewMainGames.notifyUserIntGamesInfoListFinished(result);
-        }
-        onNotifySeasonTicketAddFinished: {
-            stackView.currentItem.notifyUserIntSeasonTicketAdd(result)
-        }
-        onNotifySeasonTicketListFinished: {
-            stackView.currentItem.notifyUserIntSeasonTicketListFinished(result)
-        }
-        onNotifySeasonTicketRemoveFinished: {
-            stackView.currentItem.notifyUserIntSeasonTicketRemoveFinished(result)
-        }
-        onNotifySeasonTicketEditFinished: {
-            stackView.currentItem.notifyUserIntSeasonTicketEditFinished(result)
-        }
+        onNotifyGamesListFinished: viewMainGames.notifyUserIntGamesListFinished(result)
+        onNotifyGamesInfoListFinished: viewMainGames.notifyUserIntGamesInfoListFinished(result);
+        onNotifySetGamesFixedTimeFinished: viewMainGames.notifySetGamesFixedTimeFinished(result);
+
+        onNotifySeasonTicketAddFinished: stackView.currentItem.notifyUserIntSeasonTicketAdd(result)
+        onNotifySeasonTicketListFinished: stackView.currentItem.notifyUserIntSeasonTicketListFinished(result)
+        onNotifySeasonTicketRemoveFinished: stackView.currentItem.notifyUserIntSeasonTicketRemoveFinished(result)
+        onNotifySeasonTicketEditFinished: stackView.currentItem.notifyUserIntSeasonTicketEditFinished(result)
+
 
         onNotifyAvailableTicketStateChangedFinished: {
             stackView.currentItem.notifyAvailableTicketStateChangedFinished(result);

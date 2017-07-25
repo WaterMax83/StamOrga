@@ -28,7 +28,6 @@
 class GlobalSettings : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(quint32 lastGamesLoadCount READ lastGamesLoadCount WRITE setLastGamesLoadCount NOTIFY lastGamesLoadCountChanged)
     Q_PROPERTY(QString debugIP READ debugIP WRITE setDebugIP NOTIFY debugIPChanged)
     Q_PROPERTY(QString debugIPWifi READ debugIPWifi WRITE setDebugIPWifi NOTIFY debugIPWifiChanged)
     Q_PROPERTY(bool useReadableName READ useReadableName WRITE setUseReadableName NOTIFY useReadableNameChanged)
@@ -39,22 +38,6 @@ public:
     void initialize(GlobalData* pGlobalData, QGuiApplication* app);
 
     Q_INVOKABLE void saveGlobalSettings();
-
-    quint32 lastGamesLoadCount()
-    {
-        QMutexLocker lock(&this->m_mutex);
-        return this->m_ulastGamesLoadCount;
-    }
-    void setLastGamesLoadCount(quint32 count)
-    {
-        if (this->m_ulastGamesLoadCount != count) {
-            {
-                QMutexLocker lock(&this->m_mutex);
-                this->m_ulastGamesLoadCount = count;
-            }
-            emit lastGamesLoadCountChanged();
-        }
-    }
 
     QString debugIP()
     {
@@ -111,7 +94,6 @@ public:
     Q_INVOKABLE void checkNewStateChangedAtStart();
 
 signals:
-    void lastGamesLoadCountChanged();
     void debugIPChanged();
     void debugIPWifiChanged();
     void useReadableNameChanged();
@@ -123,7 +105,6 @@ public slots:
 
 private:
     GlobalData* m_pGlobalData;
-    quint32     m_ulastGamesLoadCount;
     bool        m_useReadableName;
     bool        m_loadGameInfo;
     QString     m_debugIP;

@@ -126,6 +126,15 @@ qint32 ConnectionHandling::startListGettingGamesInfo()
     return ERROR_CODE_SUCCESS;
 }
 
+qint32 ConnectionHandling::startSetFixedGameTime(const quint32 gameIndex, const quint32 fixedTime)
+{
+    DataConRequest req(OP_CODE_CMD_REQ::REQ_SET_FIXED_GAME_TIME);
+    req.m_lData.append(QString::number(gameIndex));
+    req.m_lData.append(QString::number(fixedTime));
+    this->sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
+}
+
 qint32 ConnectionHandling::startRemoveSeasonTicket(quint32 index)
 {
     DataConRequest req(OP_CODE_CMD_REQ::REQ_REMOVE_TICKET);

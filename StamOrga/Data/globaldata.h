@@ -172,6 +172,7 @@ public:
 
     Q_INVOKABLE bool userIsDebugEnabled();
     Q_INVOKABLE bool userIsGameAddingEnabled();
+    Q_INVOKABLE bool userIsGameFixedTimeEnabled();
     void SetUserProperties(quint32 value);
 
     void saveGlobalUserSettings();

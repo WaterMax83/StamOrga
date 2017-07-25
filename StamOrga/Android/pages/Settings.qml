@@ -34,29 +34,6 @@ Item {
            spacing: 20
 
            RowLayout {
-//               width: parent.width
-               Layout.preferredWidth: parent.width
-               Layout.fillWidth: true
-
-               Label {
-                   id: text1
-                   text: qsTr("Lade beendete Spiele:")
-                   Layout.fillWidth: true
-                   Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                   font.pixelSize: 14
-                   color: "white"
-               }
-               SpinBox {
-                   id: spBoxLoadPastGames
-                   to: 50
-                   from: 0
-                   value: globalSettings.lastGamesLoadCount
-                   Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
-                   onValueChanged: valueWasEditedEnableSave()
-               }
-           }
-
-           RowLayout {
                Layout.preferredWidth: parent.width
                Layout.fillWidth: true
 
@@ -159,10 +136,6 @@ Item {
 
    function toolButtonClicked() {
               var saveSettings = false;
-              if (globalSettings.lastGamesLoadCount !== spBoxLoadPastGames.value) {
-                  globalSettings.lastGamesLoadCount = spBoxLoadPastGames.value;
-                   saveSettings = true;
-              }
 
               if (globalSettings.useReadableName !== useReadableName.checked) {
                    globalSettings.useReadableName = useReadableName.checked;

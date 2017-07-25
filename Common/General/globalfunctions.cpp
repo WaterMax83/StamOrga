@@ -95,6 +95,8 @@ QString getErrorCodeString(qint32 code)
         return QString("Karte nicht vorhanden: %1").arg(code);
     case ERROR_CODE_NOT_IMPLEMENTED:
         return QString("Funktion nicht implementiert: %1").arg(code);
+    case ERROR_CODE_UPDATE_FUNCTION:
+        return QString("Version veraltet, Funktion nicht möglich: %1").arg(code);
     default:
         return QString("Unbekannter Fehler: %1").arg(code);
     }

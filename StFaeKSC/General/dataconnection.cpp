@@ -297,9 +297,6 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
             lastUpdateGameFromServer = pGame->m_lastUpdate;
 
         QString game(pGame->m_itemName + ";" + pGame->m_away + ";" + pGame->m_score);
-        quint16 freeTickets     = this->m_pGlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_FREE);
-        quint16 blockTickets    = this->m_pGlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_BLOCKED);
-        quint16 reservedTickets = this->m_pGlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_RESERVED);
 
         wAckArray.device()->seek(ackArray.size());
         wAckArray << quint16(game.toUtf8().size() + GAMES_OFFSET);
@@ -310,7 +307,12 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
             wAckArray << quint8(pGame->m_competition);
         wAckArray << pGame->m_timestamp;
         wAckArray << pGame->m_index;
-        wAckArray << freeTickets << blockTickets << reservedTickets;
+        if (msg->getVersion() < MSG_HEADER_VERSION_GAME_LIST) {
+            quint16 freeTickets     = this->m_pGlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_FREE);
+            quint16 blockTickets    = this->m_pGlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_BLOCKED);
+            quint16 reservedTickets = this->m_pGlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_RESERVED);
+            wAckArray << freeTickets << blockTickets << reservedTickets;
+        }
 
         ackArray.append(game);
     }
@@ -344,7 +346,6 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
 #define GAME_INFO_SIZE 18
 MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol* msg)
 {
-
     if (msg->getDataLength() != 8) {
         qWarning() << QString("Error getting wrong message size %1 for get games info list from %2")
                           .arg(msg->getDataLength())
@@ -430,6 +431,42 @@ MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol* msg)
     qInfo().noquote() << QString("User %1 request Games Info List").arg(this->m_pUserConData->m_userName);
 
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_GAMES_INFO_LIST, &buffer[0], offset);
+}
+
+/* request
+ * 0    quint32 gameIndex   4
+ * 4    quint32 fixedTime   4
+ */
+MessageProtocol* DataConnection::requestSetFixedGameTime(MessageProtocol* msg)
+{
+    if (msg->getDataLength() != 8) {
+        qWarning() << QString("Error getting wrong message size %1 for set games fixed time from %2")
+                          .arg(msg->getDataLength())
+                          .arg(this->m_pUserConData->m_userName);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_SET_FIXED_GAME_TIME, ERROR_CODE_WRONG_SIZE);
+    }
+
+    const char* pData = msg->getPointerToData();
+    quint32     gameIndex, fixedTime;
+    memcpy(&gameIndex, pData, sizeof(quint32));
+    gameIndex = qFromLittleEndian(gameIndex);
+    memcpy(&fixedTime, pData + 4, sizeof(quint32));
+    fixedTime = qFromLittleEndian(fixedTime);
+
+    int rValue = this->m_pGlobalData->m_GamesList.changeScheduledValue(gameIndex, fixedTime);
+    if (rValue == ERROR_CODE_SUCCESS)
+        qInfo().noquote() << QString("Update scheduled fixed time to %1 from game %2 from %3")
+                                 .arg(fixedTime)
+                                 .arg(gameIndex)
+                                 .arg(this->m_pUserConData->m_userName);
+    else
+        qWarning().noquote() << QString("Could not update scheduled fixed time to %1 from game %2 from %3")
+                                    .arg(fixedTime)
+                                    .arg(gameIndex)
+                                    .arg(this->m_pUserConData->m_userName);
+
+
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_SET_FIXED_GAME_TIME, rValue);
 }
 
 /*

@@ -34,6 +34,7 @@ class GamePlay : public QObject
     Q_PROPERTY(QString timestamp READ timestamp NOTIFY timestampChanged)
     Q_PROPERTY(QString competition READ competition NOTIFY competitionChanged)
     Q_PROPERTY(quint32 index READ index WRITE setIndex NOTIFY indexChanged)
+    Q_PROPERTY(bool timeFixed READ timeFixed WRITE setTimeFixed NOTIFY timeFixedChanged)
     Q_PROPERTY(quint8 seasonIndex READ seasonIndex WRITE setSeasonIndex NOTIFY seasonIndexChanged)
 public:
     explicit GamePlay(QObject* parent = 0);
@@ -109,6 +110,19 @@ public:
         }
     }
 
+    bool timeFixed()
+    {
+        return this->m_timeFixed;
+    }
+    void setTimeFixed(const bool fixed)
+    {
+        if (this->m_timeFixed != fixed) {
+            this->m_timeFixed = fixed;
+            emit this->timeFixedChanged();
+        }
+    }
+
+
     quint8 seasonIndex() { return this->m_seasonIndex; }
     void setSeasonIndex(const quint8 seasonIndex)
     {
@@ -177,6 +191,7 @@ signals:
     void timestampChanged();
     void competitionChanged();
     void indexChanged();
+    void timeFixedChanged();
     void seasonIndexChanged();
 
 public slots:
@@ -189,6 +204,7 @@ private:
     quint32          m_index;
     quint8           m_seasonIndex;
     qint64           m_timestamp;
+    bool             m_timeFixed;
     quint16          m_freeTickets;
     quint16          m_blockedTickets;
     quint16          m_reservedTickets;

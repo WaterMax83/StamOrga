@@ -174,6 +174,17 @@ Page {
             toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
     }
 
+    function notifySetGamesFixedTimeFinished(result) {
+        if (result === 1) {
+            showLoadingGameInfos("Lade Spielinfos")
+            userIntGames.startListGettingGames()
+            gamesListPagePresent.cleanGameLayout();
+            gamesListPagePast.cleanGameLayout();
+        }
+        else
+            toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
+    }
+
     function pageOpenedUpdateView() {
 
         if (globalUserData.userIsGameAddingEnabled() || userIntGames.isDebuggingEnabled())

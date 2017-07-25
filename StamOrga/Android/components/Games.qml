@@ -42,7 +42,7 @@ Rectangle {
         }
 
         GradientStop {
-            position: 0.5
+            position: 0.9
             color: gradColorStop
         }
     }
@@ -78,10 +78,40 @@ Rectangle {
                 text: qsTr("Date")
                 leftPadding: 5
                 topPadding: 3
-                Layout.fillWidth: true
+
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
 
+            Text {
+                id: labelLineTimeNotFixed
+                text: "<i>(nicht terminiert)</i>"
+                textFormat: Text.RichText
+                font.pixelSize: 12
+                color: "white"
+                leftPadding: 5
+                topPadding: 3
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
+                visible: false
+            }
+        }
+
+        RowLayout {
+            id: layoutWhatLine
+
+            anchors.right: parent.right
+            anchors.left: parent.left
+            Layout.preferredWidth: columnLayout.width
+            Layout.fillWidth: true
+            spacing: 5
+
+            Label {
+                id: labelLineWhat
+                text: qsTr("What")
+                leftPadding: 5
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
+            }
             Image {
                 id: imageMeetingIsPresent
                 anchors.top : parent.top
@@ -184,13 +214,6 @@ Rectangle {
         }
 
         Label {
-            id: labelLineWhat
-            text: qsTr("What")
-            leftPadding: 5
-            Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
-        }
-
-        Label {
             id: labelLineHome
             text: qsTr("Home")
             leftPadding: 5
@@ -262,6 +285,11 @@ Rectangle {
                     mainRectangleGame.gradColorStop = "#905090"
                 }
             }
+
+            var fixed = gamePlayItem.timeFixed
+//            console.log("Fixed = " + fixed);
+            if (!gamePlayItem.timeFixed)
+                labelLineTimeNotFixed.visible = true
 
             var meetingPresent = gamePlayItem.getMeetingInfo();
             if (meetingPresent > 0) {

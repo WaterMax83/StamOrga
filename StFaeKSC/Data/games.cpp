@@ -57,7 +57,7 @@ Games::Games()
             QString          score       = this->m_pConfigSettings->value(PLAY_SCORE, "").toString();
             CompetitionIndex competition = CompetitionIndex(this->m_pConfigSettings->value(PLAY_COMPETITION, 0).toUInt());
             qint64           lastUpdate  = this->m_pConfigSettings->value(PLAY_LAST_UDPATE, 0).toLongLong();
-            bool             scheduled   = this->m_pConfigSettings->value(PLAY_SCHEDULED, false).toBool();
+            quint32          scheduled   = this->m_pConfigSettings->value(PLAY_SCHEDULED, false).toUInt();
 
             if (saison == 0) {
                 bProblems  = true;
@@ -183,7 +183,7 @@ int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sInde
     this->m_pConfigSettings->setValue(PLAY_SAISON, saison);
     this->m_pConfigSettings->setValue(PLAY_COMPETITION, comp);
     this->m_pConfigSettings->setValue(PLAY_LAST_UDPATE, lastUpdate);
-    this->m_pConfigSettings->setValue(PLAY_SCHEDULED, false);
+    this->m_pConfigSettings->setValue(PLAY_SCHEDULED, 0);
 
     this->m_pConfigSettings->endArray();
     this->m_pConfigSettings->endGroup();
@@ -225,6 +225,24 @@ int Games::showAllGames()
         std::cout << output.toStdString() << std::endl;
     }
     return 0;
+}
+
+int Games::changeScheduledValue(const quint32 gameIndex, const quint32 fixedTime)
+{
+    GamesPlay* gPlay = (GamesPlay*)this->getItem(gameIndex);
+    if (gPlay == NULL)
+        return ERROR_CODE_NOT_FOUND;
+
+    if (gPlay->m_scheduled != fixedTime) {
+        if (this->updateItemValue(gPlay, PLAY_SCHEDULED, QVariant(fixedTime))) {
+            gPlay->m_scheduled = fixedTime;
+            qint64 lastUpdate  = QDateTime::currentMSecsSinceEpoch();
+            if (this->updateItemValue(gPlay, PLAY_LAST_UDPATE, QVariant(lastUpdate)))
+                gPlay->m_lastUpdate = lastUpdate;
+        } else
+            return ERROR_CODE_COMMON;
+    }
+    return ERROR_CODE_SUCCESS;
 }
 
 void Games::saveCurrentInteralList()

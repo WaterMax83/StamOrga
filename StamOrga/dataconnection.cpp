@@ -171,9 +171,12 @@ void DataConnection::checkNewOncomingData()
             request.m_result = this->m_pDataHandle->getHandleGamesInfoListResponse(msg);
             break;
 
+        case OP_CODE_CMD_RES::ACK_SET_FIXED_GAME_TIME:
+            request.m_result = msg->getIntData();
+            break;
+
         case OP_CODE_CMD_RES::ACK_ADD_TICKET:
             request.m_result = msg->getIntData();
-            ;
             break;
 
         case OP_CODE_CMD_RES::ACK_REMOVE_TICKET:
@@ -322,6 +325,15 @@ void DataConnection::startSendGamesInfoListRequest(DataConRequest request)
     quint32 data[2];
     data[0] = 0x00;
     data[1] = 0x00;
+    MessageProtocol msg(request.m_request, (char*)&data[0], 8);
+    this->sendMessageRequest(&msg, request);
+}
+
+void DataConnection::startSendSetGameTimeFixedRequest(DataConRequest request)
+{
+    quint32 data[2];
+    data[0] = request.m_lData.at(0).toUInt();
+    data[1] = request.m_lData.at(1).toUInt();
     MessageProtocol msg(request.m_request, (char*)&data[0], 8);
     this->sendMessageRequest(&msg, request);
 }
@@ -585,6 +597,10 @@ void DataConnection::startSendNewRequest(DataConRequest request)
 
     case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST:
         this->startSendGamesInfoListRequest(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_SET_FIXED_GAME_TIME:
+        this->startSendSetGameTimeFixedRequest(request);
         break;
 
     case OP_CODE_CMD_REQ::REQ_ADD_TICKET:
