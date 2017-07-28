@@ -199,7 +199,7 @@ Page {
         gamesListPagePast.showListedGames()
 
         if (globalUserData.getGamePlayLength() > 0) {
-            txtInfoLoadingGames.text = "Letztes Update am " + globalUserData.getGamePlayLastUpdate()
+            txtInfoLoadingGames.text = "Letztes Update am " + globalUserData.getGamePlayLastUpdateString()
         } else
             txtInfoLoadingGames.text = "Keine Daten gespeichert\nZiehen zum Aktualisieren"
     }

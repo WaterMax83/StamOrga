@@ -310,9 +310,9 @@ void DataConnection::startSendGamesListRequest(DataConRequest request)
     qint64  timeStamp = this->m_pGlobalData->getGamePlayLastLocalUpdate();
 
     if (timeStamp + TIMEOUT_UPDATE_GAMES > QDateTime::currentMSecsSinceEpoch())
-        data[0] = qToLittleEndian(GameUpdateIndex::GameUpdateDiff);
+        data[0] = qToLittleEndian(UpdateIndex::UpdateDiff);
     else
-        data[0] = qToLittleEndian(GameUpdateIndex::GameUpdateAll);
+        data[0] = qToLittleEndian(UpdateIndex::UpdateAll);
     timeStamp   = qToLittleEndian(this->m_pGlobalData->getGamePlayLastServerUpdate());
     memcpy(&data[1], &timeStamp, sizeof(qint64));
 
@@ -323,8 +323,8 @@ void DataConnection::startSendGamesListRequest(DataConRequest request)
 void DataConnection::startSendGamesInfoListRequest(DataConRequest request)
 {
     quint32 data[2];
-    data[0] = 0x00;
-    data[1] = 0x00;
+    qint64  timeStamp = qToLittleEndian(this->m_pGlobalData->getGamePlayLastServerUpdate());
+    memcpy(&data[0], &timeStamp, sizeof(qint64));
     MessageProtocol msg(request.m_request, (char*)&data[0], 8);
     this->sendMessageRequest(&msg, request);
 }
@@ -380,7 +380,12 @@ void DataConnection::startSendEditSeasonTicket(DataConRequest request)
 
 void DataConnection::startSendSeasonTicketListRequest(DataConRequest request)
 {
-    MessageProtocol msg(request.m_request);
+    quint32 data[2];
+    qint64  timeStamp;
+    timeStamp = qToLittleEndian(this->m_pGlobalData->getSeasonTicketLastServerUpdate());
+    memcpy(&data[0], &timeStamp, sizeof(qint64));
+
+    MessageProtocol msg(request.m_request, (char*)(&data[0]), sizeof(quint32) * 2);
     this->sendMessageRequest(&msg, request);
 }
 
@@ -402,9 +407,13 @@ void DataConnection::startSendChangeTicketState(DataConRequest request)
 
 void DataConnection::startSendAvailableTicketListRequest(DataConRequest request)
 {
-    quint32 index = request.m_lData.at(0).toUInt();
+    quint32 data[3];
+    qint64  timeStamp = qToLittleEndian(this->m_pGlobalData->getSeasonTicketLastServerUpdate());
 
-    MessageProtocol msg(request.m_request, index);
+    data[0] = request.m_lData.at(0).toUInt();
+    memcpy(&data[1], &timeStamp, sizeof(qint64));
+
+    MessageProtocol msg(request.m_request, (char*)(&data[0]), sizeof(quint32) * 3);
     this->sendMessageRequest(&msg, request);
 }
 

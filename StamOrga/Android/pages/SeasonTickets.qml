@@ -193,7 +193,7 @@ Flickable {
                 var sprite = seasonTicketItem.createObject(columnLayoutTickets)
                 sprite.showTicketInfo(i);
             }
-            txtInfoSeasonTicket.text = "Letztes Update am " + globalUserData.getSeasonTicketLastUpdateString()
+            txtInfoSeasonTicket.text = "Letztes Update am " + globalUserData.getSeasonTicketLastLocalUpdateString()
         } else
             txtInfoSeasonTicket.text = "Keine Daten gespeichert\nZiehen zum Aktualisieren"
 

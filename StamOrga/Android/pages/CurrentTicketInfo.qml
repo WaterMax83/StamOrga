@@ -486,6 +486,6 @@ Flickable {
 
 
 //        txtInfoCurrentGame.text = "Letztes Update am "
-//                + globalUserData.getSeasonTicketLastUpdateString()
+//                + globalUserData.getSeasonTicketLastLocalUpdateString()
     }
 }

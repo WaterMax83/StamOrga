@@ -278,23 +278,25 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
                 gamesInPast++;
         }
 
-        if (gamesInPast > updateIndex)
-            startValue = gamesInPast - updateIndex;
+        qint32 loadLastGames = updateIndex;
+        if (gamesInPast > loadLastGames)
+            startValue = gamesInPast - loadLastGames;
         wAckArray << quint16(numbOfGames - startValue);
-    } else
+    } else {
+        if (lastUpdateGamesFromApp == 0)
+            updateIndex = UpdateIndex::UpdateAll;
         wAckArray << qint16(updateIndex);
+    }
 
-    qint64 lastUpdateGameFromServer = 0;
+
     for (qint32 i = startValue; i < numbOfGames; i++) {
         GamesPlay* pGame = (GamesPlay*)(this->m_pGlobalData->m_GamesList.getRequestConfigItemFromListIndex(i));
         if (pGame == NULL)
             continue;
-        if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST && updateIndex == GameUpdateIndex::GameUpdateDiff) {
+        if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST && updateIndex == UpdateIndex::UpdateDiff) {
             if (pGame->m_lastUpdate <= lastUpdateGamesFromApp)
                 continue; // Skip game because user already has all info
         }
-        if (pGame->m_lastUpdate > lastUpdateGameFromServer)
-            lastUpdateGameFromServer = pGame->m_lastUpdate;
 
         QString game(pGame->m_itemName + ";" + pGame->m_away + ";" + pGame->m_score);
 
@@ -317,6 +319,7 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
         ackArray.append(game);
     }
     if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST) {
+        qint64 lastUpdateGameFromServer = this->m_pGlobalData->m_GamesList.getLastUpdateTime();
         if (lastUpdateGameFromServer == 0)
             lastUpdateGameFromServer = lastUpdateGamesFromApp;
         wAckArray.device()->seek(ackArray.size());
@@ -351,6 +354,15 @@ MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol* msg)
                           .arg(msg->getDataLength())
                           .arg(this->m_pUserConData->m_userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_GAMES_INFO_LIST, ERROR_CODE_WRONG_SIZE);
+    }
+
+    if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST) {
+        const char* pData                    = msg->getPointerToData();
+        qint64      lastUpdateTicketsFromApp = 0;
+        memcpy(&lastUpdateTicketsFromApp, pData, sizeof(qint64));
+        lastUpdateTicketsFromApp = qFromLittleEndian(lastUpdateTicketsFromApp);
+        if (this->m_pGlobalData->m_SeasonTicket.getLastUpdateTime() > lastUpdateTicketsFromApp)
+            return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_GAMES_INFO_LIST, ERROR_CODE_UPDATE_LIST);
     }
 
     char buffer[5000];
@@ -484,22 +496,30 @@ MessageProtocol* DataConnection::requestSetFixedGameTime(MessageProtocol* msg)
 
 MessageProtocol* DataConnection::requestGetTicketsList(MessageProtocol* msg)
 {
-    if (msg->getDataLength() > 0) {
-        qWarning() << QString("Error getting wrong message size %1 for get ticket list from %2")
+    if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST && msg->getDataLength() != 8) {
+        qWarning() << QString("Error getting wrong message size %1 for get ticket list from %2, expected 8")
                           .arg(msg->getDataLength())
                           .arg(this->m_pUserConData->m_userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_TICKETS_LIST, ERROR_CODE_WRONG_SIZE);
     }
 
-    //    const char* pData = msg->getPointerToData();
+    const char* pData = msg->getPointerToData();
+    qint64      appTimeStamp;
+    memcpy(&appTimeStamp, pData, sizeof(qint64));
+    appTimeStamp = qFromLittleEndian(appTimeStamp);
 
     QByteArray  ackArray;
     QDataStream wAckArray(&ackArray, QIODevice::WriteOnly);
     wAckArray.setByteOrder(QDataStream::LittleEndian);
 
+    quint16 updateIndex   = UpdateIndex::UpdateAll;
     quint16 numbOfTickets = this->m_pGlobalData->m_SeasonTicket.getNumberOfInternalList();
     wAckArray << (quint32)ERROR_CODE_SUCCESS;
-    wAckArray << numbOfTickets;
+    if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST)
+        wAckArray << updateIndex;
+    else
+        wAckArray << numbOfTickets;
+
 
     for (quint32 i = 0; i < numbOfTickets; i++) {
         TicketInfo* pTicket = (TicketInfo*)(this->m_pGlobalData->m_SeasonTicket.getRequestConfigItemFromListIndex(i));
@@ -516,6 +536,10 @@ MessageProtocol* DataConnection::requestGetTicketsList(MessageProtocol* msg)
         wAckArray << pTicket->m_userIndex;
 
         ackArray.append(ticket);
+    }
+    if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST) {
+        wAckArray.device()->seek(ackArray.size());
+        wAckArray << this->m_pGlobalData->m_SeasonTicket.getLastUpdateTime();
     }
 
     qInfo().noquote() << QString("User %1 request Ticket List with %2 entries").arg(this->m_pUserConData->m_userName).arg(numbOfTickets);
@@ -684,19 +708,29 @@ MessageProtocol* DataConnection::requestChangeStateSeasonTicket(MessageProtocol*
 }
 
 /*  request
- * 0                Header          12
- * 12   quint32      gameIndex       4
+ * 0   quint32      gameIndex       4
+ * 4   qint64       lastTimeStamp   8
  */
 MessageProtocol* DataConnection::requestGetAvailableTicketList(MessageProtocol* msg)
 {
     qint32 rCode;
-    if (msg->getDataLength() != 4) {
-        qWarning() << QString("Wrong message size for get available Season ticket for user %1").arg(this->m_pUserConData->m_userName);
+    if (msg->getDataLength() != 4 && msg->getVersion() < MSG_HEADER_VERSION_GAME_LIST) {
+        qWarning() << QString("Wrong message size %2 for get available Season ticket for user %1, expected 4").arg(this->m_pUserConData->m_userName).arg(msg->getDataLength());
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_AVAILABLE_TICKETS, ERROR_CODE_WRONG_SIZE);
+    } else if (msg->getDataLength() != 12 && msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST) {
+        qWarning() << QString("Wrong message size %2 for get available Season ticket for user %1, expected 12").arg(this->m_pUserConData->m_userName).arg(msg->getDataLength());
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_AVAILABLE_TICKETS, ERROR_CODE_WRONG_SIZE);
     }
 
-    const char* pData     = msg->getPointerToData();
-    quint32     gameIndex = qFromLittleEndian(*((quint32*)pData));
+    const char* pData                    = msg->getPointerToData();
+    quint32     gameIndex                = qFromLittleEndian(*((quint32*)pData));
+    qint64      lastUpdateTicketsFromApp = 0;
+    if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST) {
+        memcpy(&lastUpdateTicketsFromApp, pData + 4, sizeof(qint64));
+        lastUpdateTicketsFromApp = qFromLittleEndian(lastUpdateTicketsFromApp);
+        if (this->m_pGlobalData->m_SeasonTicket.getLastUpdateTime() > lastUpdateTicketsFromApp)
+            return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_AVAILABLE_TICKETS, ERROR_CODE_UPDATE_LIST);
+    }
 
     QByteArray data;
     if ((rCode = this->m_pGlobalData->requestGetAvailableSeasonTicket(gameIndex, this->m_pUserConData->m_userName, data)) == ERROR_CODE_SUCCESS)

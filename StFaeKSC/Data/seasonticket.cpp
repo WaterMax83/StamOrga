@@ -59,6 +59,8 @@ SeasonTicket::SeasonTicket()
         this->m_pConfigSettings->endGroup();
     }
 
+    if (this->readLastUpdateTime() == 0)
+        this->setNewUpdateTime();
 
     for (int i = 0; i < this->m_lAddItemProblems.size(); i++) {
         bProblems           = true;
@@ -88,10 +90,9 @@ int SeasonTicket::addNewSeasonTicket(QString user, quint32 userIndex, QString ti
 
     int newIndex = this->getNextInternalIndex();
 
-    QMutexLocker locker(&this->m_mConfigIniMutex);
-
     qint64 timestamp = QDateTime::currentDateTime().toMSecsSinceEpoch();
 
+    this->m_mConfigIniMutex.lock();
 
     this->m_pConfigSettings->beginGroup(GROUP_LIST_ITEM);
     this->m_pConfigSettings->beginWriteArray(CONFIG_LIST_ARRAY);
@@ -110,6 +111,10 @@ int SeasonTicket::addNewSeasonTicket(QString user, quint32 userIndex, QString ti
     this->m_pConfigSettings->endArray();
     this->m_pConfigSettings->endGroup();
     this->m_pConfigSettings->sync();
+
+    this->m_mConfigIniMutex.unlock();
+
+    this->setNewUpdateTime();
 
     this->addNewTicketInfo(user, userIndex, ticketName, timestamp, discount, ticketName, newIndex, false);
 
@@ -164,7 +169,7 @@ int SeasonTicket::showAllSeasonTickets()
 
 void SeasonTicket::saveCurrentInteralList()
 {
-    QMutexLocker locker(&this->m_mConfigIniMutex);
+    this->m_mConfigIniMutex.lock();
 
     this->m_pConfigSettings->beginGroup(GROUP_LIST_ITEM);
     this->m_pConfigSettings->remove(""); // clear all elements
@@ -188,6 +193,9 @@ void SeasonTicket::saveCurrentInteralList()
 
     this->m_pConfigSettings->endArray();
     this->m_pConfigSettings->endGroup();
+    this->m_mConfigIniMutex.unlock();
+
+    this->setNewUpdateTime();
 
     qDebug().noquote() << QString("saved actual SeasonTicket List with %1 entries").arg(this->getNumberOfInternalList());
 }

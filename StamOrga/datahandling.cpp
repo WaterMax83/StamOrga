@@ -187,17 +187,16 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol* msg)
         this->m_pGlobalData->addNewGamePlay(play, updateIndex);
     }
     memcpy(&timeStamp, pData + offset, sizeof(qint64));
-    this->m_pGlobalData->setGamePlayLastServerUpdate(qFromLittleEndian(timeStamp));
     offset += sizeof(qint64);
 
-    this->m_pGlobalData->saveActualGamesList();
+    this->m_pGlobalData->saveCurrentGamesList(qFromLittleEndian(timeStamp));
 
     return rValue;
 }
 
 qint32 DataHandling::getHandleGamesInfoListResponse(MessageProtocol* msg)
 {
-    if (msg->getDataLength() < 8)
+    if (msg->getDataLength() < 4)
         return ERROR_CODE_WRONG_SIZE;
 
     const char* pData = msg->getPointerToData();
@@ -298,7 +297,9 @@ qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol* msg)
 
     quint32     userIndex = this->m_pGlobalData->userIndex();
     const char* pData     = msg->getPointerToData();
-    qint32      rValue    = qFromLittleEndian(*((qint32*)pData));
+    qint32      rValue;
+    memcpy(&rValue, pData, sizeof(qint32));
+    rValue = qFromLittleEndian(rValue);
 
     if (rValue != ERROR_CODE_SUCCESS)
         return rValue;
@@ -306,11 +307,13 @@ qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol* msg)
     quint32 totalSize = msg->getDataLength();
     quint32 offset    = 4;
 
-    quint16 totalPacks = qFromLittleEndian(*(quint16*)(pData + offset));
+    quint16 updateIndex;
+    memcpy(&updateIndex, pData + offset, sizeof(quint16));
+    updateIndex = qFromLittleEndian(updateIndex);
     offset += 2;
 
-    this->m_pGlobalData->startUpdateSeasonTickets();
-    while (offset < totalSize && totalPacks > 0) {
+    this->m_pGlobalData->startUpdateSeasonTickets(updateIndex);
+    while (offset + TICKET_OFFSET < totalSize) {
         SeasonTicketItem* sTicket = new SeasonTicketItem();
         quint16           size    = qFromLittleEndian(*(qint16*)(pData + offset));
         offset += 2;
@@ -339,11 +342,14 @@ qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol* msg)
             sTicket->setPlace(lsticketString.value(1));
 
         QQmlEngine::setObjectOwnership(sTicket, QQmlEngine::CppOwnership);
-        this->m_pGlobalData->addNewSeasonTicket(sTicket);
-        totalPacks--;
+        this->m_pGlobalData->addNewSeasonTicket(sTicket, updateIndex);
     }
 
-    this->m_pGlobalData->saveCurrentSeasonTickets();
+    qint64 serverTimeStamp;
+    memcpy(&serverTimeStamp, pData + offset, sizeof(qint64));
+    serverTimeStamp = qFromLittleEndian(serverTimeStamp);
+
+    this->m_pGlobalData->saveCurrentSeasonTickets(serverTimeStamp);
 
     return rValue;
 }

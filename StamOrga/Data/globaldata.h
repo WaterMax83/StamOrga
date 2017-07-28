@@ -189,10 +189,10 @@ public:
 
     Q_INVOKABLE void copyTextToClipBoard(QString text);
 
-    void saveActualGamesList();
+    void saveCurrentGamesList(qint64 timestamp);
 
-    void startUpdateGamesPlay(qint16 updateIndex);
-    void addNewGamePlay(GamePlay* gPlay, qint16 updateIndex = 0);
+    void startUpdateGamesPlay(const qint16 updateIndex);
+    void addNewGamePlay(GamePlay* gPlay, const qint16 updateIndex = 0);
     Q_INVOKABLE quint32 getGamePlayLength()
     {
         QMutexLocker lock(&this->m_mutexGame);
@@ -200,16 +200,15 @@ public:
     }
     GamePlay* getGamePlay(const quint32 gameIndex);
     Q_INVOKABLE GamePlay* getGamePlayFromArrayIndex(int index);
-    Q_INVOKABLE QString getGamePlayLastUpdate();
+    Q_INVOKABLE QString getGamePlayLastUpdateString();
     qint64              getGamePlayLastLocalUpdate();
     qint64              getGamePlayLastServerUpdate();
-    void setGamePlayLastServerUpdate(qint64 timestamp);
 
 
-    void saveCurrentSeasonTickets();
+    void saveCurrentSeasonTickets(qint64 timestamp);
 
-    void startUpdateSeasonTickets();
-    void addNewSeasonTicket(SeasonTicketItem* sTicket);
+    void startUpdateSeasonTickets(const quint16 updateIndex);
+    void addNewSeasonTicket(SeasonTicketItem* sTicket, const quint16 updateIndex = 0);
     Q_INVOKABLE quint32 getSeasonTicketLength()
     {
         QMutexLocker lock(&this->m_mutexTicket);
@@ -217,8 +216,9 @@ public:
     }
     Q_INVOKABLE SeasonTicketItem* getSeasonTicketFromArrayIndex(int index);
     SeasonTicketItem* getSeasonTicket(quint32 ticketIndex);
-    Q_INVOKABLE QString getSeasonTicketLastUpdateString();
-    qint64              getSeasonTicketLastUpdate();
+    Q_INVOKABLE QString getSeasonTicketLastLocalUpdateString();
+    qint64              getSeasonTicketLastLocalUpdate();
+    qint64              getSeasonTicketLastServerUpdate();
 
     Q_INVOKABLE MeetingInfo* getMeetingInfo() { return &this->m_meetingInfo; }
 
@@ -261,11 +261,12 @@ private:
     QList<GamePlay*> m_lGamePlay;
     qint64           m_gpLastLocalUpdateTimeStamp;
     qint64           m_gpLastServerUpdateTimeStamp;
-    //    bool existGamePlay(GamePlay* gPlay);
+    bool             m_bGamePlayLastUpdateDidChanges;
 
     QList<SeasonTicketItem*> m_lSeasonTicket;
-    qint64                   m_stLastTimeStamp;
-    bool existSeasonTicket(SeasonTicketItem* sTicket);
+    qint64                   m_stLastLocalUpdateTimeStamp;
+    qint64                   m_stLastServerUpdateTimeStamp;
+    bool                     m_bSeasonTicketLastUpdateDidChanges;
 
     MeetingInfo m_meetingInfo;
 

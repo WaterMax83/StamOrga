@@ -126,7 +126,6 @@ Flickable {
                 var component = Qt.createComponent("../pages/CurrentGamePage.qml")
                 if (component.status === Component.Ready) {
                     var sprite = stackView.push(component)
-                    //                   userIntGames.startListSeasonTickets();
                     sprite.userIntCurrentGame = userIntGames
                     sprite.showAllInfoAboutGame(sender)
                     if (sender.isGameAHomeGame())

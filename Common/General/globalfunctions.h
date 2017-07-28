@@ -72,6 +72,7 @@ extern bool checkFilePathExistAndCreate(const QString& path);
 #define ERROR_CODE_WRONG_PARAMETER -11
 #define ERROR_CODE_NOT_IMPLEMENTED -12
 #define ERROR_CODE_UPDATE_FUNCTION -13
+#define ERROR_CODE_UPDATE_LIST -14
 #define ERROR_CODE_NO_USER -20
 #define ERROR_CODE_WRONG_PASSWORD -21
 
@@ -104,9 +105,9 @@ enum CompetitionIndex {
     MAX_COMPETITION = 7,
 };
 
-enum GameUpdateIndex {
-    GameUpdateAll  = 0,
-    GameUpdateDiff = 1,
+enum UpdateIndex {
+    UpdateAll  = 0,
+    UpdateDiff = 1,
 };
 
 extern CompetitionIndex getCompetitionIndex(QString comp);

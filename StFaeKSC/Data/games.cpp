@@ -76,7 +76,8 @@ Games::Games()
         this->m_pConfigSettings->endArray();
         this->m_pConfigSettings->endGroup();
     }
-
+    if (this->readLastUpdateTime() == 0)
+        this->setNewUpdateTime();
 
     for (int i = 0; i < this->m_lAddItemProblems.size(); i++) {
         bProblems        = true;
@@ -155,10 +156,11 @@ int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sInde
                 pGame->m_saisonIndex = sIndex;
         }
 
-        if (pGame->m_lastUpdate != lastUpdate) {
-            if (this->updateItemValue(pGame, PLAY_LAST_UDPATE, QVariant(lastUpdate)))
-                pGame->m_lastUpdate = lastUpdate;
-        }
+        if (this->getLastUpdateTime() > lastUpdate)
+            lastUpdate = this->getLastUpdateTime();
+
+        if (this->updateItemValue(pGame, PLAY_LAST_UDPATE, QVariant(lastUpdate), lastUpdate))
+            pGame->m_lastUpdate = lastUpdate;
 
         this->m_mInternalInfoMutex.unlock();
         return pGame->m_index;
@@ -166,8 +168,7 @@ int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sInde
 
     int newIndex = this->getNextInternalIndex();
 
-    QMutexLocker locker(&this->m_mConfigIniMutex);
-
+    this->m_mConfigIniMutex.lock();
 
     this->m_pConfigSettings->beginGroup(GROUP_LIST_ITEM);
     this->m_pConfigSettings->beginWriteArray(CONFIG_LIST_ARRAY);
@@ -189,11 +190,15 @@ int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sInde
     this->m_pConfigSettings->endGroup();
     this->m_pConfigSettings->sync();
 
+    this->m_mConfigIniMutex.unlock();
+
     GamesPlay* play = new GamesPlay(home, away, timestamp, sIndex, score, comp, saison, newIndex, lastUpdate, false);
 
     this->addNewGamesPlay(play, false);
 
     this->sortGamesListByTime();
+
+    this->setNewUpdateTime();
 
     qInfo().noquote() << QString("Added new game: %1").arg(home + " : " + away);
     return newIndex;
@@ -247,7 +252,7 @@ int Games::changeScheduledValue(const quint32 gameIndex, const quint32 fixedTime
 
 void Games::saveCurrentInteralList()
 {
-    QMutexLocker locker(&this->m_mConfigIniMutex);
+    this->m_mConfigIniMutex.lock();
 
     this->m_pConfigSettings->beginGroup(GROUP_LIST_ITEM);
     this->m_pConfigSettings->remove(""); // clear all elements
@@ -275,6 +280,10 @@ void Games::saveCurrentInteralList()
 
     this->m_pConfigSettings->endArray();
     this->m_pConfigSettings->endGroup();
+
+    this->m_mConfigIniMutex.unlock();
+
+    this->setNewUpdateTime();
 
     qDebug().noquote() << QString("saved actual Games List with %1 entries").arg(this->getNumberOfInternalList());
 }
