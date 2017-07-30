@@ -496,6 +496,19 @@ Flickable {
             loadMeetingInfo();
 
         } else {
+            if (result === -7) {
+                var component = Qt.createComponent("../components/AcceptDialog.qml");
+                if (component.status === Component.Ready) {
+                    var dialog = component.createObject(mainPaneCurrentGame,{popupType: 1});
+                    dialog.headerText = "Information";
+                    dialog.parentHeight = mainPaneCurrentGame.height
+                    dialog.parentWidth = mainPaneCurrentGame.width
+                    dialog.textToAccept = "Der Name exisitiert bereits.\n\nZum Ändern eines vorhanden Eintrags auf den Namen klicken.";
+                    dialog.showCancelButton = false
+                    dialog.open();
+                }
+            }
+
             toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
             showInfoHeader("Teilnehmen hat nicht funktioniert", false)
         }

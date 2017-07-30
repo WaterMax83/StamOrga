@@ -84,6 +84,7 @@ private:
     void startSendReadableNameRequest(DataConRequest request);
     void startSendGamesListRequest(DataConRequest request);
     void startSendGamesInfoListRequest(DataConRequest request);
+    void startSendSetGameTimeFixedRequest(DataConRequest request);
     void startSendAddSeasonTicket(DataConRequest request);
     void startSendRemoveSeasonTicket(DataConRequest request);
     void startSendSeasonTicketListRequest(DataConRequest request);

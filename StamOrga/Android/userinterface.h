@@ -39,6 +39,8 @@ public:
 
     Q_INVOKABLE qint32 startListGettingGamesInfo();
 
+    Q_INVOKABLE qint32 startSetFixedGameTime(const quint32 gameIndex, const quint32 fixed);
+
     Q_INVOKABLE qint32 startUpdateUserPassword(QString newPassw);
 
     Q_INVOKABLE qint32 startUpdateReadableName(QString name);
@@ -76,7 +78,7 @@ public:
 
     Q_INVOKABLE bool isDeviceMobile()
     {
-#ifdef Q_OS_ANDROID
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
         return true;
 #else
         return false;
@@ -105,6 +107,7 @@ signals:
     void notifyUpdateReadableNameRequest(qint32 result);
     void notifyGamesListFinished(qint32 result);
     void notifyGamesInfoListFinished(qint32 result);
+    void notifySetGamesFixedTimeFinished(qint32 result);
     void notifySeasonTicketAddFinished(qint32 result);
     void notifySeasonTicketRemoveFinished(qint32 result);
     void notifySeasonTicketEditFinished(qint32 result);

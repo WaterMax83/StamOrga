@@ -42,6 +42,7 @@ public:
     qint32 startUpdateReadableName(QString name);
     qint32 startListGettingGames();
     qint32 startListGettingGamesInfo();
+    qint32 startSetFixedGameTime(const quint32 gameIndex, const quint32 fixedTime);
     qint32 startRemoveSeasonTicket(quint32 index);
     qint32 startEditSeasonTicket(quint32 index, QString name, QString place, quint32 discount);
     qint32 startAddSeasonTicket(QString name, quint32 discount);

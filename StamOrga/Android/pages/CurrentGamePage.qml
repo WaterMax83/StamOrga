@@ -15,7 +15,6 @@
 *    You should have received a copy of the GNU General Public License
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 import QtQuick 2.7
 import QtQuick.Controls 2.1
 import QtQuick.Layouts 1.0
@@ -24,12 +23,10 @@ import com.watermax.demo 1.0
 
 import "../components" as MyComponents
 
-Flickable {
-    id: flickableCurrentGame
+Item {
+    id: itemCurrentGame
     property UserInterface userIntCurrentGame
     property var m_gamePlayCurrentItem
-
-    contentHeight: mainPaneCurrentGame.height
 
     Pane {
         id: mainPaneCurrentGame
@@ -52,17 +49,6 @@ Flickable {
 //                Layout.topMargin: 10
             }
 
-            Text {
-                width: parent.width
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                text: "Treffen"
-                font.capitalization: Font.AllUppercase
-                font.pixelSize: 20
-                color: "#0894c1"
-                Layout.bottomMargin: 3
-                Layout.topMargin: 3
-            }
-
             ColumnLayout {
                 id: columnLayoutBusyInfoCurrGame
                 spacing: 0
@@ -82,20 +68,72 @@ Flickable {
                 }
             }
 
-            CurrentMeetInfo {
-                id: currentMeetInfo
-                width: parent.width
+            TabBar {
+                  id: tabBar
+                  currentIndex: swipeViewCurrentHomeGame.currentIndex
+                  anchors.left: parent.left
+                  anchors.right: parent.right
+                  Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+
+                  Repeater {
+                      model: tabModel
+                      delegate: TabButton {
+                          text: model.text
+                      }
+                  }
+              }
+
+            SwipeView {
+                id: swipeViewCurrentHomeGame
+                anchors.top : tabBar.bottom
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                Layout.fillHeight: true
+                currentIndex: tabBar.currentIndex
             }
         }
     }
 
+    ListModel {
+        id: tabModel
+    }
+
+    CurrentTicketInfo {
+        id: currentTicketInfo
+    }
+
+
+
+    function currentTicketInfoNewHeaderInfo(text, load) {
+        if (swipeViewCurrentHomeGame.currentItem === currentTicketInfo) {
+            busyLoadingIndicatorCurrentGames.visible = load;
+            if (text === "")
+                txtInfoCurrentGame.visible = false
+            else
+                txtInfoCurrentGame.visible = true;
+            txtInfoCurrentGame.text = text;
+        }
+    }
+
+    CurrentMeetInfo {
+        id: currentMeetInfo
+    }
+
     function currentMeetInfoNewHeaderInfo(text, load) {
-        busyLoadingIndicatorCurrentGames.visible = load;
-        if (text === "")
-            txtInfoCurrentGame.visible = false
-        else
-            txtInfoCurrentGame.visible = true;
-        txtInfoCurrentGame.text = text;
+        if (swipeViewCurrentHomeGame.currentItem === currentMeetInfo) {
+            busyLoadingIndicatorCurrentGames.visible = load;
+            if (text === "")
+                txtInfoCurrentGame.visible = false
+            else
+                txtInfoCurrentGame.visible = true;
+            txtInfoCurrentGame.text = text;
+        }
+    }
+
+    function toolButtonClicked() {
+
     }
 
     function showAllInfoAboutGame(sender) {
@@ -103,17 +141,35 @@ Flickable {
         m_gamePlayCurrentItem = sender
         gameHeader.showGamesInfo(sender)
 
+        if (sender.isGameASeasonTicketGame()) {
+            tabModel.append({ "text": "Karten"});
+            swipeViewCurrentHomeGame.addItem(currentTicketInfo)
+            currentTicketInfo.showInfoHeader.connect(currentTicketInfoNewHeaderInfo);
+            currentTicketInfo.showAllInfoAboutGame(sender);
+        }
+
+        tabModel.append({ "text": "Treffen"});
+        swipeViewCurrentHomeGame.addItem(currentMeetInfo)
+
         currentMeetInfo.showInfoHeader.connect(currentMeetInfoNewHeaderInfo);
         currentMeetInfo.showAllInfoAboutGame();
     }
 
     function pageOpenedUpdateView() {}
 
-    function notifyUserIntSeasonTicketListFinished(result) {}
+    function notifyUserIntSeasonTicketListFinished(result) {
+        currentTicketInfo.notifyUserIntSeasonTicketListFinished(result);
+    }
 
-    function notifyAvailableTicketStateChangedFinished(result) {}
+    function notifyAvailableTicketStateChangedFinished(result) {
+        currentTicketInfo.notifyAvailableTicketStateChangedFinished(result);
+    }
 
-    function notifyAvailableTicketListFinished(result) {}
+    function notifyAvailableTicketListFinished(result) {
+        currentTicketInfo.notifyAvailableTicketListFinished(result);
+        if (result === 1)
+            gameHeader.showGamesInfo(m_gamePlayCurrentItem)
+    }
 
     function notifyChangedMeetingInfoFinished(result) {
         currentMeetInfo.notifyChangedMeetingInfoFinished(result);
@@ -130,4 +186,5 @@ Flickable {
     }
 
     function notifyUserIntConnectionFinished(result) {}
+
 }

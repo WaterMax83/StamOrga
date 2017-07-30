@@ -80,6 +80,11 @@ qint32 UserInterface::startListGettingGamesInfo()
     return this->m_pConHandle->startListGettingGamesInfo();
 }
 
+qint32 UserInterface::startSetFixedGameTime(const quint32 gameIndex, const quint32 fixed)
+{
+    return this->m_pConHandle->startSetFixedGameTime(gameIndex, fixed);
+}
+
 qint32 UserInterface::startAddSeasonTicket(QString name, quint32 discount)
 {
     return this->m_pConHandle->startAddSeasonTicket(name, discount);
@@ -167,6 +172,10 @@ void UserInterface::slCommandFinished(quint32 command, qint32 result)
 
     case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST:
         emit this->notifyGamesInfoListFinished(result);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_SET_FIXED_GAME_TIME:
+        emit this->notifySetGamesFixedTimeFinished(result);
         break;
 
     case OP_CODE_CMD_REQ::REQ_ADD_TICKET:

@@ -37,9 +37,10 @@ struct msg_Header {
 // clang-format off
 #define MSG_HEADER_VERSION_START        0x1
 #define MSG_HEADER_VERSION_PASSWORD     0x2
+#define MSG_HEADER_VERSION_GAME_LIST    0x3
 // clang-format on
 
-#define MSG_HEADER_VERSION MSG_HEADER_VERSION_PASSWORD
+#define MSG_HEADER_VERSION MSG_HEADER_VERSION_GAME_LIST
 
 #define MAX_DATAGRAMM_SIZE 512
 

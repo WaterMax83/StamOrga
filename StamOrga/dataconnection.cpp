@@ -171,9 +171,12 @@ void DataConnection::checkNewOncomingData()
             request.m_result = this->m_pDataHandle->getHandleGamesInfoListResponse(msg);
             break;
 
+        case OP_CODE_CMD_RES::ACK_SET_FIXED_GAME_TIME:
+            request.m_result = msg->getIntData();
+            break;
+
         case OP_CODE_CMD_RES::ACK_ADD_TICKET:
             request.m_result = msg->getIntData();
-            ;
             break;
 
         case OP_CODE_CMD_RES::ACK_REMOVE_TICKET:
@@ -250,10 +253,10 @@ void DataConnection::startSendVersionRequest(DataConRequest request)
     QString sVersion = STAM_ORGA_VERSION_S;
 #ifdef Q_OS_WIN
     sVersion.append("_Win");
-#else
-#ifdef Q_OS_ANDROID
+#elif defined(Q_OS_ANDROID)
     sVersion.append("_Android");
-#endif
+#elif defined(Q_OS_IOS)
+    sVersion.append(("_iOS");
 #endif
     wVersion << quint16(sVersion.toUtf8().size());
 
@@ -303,17 +306,34 @@ void DataConnection::startSendReadableNameRequest(DataConRequest request)
 
 void DataConnection::startSendGamesListRequest(DataConRequest request)
 {
-    quint32 data;
-    data = qToLittleEndian(g_GlobalSettings->lastGamesLoadCount()); /* game numbers */
-    MessageProtocol msg(request.m_request, (char*)(&data), sizeof(quint32));
+    quint32 data[3];
+    qint64  timeStamp = this->m_pGlobalData->getGamePlayLastLocalUpdate();
+
+    if (timeStamp + TIMEOUT_UPDATE_GAMES > QDateTime::currentMSecsSinceEpoch())
+        data[0] = qToLittleEndian(UpdateIndex::UpdateDiff);
+    else
+        data[0] = qToLittleEndian(UpdateIndex::UpdateAll);
+    timeStamp   = qToLittleEndian(this->m_pGlobalData->getGamePlayLastServerUpdate());
+    memcpy(&data[1], &timeStamp, sizeof(qint64));
+
+    MessageProtocol msg(request.m_request, (char*)(&data[0]), sizeof(quint32) * 3);
     this->sendMessageRequest(&msg, request);
 }
 
 void DataConnection::startSendGamesInfoListRequest(DataConRequest request)
 {
     quint32 data[2];
-    data[0] = 0x00;
-    data[1] = 0x00;
+    qint64  timeStamp = qToLittleEndian(this->m_pGlobalData->getGamePlayLastServerUpdate());
+    memcpy(&data[0], &timeStamp, sizeof(qint64));
+    MessageProtocol msg(request.m_request, (char*)&data[0], 8);
+    this->sendMessageRequest(&msg, request);
+}
+
+void DataConnection::startSendSetGameTimeFixedRequest(DataConRequest request)
+{
+    quint32 data[2];
+    data[0] = request.m_lData.at(0).toUInt();
+    data[1] = request.m_lData.at(1).toUInt();
     MessageProtocol msg(request.m_request, (char*)&data[0], 8);
     this->sendMessageRequest(&msg, request);
 }
@@ -360,7 +380,12 @@ void DataConnection::startSendEditSeasonTicket(DataConRequest request)
 
 void DataConnection::startSendSeasonTicketListRequest(DataConRequest request)
 {
-    MessageProtocol msg(request.m_request);
+    quint32 data[2];
+    qint64  timeStamp;
+    timeStamp = qToLittleEndian(this->m_pGlobalData->getSeasonTicketLastServerUpdate());
+    memcpy(&data[0], &timeStamp, sizeof(qint64));
+
+    MessageProtocol msg(request.m_request, (char*)(&data[0]), sizeof(quint32) * 2);
     this->sendMessageRequest(&msg, request);
 }
 
@@ -382,9 +407,13 @@ void DataConnection::startSendChangeTicketState(DataConRequest request)
 
 void DataConnection::startSendAvailableTicketListRequest(DataConRequest request)
 {
-    quint32 index = request.m_lData.at(0).toUInt();
+    quint32 data[3];
+    qint64  timeStamp = qToLittleEndian(this->m_pGlobalData->getSeasonTicketLastServerUpdate());
 
-    MessageProtocol msg(request.m_request, index);
+    data[0] = request.m_lData.at(0).toUInt();
+    memcpy(&data[1], &timeStamp, sizeof(qint64));
+
+    MessageProtocol msg(request.m_request, (char*)(&data[0]), sizeof(quint32) * 3);
     this->sendMessageRequest(&msg, request);
 }
 
@@ -577,6 +606,10 @@ void DataConnection::startSendNewRequest(DataConRequest request)
 
     case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST:
         this->startSendGamesInfoListRequest(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_SET_FIXED_GAME_TIME:
+        this->startSendSetGameTimeFixedRequest(request);
         break;
 
     case OP_CODE_CMD_REQ::REQ_ADD_TICKET:

@@ -71,6 +71,8 @@ extern bool checkFilePathExistAndCreate(const QString& path);
 #define ERROR_CODE_MISSING_TICKET -10
 #define ERROR_CODE_WRONG_PARAMETER -11
 #define ERROR_CODE_NOT_IMPLEMENTED -12
+#define ERROR_CODE_UPDATE_FUNCTION -13
+#define ERROR_CODE_UPDATE_LIST -14
 #define ERROR_CODE_NO_USER -20
 #define ERROR_CODE_WRONG_PASSWORD -21
 
@@ -93,22 +95,30 @@ enum ACCEPT_STATE {
 };
 
 enum CompetitionIndex {
-    NO_COMPETITION   = 0,
-    BUNDESLIGA_1     = 1,
-    BUNDESLIGA_2     = 2,
-    LIGA_3           = 3,
-    DFB_POKAL        = 4,
+    NO_COMPETITION  = 0,
+    BUNDESLIGA_1    = 1,
+    BUNDESLIGA_2    = 2,
+    LIGA_3          = 3,
+    DFB_POKAL       = 4,
     BADISCHER_POKAL = 5,
-    TESTSPIEL        = 6,
-    MAX_COMPETITION  = 7,
+    TESTSPIEL       = 6,
+    MAX_COMPETITION = 7,
+};
+
+enum UpdateIndex {
+    UpdateAll  = 0,
+    UpdateDiff = 1,
 };
 
 extern CompetitionIndex getCompetitionIndex(QString comp);
 extern QString getCompetitionString(CompetitionIndex index);
 extern QString createRandomString(qint32 size);
 
-#define USER_ENABLE_LOG 0x1
-#define USER_ENABLE_ADD_GAME 0x2
+// clang-format off
+#define USER_ENABLE_LOG                     0x1
+#define USER_ENABLE_ADD_GAME                0x2
+#define USER_ENABLE_FIXED_GAME_TIME         0x4
+// clang-format on
 
 
 #endif // GLOBALFUNCTIONS_H

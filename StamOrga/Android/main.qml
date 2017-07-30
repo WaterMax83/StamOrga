@@ -199,7 +199,7 @@ ApplicationWindow {
         id: stackView
         anchors.fill: parent
 
-        initialItem: viewGames
+        initialItem: viewMainGames
 
         onCurrentItemChanged: {
             stackView.currentItem.pageOpenedUpdateView()
@@ -207,8 +207,8 @@ ApplicationWindow {
     }
 
 
-    MyPages.GamesPage {
-        id: viewGames
+    MyPages.GamesMainPage {
+        id: viewMainGames
         userIntGames: userInt
     }
 
@@ -216,31 +216,30 @@ ApplicationWindow {
         id: toastManager
     }
 
+    /* Need components because otherwise they will be shown in main view */
     Component {
         id: viewUserLogin
         MyPages.UserLogin {
             userIntUser: userInt
         }
     }
-
     Component {
         id: viewSeasonTickets
         MyPages.SeasonTickets {
             userIntTicket: userInt
         }
     }
-
     Component {
         id: viewSettingsPage
         MyPages.Settings {
         }
     }
-
-    Component {
+    Component{
         id: viewLoggingPage
         MyPages.LogginPage {
         }
     }
+
 
     UserInterface {
         id: userInt
@@ -276,7 +275,7 @@ ApplicationWindow {
                                         })
                 }
             }
-            if (stackView.currentItem === viewGames) {
+            if (stackView.currentItem === viewMainGames) {
                 if (globalUserData.userIsGameAddingEnabled() || userInt.isDebuggingEnabled())
                     updateHeaderFromMain("StamOrga", "images/add.png")
                 else
@@ -290,24 +289,15 @@ ApplicationWindow {
         onNotifyUpdateReadableNameRequest: {
             stackView.currentItem.notifyUserIntUpdateReadableNameFinished(result)
         }
-        onNotifyGamesListFinished: {
-            viewGames.notifyUserIntGamesListFinished(result)
-        }
-        onNotifyGamesInfoListFinished: {
-            viewGames.notifyUserIntGamesInfoListFinished(result);
-        }
-        onNotifySeasonTicketAddFinished: {
-            stackView.currentItem.notifyUserIntSeasonTicketAdd(result)
-        }
-        onNotifySeasonTicketListFinished: {
-            stackView.currentItem.notifyUserIntSeasonTicketListFinished(result)
-        }
-        onNotifySeasonTicketRemoveFinished: {
-            stackView.currentItem.notifyUserIntSeasonTicketRemoveFinished(result)
-        }
-        onNotifySeasonTicketEditFinished: {
-            stackView.currentItem.notifyUserIntSeasonTicketEditFinished(result)
-        }
+        onNotifyGamesListFinished: viewMainGames.notifyUserIntGamesListFinished(result)
+        onNotifyGamesInfoListFinished: viewMainGames.notifyUserIntGamesInfoListFinished(result);
+        onNotifySetGamesFixedTimeFinished: viewMainGames.notifySetGamesFixedTimeFinished(result);
+
+        onNotifySeasonTicketAddFinished: stackView.currentItem.notifyUserIntSeasonTicketAdd(result)
+        onNotifySeasonTicketListFinished: stackView.currentItem.notifyUserIntSeasonTicketListFinished(result)
+        onNotifySeasonTicketRemoveFinished: stackView.currentItem.notifyUserIntSeasonTicketRemoveFinished(result)
+        onNotifySeasonTicketEditFinished: stackView.currentItem.notifyUserIntSeasonTicketEditFinished(result)
+
 
         onNotifyAvailableTicketStateChangedFinished: {
             stackView.currentItem.notifyAvailableTicketStateChangedFinished(result);
@@ -332,8 +322,7 @@ ApplicationWindow {
     Connections {
        target: globalSettings
        onSendAppStateChangedToActive: {
-           console.log("App State changed in qml: " + value);
-           viewGames.showLoadingGameInfos()
+           viewMainGames.showLoadingGameInfos("Lade Spielinfos")
            if (value === 1)
                userInt.startListGettingGamesInfo();
            else if (value === 2)

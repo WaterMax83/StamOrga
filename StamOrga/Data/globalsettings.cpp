@@ -21,12 +21,12 @@
 #include "../../Common/General/globaltiming.h"
 
 // clang-format off
-#define SETT_LOAD_LAST_GAMES        "LastGamesLoadCount"
 #define SETT_USE_READABLE_NAME      "UseReadableName"
 #define SETT_DEBUG_IP               "DebugIP"
 #define SETT_DEBUG_IP_WIFI          "DebugIPWifi"
 #define SETT_LAST_SHOWN_VERSION     "LastShownVersion"
 #define SETT_LOAD_GAME_INFO         "LoadGameInfo"
+#define SETT_SAVE_INFOS_ON_APP      "SaveInfosOnApp"
 // clang-format on
 
 GlobalSettings::GlobalSettings(QObject* parent)
@@ -41,9 +41,9 @@ void GlobalSettings::initialize(GlobalData* pGlobalData, QGuiApplication* app)
 
     this->m_pGlobalData->m_pMainUserSettings->beginGroup("GLOBAL_SETTINGS");
 
-    this->setLastGamesLoadCount(this->m_pGlobalData->m_pMainUserSettings->value(SETT_LOAD_LAST_GAMES, 5).toInt());
     this->setUseReadableName(this->m_pGlobalData->m_pMainUserSettings->value(SETT_USE_READABLE_NAME, true).toBool());
     this->setLoadGameInfo(this->m_pGlobalData->m_pMainUserSettings->value(SETT_LOAD_GAME_INFO, true).toBool());
+    this->setSaveInfosOnApp(this->m_pGlobalData->m_pMainUserSettings->value(SETT_SAVE_INFOS_ON_APP, true).toBool());
     this->setDebugIP(this->m_pGlobalData->m_pMainUserSettings->value(SETT_DEBUG_IP, "").toString());
     this->setDebugIPWifi(this->m_pGlobalData->m_pMainUserSettings->value(SETT_DEBUG_IP_WIFI, "").toString());
     this->m_lastShownVersion = this->m_pGlobalData->m_pMainUserSettings->value(SETT_LAST_SHOWN_VERSION, "").toString();
@@ -60,9 +60,9 @@ void GlobalSettings::saveGlobalSettings()
 
     this->m_pGlobalData->m_pMainUserSettings->beginGroup("GLOBAL_SETTINGS");
 
-    this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_LOAD_LAST_GAMES, this->m_ulastGamesLoadCount);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_USE_READABLE_NAME, this->m_useReadableName);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_LOAD_GAME_INFO, this->m_loadGameInfo);
+    this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_SAVE_INFOS_ON_APP, this->m_saveInfosOnApp);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_DEBUG_IP, this->m_debugIP);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_DEBUG_IP_WIFI, this->m_debugIPWifi);
 
@@ -82,7 +82,11 @@ QString GlobalSettings::getVersionChangeInfo()
 {
     QString rValue;
 
-    rValue.append("<b>V1.0.1:</b><br>");
+    rValue.append("<b>V1.0.2:</b>(XX.YY.2017)<br>");
+    rValue.append("- Spielterminierung hinzugefügt<br>");
+    rValue.append("- Spielliste in Aktuell/Vergangenheit aufgeteilt<br>");
+
+    rValue.append("<br><b>V1.0.1:</b>(17.07.2017)<br>");
     rValue.append("- Mehr Informationen in der Spielübersicht<br>");
     rValue.append("- automatisches Laden der Spielinformationen<br>");
     rValue.append("- Dauerkarten editierbar<br>");
@@ -122,7 +126,6 @@ void GlobalSettings::checkNewStateChangedAtStart()
 
 void GlobalSettings::stateFromAppChanged(Qt::ApplicationState state)
 {
-    qDebug() << QString("State changed %1 %2").arg(state).arg(this->loadGameInfo());
     if (state != Qt::ApplicationState::ApplicationActive)
         return;
 
@@ -136,7 +139,7 @@ void GlobalSettings::stateFromAppChanged(Qt::ApplicationState state)
     if ((now - this->m_lastGameInfoUpdate) < TIMEOUT_LOAD_GAMEINFO)
         return;
 
-    if ((now - this->m_pGlobalData->m_gpLastTimeStamp) < TIMEOUT_LOAD_GAMES)
+    if ((now - this->m_pGlobalData->m_gpLastLocalUpdateTimeStamp) < TIMEOUT_LOAD_GAMES)
         emit this->sendAppStateChangedToActive(1);
     else
         emit this->sendAppStateChangedToActive(2);

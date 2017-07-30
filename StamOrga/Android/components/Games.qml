@@ -42,7 +42,7 @@ Rectangle {
         }
 
         GradientStop {
-            position: 0.5
+            position: 0.9
             color: gradColorStop
         }
     }
@@ -78,10 +78,40 @@ Rectangle {
                 text: qsTr("Date")
                 leftPadding: 5
                 topPadding: 3
-                Layout.fillWidth: true
+
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
 
+            Text {
+                id: labelLineTimeNotFixed
+                text: "<i>(nicht terminiert)</i>"
+                textFormat: Text.RichText
+                font.pixelSize: 12
+                color: "white"
+                leftPadding: 5
+                topPadding: 3
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
+                visible: false
+            }
+        }
+
+        RowLayout {
+            id: layoutWhatLine
+
+            anchors.right: parent.right
+            anchors.left: parent.left
+            Layout.preferredWidth: columnLayout.width
+            Layout.fillWidth: true
+            spacing: 5
+
+            Label {
+                id: labelLineWhat
+                text: qsTr("What")
+                leftPadding: 5
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
+            }
             Image {
                 id: imageMeetingIsPresent
                 anchors.top : parent.top
@@ -149,7 +179,7 @@ Rectangle {
                     Image {
                         id: imageInterestMeeting
                         anchors.fill: parent
-                        source: "../images/done.png";
+                        source: "../images/help.png";
                     }
                     ColorOverlay {
                         anchors.fill: imageInterestMeeting
@@ -162,7 +192,7 @@ Rectangle {
             RowLayout {
                 id: freeTicketsItem
                 visible: false
-                spacing: 4
+                spacing: 5
                 Label {
                     id: labelFreeTickets
                     topPadding: 3
@@ -181,13 +211,6 @@ Rectangle {
                     color: "green"
                 }
             }
-        }
-
-        Label {
-            id: labelLineWhat
-            text: qsTr("What")
-            leftPadding: 5
-            Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
         }
 
         Label {
@@ -245,6 +268,7 @@ Rectangle {
             if (gamePlayItem.isGameInPast()) {
                 mainRectangleGame.gradColorStart = "#505050"
                 mainRectangleGame.gradColorStop = "#909090"
+                return;
             } else if (gamePlayItem.isGameRunning()) {
                 mainRectangleGame.gradColorStart = "#f30707"
                 mainRectangleGame.gradColorStop = "#ff4747"
@@ -261,6 +285,11 @@ Rectangle {
                     mainRectangleGame.gradColorStop = "#905090"
                 }
             }
+
+            var fixed = gamePlayItem.timeFixed
+//            console.log("Fixed = " + fixed);
+            if (!gamePlayItem.timeFixed)
+                labelLineTimeNotFixed.visible = true
 
             var meetingPresent = gamePlayItem.getMeetingInfo();
             if (meetingPresent > 0) {

@@ -27,6 +27,7 @@ Dialog {
     property int parentHeight : 960
     property alias textToAccept : labelAcceptText.text
     property alias headerText: accepptTextDialog.title
+    property bool showCancelButton: true
 
     signal acceptedDialog()
 
@@ -34,11 +35,11 @@ Dialog {
     x: Math.round((parentWidth - width) / 2)
     y: Math.round(parentHeight / 6)
     width: Math.round(Math.min(parentWidth, parentHeight) / 3 * 2)
-    Layout.maximumHeight: parentHeight / 4 * 3
+//    Layout.maximumHeight: parentHeight / 4 * 3
     modal: true
     focus: true
 
-    standardButtons: Dialog.Ok | Dialog.Cancel
+    standardButtons: Dialog.Ok | (showCancelButton ? Dialog.Cancel : 0)
     onAccepted: {
         acceptedDialog();
         accepptTextDialog.close();

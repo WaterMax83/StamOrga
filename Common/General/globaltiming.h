@@ -42,8 +42,15 @@
 #endif
 
 // clang-format off
-#define TIMEOUT_LOAD_GAMEINFO   (10 * 60 * 1000) // 10min
-#define TIMEOUT_LOAD_GAMES      (60 * 60 * 1000) // 60min
+#ifdef QT_DEBUG
+#define TIMEOUT_LOAD_GAMEINFO   qint64(10 * 60 * 1000) // 10min
+#define TIMEOUT_LOAD_GAMES      qint64(20 * 60 * 1000) // 20min
+#define TIMEOUT_UPDATE_GAMES    qint64(30 * 60 * 1000) // 30min
+#else
+#define TIMEOUT_LOAD_GAMEINFO   qint64(10 * 60 * 1000) // 10min
+#define TIMEOUT_LOAD_GAMES      qint64(1 * 24 * 60 * 60 * 1000) // 1 Tag
+#define TIMEOUT_UPDATE_GAMES    qint64(7 * 24 * 60 * 60 * 1000) // 7 Tage
+#endif
 // clang-format on
 
 inline uint CalcMSecEpochToUsHour(quint64 msec64)

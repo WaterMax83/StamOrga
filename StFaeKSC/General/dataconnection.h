@@ -38,6 +38,7 @@ public:
     MessageProtocol* requestGetProgramVersion(MessageProtocol* msg);
     MessageProtocol* requestGetGamesList(MessageProtocol* msg);
     MessageProtocol* requestGetGamesInfoList(MessageProtocol* msg);
+    MessageProtocol* requestSetFixedGameTime(MessageProtocol* msg);
     MessageProtocol* requestGetTicketsList(MessageProtocol* msg);
     MessageProtocol* requestAddSeasonTicket(MessageProtocol* msg);
     MessageProtocol* requestRemoveSeasonTicket(MessageProtocol* msg);

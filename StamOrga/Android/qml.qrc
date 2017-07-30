@@ -22,15 +22,14 @@
         <file>pages/SeasonTickets.qml</file>
         <file>images/+material/add.png</file>
         <file>images/add.png</file>
-        <file>pages/GamesPage.qml</file>
+        <file>pages/GamesListPage.qml</file>
         <file>components/VersionDialog.qml</file>
         <file>components/SeasonTicket.qml</file>
         <file>components/EditableTextDialog.qml</file>
         <file>pages/LogginPage.qml</file>
         <file>components/AcceptDialog.qml</file>
         <file>images/StammtischLogo.png</file>
-        <file>pages/CurrentHomeGamePage.qml</file>
-        <file>pages/CurrentAwayGamePage.qml</file>
+        <file>pages/CurrentGamePage.qml</file>
         <file>components/Toast.qml</file>
         <file>components/ToastManager.qml</file>
         <file>pages/Settings.qml</file>
@@ -57,5 +56,6 @@
         <file>images/help.png</file>
         <file>pages/newVersionInfo.qml</file>
         <file>components/EditSeasonTicketDialog.qml</file>
+        <file>pages/GamesMainPage.qml</file>
     </qresource>
 </RCC>

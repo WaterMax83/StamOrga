@@ -99,7 +99,7 @@ Flickable {
                         width: parent.height / 4 * 2
                         height: parent.height / 4 * 2
                         radius: width * 0.5
-                        color: "red"
+                        color: model.menuOpen ? "blue": "red"
                     }
 
                     Text {
@@ -123,6 +123,7 @@ Flickable {
                             clickedBlockedMenu.y = globalCoordinates.y - singleBlockedRow.height / 2
                             menuTicketIndex = model.index
                             clickedBlockedMenu.open();
+                            model.menuOpen = true
                         }
                     }
                 }
@@ -164,7 +165,7 @@ Flickable {
                             width: parent.height / 4 * 2
                             height: parent.height / 4 * 2
                             radius: width * 0.5
-                            color: "yellow"
+                            color: model.menuOpen ? "blue": "yellow"
                         }
 
                         Text {
@@ -179,6 +180,7 @@ Flickable {
                     }
 
                     Text {
+                        id: textReservedFor
                         text: "-> für " + model.reserve
                         anchors.left: parent.left
                         anchors.leftMargin: listViewItemHeight + imageItemReserved.width + 10
@@ -192,12 +194,13 @@ Flickable {
                         anchors.top: parent.top
                         anchors.bottom: parent.bottom
                         anchors.left: rowItemReserved.left
-                        anchors.right: parent.right
+                        anchors.right: (rowItemReserved.width > textReservedFor.width) ? rowItemReserved.right : textReservedFor.right
                         onClicked: {
                             var globalCoordinates = singleReservedRow.mapToItem(flickableCurrentTicketInfo, 0, 0)
                             clickedReservedMenu.y = globalCoordinates.y - singleReservedRow.height / 2
                             menuTicketIndex = model.index
                             clickedReservedMenu.open();
+                            model.menuOpen = true
                         }
                     }
                 }
@@ -232,7 +235,7 @@ Flickable {
                         width: parent.height / 4 * 2
                         height: parent.height / 4 * 2
                         radius: width * 0.5
-                        color: "green"
+                        color: model.menuOpen ? "blue": "green"
                     }
 
                     Text {
@@ -255,6 +258,7 @@ Flickable {
                             clickedFreeMenu.y = globalCoordinates.y - singleFreeRow.height / 2
                             menuTicketIndex = model.index
                             clickedFreeMenu.open();
+                            model.menuOpen = true
                         }
                     }
                 }
@@ -275,8 +279,13 @@ Flickable {
             id: clickedBlockedMenu
             x: (flickableCurrentTicketInfo.width - width) / 2
             y: flickableCurrentTicketInfo.height / 6
-
-
+            title: "Help"
+            onAboutToHide:  {
+                for (var i = 0; i < listViewModelBlockedTickets.count; i++) {
+                    var model = listViewModelBlockedTickets.get(i);
+                    model.menuOpen = false;
+                }
+            }
 
             background: Rectangle {
                     implicitWidth: menuItemFree.width
@@ -289,6 +298,7 @@ Flickable {
                 onClicked: {
                     userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 2);
                     showInfoHeader("Gebe Karte frei", true)
+
                 }
             }
         }
@@ -297,6 +307,10 @@ Flickable {
             id: clickedReservedMenu
             x: (flickableCurrentTicketInfo.width - width) / 2
             y: flickableCurrentTicketInfo.height / 6
+            onAboutToHide:  {
+                for (var i = 0; i < listViewModelReservedTickets.count; i++)
+                    var model = listViewModelReservedTickets.get(i).menuOpen = false;
+            }
 
             background: Rectangle {
                     implicitWidth: menuItemBlockFromReserve.width
@@ -344,6 +358,10 @@ Flickable {
             id: clickedFreeMenu
             x: (flickableCurrentTicketInfo.width - width) / 2
             y: flickableCurrentTicketInfo.height / 6
+            onAboutToHide:  {
+                for (var i = 0; i < listViewModelFreeTickets.count; i++)
+                    var model = listViewModelFreeTickets.get(i).menuOpen = false;
+            }
 
             background: Rectangle {
                     implicitWidth: menuItemBlock.width
@@ -446,20 +464,23 @@ Flickable {
                 if (seasonTicketItem.getTicketState() === 2) {
                     listViewModelFreeTickets.append({
                                                         title: seasonTicketItem.name + discount,
-                                                        index: seasonTicketItem.index
+                                                        index: seasonTicketItem.index,
+                                                        menuOpen: false
                                                     });
                 }
                 else if (seasonTicketItem.getTicketState() === 3) {
                     listViewModelReservedTickets.append({
                                                         title: seasonTicketItem.name + discount,
                                                         reserve: seasonTicketItem.getTicketReserveName(),
-                                                        index: seasonTicketItem.index
+                                                        index: seasonTicketItem.index,
+                                                        menuOpen: false
                                                     });
                 }
                 else
                     listViewModelBlockedTickets.append({
                                                        title: seasonTicketItem.name + discount,
-                                                       index: seasonTicketItem.index
+                                                       index: seasonTicketItem.index,
+                                                       menuOpen: false
                                                    })
             }
             /* Does not work in defintion for freeTickets, so set it here */
@@ -486,6 +507,6 @@ Flickable {
 
 
 //        txtInfoCurrentGame.text = "Letztes Update am "
-//                + globalUserData.getSeasonTicketLastUpdateString()
+//                + globalUserData.getSeasonTicketLastLocalUpdateString()
     }
 }

@@ -16,6 +16,8 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QDateTime>
+
 #include "configlist.h"
 
 #include "../Common/General/globalfunctions.h"
@@ -138,10 +140,10 @@ ConfigItem* ConfigList::getProblemItemFromArrayIndex(int index)
     return this->m_lAddItemProblems[index];
 }
 
-bool ConfigList::updateItemValue(ConfigItem* pItem, QString key, QVariant value)
+bool ConfigList::updateItemValue(ConfigItem* pItem, QString key, QVariant value, qint64 timeStamp)
 {
     bool         rValue = false;
-    QMutexLocker locker(&this->m_mConfigIniMutex);
+    this->m_mConfigIniMutex.lock();
 
     this->m_pConfigSettings->beginGroup(GROUP_LIST_ITEM);
     int arrayCount = this->m_pConfigSettings->beginReadArray(CONFIG_LIST_ARRAY);
@@ -159,6 +161,11 @@ bool ConfigList::updateItemValue(ConfigItem* pItem, QString key, QVariant value)
     }
     this->m_pConfigSettings->endArray();
     this->m_pConfigSettings->endGroup();
+
+    this->m_mConfigIniMutex.unlock();
+
+    this->setNewUpdateTime(timeStamp);
+
     return rValue;
 }
 
@@ -187,6 +194,43 @@ quint32 ConfigList::getNextInternalIndex()
 
     return savedIndex;
 }
+
+qint64 ConfigList::getLastUpdateTime()
+{
+    return this->m_lastUpdateTimeStamp;
+}
+
+qint64 ConfigList::readLastUpdateTime()
+{
+    QMutexLocker locker(&this->m_mConfigIniMutex);
+
+    this->m_pConfigSettings->beginGroup(ITEM_UPDATE_GROUP);
+    this->m_lastUpdateTimeStamp = this->m_pConfigSettings->value(ITEM_LAST_UPDATE, 0).toLongLong();
+    this->m_pConfigSettings->endGroup();
+
+    return this->getLastUpdateTime();
+}
+
+qint64 ConfigList::setNewUpdateTime(qint64 timeStamp)
+{
+    QMutexLocker locker(&this->m_mConfigIniMutex);
+
+    if (timeStamp == 0)
+        timeStamp = QDateTime::currentMSecsSinceEpoch();
+
+    if (this->m_lastUpdateTimeStamp == timeStamp)
+        return getLastUpdateTime();
+
+    this->m_pConfigSettings->beginGroup(ITEM_UPDATE_GROUP);
+
+    this->m_lastUpdateTimeStamp = timeStamp;
+    this->m_pConfigSettings->setValue(ITEM_LAST_UPDATE, this->m_lastUpdateTimeStamp);
+
+    this->m_pConfigSettings->endGroup();
+
+    return this->getLastUpdateTime();
+}
+
 
 ConfigList::~ConfigList()
 {

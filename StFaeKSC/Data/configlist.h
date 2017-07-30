@@ -48,6 +48,9 @@ public:
 #define ITEM_INDEX_GROUP "IndexCount"
 #define ITEM_MAX_INDEX "CurrentCount"
 
+#define ITEM_UPDATE_GROUP "Update"
+#define ITEM_LAST_UPDATE "LastUpdate"
+
 class ConfigList
 {
 public:
@@ -70,6 +73,8 @@ public:
         return this->getItemFromArrayIndex(index);
     }
 
+    qint64 getLastUpdateTime();
+
 protected:
     QList<ConfigItem*> m_lInteralList;
     QList<ConfigItem*> m_lAddItemProblems;
@@ -83,9 +88,13 @@ protected:
     ConfigItem* getItemFromArrayIndex(int index);
     ConfigItem* getProblemItemFromArrayIndex(int index);
 
-    bool updateItemValue(ConfigItem* pItem, QString key, QVariant value);
+    bool updateItemValue(ConfigItem* pItem, QString key, QVariant value, qint64 timeStamp = 0);
 
     quint32 getNextInternalIndex();
+
+    qint64 m_lastUpdateTimeStamp;
+    qint64 readLastUpdateTime();
+    qint64 setNewUpdateTime(qint64 timeStamp = 0);
 };
 
 #endif // CONFIGLIST_H

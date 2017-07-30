@@ -130,45 +130,47 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol* msg)
     quint32 totalSize = msg->getDataLength();
     quint32 offset    = 4;
 
-    quint16 totalPacks = qFromLittleEndian(*(quint16*)(pData + offset));
-    offset += 2;
+    qint16 updateIndex;
+    memcpy(&updateIndex, pData + offset, sizeof(qint16));
+    updateIndex = qFromLittleEndian(updateIndex);
+    offset += sizeof(qint16);
 
-    this->m_pGlobalData->startUpdateGamesPlay();
-    while (offset < totalSize && totalPacks > 0) {
+    quint16 size;
+    quint8  tmp;
+    qint64  timeStamp;
+    this->m_pGlobalData->startUpdateGamesPlay(updateIndex);
+    while (offset + GAMES_OFFSET < totalSize) {
         GamePlay* play = new GamePlay();
-        quint16   size = qFromLittleEndian(*(qint16*)(pData + offset));
-        offset += 2;
+        memcpy(&size, pData + offset, sizeof(quint16));
+        size = qFromLittleEndian(size);
+        offset += sizeof(quint16);
 
-        if (size <= 8) {
+        if (size <= GAMES_OFFSET) {
             qWarning().noquote() << QString("Size is to small %1").arg(size);
             delete play;
             break;
         }
-
-        play->setSeasonIndex(*(qint8*)(pData + offset));
-        offset += 1;
-        play->setCompetition(CompetitionIndex(*(qint8*)(pData + offset)));
+        memcpy(&tmp, pData + offset, sizeof(quint8));
+        play->setSeasonIndex(qFromLittleEndian(tmp));
+        offset += sizeof(quint8);
+        memcpy(&tmp, pData + offset, sizeof(quint8));
+        tmp = qFromLittleEndian(tmp);
+        play->setCompetition(CompetitionIndex(tmp & 0x7F));
+        play->setTimeFixed((tmp & 0x80) > 0 ? true : false);
         offset += 1;
 
         /* On Android there are problems reading from qint64 pointers???? SIGBUS*/
         //        play->setTimeStamp(qFromLittleEndian(*(qint64 *)(pData + offset)));
-        quint32 tmp       = qFromLittleEndian(*(qint32*)(pData + offset));
-        qint64  timeStamp = qint64(tmp);
-        tmp               = qFromLittleEndian(*(quint32*)(pData + offset + 4));
-        timeStamp |= qint64(tmp) << 32;
+        quint32 tmp32 = qFromLittleEndian(*(qint32*)(pData + offset));
+        timeStamp     = qint64(tmp32);
+        tmp32         = qFromLittleEndian(*(quint32*)(pData + offset + 4));
+        timeStamp |= qint64(tmp32) << 32;
 
         play->setTimeStamp(timeStamp);
         offset += 8;
 
         play->setIndex(qFromLittleEndian(*(quint32*)(pData + offset)));
         offset += 4;
-
-        //        play->setFreeTickets(qFromLittleEndian(*(quint16*)(pData + offset)));
-        offset += 2;
-        //        play->setBlockedTickets(qFromLittleEndian(*(quint16*)(pData + offset)));
-        offset += 2;
-        //        play->setReservedTickets(qFromLittleEndian(*(quint16*)(pData + offset)));
-        offset += 2;
 
         QString playString(QByteArray(pData + offset, size - GAMES_OFFSET));
         offset += (size - GAMES_OFFSET);
@@ -182,18 +184,19 @@ qint32 DataHandling::getHandleGamesListResponse(MessageProtocol* msg)
             play->setScore(lplayString.value(2));
 
         QQmlEngine::setObjectOwnership(play, QQmlEngine::CppOwnership);
-        this->m_pGlobalData->addNewGamePlay(play);
-        totalPacks--;
+        this->m_pGlobalData->addNewGamePlay(play, updateIndex);
     }
+    memcpy(&timeStamp, pData + offset, sizeof(qint64));
+    offset += sizeof(qint64);
 
-    this->m_pGlobalData->saveActualGamesList();
+    this->m_pGlobalData->saveCurrentGamesList(qFromLittleEndian(timeStamp));
 
     return rValue;
 }
 
 qint32 DataHandling::getHandleGamesInfoListResponse(MessageProtocol* msg)
 {
-    if (msg->getDataLength() < 8)
+    if (msg->getDataLength() < 4)
         return ERROR_CODE_WRONG_SIZE;
 
     const char* pData = msg->getPointerToData();
@@ -294,7 +297,9 @@ qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol* msg)
 
     quint32     userIndex = this->m_pGlobalData->userIndex();
     const char* pData     = msg->getPointerToData();
-    qint32      rValue    = qFromLittleEndian(*((qint32*)pData));
+    qint32      rValue;
+    memcpy(&rValue, pData, sizeof(qint32));
+    rValue = qFromLittleEndian(rValue);
 
     if (rValue != ERROR_CODE_SUCCESS)
         return rValue;
@@ -302,11 +307,13 @@ qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol* msg)
     quint32 totalSize = msg->getDataLength();
     quint32 offset    = 4;
 
-    quint16 totalPacks = qFromLittleEndian(*(quint16*)(pData + offset));
+    quint16 updateIndex;
+    memcpy(&updateIndex, pData + offset, sizeof(quint16));
+    updateIndex = qFromLittleEndian(updateIndex);
     offset += 2;
 
-    this->m_pGlobalData->startUpdateSeasonTickets();
-    while (offset < totalSize && totalPacks > 0) {
+    this->m_pGlobalData->startUpdateSeasonTickets(updateIndex);
+    while (offset + TICKET_OFFSET < totalSize) {
         SeasonTicketItem* sTicket = new SeasonTicketItem();
         quint16           size    = qFromLittleEndian(*(qint16*)(pData + offset));
         offset += 2;
@@ -335,11 +342,14 @@ qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol* msg)
             sTicket->setPlace(lsticketString.value(1));
 
         QQmlEngine::setObjectOwnership(sTicket, QQmlEngine::CppOwnership);
-        this->m_pGlobalData->addNewSeasonTicket(sTicket);
-        totalPacks--;
+        this->m_pGlobalData->addNewSeasonTicket(sTicket, updateIndex);
     }
 
-    this->m_pGlobalData->saveCurrentSeasonTickets();
+    qint64 serverTimeStamp;
+    memcpy(&serverTimeStamp, pData + offset, sizeof(qint64));
+    serverTimeStamp = qFromLittleEndian(serverTimeStamp);
+
+    this->m_pGlobalData->saveCurrentSeasonTickets(serverTimeStamp);
 
     return rValue;
 }

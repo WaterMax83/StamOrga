@@ -126,6 +126,15 @@ qint32 ConnectionHandling::startListGettingGamesInfo()
     return ERROR_CODE_SUCCESS;
 }
 
+qint32 ConnectionHandling::startSetFixedGameTime(const quint32 gameIndex, const quint32 fixedTime)
+{
+    DataConRequest req(OP_CODE_CMD_REQ::REQ_SET_FIXED_GAME_TIME);
+    req.m_lData.append(QString::number(gameIndex));
+    req.m_lData.append(QString::number(fixedTime));
+    this->sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
+}
+
 qint32 ConnectionHandling::startRemoveSeasonTicket(quint32 index)
 {
     DataConRequest req(OP_CODE_CMD_REQ::REQ_REMOVE_TICKET);
@@ -175,9 +184,9 @@ qint32 ConnectionHandling::startChangeSeasonTicketState(quint32 tickedIndex, qui
 qint32 ConnectionHandling::startListAvailableTicket(quint32 gameIndex)
 {
     /* check if update was more than one our ago, than update items */
-    qint64 oneHourAgo = QDateTime::currentDateTime().addSecs(-(60 * 60)).toMSecsSinceEpoch();
-    if (oneHourAgo > this->m_pGlobalData->getSeasonTicketLastUpdate())
-        return this->startListSeasonTickets();
+    //    qint64 oneHourAgo = QDateTime::currentDateTime().addSecs(-(60 * 60)).toMSecsSinceEpoch();
+    //    if (oneHourAgo > this->m_pGlobalData->getSeasonTicketLastLocalUpdate())
+    //        return this->startListSeasonTickets();
 
     DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS);
     req.m_lData.append(QString::number(gameIndex));
@@ -371,11 +380,26 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
         emit this->sNotifyCommandFinished(request.m_request, request.m_result);
         break;
 
+    case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST: {
+
+        static quint32 retryGetGamesInfoCount = 0;
+        if (request.m_result == ERROR_CODE_UPDATE_LIST) {
+            if (retryGetGamesInfoCount < 3) {
+                this->startListGettingGames();
+                retryGetGamesInfoCount++;
+                return;
+            }
+        }
+        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
+        retryGetGamesInfoCount = 0;
+        break;
+    }
+
     case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS: {
 
         static quint32 retryGetTicketCount = 0;
-        if (request.m_result == ERROR_CODE_MISSING_TICKET) {
-            if (retryGetTicketCount < 5) {
+        if (request.m_result == ERROR_CODE_UPDATE_LIST) {
+            if (retryGetTicketCount < 3) {
                 this->startListSeasonTickets();
                 retryGetTicketCount++;
                 return;
