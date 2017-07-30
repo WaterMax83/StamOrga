@@ -82,6 +82,18 @@ void GlobalData::loadGlobalSettings()
 
     this->m_pMainUserSettings->endGroup();
 
+    if (!g_GlobalSettings->saveInfosOnApp()) {
+        this->m_pMainUserSettings->beginGroup(GAMES_GROUP);
+        if (this->m_pMainUserSettings->childGroups().length() > 0 || this->m_pMainUserSettings->childKeys().length() > 0)
+            this->m_pMainUserSettings->remove("");
+        this->m_pMainUserSettings->endGroup();
+        this->m_pMainUserSettings->beginGroup(SEASONTICKET_GROUP);
+        if (this->m_pMainUserSettings->childGroups().length() > 0 || this->m_pMainUserSettings->childKeys().length() > 0)
+            this->m_pMainUserSettings->remove("");
+        this->m_pMainUserSettings->endGroup();
+        return;
+    }
+
     /* Getting data from last Games */
     this->m_pMainUserSettings->beginGroup(GAMES_GROUP);
     this->m_gpLastLocalUpdateTimeStamp  = this->m_pMainUserSettings->value("LocalGamesUpdateTime", 0).toLongLong();
@@ -158,6 +170,9 @@ void GlobalData::saveCurrentGamesList(qint64 timestamp)
     this->m_gpLastServerUpdateTimeStamp = timestamp;
 
     std::sort(this->m_lGamePlay.begin(), this->m_lGamePlay.end(), GamePlay::compareTimeStampFunction);
+
+    if (!g_GlobalSettings->saveInfosOnApp())
+        return;
 
     this->m_pMainUserSettings->beginGroup(GAMES_GROUP);
     this->m_pMainUserSettings->remove(""); // clear all elements
@@ -282,11 +297,13 @@ void GlobalData::saveCurrentSeasonTickets(qint64 timestamp)
 {
     QMutexLocker lock(&this->m_mutexTicket);
 
-    if (this->m_stLastServerUpdateTimeStamp == timestamp && !this->m_bSeasonTicketLastUpdateDidChanges) {
-        qDebug() << QString("Did not update anything");
+    if (this->m_stLastServerUpdateTimeStamp == timestamp && !this->m_bSeasonTicketLastUpdateDidChanges)
         return;
-    }
+
     this->m_stLastServerUpdateTimeStamp = timestamp;
+
+    if (!g_GlobalSettings->saveInfosOnApp())
+        return;
 
     this->m_pMainUserSettings->beginGroup(SEASONTICKET_GROUP);
     this->m_pMainUserSettings->remove(""); // clear all elements

@@ -288,7 +288,7 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
         wAckArray << qint16(updateIndex);
     }
 
-
+    quint16 numbOfLoadedGames = 0;
     for (qint32 i = startValue; i < numbOfGames; i++) {
         GamesPlay* pGame = (GamesPlay*)(this->m_pGlobalData->m_GamesList.getRequestConfigItemFromListIndex(i));
         if (pGame == NULL)
@@ -316,6 +316,7 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
             wAckArray << freeTickets << blockTickets << reservedTickets;
         }
 
+        numbOfLoadedGames++;
         ackArray.append(game);
     }
     if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST) {
@@ -326,7 +327,7 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
         wAckArray << lastUpdateGameFromServer;
     }
 
-    qInfo().noquote() << QString("User %1 request Games List with %2 entries").arg(this->m_pUserConData->m_userName).arg(numbOfGames);
+    qInfo().noquote() << QString("User %1 request Games List with %2 entries").arg(this->m_pUserConData->m_userName).arg(numbOfLoadedGames);
 
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_GAMES_LIST, ackArray);
 }
@@ -361,7 +362,7 @@ MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol* msg)
         qint64      lastUpdateTicketsFromApp = 0;
         memcpy(&lastUpdateTicketsFromApp, pData, sizeof(qint64));
         lastUpdateTicketsFromApp = qFromLittleEndian(lastUpdateTicketsFromApp);
-        if (this->m_pGlobalData->m_SeasonTicket.getLastUpdateTime() > lastUpdateTicketsFromApp)
+        if (this->m_pGlobalData->m_GamesList.getLastUpdateTime() > lastUpdateTicketsFromApp)
             return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_GAMES_INFO_LIST, ERROR_CODE_UPDATE_LIST);
     }
 
@@ -503,10 +504,12 @@ MessageProtocol* DataConnection::requestGetTicketsList(MessageProtocol* msg)
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_TICKETS_LIST, ERROR_CODE_WRONG_SIZE);
     }
 
-    const char* pData = msg->getPointerToData();
-    qint64      appTimeStamp;
-    memcpy(&appTimeStamp, pData, sizeof(qint64));
-    appTimeStamp = qFromLittleEndian(appTimeStamp);
+    if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST) {
+//        const char* pData = msg->getPointerToData();
+//        qint64      appTimeStamp;
+//        memcpy(&appTimeStamp, pData, sizeof(qint64));
+//        appTimeStamp = qFromLittleEndian(appTimeStamp);
+    }
 
     QByteArray  ackArray;
     QDataStream wAckArray(&ackArray, QIODevice::WriteOnly);

@@ -32,6 +32,7 @@ class GlobalSettings : public QObject
     Q_PROPERTY(QString debugIPWifi READ debugIPWifi WRITE setDebugIPWifi NOTIFY debugIPWifiChanged)
     Q_PROPERTY(bool useReadableName READ useReadableName WRITE setUseReadableName NOTIFY useReadableNameChanged)
     Q_PROPERTY(bool loadGameInfo READ loadGameInfo WRITE setLoadGameInfo NOTIFY loadGameInfoChanged)
+    Q_PROPERTY(bool saveInfosOnApp READ saveInfosOnApp WRITE setSaveInfosOnApp NOTIFY saveInfosOnAppChanged)
 public:
     explicit GlobalSettings(QObject* parent = 0);
 
@@ -85,6 +86,13 @@ public:
         emit this->loadGameInfoChanged();
     }
 
+    bool saveInfosOnApp() { return this->m_saveInfosOnApp; }
+    void setSaveInfosOnApp(bool save)
+    {
+        this->m_saveInfosOnApp = save;
+        emit this->saveInfosOnAppChanged();
+    }
+
     Q_INVOKABLE QString getCurrentVersion();
 
     Q_INVOKABLE QString getVersionChangeInfo();
@@ -98,6 +106,7 @@ signals:
     void debugIPWifiChanged();
     void useReadableNameChanged();
     void loadGameInfoChanged();
+    void saveInfosOnAppChanged();
     void sendAppStateChangedToActive(quint32 value);
 
 public slots:
@@ -107,6 +116,7 @@ private:
     GlobalData* m_pGlobalData;
     bool        m_useReadableName;
     bool        m_loadGameInfo;
+    bool        m_saveInfosOnApp;
     QString     m_debugIP;
     QString     m_debugIPWifi;
     QMutex      m_mutex;

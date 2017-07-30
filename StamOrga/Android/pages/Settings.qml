@@ -71,6 +71,24 @@ Item {
                }
            }
 
+           RowLayout {
+               Layout.preferredWidth: parent.width
+               Layout.fillWidth: true
+
+               Label {
+                   id: text4
+                   text: qsTr("Speichere geladene Daten:")
+                   Layout.fillWidth: true
+                   Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                   font.pixelSize: 14
+                   color: "white"
+               }
+               CheckBox {
+                    id: saveInfosOnApp
+                    checked: globalSettings.saveInfosOnApp
+                    onCheckedChanged: valueWasEditedEnableSave()
+               }
+           }
 
 
            RowLayout {
@@ -144,6 +162,11 @@ Item {
 
               if (globalSettings.loadGameInfo !== loadGameInfo.checked) {
                    globalSettings.loadGameInfo = loadGameInfo.checked;
+                   saveSettings = true;
+              }
+
+              if (globalSettings.saveInfosOnApp !== saveInfosOnApp.checked) {
+                   globalSettings.saveInfosOnApp = saveInfosOnApp.checked;
                    saveSettings = true;
               }
 

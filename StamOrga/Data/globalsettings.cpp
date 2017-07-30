@@ -21,12 +21,12 @@
 #include "../../Common/General/globaltiming.h"
 
 // clang-format off
-#define SETT_LOAD_LAST_GAMES        "LastGamesLoadCount"
 #define SETT_USE_READABLE_NAME      "UseReadableName"
 #define SETT_DEBUG_IP               "DebugIP"
 #define SETT_DEBUG_IP_WIFI          "DebugIPWifi"
 #define SETT_LAST_SHOWN_VERSION     "LastShownVersion"
 #define SETT_LOAD_GAME_INFO         "LoadGameInfo"
+#define SETT_SAVE_INFOS_ON_APP      "SaveInfosOnApp"
 // clang-format on
 
 GlobalSettings::GlobalSettings(QObject* parent)
@@ -43,6 +43,7 @@ void GlobalSettings::initialize(GlobalData* pGlobalData, QGuiApplication* app)
 
     this->setUseReadableName(this->m_pGlobalData->m_pMainUserSettings->value(SETT_USE_READABLE_NAME, true).toBool());
     this->setLoadGameInfo(this->m_pGlobalData->m_pMainUserSettings->value(SETT_LOAD_GAME_INFO, true).toBool());
+    this->setSaveInfosOnApp(this->m_pGlobalData->m_pMainUserSettings->value(SETT_SAVE_INFOS_ON_APP, true).toBool());
     this->setDebugIP(this->m_pGlobalData->m_pMainUserSettings->value(SETT_DEBUG_IP, "").toString());
     this->setDebugIPWifi(this->m_pGlobalData->m_pMainUserSettings->value(SETT_DEBUG_IP_WIFI, "").toString());
     this->m_lastShownVersion = this->m_pGlobalData->m_pMainUserSettings->value(SETT_LAST_SHOWN_VERSION, "").toString();
@@ -61,6 +62,7 @@ void GlobalSettings::saveGlobalSettings()
 
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_USE_READABLE_NAME, this->m_useReadableName);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_LOAD_GAME_INFO, this->m_loadGameInfo);
+    this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_SAVE_INFOS_ON_APP, this->m_saveInfosOnApp);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_DEBUG_IP, this->m_debugIP);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_DEBUG_IP_WIFI, this->m_debugIPWifi);
 
