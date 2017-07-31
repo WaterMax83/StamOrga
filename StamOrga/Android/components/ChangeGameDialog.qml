@@ -133,7 +133,6 @@ Dialog {
             id: spBoxSeasonIndex
             to: 34
             from: 1
-//            value: globalUserData.conMasterPort
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             KeyNavigation.tab: comboBoxCompetition
         }

@@ -257,66 +257,65 @@ Flickable {
                 }
             }
 
-            Item {
-                width: parent.width
+            ListView {
+                id: listViewAcceptedUsers
                 visible: isAcceptVisible
+                interactive: false
+                implicitWidth: mainColumnLayoutCurrentGame.width
 
-                ListView {
-                    id: listViewAcceptedUsers
-                    interactive: false
-                    implicitWidth: mainColumnLayoutCurrentGame.width
+                delegate: RowLayout {
+                    id: singleRowAccepted
+                    width: parent.width
+                    height: listViewItemHeight
 
-                    delegate: RowLayout {
-                        id: singleRowAccepted
-                        width: parent.width
-                        height: listViewItemHeight
-
-                        Rectangle {
-                            id: imageItemAccepted
-                            anchors.left: parent.left
-                            anchors.leftMargin: parent.height
-                            width: parent.height / 4 * 3
-                            height: parent.height / 4 * 3
-                            radius: width * 0.5
-                            color: model.color
-                            Image {
-                                anchors.fill: parent
-                                source: model.source
-                            }
-                        }
-
-                        Text {
-                            id: textItemAccepted
-                            text: model.title
-                            anchors.left: imageItemAccepted.right
-                            anchors.leftMargin: 10
-                            anchors.verticalCenter: parent.verticalCenter
-                            Layout.alignment: Qt.AlignVCenter
-                            color: "white"
-                            font.pixelSize: parent.height / 4 * 2
-                        }
-                        MouseArea {
-                            anchors.top: parent.top
-                            anchors.bottom: parent.bottom
-                            anchors.left: imageItemAccepted.left
-                            anchors.right: textItemAccepted.right
-                            onClicked: {
-                                var globalCoordinates = singleRowAccepted.mapToItem(flickableCurrentMeetInfo, 0, 0)
-                                clickedAcceptedUserMenu.y = globalCoordinates.y - singleRowAccepted.height / 2
-                                menuAcceptIndex = model.index
-                                menuAcceptValue = model.value
-                                menuAcceptText = model.title
-                                clickedAcceptedUserMenu.open();
-                            }
+                    Rectangle {
+                        id: imageItemAccepted
+                        anchors.left: parent.left
+                        anchors.leftMargin: parent.height
+                        width: parent.height / 4 * 3
+                        height: parent.height / 4 * 3
+                        radius: width * 0.5
+                        color: model.color
+                        Image {
+                            anchors.fill: parent
+                            source: model.source
                         }
                     }
 
-                    model: ListModel {
-                        id: listViewModelAcceptedUsers
+                    Text {
+                        id: textItemAccepted
+                        text: model.title
+                        anchors.left: imageItemAccepted.right
+                        anchors.leftMargin: 10
+                        anchors.verticalCenter: parent.verticalCenter
+                        Layout.alignment: Qt.AlignVCenter
+                        color: "white"
+                        font.pixelSize: parent.height / 4 * 2
                     }
+                    MouseArea {
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.left: imageItemAccepted.left
+                        anchors.right: textItemAccepted.right
+                        onClicked: {
+                            var globalCoordinates = singleRowAccepted.mapToItem(flickableCurrentMeetInfo, 0, 0)
+                            clickedAcceptedUserMenu.y = globalCoordinates.y - singleRowAccepted.height / 2
+                            menuAcceptIndex = model.index
+                            menuAcceptValue = model.value
+                            menuAcceptText = model.title
+                            clickedAcceptedUserMenu.open();
+                        }
+                    }
+                }
+
+                model: ListModel {
+                    id: listViewModelAcceptedUsers
                 }
             }
         }
+    }
+
+    ScrollIndicator.vertical: ScrollIndicator {
     }
 
     property int menuAcceptIndex

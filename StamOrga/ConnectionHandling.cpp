@@ -432,6 +432,7 @@ void ConnectionHandling::checkTimeoutResult(qint32 result)
     if (result == ERROR_CODE_TIMEOUT) {
         this->stopDataConnection();
         this->m_lastSuccessTimeStamp = 0;
+        emit this->sSendNewBindingPortRequest();
     } else if (this->m_pGlobalData->bIsConnected())
         this->m_lastSuccessTimeStamp = QDateTime::currentMSecsSinceEpoch();
 }

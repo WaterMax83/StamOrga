@@ -60,8 +60,8 @@ void MainConnection::slotNewBindingPortRequest()
 {
     if (this->m_pMasterUdpSocket->state() != QAbstractSocket::UnconnectedState)
         this->m_pMasterUdpSocket->disconnectFromHost();
-    bool test = this->m_pMasterUdpSocket->bind();
-    QString("new Binding for port %1").arg(test);
+    this->m_pMasterUdpSocket->bind();
+    this->m_hMasterReceiver = QHostAddress(this->m_pGlobalData->ipAddr());
 }
 
 void MainConnection::slotSendNewMainConRequest(QString username)

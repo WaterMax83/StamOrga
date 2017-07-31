@@ -82,9 +82,11 @@ QString GlobalSettings::getVersionChangeInfo()
 {
     QString rValue;
 
-    rValue.append("<b>V1.0.2:</b>(XX.YY.2017)<br>");
+    rValue.append("<b>V1.0.2:</b>(31.07.2017)<br>");
     rValue.append("- Spielterminierung hinzugefügt<br>");
     rValue.append("- Spielliste in Aktuell/Vergangenheit aufgeteilt<br>");
+    rValue.append("- Daten nur nach Bedarf vom Server laden<br>");
+    rValue.append("- Fehler beseitigt (Einstellungen/Tickets/etc..)<br>");
 
     rValue.append("<br><b>V1.0.1:</b>(17.07.2017)<br>");
     rValue.append("- Mehr Informationen in der Spielübersicht<br>");
@@ -92,7 +94,7 @@ QString GlobalSettings::getVersionChangeInfo()
     rValue.append("- Dauerkarten editierbar<br>");
     rValue.append("- Passwörter vollständig gehasht<br>");
     rValue.append("- Versionshistorie hinzugefügt<br>");
-    rValue.append("- Diverse Bug fixes<br>");
+    rValue.append("- Diverse Fehler beseitigt<br>");
 
     rValue.append("<br><b>V1.0.0:</b><br>");
     rValue.append("Erste Version<br>");

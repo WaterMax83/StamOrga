@@ -185,22 +185,22 @@ Item {
 
               updateHeaderFromMain("", "");
 
+              isSaveButtonShown = false;
+
               toastManager.show("Daten erfolgreich gespeichert", 3000)
    }
 
-   property bool isSavePossible : false;
+   property bool isSaveButtonShown : false;
    property bool isStartupDone : false
    function valueWasEditedEnableSave() {
 
        if (!isStartupDone)
            return;
 
-       if (isSavePossible)
+       if (isSaveButtonShown)
            return;
 
-       console.log("Hallo Welt");
-
-       isSavePossible = true;
+       isSaveButtonShown = true;
        updateHeaderFromMain("", "images/save.png");
    }
 
