@@ -31,11 +31,13 @@ Page {
     height: parent.height
     property UserInterface userIntGames
 
-    ColumnLayout {
+    GridLayout {
         id: mainColumnGamesMainPage
         anchors.fill: parent
         Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-        spacing: 0
+        flow: GridLayout.TopToBottom
+        rows: 3
+        columns: 2
 
         ColumnLayout {
             id: columnLayoutBusyInfo
@@ -55,6 +57,7 @@ Page {
                 horizontalAlignment: Text.AlignHCenter
                 Layout.alignment:  Qt.AlignHCenter | Qt.AlignVCenter
             }
+
         }
 
         TabBar {
@@ -81,6 +84,7 @@ Page {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
             Layout.fillHeight: true
             currentIndex: tabBarGamesMainPage.currentIndex
+            Layout.columnSpan: 2
 
 
             MyPages.GamesListPage {
@@ -99,10 +103,10 @@ Page {
         }
     }
 
-
     property var addGameDialog;
 
     function toolButtonClicked() {
+
         if (globalUserData.userIsGameAddingEnabled() || userIntGames.isDebuggingEnabled()) {
             var component = Qt.createComponent("../components/ChangeGameDialog.qml");
             if (component.status === Component.Ready) {
@@ -208,7 +212,6 @@ Page {
     {
         busyLoadingIndicatorGames.visible = true
         txtInfoLoadingGames.text = text
-//        txtInfoLoadingGames.text = "Lade Spielinfos"
     }
 
 }
