@@ -25,6 +25,7 @@ import "../components" as MyComponents
 
 Flickable {
     id: flickableCurrentMeetInfo
+    clip: true
     height: parent.height * 1.2
     contentHeight: mainPaneCurrentMeetInfo.height
 

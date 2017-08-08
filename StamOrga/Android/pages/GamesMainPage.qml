@@ -67,6 +67,7 @@ Page {
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
                 currentIndex: swipeViewGamesMainPage.currentIndex
 
+
                 TabButton {
                     text: "Aktuell"
                 }
@@ -86,12 +87,17 @@ Page {
             currentIndex: tabBarGamesMainPage.currentIndex
             Layout.columnSpan: 2
 
-
             MyPages.GamesListPage {
                 id: gamesListPagePresent
                 showOnlyPastGames : false
                 onShowInfoHeader: showLoadingGameInfos(text);
                 onAcceptedChangeGame: startEditGame(dialog);
+                onDragStarted: {
+                    movedInfoIndex = 1; movedStartY = contentY;
+                    movedStartMargin = columnLayoutBusyInfo.Layout.topMargin > 0 ? 10 : -movedInfoHeigth;
+                }
+                onDragEnded: { movedInfoIndex = 0; checkMovedInfoEnd(movedStartY - contentY); }
+                onContentYChanged : checkMovedInfo(1, movedStartY - contentY);
 
             }
             MyPages.GamesListPage {
@@ -99,9 +105,63 @@ Page {
                 showOnlyPastGames : true
                 onShowInfoHeader: showLoadingGameInfos(text);
                 onAcceptedChangeGame: startEditGame(dialog);
+                onDragStarted: {
+                    movedInfoIndex = 2; movedStartY = contentY;
+                    movedStartMargin = columnLayoutBusyInfo.Layout.topMargin > 0 ? 10 : -movedInfoHeigth;
+                }
+                onDragEnded: { movedInfoIndex = 0; checkMovedInfoEnd(movedStartY - contentY); }
+                onContentYChanged : checkMovedInfo(2, movedStartY - contentY);
             }
         }
     }
+
+    NumberAnimation {
+        id: animateMoveInfoUp
+        target: columnLayoutBusyInfo
+        property: "Layout.topMargin"
+        to: -movedInfoHeigth
+        duration: 250
+    }
+    NumberAnimation {
+        id: animateMoveInfoDown
+        target: columnLayoutBusyInfo
+        property: "Layout.topMargin"
+        to: 10
+        duration: 250
+    }
+
+    function checkMovedInfo(index, diff) {
+        if (movedInfoIndex !== index)
+            return;
+
+        if (movedStartMargin === 10) {
+            if (diff < 0)
+                columnLayoutBusyInfo.Layout.topMargin = Math.max(-movedInfoHeigth, (diff * 0.5) + 10);
+        } else if (movedStartMargin === -movedInfoHeigth) {
+
+            if (diff > 0)
+                columnLayoutBusyInfo.Layout.topMargin = Math.min(10, -movedInfoHeigth + (diff * 0.5));
+        }
+    }
+
+    function checkMovedInfoEnd(diff){
+        if (movedStartMargin === 10) {
+            if (diff < -10)
+                animateMoveInfoUp.start()
+            else
+                animateMoveInfoDown.start()
+        } else if (movedStartMargin === -movedInfoHeigth){
+            if (diff > 10)
+                animateMoveInfoDown.start()
+            else
+                animateMoveInfoUp.start()
+        }
+    }
+
+    property int movedInfoIndex : 0
+    property int movedStartY : 0
+    property int movedStartMargin : 10
+    property int movedInfoHeigth : txtInfoLoadingGames.height
 
     property var addGameDialog;
 

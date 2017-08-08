@@ -57,5 +57,9 @@
         <file>pages/newVersionInfo.qml</file>
         <file>components/EditSeasonTicketDialog.qml</file>
         <file>pages/GamesMainPage.qml</file>
+        <file>components/TicketInfoSingleItem.qml</file>
+        <file>components/TicketInfoDoubleItem.qml</file>
+        <file>images/+material/info.png</file>
+        <file>images/info.png</file>
     </qresource>
 </RCC>

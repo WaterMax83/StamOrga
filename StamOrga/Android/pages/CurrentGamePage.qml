@@ -44,9 +44,6 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 Layout.alignment: Qt.AlignTop
-//                Layout.leftMargin: 10
-//                Layout.rightMargin: 10
-//                Layout.topMargin: 10
             }
 
             ColumnLayout {
@@ -102,6 +99,12 @@ Item {
 
     CurrentTicketInfo {
         id: currentTicketInfo
+        onDragStarted: {
+            movedInfoIndex = 2; movedStartY = contentY;
+            movedStartMargin = gameHeader.Layout.topMargin === 0 ? 0 : -movedInfoHeigth;
+        }
+        onDragEnded: { movedInfoIndex = 0; checkMovedInfoEnd(movedStartY - contentY); }
+        onContentYChanged : checkMovedInfo(2, movedStartY - contentY);
     }
 
 
@@ -119,6 +122,12 @@ Item {
 
     CurrentMeetInfo {
         id: currentMeetInfo
+        onDragStarted: {
+            movedInfoIndex = 2; movedStartY = contentY;
+            movedStartMargin = gameHeader.Layout.topMargin === 0 ? 0 : -movedInfoHeigth;
+        }
+        onDragEnded: { movedInfoIndex = 0; checkMovedInfoEnd(movedStartY - contentY); }
+        onContentYChanged : checkMovedInfo(2, movedStartY - contentY);
     }
 
     function currentMeetInfoNewHeaderInfo(text, load) {
@@ -131,6 +140,54 @@ Item {
             txtInfoCurrentGame.text = text;
         }
     }
+
+    NumberAnimation {
+        id: animateMoveInfoUp
+        target: gameHeader
+        property: "Layout.topMargin"
+        to: -movedInfoHeigth
+        duration: 250
+    }
+    NumberAnimation {
+        id: animateMoveInfoDown
+        target: gameHeader
+        property: "Layout.topMargin"
+        to: 0
+        duration: 250
+    }
+
+    function checkMovedInfo(index, diff) {
+        if (movedInfoIndex !== index)
+            return;
+
+        if (movedStartMargin === 0) {
+            if (diff < 0)
+                gameHeader.Layout.topMargin = Math.max(-movedInfoHeigth, (diff * 0.5));
+        } else if (movedStartMargin === -movedInfoHeigth) {
+
+            if (diff > 0)
+                gameHeader.Layout.topMargin = Math.min(0, -movedInfoHeigth + (diff * 0.5));
+        }
+    }
+
+    function checkMovedInfoEnd(diff){
+        if (movedStartMargin === 0) {
+            if (diff < -10)
+                animateMoveInfoUp.start()
+            else
+                animateMoveInfoDown.start()
+        } else if (movedStartMargin === -movedInfoHeigth){
+            if (diff > 10)
+                animateMoveInfoDown.start()
+            else
+                animateMoveInfoUp.start()
+        }
+    }
+
+    property int movedInfoIndex : 0
+    property int movedStartY : 0
+    property int movedStartMargin : 0
+    property int movedInfoHeigth : gameHeader.height + 15
 
     function toolButtonClicked() {
 

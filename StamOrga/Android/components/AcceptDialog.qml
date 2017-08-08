@@ -55,8 +55,11 @@ Dialog {
         width: accepptTextDialog.width
         spacing: 20
 
-        Label {
+        Text {
             id: labelAcceptText
+            textFormat: Text.RichText
+            font.pixelSize: 12
+            color: "white"
             wrapMode: Text.WordWrap
             Layout.maximumWidth: parent.width
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter

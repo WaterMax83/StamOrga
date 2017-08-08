@@ -21,10 +21,11 @@ import QtQuick.Layouts 1.0
 
 import com.watermax.demo 1.0
 
-//import "../components" as MyComponents
+import "../components" as MyComponents
 
 Flickable {
     id: flickableCurrentTicketInfo
+    clip: true
     height: parent.height * 1.2
     contentHeight: mainPaneCurrentTicketInfo.height
 
@@ -87,44 +88,17 @@ Flickable {
                 interactive: false
                 implicitWidth: mainColumnLayoutCurrentGame.width
 
-                delegate: RowLayout {
+                delegate: MyComponents.TicketInfoSingleItem {
                     id: singleBlockedRow
-                    width: parent.width
                     height: listViewItemHeight
-
-                    Rectangle {
-                        id: imageItemBlocked
-                        anchors.left: parent.left
-                        anchors.leftMargin: parent.height
-                        width: parent.height / 4 * 2
-                        height: parent.height / 4 * 2
-                        radius: width * 0.5
-                        color: model.menuOpen ? "blue": "red"
-                    }
-
-                    Text {
-                        id: textItemBlocked
-                        text: model.title
-                        anchors.left: imageItemBlocked.right
-                        anchors.leftMargin: 10
-                        anchors.verticalCenter: parent.verticalCenter
-                        Layout.alignment: Qt.AlignVCenter
-                        color: "white"
-                        font.pixelSize: parent.height / 4 * 2
-                    }
-
-                    MouseArea {
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        anchors.left: imageItemBlocked.left
-                        anchors.right: textItemBlocked.right
-                        onClicked: {
-                            var globalCoordinates = singleBlockedRow.mapToItem(flickableCurrentTicketInfo, 0, 0)
-                            clickedBlockedMenu.y = globalCoordinates.y - singleBlockedRow.height / 2
-                            menuTicketIndex = model.index
-                            clickedBlockedMenu.open();
-                            model.menuOpen = true
-                        }
+                    itemModel: model
+                    imageColor : "red"
+                    onClickedItem: {
+                        var globalCoordinates = singleBlockedRow.mapToItem(flickableCurrentTicketInfo, 0, 0)
+                        clickedBlockedMenu.y = globalCoordinates.y - singleBlockedRow.height / 2
+                        menuTicketIndex = model.index
+                        clickedBlockedMenu.open();
+                        model.menuOpen = true
                     }
                 }
 
@@ -146,62 +120,16 @@ Flickable {
                 interactive: false
                 implicitWidth: mainColumnLayoutCurrentGame.width
 
-                delegate: ColumnLayout {
+                delegate: MyComponents.TicketInfoDoubleItem {
                     id: singleReservedRow
-                    width: parent.width
-                    spacing: 0
-
-                    RowLayout {
-                        id: rowItemReserved
-                        width: parent.width
-                        height: listViewItemHeight
-                        anchors.left: parent.left
-                        anchors.leftMargin: listViewItemHeight
-
-
-                        Rectangle {
-                            id: imageItemReserved
-                            anchors.left: parent.left
-                            width: parent.height / 4 * 2
-                            height: parent.height / 4 * 2
-                            radius: width * 0.5
-                            color: model.menuOpen ? "blue": "yellow"
-                        }
-
-                        Text {
-                            text: model.title
-                            anchors.left: imageItemReserved.right
-                            anchors.leftMargin: 10
-                            anchors.verticalCenter: parent.verticalCenter
-                            Layout.alignment: Qt.AlignVCenter
-                            color: "white"
-                            font.pixelSize: listViewItemHeight / 4 * 2
-                        }
-                    }
-
-                    Text {
-                        id: textReservedFor
-                        text: "-> für " + model.reserve
-                        anchors.left: parent.left
-                        anchors.leftMargin: listViewItemHeight + imageItemReserved.width + 10
-                        bottomPadding: 5
-                        Layout.alignment: Qt.AlignVCenter
-                        color: "white"
-                        font.pixelSize: listViewItemHeight / 4 * 2
-                    }
-
-                    MouseArea {
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        anchors.left: rowItemReserved.left
-                        anchors.right: (rowItemReserved.width > textReservedFor.width) ? rowItemReserved.right : textReservedFor.right
-                        onClicked: {
-                            var globalCoordinates = singleReservedRow.mapToItem(flickableCurrentTicketInfo, 0, 0)
-                            clickedReservedMenu.y = globalCoordinates.y - singleReservedRow.height / 2
-                            menuTicketIndex = model.index
-                            clickedReservedMenu.open();
-                            model.menuOpen = true
-                        }
+//                    height: listViewItemHeight
+                    itemModel: model
+                    onClickedItem: {
+                        var globalCoordinates = singleReservedRow.mapToItem(flickableCurrentTicketInfo, 0, 0)
+                        clickedReservedMenu.y = globalCoordinates.y - singleReservedRow.height / 2
+                        menuTicketIndex = model.index
+                        clickedReservedMenu.open();
+                        model.menuOpen = true
                     }
                 }
 
@@ -224,42 +152,17 @@ Flickable {
                 interactive: false
                 implicitWidth: mainColumnLayoutCurrentGame.width
 
-                delegate: RowLayout {
+                delegate: MyComponents.TicketInfoSingleItem {
                     id: singleFreeRow
-                    width: parent.width
                     height: listViewItemHeight
-                    Rectangle {
-                        id: imageItemFree
-                        anchors.left: parent.left
-                        anchors.leftMargin: parent.height
-                        width: parent.height / 4 * 2
-                        height: parent.height / 4 * 2
-                        radius: width * 0.5
-                        color: model.menuOpen ? "blue": "green"
-                    }
-
-                    Text {
-                        id: textItemFree
-                        text: model.title
-                        anchors.left: imageItemFree.right
-                        anchors.leftMargin: 10
-                        anchors.verticalCenter: parent.verticalCenter
-                        Layout.alignment: Qt.AlignVCenter
-                        color: "white"
-                        font.pixelSize: parent.height / 4 * 2
-                    }
-                    MouseArea {
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        anchors.left: imageItemFree.left
-                        anchors.right: textItemFree.right
-                        onClicked: {
-                            var globalCoordinates = singleFreeRow.mapToItem(flickableCurrentTicketInfo, 0, 0)
-                            clickedFreeMenu.y = globalCoordinates.y - singleFreeRow.height / 2
-                            menuTicketIndex = model.index
-                            clickedFreeMenu.open();
-                            model.menuOpen = true
-                        }
+                    itemModel: model
+                    imageColor : "green"
+                    onClickedItem: {
+                        var globalCoordinates = singleFreeRow.mapToItem(flickableCurrentTicketInfo, 0, 0)
+                        clickedFreeMenu.y = globalCoordinates.y - singleFreeRow.height / 2
+                        menuTicketIndex = model.index
+                        clickedFreeMenu.open();
+                        model.menuOpen = true
                     }
                 }
 
@@ -275,132 +178,115 @@ Flickable {
 
     property int menuTicketIndex
 
-    Menu {
-            id: clickedBlockedMenu
-            x: (flickableCurrentTicketInfo.width - width) / 2
-            y: flickableCurrentTicketInfo.height / 6
-            title: "Help"
-            onAboutToHide:  {
-                for (var i = 0; i < listViewModelBlockedTickets.count; i++) {
-                    var model = listViewModelBlockedTickets.get(i);
-                    model.menuOpen = false;
-                }
-            }
+    function freeTicketItem() {
+        userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 2);
+        showInfoHeader("Gebe Karte frei", true)
+    }
 
-            background: Rectangle {
-                    implicitWidth: menuItemFree.width
-                    color: "#4f4f4f"
-                }
+    function blockTicketItem() {
+        userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 1);
+        showInfoHeader("Sperre Karte", true)
+    }
 
-            MenuItem {
-                id: menuItemFree
-                text : "Freigeben"
-                onClicked: {
-                    userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 2);
-                    showInfoHeader("Gebe Karte frei", true)
-
-                }
-            }
+    function reserveTicketItem(text) {
+        var component = Qt.createComponent("../components/EditableTextDialog.qml");
+        if (component.status === Component.Ready) {
+            var dialog = component.createObject(mainPaneCurrentGame,{popupType: 1});
+            dialog.headerText = text;
+            dialog.parentHeight = mainWindow.height
+            dialog.parentWidth =  mainPaneCurrentGame.width
+            dialog.textMinSize = 4;
+            dialog.acceptedTextEdit.connect(acceptedEditReserveNameDialog);
+            dialog.open();
         }
-
-    Menu {
-            id: clickedReservedMenu
-            x: (flickableCurrentTicketInfo.width - width) / 2
-            y: flickableCurrentTicketInfo.height / 6
-            onAboutToHide:  {
-                for (var i = 0; i < listViewModelReservedTickets.count; i++)
-                    var model = listViewModelReservedTickets.get(i).menuOpen = false;
-            }
-
-            background: Rectangle {
-                    implicitWidth: menuItemBlockFromReserve.width
-                    color: "#4f4f4f"
-                }
-
-            MenuItem {
-                id: menuItemFreeFromReserve
-                text: "Freigeben"
-                onClicked: {
-                    userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 2);
-                    showInfoHeader("Gebe Karte frei", true)
-                }
-            }
-
-            MenuItem {
-                id: menuItemBlockFromReserve
-                text: "Sperren"
-                onClicked: {
-                    userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 1);
-                    showInfoHeader("Sperre Karte", true)
-                }
-            }
-
-            MenuItem {
-                id: menuItemChangeReserve
-                text: "Reservierung ändern"
-                onClicked: {
-
-                    var component = Qt.createComponent("../components/EditableTextDialog.qml");
-                    if (component.status === Component.Ready) {
-                        var dialog = component.createObject(mainPaneCurrentGame,{popupType: 1});
-                        dialog.headerText = "Reservierung ändern";
-                        dialog.parentHeight = mainWindow.height
-                        dialog.parentWidth =  mainPaneCurrentGame.width
-                        dialog.textMinSize = 4;
-                        dialog.acceptedTextEdit.connect(acceptedEditReserveNameDialog);
-                        dialog.open();
-                    }
-                }
-            }
-        }
-
-    Menu {
-            id: clickedFreeMenu
-            x: (flickableCurrentTicketInfo.width - width) / 2
-            y: flickableCurrentTicketInfo.height / 6
-            onAboutToHide:  {
-                for (var i = 0; i < listViewModelFreeTickets.count; i++)
-                    var model = listViewModelFreeTickets.get(i).menuOpen = false;
-            }
-
-            background: Rectangle {
-                    implicitWidth: menuItemBlock.width
-                    color: "#4f4f4f"
-                }
-
-            MenuItem {
-                id: menuItemReserve
-                text: "Reservieren"
-                onClicked: {
-
-
-                    var component = Qt.createComponent("../components/EditableTextDialog.qml");
-                    if (component.status === Component.Ready) {
-                        var dialog = component.createObject(mainPaneCurrentGame,{popupType: 1});
-                        dialog.headerText = "Reserviere für";
-                        dialog.parentHeight = mainWindow.height
-                        dialog.parentWidth =  mainPaneCurrentGame.width
-                        dialog.textMinSize = 4;
-                        dialog.acceptedTextEdit.connect(acceptedEditReserveNameDialog);
-                        dialog.open();
-                    }
-                }
-            }
-
-            MenuItem {
-                id: menuItemBlock
-                text: "Sperren"
-                onClicked: {
-                    userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 1);
-                    showInfoHeader("Sperre Karte", true)
-                }
-            }
-        }
+    }
 
     function acceptedEditReserveNameDialog(text)
     {
         userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 3, text);
         showInfoHeader("Reserviere Karte", true)
+    }
+
+    Menu {
+        id: clickedBlockedMenu
+        x: (flickableCurrentTicketInfo.width - width) / 2
+        y: flickableCurrentTicketInfo.height / 6
+        onAboutToHide:  {
+            for (var i = 0; i < listViewModelBlockedTickets.count; i++) {
+                var model = listViewModelBlockedTickets.get(i);
+                model.menuOpen = false;
+            }
+        }
+
+        background: Rectangle {
+                implicitWidth: menuItemFree.width
+                color: "#4f4f4f"
+            }
+        MenuItem {
+            id: menuItemFree
+            text : "Freigeben"
+            onClicked: freeTicketItem();
+        }
+    }
+
+    Menu {
+        id: clickedReservedMenu
+        x: (flickableCurrentTicketInfo.width - width) / 2
+        y: flickableCurrentTicketInfo.height / 6
+        onAboutToHide:  {
+            for (var i = 0; i < listViewModelReservedTickets.count; i++)
+                var model = listViewModelReservedTickets.get(i).menuOpen = false;
+        }
+
+        background: Rectangle {
+                implicitWidth: menuItemBlockFromReserve.width
+                color: "#4f4f4f"
+            }
+
+        MenuItem {
+            id: menuItemFreeFromReserve
+            text: "Freigeben"
+            onClicked: freeTicketItem();
+        }
+
+        MenuItem {
+            id: menuItemBlockFromReserve
+            text: "Sperren"
+            onClicked: blockTicketItem();
+        }
+
+        MenuItem {
+            id: menuItemChangeReserve
+            text: "Reservierung ändern"
+            onClicked: reserveTicketItem("Reservierung ändern");
+        }
+    }
+
+    Menu {
+        id: clickedFreeMenu
+        x: (flickableCurrentTicketInfo.width - width) / 2
+        y: flickableCurrentTicketInfo.height / 6
+        onAboutToHide:  {
+            for (var i = 0; i < listViewModelFreeTickets.count; i++)
+                var model = listViewModelFreeTickets.get(i).menuOpen = false;
+        }
+
+        background: Rectangle {
+                implicitWidth: menuItemBlock.width
+                color: "#4f4f4f"
+            }
+
+        MenuItem {
+            id: menuItemReserve
+            text: "Reservieren"
+            onClicked: reserveTicketItem("Reserviere für");
+        }
+
+        MenuItem {
+            id: menuItemBlock
+            text: "Sperren"
+            onClicked: blockTicketItem();
+        }
     }
 
     function showAllInfoAboutGame(sender) {
@@ -465,6 +351,7 @@ Flickable {
                     listViewModelFreeTickets.append({
                                                         title: seasonTicketItem.name + discount,
                                                         index: seasonTicketItem.index,
+                                                        place: seasonTicketItem.place,
                                                         menuOpen: false
                                                     });
                 }
@@ -473,6 +360,7 @@ Flickable {
                                                         title: seasonTicketItem.name + discount,
                                                         reserve: seasonTicketItem.getTicketReserveName(),
                                                         index: seasonTicketItem.index,
+                                                        place: seasonTicketItem.place,
                                                         menuOpen: false
                                                     });
                 }
@@ -480,12 +368,13 @@ Flickable {
                     listViewModelBlockedTickets.append({
                                                        title: seasonTicketItem.name + discount,
                                                        index: seasonTicketItem.index,
+                                                       place: seasonTicketItem.place,
                                                        menuOpen: false
                                                    })
             }
             /* Does not work in defintion for freeTickets, so set it here */
             listViewBlockedTickets.implicitHeight = listViewModelBlockedTickets.count * listViewItemHeight
-            listViewReservedTickets.implicitHeight = listViewModelReservedTickets.count * listViewItemHeight * ( 4 / 3)
+            listViewReservedTickets.implicitHeight = listViewModelReservedTickets.count * listViewItemHeight * ( 20 / 13)
             listViewFreeTickets.implicitHeight = listViewModelFreeTickets.count * listViewItemHeight
 
             txtInfoCurrentGameBlockedTickets.visible = true

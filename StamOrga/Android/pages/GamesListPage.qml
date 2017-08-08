@@ -26,7 +26,7 @@ import "../components" as MyComponents
 
 Flickable {
     id: flickableGames
-//    property UserInterface userIntGames
+    clip: true
     contentHeight: mainPaneGames.height
     rebound: Transition {
             NumberAnimation {
