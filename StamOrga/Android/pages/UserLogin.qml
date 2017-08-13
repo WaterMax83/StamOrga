@@ -48,10 +48,11 @@ Flickable {
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }
 
-                Label {
+                Text {
                     id: txtInfoConnecting
-                    text: qsTr("Label")
                     visible: false
+                    font.pointSize: 10
+                    color: "white"
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     Layout.bottomMargin: 35
                 }
@@ -82,8 +83,10 @@ Flickable {
     //            }
 
 
-                Label {
+                Text {
                     text: qsTr("Login / Email")
+                    font.pointSize: 10
+                    color: "white"
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }
 
@@ -104,8 +107,10 @@ Flickable {
 
 
 
-                Label {
+                Text {
                     text: qsTr("Passwort")
+                    font.pointSize: 10
+                    color: "white"
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }
 
@@ -183,7 +188,7 @@ Flickable {
                         userIntUser.startUpdateReadableName(text)
                     }
                 }
-                Label {
+                Text {
                     id: txtInfoReadableName
     //                width: parent.width / 3 * 2
                     text: qsTr("Der Nutzername dient als Vorauswahl für alle editierbaren Textfelder")
@@ -193,6 +198,8 @@ Flickable {
                     Layout.maximumWidth: parent.width - 20
                     visible: true
                     Layout.bottomMargin: 35
+                    font.pointSize: 10
+                    color: "white"
                 }
 
                 ToolSeparator {
@@ -344,8 +351,10 @@ Flickable {
                 id: columnLayoutChPass2
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
-                Label {
+                Text {
                     id: labelChaPass1
+                    font.pointSize: 10
+                    color: "white"
                     text: qsTr("neues Passwort")
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }
@@ -363,8 +372,10 @@ Flickable {
                 id: columnLayoutChPass3
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
-                Label {
+                Text {
                     id: labelChaPass2
+                    font.pointSize: 10
+                    color: "white"
                     text: qsTr("Passwort wiederholen")
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }
@@ -378,22 +389,24 @@ Flickable {
                 }
             }
 
-            Label {
+            Text {
                 id: labelPasswordDiffer
                 visible: false
                 text: qsTr("Passwörter stimmen nicht überein")
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 wrapMode: Text.WordWrap
                 Layout.maximumWidth: parent.width
+                font.pointSize: 10
                 color: "red"
             }
-            Label {
+            Text {
                 id: labelPasswordTooShort
                 visible: false
                 text: qsTr("Das Passwort muss mindestens 6 Zeichen lang sein")
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 wrapMode: Text.WordWrap
                 Layout.maximumWidth: parent.width
+                font.pointSize: 10
                 color: "orange"
             }
         }

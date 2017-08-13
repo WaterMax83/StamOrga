@@ -79,7 +79,7 @@ Dialog {
                 id: inputHome
                 anchors { fill:parent; leftMargin: 5 }
                 verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 16
+                font.pointSize: 16
                 color: "#505050"
                 KeyNavigation.tab: inputAway
             }
@@ -101,7 +101,7 @@ Dialog {
                 id: inputAway
                 anchors { fill:parent; leftMargin: 5 }
                 verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 16
+                font.pointSize: 16
                 color: "#505050"
                 KeyNavigation.tab: inputScore
             }
@@ -123,7 +123,7 @@ Dialog {
                 id: inputScore
                 anchors { fill:parent; leftMargin: 5 }
                 verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 16
+                font.pointSize: 16
                 color: "#505050"
                 KeyNavigation.tab: spBoxSeasonIndex
             }
@@ -160,7 +160,7 @@ Dialog {
                 id: inputDate
                 anchors { fill:parent; leftMargin: 5 }
                 verticalAlignment: Text.AlignVCenter
-                font.pixelSize: 16
+                font.pointSize: 16
                 color: "#505050"
             }
         }

@@ -21,6 +21,7 @@
 
 #include <QObject>
 #include <QSettings>
+#include <QStringList>
 #include <QtGui/QGuiApplication>
 
 #include "globaldata.h"
@@ -93,6 +94,12 @@ public:
         emit this->saveInfosOnAppChanged();
     }
 
+    Q_INVOKABLE QString getChangeDefaultFont() { return this->m_changeDefaultFont; }
+    Q_INVOKABLE void setChangeDefaultFont(QString font);
+
+    Q_INVOKABLE qint64 getCurrentFontIndex() { return this->m_currentFontIndex; }
+    void setCurrentFontList(QStringList* list);
+
     Q_INVOKABLE QString getCurrentVersion();
 
     Q_INVOKABLE QString getVersionChangeInfo();
@@ -113,14 +120,17 @@ public slots:
     void stateFromAppChanged(Qt::ApplicationState state);
 
 private:
-    GlobalData* m_pGlobalData;
-    bool        m_useReadableName;
-    bool        m_loadGameInfo;
-    bool        m_saveInfosOnApp;
-    QString     m_debugIP;
-    QString     m_debugIPWifi;
-    QMutex      m_mutex;
-    qint64      m_lastGameInfoUpdate;
+    GlobalData*  m_pGlobalData;
+    bool         m_useReadableName;
+    bool         m_loadGameInfo;
+    bool         m_saveInfosOnApp;
+    QString      m_debugIP;
+    QString      m_debugIPWifi;
+    QMutex       m_mutex;
+    qint64       m_lastGameInfoUpdate;
+    QString      m_changeDefaultFont;
+    qint64       m_currentFontIndex;
+    QStringList* m_fontList = NULL;
 
     QString m_lastShownVersion;
 };

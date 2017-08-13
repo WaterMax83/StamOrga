@@ -51,16 +51,9 @@ public:
 
     int showLoggingInfo(quint16 numbOfLines);
 
-    QString getCurrentLoggingList(int index)
-    {
-        if (index < this->m_lastLogFiles.size()) {
-            QFile file(this->m_lastLogFiles[index]);
-            if (file.open(QFile::ReadOnly))
-                return QString(file.readAll());
-        }
+    void clearCurrentLoggingList(int index);
 
-        return this->m_currentLogging;
-    }
+    QString getCurrentLoggingList(int index);
 
     QStringList getLogFileDates();
 

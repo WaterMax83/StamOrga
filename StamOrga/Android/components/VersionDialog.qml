@@ -39,19 +39,20 @@ Dialog {
         id: versionColumn
         spacing: 20
 
-        Label {
+        Text {
             width: versionDialog.availableWidth
             text: "Es gibt eine neue Version von StamOrga"
-            wrapMode: Label.Wrap
-            font.pixelSize: 12
+            wrapMode: Text.Wrap
+            color: "white"
+            font.pointSize: 12
         }
 
         Text {
             id: versionDialogTextUpdate
             width: versionDialog.availableWidth
             textFormat: Text.RichText
-            wrapMode: Label.Wrap
-            font.pixelSize: 12
+            wrapMode: Text.Wrap
+            font.pointSize: 12
             color: "white"
             onLinkActivated: Qt.openUrlExternally(link)
         }

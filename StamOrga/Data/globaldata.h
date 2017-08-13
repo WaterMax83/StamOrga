@@ -177,15 +177,11 @@ public:
 
     void saveGlobalUserSettings();
 
-    Q_INVOKABLE QString getCurrentLoggingList(int index)
-    {
-        return this->m_logApp->getCurrentLoggingList(index);
-    }
+    Q_INVOKABLE QString getCurrentLoggingList(int index);
 
-    Q_INVOKABLE QStringList getCurrentLogFileList()
-    {
-        return this->m_logApp->getLogFileDates();
-    }
+    Q_INVOKABLE QStringList getCurrentLogFileList();
+
+    Q_INVOKABLE void deleteCurrentLoggingFile(int index);
 
     Q_INVOKABLE void copyTextToClipBoard(QString text);
 

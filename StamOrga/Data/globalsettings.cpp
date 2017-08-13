@@ -16,9 +16,11 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "globalsettings.h"
+#include <QtGui/QFontDatabase>
+
 #include "../../Common/General/config.h"
 #include "../../Common/General/globaltiming.h"
+#include "globalsettings.h"
 
 // clang-format off
 #define SETT_USE_READABLE_NAME      "UseReadableName"
@@ -27,6 +29,7 @@
 #define SETT_LAST_SHOWN_VERSION     "LastShownVersion"
 #define SETT_LOAD_GAME_INFO         "LoadGameInfo"
 #define SETT_SAVE_INFOS_ON_APP      "SaveInfosOnApp"
+#define SETT_CHANGE_DEFAULT_FONT    "ChangeDefaultFont"
 // clang-format on
 
 GlobalSettings::GlobalSettings(QObject* parent)
@@ -47,6 +50,7 @@ void GlobalSettings::initialize(GlobalData* pGlobalData, QGuiApplication* app)
     this->setDebugIP(this->m_pGlobalData->m_pMainUserSettings->value(SETT_DEBUG_IP, "").toString());
     this->setDebugIPWifi(this->m_pGlobalData->m_pMainUserSettings->value(SETT_DEBUG_IP_WIFI, "").toString());
     this->m_lastShownVersion = this->m_pGlobalData->m_pMainUserSettings->value(SETT_LAST_SHOWN_VERSION, "").toString();
+    this->setChangeDefaultFont(this->m_pGlobalData->m_pMainUserSettings->value(SETT_CHANGE_DEFAULT_FONT, "Default").toString());
 
     this->m_pGlobalData->m_pMainUserSettings->endGroup();
 
@@ -65,12 +69,30 @@ void GlobalSettings::saveGlobalSettings()
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_SAVE_INFOS_ON_APP, this->m_saveInfosOnApp);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_DEBUG_IP, this->m_debugIP);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_DEBUG_IP_WIFI, this->m_debugIPWifi);
-
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_LAST_SHOWN_VERSION, this->m_lastShownVersion);
+    this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_CHANGE_DEFAULT_FONT, this->m_changeDefaultFont);
 
     this->m_pGlobalData->m_pMainUserSettings->endGroup();
 
     this->m_pGlobalData->m_pMainUserSettings->sync();
+}
+
+void GlobalSettings::setChangeDefaultFont(QString font)
+{
+    this->m_changeDefaultFont = font;
+    if (this->m_fontList == NULL)
+        return;
+
+    this->m_currentFontIndex = this->m_fontList->indexOf(font);
+}
+
+void GlobalSettings::setCurrentFontList(QStringList* list)
+{
+    this->m_fontList = list;
+    if (this->m_fontList == NULL)
+        return;
+
+    this->m_currentFontIndex = this->m_fontList->indexOf(this->m_changeDefaultFont);
 }
 
 QString GlobalSettings::getCurrentVersion()

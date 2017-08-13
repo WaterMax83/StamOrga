@@ -54,7 +54,7 @@ ColumnLayout {
             anchors.verticalCenter: parent.verticalCenter
             Layout.alignment: Qt.AlignVCenter
             color: "white"
-            font.pixelSize: listViewItemHeight / 4 * 2
+            font.pointSize: listViewItemHeight / 5 * 2
         }
 
         Image {
@@ -98,7 +98,7 @@ ColumnLayout {
         bottomPadding: 5
         Layout.alignment: Qt.AlignVCenter
         color: "white"
-        font.pixelSize: listViewItemHeight / 4 * 2
+        font.pointSize: listViewItemHeight / 6 * 2.5
     }
 
     MouseArea {

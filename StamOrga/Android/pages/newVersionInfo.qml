@@ -49,7 +49,7 @@ Flickable {
                     text: "Was ist neu:"
                     color: "white"
                     font.bold: true
-                    font.pixelSize: 18
+                    font.pointSize: 18
                 }
 
                 Text {
@@ -58,7 +58,7 @@ Flickable {
                     wrapMode: Text.WordWrap
                     Layout.maximumWidth: parent.width
                     Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                    font.pixelSize: 12
+                    font.pointSize: 12
                     color: "white"
                     text: globalSettings.getVersionChangeInfo()
                 }

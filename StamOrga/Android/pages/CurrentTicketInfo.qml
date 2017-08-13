@@ -75,9 +75,11 @@ Flickable {
             id: mainColumnLayoutCurrentTicketInfo
             width: parent.width
 
-            Label {
+            Text {
                 id: txtInfoCurrentGameBlockedTickets
                 visible: false
+                color: "white"
+                font.pointSize: 10
                 text: "<b>Gesperrte Karten</b> <i>(Besitzer geht selbst)</i><b>:</b>"
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
             }
@@ -107,9 +109,11 @@ Flickable {
                 }
             }
 
-            Label {
+            Text {
                 id: txtInfoCurrentGameReservedTickets
                 visible: false
+                color: "white"
+                font.pointSize: 10
                 text: "<b>Reservierte Karten:</b>"
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
             }
@@ -139,9 +143,11 @@ Flickable {
             }
 
 
-            Label {
+            Text {
                 id: txtInfoCurrentGameFreeTickets
                 visible: false
+                color: "white"
+                font.pointSize: 10
                 text: "<b>Freie Karten:</b>"
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
             }
@@ -374,14 +380,12 @@ Flickable {
             }
             /* Does not work in defintion for freeTickets, so set it here */
             listViewBlockedTickets.implicitHeight = listViewModelBlockedTickets.count * listViewItemHeight
-            listViewReservedTickets.implicitHeight = listViewModelReservedTickets.count * listViewItemHeight * ( 20 / 13)
+            listViewReservedTickets.implicitHeight = listViewModelReservedTickets.count * listViewItemHeight * ( 20 / 12)
             listViewFreeTickets.implicitHeight = listViewModelFreeTickets.count * listViewItemHeight
 
             txtInfoCurrentGameBlockedTickets.visible = true
             txtInfoCurrentGameReservedTickets.visible = true
             txtInfoCurrentGameFreeTickets.visible = true
-
-//            txtInfoCurrentGame.visible = false;
 
         } else {
             txtInfoCurrentGameBlockedTickets.visible = false

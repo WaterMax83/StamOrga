@@ -65,19 +65,23 @@ Rectangle {
             Layout.preferredWidth: columnLayoutTicketItem.width
             Layout.fillWidth: true
 
-            Label {
+            Text {
                 id: labelTicketItemHead
                 text: qsTr("Karte:")
                 leftPadding: 7
                 topPadding: 5
+                color: "white"
+                font.pointSize: 10
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
 
-            Label {
+            Text {
                 id: labelTicketItem
                 text: qsTr("")
                 leftPadding: labelInfoDiscountHead.width - labelTicketItemHead.width + 10
                 topPadding: 5
+                color: "white"
+                font.pointSize: 10
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
@@ -91,21 +95,25 @@ Rectangle {
             Layout.preferredWidth: columnLayoutTicketItem.width
             Layout.fillWidth: true
 
-            Label {
+            Text {
                 id: labelInfoDiscountHead
                 text: qsTr("Ermäßigung: ")
                 leftPadding: 7
+                color: "white"
+                font.pointSize: 10
                 visible: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
 
-            Label {
+            Text {
                 id: labelInfoDiscount
                 text: qsTr("")
     //            rightPadding: layoutNameOfTicket.width / 10
     //            topPadding: 5
                 leftPadding: 10
                 visible: true
+                color: "white"
+                font.pointSize: 10
                 Layout.fillWidth: true
     //            Layout.alignment: Qt.AlignRight | Qt.AlignHCenter
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
@@ -121,20 +129,22 @@ Rectangle {
             Layout.preferredWidth: columnLayoutTicketItem.width
             Layout.fillWidth: true
 
-            Label {
+            Text {
                 id: labelTextWhereIsTicket
                 text: qsTr("Ort:")
                 leftPadding: 7
-//                Layout.fillWidth: true
                 bottomPadding: 1
+                color: "white"
+                font.pointSize: 10
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
 
-            Label {
+            Text {
                 id: labelInfoWhere
                 text: qsTr("")
-//                rightPadding: layoutPlaceOfTicket.width / 10
                 bottomPadding: 1
+                color: "white"
+                font.pointSize: 10
                 leftPadding: labelInfoDiscountHead.width - labelTextWhereIsTicket.width + 10
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter

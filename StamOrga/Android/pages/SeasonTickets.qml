@@ -82,10 +82,11 @@ Flickable {
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }
 
-                Label {
+                Text {
                     id: txtInfoSeasonTicket
-                    text: qsTr("Label")
                     visible: true
+                    color: "white"
+                    font.pointSize: 10
                     horizontalAlignment: Text.AlignHCenter
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }

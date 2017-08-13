@@ -18,9 +18,13 @@
 
 #include <QtCore/QDateTime>
 #include <QtCore/QMetaObject>
+#include <QtCore/QStringListModel>
+#include <QtGui/QFont>
+#include <QtGui/QFontDatabase>
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/QQmlContext>
+#include <QtWidgets/QApplication>
 
 #include <iostream>
 
@@ -38,7 +42,8 @@ GlobalSettings* g_GlobalSettings;
 int main(int argc, char* argv[])
 {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QGuiApplication app(argc, argv);
+    QCoreApplication::setAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles, true);
+    QApplication app(argc, argv);
 
 
     // Register our component type with QML.
@@ -56,11 +61,34 @@ int main(int argc, char* argv[])
     GlobalData globalUserData;
     globalSettings.initialize(&globalUserData, &app);
 
+    QFontDatabase base;
+    QStringList   fontFamilies = base.families();
+    QString       chFontFam    = globalSettings.getChangeDefaultFont();
+    if (chFontFam != "Default") {
+
+        if (fontFamilies.contains(chFontFam)) {
+            qInfo().noquote() << QString("Aendere Schrift von %1 nach %2").arg(app.font().family(), chFontFam);
+
+            QFont newFont = QFont(chFontFam);
+            app.setFont(newFont);
+
+            //            QString styleSheet = QString("font-family:%1px;").arg(chFontFam);
+            //            app.setStyleSheet(styleSheet);
+        } else
+            qWarning().noquote() << QString("Kann Schrift nicht nach %2 aendern, da Sie nicht vorhanden ist, behalte %1")
+                                        .arg(app.font().family(), chFontFam);
+    }
+
+    fontFamilies.insert(0, "Default");
+    globalSettings.setCurrentFontList(&fontFamilies);
+    QStringListModel fontFamiliesModel;
+    fontFamiliesModel.setStringList(fontFamilies);
 
     // engine to start qml display -> takes about half a second
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("globalUserData", &globalUserData);
     engine.rootContext()->setContextProperty("globalSettings", &globalSettings);
+    engine.rootContext()->setContextProperty("fontFamiliesModel", &fontFamiliesModel);
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));
 
     // load settings to update data

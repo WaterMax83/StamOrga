@@ -126,6 +126,31 @@ int Logging::showLoggingInfo(quint16 numbOfLines)
     return numbOfLines;
 }
 
+void Logging::clearCurrentLoggingList(int index)
+{
+    if (this->m_lastLogFiles.size() > 0 && index >= 0 && index < this->m_lastLogFiles.size()) {
+        QFile file(this->m_lastLogFiles[index]);
+        if (file.open(QFile::WriteOnly)) {
+            file.resize(0);
+            file.close();
+        }
+        return;
+    }
+
+    this->m_currentLogging = "";
+}
+
+QString Logging::getCurrentLoggingList(int index)
+{
+    if (this->m_lastLogFiles.size() > 0 && index >= 0 && index < this->m_lastLogFiles.size()) {
+        QFile file(this->m_lastLogFiles[index]);
+        if (file.open(QFile::ReadOnly))
+            return QString(file.readAll());
+    }
+
+    return this->m_currentLogging;
+}
+
 QStringList Logging::getLogFileDates()
 {
     QMutexLocker lock(&this->m_internalMutex);

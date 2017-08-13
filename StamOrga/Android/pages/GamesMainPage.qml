@@ -51,9 +51,11 @@ Page {
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             }
 
-            Label {
+            Text {
                 id: txtInfoLoadingGames
                 visible: true
+                color: "white"
+                font.pointSize: 10
                 horizontalAlignment: Text.AlignHCenter
                 Layout.alignment:  Qt.AlignHCenter | Qt.AlignVCenter
             }

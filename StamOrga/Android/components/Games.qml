@@ -73,12 +73,13 @@ Rectangle {
             Layout.fillWidth: true
             spacing: 5
 
-            Label {
+            Text {
                 id: labelLineDate
                 text: qsTr("Date")
                 leftPadding: 5
                 topPadding: 3
-
+                color: "white"
+                font.pointSize: 10
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
 
@@ -86,7 +87,7 @@ Rectangle {
                 id: labelLineTimeNotFixed
                 text: "<i>(nicht terminiert)</i>"
                 textFormat: Text.RichText
-                font.pixelSize: 12
+                font.pointSize: 10
                 color: "white"
                 leftPadding: 5
                 topPadding: 3
@@ -105,10 +106,12 @@ Rectangle {
             Layout.fillWidth: true
             spacing: 5
 
-            Label {
+            Text {
                 id: labelLineWhat
                 text: qsTr("What")
                 leftPadding: 5
+                color: "white"
+                font.pointSize: 10
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
@@ -130,9 +133,11 @@ Rectangle {
                 visible: false
                 spacing: 0
                 Layout.rightMargin: interestMeetingItem.visible ? 0 : freeTicketsItem.visible ? 10 : 5
-                Label {
+                Text {
                     id: labelAcceptedMeeting
                     topPadding: 3
+                    color: "white"
+                    font.pointSize: 10
                     Layout.alignment: Qt.AlignRight
                 }
 
@@ -162,9 +167,11 @@ Rectangle {
                 visible: false
                 spacing: 0
                 Layout.rightMargin: freeTicketsItem.visible ? 10 : 5
-                Label {
+                Text {
                     id: labelInterestMeeting
                     topPadding: 3
+                    color: "white"
+                    font.pointSize: 10
                     Layout.alignment: Qt.AlignRight
                 }
 
@@ -193,9 +200,11 @@ Rectangle {
                 id: freeTicketsItem
                 visible: false
                 spacing: 5
-                Label {
+                Text {
                     id: labelFreeTickets
                     topPadding: 3
+                    color: "white"
+                    font.pointSize: 10
                     Layout.alignment: Qt.AlignRight
                 }
 
@@ -213,12 +222,14 @@ Rectangle {
             }
         }
 
-        Label {
+        Text {
             id: labelLineHome
             text: qsTr("Home")
             leftPadding: 5
             topPadding: 5
             font.bold: true
+            color: "white"
+            font.pointSize: 10
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
         }
@@ -231,19 +242,23 @@ Rectangle {
             Layout.preferredWidth: columnLayout.width
             Layout.fillWidth: true
 
-            Label {
+            Text {
                 id: labelLineAway
                 text: qsTr("Away")
                 leftPadding: 5
                 font.bold: true
+                color: "white"
+                font.pointSize: 10
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
 
-            Label {
+            Text {
                 id: labelLineScore
                 text: qsTr("")
                 font.bold: true
+                color: "white"
+                font.pointSize: 10
                 rightPadding: layoutExplicitGame.width / 100 * 30
                 Layout.alignment: Qt.AlignRight | Qt.AlignHCenter
             }

@@ -407,6 +407,20 @@ qint64 GlobalData::getSeasonTicketLastServerUpdate()
     return this->m_stLastServerUpdateTimeStamp;
 }
 
+QString GlobalData::getCurrentLoggingList(int index)
+{
+    return this->m_logApp->getCurrentLoggingList(index);
+}
+
+QStringList GlobalData::getCurrentLogFileList()
+{
+    return this->m_logApp->getLogFileDates();
+}
+
+void GlobalData::deleteCurrentLoggingFile(int index)
+{
+    this->m_logApp->clearCurrentLoggingList(index);
+}
 void GlobalData::copyTextToClipBoard(QString text)
 {
     QClipboard* clip = QGuiApplication::clipboard();

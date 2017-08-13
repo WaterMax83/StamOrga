@@ -137,22 +137,28 @@ Flickable {
             }
             onPressedAndHoldCurrentGame: {
                 menuSender = sender;
+                var openCounter = 0;
                 menuItemEditGame.visible = false;
                 menuItemFixedGameTime.visible = false;
                 menuItemNotFixedGameTime.visible = false;
-                if (globalUserData.userIsGameAddingEnabled() || userIntGames.isDebuggingEnabled())
+                if (globalUserData.userIsGameAddingEnabled() || userIntGames.isDebuggingEnabled()) {
                     menuItemEditGame.visible = true;
+                    openCounter++;
+                }
 
                 if (globalUserData.userIsGameFixedTimeEnabled() && !sender.isGameInPast()) {
                     if(sender.timeFixed)
                         menuItemNotFixedGameTime.visible = true;
                     else
                         menuItemFixedGameTime.visible = true;
+                    openCounter++;
                 }
 
-                var globalCoordinates = mapToItem(mainItemGamesMainPage, 0, 0)
-                pressAndHoldCurrentGameMenu.y = globalCoordinates.y - height / 2
-                pressAndHoldCurrentGameMenu.open();
+                if (openCounter > 0) {
+                    var globalCoordinates = mapToItem(mainItemGamesMainPage, 0, 0)
+                    pressAndHoldCurrentGameMenu.y = globalCoordinates.y - height / 2
+                    pressAndHoldCurrentGameMenu.open();
+                }
             }
         }
     }

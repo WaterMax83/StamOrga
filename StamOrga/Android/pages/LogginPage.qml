@@ -49,6 +49,7 @@ Flickable {
                Layout.maximumWidth: parent.width
                rightPadding: 5
                visible: true
+               font.pointSize: 8
                color: "white"
            }
 
@@ -57,7 +58,8 @@ Flickable {
                implicitWidth: parent.width / 3 * 2
                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                onClicked: {
-                globalUserData.copyTextToClipBoard(txtLogging.text);
+                    globalUserData.copyTextToClipBoard(txtLogging.text);
+                    toastManager.show("Daten wurden in die Zwischenablage kopiert", 2000);
                }
            }
 
@@ -66,7 +68,8 @@ Flickable {
                implicitWidth: parent.width / 3 * 2
                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                onClicked: {
-                globalUserData.copyTextToClipBoard(txtLogging.text);
+                    globalUserData.deleteCurrentLoggingFile(logFilesCombo.currentIndex);
+                    pageOpenedUpdateView();
                }
            }
        }

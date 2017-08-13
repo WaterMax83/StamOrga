@@ -37,13 +37,13 @@ Item {
                Layout.preferredWidth: parent.width
                Layout.fillWidth: true
 
-               Label {
+               Text {
                    id: text2
                    text: qsTr("Benutze Nutzername:")
                    Layout.fillWidth: true
                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                   font.pixelSize: 14
                    color: "white"
+                   font.pointSize: 12
                }
                CheckBox {
                     id: useReadableName
@@ -56,12 +56,12 @@ Item {
                Layout.preferredWidth: parent.width
                Layout.fillWidth: true
 
-               Label {
+               Text {
                    id: text3
-                   text: qsTr("Lade Spiel Infos beim Start:")
+                   text: qsTr("Aktualisiere Spiele automatisch:")
                    Layout.fillWidth: true
                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                   font.pixelSize: 14
+                   font.pointSize: 12
                    color: "white"
                }
                CheckBox {
@@ -75,12 +75,12 @@ Item {
                Layout.preferredWidth: parent.width
                Layout.fillWidth: true
 
-               Label {
+               Text {
                    id: text4
                    text: qsTr("Speichere geladene Daten:")
                    Layout.fillWidth: true
                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                   font.pixelSize: 14
+                   font.pointSize: 12
                    color: "white"
                }
                CheckBox {
@@ -90,6 +90,27 @@ Item {
                }
            }
 
+           RowLayout {
+               Layout.preferredWidth: parent.width
+               Layout.fillWidth: true
+               visible: !userInt.isDeviceMobile()
+
+               Text {
+                   id: text5
+                   text: qsTr("Schrift:")
+                   Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                   font.pointSize: 12
+                   color: "white"
+               }
+               ComboBox {
+                   id: cbfontFamilies
+                   Layout.fillWidth: true
+                   model: fontFamiliesModel
+                   textRole: "display"
+                   onCurrentIndexChanged: valueWasEditedEnableSave();
+               }
+
+           }
 
            RowLayout {
                spacing: 5
@@ -97,8 +118,10 @@ Item {
                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                visible: userInt.isDebuggingEnabled()
 
-               Label {
+               Text {
                    text: qsTr("Alternative IP:")
+                   font.pointSize: 12
+                   color: "white"
                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                }
 
@@ -118,8 +141,10 @@ Item {
                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                visible: userInt.isDebuggingEnabled() && userInt.isDeviceMobile()
 
-               Label {
+               Text {
                    text: qsTr("Alternative IP Wlan")
+                   font.pointSize: 12
+                   color: "white"
                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                }
 
@@ -139,7 +164,7 @@ Item {
                wrapMode: Text.WordWrap
                Layout.maximumWidth: parent.width
                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-               font.pixelSize: 14
+               font.pointSize: 12
                color: "white"
                text: "Aktuelle Version: <a href=\"tmp\">" + globalSettings.getCurrentVersion() + "</a>"
                onLinkActivated: {
@@ -152,43 +177,63 @@ Item {
        }
    }
 
-   function toolButtonClicked() {
-              var saveSettings = false;
+    function toolButtonClicked() {
+        var saveSettings = false;
+        var saveFonts = false;
 
-              if (globalSettings.useReadableName !== useReadableName.checked) {
-                   globalSettings.useReadableName = useReadableName.checked;
-                   saveSettings = true;
-              }
+        if (globalSettings.useReadableName !== useReadableName.checked) {
+           globalSettings.useReadableName = useReadableName.checked;
+           saveSettings = true;
+        }
 
-              if (globalSettings.loadGameInfo !== loadGameInfo.checked) {
-                   globalSettings.loadGameInfo = loadGameInfo.checked;
-                   saveSettings = true;
-              }
+        if (globalSettings.loadGameInfo !== loadGameInfo.checked) {
+           globalSettings.loadGameInfo = loadGameInfo.checked;
+           saveSettings = true;
+        }
 
-              if (globalSettings.saveInfosOnApp !== saveInfosOnApp.checked) {
-                   globalSettings.saveInfosOnApp = saveInfosOnApp.checked;
-                   saveSettings = true;
-              }
+        if (globalSettings.saveInfosOnApp !== saveInfosOnApp.checked) {
+           globalSettings.saveInfosOnApp = saveInfosOnApp.checked;
+           saveSettings = true;
+        }
 
-              if (globalSettings.debugIP !== txtOtherIPAddr.text) {
-                   globalSettings.debugIP = txtOtherIPAddr.text;
-                   saveSettings = true;
-              }
+        if (globalSettings.getChangeDefaultFont() !== cbfontFamilies.currentText ) {
+            globalSettings.setChangeDefaultFont(cbfontFamilies.currentText);
+            saveSettings = true;
+            saveFonts = true;
+        }
 
-              if (globalSettings.debugIPWifi !== txtOtherIPAddrWifi.text) {
-                   globalSettings.debugIPWifi = txtOtherIPAddrWifi.text;
-                   saveSettings = true;
-              }
+        if (globalSettings.debugIP !== txtOtherIPAddr.text) {
+           globalSettings.debugIP = txtOtherIPAddr.text;
+           saveSettings = true;
+        }
 
-              if (saveSettings)
-                  globalSettings.saveGlobalSettings();
+        if (globalSettings.debugIPWifi !== txtOtherIPAddrWifi.text) {
+           globalSettings.debugIPWifi = txtOtherIPAddrWifi.text;
+           saveSettings = true;
+        }
 
-              updateHeaderFromMain("", "");
+        if (saveSettings)
+          globalSettings.saveGlobalSettings();
 
-              isSaveButtonShown = false;
+        updateHeaderFromMain("", "");
 
-              toastManager.show("Daten erfolgreich gespeichert", 3000)
-   }
+        isSaveButtonShown = false;
+
+        toastManager.show("Daten erfolgreich gespeichert", 3000)
+
+        if (saveFonts) {
+            var component = Qt.createComponent("../components/AcceptDialog.qml");
+            if (component.status === Component.Ready) {
+              var dialog = component.createObject(mainPaneSettings,{popupType: 1});
+              dialog.headerText = "Information";
+              dialog.parentHeight = mainWindow.height
+              dialog.parentWidth = mainWindow.width
+              dialog.textToAccept = "Zum Aktualisieren der Schrift muss die App neu gestarted werden";
+              dialog.showCancelButton = false
+              dialog.open();
+            }
+        }
+    }
 
    property bool isSaveButtonShown : false;
    property bool isStartupDone : false
@@ -205,6 +250,10 @@ Item {
    }
 
    function pageOpenedUpdateView() {
+
+//       fontFamiliesModel.get(cbfontFamilies.currentIndex).text = "Arial"
+        cbfontFamilies.currentIndex = globalSettings.getCurrentFontIndex();
+
        isStartupDone = true;
    }
 

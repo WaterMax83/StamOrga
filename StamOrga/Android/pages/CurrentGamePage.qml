@@ -58,9 +58,11 @@ Item {
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }
 
-                Label {
+                Text {
                     id: txtInfoCurrentGame
                     visible: false
+                    color: "white"
+                    font.pointSize: 10
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }
             }

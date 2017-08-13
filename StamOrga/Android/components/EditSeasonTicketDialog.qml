@@ -66,9 +66,11 @@ Dialog {
             id: columnLayoutAddTicketName
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
-            Label {
+            Text {
                 id: labelAddTicketName
                 text: qsTr("Name")
+                color: "white"
+                font.pointSize: 10
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             }
 
@@ -85,12 +87,13 @@ Dialog {
             checked: false
         }
 
-        Label {
+        Text {
             id: labelTicketNameTooShort
             visible: false
             text: qsTr("Der Name muss mindestens " + textMinSize + " Zeichen lang sein")
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             wrapMode: Text.WordWrap
+            font.pointSize: 10
             Layout.maximumWidth: parent.width
             color: "orange"
         }

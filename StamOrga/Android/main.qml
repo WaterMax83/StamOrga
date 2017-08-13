@@ -72,11 +72,12 @@ ApplicationWindow {
                 }
             }
 
-            Label {
+            Text {
                 id: titleLabel
                 //                text: listView.currentItem ? listView.currentItem.text : "StamOrga"
-                font.pixelSize: 25
-                elide: Label.ElideRight
+                color: "white"
+                font.pointSize: 25
+                elide: Text.ElideRight
                 horizontalAlignment: Qt.AlignHCenter
                 verticalAlignment: Qt.AlignVCenter
                 Layout.fillWidth: true

@@ -45,7 +45,7 @@ Rectangle {
         id: inputText
         anchors { fill:parent; leftMargin: 5 }
         verticalAlignment: Text.AlignVCenter
-        font.pixelSize: 16
+        font.pointSize: 12
         color: "#505050"
         Layout.fillWidth: true
         onTextChanged: {
