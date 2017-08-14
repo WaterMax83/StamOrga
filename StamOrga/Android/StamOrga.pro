@@ -11,6 +11,10 @@
 
 QT += qml quick network widgets
 
+android{
+    QT += androidextras
+}
+
 CONFIG += c++11
 
 DEFINES += STAMORGA_APP
@@ -36,7 +40,8 @@ SOURCES += main.cpp \
     ../Data/gameplay.cpp \
     ../Data/seasonticket.cpp \
     ../Data/meetinginfo.cpp \
-    ../Data/globalsettings.cpp
+    ../Data/globalsettings.cpp \
+    source/pushnotification.cpp
 
 
 RESOURCES += qml.qrc
@@ -83,12 +88,25 @@ HEADERS += \
     ../Data/seasonticket.h \
     ../Data/meetinginfo.h \
     ../Data/acceptmeetinginfo.h \
-    ../Data/globalsettings.h
+    ../Data/globalsettings.h \
+    source/pushnotification.h
+
+#android{
+    ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
+
+    ################# adapt that accordingly #######################
+    ANDROID_JAVA_SOURCES.path = /src/org/qtproject/example
+    ################################################################
+
+    ANDROID_JAVA_SOURCES.files = $$files($$PWD/source/java/*.java)
+    INSTALLS += ANDROID_JAVA_SOURCES
+#}
 
 DISTFILES += \
     android/AndroidManifest.xml \
     android/gradle/wrapper/gradle-wrapper.jar \
     android/gradlew \
+    android/google-services.json \
     android/res/values/libs.xml \
     android/build.gradle \
     android/gradle/wrapper/gradle-wrapper.properties \

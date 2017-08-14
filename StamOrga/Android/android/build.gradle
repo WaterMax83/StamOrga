@@ -5,6 +5,7 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:1.1.0'
+        classpath 'com.google.gms:google-services:3.1.0'
     }
 }
 
@@ -12,12 +13,19 @@ allprojects {
     repositories {
         jcenter()
     }
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
+        }
+    }
 }
 
 apply plugin: 'com.android.application'
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile "com.google.firebase:firebase-messaging:9.0.0"
+    compile "com.android.support:appcompat-v7:22.1.0"
 }
 
 android {
@@ -54,4 +62,10 @@ android {
     lintOptions {
         abortOnError false
     }
+    defaultConfig {
+        //adapt that accordingly
+        applicationId "org.qtproject.example"
+    }
 }
+
+apply plugin: 'com.google.gms.google-services'

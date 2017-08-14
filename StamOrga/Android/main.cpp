@@ -34,6 +34,7 @@
 #include "../Data/globaldata.h"
 #include "../Data/globalsettings.h"
 #include "../dataconnection.h"
+#include "source/pushnotification.h"
 #include "userinterface.h"
 
 
@@ -45,7 +46,6 @@ int main(int argc, char* argv[])
     QCoreApplication::setAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles, true);
     QApplication app(argc, argv);
 
-
     // Register our component type with QML.
     qmlRegisterType<UserInterface>("com.watermax.demo", 1, 0, "UserInterface");
     //    qmlRegisterType<GamePlay>("com.watermax.demo", 1, 0, "MeetingInfo*");
@@ -54,6 +54,9 @@ int main(int argc, char* argv[])
     qRegisterMetaType<MeetingInfo*>("MeetingInfo*");
     qRegisterMetaType<AcceptMeetingInfo*>("AcceptMeetingInfo*");
     qRegisterMetaType<DataConRequest>("DataConRequest");
+
+    PushNotificationRegistrationTokenHandler pushHandler;
+    Q_UNUSED(pushHandler);
 
     GlobalSettings globalSettings;
     g_GlobalSettings = &globalSettings;

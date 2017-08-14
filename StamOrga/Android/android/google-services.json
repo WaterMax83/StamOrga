@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "731525538377",
+    "firebase_url": "https://stamorga-2fca6.firebaseio.com",
+    "project_id": "stamorga-2fca6",
+    "storage_bucket": "stamorga-2fca6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:731525538377:android:256783f3d084e274",
+        "android_client_info": {
+          "package_name": "org.qtproject.example"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "731525538377-c66r9eds4pqhneqa6q4he9ekmos3g8fm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtiXBYpZ_ojjaMJhdPEIGasAUhV-Tt-Bg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
