@@ -21,10 +21,6 @@ public class MyFcmListenerService extends FirebaseMessagingService
 
     /**
      * Called when message is received.
-     *
-     * @param from SenderID of the sender.
-     * @param data Data bundle containing message data as key/value pairs.
-     *             For Set of keys use data.keySet().
      */
     @Override
     public void onMessageReceived(RemoteMessage message){
@@ -50,34 +46,16 @@ public class MyFcmListenerService extends FirebaseMessagingService
             // normal downstream message.
         }
 
-        /**
-         * In some cases it may be useful to show a notification indicating to the user
-         * that a message was received.
-         */
         sendNotification(msg);
     }
 
-
-    /**
-     * Create and show a simple notification containing the received FCM message.
-     *
-     * @param message FCM message received.
-     */
     private void sendNotification(String message)
     {
-        Intent intent = new Intent(this, Vibrate.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent, PendingIntent.FLAG_ONE_SHOT);
-
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.icon)
-                .setContentTitle("FCM Message") //adapt that accordingly
+                .setContentTitle("StamOrga Nachricht")
                 .setContentText(message)
-                .setAutoCancel(true)
-                .setSound(defaultSoundUri)
-                .setContentIntent(pendingIntent);
-//
+                .setAutoCancel(true);
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 

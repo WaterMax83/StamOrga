@@ -4,17 +4,19 @@
 #include <QObject>
 #include <QQmlEngine>
 
-class PushNotificationRegistrationTokenHandler : public QObject
+class PushNotificationInformationHandler : public QObject
 {
     Q_OBJECT
 public:
-    PushNotificationRegistrationTokenHandler(QObject* parent = 0);
-    ~PushNotificationRegistrationTokenHandler();
+    PushNotificationInformationHandler(QObject* parent = 0);
+    ~PushNotificationInformationHandler();
+
+    void setNewRegistrationToken(QString token);
 signals:
     void fcmRegistrationTokenChanged(QString token);
 
 private:
-    //    QString m_fcmToken;
+    QString m_fcmToken;
 };
 
 

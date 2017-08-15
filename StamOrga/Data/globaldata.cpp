@@ -18,6 +18,7 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QStandardPaths>
+#include <QtCore/QUuid>
 #include <QtGui/QClipboard>
 #include <QtGui/QGuiApplication>
 #include <QtNetwork/QNetworkConfigurationManager>
@@ -26,23 +27,29 @@
 #include "globaldata.h"
 #include "globalsettings.h"
 
-#define GROUP_ARRAY_ITEM "item"
-#define ITEM_INDEX "index"
+// clang-format off
+#define GROUP_ARRAY_ITEM    "item"
+#define ITEM_INDEX          "index"
 
-#define GAMES_GROUP "GAMES_LIST"
-#define PLAY_HOME "home"
-#define PLAY_AWAY "away"
-#define PLAY_DATETIME "datetime"
-#define PLAY_SAISON_INDEX "sIndex"
-#define PLAY_SCORE "score"
-#define PLAY_COMPETITION "competition"
-#define PLAY_TIME_FIXED "timeFixed"
+#define GAMES_GROUP         "GAMES_LIST"
+#define PLAY_HOME           "home"
+#define PLAY_AWAY           "away"
+#define PLAY_DATETIME       "datetime"
+#define PLAY_SAISON_INDEX   "sIndex"
+#define PLAY_SCORE          "score"
+#define PLAY_COMPETITION    "competition"
+#define PLAY_TIME_FIXED     "timeFixed"
 
-#define SEASONTICKET_GROUP "SEASONTICKET_LIST"
-#define TICKET_NAME "name"
-#define TICKET_PLACE "place"
-#define TICKET_DISCOUNT "discount"
-#define TICKET_USER_INDEX "userIndex"
+#define SEASONTICKET_GROUP  "SEASONTICKET_LIST"
+#define TICKET_NAME         "name"
+#define TICKET_PLACE        "place"
+#define TICKET_DISCOUNT     "discount"
+#define TICKET_USER_INDEX   "userIndex"
+
+#define APP_INFO_GROUP      "AppInfo"
+#define APP_INFO_TOKEN      "FcmToken"
+#define APP_INFO_GUID       "AppGuid"
+// clang-format on
 
 
 GlobalData::GlobalData(QObject* parent)
@@ -61,12 +68,28 @@ GlobalData::GlobalData(QObject* parent)
 
     this->m_pMainUserSettings = new QSettings();
     this->m_pMainUserSettings->setIniCodec(("UTF-8"));
+
+    QMutexLocker lock(&this->m_pushNotificationMutex);
+    this->m_pMainUserSettings->beginGroup(APP_INFO_GROUP);
+#ifdef Q_OS_ANDROID
+    this->m_pushNotificationInfoHandler = new PushNotificationInformationHandler(this);
+    connect(this->m_pushNotificationInfoHandler, &PushNotificationInformationHandler::fcmRegistrationTokenChanged,
+            this, &GlobalData::slotNewFcmRegistrationToken);
+
+    this->m_pushNotificationToken = this->m_pMainUserSettings->value(APP_INFO_TOKEN, "").toString();
+#endif
+    this->m_AppInstanceGUID = this->m_pMainUserSettings->value(APP_INFO_GUID, "").toString();
+    if (this->m_AppInstanceGUID == "") {
+        this->m_AppInstanceGUID = QUuid::createUuid().toString();
+        this->m_pMainUserSettings->setValue(APP_INFO_GUID, this->m_AppInstanceGUID);
+        qInfo().noquote() << QString("Create a new GUID for this instance %1").arg(this->m_AppInstanceGUID);
+    }
+
+    this->m_pMainUserSettings->endGroup();
 }
 
 void GlobalData::loadGlobalSettings()
 {
-    //    QMutexLocker lock(&this->m_mutexUserIni);
-
     QHostInfo::lookupHost("watermax83.ddns.net", this, SLOT(callBackLookUpHost(QHostInfo)));
 
     qInfo().noquote() << this->m_pMainUserSettings->fileName();
@@ -466,6 +489,21 @@ void GlobalData::callBackLookUpHost(const QHostInfo& host)
     if (host.addresses().size() > 0)
         qInfo().noquote() << QString("Setting IP Address: %1").arg(lastIP);
 }
+
+#ifdef Q_OS_ANDROID
+void GlobalData::slotNewFcmRegistrationToken(QString token)
+{
+    QMutexLocker lock(&this->m_pushNotificationMutex);
+
+    this->m_pushNotificationToken = token;
+
+    this->m_pMainUserSettings->beginGroup(APP_INFO_GROUP);
+    this->m_pMainUserSettings->setValue(APP_INFO_TOKEN, this->m_pushNotificationToken);
+    this->m_pMainUserSettings->endGroup();
+
+    qDebug() << QString("Global Data got a new token %1").arg(token);
+}
+#endif
 
 bool GlobalData::userIsDebugEnabled()
 {

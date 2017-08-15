@@ -131,8 +131,7 @@ private:
     QString      m_changeDefaultFont;
     qint64       m_currentFontIndex;
     QStringList* m_fontList = NULL;
-
-    QString m_lastShownVersion;
+    QString      m_lastShownVersion;
 };
 
 

@@ -31,6 +31,7 @@
 #include "gameplay.h"
 #include "meetinginfo.h"
 #include "seasonticket.h"
+#include "source/pushnotification.h"
 
 
 #define USER_IS_ENABLED(val) ((this->m_UserProperties & val) > 0 ? true : false)
@@ -218,6 +219,9 @@ public:
 
     Q_INVOKABLE MeetingInfo* getMeetingInfo() { return &this->m_meetingInfo; }
 
+    QString getCurrentAppGUID() { return this->m_AppInstanceGUID; }
+    QString getCurrentAppToken() { return this->m_pushNotificationToken; }
+
 signals:
     void
     userNameChanged();
@@ -232,6 +236,9 @@ public slots:
 
 private slots:
     void callBackLookUpHost(const QHostInfo& host);
+#ifdef Q_OS_ANDROID
+    void slotNewFcmRegistrationToken(QString token);
+#endif
 
 private:
     QString m_userName;
@@ -250,6 +257,7 @@ private:
     QMutex m_mutexGame;
     QMutex m_mutexTicket;
 
+
     bool m_bIsConnected;
 
     QSettings* m_pMainUserSettings;
@@ -265,6 +273,11 @@ private:
     bool                     m_bSeasonTicketLastUpdateDidChanges;
 
     MeetingInfo m_meetingInfo;
+
+    PushNotificationInformationHandler* m_pushNotificationInfoHandler;
+    QMutex                              m_pushNotificationMutex;
+    QString                             m_pushNotificationToken;
+    QString                             m_AppInstanceGUID;
 
     Logging*             m_logApp;
     BackgroundController m_ctrlLog;

@@ -34,7 +34,6 @@
 #include "../Data/globaldata.h"
 #include "../Data/globalsettings.h"
 #include "../dataconnection.h"
-#include "source/pushnotification.h"
 #include "userinterface.h"
 
 
@@ -55,7 +54,7 @@ int main(int argc, char* argv[])
     qRegisterMetaType<AcceptMeetingInfo*>("AcceptMeetingInfo*");
     qRegisterMetaType<DataConRequest>("DataConRequest");
 
-    PushNotificationRegistrationTokenHandler pushHandler;
+    PushNotificationInformationHandler pushHandler;
     Q_UNUSED(pushHandler);
 
     GlobalSettings globalSettings;

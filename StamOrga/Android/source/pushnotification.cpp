@@ -5,14 +5,25 @@
 #include <QtAndroidExtras>
 #endif
 
-PushNotificationRegistrationTokenHandler::PushNotificationRegistrationTokenHandler(QObject* parent)
+static PushNotificationInformationHandler* g_PushInstance = NULL;
+
+PushNotificationInformationHandler::PushNotificationInformationHandler(QObject* parent)
     : QObject(parent)
-//    , m_fcmToken("")
+{
+    this->m_fcmToken = "";
+    g_PushInstance   = this;
+}
+
+PushNotificationInformationHandler::~PushNotificationInformationHandler()
 {
 }
 
-PushNotificationRegistrationTokenHandler::~PushNotificationRegistrationTokenHandler()
+void PushNotificationInformationHandler::setNewRegistrationToken(QString token)
 {
+    if (this->m_fcmToken != token) {
+        this->m_fcmToken = token;
+        emit this->fcmRegistrationTokenChanged(this->m_fcmToken);
+    }
 }
 
 
@@ -20,11 +31,10 @@ PushNotificationRegistrationTokenHandler::~PushNotificationRegistrationTokenHand
 static void fcmTokenResult(JNIEnv* /*env*/ env, jobject obj, jstring fcmToken)
 {
     const char* nativeString = env->GetStringUTFChars(fcmToken, 0);
-    qDebug() << "FCM Token is: " << nativeString;
+    Q_UNUSED(obj);
 
-    QString fcmTokenString = QString(nativeString);
-
-    //    emit this->fcmRegistrationTokenChanged(fcmToken);
+    if (g_PushInstance != NULL)
+        g_PushInstance->setNewRegistrationToken(QString(nativeString));
 }
 
 
