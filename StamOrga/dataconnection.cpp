@@ -267,7 +267,17 @@ void DataConnection::startSendVersionRequest(DataConRequest request)
 
 void DataConnection::startSendUserPropsRequest(DataConRequest request)
 {
-    MessageProtocol msg(request.m_request);
+    quint32 offset = 0;
+    char    data[200];
+    memset(&data[0], 0x0, 200);
+    QByteArray tmp = this->m_pGlobalData->getCurrentAppGUID().toUtf8();
+    memcpy(&data[offset], tmp.constData(), tmp.length());
+    offset += (tmp.length() + 1);
+    tmp = this->m_pGlobalData->getCurrentAppToken().toUtf8();
+    memcpy(&data[offset], tmp.constData(), tmp.length());
+    offset += (tmp.length() + 1);
+
+    MessageProtocol msg(request.m_request, &data[0], offset);
     this->sendMessageRequest(&msg, request);
 }
 

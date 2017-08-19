@@ -49,7 +49,7 @@ void GlobalData::initialize()
                 AvailableTicketInfo* info = (AvailableTicketInfo*)ticket->getRequestConfigItemFromListIndex(i);
                 if (info == NULL)
                     continue;
-                TicketInfo* tInfo = (TicketInfo*) this->m_SeasonTicket.getItem(info->m_ticketID);
+                TicketInfo* tInfo = (TicketInfo*)this->m_SeasonTicket.getItem(info->m_ticketID);
                 if (tInfo == NULL)
                     ticket->removeItem(info->m_index); /* Ticket is no longer present, remove it */
             }
@@ -181,10 +181,10 @@ qint32 GlobalData::requestGetAvailableSeasonTicket(const quint32 gameIndex, cons
                     wFreeTickets << quint32(0x0);
                     continue;
                 }
-                TicketInfo* tInfo = (TicketInfo*) this->m_SeasonTicket.getItem(info->m_ticketID);
+                TicketInfo* tInfo = (TicketInfo*)this->m_SeasonTicket.getItem(info->m_ticketID);
                 if (tInfo == NULL) {
                     ticket->removeItem(info->m_index);
-                    continue;   /* Ticket is no longer present, remove it */
+                    continue; /* Ticket is no longer present, remove it */
                 }
                 if (info->m_state == TICKET_STATE_FREE) {
                     wFreeTickets << quint32(info->m_ticketID);
@@ -286,9 +286,11 @@ qint32 GlobalData::requestChangeMeetingInfo(const quint32 gameIndex, const quint
     foreach (MeetingInfo* mInfo, this->m_meetingInfos) {
         if (mInfo->getGameIndex() == gameIndex) {
             result = mInfo->changeMeetingInfo(when, where, info);
-            if (result == ERROR_CODE_SUCCESS)
-                qInfo().noquote() << QString("Changed Meeting info at game %1").arg(pGame->m_index);
-            else
+            if (result == ERROR_CODE_SUCCESS) {
+                qInfo().noquote() << QString("Changed Meeting info at game %1:%2, %3").arg(pGame->m_itemName, pGame->m_away).arg(pGame->m_index);
+                QString body = QString("Beim Spiel %1:%1 wurde das Treffen geändert").arg(pGame->m_itemName, pGame->m_away);
+                emit this->sendNewNotification(NOTIFY_TOPIC_CHANGE_MEETING, "Treffen verändert", body);
+            } else
                 qWarning().noquote() << QString("Error setting meeting info at game %1: %2").arg(pGame->m_index).arg(result);
             return result;
         }
@@ -298,7 +300,9 @@ qint32 GlobalData::requestChangeMeetingInfo(const quint32 gameIndex, const quint
     if (mInfo->initialize(pGame->m_saison, pGame->m_competition, pGame->m_saisonIndex, pGame->m_index)) {
         this->m_meetingInfos.append(mInfo);
         result = mInfo->changeMeetingInfo(when, where, info);
-        qInfo().noquote() << QString("Changed MeetingInfo at game %1").arg(pGame->m_index);
+        qInfo().noquote() << QString("Added MeetingInfo at game %1:%2, %3").arg(pGame->m_itemName, pGame->m_away).arg(pGame->m_index);
+        QString body = QString("Beim Spiel %1:%1 wurde ein neues Treffen angelegt").arg(pGame->m_itemName, pGame->m_away);
+        emit this->sendNewNotification(NOTIFY_TOPIC_NEW_MEETING, "Neues Treffen", body);
     } else {
         delete mInfo;
         qWarning().noquote() << QString("Error creating meeting info file for game %1").arg(pGame->m_index);

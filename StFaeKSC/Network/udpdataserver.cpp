@@ -141,7 +141,7 @@ MessageProtocol* UdpDataServer::checkNewMessage(MessageProtocol* msg)
             break;
 
         case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
-            ack = this->m_pDataConnection->requestGetUserProperties();
+            ack = this->m_pDataConnection->requestGetUserProperties(msg);
             break;
 
         case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:

@@ -30,6 +30,7 @@
 #include "Data/readonlinegames.h"
 #include "General/console.h"
 #include "General/globaldata.h"
+#include "General/pushnotification.h"
 #include "Network/udpserver.h"
 
 
@@ -43,6 +44,9 @@ int main(int argc, char* argv[])
     GlobalData globalData;
     Console*   con = new Console(&globalData);
     globalData.initialize();
+
+    PushNotification pushNotify;
+    pushNotify.initialize(&globalData);
 
     qInfo() << "*************************************************************";
     qInfo() << QString("Starting StFaeKSC %1").arg(STAM_ORGA_VERSION_S);

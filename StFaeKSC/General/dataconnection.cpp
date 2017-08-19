@@ -74,8 +74,12 @@ MessageProtocol* DataConnection::requestCheckUserLogin(MessageProtocol* msg)
  * 20               index           4
  * 24               readableName    X
  */
-MessageProtocol* DataConnection::requestGetUserProperties()
+MessageProtocol* DataConnection::requestGetUserProperties(MessageProtocol* msg)
 {
+    if (msg->getDataLength() > 0) {
+        /* App GUID and Fcm Token, maybe needed later */
+    }
+
     QByteArray  answer;
     QDataStream wAnswer(&answer, QIODevice::WriteOnly);
     wAnswer.setByteOrder(QDataStream::LittleEndian);
@@ -86,7 +90,6 @@ MessageProtocol* DataConnection::requestGetUserProperties()
     QString readableName = this->m_pGlobalData->m_UserList.getReadableName(this->m_pUserConData->m_userName);
     answer.append(readableName.toUtf8());
     answer.append((char)0x00);
-
 
     qInfo().noquote() << QString("User %1 getting user properties %2").arg(this->m_pUserConData->m_userName, readableName);
 
@@ -505,10 +508,10 @@ MessageProtocol* DataConnection::requestGetTicketsList(MessageProtocol* msg)
     }
 
     if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST) {
-//        const char* pData = msg->getPointerToData();
-//        qint64      appTimeStamp;
-//        memcpy(&appTimeStamp, pData, sizeof(qint64));
-//        appTimeStamp = qFromLittleEndian(appTimeStamp);
+        //        const char* pData = msg->getPointerToData();
+        //        qint64      appTimeStamp;
+        //        memcpy(&appTimeStamp, pData, sizeof(qint64));
+        //        appTimeStamp = qFromLittleEndian(appTimeStamp);
     }
 
     QByteArray  ackArray;

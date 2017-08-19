@@ -27,8 +27,9 @@
 #include "../Data/meetinginfo.h"
 #include "../Data/seasonticket.h"
 
-class GlobalData
+class GlobalData : public QObject
 {
+    Q_OBJECT
 public:
     GlobalData();
 
@@ -52,6 +53,9 @@ public:
     SeasonTicket                 m_SeasonTicket;
     QList<AvailableGameTickets*> m_availableTickets;
     QList<MeetingInfo*>          m_meetingInfos;
+
+signals:
+    void sendNewNotification(const QString topic, const QString header, const QString body);
 };
 
 #endif // GLOBALDATA_H

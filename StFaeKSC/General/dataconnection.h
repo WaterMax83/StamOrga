@@ -32,7 +32,7 @@ public:
     explicit DataConnection(GlobalData* pGData, QObject* parent = 0);
 
     MessageProtocol* requestCheckUserLogin(MessageProtocol* msg);
-    MessageProtocol* requestGetUserProperties();
+    MessageProtocol* requestGetUserProperties(MessageProtocol* msg);
     MessageProtocol* requestUserChangeLogin(MessageProtocol* msg);
     MessageProtocol* requestUserChangeReadname(MessageProtocol* msg);
     MessageProtocol* requestGetProgramVersion(MessageProtocol* msg);

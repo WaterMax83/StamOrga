@@ -47,7 +47,8 @@ SOURCES += main.cpp \
     Data/configlist.cpp \
     Data/readonlinegames.cpp \
     Data/availablegameticket.cpp \
-    Data/meetinginfo.cpp
+    Data/meetinginfo.cpp \
+    General/pushnotification.cpp
 
 HEADERS += \
     ../Common/General/backgroundcontroller.h \
@@ -73,7 +74,8 @@ HEADERS += \
     Data/configlist.h \
     Data/readonlinegames.h \
     Data/availablegameticket.h \
-    Data/meetinginfo.h
+    Data/meetinginfo.h \
+    General/pushnotification.h
 
 
 unix {
