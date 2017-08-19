@@ -1,3 +1,21 @@
+/*
+*	This file is part of StamOrga
+*   Copyright (C) 2017 Markus Schneider
+*
+*	This program is free software; you can redistribute it and/or modify
+*   it under the terms of the GNU General Public License as published by
+*   the Free Software Foundation; either version 3 of the License, or
+*   (at your option) any later version.
+*
+*	StamOrga is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+
+*    You should have received a copy of the GNU General Public License
+*    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include "pushnotification.h"
 
 #ifdef Q_OS_ANDROID
@@ -38,7 +56,6 @@ static void fcmTokenResult(JNIEnv* /*env*/ env, jobject obj, jstring fcmToken)
 }
 
 
-// create a vector with all our JNINativeMethod(s)
 static JNINativeMethod methods[] = {
     {
         "sendFCMToken", // const char* function name;
@@ -53,18 +70,15 @@ static JNINativeMethod methods[] = {
 JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* /*reserved*/)
 {
     JNIEnv* env;
-    // get the JNIEnv pointer.
     if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6)
         != JNI_OK) {
         return JNI_ERR;
     }
 
-    // search for Java class which declares the native methods
     jclass javaClass = env->FindClass("org/qtproject/example/JavaNatives");
     if (!javaClass)
         return JNI_ERR;
 
-    // register our native methods
     if (env->RegisterNatives(javaClass, methods,
                              sizeof(methods) / sizeof(methods[0]))
         < 0) {
@@ -74,3 +88,35 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* /*reserved*/)
     return JNI_VERSION_1_6;
 }
 #endif
+
+void PushNotificationInformationHandler::subscribeToTopic(QString topic)
+{
+#ifdef Q_OS_ANDROID
+#ifdef QT_DEBUG
+    topic.append("Debug");
+#endif
+    QAndroidJniObject javaNotification = QAndroidJniObject::fromString(topic);
+    QAndroidJniObject::callStaticMethod<void>("org/qtproject/example/MainActivity",
+                                              "SubscribeToTopic",
+                                              "(Ljava/lang/String;)V",
+                                              javaNotification.object<jstring>());
+#else
+    Q_UNUSED(topic);
+#endif
+}
+
+void PushNotificationInformationHandler::unSubscribeFromTopic(QString topic)
+{
+#ifdef Q_OS_ANDROID
+#ifdef QT_DEBUG
+    topic.append("Debug");
+#endif
+    QAndroidJniObject javaNotification = QAndroidJniObject::fromString(topic);
+    QAndroidJniObject::callStaticMethod<void>("org/qtproject/example/MainActivity",
+                                              "UnRegisterFromTopic",
+                                              "(Ljava/lang/String;)V",
+                                              javaNotification.object<jstring>());
+#else
+    Q_UNUSED(topic);
+#endif
+}

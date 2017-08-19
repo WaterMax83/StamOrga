@@ -64,4 +64,12 @@ public class MainActivity extends org.qtproject.qt5.android.bindings.QtActivity
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
         super.onPause();
     }
+
+    public static void SubscribeToTopic(String topic) {
+        FirebaseMessaging.getInstance().subscribeToTopic(topic);
+    }
+
+    public static void UnRegisterFromTopic(String topic) {
+        FirebaseMessaging.getInstance().unsubscribeFromTopic(topic);
+    }
 }

@@ -93,6 +93,39 @@ Item {
            RowLayout {
                Layout.preferredWidth: parent.width
                Layout.fillWidth: true
+
+               Text {
+                   id: labelNotificationText
+                   Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                   font.pointSize: 12
+                   Layout.topMargin: (saveInfosOnApp.height - height) / 2
+                   Layout.bottomMargin: (saveInfosOnApp.height - height) / 2
+                   color: "white"
+                   text: "Benachrichtigungen >"
+               }
+               MouseArea {
+                   anchors.fill: labelNotificationText
+                   onClicked: {
+                       var component = Qt.createComponent("../components/NotificationSettingsDialog.qml");
+                       if (component.status === Component.Ready) {
+                           var dialog = component.createObject(mainPaneSettings,{popupType: 1});
+                           dialog.parentHeight = mainWindow.height
+                           dialog.parentWidth = mainWindow.width
+                           dialog.enableNewAppVersion = notifyNewAppVersion;
+                           dialog.enableMeetingAdded = notifyNewMeetInfo;
+                           dialog.enableMeetingChanged = notifyChangeMeetInfo;
+                           dialog.enableNewFreeTicket = notifyFreeTicket;
+                           dialog.acceptedDialog.connect(acceptedNotificationDialog);
+                           notifyDialog = dialog;
+                           dialog.open();
+                       }
+                   }
+               }
+           }
+
+           RowLayout {
+               Layout.preferredWidth: parent.width
+               Layout.fillWidth: true
                visible: !userInt.isDeviceMobile()
 
                Text {
@@ -159,11 +192,13 @@ Item {
            }
 
            Text {
-               id: labelAcceptText
+               id: labelVersionText
                textFormat: Text.RichText
                wrapMode: Text.WordWrap
                Layout.maximumWidth: parent.width
                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+               Layout.topMargin: (saveInfosOnApp.height - height) / 2
+               Layout.bottomMargin: (saveInfosOnApp.height - height) / 2
                font.pointSize: 12
                color: "white"
                text: "Aktuelle Version: <a href=\"tmp\">" + globalSettings.getCurrentVersion() + "</a>"
@@ -212,6 +247,23 @@ Item {
            saveSettings = true;
         }
 
+        if (notifyNewAppVersion !== globalSettings.isNotificationNewAppVersionEnabled()) {
+            globalSettings.setNotificationNewAppVersionEnabled(notifyNewAppVersion);
+            saveSettings = true;
+        }
+        if (notifyNewMeetInfo !== globalSettings.isNotificationNewMeetingEnabled()){
+            globalSettings.setNotificationNewMeetingEnabled(notifyNewMeetInfo);
+            saveSettings = true;
+        }
+        if (notifyChangeMeetInfo !== globalSettings.isNotificationChangedMeetingEnabled()){
+            globalSettings.setNotificationChangedMeetingEnabled(notifyChangeMeetInfo);
+            saveSettings = true;
+        }
+        if (notifyFreeTicket !== globalSettings.isNotificationNewFreeTicketEnabled()){
+            globalSettings.setNotificationNewFreeTicketEnabled(notifyFreeTicket);
+            saveSettings = true;
+        }
+
         if (saveSettings)
           globalSettings.saveGlobalSettings();
 
@@ -251,10 +303,27 @@ Item {
 
    function pageOpenedUpdateView() {
 
-//       fontFamiliesModel.get(cbfontFamilies.currentIndex).text = "Arial"
         cbfontFamilies.currentIndex = globalSettings.getCurrentFontIndex();
 
+        notifyNewAppVersion = globalSettings.isNotificationNewAppVersionEnabled();
+        notifyNewMeetInfo = globalSettings.isNotificationNewMeetingEnabled();
+        notifyChangeMeetInfo = globalSettings.isNotificationChangedMeetingEnabled()
+        notifyFreeTicket = globalSettings.isNotificationNewFreeTicketEnabled();
+
        isStartupDone = true;
+   }
+
+   property var notifyNewAppVersion;
+   property var notifyNewMeetInfo;
+   property var notifyChangeMeetInfo;
+   property var notifyFreeTicket;
+   property var notifyDialog;
+   function acceptedNotificationDialog() {
+       notifyNewAppVersion = notifyDialog.enableNewAppVersion;
+       notifyNewMeetInfo = notifyDialog.enableMeetingAdded;
+       notifyChangeMeetInfo = notifyDialog.enableMeetingChanged;
+       notifyFreeTicket=  notifyDialog.enableNewFreeTicket;
+       valueWasEditedEnableSave();
    }
 
    function notifyUserIntConnectionFinished(result) {}

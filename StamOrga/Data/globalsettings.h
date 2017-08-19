@@ -108,6 +108,15 @@ public:
 
     Q_INVOKABLE void checkNewStateChangedAtStart();
 
+    Q_INVOKABLE bool isNotificationNewAppVersionEnabled();
+    Q_INVOKABLE bool isNotificationNewMeetingEnabled();
+    Q_INVOKABLE bool isNotificationChangedMeetingEnabled();
+    Q_INVOKABLE bool isNotificationNewFreeTicketEnabled();
+    Q_INVOKABLE void setNotificationNewAppVersionEnabled(bool enable);
+    Q_INVOKABLE void setNotificationNewMeetingEnabled(bool enable);
+    Q_INVOKABLE void setNotificationChangedMeetingEnabled(bool enable);
+    Q_INVOKABLE void setNotificationNewFreeTicketEnabled(bool enable);
+
 signals:
     void debugIPChanged();
     void debugIPWifiChanged();
@@ -132,6 +141,7 @@ private:
     qint64       m_currentFontIndex;
     QStringList* m_fontList = NULL;
     QString      m_lastShownVersion;
+    quint64      m_notificationEnabledValue;
 };
 
 

@@ -54,9 +54,6 @@ int main(int argc, char* argv[])
     qRegisterMetaType<AcceptMeetingInfo*>("AcceptMeetingInfo*");
     qRegisterMetaType<DataConRequest>("DataConRequest");
 
-    PushNotificationInformationHandler pushHandler;
-    Q_UNUSED(pushHandler);
-
     GlobalSettings globalSettings;
     g_GlobalSettings = &globalSettings;
 

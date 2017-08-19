@@ -55,27 +55,27 @@ extern QString getUserHomeConfigPath();
 
 extern bool checkFilePathExistAndCreate(const QString& path);
 
-
-#define ERROR_CODE_NEW_VERSION 5
-#define ERROR_CODE_SUCCESS 1
-#define ERROR_CODE_NO_ERROR 0
-#define ERROR_CODE_COMMON -1
-#define ERROR_CODE_WRONG_SIZE -2
-#define ERROR_CODE_TIMEOUT -3
-#define ERROR_CODE_ERR_SEND -4
-#define ERROR_CODE_NOT_FOUND -5
-#define ERROR_CODE_NO_CONNECT -6
-#define ERROR_CODE_ALREADY_EXIST -7
-#define ERROR_CODE_IN_PAST -8
-#define ERROR_CODE_NOT_POSSIBLE -9
-#define ERROR_CODE_MISSING_TICKET -10
-#define ERROR_CODE_WRONG_PARAMETER -11
-#define ERROR_CODE_NOT_IMPLEMENTED -12
-#define ERROR_CODE_UPDATE_FUNCTION -13
-#define ERROR_CODE_UPDATE_LIST -14
-#define ERROR_CODE_NO_USER -20
-#define ERROR_CODE_WRONG_PASSWORD -21
-
+// clang-format off
+#define ERROR_CODE_NEW_VERSION          5
+#define ERROR_CODE_SUCCESS              1
+#define ERROR_CODE_NO_ERROR             0
+#define ERROR_CODE_COMMON               -1
+#define ERROR_CODE_WRONG_SIZE           -2
+#define ERROR_CODE_TIMEOUT              -3
+#define ERROR_CODE_ERR_SEND             -4
+#define ERROR_CODE_NOT_FOUND            -5
+#define ERROR_CODE_NO_CONNECT           -6
+#define ERROR_CODE_ALREADY_EXIST        -7
+#define ERROR_CODE_IN_PAST              -8
+#define ERROR_CODE_NOT_POSSIBLE         -9
+#define ERROR_CODE_MISSING_TICKET       -10
+#define ERROR_CODE_WRONG_PARAMETER      -11
+#define ERROR_CODE_NOT_IMPLEMENTED      -12
+#define ERROR_CODE_UPDATE_FUNCTION      -13
+#define ERROR_CODE_UPDATE_LIST          -14
+#define ERROR_CODE_NO_USER              -20
+#define ERROR_CODE_WRONG_PASSWORD       -21
+// clang-format on
 
 extern QString getErrorCodeString(qint32 code);
 
@@ -118,6 +118,14 @@ extern QString createRandomString(qint32 size);
 #define USER_ENABLE_LOG                     0x1
 #define USER_ENABLE_ADD_GAME                0x2
 #define USER_ENABLE_FIXED_GAME_TIME         0x4
+// clang-format on
+
+
+// clang-format off
+#define NOTIFY_TOPIC_NEW_APP_VERSION        "NewAppVersion"
+#define NOTIFY_TOPIC_NEW_MEETING            "NewMeeting"
+#define NOTIFY_TOPIC_CHANGE_MEETING         "ChangeMeeting"
+#define NOTIFY_TOPIC_NEW_FREE_TICKET        "NewFreeTicket"
 // clang-format on
 
 
