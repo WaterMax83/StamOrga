@@ -44,7 +44,7 @@ Dialog {
             text: "Es gibt eine neue Version von StamOrga"
             wrapMode: Text.Wrap
             color: "white"
-            font.pointSize: 12
+            font.pixelSize: 12
         }
 
         Text {
@@ -52,7 +52,7 @@ Dialog {
             width: versionDialog.availableWidth
             textFormat: Text.RichText
             wrapMode: Text.Wrap
-            font.pointSize: 12
+            font.pixelSize: 12
             color: "white"
             onLinkActivated: Qt.openUrlExternally(link)
         }

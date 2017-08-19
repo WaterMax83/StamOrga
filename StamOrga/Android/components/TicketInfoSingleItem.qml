@@ -46,7 +46,7 @@ RowLayout {
         anchors.verticalCenter: parent.verticalCenter
         Layout.alignment: Qt.AlignVCenter
         color: "white"
-        font.pointSize: parent.height / 5 * 2
+        font.pixelSize: parent.height / 5 * 2
     }
 
     Image {

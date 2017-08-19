@@ -26,14 +26,17 @@ public class MyFcmListenerService extends FirebaseMessagingService
     public void onMessageReceived(RemoteMessage message){
         String from = message.getFrom();
         Map<String, String> data = message.getData();
-        String msg = "";
+        String title = "";
+        String body = "";
 
         for (Map.Entry<String, String> entry : data.entrySet())
         {
             Log.d(TAG, entry.getKey() + "/" + entry.getValue());
         }
         if (data.containsKey("title"))
-            msg = data.get("title").toString();
+            title = data.get("title").toString();
+        if (data.containsKey("body"))
+            body = data.get("body").toString();
 
         Log.d(TAG, "From: " + from);
         Log.d(TAG, "Size: " + data.size());
@@ -46,16 +49,21 @@ public class MyFcmListenerService extends FirebaseMessagingService
             // normal downstream message.
         }
 
-        sendNotification(msg);
+        sendNotification(title, body);
     }
 
-    private void sendNotification(String message)
+    private void sendNotification(String title, String message)
     {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent, PendingIntent.FLAG_ONE_SHOT);
+
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.icon)
-                .setContentTitle("StamOrga Nachricht")
+                .setContentTitle(title)
                 .setContentText(message)
-                .setAutoCancel(true);
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent);
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 

@@ -49,7 +49,7 @@ Flickable {
                Layout.maximumWidth: parent.width
                rightPadding: 5
                visible: true
-               font.pointSize: 8
+               font.pixelSize: 8
                color: "white"
            }
 

@@ -501,7 +501,7 @@ void GlobalData::slotNewFcmRegistrationToken(QString token)
     this->m_pMainUserSettings->setValue(APP_INFO_TOKEN, this->m_pushNotificationToken);
     this->m_pMainUserSettings->endGroup();
 
-    qDebug() << QString("Global Data got a new token %1").arg(token);
+    qInfo().noquote() << QString("Global Data got a new token %1").arg(token);
 }
 #endif
 

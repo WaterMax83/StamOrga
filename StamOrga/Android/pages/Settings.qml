@@ -43,7 +43,7 @@ Item {
                    Layout.fillWidth: true
                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                    color: "white"
-                   font.pointSize: 12
+                   font.pixelSize: 14
                }
                CheckBox {
                     id: useReadableName
@@ -61,7 +61,7 @@ Item {
                    text: qsTr("Aktualisiere Spiele automatisch:")
                    Layout.fillWidth: true
                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                   font.pointSize: 12
+                   font.pixelSize: 14
                    color: "white"
                }
                CheckBox {
@@ -80,7 +80,7 @@ Item {
                    text: qsTr("Speichere geladene Daten:")
                    Layout.fillWidth: true
                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                   font.pointSize: 12
+                   font.pixelSize: 14
                    color: "white"
                }
                CheckBox {
@@ -93,11 +93,12 @@ Item {
            RowLayout {
                Layout.preferredWidth: parent.width
                Layout.fillWidth: true
+               visible: userInt.isDeviceMobile()
 
                Text {
                    id: labelNotificationText
                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                   font.pointSize: 12
+                   font.pixelSize: 14
                    Layout.topMargin: (saveInfosOnApp.height - height) / 2
                    Layout.bottomMargin: (saveInfosOnApp.height - height) / 2
                    color: "white"
@@ -132,7 +133,7 @@ Item {
                    id: text5
                    text: qsTr("Schrift:")
                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                   font.pointSize: 12
+                   font.pixelSize: 14
                    color: "white"
                }
                ComboBox {
@@ -153,7 +154,7 @@ Item {
 
                Text {
                    text: qsTr("Alternative IP:")
-                   font.pointSize: 12
+                   font.pixelSize: 14
                    color: "white"
                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                }
@@ -176,7 +177,7 @@ Item {
 
                Text {
                    text: qsTr("Alternative IP Wlan")
-                   font.pointSize: 12
+                   font.pixelSize: 14
                    color: "white"
                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                }
@@ -199,7 +200,7 @@ Item {
                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                Layout.topMargin: (saveInfosOnApp.height - height) / 2
                Layout.bottomMargin: (saveInfosOnApp.height - height) / 2
-               font.pointSize: 12
+               font.pixelSize: 14
                color: "white"
                text: "Aktuelle Version: <a href=\"tmp\">" + globalSettings.getCurrentVersion() + "</a>"
                onLinkActivated: {

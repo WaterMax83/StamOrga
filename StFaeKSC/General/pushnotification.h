@@ -22,6 +22,11 @@
 
 #include <QObject>
 #include <QSettings>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QList>
+#include <QMutex>
 
 #include "../Common/General/backgroundcontroller.h"
 #include "../Common/General/backgroundworker.h"
@@ -47,15 +52,24 @@ signals:
 
 public slots:
     void slotSendNewNotification(const QString topic, const QString header, const QString body);
+    void finished(QNetworkReply * reply);
+    void sslErrors(QNetworkReply* reply, QList<QSslError> errors);
 
 protected:
     int DoBackgroundWork();
 
 private:
-    GlobalData*          m_pGlobalData;
-    BackgroundController m_ctrlBackground;
-    QString              m_fcmServerKey;
-    QSettings*           m_pPushSettings;
+    GlobalData*            m_pGlobalData;
+    BackgroundController   m_ctrlBackground;
+    QByteArray             m_fcmServerKey;
+    QSettings*             m_pPushSettings;
+    QNetworkAccessManager  *m_nam;
+    QUrl                   m_fcmServiceUrl;
+    QList<PushNotifyInfo*> m_lPushToSend;
+    PushNotifyInfo         m_lastPushNotify;
+    QMutex                 m_sendMutex;
+
+    void sendNewPushNotify(PushNotifyInfo *pushNotify);
 };
 
 #endif // PUSHNOTIFICATION_H

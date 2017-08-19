@@ -55,7 +55,7 @@ Page {
                 id: txtInfoLoadingGames
                 visible: true
                 color: "white"
-                font.pointSize: 10
+                font.pixelSize: 10
                 horizontalAlignment: Text.AlignHCenter
                 Layout.alignment:  Qt.AlignHCenter | Qt.AlignVCenter
             }

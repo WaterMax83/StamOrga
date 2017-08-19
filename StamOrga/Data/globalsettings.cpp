@@ -77,6 +77,7 @@ void GlobalSettings::initialize(GlobalData* pGlobalData, QGuiApplication* app)
     else
         PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_FREE_TICKET);
 
+    PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_GENERAL);
 
     connect(app, &QGuiApplication::applicationStateChanged, this, &GlobalSettings::stateFromAppChanged);
 }

@@ -76,7 +76,7 @@ ApplicationWindow {
                 id: titleLabel
                 //                text: listView.currentItem ? listView.currentItem.text : "StamOrga"
                 color: "white"
-                font.pointSize: 25
+                font.pixelSize: 25
                 elide: Text.ElideRight
                 horizontalAlignment: Qt.AlignHCenter
                 verticalAlignment: Qt.AlignVCenter

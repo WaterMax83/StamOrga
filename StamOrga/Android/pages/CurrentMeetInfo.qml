@@ -196,7 +196,7 @@ Flickable {
                 Text {
                     text: "Info"
                     color: "white"
-                    font.pointSize: 10
+                    font.pixelSize: 12
                 }
                 ToolSeparator {
                     id: toolSeparator1
@@ -224,7 +224,7 @@ Flickable {
                     width: parent.width
                     color: "#505050"
                     leftPadding: 5
-                    font.pointSize: 12
+                    font.pixelSize: 16
                     enabled: isEditMode
                     onTextChanged: checkNewTextInput()
                 }
@@ -253,7 +253,7 @@ Flickable {
                 Text {
                     text: "Zusagen"
                     color: "white"
-                    font.pointSize: 10
+                    font.pixelSize: 12
                 }
                 ToolSeparator {
                     id: toolSeparator2
@@ -296,7 +296,7 @@ Flickable {
                         anchors.verticalCenter: parent.verticalCenter
                         Layout.alignment: Qt.AlignVCenter
                         color: "white"
-                        font.pointSize: parent.height / 5 * 2
+                        font.pixelSize: parent.height / 5 * 3
                     }
                     MouseArea {
                         anchors.top: parent.top

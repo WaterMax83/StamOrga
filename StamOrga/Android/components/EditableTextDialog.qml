@@ -73,7 +73,7 @@ Dialog {
             visible: false
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             wrapMode: Text.WordWrap
-            font.pointSize: 10
+            font.pixelSize: 10
             Layout.maximumWidth: parent.width
             color: "orange"
         }

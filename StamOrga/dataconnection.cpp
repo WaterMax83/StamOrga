@@ -319,7 +319,7 @@ void DataConnection::startSendGamesListRequest(DataConRequest request)
     quint32 data[3];
     qint64  timeStamp = this->m_pGlobalData->getGamePlayLastLocalUpdate();
 
-    if (timeStamp + TIMEOUT_UPDATE_GAMES > QDateTime::currentMSecsSinceEpoch())
+    if (timeStamp + TIMEOUT_UPDATE_GAMES > QDateTime::currentMSecsSinceEpoch() && this->m_pGlobalData->getGamePlayLength() > 0)
         data[0] = qToLittleEndian(UpdateIndex::UpdateDiff);
     else
         data[0] = qToLittleEndian(UpdateIndex::UpdateAll);

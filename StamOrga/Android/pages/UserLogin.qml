@@ -51,7 +51,7 @@ Flickable {
                 Text {
                     id: txtInfoConnecting
                     visible: false
-                    font.pointSize: 10
+                    font.pixelSize: 10
                     color: "white"
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     Layout.bottomMargin: 35
@@ -85,7 +85,7 @@ Flickable {
 
                 Text {
                     text: qsTr("Login / Email")
-                    font.pointSize: 10
+                    font.pixelSize: 12
                     color: "white"
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }
@@ -109,7 +109,7 @@ Flickable {
 
                 Text {
                     text: qsTr("Passwort")
-                    font.pointSize: 10
+                    font.pixelSize: 12
                     color: "white"
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }
@@ -198,7 +198,7 @@ Flickable {
                     Layout.maximumWidth: parent.width - 20
                     visible: true
                     Layout.bottomMargin: 35
-                    font.pointSize: 10
+                    font.pixelSize: 12
                     color: "white"
                 }
 
@@ -353,7 +353,7 @@ Flickable {
 
                 Text {
                     id: labelChaPass1
-                    font.pointSize: 10
+                    font.pixelSize: 12
                     color: "white"
                     text: qsTr("neues Passwort")
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
@@ -374,7 +374,7 @@ Flickable {
 
                 Text {
                     id: labelChaPass2
-                    font.pointSize: 10
+                    font.pixelSize: 12
                     color: "white"
                     text: qsTr("Passwort wiederholen")
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
@@ -396,7 +396,7 @@ Flickable {
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 wrapMode: Text.WordWrap
                 Layout.maximumWidth: parent.width
-                font.pointSize: 10
+                font.pixelSize: 10
                 color: "red"
             }
             Text {
@@ -406,7 +406,7 @@ Flickable {
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 wrapMode: Text.WordWrap
                 Layout.maximumWidth: parent.width
-                font.pointSize: 10
+                font.pixelSize: 10
                 color: "orange"
             }
         }
