@@ -99,6 +99,8 @@ QString getErrorCodeString(qint32 code)
         return QString("Version veraltet, Funktion nicht möglich: %1").arg(code);
     case ERROR_CODE_UPDATE_LIST:
         return QString("Liste muss aktualisiert werden: %1").arg(code);
+    case ERROR_CODE_NOT_READY:
+        return QString("Server is not nicht bereit: %1").arg(code);
     default:
         return QString("Unbekannter Fehler: %1").arg(code);
     }

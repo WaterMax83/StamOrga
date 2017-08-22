@@ -354,6 +354,19 @@ qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol* msg)
     return rValue;
 }
 
+qint32 DataHandling::getHandleChangeTicketStateResponse(MessageProtocol* msg)
+{
+    if (msg->getDataLength() < 12)
+        return ERROR_CODE_WRONG_SIZE;
+
+    const char* pData = msg->getPointerToData();
+    qint32      result;
+    memcpy(&result, pData, sizeof(quint32));
+    result = qFromLittleEndian(result);
+
+    return result;
+}
+
 /*  answer
  * 0   quint32     result          4
  * 4   quint16     freeCount       2
@@ -435,6 +448,19 @@ qint32 DataHandling::getHandleAvailableTicketListResponse(MessageProtocol* msg, 
         game->setReservedTickets(countOfReservedTickets);
         game->setBlockedTickets(this->m_pGlobalData->getSeasonTicketLength() - countOfFreeTickets - countOfReservedTickets);
     }
+
+    return result;
+}
+
+qint32 DataHandling::getHandleChangeMeetingResponse(MessageProtocol* msg)
+{
+    if (msg->getDataLength() < 12)
+        return ERROR_CODE_WRONG_SIZE;
+
+    const char* pData = msg->getPointerToData();
+    qint32      result;
+    memcpy(&result, pData, sizeof(quint32));
+    result = qFromLittleEndian(result);
 
     return result;
 }

@@ -192,7 +192,7 @@ void DataConnection::checkNewOncomingData()
             break;
 
         case OP_CODE_CMD_RES::ACK_STATE_CHANGE_SEASON_TICKET:
-            request.m_result = msg->getIntData();
+            request.m_result = this->m_pDataHandle->getHandleChangeTicketStateResponse(msg);
             break;
 
         case OP_CODE_CMD_RES::ACK_GET_AVAILABLE_TICKETS:
@@ -204,7 +204,7 @@ void DataConnection::checkNewOncomingData()
             break;
 
         case OP_CODE_CMD_RES::ACK_CHANGE_MEETING_INFO:
-            request.m_result = msg->getIntData();
+            request.m_result = this->m_pDataHandle->getHandleChangeMeetingResponse(msg);
             break;
 
         case OP_CODE_CMD_RES::ACK_GET_MEETING_INFO:

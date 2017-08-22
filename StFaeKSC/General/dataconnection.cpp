@@ -703,14 +703,24 @@ MessageProtocol* DataConnection::requestChangeStateSeasonTicket(MessageProtocol*
 
     QString reserveName(QByteArray(pData + 14, actLength));
 
-    if ((rCode = this->m_pGlobalData->requestChangeStateSeasonTicket(ticketIndex, gameIndex, state, reserveName, this->m_pUserConData->m_userName)) == ERROR_CODE_SUCCESS) {
+    qint64 messageID;
+    rCode = this->m_pGlobalData->requestChangeStateSeasonTicket(ticketIndex, gameIndex, state,
+                                                                     reserveName, this->m_pUserConData->m_userName,
+                                                                     messageID);
+    if (rCode == ERROR_CODE_SUCCESS)
         qInfo().noquote() << QString("User %1 set SeasonTicket %2 state to %3")
                                  .arg(this->m_pUserConData->m_userName)
                                  .arg(this->m_pGlobalData->m_SeasonTicket.getItemName(ticketIndex))
                                  .arg(state);
-        return new MessageProtocol(OP_CODE_CMD_RES::ACK_STATE_CHANGE_SEASON_TICKET, ERROR_CODE_SUCCESS);
-    }
-    return new MessageProtocol(OP_CODE_CMD_RES::ACK_STATE_CHANGE_SEASON_TICKET, rCode);
+
+    if (msg->getVersion() < MSG_HEADER_VERSION_MESSAGE_ID)
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_STATE_CHANGE_SEASON_TICKET, rCode);
+
+    qint32 data[3];
+    data[0] = qToLittleEndian(rCode);
+    messageID = qToLittleEndian(messageID);
+    memcpy(&data[1], &messageID, sizeof(qint64));
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_STATE_CHANGE_SEASON_TICKET, (char*)&data[0], sizeof(qint32) * 3);
 }
 
 /*  request
@@ -822,12 +832,21 @@ MessageProtocol* DataConnection::requestChangeMeetingInfo(MessageProtocol* msg)
     offset += where.toUtf8().size() + 1;
     QString info(QByteArray(pData + offset));
 
-    if ((rCode = this->m_pGlobalData->requestChangeMeetingInfo(gameIndex, 0, when, where, info)) == ERROR_CODE_SUCCESS) {
+    qint64 messageID = -1;
+    if ((rCode = this->m_pGlobalData->requestChangeMeetingInfo(gameIndex, 0, when, where, info, messageID)) == ERROR_CODE_SUCCESS) {
         qInfo().noquote() << QString("User %1 set MeetingInfo of game %2")
                                  .arg(this->m_pUserConData->m_userName)
                                  .arg(this->m_pGlobalData->m_GamesList.getItemName(gameIndex));
     }
-    return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_MEETING_INFO, rCode);
+
+    if (msg->getVersion() < MSG_HEADER_VERSION_MESSAGE_ID)
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_MEETING_INFO, rCode);
+
+    qint32 data[3];
+    data[0] = qToLittleEndian(rCode);
+    messageID = qToLittleEndian(messageID);
+    memcpy(&data[1], &messageID, sizeof(qint64));
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_MEETING_INFO, (char*)&data[0], sizeof(qint32) * 3);
 }
 
 /*  request

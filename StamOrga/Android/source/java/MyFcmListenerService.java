@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import java.util.Map;
+import java.lang.System;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -41,12 +42,9 @@ public class MyFcmListenerService extends FirebaseMessagingService
         Log.d(TAG, "From: " + from);
         Log.d(TAG, "Size: " + data.size());
 
-        //adapt that if you want to react to topics
-        //individually.
         if (from.startsWith("/topics/")) {
             // message received from some topic.
-        } else {
-            // normal downstream message.
+            long time = System.currentTimeMillis();
         }
 
         sendNotification(title, body);
