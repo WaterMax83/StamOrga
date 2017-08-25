@@ -58,7 +58,7 @@ Dialog {
         Text {
             id: labelAcceptText
             textFormat: Text.RichText
-            font.pixelSize: 12
+            font.pixelSize: 14
             color: "white"
             wrapMode: Text.WordWrap
             Layout.maximumWidth: parent.width

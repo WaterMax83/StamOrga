@@ -66,7 +66,7 @@ Dialog {
                 text: qsTr("Neuer App Version:")
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                font.pixelSize: 12
+                font.pixelSize: 14
                 color: "white"
             }
             CheckBox {
@@ -83,7 +83,7 @@ Dialog {
                 text: qsTr("Neues Treffen:")
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                font.pixelSize: 12
+                font.pixelSize: 14
                 color: "white"
             }
             CheckBox {
@@ -100,7 +100,7 @@ Dialog {
                 text: qsTr("Treffen geändert:")
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                font.pixelSize: 12
+                font.pixelSize: 14
                 color: "white"
             }
             CheckBox {
@@ -117,7 +117,7 @@ Dialog {
                 text: qsTr("Dauerkarte frei:")
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                font.pixelSize: 12
+                font.pixelSize: 14
                 color: "white"
             }
             CheckBox {

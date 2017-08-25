@@ -44,7 +44,18 @@ public class MyFcmListenerService extends FirebaseMessagingService
 
         if (from.startsWith("/topics/")) {
             // message received from some topic.
-            long time = System.currentTimeMillis();
+//            long time = System.currentTimeMillis();
+
+            String userIndex = "unknown"
+            if (data.containsKey("u_id"))
+                userIndex = data.get("u_id").toString();
+
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(m_context);
+            String savedUserIndex = sharedPreferences.getString(QuickstartPreferences.FCM_TOPIC_USER_INDEX, "");
+
+            /* Check if this topic was started from this user */
+            if (userIndex != "-1" && userIndex == savedUserIndex)
+                return;
         }
 
         sendNotification(title, body);

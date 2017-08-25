@@ -60,14 +60,15 @@ qint32 DataHandling::getHandleVersionResponse(MessageProtocol* msg, QString* ver
 
     if ((uVersion & 0xFFFFFF00) > (STAM_ORGA_VERSION_I & 0xFFFFFF00)) {
         version->append(QString("Deine Version: %2<br>Aktuelle Version: %1<br><br>").arg(remVersion, STAM_ORGA_VERSION_S));
-#ifdef Q_OS_WIN
-        version->append(QString("<a href=\"https://github.com/WaterMax83/StamOrga/releases/download/%1/StamOrga.Winx64.%1.exe\">Lade %2</a>\n")
-                            .arg(remVersion.toLower(), remVersion));
-#endif
-#ifdef Q_OS_ANDROID
-        version->append(QString("<a href=\"https://github.com/WaterMax83/StamOrga/releases/download/%1/StamOrga.Android.%1.apk\">Lade %2</a>\n")
-                            .arg(remVersion.toLower(), remVersion));
-#endif
+        version->append(QString(STAM_ORGA_VERSION_LINK).arg(remVersion.toLower(), remVersion));
+        //#ifdef Q_OS_WIN
+        //        version->append(QString("<a href=\"https://github.com/WaterMax83/StamOrga/releases/download/%1/StamOrga.Winx64.%1.exe\">Lade %2</a>\n")
+        //                            .arg(remVersion.toLower(), remVersion));
+        //#endif
+        //#ifdef Q_OS_ANDROID
+        //        version->append(QString("<a href=\"https://github.com/WaterMax83/StamOrga/releases/download/%1/StamOrga.Android.%1.apk\">Lade %2</a>\n")
+        //                            .arg(remVersion.toLower(), remVersion));
+        //#endif
         return ERROR_CODE_NEW_VERSION;
     }
     version->append(remVersion);
@@ -95,6 +96,7 @@ qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol* msg)
     index      = qFromLittleEndian(index);
 
     this->m_pGlobalData->setUserIndex(index);
+    qDebug() << QString("UserIndex = %1").arg(index);
 
     SeasonTicketItem* seasonTicket;
     int               i = 0;
@@ -364,6 +366,10 @@ qint32 DataHandling::getHandleChangeTicketStateResponse(MessageProtocol* msg)
     memcpy(&result, pData, sizeof(quint32));
     result = qFromLittleEndian(result);
 
+    qint64 messageID;
+    memcpy(&messageID, pData + sizeof(quint32), sizeof(qint64));
+    messageID = qFromLittleEndian(messageID);
+
     return result;
 }
 
@@ -461,6 +467,10 @@ qint32 DataHandling::getHandleChangeMeetingResponse(MessageProtocol* msg)
     qint32      result;
     memcpy(&result, pData, sizeof(quint32));
     result = qFromLittleEndian(result);
+
+    qint64 messageID;
+    memcpy(&messageID, pData + sizeof(quint32), sizeof(qint64));
+    messageID = qFromLittleEndian(messageID);
 
     return result;
 }

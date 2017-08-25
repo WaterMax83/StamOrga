@@ -70,7 +70,7 @@ Dialog {
                 id: labelAddTicketName
                 text: qsTr("Name")
                 color: "white"
-                font.pixelSize: 10
+                font.pixelSize: 12
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             }
 
@@ -93,7 +93,7 @@ Dialog {
             text: qsTr("Der Name muss mindestens " + textMinSize + " Zeichen lang sein")
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             wrapMode: Text.WordWrap
-            font.pixelSize: 10
+            font.pixelSize: 12
             Layout.maximumWidth: parent.width
             color: "orange"
         }

@@ -102,6 +102,8 @@ public:
 
     Q_INVOKABLE QString getCurrentVersion();
 
+    Q_INVOKABLE QString getCurrentVersionLink();
+
     Q_INVOKABLE QString getVersionChangeInfo();
 
     Q_INVOKABLE bool isVersionChangeAlreadyShown();

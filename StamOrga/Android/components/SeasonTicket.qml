@@ -71,7 +71,7 @@ Rectangle {
                 leftPadding: 7
                 topPadding: 5
                 color: "white"
-                font.pixelSize: 12
+                font.pixelSize: 14
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
 
@@ -81,7 +81,7 @@ Rectangle {
                 leftPadding: labelInfoDiscountHead.width - labelTicketItemHead.width + 10
                 topPadding: 5
                 color: "white"
-                font.pixelSize: 12
+                font.pixelSize: 14
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
@@ -100,7 +100,7 @@ Rectangle {
                 text: qsTr("Ermäßigung: ")
                 leftPadding: 7
                 color: "white"
-                font.pixelSize: 12
+                font.pixelSize: 14
                 visible: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
@@ -113,7 +113,7 @@ Rectangle {
                 leftPadding: 10
                 visible: true
                 color: "white"
-                font.pixelSize: 12
+                font.pixelSize: 14
                 Layout.fillWidth: true
     //            Layout.alignment: Qt.AlignRight | Qt.AlignHCenter
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
@@ -135,7 +135,7 @@ Rectangle {
                 leftPadding: 7
                 bottomPadding: 1
                 color: "white"
-                font.pixelSize: 12
+                font.pixelSize: 14
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
 
@@ -144,7 +144,7 @@ Rectangle {
                 text: qsTr("")
                 bottomPadding: 1
                 color: "white"
-                font.pixelSize: 12
+                font.pixelSize: 14
                 leftPadding: labelInfoDiscountHead.width - labelTextWhereIsTicket.width + 10
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter

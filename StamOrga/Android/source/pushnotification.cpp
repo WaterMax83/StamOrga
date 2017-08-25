@@ -120,3 +120,16 @@ void PushNotificationInformationHandler::unSubscribeFromTopic(QString topic)
     Q_UNUSED(topic);
 #endif
 }
+
+void PushNotificationInformationHandler::setUserIndexForTopics(QString userIndex)
+{
+#ifdef Q_OS_ANDROID
+    QAndroidJniObject javaNotification = QAndroidJniObject::fromString(userIndex);
+    QAndroidJniObject::callStaticMethod<void>("org/qtproject/example/MainActivity",
+                                              "SetUserIndexForNotificationTopic",
+                                              "(Ljava/lang/String;)V",
+                                              javaNotification.object<jstring>());
+#else
+    Q_UNUSED(userIndex);
+#endif
+}

@@ -79,7 +79,7 @@ Rectangle {
                 leftPadding: 5
                 topPadding: 3
                 color: "white"
-                font.pixelSize: 12
+                font.pixelSize: 14
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
 
@@ -87,7 +87,7 @@ Rectangle {
                 id: labelLineTimeNotFixed
                 text: "<i>(nicht terminiert)</i>"
                 textFormat: Text.RichText
-                font.pixelSize: 12
+                font.pixelSize: 14
                 color: "white"
                 leftPadding: 5
                 topPadding: 3
@@ -111,7 +111,7 @@ Rectangle {
                 text: qsTr("What")
                 leftPadding: 5
                 color: "white"
-                font.pixelSize: 12
+                font.pixelSize: 14
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
@@ -137,7 +137,7 @@ Rectangle {
                     id: labelAcceptedMeeting
                     topPadding: 3
                     color: "white"
-                    font.pixelSize: 12
+                    font.pixelSize: 14
                     Layout.alignment: Qt.AlignRight
                 }
 
@@ -171,7 +171,7 @@ Rectangle {
                     id: labelInterestMeeting
                     topPadding: 3
                     color: "white"
-                    font.pixelSize: 12
+                    font.pixelSize: 14
                     Layout.alignment: Qt.AlignRight
                 }
 
@@ -204,7 +204,7 @@ Rectangle {
                     id: labelFreeTickets
                     topPadding: 3
                     color: "white"
-                    font.pixelSize: 12
+                    font.pixelSize: 14
                     Layout.alignment: Qt.AlignRight
                 }
 
@@ -229,7 +229,7 @@ Rectangle {
             topPadding: 5
             font.bold: true
             color: "white"
-            font.pixelSize: 12
+            font.pixelSize: 14
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
         }
@@ -248,7 +248,7 @@ Rectangle {
                 leftPadding: 5
                 font.bold: true
                 color: "white"
-                font.pixelSize: 12
+                font.pixelSize: 14
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
@@ -258,7 +258,7 @@ Rectangle {
                 text: qsTr("")
                 font.bold: true
                 color: "white"
-                font.pixelSize: 12
+                font.pixelSize: 14
                 rightPadding: layoutExplicitGame.width / 100 * 30
                 Layout.alignment: Qt.AlignRight | Qt.AlignHCenter
             }

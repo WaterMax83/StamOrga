@@ -196,7 +196,7 @@ Flickable {
                 Text {
                     text: "Info"
                     color: "white"
-                    font.pixelSize: 12
+                    font.pixelSize: 14
                 }
                 ToolSeparator {
                     id: toolSeparator1
@@ -253,7 +253,7 @@ Flickable {
                 Text {
                     text: "Zusagen"
                     color: "white"
-                    font.pixelSize: 12
+                    font.pixelSize: 14
                 }
                 ToolSeparator {
                     id: toolSeparator2

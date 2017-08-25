@@ -276,6 +276,15 @@ void DataConnection::startSendUserPropsRequest(DataConRequest request)
     tmp = this->m_pGlobalData->getCurrentAppToken().toUtf8();
     memcpy(&data[offset], tmp.constData(), tmp.length());
     offset += (tmp.length() + 1);
+#ifdef Q_OS_WIN
+    qint32 os = qToLittleEndian(1);
+#elif defined(Q_OS_ANDROID)
+    qint32 os = qToLittleEndian(2);
+#elif defined(Q_OS_IOS)
+    qint32 os = qToLittleEndian(3);
+#endif
+    memcpy(&data[offset], &os, sizeof(qint32));
+    offset += sizeof(qint32);
 
     MessageProtocol msg(request.m_request, &data[0], offset);
     this->sendMessageRequest(&msg, request);

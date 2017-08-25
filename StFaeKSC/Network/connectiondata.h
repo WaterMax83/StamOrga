@@ -27,6 +27,7 @@ struct UserConData {
     quint16      m_dstDataPort;
     quint16      m_srcDataPort;
     QString      m_userName;
+    qint32       m_userID;
     QString      m_randomLogin;
     bool         m_bIsConnected;
 };

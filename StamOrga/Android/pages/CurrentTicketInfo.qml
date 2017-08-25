@@ -40,7 +40,7 @@ Flickable {
             }
         }
 
-    property int listViewItemHeight : 35
+    property int listViewItemHeight : 30
 
     onDragEnded: {
         if (flickableCurrentTicketInfo.contentY < -100) {
@@ -77,7 +77,7 @@ Flickable {
                 id: txtInfoCurrentGameBlockedTickets
                 visible: false
                 color: "white"
-                font.pixelSize: 12
+                font.pixelSize: 14
                 text: "<b>Gesperrte Karten</b> <i>(Besitzer geht selbst)</i><b>:</b>"
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
             }
@@ -111,7 +111,7 @@ Flickable {
                 id: txtInfoCurrentGameReservedTickets
                 visible: false
                 color: "white"
-                font.pixelSize: 12
+                font.pixelSize: 14
                 text: "<b>Reservierte Karten:</b>"
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
             }

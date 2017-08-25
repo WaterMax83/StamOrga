@@ -124,6 +124,7 @@ void UdpServer::checkNewOncomingData()
                     /* Create new thread if it is not running and you got a port */
                     if (this->m_lUserCons[i].userConData.m_dstDataPort && this->m_lUserCons[i].pctrlUdpDataServer == NULL) {
                         this->m_lUserCons[i].userConData.m_userName = userName;
+                        this->m_lUserCons[i].userConData.m_userID   = userIndex;
                         this->m_lUserCons[i].pDataServer            = new UdpDataServer(&this->m_lUserCons[i].userConData,
                                                                              this->m_pGlobalData);
                         connect(this->m_lUserCons[i].pDataServer, &UdpDataServer::notifyConnectionTimedOut, this, &UdpServer::onConnectionTimedOut);

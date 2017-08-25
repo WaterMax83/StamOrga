@@ -51,7 +51,7 @@ Flickable {
                 Text {
                     id: txtInfoConnecting
                     visible: false
-                    font.pixelSize: 10
+                    font.pixelSize: 12
                     color: "white"
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     Layout.bottomMargin: 35
@@ -396,7 +396,7 @@ Flickable {
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 wrapMode: Text.WordWrap
                 Layout.maximumWidth: parent.width
-                font.pixelSize: 10
+                font.pixelSize: 12
                 color: "red"
             }
             Text {
@@ -406,7 +406,7 @@ Flickable {
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 wrapMode: Text.WordWrap
                 Layout.maximumWidth: parent.width
-                font.pixelSize: 10
+                font.pixelSize: 12
                 color: "orange"
             }
         }

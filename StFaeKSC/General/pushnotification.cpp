@@ -25,10 +25,12 @@
 
 // clang-format off
 #define PUSH_GENERAL_GROUP	"General"
+#define PUSH_APP_VERSION    "PushAppVersion"
+#define PUSH_DEACTIVATE     "Deactivate"
 #define PUSH_NUMBER			"PushNumber"
 
 #ifdef QT_DEBUG
-#define WAIT_TIME_BEFORE_SEND      1 * 30 * 1000
+#define WAIT_TIME_BEFORE_SEND      1 * 20 * 1000
 #else
 #define WAIT_TIME_BEFORE_SEND      5 * 60 * 1000
 #endif
@@ -71,8 +73,6 @@ int PushNotification::DoBackgroundWork()
     QString fcmKey(fcmKeyFile.readAll());
     this->m_fcmServerKey = QString("key=%1").arg(fcmKey.replace("\n", "")).toUtf8();
 
-    this->m_nam = new QNetworkAccessManager(this);
-
     this->m_fcmServiceUrl = QUrl("https://fcm.googleapis.com/fcm/send");
 
     this->m_restartSendTimer = new QTimer();
@@ -86,6 +86,7 @@ int PushNotification::DoBackgroundWork()
 
     connect(this, &PushNotification::sendNewNotificationSignal, this, &PushNotification::slotSendNewNotification);
 
+    this->m_nam = new QNetworkAccessManager(this);
     connect(this->m_nam, &QNetworkAccessManager::finished, this, &PushNotification::finished);
     connect(this->m_nam, &QNetworkAccessManager::sslErrors, this, &PushNotification::sslErrors);
 
@@ -97,41 +98,49 @@ int PushNotification::DoBackgroundWork()
     this->m_pPushSettings    = new QSettings(pushSettingsPath, QSettings::IniFormat);
     this->m_pPushSettings->setIniCodec(("UTF-8"));
 
-    this->m_pPushSettings->beginGroup("PushHeader");
+    this->m_pPushSettings->beginGroup(PUSH_GENERAL_GROUP);
 
-    quint32 savedVersion = this->m_pPushSettings->value("PushAppVersion", 0).toUInt();
-    if (savedVersion < STAM_ORGA_VERSION_I) {
-        this->m_pPushSettings->setValue("PushAppVersion", STAM_ORGA_VERSION_I);
-        this->sendNewVersionNotification("Neue StamOrga Version", QString("Es gibt eine neue Version: %1").arg(STAM_ORGA_VERSION_S));
-    }
+    if (this->m_pPushSettings->value(PUSH_DEACTIVATE, 0).toInt() != 0)
+        this->m_doNotUseSSLbecauseOfVersion = true;
+
+    quint32 savedVersion = this->m_pPushSettings->value(PUSH_APP_VERSION, 0).toUInt();
 
     this->m_pPushSettings->endGroup();
+
+    if (savedVersion < STAM_ORGA_VERSION_I) {
+        this->m_pPushSettings->beginGroup(PUSH_GENERAL_GROUP);
+        this->m_pPushSettings->setValue(PUSH_APP_VERSION, STAM_ORGA_VERSION_I);
+        this->m_pPushSettings->endGroup();
+        this->sendNewVersionNotification("Neue StamOrga Version", QString("Es gibt eine neue Version: %1").arg(STAM_ORGA_VERSION_S));
+    }
 
     return ERROR_CODE_SUCCESS;
 }
 
 qint64 PushNotification::sendNewVersionNotification(const QString header, const QString body)
 {
-    PushNotifyInfo* push = new PushNotifyInfo();
-    push->m_topic        = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_VERSION;
-    push->m_header       = header;
-    push->m_body         = body;
-    push->m_sendMessageID   = getNextInternalPushNumber();
-    push->m_sendTime     = QDateTime::currentMSecsSinceEpoch();
+    PushNotifyInfo* push  = new PushNotifyInfo();
+    push->m_topic         = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_VERSION;
+    push->m_header        = header;
+    push->m_body          = body;
+    push->m_sendMessageID = getNextInternalPushNumber();
+    push->m_sendTime      = QDateTime::currentMSecsSinceEpoch();
+    push->m_userID        = -1;
 
     this->insertNewNotification(push);
 
     return push->m_sendMessageID;
 }
 
-qint64 PushNotification::sendNewMeetingNotification(const QString header, const QString body, const quint32 gameIndex)
+qint64 PushNotification::sendNewMeetingNotification(const QString header, const QString body, const qint32 userID, const quint32 gameIndex)
 {
     PushNotifyInfo* push   = new PushNotifyInfo();
     push->m_topic          = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING;
     push->m_header         = header;
     push->m_body           = body;
-    push->m_sendMessageID     = getNextInternalPushNumber();
+    push->m_sendMessageID  = getNextInternalPushNumber();
     push->m_sendTime       = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND; // 5min
+    push->m_userID         = userID;
     push->m_internalIndex1 = gameIndex;
 
     this->insertNewNotification(push);
@@ -139,14 +148,16 @@ qint64 PushNotification::sendNewMeetingNotification(const QString header, const 
     return push->m_sendMessageID;
 }
 
-qint64 PushNotification::sendChangeMeetingNotification(const QString header, const QString body, const quint32 gameIndex)
+qint64 PushNotification::sendChangeMeetingNotification(const QString header, const QString body, const qint32 userID, const quint32 gameIndex)
 {
     this->m_notifyMutex.lock();
 
     foreach (PushNotifyInfo* p, this->m_lPushToSend) {
         if (p->m_topic == PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING || p->m_topic == PUSH_NOTIFY_TOPIC::PUSH_NOT_CHG_MEETING) {
-            if (p->m_internalIndex1 == gameIndex)
+            if (p->m_internalIndex1 == gameIndex) {
+                this->m_notifyMutex.unlock();
                 return -1;
+            }
         }
     }
 
@@ -156,8 +167,9 @@ qint64 PushNotification::sendChangeMeetingNotification(const QString header, con
     push->m_topic          = PUSH_NOTIFY_TOPIC::PUSH_NOT_CHG_MEETING;
     push->m_header         = header;
     push->m_body           = body;
-    push->m_sendMessageID     = getNextInternalPushNumber();
+    push->m_sendMessageID  = getNextInternalPushNumber();
     push->m_sendTime       = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND;
+    push->m_userID         = userID;
     push->m_internalIndex1 = gameIndex;
 
     this->insertNewNotification(push);
@@ -165,14 +177,16 @@ qint64 PushNotification::sendChangeMeetingNotification(const QString header, con
     return push->m_sendMessageID;
 }
 
-qint64 PushNotification::sendNewTicketNotification(const QString header, const QString body, const quint32 gameIndex, const quint32 ticketIndex)
+qint64 PushNotification::sendNewTicketNotification(const QString header, const QString body, const qint32 userID, const quint32 gameIndex, const quint32 ticketIndex)
 {
     this->m_notifyMutex.lock();
 
     foreach (PushNotifyInfo* p, this->m_lPushToSend) {
         if (p->m_topic == PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING || p->m_topic == PUSH_NOTIFY_TOPIC::PUSH_NOT_CHG_MEETING) {
-            if (p->m_internalIndex1 == gameIndex && p->m_internalIndex2 == ticketIndex)
+            if (p->m_internalIndex1 == gameIndex && p->m_internalIndex2 == ticketIndex) {
+                this->m_notifyMutex.unlock();
                 return -1;
+            }
         }
     }
 
@@ -182,8 +196,9 @@ qint64 PushNotification::sendNewTicketNotification(const QString header, const Q
     push->m_topic          = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_TICKET;
     push->m_header         = header;
     push->m_body           = body;
-    push->m_sendMessageID     = getNextInternalPushNumber();
+    push->m_sendMessageID  = getNextInternalPushNumber();
     push->m_sendTime       = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND;
+    push->m_userID         = userID;
     push->m_internalIndex1 = gameIndex;
     push->m_internalIndex2 = ticketIndex;
 
@@ -196,7 +211,7 @@ qint64 PushNotification::removeNewTicketNotification(const quint32 gameIndex, co
 {
     QMutexLocker lock(&this->m_notifyMutex);
 
-    for(int i=0; i<this->m_lPushToSend.count(); i++) {
+    for (int i = 0; i < this->m_lPushToSend.count(); i++) {
         if (this->m_lPushToSend[i]->m_internalIndex1 == gameIndex && this->m_lPushToSend[i]->m_internalIndex2 == ticketIndex)
             this->m_lPushToSend.removeAt(i);
     }
@@ -252,9 +267,14 @@ void PushNotification::slotConnectionTimeout()
 {
     QMutexLocker lock(&this->m_notifyMutex);
 
-    if (this->m_lastPushNotify != NULL)
+    qint64 sendNumber = -1;
+    if (this->m_lastPushNotify != NULL) {
+        sendNumber = this->m_lastPushNotify->m_sendMessageID;
         delete this->m_lastPushNotify;
+    }
     this->m_lastPushNotify = NULL;
+
+    qInfo().noquote() << QString("Connection timeout for Notification %1").arg(sendNumber);
 
     this->slotSendNewNotification();
 }
@@ -275,16 +295,19 @@ void PushNotification::startSendNewPushNotify(PushNotifyInfo* pushNotify)
     jsonString.append("\"data\" : {");
     jsonString.append(QString("\"body\" : \"%1\",").arg(pushNotify->m_body));
     jsonString.append(QString("\"title\" : \"%1\",").arg(pushNotify->m_header));
-    jsonString.append(QString("\"id\" : \"%1\",").arg(pushNotify->m_sendMessageID));
+    jsonString.append(QString("\"m_id\" : \"%1\",").arg(pushNotify->m_sendMessageID));
+    jsonString.append(QString("\"u_id\" : \"%1\",").arg(pushNotify->m_userID));
     jsonString.append("}");
     jsonString.append("}");
 
-    qInfo().noquote() << QString("Send Notification %3 to \"%1\" about \"%2\"")
-                         .arg(sendTopic, pushNotify->m_body)
-                         .arg(pushNotify->m_sendMessageID);
+    qInfo().noquote() << QString("Send Notification %3 to \"%1\" about \"%2\" with size %4")
+                             .arg(sendTopic, pushNotify->m_body)
+                             .arg(pushNotify->m_sendMessageID)
+                             .arg(jsonString.length());
 
     this->m_lastPushNotify = pushNotify;
-    this->m_nam->post(request, jsonString);
+    if (!this->m_doNotUseSSLbecauseOfVersion)
+        this->m_nam->post(request, jsonString);
     this->m_connectionTimeoutTimer->start();
 }
 
@@ -351,9 +374,7 @@ qint64 PushNotification::getNextInternalPushNumber()
 
     this->m_pPushSettings->beginGroup(PUSH_GENERAL_GROUP);
     savedIndex = this->m_pPushSettings->value(PUSH_NUMBER, 0).toLongLong();
-
     savedIndex++;
-
     this->m_pPushSettings->setValue(PUSH_NUMBER, savedIndex);
     this->m_pPushSettings->endGroup();
 
@@ -367,6 +388,10 @@ PushNotification::~PushNotification()
         delete this->m_lPushToSend.at(i);
         this->m_lPushToSend.removeLast();
     }
+
+    if (this->m_nam != NULL)
+        delete this->m_nam;
+    this->m_nam = NULL;
 
     if (this->m_lastPushNotify != NULL)
         delete this->m_lastPushNotify;

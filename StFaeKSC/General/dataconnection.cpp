@@ -705,8 +705,8 @@ MessageProtocol* DataConnection::requestChangeStateSeasonTicket(MessageProtocol*
 
     qint64 messageID;
     rCode = this->m_pGlobalData->requestChangeStateSeasonTicket(ticketIndex, gameIndex, state,
-                                                                     reserveName, this->m_pUserConData->m_userName,
-                                                                     messageID);
+                                                                reserveName, this->m_pUserConData->m_userID,
+                                                                messageID);
     if (rCode == ERROR_CODE_SUCCESS)
         qInfo().noquote() << QString("User %1 set SeasonTicket %2 state to %3")
                                  .arg(this->m_pUserConData->m_userName)
@@ -717,7 +717,7 @@ MessageProtocol* DataConnection::requestChangeStateSeasonTicket(MessageProtocol*
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_STATE_CHANGE_SEASON_TICKET, rCode);
 
     qint32 data[3];
-    data[0] = qToLittleEndian(rCode);
+    data[0]   = qToLittleEndian(rCode);
     messageID = qToLittleEndian(messageID);
     memcpy(&data[1], &messageID, sizeof(qint64));
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_STATE_CHANGE_SEASON_TICKET, (char*)&data[0], sizeof(qint32) * 3);
@@ -833,17 +833,17 @@ MessageProtocol* DataConnection::requestChangeMeetingInfo(MessageProtocol* msg)
     QString info(QByteArray(pData + offset));
 
     qint64 messageID = -1;
-    if ((rCode = this->m_pGlobalData->requestChangeMeetingInfo(gameIndex, 0, when, where, info, messageID)) == ERROR_CODE_SUCCESS) {
+    rCode            = this->m_pGlobalData->requestChangeMeetingInfo(gameIndex, 0, when, where, info, this->m_pUserConData->m_userID, messageID);
+    if (rCode == ERROR_CODE_SUCCESS)
         qInfo().noquote() << QString("User %1 set MeetingInfo of game %2")
                                  .arg(this->m_pUserConData->m_userName)
                                  .arg(this->m_pGlobalData->m_GamesList.getItemName(gameIndex));
-    }
 
     if (msg->getVersion() < MSG_HEADER_VERSION_MESSAGE_ID)
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_MEETING_INFO, rCode);
 
     qint32 data[3];
-    data[0] = qToLittleEndian(rCode);
+    data[0]   = qToLittleEndian(rCode);
     messageID = qToLittleEndian(messageID);
     memcpy(&data[1], &messageID, sizeof(qint64));
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_MEETING_INFO, (char*)&data[0], sizeof(qint32) * 3);

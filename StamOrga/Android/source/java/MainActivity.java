@@ -20,6 +20,8 @@ public class MainActivity extends org.qtproject.qt5.android.bindings.QtActivity
 {
     private static final String TAG = "MainActivity";
 
+    private static Context m_context;
+
     private BroadcastReceiver mRegistrationBroadcastReceiver;
 
     @Override
@@ -27,6 +29,7 @@ public class MainActivity extends org.qtproject.qt5.android.bindings.QtActivity
     {
         super.onCreate(savedInstanceState);
 
+        m_context = this;
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String token1 = sharedPreferences.getString(QuickstartPreferences.FCM_TOKEN, "");
         Log.i(TAG, "Token beim Start " + token1);
@@ -65,11 +68,23 @@ public class MainActivity extends org.qtproject.qt5.android.bindings.QtActivity
         super.onPause();
     }
 
-    public static void SubscribeToTopic(String topic) {
+    public static void SubscribeToTopic(String topic)
+    {
         FirebaseMessaging.getInstance().subscribeToTopic(topic);
     }
 
-    public static void UnRegisterFromTopic(String topic) {
+    public static void UnRegisterFromTopic(String topic)
+    {
         FirebaseMessaging.getInstance().unsubscribeFromTopic(topic);
+    }
+
+    public static void SetUserIndexForNotificationTopic(String userIndex)
+    {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(m_context);
+        String savedUserIndex = sharedPreferences.getString(QuickstartPreferences.FCM_TOPIC_USER_INDEX, "");
+        if (savedUserIndex == userIndex)
+            return;
+
+        sharedPreferences.edit().putString(QuickstartPreferences.FCM_TOPIC_USER_INDEX, userIndex).apply();
     }
 }

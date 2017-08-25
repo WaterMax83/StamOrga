@@ -33,6 +33,7 @@ public:
 
     static void subscribeToTopic(QString topic);
     static void unSubscribeFromTopic(QString topic);
+    static void setUserIndexForTopics(QString userIndex);
 
 signals:
     void fcmRegistrationTokenChanged(QString token);

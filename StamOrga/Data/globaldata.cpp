@@ -220,6 +220,113 @@ void GlobalData::saveCurrentGamesList(qint64 timestamp)
     this->m_pMainUserSettings->endGroup();
 }
 
+QString GlobalData::userName()
+{
+    QMutexLocker lock(&this->m_mutexUser);
+    return this->m_userName;
+}
+void GlobalData::setUserName(const QString& user)
+{
+    if (this->m_userName != user) {
+        {
+            QMutexLocker lock(&this->m_mutexUser);
+            this->m_userName = user;
+        }
+        emit userNameChanged();
+    }
+}
+
+QString GlobalData::readableName()
+{
+    QMutexLocker lock(&this->m_mutexUser);
+    return this->m_readableName;
+}
+void GlobalData::setReadableName(const QString& name)
+{
+    if (this->m_readableName != name) {
+        {
+            QMutexLocker lock(&this->m_mutexUser);
+            this->m_readableName = name;
+        }
+        emit readableNameChanged();
+    }
+}
+
+QString GlobalData::passWord()
+{
+    QMutexLocker lock(&this->m_mutexUser);
+    return this->m_passWord;
+}
+void GlobalData::setPassWord(const QString& passw)
+{
+    if (this->m_passWord != passw) {
+        {
+            QMutexLocker lock(&this->m_mutexUser);
+            this->m_passWord = passw;
+        }
+        emit passWordChanged();
+    }
+}
+
+QString GlobalData::ipAddr()
+{
+    QMutexLocker lock(&this->m_mutexUser);
+    return this->m_ipAddress;
+}
+void GlobalData::setIpAddr(const QString& ip)
+{
+    if (this->m_ipAddress != ip) {
+        {
+            QMutexLocker lock(&this->m_mutexUser);
+            this->m_ipAddress = ip;
+        }
+        emit ipAddrChanged();
+    }
+}
+
+quint32 GlobalData::conMasterPort()
+{
+    QMutexLocker lock(&this->m_mutexUser);
+    return this->m_uMasterPort;
+}
+void GlobalData::setConMasterPort(quint32 port)
+{
+    if (this->m_uMasterPort != port) {
+        {
+            QMutexLocker lock(&this->m_mutexUser);
+            this->m_uMasterPort = port;
+        }
+        emit conMasterPortChanged();
+    }
+}
+
+quint32 GlobalData::conDataPort()
+{
+    QMutexLocker lock(&this->m_mutexUser);
+    return this->m_uDataPort;
+}
+void GlobalData::setConDataPort(quint32 port)
+{
+    QMutexLocker lock(&this->m_mutexUser);
+    if (this->m_uDataPort != port) {
+        this->m_uDataPort = port;
+    }
+}
+
+quint32 GlobalData::userIndex()
+{
+    QMutexLocker lock(&this->m_mutexUser);
+    return this->m_userIndex;
+}
+void GlobalData::setUserIndex(quint32 userIndex)
+{
+    QMutexLocker lock(&this->m_mutexUser);
+    if (this->m_userIndex != userIndex) {
+        this->m_userIndex = userIndex;
+        PushNotificationInformationHandler::setUserIndexForTopics(QString::number(userIndex));
+    }
+}
+
 void GlobalData::startUpdateGamesPlay(const qint16 updateIndex)
 {
     QMutexLocker lock(&this->m_mutexGame);

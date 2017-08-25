@@ -126,15 +126,22 @@ QString GlobalSettings::getCurrentVersion()
     return STAM_ORGA_VERSION_S;
 }
 
+QString GlobalSettings::getCurrentVersionLink()
+{
+    return QString(STAM_ORGA_VERSION_LINK).arg(QString(STAM_ORGA_VERSION_S).toLower(), STAM_ORGA_VERSION_S);
+}
+
 QString GlobalSettings::getVersionChangeInfo()
 {
     QString rValue;
 
-    rValue.append("<b>V1.0.3:</b>(XX.XX.2017)<br>");
+    rValue.append("<b>V1.0.3:</b>(25.08.2017)<br>");
+    rValue.append("- Push Notifications (Android)<br>");
+    rValue.append("- Schrift änderbar (Windows)<br>");
     rValue.append("- Infos über Ort bei Spieltagstickets<br>");
     rValue.append("- Optische Anpassungen<br>");
 
-    rValue.append("<b>V1.0.2:</b>(31.07.2017)<br>");
+    rValue.append("<br><b>V1.0.2:</b>(31.07.2017)<br>");
     rValue.append("- Spielterminierung hinzugefügt<br>");
     rValue.append("- Spielliste in Aktuell/Vergangenheit aufgeteilt<br>");
     rValue.append("- Daten nur nach Bedarf vom Server laden<br>");

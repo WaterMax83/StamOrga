@@ -62,6 +62,16 @@ Flickable {
                     color: "white"
                     text: globalSettings.getVersionChangeInfo()
                 }
+
+                Text {
+                    id: labelLinkToCurrentVersion
+                    textFormat: Text.RichText
+                    wrapMode: Text.Wrap
+                    font.pixelSize: 12
+                    color: "white"
+                    text: globalSettings.getCurrentVersionLink()
+                    onLinkActivated: Qt.openUrlExternally(link)
+                }
             }
     }
 

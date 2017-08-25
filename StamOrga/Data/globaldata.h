@@ -53,114 +53,29 @@ public:
 
     void loadGlobalSettings();
 
-    QString userName()
-    {
-        QMutexLocker lock(&this->m_mutexUser);
-        return this->m_userName;
-    }
-    void setUserName(const QString& user)
-    {
-        if (this->m_userName != user) {
-            {
-                QMutexLocker lock(&this->m_mutexUser);
-                this->m_userName = user;
-            }
-            emit userNameChanged();
-        }
-    }
+    QString userName();
+    void setUserName(const QString& user);
 
     QString getSalt() { return this->m_salt; }
     void setSalt(QString salt) { this->m_salt = salt; }
 
-    QString readableName()
-    {
-        QMutexLocker lock(&this->m_mutexUser);
-        return this->m_readableName;
-    }
-    void setReadableName(const QString& name)
-    {
-        if (this->m_readableName != name) {
-            {
-                QMutexLocker lock(&this->m_mutexUser);
-                this->m_readableName = name;
-            }
-            emit readableNameChanged();
-        }
-    }
+    QString readableName();
+    void setReadableName(const QString& name);
 
-    QString passWord()
-    {
-        QMutexLocker lock(&this->m_mutexUser);
-        return this->m_passWord;
-    }
-    void setPassWord(const QString& passw)
-    {
-        if (this->m_passWord != passw) {
-            {
-                QMutexLocker lock(&this->m_mutexUser);
-                this->m_passWord = passw;
-            }
-            emit passWordChanged();
-        }
-    }
+    QString passWord();
+    void setPassWord(const QString& passw);
 
-    QString ipAddr()
-    {
-        QMutexLocker lock(&this->m_mutexUser);
-        return this->m_ipAddress;
-    }
-    void setIpAddr(const QString& ip)
-    {
-        if (this->m_ipAddress != ip) {
-            {
-                QMutexLocker lock(&this->m_mutexUser);
-                this->m_ipAddress = ip;
-            }
-            emit ipAddrChanged();
-        }
-    }
+    QString ipAddr();
+    void setIpAddr(const QString& ip);
 
-    quint32 conMasterPort()
-    {
-        QMutexLocker lock(&this->m_mutexUser);
-        return this->m_uMasterPort;
-    }
-    void setConMasterPort(quint32 port)
-    {
-        if (this->m_uMasterPort != port) {
-            {
-                QMutexLocker lock(&this->m_mutexUser);
-                this->m_uMasterPort = port;
-            }
-            emit conMasterPortChanged();
-        }
-    }
+    quint32 conMasterPort();
+    void setConMasterPort(quint32 port);
 
-    quint32 conDataPort()
-    {
-        QMutexLocker lock(&this->m_mutexUser);
-        return this->m_uDataPort;
-    }
-    void setConDataPort(quint32 port)
-    {
-        QMutexLocker lock(&this->m_mutexUser);
-        if (this->m_uDataPort != port) {
-            this->m_uDataPort = port;
-        }
-    }
+    quint32 conDataPort();
+    void setConDataPort(quint32 port);
 
-    quint32 userIndex()
-    {
-        QMutexLocker lock(&this->m_mutexUser);
-        return this->m_userIndex;
-    }
-    void setUserIndex(quint32 userIndex)
-    {
-        QMutexLocker lock(&this->m_mutexUser);
-        if (this->m_userIndex != userIndex) {
-            this->m_userIndex = userIndex;
-        }
-    }
+    quint32 userIndex();
+    void setUserIndex(quint32 userIndex);
 
     bool bIsConnected() { return this->m_bIsConnected; }
     void setbIsConnected(bool enable)

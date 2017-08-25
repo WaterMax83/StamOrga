@@ -47,6 +47,7 @@ struct PushNotifyInfo {
     QString           m_body;
     qint64            m_sendMessageID;
     qint64            m_sendTime;
+    qint32            m_userID;
     quint32           m_internalIndex1;
     quint32           m_internalIndex2;
 };
@@ -61,9 +62,9 @@ public:
     void initialize(GlobalData* pGlobalData);
 
     qint64 sendNewVersionNotification(const QString header, const QString body);
-    qint64 sendNewMeetingNotification(const QString header, const QString body, const quint32 gameIndex);
-    qint64 sendChangeMeetingNotification(const QString header, const QString body, const quint32 gameIndex);
-    qint64 sendNewTicketNotification(const QString header, const QString body, const quint32 gameIndex, const quint32 ticketIndex);
+    qint64 sendNewMeetingNotification(const QString header, const QString body, const qint32 userID, const quint32 gameIndex);
+    qint64 sendChangeMeetingNotification(const QString header, const QString body, const qint32 userID, const quint32 gameIndex);
+    qint64 sendNewTicketNotification(const QString header, const QString body, const qint32 userID, const quint32 gameIndex, const quint32 ticketIndex);
     qint64 removeNewTicketNotification(const quint32 gameIndex, const quint32 ticketIndex);
 
 
@@ -84,13 +85,14 @@ private:
     BackgroundController   m_ctrlBackground;
     QByteArray             m_fcmServerKey;
     QSettings*             m_pPushSettings = NULL;
-    QNetworkAccessManager* m_nam;
+    QNetworkAccessManager* m_nam           = NULL;
     QUrl                   m_fcmServiceUrl;
     QList<PushNotifyInfo*> m_lPushToSend;
     PushNotifyInfo*        m_lastPushNotify;
     QMutex                 m_notifyMutex;
-    QTimer*                m_restartSendTimer       = NULL;
-    QTimer*                m_connectionTimeoutTimer = NULL;
+    QTimer*                m_restartSendTimer            = NULL;
+    QTimer*                m_connectionTimeoutTimer      = NULL;
+    bool                   m_doNotUseSSLbecauseOfVersion = false;
 
     void startSendNewPushNotify(PushNotifyInfo* pushNotify);
 

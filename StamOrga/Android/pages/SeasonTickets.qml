@@ -86,7 +86,7 @@ Flickable {
                     id: txtInfoSeasonTicket
                     visible: true
                     color: "white"
-                    font.pixelSize: 10
+                    font.pixelSize: 12
                     horizontalAlignment: Text.AlignHCenter
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }

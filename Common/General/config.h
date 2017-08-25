@@ -27,4 +27,13 @@
 #define STAM_ORGA_VERSION_S "V" + QString(STAMORGA_VERSION)
 #define STAM_ORGA_VERSION_I QString("0x0" + QString(STAMORGA_VERSION).replace(".", "0") + "00").toUInt(NULL, 16)
 
+#ifdef Q_OS_WIN
+#undef STAM_ORGA_VERSION_LINK
+#define STAM_ORGA_VERSION_LINK "<a href=\"https://github.com/WaterMax83/StamOrga/releases/download/%1/StamOrga.Winx64.%1.zip\">Lade %2</a>\n"
+#endif
+#ifdef Q_OS_ANDROID
+#undef STAM_ORGA_VERSION_LINK
+#define STAM_ORGA_VERSION_LINK "<a href=\"https://github.com/WaterMax83/StamOrga/releases/download/%1/StamOrga.Android.%1.apk\">Lade %2</a>\n"
+#endif
+
 #endif // CONFIG_H
