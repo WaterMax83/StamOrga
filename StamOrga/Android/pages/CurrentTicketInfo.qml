@@ -145,7 +145,7 @@ Flickable {
                 id: txtInfoCurrentGameFreeTickets
                 visible: false
                 color: "white"
-                font.pixelSize: 12
+                font.pixelSize: 14
                 text: "<b>Freie Karten:</b>"
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
             }

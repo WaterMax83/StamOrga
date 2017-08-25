@@ -5,6 +5,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -30,10 +32,10 @@ public class MyFcmListenerService extends FirebaseMessagingService
         String title = "";
         String body = "";
 
-        for (Map.Entry<String, String> entry : data.entrySet())
-        {
-            Log.d(TAG, entry.getKey() + "/" + entry.getValue());
-        }
+//        for (Map.Entry<String, String> entry : data.entrySet())
+//        {
+//            Log.d(TAG, entry.getKey() + "/" + entry.getValue());
+//        }
         if (data.containsKey("title"))
             title = data.get("title").toString();
         if (data.containsKey("body"))
@@ -46,16 +48,18 @@ public class MyFcmListenerService extends FirebaseMessagingService
             // message received from some topic.
 //            long time = System.currentTimeMillis();
 
-            String userIndex = "unknown"
+            String userIndex = "unknown";
             if (data.containsKey("u_id"))
                 userIndex = data.get("u_id").toString();
 
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(m_context);
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
             String savedUserIndex = sharedPreferences.getString(QuickstartPreferences.FCM_TOPIC_USER_INDEX, "");
 
             /* Check if this topic was started from this user */
-            if (userIndex != "-1" && userIndex == savedUserIndex)
+            if (!userIndex.equals("-1") && userIndex.equals(savedUserIndex)) {
+                Log.d(TAG, "Did not send notification because userIndex is from this instance: " + userIndex);
                 return;
+            }
         }
 
         sendNotification(title, body);
