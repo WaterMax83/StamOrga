@@ -30,6 +30,7 @@
 #include "../Common/General/globalfunctions.h"
 #include "console.h"
 #include "usercommand.h"
+#include "pushnotification.h"
 
 
 #define SETTINGS_PATH "/Settings/settings.ini"
@@ -96,11 +97,12 @@ void Console::readCommand()
             UserCommand::runGameCommand(qLine, &this->m_pGlobalData->m_GamesList);
         } else if (qLine == "ticket" || qLine.left(7) == "ticket ") {
             UserCommand::runTicketCommand(qLine, &this->m_pGlobalData->m_SeasonTicket);
+        }else if (qLine == "token") {
+            g_pushNotify->showCurrentTokenInformation();
         } else if (qLine == "read" || qLine.left(5) == "read ") {
             UserCommand::runReadCommand(qLine, this->m_pGlobalData);
         } else if (qLine == "log" || qLine.left(4) == "log ") {
             UserCommand::runLoggingCommand(this->m_logging, qLine);
-
         } else if (line.length() == 0) {
 
         } else {
@@ -123,6 +125,8 @@ void Console::printHelp()
               << "use the game command" << std::endl;
     std::cout << "ticket:\t\t"
               << "use the ticket command" << std::endl;
+    std::cout << "token:\t\t"
+              << "show the current token Info" << std::endl;
     std::cout << "read %PATH%:\t"
               << "read a new file in csv file format" << std::endl;
     std::cout << "log %i:\t\t"

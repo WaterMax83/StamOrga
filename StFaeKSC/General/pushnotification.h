@@ -31,13 +31,15 @@
 
 #include "../Common/General/backgroundcontroller.h"
 #include "../Common/General/backgroundworker.h"
+#include "../Data/configlist.h"
 #include "globaldata.h"
 
 enum PUSH_NOTIFY_TOPIC {
-    PUSH_NOT_NEW_VERSION = 1,
-    PUSH_NOT_NEW_MEETING = 2,
-    PUSH_NOT_CHG_MEETING = 3,
-    PUSH_NOT_NEW_TICKET  = 4
+    PUSH_NOT_NEW_VERSION     = 1,
+    PUSH_NOT_NEW_MEETING     = 2,
+    PUSH_NOT_CHG_MEETING     = 3,
+    PUSH_NOT_NEW_TICKET      = 4,
+    PUSH_NOT_NEW_AWAY_ACCEPT = 5
 };
 
 
@@ -52,7 +54,35 @@ struct PushNotifyInfo {
     quint32           m_internalIndex2;
 };
 
-class PushNotification : public BackgroundWorker
+class AppTokenUID : public ConfigItem
+{
+public:
+    QString m_guid;
+    QString m_fcmToken;
+    quint32 m_userIndex;
+    qint32  m_oSystem;
+
+    AppTokenUID(QString guid, QString token, qint64 timestamp, quint32 userIndex,
+                qint32 system, quint32 index)
+    {
+        this->m_itemName  = "";
+        this->m_timestamp = timestamp;
+        this->m_userIndex = userIndex;
+        this->m_index     = index;
+        this->m_guid      = guid;
+        this->m_fcmToken  = token;
+        this->m_oSystem   = system;
+    }
+};
+
+// clang-format off
+#define APP_TOKEN_GUID      "Guid"
+#define APP_TOKEN_TOKEN     "Token"
+#define APP_TOKEN_USERINDEX "UserIndex"
+#define APP_TOKEN_SYSTEM    "OS"
+// clang-format on
+
+class PushNotification : public BackgroundWorker, public ConfigList
 {
     Q_OBJECT
 public:
@@ -61,11 +91,16 @@ public:
 
     void initialize(GlobalData* pGlobalData);
 
-    qint64 sendNewVersionNotification(const QString header, const QString body);
-    qint64 sendNewMeetingNotification(const QString header, const QString body, const qint32 userID, const quint32 gameIndex);
-    qint64 sendChangeMeetingNotification(const QString header, const QString body, const qint32 userID, const quint32 gameIndex);
-    qint64 sendNewTicketNotification(const QString header, const QString body, const qint32 userID, const quint32 gameIndex, const quint32 ticketIndex);
+    qint32 addNewAppInformation(QString guid, QString fcmToken, qint32 system, quint32 userIndex);
+
+    void showCurrentTokenInformation();
+
+    qint64 sendNewVersionNotification(const QString body);
+    qint64 sendNewMeetingNotification(const QString body, const qint32 userID, const quint32 gameIndex);
+    qint64 sendChangeMeetingNotification(const QString body, const qint32 userID, const quint32 gameIndex);
+    qint64 sendNewTicketNotification(const QString body, const qint32 userID, const quint32 gameIndex, const quint32 ticketIndex);
     qint64 removeNewTicketNotification(const quint32 gameIndex, const quint32 ticketIndex);
+    qint64 sendNewFirstAwayAccept(const QString body, const qint32 userID);
 
 
 signals:
@@ -81,11 +116,11 @@ protected:
     int DoBackgroundWork();
 
 private:
+    bool                   m_initialized;
     GlobalData*            m_pGlobalData;
     BackgroundController   m_ctrlBackground;
     QByteArray             m_fcmServerKey;
-    QSettings*             m_pPushSettings = NULL;
-    QNetworkAccessManager* m_nam           = NULL;
+    QNetworkAccessManager* m_nam = NULL;
     QUrl                   m_fcmServiceUrl;
     QList<PushNotifyInfo*> m_lPushToSend;
     PushNotifyInfo*        m_lastPushNotify;
@@ -101,6 +136,14 @@ private:
     QString getTopicStringFromIndex(const PUSH_NOTIFY_TOPIC topic);
 
     qint64 getNextInternalPushNumber();
+
+    void loadCurrentInteralList();
+
+    bool addNewAppToken(AppTokenUID* app, bool checkApp = true);
+
+    AppTokenUID* appInfoExists(QString guid);
+
+    void saveCurrentInteralList() override;
 };
 
 extern PushNotification* g_pushNotify;

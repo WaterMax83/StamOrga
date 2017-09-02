@@ -77,7 +77,13 @@ void GlobalSettings::initialize(GlobalData* pGlobalData, QGuiApplication* app)
     else
         PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_FREE_TICKET);
 
+    if (this->isNotificationNewAwayAcceptEnabled())
+        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_AWAY_ACCEPT);
+    else
+        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_AWAY_ACCEPT);
+
     PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_GENERAL);
+    PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_GENERAL_BACKUP);
 
     connect(app, &QGuiApplication::applicationStateChanged, this, &GlobalSettings::stateFromAppChanged);
 }
@@ -212,6 +218,7 @@ void GlobalSettings::stateFromAppChanged(Qt::ApplicationState state)
 #define NOT_OFFSET_NEWMEET 1
 #define NOT_OFFSET_CHGGAME 2
 #define NOT_OFFSET_NEWTICK 3
+#define NOT_OFFSET_NEWAWAY 4
 
 bool GlobalSettings::isNotificationNewAppVersionEnabled()
 {
@@ -228,6 +235,10 @@ bool GlobalSettings::isNotificationChangedMeetingEnabled()
 bool GlobalSettings::isNotificationNewFreeTicketEnabled()
 {
     return (this->m_notificationEnabledValue & (1 << NOT_OFFSET_NEWTICK)) ? true : false;
+}
+bool GlobalSettings::isNotificationNewAwayAcceptEnabled()
+{
+    return (this->m_notificationEnabledValue & (1 << NOT_OFFSET_NEWAWAY)) ? true : false;
 }
 void GlobalSettings::setNotificationNewAppVersionEnabled(bool enable)
 {
@@ -264,4 +275,13 @@ void GlobalSettings::setNotificationNewFreeTicketEnabled(bool enable)
         PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_FREE_TICKET);
     else
         PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_FREE_TICKET);
+}
+void GlobalSettings::setNotificationNewAwayAcceptEnabled(bool enable)
+{
+    this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_NEWAWAY);
+    this->m_notificationEnabledValue |= (enable ? 1 : 0) << NOT_OFFSET_NEWAWAY;
+    if (enable)
+        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_AWAY_ACCEPT);
+    else
+        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_AWAY_ACCEPT);
 }

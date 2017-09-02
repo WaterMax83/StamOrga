@@ -285,7 +285,7 @@ void Games::saveCurrentInteralList()
 
     this->setNewUpdateTime();
 
-    qDebug().noquote() << QString("saved actual Games List with %1 entries").arg(this->getNumberOfInternalList());
+    qDebug().noquote() << QString("saved current Games List with %1 entries").arg(this->getNumberOfInternalList());
 }
 
 GamesPlay* Games::gameExists(quint8 sIndex, CompetitionIndex comp, quint16 saison, qint64 timestamp)

@@ -48,8 +48,8 @@ int main(int argc, char* argv[])
     PushNotification pushNotify;
     pushNotify.initialize(&globalData);
 
-    qInfo() << "*************************************************************";
-    qInfo() << QString("Starting StFaeKSC %1").arg(STAM_ORGA_VERSION_S);
+    qInfo().noquote() << "*************************************************************";
+    qInfo().noquote() << QString("Starting StFaeKSC %1").arg(STAM_ORGA_VERSION_S);
 
     BackgroundController ctrlUdp;
     if (argc > 1 && QString(argv[1]) == "-noServer") {

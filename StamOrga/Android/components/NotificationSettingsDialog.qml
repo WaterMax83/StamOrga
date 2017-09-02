@@ -30,6 +30,7 @@ Dialog {
     property alias enableMeetingAdded : newMeeting.checked
     property alias enableMeetingChanged : changedMeeting.checked
     property alias enableNewFreeTicket : newFreeTicket.checked
+    property alias enableNewAwayAccept : newAwayAccept.checked
 
     signal acceptedDialog()
 
@@ -122,6 +123,23 @@ Dialog {
             }
             CheckBox {
                  id: newFreeTicket
+            }
+        }
+
+        RowLayout {
+            Layout.preferredWidth: parent.width
+            Layout.fillWidth: true
+
+            Text {
+                id: text5
+                text: qsTr("Erster Auswärtsfahrer:")
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                font.pixelSize: 14
+                color: "white"
+            }
+            CheckBox {
+                 id: newAwayAccept
             }
         }
 

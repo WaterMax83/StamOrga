@@ -93,7 +93,7 @@ Item {
            RowLayout {
                Layout.preferredWidth: parent.width
                Layout.fillWidth: true
-               visible: userInt.isDeviceMobile()
+               visible: userInt.isDeviceMobile() || userInt.isDebuggingEnabled()
 
                Text {
                    id: labelNotificationText
@@ -116,6 +116,7 @@ Item {
                            dialog.enableMeetingAdded = notifyNewMeetInfo;
                            dialog.enableMeetingChanged = notifyChangeMeetInfo;
                            dialog.enableNewFreeTicket = notifyFreeTicket;
+                           dialog.enableNewAwayAccept = notifyAwayAccept;
                            dialog.acceptedDialog.connect(acceptedNotificationDialog);
                            notifyDialog = dialog;
                            dialog.open();
@@ -264,6 +265,10 @@ Item {
             globalSettings.setNotificationNewFreeTicketEnabled(notifyFreeTicket);
             saveSettings = true;
         }
+        if (notifyAwayAccept !== globalSettings.isNotificationNewAwayAcceptEnabled()){
+            globalSettings.setNotificationNewAwayAcceptEnabled(notifyAwayAccept);
+            saveSettings = true;
+        }
 
         if (saveSettings)
           globalSettings.saveGlobalSettings();
@@ -310,6 +315,7 @@ Item {
         notifyNewMeetInfo = globalSettings.isNotificationNewMeetingEnabled();
         notifyChangeMeetInfo = globalSettings.isNotificationChangedMeetingEnabled()
         notifyFreeTicket = globalSettings.isNotificationNewFreeTicketEnabled();
+        notifyAwayAccept = globalSettings.isNotificationNewAwayAcceptEnabled();
 
        isStartupDone = true;
    }
@@ -318,12 +324,14 @@ Item {
    property var notifyNewMeetInfo;
    property var notifyChangeMeetInfo;
    property var notifyFreeTicket;
+   property var notifyAwayAccept;
    property var notifyDialog;
    function acceptedNotificationDialog() {
        notifyNewAppVersion = notifyDialog.enableNewAppVersion;
        notifyNewMeetInfo = notifyDialog.enableMeetingAdded;
        notifyChangeMeetInfo = notifyDialog.enableMeetingChanged;
-       notifyFreeTicket=  notifyDialog.enableNewFreeTicket;
+       notifyFreeTicket = notifyDialog.enableNewFreeTicket;
+       notifyAwayAccept = notifyDialog.enableNewAwayAccept;
        valueWasEditedEnableSave();
    }
 

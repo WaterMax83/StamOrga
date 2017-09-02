@@ -98,7 +98,7 @@ Flickable {
                         if (result === 0)
                             toastManager.show("Keine Änderung, nichts gespeichert", 2000);
                         else {
-                            showInfoHeader("Speichere Infos", false)
+                            showInfoHeader("Speichere Infos", true)
                         }
 
                     }

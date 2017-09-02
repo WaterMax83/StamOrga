@@ -62,7 +62,7 @@ Item {
                     id: txtInfoCurrentGame
                     visible: false
                     color: "white"
-                    font.pixelSize: 10
+                    font.pixelSize: 12
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 }
             }

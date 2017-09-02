@@ -127,7 +127,9 @@ extern QString createRandomString(qint32 size);
 #define NOTIFY_TOPIC_NEW_MEETING            "NewMeeting"
 #define NOTIFY_TOPIC_CHANGE_MEETING         "ChangeMeeting"
 #define NOTIFY_TOPIC_NEW_FREE_TICKET        "NewFreeTicket"
+#define NOTIFY_TOPIC_NEW_AWAY_ACCEPT        "NewAwayAccept"
 #define NOTIFY_TOPIC_GENERAL                "GeneralTopic"
+#define NOTIFY_TOPIC_GENERAL_BACKUP         "GeneralBackup"     // after versoin 1.0.3
 // clang-format on
 
 

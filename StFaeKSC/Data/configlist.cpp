@@ -142,7 +142,7 @@ ConfigItem* ConfigList::getProblemItemFromArrayIndex(int index)
 
 bool ConfigList::updateItemValue(ConfigItem* pItem, QString key, QVariant value, qint64 timeStamp)
 {
-    bool         rValue = false;
+    bool rValue = false;
     this->m_mConfigIniMutex.lock();
 
     this->m_pConfigSettings->beginGroup(GROUP_LIST_ITEM);
@@ -169,6 +169,13 @@ bool ConfigList::updateItemValue(ConfigItem* pItem, QString key, QVariant value,
     return rValue;
 }
 
+void ConfigList::addNewConfigItem(ConfigItem* item, QList<ConfigItem*>* pList)
+{
+    QMutexLocker locker(&this->m_mInternalInfoMutex);
+
+    if (!pList->contains(item))
+        pList->append(item);
+}
 
 quint32 ConfigList::getNextInternalIndex()
 {

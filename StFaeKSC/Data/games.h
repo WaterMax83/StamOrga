@@ -88,9 +88,6 @@ public:
 private:
     void saveCurrentInteralList() override;
 
-    //    bool addNewGamesPlay(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, CompetitionIndex comp, quint16 season, quint32 index, bool checkGame = true);
-    //    void addNewGamesPlay(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, CompetitionIndex comp, quint16 season, quint32 index, QList<ConfigItem*>* pList);
-
     bool addNewGamesPlay(GamesPlay* play, bool checkGame = true);
     void addNewGamesPlay(GamesPlay* play, QList<ConfigItem*>* pList);
 };

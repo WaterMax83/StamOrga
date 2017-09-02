@@ -90,6 +90,8 @@ protected:
 
     bool updateItemValue(ConfigItem* pItem, QString key, QVariant value, qint64 timeStamp = 0);
 
+    void addNewConfigItem(ConfigItem* item, QList<ConfigItem*>* pList);
+
     quint32 getNextInternalIndex();
 
     qint64 m_lastUpdateTimeStamp;

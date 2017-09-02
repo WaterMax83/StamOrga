@@ -114,10 +114,12 @@ public:
     Q_INVOKABLE bool isNotificationNewMeetingEnabled();
     Q_INVOKABLE bool isNotificationChangedMeetingEnabled();
     Q_INVOKABLE bool isNotificationNewFreeTicketEnabled();
+    Q_INVOKABLE bool isNotificationNewAwayAcceptEnabled();
     Q_INVOKABLE void setNotificationNewAppVersionEnabled(bool enable);
     Q_INVOKABLE void setNotificationNewMeetingEnabled(bool enable);
     Q_INVOKABLE void setNotificationChangedMeetingEnabled(bool enable);
-    Q_INVOKABLE void setNotificationNewFreeTicketEnabled(bool enable);
+    Q_INVOKABLE void setNotificationNewFreeTicketEnabled(bool enabled);
+    Q_INVOKABLE void setNotificationNewAwayAcceptEnabled(bool enable);
 
 signals:
     void debugIPChanged();

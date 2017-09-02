@@ -24,6 +24,7 @@
 #include "../Common/Network/messagecommand.h"
 #include "../Data/seasonticket.h"
 #include "dataconnection.h"
+#include "pushnotification.h"
 
 DataConnection::DataConnection(GlobalData* pGData, QObject* parent)
     : QObject(parent)
@@ -67,6 +68,12 @@ MessageProtocol* DataConnection::requestCheckUserLogin(MessageProtocol* msg)
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_LOGIN_USER, result);
 }
 
+/* Request
+ * 0                GUID            X
+ * X                Token           Y
+ * X+Y              OS              4
+ */
+
 /* Answer
  * 0                Header          12
  * 12               SUCCESS         4
@@ -77,7 +84,17 @@ MessageProtocol* DataConnection::requestCheckUserLogin(MessageProtocol* msg)
 MessageProtocol* DataConnection::requestGetUserProperties(MessageProtocol* msg)
 {
     if (msg->getDataLength() > 0) {
-        /* App GUID and Fcm Token, maybe needed later */
+        const char* pData  = msg->getPointerToData();
+        quint32     offset = 0;
+        QString     guid(QByteArray(pData + offset));
+        offset += guid.toUtf8().length() + 1;
+        QString token(QByteArray(pData + offset));
+        offset += token.toUtf8().length() + 1;
+        qint32 system;
+        memcpy(&system, pData + offset, sizeof(qint32));
+        system = qFromLittleEndian(system);
+
+        g_pushNotify->addNewAppInformation(guid, token, system, this->m_pUserConData->m_userID);
     }
 
     QByteArray  answer;
@@ -907,11 +924,20 @@ MessageProtocol* DataConnection::requestAcceptMeeting(MessageProtocol* msg)
 
     QString name(QByteArray((char*)(pData + 3)));
 
-    if ((rCode = this->m_pGlobalData->requestAcceptMeetingInfo(gameIndex, 0, acceptValue, acceptIndex, name, this->m_pUserConData->m_userName)) == ERROR_CODE_SUCCESS) {
+    qint64 messageID;
+    rCode = this->m_pGlobalData->requestAcceptMeetingInfo(gameIndex, 0, acceptValue, acceptIndex, name, this->m_pUserConData->m_userID, messageID);
+    if (rCode == ERROR_CODE_SUCCESS) {
         qInfo().noquote() << QString("User %1 accepted MeetingInfo of game %2 with value %3")
                                  .arg(this->m_pUserConData->m_userName)
                                  .arg(this->m_pGlobalData->m_GamesList.getItemName(gameIndex))
                                  .arg(acceptValue);
     }
-    return new MessageProtocol(OP_CODE_CMD_RES::ACK_ACCEPT_MEETING, rCode);
+    if (msg->getVersion() <= MSG_HEADER_VERSION_MESSAGE_ID)
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_ACCEPT_MEETING, rCode);
+
+    qint32 data[3];
+    data[0]   = qToLittleEndian(rCode);
+    messageID = qToLittleEndian(messageID);
+    memcpy(&data[1], &messageID, sizeof(qint64));
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_ACCEPT_MEETING, (char*)&data[0], sizeof(qint32) * 3);
 }

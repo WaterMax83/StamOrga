@@ -117,7 +117,7 @@ qint32 GlobalData::requestChangeStateSeasonTicket(const quint32 ticketIndex, con
                     result = ticket->changeTicketState(ticketIndex, userID, newState);
                 if (newState == TICKET_STATE_FREE) {
                     QString body = QString("Karte \'%1\' beim Spiel %2 : %3 ist frei").arg(pTicket->m_itemName, pGame->m_itemName, pGame->m_away);
-                    messageID    = g_pushNotify->sendNewTicketNotification("Neue Karte frei", body, userID, gameIndex, ticketIndex);
+                    messageID    = g_pushNotify->sendNewTicketNotification(body, userID, gameIndex, ticketIndex);
                 } else
                     messageID = g_pushNotify->removeNewTicketNotification(gameIndex, ticketIndex);
             } else if (newState == TICKET_STATE_RESERVED) {
@@ -149,7 +149,7 @@ qint32 GlobalData::requestChangeStateSeasonTicket(const quint32 ticketIndex, con
         result = ticket->addNewTicket(ticketIndex, userID, TICKET_STATE_FREE, reserveName);
         qInfo().noquote() << QString("Changed ticketState from %1 at game %2 to %3").arg(pTicket->m_itemName).arg(pGame->m_index).arg(TICKET_STATE_FREE);
         QString body = QString("Karte \'%1\' beim Spiel %2 : %3 ist frei").arg(pTicket->m_itemName, pGame->m_itemName, pGame->m_away);
-        messageID    = g_pushNotify->sendNewTicketNotification("Neue Karte frei", body, userID, gameIndex, ticketIndex);
+        messageID    = g_pushNotify->sendNewTicketNotification(body, userID, gameIndex, ticketIndex);
     } else {
         delete ticket;
         qWarning().noquote() << QString("Error creating available ticket file for game %1").arg(pGame->m_index);
@@ -307,6 +307,9 @@ quint16 GlobalData::getMeetingInfoValue(const quint32 gamesIndex)
     return 0;
 }
 
+#define BODY_CHANGE_MEET "Beim Spiel %1 : %2 wurde das Treffen geändert"
+#define BODY_ADD_MEETING "Kommst du zu %1 : %2 ?"
+
 qint32 GlobalData::requestChangeMeetingInfo(const quint32 gameIndex, const quint32 version,
                                             const QString when, const QString where, const QString info,
                                             const qint32 userID, qint64& messageID)
@@ -330,11 +333,23 @@ qint32 GlobalData::requestChangeMeetingInfo(const quint32 gameIndex, const quint
     //    quint32 userID = this->m_UserList.getItemIndex(userName);
     foreach (MeetingInfo* mInfo, this->m_meetingInfos) {
         if (mInfo->getGameIndex() == gameIndex) {
+
+            /* Check old infos if this only exist someone accepted it */
+            QString oldWhen, oldWhere, oldInfo;
+            mInfo->getMeetingInfo(oldWhen, oldWhere, oldInfo);
+
             result = mInfo->changeMeetingInfo(when, where, info);
             if (result == ERROR_CODE_SUCCESS) {
                 qInfo().noquote() << QString("Changed Meeting info at game %1:%2, %3").arg(pGame->m_itemName, pGame->m_away).arg(pGame->m_index);
-                QString body = QString("Beim Spiel %1 : %2 wurde das Treffen geändert").arg(pGame->m_itemName, pGame->m_away);
-                messageID    = g_pushNotify->sendChangeMeetingNotification("Treffen wurde verändert", body, userID, gameIndex);
+
+                /* When there were no infos saved, this was also a new meeting */
+                if (oldWhen.length() > 0 || oldWhere.length() > 0 || oldInfo.length() > 0) {
+                    QString body = QString(BODY_CHANGE_MEET).arg(pGame->m_itemName, pGame->m_away);
+                    messageID    = g_pushNotify->sendChangeMeetingNotification(body, userID, gameIndex);
+                } else {
+                    QString body = QString(BODY_ADD_MEETING).arg(pGame->m_itemName, pGame->m_away);
+                    messageID    = g_pushNotify->sendNewMeetingNotification(body, userID, gameIndex);
+                }
             } else
                 qWarning().noquote() << QString("Error setting meeting info at game %1: %2").arg(pGame->m_index).arg(result);
             return result;
@@ -346,8 +361,8 @@ qint32 GlobalData::requestChangeMeetingInfo(const quint32 gameIndex, const quint
         this->m_meetingInfos.append(mInfo);
         result = mInfo->changeMeetingInfo(when, where, info);
         qInfo().noquote() << QString("Added MeetingInfo at game %1:%2, %3").arg(pGame->m_itemName, pGame->m_away).arg(pGame->m_index);
-        QString body = QString("Kommst du zu %1 : %2 ?").arg(pGame->m_itemName, pGame->m_away);
-        messageID    = g_pushNotify->sendNewMeetingNotification("Neues Treffen angelegt", body, userID, gameIndex);
+        QString body = QString(BODY_ADD_MEETING).arg(pGame->m_itemName, pGame->m_away);
+        messageID    = g_pushNotify->sendNewMeetingNotification(body, userID, gameIndex);
     } else {
         delete mInfo;
         qWarning().noquote() << QString("Error creating meeting info file for game %1").arg(pGame->m_index);
@@ -445,13 +460,16 @@ qint32 GlobalData::requestGetMeetingInfo(const quint32 gameIndex, const quint32 
     return ERROR_CODE_SUCCESS;
 }
 
+
+#define BODY_NEW_AWAY_ACCEPT "%1 fährt zu %2, kommst du mit?"
+
 /*  answer
  * 0                Header          12
  * 12   quint32     result          4
  */
 qint32 GlobalData::requestAcceptMeetingInfo(const quint32 gameIndex, const quint32 version,
                                             const quint32 acceptValue, const quint32 acceptIndex,
-                                            const QString name, const QString userName)
+                                            const QString name, const qint32 userID, qint64& messageID)
 {
     if (!this->m_initalized)
         return ERROR_CODE_NOT_READY;
@@ -469,12 +487,17 @@ qint32 GlobalData::requestAcceptMeetingInfo(const quint32 gameIndex, const quint
 #endif
 
     qint32 result = ERROR_CODE_SUCCESS;
-    qint32 userID = this->m_UserList.getItemIndex(userName);
     foreach (MeetingInfo* mInfo, this->m_meetingInfos) {
         if (mInfo->getGameIndex() == gameIndex) {
-            if (acceptIndex == 0)
+            if (acceptIndex == 0) {
                 result = mInfo->addNewAcceptation(acceptValue, userID, name);
-            else
+
+                /* Send an info if the first person is going to a game which is not at home */
+                if (pGame->m_away == "KSC" && mInfo->getAcceptedNumber(ACCEPT_STATE_ACCEPT) == 0) {
+                    QString body = QString(BODY_NEW_AWAY_ACCEPT).arg(name, pGame->m_itemName);
+                    messageID    = g_pushNotify->sendNewFirstAwayAccept(body, userID);
+                }
+            } else
                 result = mInfo->changeAcceptation(acceptIndex, acceptValue, userID, name);
             if (result == ERROR_CODE_SUCCESS)
                 qInfo().noquote() << QString("Changed Acceptation of %2 at game %1").arg(pGame->m_index).arg(name);
@@ -489,6 +512,12 @@ qint32 GlobalData::requestAcceptMeetingInfo(const quint32 gameIndex, const quint
         this->m_meetingInfos.append(mInfo);
         result = mInfo->addNewAcceptation(acceptValue, userID, name);
         qInfo().noquote() << QString("Changed Acceptation of %2 at game %1").arg(pGame->m_index).arg(name);
+
+        /* Send an info if the first person is going to an game which is not at home */
+        if (pGame->m_away == "KSC") {
+            QString body = QString(BODY_NEW_AWAY_ACCEPT).arg(name, pGame->m_itemName);
+            messageID    = g_pushNotify->sendNewFirstAwayAccept(body, userID);
+        }
     } else {
         delete mInfo;
         qWarning().noquote() << QString("Error creating meeting info file for game %1").arg(pGame->m_index);
