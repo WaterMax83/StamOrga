@@ -119,6 +119,7 @@ extern QString createRandomString(qint32 size);
 #define USER_ENABLE_LOG                     0x1
 #define USER_ENABLE_ADD_GAME                0x2
 #define USER_ENABLE_FIXED_GAME_TIME         0x4
+#define USER_ENABLE_FANCLUB                 0x8
 // clang-format on
 
 

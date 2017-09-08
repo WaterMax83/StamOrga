@@ -23,14 +23,14 @@
 
 SeasonTicket::SeasonTicket()
 {
-    QString ticketSetFilePath = getUserHomeConfigPath() + "/Settings/SeasonTicket.ini";
+    QString configSetFilePath = getUserHomeConfigPath() + "/Settings/SeasonTicket.ini";
 
-    if (!checkFilePathExistAndCreate(ticketSetFilePath)) {
+    if (!checkFilePathExistAndCreate(configSetFilePath)) {
         CONSOLE_CRITICAL(QString("Could not create File for SeasonTicket setting"));
         return;
     }
 
-    this->m_pConfigSettings = new QSettings(ticketSetFilePath, QSettings::IniFormat);
+    this->m_pConfigSettings = new QSettings(configSetFilePath, QSettings::IniFormat);
     this->m_pConfigSettings->setIniCodec(("UTF-8"));
 
     /* Check wheter we have to save data after reading again */
@@ -39,9 +39,9 @@ SeasonTicket::SeasonTicket()
         QMutexLocker locker(&this->m_mConfigIniMutex);
 
         this->m_pConfigSettings->beginGroup(GROUP_LIST_ITEM);
-        int sizeOfTicket = this->m_pConfigSettings->beginReadArray(CONFIG_LIST_ARRAY);
+        int sizeOfArray = this->m_pConfigSettings->beginReadArray(CONFIG_LIST_ARRAY);
 
-        for (int i = 0; i < sizeOfTicket; i++) {
+        for (int i = 0; i < sizeOfArray; i++) {
             this->m_pConfigSettings->setArrayIndex(i);
             QString ticketName = this->m_pConfigSettings->value(ITEM_NAME, "").toString();
             qint64  timestamp  = this->m_pConfigSettings->value(ITEM_TIMESTAMP, 0x0).toULongLong();
@@ -52,7 +52,8 @@ SeasonTicket::SeasonTicket()
             quint8  discount  = quint8(this->m_pConfigSettings->value(TICKET_DISCOUNT, 0).toUInt());
             QString place     = this->m_pConfigSettings->value(TICKET_PLACE, "").toString();
 
-            if (!this->addNewTicketInfo(user, userIndex, ticketName, timestamp, discount, place, index))
+            TicketInfo* info = new TicketInfo(user, userIndex, ticketName, timestamp, discount, place, index);
+            if (!this->addNewTicketInfo(info))
                 bProblems = true;
         }
         this->m_pConfigSettings->endArray();
@@ -68,12 +69,7 @@ SeasonTicket::SeasonTicket()
         if (pTicket == NULL)
             continue;
         pTicket->m_index = this->getNextInternalIndex();
-        this->addNewTicketInfo(pTicket->m_user, pTicket->m_userIndex,
-                               pTicket->m_itemName,
-                               pTicket->m_timestamp, pTicket->m_discount,
-                               pTicket->m_place, pTicket->m_index);
-
-        delete pTicket;
+        this->addNewTicketInfo(pTicket);
     }
     this->m_lAddItemProblems.clear();
 
@@ -116,7 +112,8 @@ int SeasonTicket::addNewSeasonTicket(QString user, quint32 userIndex, QString ti
 
     this->setNewUpdateTime();
 
-    this->addNewTicketInfo(user, userIndex, ticketName, timestamp, discount, ticketName, newIndex, false);
+    TicketInfo* info = new TicketInfo(user, userIndex, ticketName, timestamp, discount, ticketName, newIndex);
+    this->addNewTicketInfo(info, false);
 
     //    qInfo() << (QString("Added new ticket: %1").arg(ticketName));
     return newIndex;
@@ -176,19 +173,19 @@ void SeasonTicket::saveCurrentInteralList()
 
     this->m_pConfigSettings->beginWriteArray(CONFIG_LIST_ARRAY);
     for (int i = 0; i < this->getNumberOfInternalList(); i++) {
-        TicketInfo* pTicket = (TicketInfo*)(this->getItemFromArrayIndex(i));
-        if (pTicket == NULL)
+        TicketInfo* pItem = (TicketInfo*)(this->getItemFromArrayIndex(i));
+        if (pItem == NULL)
             continue;
         this->m_pConfigSettings->setArrayIndex(i);
 
-        this->m_pConfigSettings->setValue(ITEM_NAME, pTicket->m_itemName);
-        this->m_pConfigSettings->setValue(ITEM_TIMESTAMP, pTicket->m_timestamp);
-        this->m_pConfigSettings->setValue(ITEM_INDEX, pTicket->m_index);
+        this->m_pConfigSettings->setValue(ITEM_NAME, pItem->m_itemName);
+        this->m_pConfigSettings->setValue(ITEM_TIMESTAMP, pItem->m_timestamp);
+        this->m_pConfigSettings->setValue(ITEM_INDEX, pItem->m_index);
 
-        this->m_pConfigSettings->setValue(TICKET_USER, pTicket->m_user);
-        this->m_pConfigSettings->setValue(TICKET_USER_INDEX, pTicket->m_userIndex);
-        this->m_pConfigSettings->setValue(TICKET_PLACE, pTicket->m_place);
-        this->m_pConfigSettings->setValue(TICKET_DISCOUNT, pTicket->m_discount);
+        this->m_pConfigSettings->setValue(TICKET_USER, pItem->m_user);
+        this->m_pConfigSettings->setValue(TICKET_USER_INDEX, pItem->m_userIndex);
+        this->m_pConfigSettings->setValue(TICKET_PLACE, pItem->m_place);
+        this->m_pConfigSettings->setValue(TICKET_DISCOUNT, pItem->m_discount);
     }
 
     this->m_pConfigSettings->endArray();
@@ -200,41 +197,23 @@ void SeasonTicket::saveCurrentInteralList()
     qDebug().noquote() << QString("saved actual SeasonTicket List with %1 entries").arg(this->getNumberOfInternalList());
 }
 
-bool SeasonTicket::addNewTicketInfo(QString user, quint32 userIndex, QString ticketName, qint64 datetime, quint8 discount, QString place, quint32 index, bool checkTicket)
+bool SeasonTicket::addNewTicketInfo(TicketInfo* info, bool checkItem)
 {
-    if (checkTicket) {
-        if (ticketName.size() < 4) {
-            qWarning().noquote() << QString("Ticket with index %1 has to short name %2 remove it").arg(index).arg(ticketName);
+    if (checkItem) {
+        if (info->m_itemName.size() < 4) {
+            qWarning().noquote() << QString("Ticket with index %1 has to short name %2 remove it").arg(info->m_index).arg(info->m_itemName);
             return false;
         }
-        if (index == 0 || this->itemExists(index)) {
-            qWarning().noquote() << QString("Ticket \"%1\" with index \"%2\" already exists, saving with new index").arg(ticketName).arg(index);
-            this->addNewTicketInfo(user, userIndex, ticketName, datetime, discount, place, index, &this->m_lAddItemProblems);
+        if (info->m_index == 0 || this->itemExists(info->m_index)) {
+            qWarning().noquote() << QString("Ticket \"%1\" with index \"%2\" already exists, saving with new index").arg(info->m_itemName).arg(info->m_index);
+            this->addNewConfigItem(info, &this->m_lAddItemProblems);
             return false;
         }
     }
 
-    this->addNewTicketInfo(user, userIndex, ticketName, datetime, discount, place, index, &this->m_lInteralList);
+    this->addNewConfigItem(info, &this->m_lInteralList);
     return true;
 }
-
-void SeasonTicket::addNewTicketInfo(QString user, quint32 userIndex, QString ticketName, qint64 datetime, quint8 discount, QString place, quint32 index, QList<ConfigItem*>* pList)
-{
-    QMutexLocker locker(&this->m_mInternalInfoMutex);
-
-    TicketInfo* ticket  = new TicketInfo;
-    ticket->m_itemName  = ticketName;
-    ticket->m_timestamp = datetime;
-    ticket->m_index     = index;
-
-    ticket->m_user      = user;
-    ticket->m_userIndex = userIndex;
-    ticket->m_discount  = discount;
-    ticket->m_place     = place;
-
-    pList->append(ticket);
-}
-
 
 SeasonTicket::~SeasonTicket()
 {

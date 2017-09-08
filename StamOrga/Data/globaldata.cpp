@@ -624,6 +624,10 @@ bool GlobalData::userIsGameFixedTimeEnabled()
 {
     return USER_IS_ENABLED(USER_ENABLE_FIXED_GAME_TIME);
 }
+bool GlobalData::userIsFanclubEnabled()
+{
+    return USER_IS_ENABLED(USER_ENABLE_FANCLUB);
+}
 
 void GlobalData::SetUserProperties(quint32 value)
 {

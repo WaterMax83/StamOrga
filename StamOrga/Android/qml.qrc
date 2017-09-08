@@ -62,5 +62,6 @@
         <file>images/+material/info.png</file>
         <file>images/info.png</file>
         <file>components/NotificationSettingsDialog.qml</file>
+        <file>pages/FanclubNewsList.qml</file>
     </qresource>
 </RCC>

@@ -38,15 +38,15 @@ qint32 AvailableGameTickets::initialize(quint32 year, quint32 competition, quint
     this->m_seasonIndex = seasonIndex;
     this->m_gameIndex   = index;
 
-    QString userSetFilePath = getUserHomeConfigPath() + "/Settings/AvailableTickets/";
-    userSetFilePath.append(QString("Tickets_Game_%1.ini").arg(index));
+    QString configSetFilePath = getUserHomeConfigPath() + "/Settings/AvailableTickets/";
+    configSetFilePath.append(QString("Tickets_Game_%1.ini").arg(index));
 
-    if (!checkFilePathExistAndCreate(userSetFilePath)) {
+    if (!checkFilePathExistAndCreate(configSetFilePath)) {
         CONSOLE_CRITICAL(QString("Could not create File for UserSettings"));
         return ERROR_CODE_COMMON;
     }
 
-    this->m_pConfigSettings = new QSettings(userSetFilePath, QSettings::IniFormat);
+    this->m_pConfigSettings = new QSettings(configSetFilePath, QSettings::IniFormat);
     this->m_pConfigSettings->setIniCodec(("UTF-8"));
 
     this->m_pConfigSettings->beginGroup("TicketHeader");
@@ -84,9 +84,9 @@ qint32 AvailableGameTickets::initialize(QString filePath)
         QMutexLocker locker(&this->m_mConfigIniMutex);
 
         this->m_pConfigSettings->beginGroup(GROUP_LIST_ITEM);
-        int sizeOfLogins = this->m_pConfigSettings->beginReadArray(CONFIG_LIST_ARRAY);
+        int sizeOfArray = this->m_pConfigSettings->beginReadArray(CONFIG_LIST_ARRAY);
 
-        for (int i = 0; i < sizeOfLogins; i++) {
+        for (int i = 0; i < sizeOfArray; i++) {
             this->m_pConfigSettings->setArrayIndex(i);
             QString name      = this->m_pConfigSettings->value(ITEM_NAME, "").toString();
             quint32 index     = this->m_pConfigSettings->value(ITEM_INDEX, 0).toUInt();
@@ -99,7 +99,8 @@ qint32 AvailableGameTickets::initialize(QString filePath)
             if (ticketID == 0 || userID == 0 || state == 0)
                 continue;
 
-            if (!this->addNewAvailableTicket(name, timestamp, index, ticketID, userID, state))
+            AvailableTicketInfo* ticket = new AvailableTicketInfo(name, timestamp, index, ticketID, userID, state);
+            if (!this->addNewAvailableTicket(ticket))
                 bProblems = true;
         }
         this->m_pConfigSettings->endArray();
@@ -113,11 +114,7 @@ qint32 AvailableGameTickets::initialize(QString filePath)
         if (pTicket == NULL)
             continue;
         pTicket->m_index = this->getNextInternalIndex();
-        this->addNewAvailableTicket(pTicket->m_itemName, pTicket->m_timestamp,
-                                    pTicket->m_index, pTicket->m_ticketID,
-                                    pTicket->m_userID, pTicket->m_state);
-
-        delete pTicket;
+        this->addNewAvailableTicket(pTicket);
     }
     this->m_lAddItemProblems.clear();
 
@@ -155,7 +152,8 @@ qint32 AvailableGameTickets::addNewTicket(quint32 ticketID, quint32 userID, quin
     this->m_pConfigSettings->endGroup();
     this->m_pConfigSettings->sync();
 
-    this->addNewAvailableTicket(name, timestamp, newIndex, ticketID, userID, state, false);
+    AvailableTicketInfo* ticket = new AvailableTicketInfo(name, timestamp, newIndex, ticketID, userID, state);
+    this->addNewAvailableTicket(ticket, false);
 
     return ERROR_CODE_SUCCESS;
 }
@@ -243,18 +241,18 @@ void AvailableGameTickets::saveCurrentInteralList()
     this->m_pConfigSettings->beginWriteArray(CONFIG_LIST_ARRAY);
     for (int i = 0; i < this->getNumberOfInternalList(); i++) {
 
-        AvailableTicketInfo* pTicket = (AvailableTicketInfo*)(this->getItemFromArrayIndex(i));
-        if (pTicket == NULL)
+        AvailableTicketInfo* pItem = (AvailableTicketInfo*)(this->getItemFromArrayIndex(i));
+        if (pItem == NULL)
             continue;
         this->m_pConfigSettings->setArrayIndex(i);
 
-        this->m_pConfigSettings->setValue(ITEM_NAME, pTicket->m_itemName);
-        this->m_pConfigSettings->setValue(ITEM_TIMESTAMP, pTicket->m_timestamp);
-        this->m_pConfigSettings->setValue(ITEM_INDEX, pTicket->m_index);
+        this->m_pConfigSettings->setValue(ITEM_NAME, pItem->m_itemName);
+        this->m_pConfigSettings->setValue(ITEM_TIMESTAMP, pItem->m_timestamp);
+        this->m_pConfigSettings->setValue(ITEM_INDEX, pItem->m_index);
 
-        this->m_pConfigSettings->setValue(AVAILABLE_TICKET_ID, pTicket->m_ticketID);
-        this->m_pConfigSettings->setValue(AVAILABLE_USER_ID, pTicket->m_userID);
-        this->m_pConfigSettings->setValue(AVAILABLE_STATE, pTicket->m_state);
+        this->m_pConfigSettings->setValue(AVAILABLE_TICKET_ID, pItem->m_ticketID);
+        this->m_pConfigSettings->setValue(AVAILABLE_USER_ID, pItem->m_userID);
+        this->m_pConfigSettings->setValue(AVAILABLE_STATE, pItem->m_state);
     }
 
     this->m_pConfigSettings->endArray();
@@ -264,31 +262,16 @@ void AvailableGameTickets::saveCurrentInteralList()
 }
 
 
-bool AvailableGameTickets::addNewAvailableTicket(QString name, qint64 timestamp, quint32 index, quint32 ticketID, quint32 userID, quint32 state, bool checkTicket)
+bool AvailableGameTickets::addNewAvailableTicket(AvailableTicketInfo* ticket, bool checkItem)
 {
-    if (checkTicket) {
-        if (index == 0 || itemExists(index)) {
-            qWarning().noquote() << QString("Available ticket with index \"%1\" already exists, saving with new index").arg(index);
-            this->addNewAvailableTicket(name, timestamp, index, ticketID, userID, state, &this->m_lAddItemProblems);
+    if (checkItem) {
+        if (ticket->m_index == 0 || itemExists(ticket->m_index)) {
+            qWarning().noquote() << QString("Available ticket with index \"%1\" already exists, saving with new index").arg(ticket->m_index);
+            this->addNewConfigItem(ticket, &this->m_lAddItemProblems);
             return false;
         }
     }
 
-    this->addNewAvailableTicket(name, timestamp, index, ticketID, userID, state, &this->m_lInteralList);
+    this->addNewConfigItem(ticket, &this->m_lInteralList);
     return true;
-}
-
-void AvailableGameTickets::addNewAvailableTicket(QString name, qint64 timestamp, quint32 index, quint32 ticketID, quint32 userID, quint32 state, QList<ConfigItem*>* pList)
-{
-    QMutexLocker locker(&this->m_mInternalInfoMutex);
-
-    AvailableTicketInfo* ticket = new AvailableTicketInfo();
-    ticket->m_itemName          = name;
-    ticket->m_timestamp         = timestamp;
-    ticket->m_index             = index;
-    ticket->m_ticketID          = ticketID;
-    ticket->m_userID            = userID;
-    ticket->m_state             = state;
-
-    pList->append(ticket);
 }

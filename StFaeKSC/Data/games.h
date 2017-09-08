@@ -43,13 +43,14 @@ public:
               quint16 saison, quint32 index, qint64 lastUpdate,
               quint32 scheduled)
     {
-        this->m_itemName    = home;
+        this->m_itemName  = home;
+        this->m_index     = index;
+        this->m_timestamp = timestamp;
+
         this->m_away        = away;
-        this->m_timestamp   = timestamp;
         this->m_saisonIndex = sIndex;
         this->m_score       = score;
         this->m_competition = comp;
-        this->m_index       = index;
         this->m_saison      = saison;
         this->m_lastUpdate  = lastUpdate;
         this->m_scheduled   = scheduled;
@@ -82,14 +83,10 @@ public:
 
     GamesPlay* gameExists(quint8 sIndex, CompetitionIndex comp, quint16 saison, qint64 timestamp);
 
-    void sortGamesListByTime();
-
-
 private:
     void saveCurrentInteralList() override;
 
-    bool addNewGamesPlay(GamesPlay* play, bool checkGame = true);
-    void addNewGamesPlay(GamesPlay* play, QList<ConfigItem*>* pList);
+    bool addNewGamesPlay(GamesPlay* play, bool checkItem = true);
 };
 
 #endif // GAMES_H

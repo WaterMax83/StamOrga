@@ -43,15 +43,15 @@ qint32 MeetingInfo::initialize(quint32 year, quint32 competition, quint32 season
     this->m_seasonIndex = seasonIndex;
     this->m_gameIndex   = index;
 
-    QString userSetFilePath = getUserHomeConfigPath() + "/Settings/Meetings/";
-    userSetFilePath.append(QString("Meetings_Game_%1.ini").arg(index));
+    QString configSetFilePath = getUserHomeConfigPath() + "/Settings/Meetings/";
+    configSetFilePath.append(QString("Meetings_Game_%1.ini").arg(index));
 
-    if (!checkFilePathExistAndCreate(userSetFilePath)) {
+    if (!checkFilePathExistAndCreate(configSetFilePath)) {
         CONSOLE_CRITICAL(QString("Could not create File for UserSettings"));
         return ERROR_CODE_COMMON;
     }
 
-    this->m_pConfigSettings = new QSettings(userSetFilePath, QSettings::IniFormat);
+    this->m_pConfigSettings = new QSettings(configSetFilePath, QSettings::IniFormat);
     this->m_pConfigSettings->setIniCodec(("UTF-8"));
 
     this->m_pConfigSettings->beginGroup("MeetingHeader");
@@ -97,9 +97,9 @@ qint32 MeetingInfo::initialize(QString filePath)
         QMutexLocker locker(&this->m_mConfigIniMutex);
 
         this->m_pConfigSettings->beginGroup(GROUP_LIST_ITEM);
-        int sizeOfLogins = this->m_pConfigSettings->beginReadArray(CONFIG_LIST_ARRAY);
+        int sizeOfArray = this->m_pConfigSettings->beginReadArray(CONFIG_LIST_ARRAY);
 
-        for (int i = 0; i < sizeOfLogins; i++) {
+        for (int i = 0; i < sizeOfArray; i++) {
             this->m_pConfigSettings->setArrayIndex(i);
             QString name      = this->m_pConfigSettings->value(ITEM_NAME, "").toString();
             quint32 index     = this->m_pConfigSettings->value(ITEM_INDEX, 0).toUInt();
@@ -111,7 +111,8 @@ qint32 MeetingInfo::initialize(QString filePath)
             if (userID == 0 || state == 0)
                 continue;
 
-            if (!this->addNewAcceptInfo(name, timestamp, index, state, userID))
+            AcceptMeetingInfo* info = new AcceptMeetingInfo(name, timestamp, index, state, userID);
+            if (!this->addNewAcceptInfo(info))
                 bProblems = true;
         }
         this->m_pConfigSettings->endArray();
@@ -125,11 +126,7 @@ qint32 MeetingInfo::initialize(QString filePath)
         if (pAccept == NULL)
             continue;
         pAccept->m_index = this->getNextInternalIndex();
-        this->addNewAcceptInfo(pAccept->m_itemName, pAccept->m_timestamp,
-                               pAccept->m_index, pAccept->m_state,
-                               pAccept->m_userID);
-
-        delete pAccept;
+        this->addNewAcceptInfo(pAccept);
     }
     this->m_lAddItemProblems.clear();
 
@@ -202,7 +199,8 @@ qint32 MeetingInfo::addNewAcceptation(const quint32 acceptState, const quint32 u
     this->m_pConfigSettings->endGroup();
     this->m_pConfigSettings->sync();
 
-    this->addNewAcceptInfo(name, timestamp, newIndex, acceptState, userID, false);
+    AcceptMeetingInfo* info = new AcceptMeetingInfo(name, timestamp, newIndex, acceptState, userID);
+    this->addNewAcceptInfo(info, false);
 
     this->sortAcceptations();
 
@@ -284,17 +282,17 @@ void MeetingInfo::saveCurrentInteralList()
     this->m_pConfigSettings->beginWriteArray(CONFIG_LIST_ARRAY);
     for (int i = 0; i < this->getNumberOfInternalList(); i++) {
 
-        AcceptMeetingInfo* accept = (AcceptMeetingInfo*)(this->getItemFromArrayIndex(i));
-        if (accept == NULL)
+        AcceptMeetingInfo* pItem = (AcceptMeetingInfo*)(this->getItemFromArrayIndex(i));
+        if (pItem == NULL)
             continue;
         this->m_pConfigSettings->setArrayIndex(i);
 
-        this->m_pConfigSettings->setValue(ITEM_NAME, accept->m_itemName);
-        this->m_pConfigSettings->setValue(ITEM_TIMESTAMP, accept->m_timestamp);
-        this->m_pConfigSettings->setValue(ITEM_INDEX, accept->m_index);
+        this->m_pConfigSettings->setValue(ITEM_NAME, pItem->m_itemName);
+        this->m_pConfigSettings->setValue(ITEM_TIMESTAMP, pItem->m_timestamp);
+        this->m_pConfigSettings->setValue(ITEM_INDEX, pItem->m_index);
 
-        this->m_pConfigSettings->setValue(MEET_INFO_STATE, accept->m_state);
-        this->m_pConfigSettings->setValue(MEET_INFO_USER_ID, accept->m_userID);
+        this->m_pConfigSettings->setValue(MEET_INFO_STATE, pItem->m_state);
+        this->m_pConfigSettings->setValue(MEET_INFO_USER_ID, pItem->m_userID);
     }
 
     this->m_pConfigSettings->endArray();
@@ -310,30 +308,16 @@ void MeetingInfo::sortAcceptations()
     std::sort(this->m_lInteralList.begin(), this->m_lInteralList.end(), AcceptMeetingInfo::compareAcceptMeetingInfo);
 }
 
-bool MeetingInfo::addNewAcceptInfo(QString name, qint64 timestamp, quint32 index, quint32 state, quint32 userID, bool checkAccept)
+bool MeetingInfo::addNewAcceptInfo(AcceptMeetingInfo* info, bool checkItem)
 {
-    if (checkAccept) {
-        if (index == 0 || itemExists(index)) {
-            qWarning().noquote() << QString("Meeting acceptation with index \"%1\" already exists, saving with new index").arg(index);
-            this->addNewAcceptInfo(name, timestamp, index, state, userID, &this->m_lAddItemProblems);
+    if (checkItem) {
+        if (info->m_index == 0 || itemExists(info->m_index)) {
+            qWarning().noquote() << QString("Meeting acceptation with index \"%1\" already exists, saving with new index").arg(info->m_index);
+            this->addNewConfigItem(info, &this->m_lAddItemProblems);
             return false;
         }
     }
 
-    this->addNewAcceptInfo(name, timestamp, index, state, userID, &this->m_lInteralList);
+    this->addNewConfigItem(info, &this->m_lInteralList);
     return true;
-}
-
-void MeetingInfo::addNewAcceptInfo(QString name, qint64 timestamp, quint32 index, quint32 state, quint32 userID, QList<ConfigItem*>* pList)
-{
-    QMutexLocker locker(&this->m_mInternalInfoMutex);
-
-    AcceptMeetingInfo* accept = new AcceptMeetingInfo();
-    accept->m_itemName        = name;
-    accept->m_timestamp       = timestamp;
-    accept->m_index           = index;
-    accept->m_state           = state;
-    accept->m_userID          = userID;
-
-    pList->append(accept);
 }

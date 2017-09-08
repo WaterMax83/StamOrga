@@ -517,9 +517,9 @@ void PushNotification::loadCurrentInteralList()
             qint64  timestamp = this->m_pConfigSettings->value(ITEM_TIMESTAMP, 0x0).toLongLong();
             quint32 index     = this->m_pConfigSettings->value(ITEM_INDEX, 0).toInt();
 
-            QString guid   = this->m_pConfigSettings->value(APP_TOKEN_GUID, "").toString();
-            QString token  = this->m_pConfigSettings->value(APP_TOKEN_TOKEN, "").toString();
-            qint32  system = this->m_pConfigSettings->value(APP_TOKEN_SYSTEM, -1).toInt();
+            QString guid      = this->m_pConfigSettings->value(APP_TOKEN_GUID, "").toString();
+            QString token     = this->m_pConfigSettings->value(APP_TOKEN_TOKEN, "").toString();
+            qint32  system    = this->m_pConfigSettings->value(APP_TOKEN_SYSTEM, -1).toInt();
             quint32 userIndex = this->m_pConfigSettings->value(APP_TOKEN_USERINDEX, 0).toUInt();
 
             AppTokenUID* app = new AppTokenUID(guid, token, timestamp, userIndex, system, index);
@@ -567,12 +567,13 @@ void PushNotification::showCurrentTokenInformation()
         AppTokenUID* app = (AppTokenUID*)(this->getItemFromArrayIndex(i));
         if (app == NULL)
             continue;
-        QString date   = QDateTime::fromMSecsSinceEpoch(app->m_timestamp).toString("dd.MM.yyyy hh:mm");
+        QString date  = QDateTime::fromMSecsSinceEpoch(app->m_timestamp).toString("dd.MM.yyyy hh:mm");
         QString token = app->m_fcmToken == "" ? "Kein Token" : app->m_fcmToken;
         std::cout << QString("%1: ").arg(app->m_index).toStdString()
                   << this->m_pGlobalData->m_UserList.getItemName(app->m_userIndex).toStdString()
                   << (QString(" - %1 - %3 - %2").arg(date, app->m_guid).arg(app->m_oSystem)).toStdString()
-                  << std::endl << token.toStdString() << std::endl;
+                  << std::endl
+                  << token.toStdString() << std::endl;
     }
 }
 
@@ -585,19 +586,19 @@ void PushNotification::saveCurrentInteralList()
 
     this->m_pConfigSettings->beginWriteArray(CONFIG_LIST_ARRAY);
     for (int i = 0; i < this->getNumberOfInternalList(); i++) {
-        AppTokenUID* app = (AppTokenUID*)(this->getItemFromArrayIndex(i));
-        if (app == NULL)
+        AppTokenUID* pItem = (AppTokenUID*)(this->getItemFromArrayIndex(i));
+        if (pItem == NULL)
             continue;
 
         this->m_pConfigSettings->setArrayIndex(i);
 
-        this->m_pConfigSettings->setValue(ITEM_TIMESTAMP, app->m_timestamp);
-        this->m_pConfigSettings->setValue(ITEM_INDEX, app->m_index);
+        this->m_pConfigSettings->setValue(ITEM_TIMESTAMP, pItem->m_timestamp);
+        this->m_pConfigSettings->setValue(ITEM_INDEX, pItem->m_index);
 
-        this->m_pConfigSettings->setValue(APP_TOKEN_GUID, app->m_guid);
-        this->m_pConfigSettings->setValue(APP_TOKEN_TOKEN, app->m_fcmToken);
-        this->m_pConfigSettings->setValue(APP_TOKEN_SYSTEM, app->m_oSystem);
-        this->m_pConfigSettings->setValue(APP_TOKEN_USERINDEX, app->m_userIndex);
+        this->m_pConfigSettings->setValue(APP_TOKEN_GUID, pItem->m_guid);
+        this->m_pConfigSettings->setValue(APP_TOKEN_TOKEN, pItem->m_fcmToken);
+        this->m_pConfigSettings->setValue(APP_TOKEN_SYSTEM, pItem->m_oSystem);
+        this->m_pConfigSettings->setValue(APP_TOKEN_USERINDEX, pItem->m_userIndex);
     }
 
     this->m_pConfigSettings->endArray();

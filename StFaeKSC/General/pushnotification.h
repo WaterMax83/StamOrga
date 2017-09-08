@@ -67,8 +67,9 @@ public:
     {
         this->m_itemName  = "";
         this->m_timestamp = timestamp;
-        this->m_userIndex = userIndex;
         this->m_index     = index;
+
+        this->m_userIndex = userIndex;
         this->m_guid      = guid;
         this->m_fcmToken  = token;
         this->m_oSystem   = system;

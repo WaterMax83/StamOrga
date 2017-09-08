@@ -30,6 +30,18 @@ struct AcceptMeetingInfo : public ConfigItem {
     quint32 m_state;
     quint32 m_userID;
 
+    AcceptMeetingInfo(QString name, qint64 timestamp,
+                      quint32 index, quint32 state,
+                      quint32 userID)
+    {
+        this->m_itemName  = name;
+        this->m_timestamp = timestamp;
+        this->m_index     = index;
+
+        this->m_state  = state;
+        this->m_userID = userID;
+    }
+
     static bool compareAcceptMeetingInfo(ConfigItem* p1, ConfigItem* p2)
     {
         AcceptMeetingInfo* a1 = (AcceptMeetingInfo*)p1;
@@ -83,8 +95,8 @@ private:
 
     bool updateHeaderValue(QString key, QVariant value);
 
-    bool addNewAcceptInfo(QString name, qint64 timestamp, quint32 index, quint32 state, quint32 userID, bool checkAccept = true);
-    void addNewAcceptInfo(QString name, qint64 timestamp, quint32 index, quint32 state, quint32 userID, QList<ConfigItem*>* pList);
+    bool addNewAcceptInfo(AcceptMeetingInfo* info, bool checkItem = true);
+    //    void addNewAcceptInfo(QString name, qint64 timestamp, quint32 index, quint32 state, quint32 userID, QList<ConfigItem*>* pList);
 };
 
 #endif // MEETINGINFO_H

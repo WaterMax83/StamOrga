@@ -23,6 +23,7 @@
 #include <QtCore/QMutex>
 
 #include "../Data/availablegameticket.h"
+#include "../Data/fanclubnews.h"
 #include "../Data/games.h"
 #include "../Data/listeduser.h"
 #include "../Data/meetinginfo.h"
@@ -56,6 +57,7 @@ public:
     ListedUser                   m_UserList;
     Games                        m_GamesList;
     SeasonTicket                 m_SeasonTicket;
+    FanclubNews                  m_fanclubNews;
     QList<AvailableGameTickets*> m_availableTickets;
     QList<MeetingInfo*>          m_meetingInfos;
     QMutex                       m_globalDataMutex;

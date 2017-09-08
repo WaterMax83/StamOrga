@@ -118,7 +118,7 @@ int ReadDataCSV::readNewGameData(QStringList line)
         score = line.value(5);
 
     this->m_pGlobalData->m_GamesList.addNewGame(home, away, datetime, sIndex, score, competition);
-    this->m_pGlobalData->m_GamesList.sortGamesListByTime();
+    this->m_pGlobalData->m_GamesList.sortItemListByTime();
 
     return ERROR_CODE_SUCCESS;
 }

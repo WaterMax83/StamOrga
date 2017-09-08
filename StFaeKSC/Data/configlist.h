@@ -75,6 +75,8 @@ public:
 
     qint64 getLastUpdateTime();
 
+    void sortItemListByTime();
+
 protected:
     QList<ConfigItem*> m_lInteralList;
     QList<ConfigItem*> m_lAddItemProblems;

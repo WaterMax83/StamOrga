@@ -30,6 +30,19 @@ struct AvailableTicketInfo : public ConfigItem {
     quint32 m_ticketID;
     quint32 m_userID;
     quint32 m_state;
+
+    AvailableTicketInfo(QString name, qint64 timestamp,
+                        quint32 index, quint32 ticketID,
+                        quint32 userID, quint32 state)
+    {
+        this->m_itemName  = name;
+        this->m_index     = index;
+        this->m_timestamp = timestamp;
+
+        this->m_ticketID = ticketID;
+        this->m_userID   = userID;
+        this->m_state    = state;
+    }
 };
 
 class AvailableGameTickets : public ConfigList
@@ -61,8 +74,7 @@ private:
 
     void saveCurrentInteralList() override;
 
-    bool addNewAvailableTicket(QString name, qint64 timestamp, quint32 index, quint32 ticketID, quint32 userID, quint32 state, bool checkTicket = true);
-    void addNewAvailableTicket(QString name, qint64 timestamp, quint32 index, quint32 ticketID, quint32 userID, quint32 state, QList<ConfigItem*>* pList);
+    bool addNewAvailableTicket(AvailableTicketInfo* ticket, bool checkItem = true);
 };
 
 #endif // AVAILABLEGAMETICKET_H

@@ -238,6 +238,13 @@ qint64 ConfigList::setNewUpdateTime(qint64 timeStamp)
     return this->getLastUpdateTime();
 }
 
+void ConfigList::sortItemListByTime()
+{
+    QMutexLocker locker(&this->m_mInternalInfoMutex);
+
+    std::sort(this->m_lInteralList.begin(), this->m_lInteralList.end(), ConfigItem::compareTimeStampFunction);
+}
+
 
 ConfigList::~ConfigList()
 {

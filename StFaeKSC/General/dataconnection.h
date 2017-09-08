@@ -50,6 +50,7 @@ public:
     MessageProtocol* requestChangeMeetingInfo(MessageProtocol* msg);
     MessageProtocol* requestGetMeetingInfo(MessageProtocol* msg);
     MessageProtocol* requestAcceptMeeting(MessageProtocol* msg);
+    MessageProtocol* requestChangeNewsData(MessageProtocol* msg);
 
     void setUserConnectionData(UserConData* pUsrConData) { this->m_pUserConData = pUsrConData; }
 

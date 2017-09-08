@@ -34,6 +34,21 @@ public:
     QString m_salt;
     QString m_readName;
     quint32 m_properties;
+
+    UserLogin(QString name, qint64 timestamp,
+              quint32 index, QString password,
+              QString salt, quint32 prop,
+              QString readname)
+    {
+        this->m_itemName  = name;
+        this->m_timestamp = timestamp;
+        this->m_index     = index;
+
+        this->m_password   = password;
+        this->m_salt       = salt;
+        this->m_readName   = readname;
+        this->m_properties = prop;
+    }
 };
 
 // clang-format off
@@ -78,8 +93,7 @@ public:
 private:
     void saveCurrentInteralList() override;
 
-    bool addNewUserLogin(QString name, qint64 timestamp, quint32 index, QString password, QString salt, quint32 prop, QString readname, bool checkUser = true);
-    void addNewUserLogin(QString name, qint64 timestamp, quint32 index, QString password, QString salt, quint32 prop, QString readname, QList<ConfigItem*>* pList);
+    bool addNewUserLogin(UserLogin* login, bool checkItem = true);
 
     QString createHashPassword(const QString passWord, const QString salt);
     QCryptographicHash* m_hash;

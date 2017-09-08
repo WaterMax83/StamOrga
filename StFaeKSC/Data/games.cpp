@@ -27,14 +27,14 @@
 
 Games::Games()
 {
-    QString gamesSetFilePath = getUserHomeConfigPath() + "/Settings/Games.ini";
+    QString configSetFilePath = getUserHomeConfigPath() + "/Settings/Games.ini";
 
-    if (!checkFilePathExistAndCreate(gamesSetFilePath)) {
+    if (!checkFilePathExistAndCreate(configSetFilePath)) {
         CONSOLE_CRITICAL(QString("Could not create File for Games setting"));
         return;
     }
 
-    this->m_pConfigSettings = new QSettings(gamesSetFilePath, QSettings::IniFormat);
+    this->m_pConfigSettings = new QSettings(configSetFilePath, QSettings::IniFormat);
     this->m_pConfigSettings->setIniCodec(("UTF-8"));
 
     /* Check wheter we have to save data after reading again */
@@ -43,9 +43,9 @@ Games::Games()
         QMutexLocker locker(&this->m_mConfigIniMutex);
 
         this->m_pConfigSettings->beginGroup(GROUP_LIST_ITEM);
-        int sizeOfGames = this->m_pConfigSettings->beginReadArray(CONFIG_LIST_ARRAY);
+        int sizeOfArray = this->m_pConfigSettings->beginReadArray(CONFIG_LIST_ARRAY);
 
-        for (int i = 0; i < sizeOfGames; i++) {
+        for (int i = 0; i < sizeOfArray; i++) {
             this->m_pConfigSettings->setArrayIndex(i);
             QString home      = this->m_pConfigSettings->value(ITEM_NAME, "").toString();
             qint64  timestamp = this->m_pConfigSettings->value(ITEM_TIMESTAMP, 0x0).toLongLong();
@@ -90,7 +90,7 @@ Games::Games()
     }
     this->m_lAddItemProblems.clear();
 
-    this->sortGamesListByTime();
+    this->sortItemListByTime();
 
     if (bProblems)
         this->saveCurrentInteralList();
@@ -138,7 +138,7 @@ int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sInde
             }
 
             this->m_mInternalInfoMutex.unlock();
-            this->sortGamesListByTime();
+            this->sortItemListByTime();
             this->m_mInternalInfoMutex.lock();
         }
         if (pGame->m_score != score && score.size() > 0) {
@@ -196,7 +196,7 @@ int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sInde
 
     this->addNewGamesPlay(play, false);
 
-    this->sortGamesListByTime();
+    this->sortItemListByTime();
 
     this->setNewUpdateTime();
 
@@ -259,23 +259,23 @@ void Games::saveCurrentInteralList()
 
     this->m_pConfigSettings->beginWriteArray(CONFIG_LIST_ARRAY);
     for (int i = 0; i < this->getNumberOfInternalList(); i++) {
-        GamesPlay* pGame = (GamesPlay*)(this->getItemFromArrayIndex(i));
-        if (pGame == NULL)
+        GamesPlay* pItem = (GamesPlay*)(this->getItemFromArrayIndex(i));
+        if (pItem == NULL)
             continue;
 
         this->m_pConfigSettings->setArrayIndex(i);
 
-        this->m_pConfigSettings->setValue(ITEM_NAME, pGame->m_itemName);
-        this->m_pConfigSettings->setValue(ITEM_TIMESTAMP, pGame->m_timestamp);
-        this->m_pConfigSettings->setValue(ITEM_INDEX, pGame->m_index);
+        this->m_pConfigSettings->setValue(ITEM_NAME, pItem->m_itemName);
+        this->m_pConfigSettings->setValue(ITEM_TIMESTAMP, pItem->m_timestamp);
+        this->m_pConfigSettings->setValue(ITEM_INDEX, pItem->m_index);
 
-        this->m_pConfigSettings->setValue(PLAY_AWAY, pGame->m_away);
-        this->m_pConfigSettings->setValue(PLAY_SAISON_INDEX, pGame->m_saisonIndex);
-        this->m_pConfigSettings->setValue(PLAY_SAISON, pGame->m_saison);
-        this->m_pConfigSettings->setValue(PLAY_SCORE, pGame->m_score);
-        this->m_pConfigSettings->setValue(PLAY_COMPETITION, pGame->m_competition);
-        this->m_pConfigSettings->setValue(PLAY_LAST_UDPATE, pGame->m_lastUpdate);
-        this->m_pConfigSettings->setValue(PLAY_SCHEDULED, pGame->m_scheduled);
+        this->m_pConfigSettings->setValue(PLAY_AWAY, pItem->m_away);
+        this->m_pConfigSettings->setValue(PLAY_SAISON_INDEX, pItem->m_saisonIndex);
+        this->m_pConfigSettings->setValue(PLAY_SAISON, pItem->m_saison);
+        this->m_pConfigSettings->setValue(PLAY_SCORE, pItem->m_score);
+        this->m_pConfigSettings->setValue(PLAY_COMPETITION, pItem->m_competition);
+        this->m_pConfigSettings->setValue(PLAY_LAST_UDPATE, pItem->m_lastUpdate);
+        this->m_pConfigSettings->setValue(PLAY_SCHEDULED, pItem->m_scheduled);
     }
 
     this->m_pConfigSettings->endArray();
@@ -309,43 +309,23 @@ GamesPlay* Games::gameExists(quint8 sIndex, CompetitionIndex comp, quint16 saiso
     return NULL;
 }
 
-
-//bool Games::addNewGamesPlay(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, CompetitionIndex comp, quint16 saison, quint32 index, bool checkGame)
-bool Games::addNewGamesPlay(GamesPlay* play, bool checkGame)
+bool Games::addNewGamesPlay(GamesPlay* play, bool checkItem)
 {
-    if (checkGame) {
+    if (checkItem) {
         if (play->m_saisonIndex == 0 || play->m_competition == NO_COMPETITION) {
             qWarning().noquote() << "Could not add game because saisonIndex or competition were zero";
             return false;
         }
         if (play->m_index == 0 || itemExists(play->m_index)) {
             qWarning().noquote() << QString("Game \"%1\" with index \"%2\" already exists, saving with new index").arg(play->m_itemName + " - " + play->m_away).arg(play->m_index);
-            this->addNewGamesPlay(play, &this->m_lAddItemProblems);
+            this->addNewConfigItem(play, &this->m_lAddItemProblems);
             return false;
         }
     }
 
-    this->addNewGamesPlay(play, &this->m_lInteralList);
+    this->addNewConfigItem(play, &this->m_lInteralList);
     return true;
 }
-
-//void Games::addNewGamesPlay(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, CompetitionIndex comp, quint16 saison, quint32 index, QList<ConfigItem*>* pList)
-void Games::addNewGamesPlay(GamesPlay* play, QList<ConfigItem*>* pList)
-{
-    QMutexLocker locker(&this->m_mInternalInfoMutex);
-
-    if (!pList->contains(play))
-        pList->append(play);
-}
-
-
-void Games::sortGamesListByTime()
-{
-    QMutexLocker locker(&this->m_mInternalInfoMutex);
-
-    std::sort(this->m_lInteralList.begin(), this->m_lInteralList.end(), ConfigItem::compareTimeStampFunction);
-}
-
 
 Games::~Games()
 {

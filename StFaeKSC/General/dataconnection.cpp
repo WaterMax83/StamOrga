@@ -125,7 +125,7 @@ MessageProtocol* DataConnection::requestGetUserProperties(MessageProtocol* msg)
 MessageProtocol* DataConnection::requestUserChangeLogin(MessageProtocol* msg)
 {
     if (msg->getDataLength() <= 8) {
-        qWarning() << QString("Getting no user login data from %1").arg(this->m_pUserConData->m_userName);
+        qWarning().noquote() << QString("Getting no user login data from %1").arg(this->m_pUserConData->m_userName);
         return NULL;
     }
 
@@ -169,7 +169,7 @@ MessageProtocol* DataConnection::requestUserChangeLogin(MessageProtocol* msg)
 MessageProtocol* DataConnection::requestUserChangeReadname(MessageProtocol* msg)
 {
     if (msg->getDataLength() <= 4) {
-        qWarning() << QString("Getting no readname from %1").arg(this->m_pUserConData->m_userName);
+        qWarning().noquote() << QString("Getting no readname from %1").arg(this->m_pUserConData->m_userName);
         return NULL;
     }
 
@@ -197,7 +197,7 @@ MessageProtocol* DataConnection::requestUserChangeReadname(MessageProtocol* msg)
 MessageProtocol* DataConnection::requestGetProgramVersion(MessageProtocol* msg)
 {
     if (msg->getDataLength() <= 6) {
-        qWarning() << QString("Getting no version data from %1").arg(this->m_pUserConData->m_userName);
+        qWarning().noquote() << QString("Getting no version data from %1").arg(this->m_pUserConData->m_userName);
         return NULL;
     }
 
@@ -259,14 +259,14 @@ MessageProtocol* DataConnection::requestGetProgramVersion(MessageProtocol* msg)
 MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
 {
     if (msg->getDataLength() != 4 && msg->getVersion() < MSG_HEADER_VERSION_GAME_LIST) {
-        qWarning() << QString("Error getting wrong message size %1 for get games list from %2, expected 4")
-                          .arg(msg->getDataLength())
-                          .arg(this->m_pUserConData->m_userName);
+        qWarning().noquote() << QString("Error getting wrong message size %1 for get games list from %2, expected 4")
+                                    .arg(msg->getDataLength())
+                                    .arg(this->m_pUserConData->m_userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_GAMES_LIST, ERROR_CODE_WRONG_SIZE);
     } else if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST && msg->getDataLength() != 12) {
-        qWarning() << QString("Error getting wrong message size %1 for get games list from %2, expected 12")
-                          .arg(msg->getDataLength())
-                          .arg(this->m_pUserConData->m_userName);
+        qWarning().noquote() << QString("Error getting wrong message size %1 for get games list from %2, expected 12")
+                                    .arg(msg->getDataLength())
+                                    .arg(this->m_pUserConData->m_userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_GAMES_LIST, ERROR_CODE_WRONG_SIZE);
     }
 
@@ -371,9 +371,9 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
 MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol* msg)
 {
     if (msg->getDataLength() != 8) {
-        qWarning() << QString("Error getting wrong message size %1 for get games info list from %2")
-                          .arg(msg->getDataLength())
-                          .arg(this->m_pUserConData->m_userName);
+        qWarning().noquote() << QString("Error getting wrong message size %1 for get games info list from %2")
+                                    .arg(msg->getDataLength())
+                                    .arg(this->m_pUserConData->m_userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_GAMES_INFO_LIST, ERROR_CODE_WRONG_SIZE);
     }
 
@@ -473,9 +473,9 @@ MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol* msg)
 MessageProtocol* DataConnection::requestSetFixedGameTime(MessageProtocol* msg)
 {
     if (msg->getDataLength() != 8) {
-        qWarning() << QString("Error getting wrong message size %1 for set games fixed time from %2")
-                          .arg(msg->getDataLength())
-                          .arg(this->m_pUserConData->m_userName);
+        qWarning().noquote() << QString("Error getting wrong message size %1 for set games fixed time from %2")
+                                    .arg(msg->getDataLength())
+                                    .arg(this->m_pUserConData->m_userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_SET_FIXED_GAME_TIME, ERROR_CODE_WRONG_SIZE);
     }
 
@@ -518,9 +518,9 @@ MessageProtocol* DataConnection::requestSetFixedGameTime(MessageProtocol* msg)
 MessageProtocol* DataConnection::requestGetTicketsList(MessageProtocol* msg)
 {
     if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST && msg->getDataLength() != 8) {
-        qWarning() << QString("Error getting wrong message size %1 for get ticket list from %2, expected 8")
-                          .arg(msg->getDataLength())
-                          .arg(this->m_pUserConData->m_userName);
+        qWarning().noquote() << QString("Error getting wrong message size %1 for get ticket list from %2, expected 8")
+                                    .arg(msg->getDataLength())
+                                    .arg(this->m_pUserConData->m_userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_TICKETS_LIST, ERROR_CODE_WRONG_SIZE);
     }
 
@@ -579,7 +579,7 @@ MessageProtocol* DataConnection::requestGetTicketsList(MessageProtocol* msg)
 MessageProtocol* DataConnection::requestAddSeasonTicket(MessageProtocol* msg)
 {
     if (msg->getDataLength() <= 6) {
-        qWarning() << QString("Message for adding season ticket to short for user %1").arg(this->m_pUserConData->m_userName);
+        qWarning().noquote() << QString("Message for adding season ticket to short for user %1").arg(this->m_pUserConData->m_userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_ADD_TICKET, ERROR_CODE_WRONG_SIZE);
     }
 
@@ -610,7 +610,7 @@ MessageProtocol* DataConnection::requestRemoveSeasonTicket(MessageProtocol* msg)
 {
     qint32 rCode;
     if (msg->getDataLength() != 4) {
-        qWarning() << QString("Wrong message size for removing season ticket for user %1").arg(this->m_pUserConData->m_userName);
+        qWarning().noquote() << QString("Wrong message size for removing season ticket for user %1").arg(this->m_pUserConData->m_userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_REMOVE_TICKET, ERROR_CODE_WRONG_SIZE);
     }
 
@@ -637,7 +637,7 @@ MessageProtocol* DataConnection::requestNewPlaceSeasonTicket(MessageProtocol* ms
 {
     qint32 rCode;
     if (msg->getDataLength() <= 6) {
-        qWarning() << QString("Wrong message size for new place season ticket for user %1").arg(this->m_pUserConData->m_userName);
+        qWarning().noquote() << QString("Wrong message size for new place season ticket for user %1").arg(this->m_pUserConData->m_userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_REMOVE_TICKET, ERROR_CODE_WRONG_SIZE);
     }
 
@@ -668,7 +668,7 @@ MessageProtocol* DataConnection::requestChangeSeasonTicket(MessageProtocol* msg)
 {
     qint32 rCode;
     if (msg->getDataLength() < 10) {
-        qWarning() << QString("Wrong message size for chance season ticket for user %1").arg(this->m_pUserConData->m_userName);
+        qWarning().noquote() << QString("Wrong message size for chance season ticket for user %1").arg(this->m_pUserConData->m_userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_TICKET, ERROR_CODE_WRONG_SIZE);
     }
 
@@ -706,7 +706,7 @@ MessageProtocol* DataConnection::requestChangeStateSeasonTicket(MessageProtocol*
 {
     qint32 rCode;
     if (msg->getDataLength() < 14) {
-        qWarning() << QString("Wrong message size for free Season ticket for user %1").arg(this->m_pUserConData->m_userName);
+        qWarning().noquote() << QString("Wrong message size for free Season ticket for user %1").arg(this->m_pUserConData->m_userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_STATE_CHANGE_SEASON_TICKET, ERROR_CODE_WRONG_SIZE);
     }
 
@@ -748,10 +748,10 @@ MessageProtocol* DataConnection::requestGetAvailableTicketList(MessageProtocol* 
 {
     qint32 rCode;
     if (msg->getDataLength() != 4 && msg->getVersion() < MSG_HEADER_VERSION_GAME_LIST) {
-        qWarning() << QString("Wrong message size %2 for get available Season ticket for user %1, expected 4").arg(this->m_pUserConData->m_userName).arg(msg->getDataLength());
+        qWarning().noquote() << QString("Wrong message size %2 for get available Season ticket for user %1, expected 4").arg(this->m_pUserConData->m_userName).arg(msg->getDataLength());
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_AVAILABLE_TICKETS, ERROR_CODE_WRONG_SIZE);
     } else if (msg->getDataLength() != 12 && msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST) {
-        qWarning() << QString("Wrong message size %2 for get available Season ticket for user %1, expected 12").arg(this->m_pUserConData->m_userName).arg(msg->getDataLength());
+        qWarning().noquote() << QString("Wrong message size %2 for get available Season ticket for user %1, expected 12").arg(this->m_pUserConData->m_userName).arg(msg->getDataLength());
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_AVAILABLE_TICKETS, ERROR_CODE_WRONG_SIZE);
     }
 
@@ -774,14 +774,14 @@ MessageProtocol* DataConnection::requestGetAvailableTicketList(MessageProtocol* 
 MessageProtocol* DataConnection::requestChangeGame(MessageProtocol* msg)
 {
     if (msg->getDataLength() < 4) {
-        qWarning() << QString("Wrong message size for request change game for user %1").arg(this->m_pUserConData->m_userName);
+        qWarning().noquote() << QString("Wrong message size for request change game for user %1").arg(this->m_pUserConData->m_userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME, ERROR_CODE_WRONG_SIZE);
     }
 
     QString     info(msg->getPointerToData());
     QStringList parts = info.split(";");
     if (parts.length() < 7) {
-        qWarning() << QString("Wrong message content count %1 for request change game for user %2").arg(parts.length()).arg(this->m_pUserConData->m_userName);
+        qWarning().noquote() << QString("Wrong message content count %1 for request change game for user %2").arg(parts.length()).arg(this->m_pUserConData->m_userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME, ERROR_CODE_WRONG_PARAMETER);
     }
 
@@ -791,7 +791,7 @@ MessageProtocol* DataConnection::requestChangeGame(MessageProtocol* msg)
     QDateTime test      = QDateTime::fromString(parts[2], "dd.MM.yyyy hh:mm");
     qint64    timestamp = test.toMSecsSinceEpoch();
     if (timestamp < 0) {
-        qWarning() << QString("Wrong timestamp %1 for request change game for user %2").arg(parts[2], this->m_pUserConData->m_userName);
+        qWarning().noquote() << QString("Wrong timestamp %1 for request change game for user %2").arg(parts[2], this->m_pUserConData->m_userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME, ERROR_CODE_WRONG_PARAMETER);
     }
     QString          score  = parts[3];
@@ -833,7 +833,7 @@ MessageProtocol* DataConnection::requestChangeMeetingInfo(MessageProtocol* msg)
 {
     qint32 rCode;
     if (msg->getDataLength() <= 4) {
-        qWarning() << QString("Wrong message size for change meeting for user %1").arg(this->m_pUserConData->m_userName);
+        qWarning().noquote() << QString("Wrong message size for change meeting for user %1").arg(this->m_pUserConData->m_userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_MEETING_INFO, ERROR_CODE_WRONG_SIZE);
     }
 
@@ -873,7 +873,7 @@ MessageProtocol* DataConnection::requestGetMeetingInfo(MessageProtocol* msg)
 {
     qint32 rCode;
     if (msg->getDataLength() != 4) {
-        qWarning() << QString("Wrong message size for get meeting for user %1").arg(this->m_pUserConData->m_userName);
+        qWarning().noquote() << QString("Wrong message size for get meeting for user %1").arg(this->m_pUserConData->m_userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_MEETING_INFO, ERROR_CODE_WRONG_SIZE);
     }
 
@@ -911,7 +911,7 @@ MessageProtocol* DataConnection::requestAcceptMeeting(MessageProtocol* msg)
 {
     qint32 rCode;
     if (msg->getDataLength() < 16) {
-        qWarning() << QString("Wrong message size for accept meeting for user %1").arg(this->m_pUserConData->m_userName);
+        qWarning().noquote() << QString("Wrong message size for accept meeting for user %1").arg(this->m_pUserConData->m_userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_ACCEPT_MEETING, ERROR_CODE_WRONG_SIZE);
     }
 
@@ -940,4 +940,38 @@ MessageProtocol* DataConnection::requestAcceptMeeting(MessageProtocol* msg)
     messageID = qToLittleEndian(messageID);
     memcpy(&data[1], &messageID, sizeof(qint64));
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_ACCEPT_MEETING, (char*)&data[0], sizeof(qint32) * 3);
+}
+
+/* request
+ * 0    quint32      newsIndex      4
+ * 4    quint32      userID         4
+ * 8    QString      header         X
+ * 8+X  QString      text           Y
+ */
+MessageProtocol* DataConnection::requestChangeNewsData(MessageProtocol* msg)
+{
+    qint32 rCode = ERROR_CODE_NOT_POSSIBLE;
+    if (msg->getDataLength() < 10) {
+        qWarning().noquote() << QString("Wrong message size for ChangeNewsData for user %1").arg(this->m_pUserConData->m_userName);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_NEWS_DATA, ERROR_CODE_WRONG_SIZE);
+    }
+
+    const quint32* pData = (quint32*)msg->getPointerToData();
+    quint32        newsIndex, userID;
+
+    newsIndex = qFromLittleEndian(pData[0]);
+    userID    = qFromLittleEndian(pData[1]);
+
+    QString header(QByteArray((char*)(pData + 2)));
+    QString text(QByteArray(msg->getPointerToData() + header.toUtf8().length() + 1));
+
+    if (newsIndex == 0) {
+        rCode = this->m_pGlobalData->m_fanclubNews.addNewFanclubNews(header, text, userID);
+        if (rCode > ERROR_CODE_NO_ERROR) {
+            qInfo().noquote() << QString("User %1 added news %2").arg(this->m_pUserConData->m_userName, header);
+            return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_NEWS_DATA, ERROR_CODE_SUCCESS);
+        }
+    }
+
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_NEWS_DATA, rCode);
 }

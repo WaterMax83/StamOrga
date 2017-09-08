@@ -31,6 +31,21 @@ struct TicketInfo : public ConfigItem {
     quint32 m_userIndex;
     quint8  m_discount;
     QString m_place;
+
+    TicketInfo(QString user, quint32 userIndex,
+               QString ticketName, qint64 timestamp,
+               quint8 discount, QString place,
+               quint32 index)
+    {
+        this->m_itemName  = ticketName;
+        this->m_timestamp = timestamp;
+        this->m_index     = index;
+
+        this->m_user      = user;
+        this->m_userIndex = userIndex;
+        this->m_discount  = discount;
+        this->m_place     = place;
+    }
 };
 
 
@@ -57,8 +72,7 @@ public:
 private:
     void saveCurrentInteralList() override;
 
-    bool addNewTicketInfo(QString user, quint32 userIndex, QString ticketName, qint64 timestamp, quint8 discount, QString place, quint32 index, bool checkTicket = true);
-    void addNewTicketInfo(QString user, quint32 userIndex, QString ticketName, qint64 timestamp, quint8 discount, QString place, quint32 index, QList<ConfigItem*>* pList);
+    bool addNewTicketInfo(TicketInfo* info, bool checkItem = true);
 };
 
 #endif // SEASONTICKET_H

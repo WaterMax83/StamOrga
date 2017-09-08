@@ -232,15 +232,16 @@ ApplicationWindow {
     }
     Component {
         id: viewSettingsPage
-        MyPages.Settings {
-        }
+        MyPages.Settings {}
     }
     Component{
         id: viewLoggingPage
-        MyPages.LogginPage {
-        }
+        MyPages.LogginPage {}
     }
-
+    Component {
+        id: viewFanclubNewList
+        MyPages.FanclubNewsList{}
+    }
 
     UserInterface {
         id: userInt
@@ -264,16 +265,29 @@ ApplicationWindow {
                 }
             }
         }
-        property bool isDebugWindowEnabled : false;
+        property bool isLoggingWindowShown : false;
+        property bool isFanclubNewsWindowShown : false;
         onNotifyUserPropertiesFinished: {
-            if (result > 0 && !userInt.isDebuggingEnabled() && !isDebugWindowEnabled) {
-                isDebugWindowEnabled = true;
-                if (globalUserData.userIsDebugEnabled()) {
-                    listViewListModel.append({
-                                            title: "Logging",
-                                            element: viewLoggingPage,
-                                            imgsource: ""
-                                        })
+            if (result > 0 && !userInt.isDebuggingEnabled()) {
+                if (!isLoggingWindowShown) {
+                    isLoggingWindowShown = true;
+                    if (globalUserData.userIsDebugEnabled()) {
+                        listViewListModel.append({
+                                                title: "Logging",
+                                                element: viewLoggingPage,
+                                                imgsource: ""
+                                            })
+                    }
+                }
+                if (!isFanclubNewsWindowShown) {
+                    isFanclubNewsWindowShown = true;
+                    if (globalUserData.userIsFanclubEnabled()) {
+                        listViewListModel.insert(2, {
+                                                title: "Fanclub",
+                                                element: viewFanclubNewList,
+                                                imgsource: ""
+                                            })
+                    }
                 }
             }
             if (stackView.currentItem === viewMainGames) {
