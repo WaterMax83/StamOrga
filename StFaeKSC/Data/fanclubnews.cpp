@@ -19,6 +19,7 @@
 #include <QDateTime>
 
 #include "fanclubnews.h"
+#include "listeduser.h"
 
 FanclubNews::FanclubNews()
 {
@@ -46,7 +47,7 @@ FanclubNews::FanclubNews()
             qint64  timestamp = this->m_pConfigSettings->value(ITEM_TIMESTAMP, 0x0).toLongLong();
             quint32 index     = this->m_pConfigSettings->value(ITEM_INDEX, 0).toInt();
 
-            QString newsText = this->m_pConfigSettings->value(NEWS_DATA_TEXT, "").toString();
+            QByteArray newsText = this->m_pConfigSettings->value(NEWS_DATA_TEXT, "").toByteArray();
             quint32 userID   = this->m_pConfigSettings->value(NEWS_DATA_USERID, false).toUInt();
 
             NewsData* news = new NewsData(home, index, timestamp, newsText, userID);
@@ -75,7 +76,7 @@ FanclubNews::FanclubNews()
         this->saveCurrentInteralList();
 }
 
-int FanclubNews::addNewFanclubNews(const QString header, const QString newsText, const quint32 userID)
+int FanclubNews::addNewFanclubNews(const QString header, const QByteArray info, const quint32 userID)
 {
     qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
     int    newIndex  = this->getNextInternalIndex();
@@ -90,7 +91,7 @@ int FanclubNews::addNewFanclubNews(const QString header, const QString newsText,
     this->m_pConfigSettings->setValue(ITEM_TIMESTAMP, timestamp);
     this->m_pConfigSettings->setValue(ITEM_INDEX, newIndex);
 
-    this->m_pConfigSettings->setValue(NEWS_DATA_TEXT, newsText);
+    this->m_pConfigSettings->setValue(NEWS_DATA_TEXT, info);
     this->m_pConfigSettings->setValue(NEWS_DATA_USERID, userID);
 
     this->m_pConfigSettings->endArray();
@@ -99,7 +100,7 @@ int FanclubNews::addNewFanclubNews(const QString header, const QString newsText,
 
     this->m_mConfigIniMutex.unlock();
 
-    NewsData* item = new NewsData(header, newIndex, timestamp, newsText, userID);
+    NewsData* item = new NewsData(header, newIndex, timestamp, info, userID);
 
     this->addNewNewsData(item, false);
 
@@ -111,6 +112,25 @@ int FanclubNews::addNewFanclubNews(const QString header, const QString newsText,
     return newIndex;
 }
 
+
+int FanclubNews::showNewsData()
+{
+    QMutexLocker locker(&this->m_mInternalInfoMutex);
+
+    for (int i = 0; i < this->getNumberOfInternalList(); i++) {
+        NewsData* pItem = (NewsData*)(this->getItemFromArrayIndex(i));
+        if (pItem == NULL)
+            continue;
+
+        QString date   = QDateTime::fromMSecsSinceEpoch(pItem->m_timestamp).toString("dd.MM.yyyy hh:mm");
+        QString output = QString("%1 - %2: %3 - %4")
+                         .arg(pItem->m_index, 2, 10, QChar('0'))
+                         .arg(date, g_ListedUser->getItemName(pItem->m_index), pItem->m_itemName);
+
+        std::cout << output.toStdString() << std::endl;
+    }
+    return 0;
+}
 
 void FanclubNews::saveCurrentInteralList()
 {

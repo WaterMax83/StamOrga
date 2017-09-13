@@ -32,7 +32,7 @@ class NewsData : public ConfigItem
 {
 public:
     NewsData(QString name, quint32 index,
-             qint64 timestamp, QString newsText,
+             qint64 timestamp, QByteArray newsText,
              quint32 userID)
     {
         this->m_itemName  = name;
@@ -43,7 +43,7 @@ public:
         this->m_userID   = userID;
     }
 
-    QString m_newsText;
+    QByteArray m_newsText;
     quint32 m_userID;
 };
 
@@ -52,7 +52,9 @@ class FanclubNews : public ConfigList
 public:
     FanclubNews();
 
-    int addNewFanclubNews(const QString header, const QString newsText, const quint32 userID);
+    int addNewFanclubNews(const QString header, const QByteArray info, const quint32 userID);
+
+    int showNewsData();
 
 private:
     void saveCurrentInteralList() override;

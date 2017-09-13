@@ -116,10 +116,11 @@ extern QString getCompetitionString(CompetitionIndex index);
 extern QString createRandomString(qint32 size);
 
 // clang-format off
-#define USER_ENABLE_LOG                     0x1
-#define USER_ENABLE_ADD_GAME                0x2
-#define USER_ENABLE_FIXED_GAME_TIME         0x4
-#define USER_ENABLE_FANCLUB                 0x8
+#define USER_ENABLE_LOG                     0x0001
+#define USER_ENABLE_ADD_GAME                0x0002
+#define USER_ENABLE_FIXED_GAME_TIME         0x0004
+#define USER_ENABLE_FANCLUB                 0x0008
+#define USER_ENABLE_FANCLUB_EDIT            0x0010
 // clang-format on
 
 

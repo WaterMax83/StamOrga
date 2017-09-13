@@ -63,5 +63,7 @@
         <file>images/info.png</file>
         <file>components/NotificationSettingsDialog.qml</file>
         <file>pages/FanclubNewsList.qml</file>
+        <file>pages/FanclubNewsItem.qml</file>
+        <file>components/BusyLoadingIndicator.qml</file>
     </qresource>
 </RCC>

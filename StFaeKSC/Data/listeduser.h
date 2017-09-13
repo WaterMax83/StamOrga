@@ -99,4 +99,5 @@ private:
     QCryptographicHash* m_hash;
 };
 
+extern ListedUser *g_ListedUser;
 #endif // LISTEDUSER_H

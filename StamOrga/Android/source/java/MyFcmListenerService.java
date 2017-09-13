@@ -74,7 +74,7 @@ public class MyFcmListenerService extends FirebaseMessagingService
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.icon)
                 .setContentTitle(title)
-                .setContentText("Small")
+                .setContentText(message)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
                 .setStyle(new NotificationCompat.BigTextStyle()

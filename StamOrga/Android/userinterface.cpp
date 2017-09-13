@@ -136,6 +136,11 @@ qint32 UserInterface::startAcceptMeetingInfo(const quint32 gameIndex, const quin
     return this->m_pConHandle->startAcceptMeetingInfo(gameIndex, accept, name, acceptIndex);
 }
 
+qint32 UserInterface::startChangeFanclubNews(const quint32 newsIndex, const QString header, const QString info)
+{
+    return this->m_pConHandle->startChangeFanclubNews(newsIndex, header, info);
+}
+
 void UserInterface::slConnectionRequestFinished(qint32 result)
 {
     emit this->notifyConnectionFinished(result);
@@ -216,6 +221,10 @@ void UserInterface::slCommandFinished(quint32 command, qint32 result)
 
     case OP_CODE_CMD_REQ::REQ_ACCEPT_MEETING:
         emit this->notifyAcceptMeetingFinished(result);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_CHANGE_NEWS_DATA:
+        emit this->notifyChangeNewsDataFinished(result);
         break;
 
     default:

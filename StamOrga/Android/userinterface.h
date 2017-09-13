@@ -67,6 +67,9 @@ public:
     Q_INVOKABLE qint32 startAcceptMeetingInfo(const quint32 gameIndex, const quint32 accept,
                                               const QString name, const quint32 acceptIndex = 0);
 
+    Q_INVOKABLE qint32 startChangeFanclubNews(const quint32 newsIndex, const QString header,
+                                              const QString info);
+
     Q_INVOKABLE bool isDebuggingEnabled()
     {
 #ifdef QT_DEBUG
@@ -118,6 +121,7 @@ signals:
     void notifyChangedMeetingInfoFinished(qint32 result);
     void notifyLoadMeetingInfoFinished(qint32 result);
     void notifyAcceptMeetingFinished(qint32 result);
+    void notifyChangeNewsDataFinished(qint32 result);
 
 public slots:
     void slConnectionRequestFinished(qint32 result);

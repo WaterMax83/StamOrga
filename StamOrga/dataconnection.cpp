@@ -215,6 +215,10 @@ void DataConnection::checkNewOncomingData()
             request.m_result = msg->getIntData();
             break;
 
+        case OP_CODE_CMD_REQ::ACK_CHANGE_NEWS_DATA:
+            request.m_result = msg->getIntData();
+            break;
+
         default:
             delete msg;
             continue;
@@ -492,6 +496,27 @@ void DataConnection::startSendAcceptMeeting(DataConRequest request)
     this->sendMessageRequest(&msg, request);
 }
 
+void DataConnection::startSendChangeNewsData(DataConRequest request)
+{
+    QByteArray header = request.m_lData.at(1).toUtf8();
+    qDebug() << QDateTime::currentDateTime();
+    QByteArray info = qCompress(request.m_lData.at(2).toUtf8(), 9);
+    qDebug() << QDateTime::currentDateTime();
+
+    int   totalSize = header.size() + info.size() + sizeof(quint32) * 2 + 2;
+    char* data      = new char[totalSize];
+    memset(data, 0x0, totalSize);
+    quint32 newsIndex = qToLittleEndian(request.m_lData.at(0).toUInt());
+    quint32 infoSize  = qToLittleEndian(info.size());
+    memcpy(data, &newsIndex, sizeof(quint32));
+    memcpy(&data[sizeof(quint32)], &infoSize, sizeof(quint32));
+    memcpy(&data[sizeof(quint32) * 2], header.constData(), header.size());
+    memcpy(&data[sizeof(quint32) * 2 + 1 + header.size()], info.constData(), info.size());
+
+    MessageProtocol msg(request.m_request, data, totalSize);
+    this->sendMessageRequest(&msg, request);
+}
+
 void DataConnection::slotConnectionTimeoutFired()
 {
     qInfo().noquote() << "DataConnection: Timeout from Data UdpServer";
@@ -671,6 +696,10 @@ void DataConnection::startSendNewRequest(DataConRequest request)
 
     case OP_CODE_CMD_REQ::REQ_ACCEPT_MEETING:
         this->startSendAcceptMeeting(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_CHANGE_NEWS_DATA:
+        this->startSendChangeNewsData(request);
         break;
 
     default:

@@ -25,6 +25,8 @@
 #include "../Common/General/globalfunctions.h"
 #include "listeduser.h"
 
+ListedUser *g_ListedUser = NULL;
+
 ListedUser::ListedUser()
 {
     QString configSetFilePath = getUserHomeConfigPath() + "/Settings/ListedUsers.ini";
@@ -33,6 +35,7 @@ ListedUser::ListedUser()
         CONSOLE_CRITICAL(QString("Could not create File for UserSettings"));
         return;
     }
+    g_ListedUser = this;
 
     this->m_hash = new QCryptographicHash(QCryptographicHash::Sha3_512);
 

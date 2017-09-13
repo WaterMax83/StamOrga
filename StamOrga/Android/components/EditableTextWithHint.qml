@@ -57,7 +57,7 @@ Rectangle {
 
     Image {
         id: rightImage
-        width: parent.height
+        width: source.length > 0 ? parent.height : 0
         height: parent.height
         anchors.right: parent.right
     }

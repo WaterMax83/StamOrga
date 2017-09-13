@@ -944,7 +944,7 @@ MessageProtocol* DataConnection::requestAcceptMeeting(MessageProtocol* msg)
 
 /* request
  * 0    quint32      newsIndex      4
- * 4    quint32      userID         4
+ * 4    quint32      infoSize       4
  * 8    QString      header         X
  * 8+X  QString      text           Y
  */
@@ -957,16 +957,21 @@ MessageProtocol* DataConnection::requestChangeNewsData(MessageProtocol* msg)
     }
 
     const quint32* pData = (quint32*)msg->getPointerToData();
-    quint32        newsIndex, userID;
+    quint32        newsIndex, infoSize;
 
     newsIndex = qFromLittleEndian(pData[0]);
-    userID    = qFromLittleEndian(pData[1]);
+    infoSize  = qFromLittleEndian(pData[1]);
 
-    QString header(QByteArray((char*)(pData + 2)));
-    QString text(QByteArray(msg->getPointerToData() + header.toUtf8().length() + 1));
+    QString     header(QByteArray((char*)(pData + 2)));
+    int         offset = header.toUtf8().length() + 1 + 2 * sizeof(quint32);
+    QByteArray  infoCompressed(msg->getPointerToData() + offset, infoSize);
+
+    QByteArray  infoNotC = qUncompress(infoCompressed);
+    QString     text(infoNotC);
+    Q_UNUSED(text);
 
     if (newsIndex == 0) {
-        rCode = this->m_pGlobalData->m_fanclubNews.addNewFanclubNews(header, text, userID);
+        rCode = this->m_pGlobalData->m_fanclubNews.addNewFanclubNews(header, infoCompressed, this->m_pUserConData->m_userID);
         if (rCode > ERROR_CODE_NO_ERROR) {
             qInfo().noquote() << QString("User %1 added news %2").arg(this->m_pUserConData->m_userName, header);
             return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_NEWS_DATA, ERROR_CODE_SUCCESS);

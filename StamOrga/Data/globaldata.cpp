@@ -628,6 +628,10 @@ bool GlobalData::userIsFanclubEnabled()
 {
     return USER_IS_ENABLED(USER_ENABLE_FANCLUB);
 }
+bool GlobalData::userIsFanclubEditEnabled()
+{
+    return USER_IS_ENABLED(USER_ENABLE_FANCLUB_EDIT);
+}
 
 void GlobalData::SetUserProperties(quint32 value)
 {

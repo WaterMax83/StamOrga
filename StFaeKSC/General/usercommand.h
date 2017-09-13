@@ -123,6 +123,18 @@ public:
         return csv.readNewCSVData(list.value(1));
     }
 
+    static int runFanclubNewsCommand(const QString& cmd, FanclubNews* pNews)
+    {
+        QStringList list = cmd.split(' ');
+        if (list.size() < 2 || list.value(0) != "news")
+            return ShowFanclubNewsHelp();
+
+        if (list.value(1) == "show" && list.size() == 2)
+            return pNews->showNewsData();
+
+        return ShowFanclubNewsHelp();
+    }
+
 private:
     static int ShowUserCommandHelp()
     {
@@ -168,6 +180,16 @@ private:
 
         std::cout << "%PATH%\t\t\t"
                   << "file path to a csv file" << std::endl;
+
+        return 0;
+    }
+
+    static int ShowFanclubNewsHelp()
+    {
+        std::cout << "News functions - Usage\n\n";
+
+        std::cout << "show\t\t\t"
+                  << "show all news" << std::endl;
 
         return 0;
     }

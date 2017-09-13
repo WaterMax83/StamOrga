@@ -257,6 +257,17 @@ qint32 ConnectionHandling::startAcceptMeetingInfo(const quint32 gameIndex, const
     return ERROR_CODE_SUCCESS;
 }
 
+qint32 ConnectionHandling::startChangeFanclubNews(const quint32 newsIndex, const QString header, const QString info)
+{
+    DataConRequest req(OP_CODE_CMD_REQ::REQ_CHANGE_NEWS_DATA);
+    req.m_lData.append(QString::number(newsIndex));
+    req.m_lData.append(header);
+    req.m_lData.append(info);
+    this->sendNewRequest(req);
+
+    return ERROR_CODE_SUCCESS;
+}
+
 /*
  * Answer function after connection with username
  */

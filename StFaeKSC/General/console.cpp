@@ -99,6 +99,8 @@ void Console::readCommand()
             UserCommand::runTicketCommand(qLine, &this->m_pGlobalData->m_SeasonTicket);
         }else if (qLine == "token") {
             g_pushNotify->showCurrentTokenInformation();
+        } else if (qLine == "news" || qLine.left(5) == "news ") {
+            UserCommand::runFanclubNewsCommand(qLine, &this->m_pGlobalData->m_fanclubNews);
         } else if (qLine == "read" || qLine.left(5) == "read ") {
             UserCommand::runReadCommand(qLine, this->m_pGlobalData);
         } else if (qLine == "log" || qLine.left(4) == "log ") {
@@ -127,6 +129,8 @@ void Console::printHelp()
               << "use the ticket command" << std::endl;
     std::cout << "token:\t\t"
               << "show the current token Info" << std::endl;
+    std::cout << "news:\t\t"
+              << "show the news Info" << std::endl;
     std::cout << "read %PATH%:\t"
               << "read a new file in csv file format" << std::endl;
     std::cout << "log %i:\t\t"

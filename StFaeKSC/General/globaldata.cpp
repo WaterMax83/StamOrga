@@ -489,19 +489,19 @@ qint32 GlobalData::requestAcceptMeetingInfo(const quint32 gameIndex, const quint
     qint32 result = ERROR_CODE_SUCCESS;
     foreach (MeetingInfo* mInfo, this->m_meetingInfos) {
         if (mInfo->getGameIndex() == gameIndex) {
-            if (acceptIndex == 0) {
+            if (acceptIndex == 0)
                 result = mInfo->addNewAcceptation(acceptValue, userID, name);
-
+            else
+                result = mInfo->changeAcceptation(acceptIndex, acceptValue, userID, name);
+            if (result == ERROR_CODE_SUCCESS) {
+                qInfo().noquote() << QString("Changed Acceptation of %2 at game %1").arg(pGame->m_index).arg(name);
                 /* Send an info if the first person is going to a game which is not at home */
-                if (pGame->m_away == "KSC" && mInfo->getAcceptedNumber(ACCEPT_STATE_ACCEPT) == 0) {
+                if (pGame->m_away == "KSC" && acceptValue == ACCEPT_STATE_ACCEPT &&
+                    mInfo->getAcceptedNumber(ACCEPT_STATE_ACCEPT) == 1) {
                     QString body = QString(BODY_NEW_AWAY_ACCEPT).arg(name, pGame->m_itemName);
                     messageID    = g_pushNotify->sendNewFirstAwayAccept(body, userID);
                 }
             } else
-                result = mInfo->changeAcceptation(acceptIndex, acceptValue, userID, name);
-            if (result == ERROR_CODE_SUCCESS)
-                qInfo().noquote() << QString("Changed Acceptation of %2 at game %1").arg(pGame->m_index).arg(name);
-            else
                 qWarning().noquote() << QString("Error setting Acceptation at game %1: %2").arg(pGame->m_index).arg(result);
             return result;
         }
@@ -514,7 +514,7 @@ qint32 GlobalData::requestAcceptMeetingInfo(const quint32 gameIndex, const quint
         qInfo().noquote() << QString("Changed Acceptation of %2 at game %1").arg(pGame->m_index).arg(name);
 
         /* Send an info if the first person is going to an game which is not at home */
-        if (pGame->m_away == "KSC") {
+        if (pGame->m_away == "KSC" && acceptValue == ACCEPT_STATE_ACCEPT) {
             QString body = QString(BODY_NEW_AWAY_ACCEPT).arg(name, pGame->m_itemName);
             messageID    = g_pushNotify->sendNewFirstAwayAccept(body, userID);
         }

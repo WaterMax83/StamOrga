@@ -64,5 +64,33 @@ Flickable {
     Pane {
         id: mainPaneFanClubNewsList
         width: parent.width
+        Rectangle {
+            color: "Red"
+            width: parent.width
+            height: 150
+        }
     }
+
+    function pageOpenedUpdateView() {
+
+        if (globalUserData.userIsFanclubEditEnabled() ||  userInt.isDebuggingEnabled())
+            updateHeaderFromMain("Fanclub", "images/add.png")
+        else
+            updateHeaderFromMain("Fanclub", "")
+
+    }
+
+    function toolButtonClicked() {
+        if (!globalUserData.userIsFanclubEditEnabled() &&  !userInt.isDebuggingEnabled())
+            return;
+
+        var component = Qt.createComponent("../pages/FanclubNewsItem.qml")
+        if (component.status === Component.Ready) {
+            var sprite = stackView.push(component)
+            sprite.userIntCurrentNews = userInt
+            sprite.startEditMode();
+        }
+    }
+
+    function notifyUserIntConnectionFinished(result) {}
 }

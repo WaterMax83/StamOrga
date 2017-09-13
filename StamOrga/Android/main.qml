@@ -139,7 +139,6 @@ ApplicationWindow {
                     text: model.title
                     highlighted: ListView.isCurrentItem
                     onClicked: {
-                        stackView.push(model.element)
                         titleLabel.text = model.title
                         if (model.imgsource !== "") {
                             imageToolButton.visible = true
@@ -147,6 +146,7 @@ ApplicationWindow {
                         } else {
                             imageToolButton.visible = false
                         }
+                        stackView.push(model.element)
 
                         drawer.close()
                     }
@@ -165,6 +165,12 @@ ApplicationWindow {
                                    element: viewSeasonTickets,
                                    imgsource: "images/add.png"
                                })
+                        if (userInt.isDebuggingEnabled())
+                            append({
+                                       title: "Fanclub",
+                                       element: viewFanclubNewList,
+                                       imgsource: ""
+                                   })
                         append({
                                    title: "Einstellungen",
                                    element: viewSettingsPage,
@@ -331,6 +337,9 @@ ApplicationWindow {
         }
         onNotifyAcceptMeetingFinished: {
             stackView.currentItem.notifyAcceptMeetingFinished(result);
+        }
+        onNotifyChangeNewsDataFinished: {
+            stackView.currentItem.notifyChangeNewsDataFinished(result);
         }
     }
 

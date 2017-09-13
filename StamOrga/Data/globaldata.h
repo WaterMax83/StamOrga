@@ -90,6 +90,7 @@ public:
     Q_INVOKABLE bool userIsGameAddingEnabled();
     Q_INVOKABLE bool userIsGameFixedTimeEnabled();
     Q_INVOKABLE bool userIsFanclubEnabled();
+    Q_INVOKABLE bool userIsFanclubEditEnabled();
     void SetUserProperties(quint32 value);
 
     void saveGlobalUserSettings();

@@ -96,7 +96,6 @@ qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol* msg)
     index      = qFromLittleEndian(index);
 
     this->m_pGlobalData->setUserIndex(index);
-    qDebug() << QString("UserIndex = %1").arg(index);
 
     SeasonTicketItem* seasonTicket;
     int               i = 0;

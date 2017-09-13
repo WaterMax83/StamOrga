@@ -55,6 +55,8 @@ public:
     qint32 startLoadMeetingInfo(const quint32 gameIndex);
     qint32 startAcceptMeetingInfo(const quint32 gameIndex, const quint32 accept,
                                   const QString name, const quint32 acceptIndex = 0);
+    qint32 startChangeFanclubNews(const quint32 newsIndex, const QString header,
+                                  const QString info);
 
 
     void setGlobalData(GlobalData* pData)

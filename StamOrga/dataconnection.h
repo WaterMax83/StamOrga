@@ -95,6 +95,7 @@ private:
     void startSendChangeMeetingInfo(DataConRequest request);
     void startSendGetMeetingInfo(DataConRequest request);
     void startSendAcceptMeeting(DataConRequest request);
+    void startSendChangeNewsData(DataConRequest request);
 
 
     void   checkNewOncomingData();
