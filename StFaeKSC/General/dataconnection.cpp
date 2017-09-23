@@ -1069,7 +1069,7 @@ MessageProtocol* DataConnection::requestGetNewsDataList(MessageProtocol* msg)
     }
 
     MessageProtocol* ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_LIST, buffer, offset);
-    delete buffer;
+    delete[] buffer;
     qInfo().noquote() << QString("User %1 got fanclub news list with %2 entries").arg(this->m_pUserConData->m_userName).arg(numbOfNews);
     return ack;
 }
@@ -1124,7 +1124,9 @@ MessageProtocol* DataConnection::requestGetNewsDataItem(MessageProtocol *msg)
 
             qInfo().noquote() << QString("User %1 got fanclub news item %2").arg(this->m_pUserConData->m_userName, pItem->m_itemName);
 
-            return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_ITEM, pData, totalSize);
+            MessageProtocol* ack =  new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_ITEM, pData, totalSize);
+            delete[] pData;
+            return ack;
         }
     }
 
