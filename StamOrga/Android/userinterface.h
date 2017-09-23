@@ -124,6 +124,7 @@ signals:
     void notifyLoadMeetingInfoFinished(qint32 result);
     void notifyAcceptMeetingFinished(qint32 result);
     void notifyChangeNewsDataFinished(qint32 result);
+    void notifyFanclubNewsListFinished(qint32 result);
 
 public slots:
     void slConnectionRequestFinished(qint32 result);

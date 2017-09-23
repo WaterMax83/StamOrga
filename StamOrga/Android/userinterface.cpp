@@ -232,6 +232,10 @@ void UserInterface::slCommandFinished(quint32 command, qint32 result)
         emit this->notifyChangeNewsDataFinished(result);
         break;
 
+    case OP_CODE_CMD_REQ::REQ_GET_NEWS_DATA_LIST:
+        emit this->notifyFanclubNewsListFinished(result);
+        break;
+
     default:
         qWarning().noquote() << QString("Unknown acknowledge: 0x%1").arg(QString::number(command, 16));
         break;

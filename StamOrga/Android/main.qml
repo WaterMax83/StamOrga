@@ -314,34 +314,22 @@ ApplicationWindow {
         onNotifyGamesListFinished: viewMainGames.notifyUserIntGamesListFinished(result)
         onNotifyGamesInfoListFinished: viewMainGames.notifyUserIntGamesInfoListFinished(result);
         onNotifySetGamesFixedTimeFinished: viewMainGames.notifySetGamesFixedTimeFinished(result);
+        onNotifyChangedGameFinished: stackView.currentItem.notifyGameChangedFinished(result);
 
         onNotifySeasonTicketAddFinished: stackView.currentItem.notifyUserIntSeasonTicketAdd(result)
         onNotifySeasonTicketListFinished: stackView.currentItem.notifyUserIntSeasonTicketListFinished(result)
         onNotifySeasonTicketRemoveFinished: stackView.currentItem.notifyUserIntSeasonTicketRemoveFinished(result)
         onNotifySeasonTicketEditFinished: stackView.currentItem.notifyUserIntSeasonTicketEditFinished(result)
 
+        onNotifyAvailableTicketStateChangedFinished: stackView.currentItem.notifyAvailableTicketStateChangedFinished(result);
+        onNotifyAvailableTicketListFinsished: stackView.currentItem.notifyAvailableTicketListFinished(result);
 
-        onNotifyAvailableTicketStateChangedFinished: {
-            stackView.currentItem.notifyAvailableTicketStateChangedFinished(result);
-        }
-        onNotifyAvailableTicketListFinsished: {
-            stackView.currentItem.notifyAvailableTicketListFinished(result);
-        }
-        onNotifyChangedGameFinished: {
-            stackView.currentItem.notifyGameChangedFinished(result);
-        }
-        onNotifyChangedMeetingInfoFinished: {
-            stackView.currentItem.notifyChangedMeetingInfoFinished(result);
-        }
-        onNotifyLoadMeetingInfoFinished: {
-            stackView.currentItem.notifyLoadMeetingInfoFinished(result);
-        }
-        onNotifyAcceptMeetingFinished: {
-            stackView.currentItem.notifyAcceptMeetingFinished(result);
-        }
-        onNotifyChangeNewsDataFinished: {
-            stackView.currentItem.notifyChangeNewsDataFinished(result);
-        }
+        onNotifyChangedMeetingInfoFinished: stackView.currentItem.notifyChangedMeetingInfoFinished(result);
+        onNotifyLoadMeetingInfoFinished: stackView.currentItem.notifyLoadMeetingInfoFinished(result);
+        onNotifyAcceptMeetingFinished: stackView.currentItem.notifyAcceptMeetingFinished(result);
+
+        onNotifyChangeNewsDataFinished: stackView.currentItem.notifyChangeNewsDataFinished(result);
+        onNotifyFanclubNewsListFinished: stackView.currentItem.notifyFanclubNewsListFinished(result);
     }
 
     Connections {

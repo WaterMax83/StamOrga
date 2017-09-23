@@ -38,6 +38,7 @@ SOURCES += main.cpp \
     ../datahandling.cpp \
     ../Data/globaldata.cpp \
     ../Data/gameplay.cpp \
+    ../Data/newsdataitem.cpp \
     ../Data/seasonticket.cpp \
     ../Data/meetinginfo.cpp \
     ../Data/globalsettings.cpp \
@@ -87,6 +88,7 @@ HEADERS += \
     ../Data/gameplay.h \
     ../Data/seasonticket.h \
     ../Data/meetinginfo.h \
+    ../Data/newsdataitem.h \
     ../Data/acceptmeetinginfo.h \
     ../Data/globalsettings.h \
     source/pushnotification.h

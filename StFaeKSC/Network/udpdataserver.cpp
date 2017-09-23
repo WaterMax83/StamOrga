@@ -215,6 +215,9 @@ MessageProtocol* UdpDataServer::checkNewMessage(MessageProtocol* msg)
         case OP_CODE_CMD_REQ::REQ_CHANGE_NEWS_DATA:
             ack = this->m_pDataConnection->requestChangeNewsData(msg);
             break;
+        case OP_CODE_CMD_REQ::REQ_GET_NEWS_DATA_LIST:
+            ack = this->m_pDataConnection->requestGetNewsDataList(msg);
+            break;
 
         default:
             qWarning().noquote() << QString("Unkown command 0x%1").arg(QString::number(msg->getIndex(), 16));

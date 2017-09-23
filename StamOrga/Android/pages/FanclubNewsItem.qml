@@ -26,6 +26,7 @@ import "../components" as MyComponents
 
 Item {
     property UserInterface userIntCurrentNews
+    property var newsDataItem
 
     Pane {
         id: mainPaneCurrentNews
@@ -153,6 +154,13 @@ Item {
     function pageOpenedUpdateView() {}
 
     function toolButtonClicked() {
+
+        if(!isEditMode) {
+            isEditMode = true;
+            updateHeaderFromMain("", "images/save.png")
+            return;
+        }
+
         if (textHeader.input.length < 1) {
             var component = Qt.createComponent("../components/AcceptDialog.qml");
             if (component.status === Component.Ready) {
@@ -173,7 +181,7 @@ Item {
         busyIndicatorNews.infoText = "Speichere News"
     }
 
-    function startShowElements(editMode) {
+    function startShowElements(newsItem, editMode) {
 
         isEditMode = editMode;
         if (editMode)
@@ -184,6 +192,13 @@ Item {
             else
                 updateHeaderFromMain("Nachricht", "")
         }
+
+        newsDataItem = newsItem;
+        if (newsItem !== undefined) {
+            textHeader.init(newsDataItem.header);
+            textAreaInfo.text = newsDataItem.info;
+        }
+
         isStartupDone = true;
     }
 
@@ -203,13 +218,20 @@ Item {
 
     function notifyChangeNewsDataFinished(result) {
 
-        if (result === 1) {
-            updateHeaderFromMain("", "")
+        if (result >= 1) {
             toastManager.show("News erfolgreich gespeichert", 2000);
             busyIndicatorNews.loadingVisible = false;
             busyIndicatorNews.infoVisible = false;
             isEditMode = false;
             updateHeaderFromMain("Nachricht", "images/edit.png")
+
+            for (var i = 0; i < globalUserData.getNewsDataItemLength(); i++) {
+                var newsItem = globalUserData.getNewsDataItemFromArrayIndex(i)
+                if (i === result) {
+                    newsDataItem = newsItem;
+                    break;
+                }
+            }
         } else {
             toastManager.show(userIntCurrentNews.getErrorCodeToString(result), 4000);
             busyIndicatorNews.loadingVisible = false;

@@ -46,10 +46,14 @@
 #define TIMEOUT_LOAD_GAMEINFO   qint64(10 * 60 * 1000) // 10min
 #define TIMEOUT_LOAD_GAMES      qint64(20 * 60 * 1000) // 20min
 #define TIMEOUT_UPDATE_GAMES    qint64(30 * 60 * 1000) // 30min
+#define TIMEOUT_UPDATE_TICKETS  qint64(10 * 60 * 1000) // 10min
+#define TIMEOUT_UPDATE_NEWS     qint64(10 * 60 * 1000) // 10min
 #else
 #define TIMEOUT_LOAD_GAMEINFO   qint64(10 * 60 * 1000) // 10min
 #define TIMEOUT_LOAD_GAMES      qint64(1 * 24 * 60 * 60 * 1000) // 1 Tag
 #define TIMEOUT_UPDATE_GAMES    qint64(7 * 24 * 60 * 60 * 1000) // 7 Tage
+#define TIMEOUT_UPDATE_TICKETS  qint64(1 * 24 * 60 * 60 * 1000) // 1 Tag
+#define TIMEOUT_UPDATE_NEWS     qint64(1 *  6 * 60 * 60 * 1000) // 6 h
 #endif
 // clang-format on
 

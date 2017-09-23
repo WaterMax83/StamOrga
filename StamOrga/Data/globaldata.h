@@ -30,6 +30,7 @@
 #include "../../Common/General/logging.h"
 #include "gameplay.h"
 #include "meetinginfo.h"
+#include "newsdataitem.h"
 #include "seasonticket.h"
 #include "source/pushnotification.h"
 
@@ -136,6 +137,22 @@ public:
 
     Q_INVOKABLE MeetingInfo* getMeetingInfo() { return &this->m_meetingInfo; }
 
+
+    void saveCurrentNewsDataList(qint64 timestamp);
+    void startUpdateNewsDataItem(const quint16 updateIndex);
+    void addNewNewsDataItem(NewsDataItem* pItem, const quint16 updateIndex = 0);
+    NewsDataItem* createNewNewsDataItem(quint32 newsIndex, QString header, QString info);
+    Q_INVOKABLE quint32 getNewsDataItemLength()
+    {
+        QMutexLocker lock(&this->m_mutexNewsData);
+        return this->m_lNewsDataItems.size();
+    }
+    Q_INVOKABLE NewsDataItem* getNewsDataItemFromArrayIndex(int index);
+    NewsDataItem* getNewsDataItem(quint32 newsIndex);
+    Q_INVOKABLE QString getNewsDataLastLocalUpdateString();
+    qint64              getNewsDataLastLocalUpdate();
+    qint64              getNewsDataLastServerUpdate();
+
     QString getCurrentAppGUID() { return this->m_AppInstanceGUID; }
     QString getCurrentAppToken() { return this->m_pushNotificationToken; }
 
@@ -173,7 +190,7 @@ private:
     QMutex m_mutexUserIni;
     QMutex m_mutexGame;
     QMutex m_mutexTicket;
-
+    QMutex m_mutexNewsData;
 
     bool m_bIsConnected;
 
@@ -190,6 +207,10 @@ private:
     bool                     m_bSeasonTicketLastUpdateDidChanges;
 
     MeetingInfo m_meetingInfo;
+
+    QList<NewsDataItem*> m_lNewsDataItems;
+    qint64               m_ndLastLocalUpdateTimeStamp;
+    qint64               m_ndLastServerUpdateTimeStamp;
 
     PushNotificationInformationHandler* m_pushNotificationInfoHandler;
     QMutex                              m_pushNotificationMutex;

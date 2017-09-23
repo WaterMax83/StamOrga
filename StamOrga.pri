@@ -12,3 +12,9 @@
 STAMORGA_VERSION=1.0.3
 
 DEFINES += STAMORGA_VERSION=\\\"$${STAMORGA_VERSION}\\\"
+
+HEADERS += \
+    $$PWD/StamOrga/Data/newsdataitem.h
+
+SOURCES += \
+    $$PWD/StamOrga/Data/newsdataitem.cpp

@@ -340,7 +340,7 @@ void GlobalData::startUpdateGamesPlay(const qint16 updateIndex)
     } else
         this->m_bGamePlayLastUpdateDidChanges = false;
 
-    this->m_gpLastLocalUpdateTimeStamp = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    this->m_gpLastLocalUpdateTimeStamp = QDateTime::currentMSecsSinceEpoch();
 }
 
 void GlobalData::addNewGamePlay(GamePlay* gPlay, const qint16 updateIndex)
@@ -471,7 +471,7 @@ void GlobalData::startUpdateSeasonTickets(const quint16 updateIndex)
     } else
         this->m_bSeasonTicketLastUpdateDidChanges = false;
 
-    this->m_stLastLocalUpdateTimeStamp = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    this->m_stLastLocalUpdateTimeStamp = QDateTime::currentMSecsSinceEpoch();
 }
 
 void GlobalData::addNewSeasonTicket(SeasonTicketItem* sTicket, const quint16 updateIndex)
@@ -535,6 +535,109 @@ qint64 GlobalData::getSeasonTicketLastServerUpdate()
 {
     QMutexLocker lock(&this->m_mutexTicket);
     return this->m_stLastServerUpdateTimeStamp;
+}
+
+void GlobalData::saveCurrentNewsDataList(qint64 timestamp)
+{
+    QMutexLocker lock(&this->m_mutexNewsData);
+
+    this->m_ndLastServerUpdateTimeStamp = timestamp;
+
+    /* Data is not saved */
+}
+
+void GlobalData::startUpdateNewsDataItem(const quint16 updateIndex)
+{
+    QMutexLocker lock(&this->m_mutexNewsData);
+
+    if (updateIndex == UpdateIndex::UpdateAll) {
+        /* need to delete, because they are all pointers */
+        for (int i = 0; i < this->m_lNewsDataItems.size(); i++)
+            delete this->m_lNewsDataItems[i];
+        this->m_lNewsDataItems.clear();
+    }
+
+    this->m_ndLastLocalUpdateTimeStamp = QDateTime::currentMSecsSinceEpoch();
+}
+
+void GlobalData::addNewNewsDataItem(NewsDataItem* pItem, const quint16 updateIndex)
+{
+    NewsDataItem* Item = this->getNewsDataItem(pItem->index());
+    if (Item == NULL) {
+        QMutexLocker lock(&this->m_mutexNewsData);
+        this->m_lNewsDataItems.append(pItem);
+        return;
+    } else if (updateIndex == UpdateIndex::UpdateDiff) {
+        if (Item->user() != pItem->user())
+            Item->setUser(pItem->user());
+
+        if (Item->header() != pItem->header())
+            Item->setHeader(pItem->header());
+
+        if (Item->info() != pItem->info())
+            Item->setInfo(pItem->info());
+    }
+}
+
+NewsDataItem* GlobalData::createNewNewsDataItem(quint32 newsIndex, QString header, QString info)
+{
+    NewsDataItem* pItem = this->getNewsDataItem(newsIndex);
+    if (pItem != NULL) {
+        pItem->setTimeStamp(QDateTime::currentMSecsSinceEpoch());
+        pItem->setHeader(header);
+        pItem->setInfo(info);
+        return pItem;
+    }
+
+    pItem = new NewsDataItem();
+    pItem->setIndex(newsIndex);
+    pItem->setTimeStamp(QDateTime::currentMSecsSinceEpoch());
+    pItem->setHeader(header);
+    pItem->setInfo(info);
+
+    QQmlEngine::setObjectOwnership(pItem, QQmlEngine::CppOwnership);
+    this->addNewNewsDataItem(pItem, UpdateIndex::UpdateAll);
+
+    return pItem;
+}
+
+NewsDataItem* GlobalData::getNewsDataItemFromArrayIndex(int index)
+{
+    QMutexLocker lock(&this->m_mutexNewsData);
+
+    if (index < this->m_lNewsDataItems.size()) {
+        return this->m_lNewsDataItems.at(index);
+    }
+    return NULL;
+}
+
+NewsDataItem* GlobalData::getNewsDataItem(quint32 newsIndex)
+{
+    QMutexLocker lock(&this->m_mutexNewsData);
+
+    for (int i = 0; i < this->m_lNewsDataItems.size(); i++) {
+        if (this->m_lNewsDataItems[i]->index() == newsIndex)
+            return this->m_lNewsDataItems[i];
+    }
+    return NULL;
+}
+
+QString GlobalData::getNewsDataLastLocalUpdateString()
+{
+    QMutexLocker lock(&this->m_mutexNewsData);
+    return QDateTime::fromMSecsSinceEpoch(this->m_ndLastLocalUpdateTimeStamp).toString("dd.MM.yy hh:mm:ss");
+}
+
+qint64 GlobalData::getNewsDataLastLocalUpdate()
+{
+    QMutexLocker lock(&this->m_mutexNewsData);
+    return this->m_ndLastLocalUpdateTimeStamp;
+}
+
+qint64 GlobalData::getNewsDataLastServerUpdate()
+{
+    QMutexLocker lock(&this->m_mutexNewsData);
+    return this->m_ndLastServerUpdateTimeStamp;
 }
 
 QString GlobalData::getCurrentLoggingList(int index)

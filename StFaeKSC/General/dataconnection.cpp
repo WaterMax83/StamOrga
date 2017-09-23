@@ -517,25 +517,27 @@ MessageProtocol* DataConnection::requestSetFixedGameTime(MessageProtocol* msg)
 
 MessageProtocol* DataConnection::requestGetTicketsList(MessageProtocol* msg)
 {
-    if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST && msg->getDataLength() != 8) {
-        qWarning().noquote() << QString("Error getting wrong message size %1 for get ticket list from %2, expected 8")
+    if (msg->getVersion() >= MSG_HEADER_ADD_FANCLUB && msg->getDataLength() != 12) {
+        qWarning().noquote() << QString("Error getting wrong message size %1 for get ticket list from %2, expected 12")
                                     .arg(msg->getDataLength())
                                     .arg(this->m_pUserConData->m_userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_TICKETS_LIST, ERROR_CODE_WRONG_SIZE);
     }
 
-    if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST) {
-        //        const char* pData = msg->getPointerToData();
-        //        qint64      appTimeStamp;
-        //        memcpy(&appTimeStamp, pData, sizeof(qint64));
-        //        appTimeStamp = qFromLittleEndian(appTimeStamp);
+    quint32 updInd                   = UpdateIndex::UpdateAll;
+    qint64  lastUpdateTicketsFromApp = 0;
+    if (msg->getVersion() >= MSG_HEADER_ADD_FANCLUB) {
+        const char* pData = msg->getPointerToData();
+        memcpy(&updInd, pData, sizeof(qint64));
+        memcpy(&lastUpdateTicketsFromApp, pData + 4, sizeof(qint64));
+        lastUpdateTicketsFromApp = qFromLittleEndian(lastUpdateTicketsFromApp);
     }
 
     QByteArray  ackArray;
     QDataStream wAckArray(&ackArray, QIODevice::WriteOnly);
     wAckArray.setByteOrder(QDataStream::LittleEndian);
 
-    quint16 updateIndex   = UpdateIndex::UpdateAll;
+    quint16 updateIndex   = (quint16)qFromLittleEndian(updInd);
     quint16 numbOfTickets = this->m_pGlobalData->m_SeasonTicket.getNumberOfInternalList();
     wAckArray << (quint32)ERROR_CODE_SUCCESS;
     if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST)
@@ -549,8 +551,12 @@ MessageProtocol* DataConnection::requestGetTicketsList(MessageProtocol* msg)
         if (pTicket == NULL)
             continue;
 
-        QString ticket(pTicket->m_itemName + ";" + pTicket->m_place);
+        if (msg->getVersion() >= MSG_HEADER_ADD_FANCLUB && updateIndex == UpdateIndex::UpdateDiff) {
+            if (pTicket->m_timestamp <= lastUpdateTicketsFromApp)
+                continue; // Skip ticket because user already has all info
+        }
 
+        QString ticket(pTicket->m_itemName + ";" + pTicket->m_place);
 
         wAckArray.device()->seek(ackArray.size());
         wAckArray << quint16(ticket.toUtf8().size() + TICKET_OFFSET);
@@ -962,21 +968,100 @@ MessageProtocol* DataConnection::requestChangeNewsData(MessageProtocol* msg)
     newsIndex = qFromLittleEndian(pData[0]);
     infoSize  = qFromLittleEndian(pData[1]);
 
-    QString     header(QByteArray((char*)(pData + 2)));
-    int         offset = header.toUtf8().length() + 1 + 2 * sizeof(quint32);
-    QByteArray  infoCompressed(msg->getPointerToData() + offset, infoSize);
+    QString    header(QByteArray((char*)(pData + 2)));
+    int        offset = header.toUtf8().length() + 1 + 2 * sizeof(quint32);
+    QByteArray infoCompressed(msg->getPointerToData() + offset, infoSize);
 
-    QByteArray  infoNotC = qUncompress(infoCompressed);
-    QString     text(infoNotC);
+    QByteArray infoNotC = qUncompress(infoCompressed);
+    QString    text(infoNotC);
     Q_UNUSED(text);
 
+    qint32 returnData[2];
     if (newsIndex == 0) {
         rCode = this->m_pGlobalData->m_fanclubNews.addNewFanclubNews(header, infoCompressed, this->m_pUserConData->m_userID);
         if (rCode > ERROR_CODE_NO_ERROR) {
             qInfo().noquote() << QString("User %1 added news %2").arg(this->m_pUserConData->m_userName, header);
-            return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_NEWS_DATA, ERROR_CODE_SUCCESS);
+            returnData[0] = qToLittleEndian(ERROR_CODE_SUCCESS);
+            returnData[1] = qToLittleEndian(rCode);
+            return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_NEWS_DATA, (char*)&returnData[0], 8);
         }
     }
+    returnData[0] = qToLittleEndian(rCode);
+    returnData[1] = qToLittleEndian(-1);
 
-    return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_NEWS_DATA, rCode);
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_NEWS_DATA, (char*)&returnData[0], 8);
+}
+
+/* answer
+ * 0    quint32      result         4
+ * 4    quint32      updateIndex    4
+ * 8    qint64       updateTime     8
+ * 16   quint32      index          4
+ * 20   qint64       time           8
+ * 24   QString      name           X
+ * 24+X QString      header         Y
+ */
+MessageProtocol* DataConnection::requestGetNewsDataList(MessageProtocol* msg)
+{
+    Q_UNUSED(msg);
+
+    quint32     updateIndex           = UpdateIndex::UpdateAll;
+    qint64      lastUpdateNewsFromApp = 0;
+    const char* pData                 = msg->getPointerToData();
+    memcpy(&updateIndex, pData, sizeof(qint64));
+    memcpy(&lastUpdateNewsFromApp, pData + 4, sizeof(qint64));
+    lastUpdateNewsFromApp = qFromLittleEndian(lastUpdateNewsFromApp);
+    updateIndex           = qFromLittleEndian(updateIndex);
+
+    qint32 numbOfNews = this->m_pGlobalData->m_fanclubNews.getNumberOfInternalList();
+    char*  buffer     = new char[numbOfNews * 200];
+    memset(&buffer[0], 0x0, numbOfNews * 200);
+    quint32 offset = 0;
+    qint32  result = ERROR_CODE_SUCCESS;
+
+    result = qToLittleEndian(result);
+    memcpy(&buffer[offset], &result, sizeof(qint32));
+    offset += sizeof(qint32);
+
+    memcpy(&buffer[offset], &updateIndex, sizeof(quint32));
+    offset += sizeof(quint32); // Status is not yet used
+
+    qint64 lastUpdateNewsFromServer = qToLittleEndian(this->m_pGlobalData->m_fanclubNews.getLastUpdateTime());
+    memcpy(&buffer[offset], &lastUpdateNewsFromServer, sizeof(qint64));
+    offset += sizeof(qint64);
+
+    quint32    index;
+    qint64     timestamp;
+    QByteArray name, header;
+    for (qint32 i = 0; i < numbOfNews; i++) {
+        NewsData* pItem = (NewsData*)(this->m_pGlobalData->m_fanclubNews.getRequestConfigItemFromListIndex(i));
+        if (pItem == NULL)
+            continue;
+
+        if (updateIndex == UpdateIndex::UpdateDiff) {
+            if (pItem->m_timestamp <= lastUpdateNewsFromApp)
+                continue; // Skip ticket because user already has all info
+        }
+
+        index = qToLittleEndian(pItem->m_index);
+        memcpy(&buffer[offset], &index, sizeof(quint32));
+        offset += sizeof(quint32);
+
+        timestamp = qToLittleEndian(pItem->m_timestamp);
+        memcpy(&buffer[offset], &timestamp, sizeof(qint64));
+        offset += sizeof(qint64);
+
+        name = g_ListedUser->getItemName(pItem->m_userID).toUtf8();
+        memcpy(&buffer[offset], name.constData(), name.length());
+        offset += name.length() + 1;
+
+        header = pItem->m_itemName.toUtf8();
+        memcpy(&buffer[offset], header.constData(), header.length());
+        offset += header.length() + 1;
+    }
+
+    MessageProtocol* ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_LIST, buffer, offset);
+    delete buffer;
+    qInfo().noquote() << QString("User %1 got fanclub news list with %2 entries").arg(this->m_pUserConData->m_userName).arg(numbOfNews);
+    return ack;
 }

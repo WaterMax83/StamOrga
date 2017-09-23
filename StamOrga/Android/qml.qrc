@@ -71,5 +71,6 @@
         <file>images/copy.png</file>
         <file>images/cut.png</file>
         <file>images/paste.png</file>
+        <file>components/NewsDataItem.qml</file>
     </qresource>
 </RCC>

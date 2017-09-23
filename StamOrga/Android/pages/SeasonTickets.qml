@@ -70,26 +70,12 @@ Flickable {
             width: parent.width
             spacing: 10
 
-            ColumnLayout {
-                id: columnLayout
-                spacing: 5
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-
-                BusyIndicator {
-                    id: busyConnectIndicatorTicket
-                    opacity: 1
-                    visible: false
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                }
-
-                Text {
-                    id: txtInfoSeasonTicket
-                    visible: true
-                    color: "white"
-                    font.pixelSize: 12
-                    horizontalAlignment: Text.AlignHCenter
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                }
+            MyComponents.BusyLoadingIndicator {
+                id: busyIndicatorTicket
+                width: parent.width
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                Layout.fillHeight: false
+                infoVisible: true
             }
 
             Column {
@@ -125,27 +111,27 @@ Flickable {
 
     function acceptedAddSeasonTicketDialog(text, discount) {
         userIntTicket.startAddSeasonTicket(text, discount);
-        busyConnectIndicatorTicket.visible = true;
-        txtInfoSeasonTicket.text = "Füge Dauerkarte hinzu"
+        busyIndicatorTicket.loadingVisible = true
+        busyIndicatorTicket.infoText = "Füge Dauerkarte hinzu"
     }
 
     function updateSeasonTicketList(){
         userIntTicket.startListSeasonTickets()
-        busyConnectIndicatorTicket.visible = true;
-        txtInfoSeasonTicket.text = "Aktualisiere Dauerkarten Liste"
+        busyIndicatorTicket.loadingVisible = true
+        busyIndicatorTicket.infoText = "Aktualisiere Dauerkarten Liste"
         for (var j = columnLayoutTickets.children.length; j > 0; j--) {
             columnLayoutTickets.children[j-1].destroy()
         }
     }
 
     function notifyUserIntSeasonTicketAdd(result) {
-        busyConnectIndicatorTicket.visible = false;
+        busyIndicatorTicket.loadingVisible = false
         if (result === 1) {
             updateSeasonTicketList()
             toastManager.show("Karte erfolgreich hinzugefügt", 2000);
         }
         else
-            txtInfoSeasonTicket.text = userIntTicket.getErrorCodeToString(result)
+            busyIndicatorTicket.infoText = userIntTicket.getErrorCodeToString(result)
     }
 
     function notifyUserIntSeasonTicketRemoveFinished(result) {
@@ -156,7 +142,8 @@ Flickable {
     }
 
     function notifyUserIntSeasonTicketListFinished(result) {
-        busyConnectIndicatorTicket.visible = false;
+//        busyConnectIndicatorTicket.visible = false;
+        busyIndicatorTicket.loadingVisible = false
         if (result === 1) {
             toastManager.show("Karten geladen", 2000)
         } else {
@@ -166,12 +153,12 @@ Flickable {
     }
 
     function notifyUserIntSeasonTicketEditFinished(result) {
-        busyConnectIndicatorTicket.visible = false;
+        busyIndicatorTicket.loadingVisible = false
         if (result === 1) {
             updateSeasonTicketList()
             toastManager.show("Erfolgreich geändert", 2000);
         }  else {
-            txtInfoSeasonTicket.text = userIntTicket.getErrorCodeToString(result);
+            busyIndicatorTicket.infoText = userIntTicket.getErrorCodeToString(result);
         }
     }
 
@@ -194,10 +181,9 @@ Flickable {
                 var sprite = seasonTicketItem.createObject(columnLayoutTickets)
                 sprite.showTicketInfo(i);
             }
-            txtInfoSeasonTicket.text = "Letztes Update am " + globalUserData.getSeasonTicketLastLocalUpdateString()
+            busyIndicatorTicket.infoText = "Letztes Update am " + globalUserData.getSeasonTicketLastLocalUpdateString()
         } else
-            txtInfoSeasonTicket.text = "Keine Daten gespeichert\nZiehen zum Aktualisieren"
-
+            busyIndicatorTicket.infoText = "Keine Daten gespeichert\nZiehen zum Aktualisieren"
     }
 
     Component {
@@ -292,24 +278,21 @@ Flickable {
         }
 
     function acceptedEditNewSeasonTicketPlace(text) {
-        busyConnectIndicatorTicket.visible = true;
-        txtInfoSeasonTicket.visible = true;
-        txtInfoSeasonTicket.text = "Ändere Ort für " + m_ticketNameToChange;
+        busyIndicatorTicket.loadingVisible = true;
+        busyIndicatorTicket.infoText = "Ändere Ort für " + m_ticketNameToChange;
         userIntTicket.startEditSeasonTicket(m_ticketNameToChangeIndex, "", text, m_ticketDiscountToChange);
     }
 
     function acceptedDeletingTicket() {
-        busyConnectIndicatorTicket.visible = true;
-        txtInfoSeasonTicket.visible = true;
-        txtInfoSeasonTicket.text = "Lösche Dauerkarte"
+        busyIndicatorTicket.loadingVisible = true;
+        busyIndicatorTicket.infoText = "Lösche Dauerkarte"
         userIntTicket.startRemoveSeasonTicket(m_ticketNameToChangeIndex)
         console.log("Lösche Dauerkarte")
     }
 
     function acceptedEditSeasonTicketDialog(text, discount) {
-        busyConnectIndicatorTicket.visible = true;
-        txtInfoSeasonTicket.visible = true;
-        txtInfoSeasonTicket.text = "Editiere " + m_ticketNameToChange;
+        busyIndicatorTicket.loadingVisible = true;
+        busyIndicatorTicket.infoText = "Editiere " + m_ticketNameToChange;
         userIntTicket.startEditSeasonTicket(m_ticketNameToChangeIndex, text, "", discount);
     }
 }

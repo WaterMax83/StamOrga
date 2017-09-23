@@ -128,18 +128,28 @@ int SeasonTicket::changeSeasonTicketInfos(const quint32 index, const qint32 disc
         if (pTicket == NULL)
             continue;
         if (pTicket->m_index == index) {
+            bool updated = false;
             if (name != "" && pTicket->m_itemName != name && this->updateItemValue(pTicket, ITEM_NAME, QVariant(name))) {
                 pTicket->m_itemName = name;
+                updated             = true;
                 qInfo().noquote() << (QString("changed name of Ticket %1 to %2").arg(index).arg(name));
             }
             if (place != "" && pTicket->m_place != place && this->updateItemValue(pTicket, TICKET_PLACE, QVariant(place))) {
                 pTicket->m_place = place;
+                updated          = true;
                 qInfo().noquote() << (QString("changed place of Ticket %1 to %2").arg(index).arg(place));
             }
             if (discount >= 0 && pTicket->m_discount != discount && this->updateItemValue(pTicket, TICKET_DISCOUNT, QVariant(quint32(discount)))) {
                 pTicket->m_discount = discount;
+                updated             = true;
                 qInfo().noquote() << (QString("changed name of Ticket %1 to %2").arg(index).arg(name));
             }
+            if (updated) {
+                qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
+                if (this->updateItemValue(pTicket, ITEM_TIMESTAMP, QVariant(timestamp)))
+                    pTicket->m_timestamp = timestamp;
+            }
+
             return ERROR_CODE_SUCCESS;
         }
     }

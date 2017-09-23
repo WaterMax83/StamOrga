@@ -215,8 +215,15 @@ void DataConnection::checkNewOncomingData()
             request.m_result = msg->getIntData();
             break;
 
-        case OP_CODE_CMD_RES::ACK_CHANGE_NEWS_DATA:
-            request.m_result = msg->getIntData();
+        case OP_CODE_CMD_RES::ACK_CHANGE_NEWS_DATA: {
+            const qint32* pData  = (qint32*)msg->getPointerToData();
+            request.m_result     = qFromLittleEndian(pData[0]);
+            request.m_returnData = QString::number(qFromLittleEndian(pData[1]));
+            break;
+        }
+
+        case OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_LIST:
+            request.m_result = this->m_pDataHandle->getHandleFanclubNewsListResponse(msg);
             break;
 
         default:
@@ -403,12 +410,17 @@ void DataConnection::startSendEditSeasonTicket(DataConRequest request)
 
 void DataConnection::startSendSeasonTicketListRequest(DataConRequest request)
 {
-    quint32 data[2];
-    qint64  timeStamp;
-    timeStamp = qToLittleEndian(this->m_pGlobalData->getSeasonTicketLastServerUpdate());
-    memcpy(&data[0], &timeStamp, sizeof(qint64));
+    quint32 data[3];
+    qint64  timeStamp = this->m_pGlobalData->getSeasonTicketLastLocalUpdate();
+    if (timeStamp + TIMEOUT_UPDATE_TICKETS > QDateTime::currentMSecsSinceEpoch() && this->m_pGlobalData->getSeasonTicketLength() > 0)
+        data[0] = qToLittleEndian(UpdateIndex::UpdateDiff);
+    else
+        data[0] = qToLittleEndian(UpdateIndex::UpdateAll);
 
-    MessageProtocol msg(request.m_request, (char*)(&data[0]), sizeof(quint32) * 2);
+    timeStamp = qToLittleEndian(this->m_pGlobalData->getSeasonTicketLastServerUpdate());
+    memcpy(&data[1], &timeStamp, sizeof(qint64));
+
+    MessageProtocol msg(request.m_request, (char*)(&data[0]), sizeof(quint32) * 3);
     this->sendMessageRequest(&msg, request);
 }
 
@@ -519,7 +531,17 @@ void DataConnection::startSendChangeNewsData(DataConRequest request)
 
 void DataConnection::startSendGetNewsDataList(DataConRequest request)
 {
-    MessageProtocol msg(request.m_request);
+    quint32 data[3];
+    qint64  timeStamp = this->m_pGlobalData->getNewsDataLastLocalUpdate();
+    if (timeStamp + TIMEOUT_UPDATE_NEWS > QDateTime::currentMSecsSinceEpoch() && this->m_pGlobalData->getNewsDataItemLength() > 0)
+        data[0] = qToLittleEndian(UpdateIndex::UpdateDiff);
+    else
+        data[0] = qToLittleEndian(UpdateIndex::UpdateAll);
+
+    timeStamp = qToLittleEndian(this->m_pGlobalData->getNewsDataLastServerUpdate());
+    memcpy(&data[1], &timeStamp, sizeof(qint64));
+
+    MessageProtocol msg(request.m_request, (char*)(&data[0]), sizeof(quint32) * 3);
     this->sendMessageRequest(&msg, request);
 }
 

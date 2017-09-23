@@ -561,3 +561,63 @@ qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg)
 
     return result;
 }
+
+/* answer
+ * 0    quint32      result         4
+ * 4    quint32      updateIndex         4
+ * 8    qint64       updateTime     8
+ * 16   quint32      index          4
+ * 20   qint64       time           8
+ * 24   QString      name           X
+ * 24+X QString      header         Y
+ */
+#define FAN_NEWS_LIST_HEAD_OFFSET 4 + 8 + 1 + 1
+qint32 DataHandling::getHandleFanclubNewsListResponse(MessageProtocol* msg)
+{
+    if (msg->getDataLength() < 16)
+        return ERROR_CODE_WRONG_SIZE;
+
+    const char* pData = msg->getPointerToData();
+    qint32      result;
+    quint32     updateIndex;
+    memcpy(&result, pData, sizeof(qint32));
+    memcpy(&updateIndex, pData + 4, sizeof(quint32));
+    qint64 serverTimeStamp;
+    memcpy(&serverTimeStamp, pData + 8, sizeof(qint64));
+
+    result = qFromLittleEndian(result);
+    if (result != ERROR_CODE_SUCCESS) {
+        return result;
+    }
+    updateIndex = qFromLittleEndian(updateIndex);
+
+    quint64 offset = 16;
+    quint32 index;
+    qint64  timestamp;
+    this->m_pGlobalData->startUpdateNewsDataItem(updateIndex);
+    while (offset + FAN_NEWS_LIST_HEAD_OFFSET < msg->getDataLength()) {
+
+        NewsDataItem* pItem = new NewsDataItem();
+
+        memcpy(&index, pData + offset, sizeof(quint32));
+        offset += sizeof(quint32);
+        pItem->setIndex(qFromLittleEndian(index));
+
+        memcpy(&timestamp, pData + offset, sizeof(qint64));
+        offset += sizeof(qint64);
+        pItem->setTimeStamp(qFromLittleEndian(timestamp));
+
+        pItem->setUser(QString(QByteArray(pData + offset)));
+        offset += pItem->user().toUtf8().length() + 1;
+
+        pItem->setHeader(QString(QByteArray(pData + offset)));
+        offset += pItem->header().toUtf8().length() + 1;
+
+        QQmlEngine::setObjectOwnership(pItem, QQmlEngine::CppOwnership);
+        this->m_pGlobalData->addNewNewsDataItem(pItem, updateIndex);
+    }
+
+    this->m_pGlobalData->saveCurrentNewsDataList(qFromLittleEndian(serverTimeStamp));
+
+    return result;
+}

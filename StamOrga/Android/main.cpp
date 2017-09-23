@@ -51,6 +51,7 @@ int main(int argc, char* argv[])
     qRegisterMetaType<GamePlay*>("GamePlay*");
     qRegisterMetaType<SeasonTicketItem*>("SeasonTicketItem*");
     qRegisterMetaType<MeetingInfo*>("MeetingInfo*");
+    qRegisterMetaType<NewsDataItem*>("NewsDataItem*");
     qRegisterMetaType<AcceptMeetingInfo*>("AcceptMeetingInfo*");
     qRegisterMetaType<DataConRequest>("DataConRequest");
 

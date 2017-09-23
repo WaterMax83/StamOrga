@@ -27,6 +27,9 @@ import "../components" as MyComponents
 Flickable {
     id: flickableFanclubNewsList
 //    property UserInterface userIntTicket
+//    flickingHorizontally: false
+//    flickingVertically: true
+    flickableDirection: Flickable.VerticalFlick
 
     contentHeight: mainPaneFanClubNewsList.height
 
@@ -76,6 +79,7 @@ Flickable {
                 width: parent.width
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
                 Layout.fillHeight: false
+                infoVisible: true
             }
 
             Column {
@@ -102,6 +106,7 @@ Flickable {
         if (!isViewAlreadyOpened)
             updateFanclubNewsList();
         isViewAlreadyOpened = true;
+        showNewsDataList();
     }
 
     function toolButtonClicked() {
@@ -112,15 +117,60 @@ Flickable {
         if (component.status === Component.Ready) {
             var sprite = stackView.push(component)
             sprite.userIntCurrentNews = userInt
-            sprite.startShowElements(true);
+            sprite.startShowElements(undefined, true);
         }
     }
 
     function updateFanclubNewsList() {
         userInt.startListFanclubNews();
         busyIndicatorNewsList.loadingVisible = true;
-        busyIndicatorNewsList.infoVisible = true;
         busyIndicatorNewsList.infoText = "Aktualisiere Liste"
+    }
+
+    function notifyFanclubNewsListFinished(result){
+        if (result === 1) {
+            toastManager.show("Liste erfolgreich geladen", 2000);
+            busyIndicatorNewsList.loadingVisible = false;
+        } else {
+            toastManager.show(userInt.getErrorCodeToString(result), 4000);
+            busyIndicatorNewsList.loadingVisible = false;
+            busyIndicatorNewsList.infoText = "Liste konnte nicht geladen werden"
+        }
+        showNewsDataList();
+    }
+
+    function showNewsDataList() {
+
+        for (var j = columnLayoutFanClubList.children.length; j > 0; j--) {
+            columnLayoutFanClubList.children[j-1].destroy()
+        }
+
+        if (globalUserData.getNewsDataItemLength() > 0) {
+            for (var i = 0; i < globalUserData.getNewsDataItemLength(); i++) {
+                var sprite = newsDataItem.createObject(columnLayoutFanClubList)
+                sprite.showNewsDataInfo(i);
+            }
+            busyIndicatorNewsList.infoText = "Letztes Update am " + globalUserData.getSeasonTicketLastLocalUpdateString()
+        } else
+            busyIndicatorNewsList.infoText = "Keine Daten gespeichert\nZiehen zum Aktualisieren"
+
+    }
+
+    Component {
+        id: newsDataItem
+        MyComponents.NewsDataItem {
+            onClickedItem: {
+                var component = Qt.createComponent("../pages/FanclubNewsItem.qml")
+                if (component.status === Component.Ready) {
+                    var sprite = stackView.push(component)
+                    sprite.userIntCurrentNews = userInt
+                    sprite.startShowElements(sender, false);
+                }
+            }
+            onPressAndHold: {
+
+            }
+        }
     }
 
     function notifyUserIntConnectionFinished(result) {}
