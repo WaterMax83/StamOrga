@@ -128,7 +128,7 @@ Item {
            RowLayout {
                Layout.preferredWidth: parent.width
                Layout.fillWidth: true
-               visible: !userInt.isDeviceMobile()
+               visible: !userInt.isDeviceMobile() || userInt.isDebuggingEnabled()
 
                Text {
                    id: text5

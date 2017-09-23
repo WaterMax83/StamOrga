@@ -150,7 +150,7 @@ Flickable {
                 var sprite = newsDataItem.createObject(columnLayoutFanClubList)
                 sprite.showNewsDataInfo(i);
             }
-            busyIndicatorNewsList.infoText = "Letztes Update am " + globalUserData.getSeasonTicketLastLocalUpdateString()
+            busyIndicatorNewsList.infoText = "Letztes Update am " + globalUserData.getNewsDataLastLocalUpdateString()
         } else
             busyIndicatorNewsList.infoText = "Keine Daten gespeichert\nZiehen zum Aktualisieren"
 

@@ -157,7 +157,8 @@ Item {
 
         if(!isEditMode) {
             isEditMode = true;
-            updateHeaderFromMain("", "images/save.png")
+            updateHeaderFromMain("", "")
+            isStartupDone = true;
             return;
         }
 
@@ -175,7 +176,10 @@ Item {
             return;
         }
 
-        userIntCurrentNews.startChangeFanclubNews(0, textHeader.input, textAreaInfo.text);
+        var newsIndex = 0;
+        if (newsDataItem !== undefined)
+            newsIndex = newsDataItem.index
+        userIntCurrentNews.startChangeFanclubNews(newsIndex, textHeader.input, textAreaInfo.text);
         busyIndicatorNews.loadingVisible = true;
         busyIndicatorNews.infoVisible = true;
         busyIndicatorNews.infoText = "Speichere News"
@@ -183,23 +187,18 @@ Item {
 
     function startShowElements(newsItem, editMode) {
 
-        isEditMode = editMode;
-        if (editMode)
-            updateHeaderFromMain("Neue Nachricht", "")
-        else {
-            if (globalUserData.userIsFanclubEditEnabled() ||  userIntCurrentNews.isDebuggingEnabled())
-                updateHeaderFromMain("Nachricht", "images/edit.png")
-            else
-                updateHeaderFromMain("Nachricht", "")
-        }
-
         newsDataItem = newsItem;
-        if (newsItem !== undefined) {
-            textHeader.init(newsDataItem.header);
-            textAreaInfo.text = newsDataItem.info;
+        isEditMode = editMode;
+        if (editMode) {
+            updateHeaderFromMain("Neue Nachricht", "")
+            isStartupDone = true;
+        } else {
+            if (newsItem !== undefined) {
+                userIntCurrentNews.startGetFanclubNewsItem(newsItem.index);
+                isStartupDone = false;
+            }
+            updateHeaderFromMain("Nachricht", "")
         }
-
-        isStartupDone = true;
     }
 
     property bool isEditMode : false;
@@ -219,7 +218,7 @@ Item {
     function notifyChangeNewsDataFinished(result) {
 
         if (result >= 1) {
-            toastManager.show("News erfolgreich gespeichert", 2000);
+            toastManager.show("Nachricht erfolgreich gespeichert", 2000);
             busyIndicatorNews.loadingVisible = false;
             busyIndicatorNews.infoVisible = false;
             isEditMode = false;
@@ -235,7 +234,26 @@ Item {
         } else {
             toastManager.show(userIntCurrentNews.getErrorCodeToString(result), 4000);
             busyIndicatorNews.loadingVisible = false;
-            busyIndicatorNews.infoText = "News speichern hat nicht funktioniert"
+            busyIndicatorNews.infoText = "Nachricht speichern hat nicht funktioniert"
+        }
+    }
+
+    function notifyGetFanclubNewsItemFinished(result){
+
+        if (result >= 1) {
+            if (globalUserData.userIsFanclubEditEnabled() ||  userIntCurrentNews.isDebuggingEnabled())
+                updateHeaderFromMain("Nachricht", "images/edit.png")
+
+            toastManager.show("Nachricht erfolgreich geladen", 2000);
+
+            if (newsDataItem !== undefined) {
+                textHeader.init(newsDataItem.header);
+                textAreaInfo.text = newsDataItem.info;
+            }
+        } else {
+                toastManager.show(userIntCurrentNews.getErrorCodeToString(result), 4000);
+                busyIndicatorNews.loadingVisible = false;
+                busyIndicatorNews.infoText = "Nachricht laden hat nicht funktioniert"
         }
     }
 

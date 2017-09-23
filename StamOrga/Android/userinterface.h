@@ -72,6 +72,8 @@ public:
 
     Q_INVOKABLE qint32 startListFanclubNews();
 
+    Q_INVOKABLE qint32 startGetFanclubNewsItem(const quint32 newsIndex);
+
     Q_INVOKABLE bool isDebuggingEnabled()
     {
 #ifdef QT_DEBUG
@@ -125,6 +127,7 @@ signals:
     void notifyAcceptMeetingFinished(qint32 result);
     void notifyChangeNewsDataFinished(qint32 result);
     void notifyFanclubNewsListFinished(qint32 result);
+    void notifyGetFanclubNewsItemFinished(qint32 result);
 
 public slots:
     void slConnectionRequestFinished(qint32 result);

@@ -985,6 +985,14 @@ MessageProtocol* DataConnection::requestChangeNewsData(MessageProtocol* msg)
             returnData[1] = qToLittleEndian(rCode);
             return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_NEWS_DATA, (char*)&returnData[0], 8);
         }
+    } else {
+        rCode = this->m_pGlobalData->m_fanclubNews.changeFanclubNews(newsIndex, header, infoCompressed, this->m_pUserConData->m_userID);
+        if (rCode == ERROR_CODE_SUCCESS) {
+            qInfo().noquote() << QString("User %1 changed news %2").arg(this->m_pUserConData->m_userName, header);
+            returnData[0] = qToLittleEndian(ERROR_CODE_SUCCESS);
+            returnData[1] = qToLittleEndian(newsIndex);
+            return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_NEWS_DATA, (char*)&returnData[0], 8);
+        }
     }
     returnData[0] = qToLittleEndian(rCode);
     returnData[1] = qToLittleEndian(-1);
@@ -1064,4 +1072,61 @@ MessageProtocol* DataConnection::requestGetNewsDataList(MessageProtocol* msg)
     delete buffer;
     qInfo().noquote() << QString("User %1 got fanclub news list with %2 entries").arg(this->m_pUserConData->m_userName).arg(numbOfNews);
     return ack;
+}
+
+/* answer
+ * 0    quint32      result         4
+ * 4    quint32      newsIndex      4
+ * 8    qint64       timestamp      8
+ * 16   quint32      infoSize       4
+ * 20   QString      userName       X
+ * X    QString      header         Y
+ * Y    QString      info           Z
+ */
+MessageProtocol* DataConnection::requestGetNewsDataItem(MessageProtocol *msg)
+{
+    qint32 rCode = ERROR_CODE_NOT_FOUND;
+    if (msg->getDataLength() != 4) {
+        qWarning().noquote() << QString("Wrong message size for get News data item for user %1").arg(this->m_pUserConData->m_userName);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_ITEM, ERROR_CODE_WRONG_SIZE);
+    }
+
+    const quint32* pData = (quint32*)msg->getPointerToData();
+    quint32        newsIndex;
+
+    newsIndex = qFromLittleEndian(pData[0]);
+    if (newsIndex != 0) {
+        NewsData *pItem =  (NewsData*)this->m_pGlobalData->m_fanclubNews.getItem(newsIndex);
+        if (pItem != NULL) {
+            QByteArray userName = g_ListedUser->getItemName(pItem->m_userID).toUtf8();
+            QByteArray header = pItem->m_itemName.toUtf8();
+            QByteArray info = pItem->m_newsText;
+            quint32 totalSize = 20 + userName.length() + header.length() + info.length() + 2;
+
+            char *pData = new char[totalSize];
+            memset(pData, 0x0, totalSize);
+
+            rCode = qToLittleEndian(ERROR_CODE_SUCCESS);
+            memcpy(pData, &rCode, sizeof(qint32));
+
+            newsIndex = qToLittleEndian(newsIndex);
+            memcpy(&pData[4], &newsIndex, sizeof(quint32));
+
+            qint64 timestamp = qToLittleEndian(pItem->m_timestamp);
+            memcpy(&pData[8], &timestamp, sizeof(qint64));
+
+            quint32 infoSize = qToLittleEndian(info.length());
+            memcpy(&pData[16], &infoSize, sizeof(quint32));
+
+            memcpy(&pData[20], userName.constData(), userName.length());
+            memcpy(&pData[21 + userName.length()], header.constData(), header.length());
+            memcpy(&pData[22 + userName.length() + header.length()], info.constData(), info.length());
+
+            qInfo().noquote() << QString("User %1 got fanclub news item %2").arg(this->m_pUserConData->m_userName, pItem->m_itemName);
+
+            return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_ITEM, pData, totalSize);
+        }
+    }
+
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_ITEM, rCode);
 }

@@ -116,6 +116,43 @@ int FanclubNews::addNewFanclubNews(const QString header, const QByteArray info, 
     return newIndex;
 }
 
+int FanclubNews::changeFanclubNews(const quint32 newsIndex, const QString header, const QByteArray info, const quint32 userID)
+{
+    NewsData* pItem =  (NewsData*)this->getItem(newsIndex);
+    if (pItem == NULL)
+        return ERROR_CODE_NOT_FOUND;
+
+    bool bChangedItem = false;
+    if (pItem->m_itemName != header) {
+        if (this->updateItemValue(pItem, ITEM_NAME, QVariant(header))) {
+            pItem->m_itemName = header;
+            bChangedItem = true;
+        }
+    }
+
+    if (pItem->m_newsText != info) {
+        if (this->updateItemValue(pItem, NEWS_DATA_TEXT, QVariant(info))) {
+            pItem->m_newsText = info;
+            bChangedItem = true;
+        }
+    }
+
+    if (pItem->m_userID != userID) {
+        if (this->updateItemValue(pItem, NEWS_DATA_USERID, QVariant(userID))) {
+            pItem->m_userID = userID;
+            bChangedItem = true;
+        }
+    }
+
+    if (bChangedItem) {
+        qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
+        if (this->updateItemValue(pItem, ITEM_TIMESTAMP, QVariant(timestamp)))
+            pItem->m_timestamp = timestamp;
+    }
+
+    return ERROR_CODE_SUCCESS;
+}
+
 
 int FanclubNews::showNewsData()
 {

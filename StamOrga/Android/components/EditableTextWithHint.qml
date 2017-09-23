@@ -48,6 +48,7 @@ Rectangle {
         font.pixelSize: 16
         color: "#505050"
         Layout.fillWidth: true
+        wrapMode: Text.Wrap
         onTextChanged: {
             if (isInit)
                 return;

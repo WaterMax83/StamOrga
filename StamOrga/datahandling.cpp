@@ -621,3 +621,54 @@ qint32 DataHandling::getHandleFanclubNewsListResponse(MessageProtocol* msg)
 
     return result;
 }
+
+qint32 DataHandling::getHandleFanclubNewsItemResponse(MessageProtocol* msg)
+{
+    if (msg->getDataLength() < 4)
+        return ERROR_CODE_WRONG_SIZE;
+
+    const char* pData = msg->getPointerToData();
+    qint32      result;
+    memcpy(&result, pData, sizeof(qint32));
+    result = qFromLittleEndian(result);
+    if (result != ERROR_CODE_SUCCESS) {
+        return result;
+    }
+    if (msg->getDataLength() < 22)
+        return ERROR_CODE_WRONG_SIZE;
+
+    quint32 newsIndex;
+    memcpy(&newsIndex, pData + 4, sizeof(quint32));
+    newsIndex = qFromLittleEndian(newsIndex);
+
+    NewsDataItem* pItem = this->m_pGlobalData->getNewsDataItem(newsIndex);
+    if (pItem == NULL)
+        return ERROR_CODE_NOT_FOUND;
+
+    qint64 timestamp;
+    memcpy(&timestamp, pData + 8, sizeof(qint64));
+    timestamp = qFromLittleEndian(timestamp);
+
+    quint32 infoSize;
+    memcpy(&infoSize, pData + 16, sizeof(quint32));
+    infoSize = qFromLittleEndian(infoSize);
+
+    quint32 offset   = 20;
+    QString userName = QString(QByteArray(pData + offset));
+    offset += userName.toUtf8().length() + 1;
+
+    QString header = QString(QByteArray(pData + offset));
+    offset += header.toUtf8().length() + 1;
+
+    QByteArray cryptInfo = QByteArray(pData + offset, infoSize);
+    QString    info("");
+    if (cryptInfo.length() > 0)
+        info = QString(qUncompress(cryptInfo));
+
+    pItem->setTimeStamp(timestamp);
+    pItem->setUser(userName);
+    pItem->setHeader(header);
+    pItem->setInfo(info);
+
+    return ERROR_CODE_SUCCESS;
+}

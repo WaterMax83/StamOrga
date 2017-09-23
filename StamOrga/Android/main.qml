@@ -330,6 +330,7 @@ ApplicationWindow {
 
         onNotifyChangeNewsDataFinished: stackView.currentItem.notifyChangeNewsDataFinished(result);
         onNotifyFanclubNewsListFinished: stackView.currentItem.notifyFanclubNewsListFinished(result);
+        onNotifyGetFanclubNewsItemFinished: stackView.currentItem.notifyGetFanclubNewsItemFinished(result);
     }
 
     Connections {

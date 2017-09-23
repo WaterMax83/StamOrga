@@ -54,6 +54,8 @@ public:
 
     int addNewFanclubNews(const QString header, const QByteArray info, const quint32 userID);
 
+    int changeFanclubNews(const quint32 newsIndex, const QString header, const QByteArray info, const quint32 userID);
+
     int showNewsData();
 
 private:

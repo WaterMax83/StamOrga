@@ -78,8 +78,8 @@ public class MyFcmListenerService extends FirebaseMessagingService
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
                 .setStyle(new NotificationCompat.BigTextStyle()
-                                .bigText(message))
-                .setContentInfo("Info");
+                                .bigText(message));
+//                .setContentInfo("Info");
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 

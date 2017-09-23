@@ -586,6 +586,7 @@ NewsDataItem* GlobalData::createNewNewsDataItem(quint32 newsIndex, QString heade
         pItem->setTimeStamp(QDateTime::currentMSecsSinceEpoch());
         pItem->setHeader(header);
         pItem->setInfo(info);
+        pItem->setUser(this->m_userName);
         return pItem;
     }
 
@@ -594,6 +595,7 @@ NewsDataItem* GlobalData::createNewNewsDataItem(quint32 newsIndex, QString heade
     pItem->setTimeStamp(QDateTime::currentMSecsSinceEpoch());
     pItem->setHeader(header);
     pItem->setInfo(info);
+    pItem->setUser(this->m_userName);
 
     QQmlEngine::setObjectOwnership(pItem, QQmlEngine::CppOwnership);
     this->addNewNewsDataItem(pItem, UpdateIndex::UpdateAll);

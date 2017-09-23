@@ -276,6 +276,15 @@ qint32 ConnectionHandling::startListFanclubNews()
     return ERROR_CODE_SUCCESS;
 }
 
+qint32 ConnectionHandling::startGetFanclubNewsItem(const quint32 newsIndex)
+{
+    DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_NEWS_DATA_ITEM);
+    req.m_lData.append(QString::number(newsIndex));
+    this->sendNewRequest(req);
+
+    return ERROR_CODE_SUCCESS;
+}
+
 /*
  * Answer function after connection with username
  */

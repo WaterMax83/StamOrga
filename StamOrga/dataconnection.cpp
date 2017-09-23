@@ -226,6 +226,10 @@ void DataConnection::checkNewOncomingData()
             request.m_result = this->m_pDataHandle->getHandleFanclubNewsListResponse(msg);
             break;
 
+        case OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_ITEM:
+            request.m_result = this->m_pDataHandle->getHandleFanclubNewsItemResponse(msg);
+            break;
+
         default:
             delete msg;
             continue;
@@ -545,6 +549,14 @@ void DataConnection::startSendGetNewsDataList(DataConRequest request)
     this->sendMessageRequest(&msg, request);
 }
 
+void DataConnection::startSendGetNewDataItem(DataConRequest request)
+{
+    quint32 newsIndex = qToLittleEndian(request.m_lData.at(0).toUInt());
+
+    MessageProtocol msg(request.m_request, newsIndex);
+    this->sendMessageRequest(&msg, request);
+}
+
 void DataConnection::slotConnectionTimeoutFired()
 {
     qInfo().noquote() << "DataConnection: Timeout from Data UdpServer";
@@ -732,6 +744,10 @@ void DataConnection::startSendNewRequest(DataConRequest request)
 
     case OP_CODE_CMD_REQ::REQ_GET_NEWS_DATA_LIST:
         this->startSendGetNewsDataList(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_GET_NEWS_DATA_ITEM:
+        this->startSendGetNewDataItem(request);
         break;
 
     default:

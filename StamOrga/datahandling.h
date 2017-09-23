@@ -40,6 +40,7 @@ public:
     qint32 getHandleChangeMeetingResponse(MessageProtocol* msg);
     qint32 getHandleLoadMeetingInfo(MessageProtocol* msg);
     qint32 getHandleFanclubNewsListResponse(MessageProtocol* msg);
+    qint32 getHandleFanclubNewsItemResponse(MessageProtocol* msg);
 
 private:
     GlobalData* m_pGlobalData;

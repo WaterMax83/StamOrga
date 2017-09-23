@@ -58,6 +58,7 @@ public:
     qint32 startChangeFanclubNews(const quint32 newsIndex, const QString header,
                                   const QString info);
     qint32 startListFanclubNews();
+    qint32 startGetFanclubNewsItem(const quint32 newsIndex);
 
 
     void setGlobalData(GlobalData* pData)
