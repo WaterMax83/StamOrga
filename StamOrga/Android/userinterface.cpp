@@ -141,6 +141,11 @@ qint32 UserInterface::startChangeFanclubNews(const quint32 newsIndex, const QStr
     return this->m_pConHandle->startChangeFanclubNews(newsIndex, header, info);
 }
 
+qint32 UserInterface::startListFanclubNews()
+{
+    return this->m_pConHandle->startListFanclubNews();
+}
+
 void UserInterface::slConnectionRequestFinished(qint32 result)
 {
     emit this->notifyConnectionFinished(result);

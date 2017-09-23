@@ -215,7 +215,7 @@ void DataConnection::checkNewOncomingData()
             request.m_result = msg->getIntData();
             break;
 
-        case OP_CODE_CMD_REQ::ACK_CHANGE_NEWS_DATA:
+        case OP_CODE_CMD_RES::ACK_CHANGE_NEWS_DATA:
             request.m_result = msg->getIntData();
             break;
 
@@ -499,9 +499,9 @@ void DataConnection::startSendAcceptMeeting(DataConRequest request)
 void DataConnection::startSendChangeNewsData(DataConRequest request)
 {
     QByteArray header = request.m_lData.at(1).toUtf8();
-    qDebug() << QDateTime::currentDateTime();
-    QByteArray info = qCompress(request.m_lData.at(2).toUtf8(), 9);
-    qDebug() << QDateTime::currentDateTime();
+    QByteArray info   = qCompress(request.m_lData.at(2).toUtf8(), 9);
+
+    qInfo().noquote() << QString("Compressed news info from %1 to %2 Bytes").arg(request.m_lData.at(2).size()).arg(info.size());
 
     int   totalSize = header.size() + info.size() + sizeof(quint32) * 2 + 2;
     char* data      = new char[totalSize];
@@ -514,6 +514,12 @@ void DataConnection::startSendChangeNewsData(DataConRequest request)
     memcpy(&data[sizeof(quint32) * 2 + 1 + header.size()], info.constData(), info.size());
 
     MessageProtocol msg(request.m_request, data, totalSize);
+    this->sendMessageRequest(&msg, request);
+}
+
+void DataConnection::startSendGetNewsDataList(DataConRequest request)
+{
+    MessageProtocol msg(request.m_request);
     this->sendMessageRequest(&msg, request);
 }
 
@@ -700,6 +706,10 @@ void DataConnection::startSendNewRequest(DataConRequest request)
 
     case OP_CODE_CMD_REQ::REQ_CHANGE_NEWS_DATA:
         this->startSendChangeNewsData(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_GET_NEWS_DATA_LIST:
+        this->startSendGetNewsDataList(request);
         break;
 
     default:

@@ -217,7 +217,7 @@ MessageProtocol* UdpDataServer::checkNewMessage(MessageProtocol* msg)
             break;
 
         default:
-            qWarning().noquote() << QString("Unkown command 0x%1").arg(QString::number(msg->getIndex()));
+            qWarning().noquote() << QString("Unkown command 0x%1").arg(QString::number(msg->getIndex(), 16));
             break;
         }
         if (ack != NULL && this->m_pUsrConData->m_bIsConnected)

@@ -70,6 +70,8 @@ public:
     Q_INVOKABLE qint32 startChangeFanclubNews(const quint32 newsIndex, const QString header,
                                               const QString info);
 
+    Q_INVOKABLE qint32 startListFanclubNews();
+
     Q_INVOKABLE bool isDebuggingEnabled()
     {
 #ifdef QT_DEBUG

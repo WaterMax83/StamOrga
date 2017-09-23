@@ -191,6 +191,7 @@ ApplicationWindow {
     }
 
     function updateHeaderFromMain(text, img) {
+
         if (img !== "") {
             imageToolButton.visible = true
             imageToolButton.source = img

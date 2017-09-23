@@ -24,94 +24,192 @@ import com.watermax.demo 1.0
 
 import "../components" as MyComponents
 
-Pane {
-//    id: mainPaneCurrentNews
-    width: parent.width
-    height: parent.height
+Item {
     property UserInterface userIntCurrentNews
 
-    ColumnLayout {
-        id: mainColumnLayoutCurrentNews
+    Pane {
+        id: mainPaneCurrentNews
         width: parent.width
         height: parent.height
 
-        MyComponents.BusyLoadingIndicator {
-            id: busyIndicatorNews
+
+        ColumnLayout {
+            id: mainColumnLayoutCurrentNews
             width: parent.width
-        }
+            height: parent.height
 
-        MyComponents.EditableTextWithHint {
-            id: textHeader
-            hint: "Überschrift"
-            imageSource: ""
-            width: parent.width
-            enabled: true
-        }
-
-        ToolSeparator {
-            id: toolSeparator1
-            orientation: "Horizontal"
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            Layout.fillWidth: true
-        }
-
-        Flickable {
-            width: parent.width
-            anchors.top: toolSeparator1.bottom
-            anchors.bottom: mainColumnLayoutCurrentNews.bottom
-            flickableDirection: Flickable.VerticalFlick
-
-            TextArea.flickable: TextArea {
-                id: textAreaInfo
+            MyComponents.BusyLoadingIndicator {
+                id: busyIndicatorNews
                 width: parent.width
-                placeholderText: qsTr("Enter description")
-                color: "#505050"
-                background: Rectangle {
-                    implicitWidth: parent.width
-                    implicitHeight: 400
-                }
-                leftPadding: 5
-                rightPadding: 5
-                font.pixelSize: 16
-                enabled: true
-                wrapMode: TextEdit.WordWrap
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                Layout.fillHeight: false
             }
 
-            ScrollBar.vertical: ScrollBar {
-                id: currentScrollBar
-                contentItem: Rectangle {
-                        implicitWidth: 6
-                        implicitHeight: 100
-                        radius: width / 2
-                        color: currentScrollBar.pressed ? "#0080FF" : "#58ACFA"
+            MyComponents.EditableTextWithHint {
+                id: textHeader
+                hint: "Überschrift"
+                imageSource: ""
+                width: parent.width
+                enabled: isEditMode
+                color: isEditMode ? "#FFFFFF" : "#AAAAAA";
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                onTextInputChanged: checkNewTextInput();
+            }
+
+            Item {
+                width: parent.width
+                Layout.fillHeight: true
+
+                Flickable {
+                    anchors.fill: parent
+                    flickableDirection: Flickable.VerticalFlick
+
+                    TextArea.flickable: TextArea {
+                        id: textAreaInfo
+                        width: parent.width
+                        color: "#505050"
+                        background: Rectangle {
+                            implicitWidth: parent.width
+                            implicitHeight: parent.height
+                            color: isEditMode ? "#FFFFFF" : "#AAAAAA";
+                        }
+                        leftPadding: 5
+                        rightPadding: 5
+                        font.pixelSize: 16
+                        wrapMode: TextEdit.Wrap
+                        textFormat: Qt.RichText
+                        focus: true
+                        enabled: isEditMode
+                        selectByMouse: true
+                        persistentSelection: true
+                        onTextChanged: checkNewTextInput();
                     }
+
+                    ScrollBar.vertical: ScrollBar {
+                        id: currentScrollBar
+                        contentItem: Rectangle {
+                                implicitWidth: 3
+                                implicitHeight: 100
+                                radius: width / 2
+                                color: currentScrollBar.pressed ? "#0080FF" : "#58ACFA"
+                            }
+                    }
+                }
+            }
+
+            ToolBar {
+                visible: isEditMode && textAreaInfo.activeFocus
+                width: parent.width
+                Row {
+                    id: toolRow
+
+                    ToolButton {
+                        id: cutButton
+                        // Don't want to close the virtual keyboard when this is clicked.
+                        focusPolicy: Qt.NoFocus
+                        checkable: true
+                        enabled: textAreaInfo.selectedText
+                        onClicked: textAreaInfo.cut()
+                        contentItem: Image {
+                            fillMode: Image.Pad
+                            horizontalAlignment: Image.AlignHCenter
+                            verticalAlignment: Image.AlignVCenter
+                            source: "../images/cut.png"
+                        }
+                    }
+                    ToolButton {
+                        id: copyButton
+                        // Don't want to close the virtual keyboard when this is clicked.
+                        focusPolicy: Qt.NoFocus
+                        checkable: true
+                        enabled: textAreaInfo.selectedText
+                        onClicked: textAreaInfo.copy()
+                        contentItem: Image {
+                            fillMode: Image.Pad
+                            horizontalAlignment: Image.AlignHCenter
+                            verticalAlignment: Image.AlignVCenter
+                            source: "../images/copy.png"
+                        }
+                    }
+                    ToolButton {
+                        id: pasteButton
+                        // Don't want to close the virtual keyboard when this is clicked.
+                        focusPolicy: Qt.NoFocus
+                        checkable: true
+                        enabled: textAreaInfo.canPaste
+                        onClicked: textAreaInfo.paste()
+                        contentItem: Image {
+                            fillMode: Image.Pad
+                            horizontalAlignment: Image.AlignHCenter
+                            verticalAlignment: Image.AlignVCenter
+                            source: "../images/paste.png"
+                        }
+                    }
+                }
             }
         }
-
     }
 
-
-    function pageOpenedUpdateView() {
-
-    }
+    function pageOpenedUpdateView() {}
 
     function toolButtonClicked() {
+        if (textHeader.input.length < 1) {
+            var component = Qt.createComponent("../components/AcceptDialog.qml");
+            if (component.status === Component.Ready) {
+                var dialog = component.createObject(mainPaneCurrentGame,{popupType: 1});
+                dialog.headerText = "Information";
+                dialog.parentHeight = mainPaneCurrentNews.height
+                dialog.parentWidth = mainPaneCurrentNews.width
+                dialog.textToAccept = "Die Überschrift darf nicht leer sein";
+                dialog.showCancelButton = false
+                dialog.open();
+            }
+            return;
+        }
+
         userIntCurrentNews.startChangeFanclubNews(0, textHeader.input, textAreaInfo.text);
         busyIndicatorNews.loadingVisible = true;
         busyIndicatorNews.infoVisible = true;
         busyIndicatorNews.infoText = "Speichere News"
     }
 
-    function startEditMode() {
-        updateHeaderFromMain("Neue News", "images/save.png")
+    function startShowElements(editMode) {
+
+        isEditMode = editMode;
+        if (editMode)
+            updateHeaderFromMain("Neue Nachricht", "")
+        else {
+            if (globalUserData.userIsFanclubEditEnabled() ||  userIntCurrentNews.isDebuggingEnabled())
+                updateHeaderFromMain("Nachricht", "images/edit.png")
+            else
+                updateHeaderFromMain("Nachricht", "")
+        }
+        isStartupDone = true;
+    }
+
+    property bool isEditMode : false;
+    property bool isTextChanged : false;
+    property bool isStartupDone : false;
+    function checkNewTextInput() {
+
+        if (!isStartupDone)
+            return;
+        if (isTextChanged)
+            return;
+
+        isTextChanged = true;
+        updateHeaderFromMain("", "images/save.png")
     }
 
     function notifyChangeNewsDataFinished(result) {
 
         if (result === 1) {
+            updateHeaderFromMain("", "")
             toastManager.show("News erfolgreich gespeichert", 2000);
             busyIndicatorNews.loadingVisible = false;
             busyIndicatorNews.infoVisible = false;
+            isEditMode = false;
+            updateHeaderFromMain("Nachricht", "images/edit.png")
         } else {
             toastManager.show(userIntCurrentNews.getErrorCodeToString(result), 4000);
             busyIndicatorNews.loadingVisible = false;

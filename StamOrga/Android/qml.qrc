@@ -65,5 +65,11 @@
         <file>pages/FanclubNewsList.qml</file>
         <file>pages/FanclubNewsItem.qml</file>
         <file>components/BusyLoadingIndicator.qml</file>
+        <file>images/+material/copy.png</file>
+        <file>images/+material/cut.png</file>
+        <file>images/+material/paste.png</file>
+        <file>images/copy.png</file>
+        <file>images/cut.png</file>
+        <file>images/paste.png</file>
     </qresource>
 </RCC>

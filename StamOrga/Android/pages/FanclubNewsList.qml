@@ -40,7 +40,7 @@ Flickable {
 
     onDragEnded: {
         if (flickableFanclubNewsList.contentY < -100) {
-//            updateSeasonTicketList();
+            updateFanclubNewsList();
         }
     }
 
@@ -64,13 +64,34 @@ Flickable {
     Pane {
         id: mainPaneFanClubNewsList
         width: parent.width
-        Rectangle {
-            color: "Red"
+        height: parent.height
+
+        ColumnLayout {
+            id: mainFanClubColumnLayout
             width: parent.width
-            height: 150
+            spacing: 10
+
+            MyComponents.BusyLoadingIndicator {
+                id: busyIndicatorNewsList
+                width: parent.width
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                Layout.fillHeight: false
+            }
+
+            Column {
+                id: columnLayoutFanClubList
+                anchors.right: parent.right
+                anchors.left: parent.left
+                width: parent.width
+                spacing: 10
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+
+            }
         }
+
     }
 
+    property bool isViewAlreadyOpened: false
     function pageOpenedUpdateView() {
 
         if (globalUserData.userIsFanclubEditEnabled() ||  userInt.isDebuggingEnabled())
@@ -78,6 +99,9 @@ Flickable {
         else
             updateHeaderFromMain("Fanclub", "")
 
+        if (!isViewAlreadyOpened)
+            updateFanclubNewsList();
+        isViewAlreadyOpened = true;
     }
 
     function toolButtonClicked() {
@@ -88,8 +112,15 @@ Flickable {
         if (component.status === Component.Ready) {
             var sprite = stackView.push(component)
             sprite.userIntCurrentNews = userInt
-            sprite.startEditMode();
+            sprite.startShowElements(true);
         }
+    }
+
+    function updateFanclubNewsList() {
+        userInt.startListFanclubNews();
+        busyIndicatorNewsList.loadingVisible = true;
+        busyIndicatorNewsList.infoVisible = true;
+        busyIndicatorNewsList.infoText = "Aktualisiere Liste"
     }
 
     function notifyUserIntConnectionFinished(result) {}

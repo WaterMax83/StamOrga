@@ -43,14 +43,18 @@ FanclubNews::FanclubNews()
 
         for (int i = 0; i < sizeOfArray; i++) {
             this->m_pConfigSettings->setArrayIndex(i);
-            QString home      = this->m_pConfigSettings->value(ITEM_NAME, "").toString();
+            QString header    = this->m_pConfigSettings->value(ITEM_NAME, "").toString();
             qint64  timestamp = this->m_pConfigSettings->value(ITEM_TIMESTAMP, 0x0).toLongLong();
             quint32 index     = this->m_pConfigSettings->value(ITEM_INDEX, 0).toInt();
 
             QByteArray newsText = this->m_pConfigSettings->value(NEWS_DATA_TEXT, "").toByteArray();
-            quint32 userID   = this->m_pConfigSettings->value(NEWS_DATA_USERID, false).toUInt();
+            quint32    userID   = this->m_pConfigSettings->value(NEWS_DATA_USERID, false).toUInt();
 
-            NewsData* news = new NewsData(home, index, timestamp, newsText, userID);
+            if (header == "") {
+                bProblems = true;
+                continue;
+            }
+            NewsData* news = new NewsData(header, index, timestamp, newsText, userID);
             if (!this->addNewNewsData(news))
                 bProblems = true;
         }
@@ -124,8 +128,8 @@ int FanclubNews::showNewsData()
 
         QString date   = QDateTime::fromMSecsSinceEpoch(pItem->m_timestamp).toString("dd.MM.yyyy hh:mm");
         QString output = QString("%1 - %2: %3 - %4")
-                         .arg(pItem->m_index, 2, 10, QChar('0'))
-                         .arg(date, g_ListedUser->getItemName(pItem->m_index), pItem->m_itemName);
+                             .arg(pItem->m_index, 2, 10, QChar('0'))
+                             .arg(date, g_ListedUser->getItemName(pItem->m_userID), pItem->m_itemName);
 
         std::cout << output.toStdString() << std::endl;
     }
