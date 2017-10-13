@@ -212,15 +212,12 @@ void DataConnection::checkNewOncomingData()
             break;
 
         case OP_CODE_CMD_RES::ACK_ACCEPT_MEETING:
-            request.m_result = msg->getIntData();
+            request.m_result = this->m_pDataHandle->getHandleAcceptMeetingResponse(msg);
             break;
 
-        case OP_CODE_CMD_RES::ACK_CHANGE_NEWS_DATA: {
-            const qint32* pData  = (qint32*)msg->getPointerToData();
-            request.m_result     = qFromLittleEndian(pData[0]);
-            request.m_returnData = QString::number(qFromLittleEndian(pData[1]));
+        case OP_CODE_CMD_RES::ACK_CHANGE_NEWS_DATA:
+            request.m_result = this->m_pDataHandle->getHandleFanclubNewsChangeResponse(msg, request.m_returnData);
             break;
-        }
 
         case OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_LIST:
             request.m_result = this->m_pDataHandle->getHandleFanclubNewsListResponse(msg);
@@ -228,6 +225,10 @@ void DataConnection::checkNewOncomingData()
 
         case OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_ITEM:
             request.m_result = this->m_pDataHandle->getHandleFanclubNewsItemResponse(msg);
+            break;
+
+        case OP_CODE_CMD_RES::ACK_DEL_NEWS_DATA_ITEM:
+            request.m_result = msg->getIntData();
             break;
 
         default:
@@ -557,6 +558,14 @@ void DataConnection::startSendGetNewDataItem(DataConRequest request)
     this->sendMessageRequest(&msg, request);
 }
 
+void DataConnection::startSendDeleteNewDataItem(DataConRequest request)
+{
+    quint32 newsIndex = qToLittleEndian(request.m_lData.at(0).toUInt());
+
+    MessageProtocol msg(request.m_request, newsIndex);
+    this->sendMessageRequest(&msg, request);
+}
+
 void DataConnection::slotConnectionTimeoutFired()
 {
     qInfo().noquote() << "DataConnection: Timeout from Data UdpServer";
@@ -748,6 +757,10 @@ void DataConnection::startSendNewRequest(DataConRequest request)
 
     case OP_CODE_CMD_REQ::REQ_GET_NEWS_DATA_ITEM:
         this->startSendGetNewDataItem(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_DEL_NEWS_DATA_ITEM:
+        this->startSendDeleteNewDataItem(request);
         break;
 
     default:

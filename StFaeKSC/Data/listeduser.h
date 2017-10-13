@@ -81,7 +81,7 @@ public:
     bool userChangeProperties(QString name, quint32 props);
     bool userChangeReadName(QString name, QString readName);
     quint32 getUserProperties(QString name);
-    QString getReadableName(QString name);
+    QString getReadableName(quint32 userIndex);
     QString getSalt(QString name);
 
     ConfigItem* getRequestConfigItemFromListIndex(int index)
@@ -99,5 +99,5 @@ private:
     QCryptographicHash* m_hash;
 };
 
-extern ListedUser *g_ListedUser;
+extern ListedUser* g_ListedUser;
 #endif // LISTEDUSER_H

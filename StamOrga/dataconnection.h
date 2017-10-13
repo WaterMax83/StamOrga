@@ -98,6 +98,7 @@ private:
     void startSendChangeNewsData(DataConRequest request);
     void startSendGetNewsDataList(DataConRequest request);
     void startSendGetNewDataItem(DataConRequest request);
+    void startSendDeleteNewDataItem(DataConRequest request);
 
 
     void   checkNewOncomingData();

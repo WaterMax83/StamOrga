@@ -117,6 +117,8 @@ Item {
                            dialog.enableMeetingChanged = notifyChangeMeetInfo;
                            dialog.enableNewFreeTicket = notifyFreeTicket;
                            dialog.enableNewAwayAccept = notifyAwayAccept;
+                           dialog.enableFanclubNews = notifyFanclubNews;
+                           dialog.visibleFanclubNews = globalUserData.userIsFanclubEnabled();
                            dialog.acceptedDialog.connect(acceptedNotificationDialog);
                            notifyDialog = dialog;
                            dialog.open();
@@ -269,6 +271,10 @@ Item {
             globalSettings.setNotificationNewAwayAcceptEnabled(notifyAwayAccept);
             saveSettings = true;
         }
+        if (notifyFanclubNews !== globalSettings.isNotificationFanclubNewsEnabled()) {
+            globalSettings.setNotificationFanclubNewsEnabled(notifyFanclubNews);
+            saveSettings = true;
+        }
 
         if (saveSettings)
           globalSettings.saveGlobalSettings();
@@ -316,6 +322,7 @@ Item {
         notifyChangeMeetInfo = globalSettings.isNotificationChangedMeetingEnabled()
         notifyFreeTicket = globalSettings.isNotificationNewFreeTicketEnabled();
         notifyAwayAccept = globalSettings.isNotificationNewAwayAcceptEnabled();
+        notifyFanclubNews = globalSettings.isNotificationFanclubNewsEnabled();
 
        isStartupDone = true;
    }
@@ -325,6 +332,7 @@ Item {
    property var notifyChangeMeetInfo;
    property var notifyFreeTicket;
    property var notifyAwayAccept;
+   property var notifyFanclubNews;
    property var notifyDialog;
    function acceptedNotificationDialog() {
        notifyNewAppVersion = notifyDialog.enableNewAppVersion;
@@ -332,6 +340,7 @@ Item {
        notifyChangeMeetInfo = notifyDialog.enableMeetingChanged;
        notifyFreeTicket = notifyDialog.enableNewFreeTicket;
        notifyAwayAccept = notifyDialog.enableNewAwayAccept;
+       notifyFanclubNews = notifyDialog.enableFanclubNews
        valueWasEditedEnableSave();
    }
 

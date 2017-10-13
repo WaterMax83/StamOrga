@@ -246,9 +246,41 @@ qint64 PushNotification::removeNewTicketNotification(const quint32 gameIndex, co
 
 qint64 PushNotification::sendNewFirstAwayAccept(const QString body, const qint32 userID)
 {
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_READY;
+
     PushNotifyInfo* push  = new PushNotifyInfo();
     push->m_topic         = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_AWAY_ACCEPT;
     push->m_header        = "Neuer Auswärtsfahrer";
+    push->m_body          = body;
+    push->m_sendMessageID = getNextInternalPushNumber();
+    push->m_sendTime      = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND;
+    push->m_userID        = userID;
+
+    this->insertNewNotification(push);
+
+    return push->m_sendMessageID;
+}
+
+qint64 PushNotification::sendNewFanclubNewsNotification(const QString body, const qint32 userID)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_READY;
+
+    this->m_notifyMutex.lock();
+
+    foreach (PushNotifyInfo* p, this->m_lPushToSend) {
+        if (p->m_topic == PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_FAN_NEWS) {
+            this->m_notifyMutex.unlock();
+            return -1;
+        }
+    }
+
+    this->m_notifyMutex.unlock();
+
+    PushNotifyInfo* push  = new PushNotifyInfo();
+    push->m_topic         = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_FAN_NEWS;
+    push->m_header        = "Fanclub Nachricht";
     push->m_body          = body;
     push->m_sendMessageID = getNextInternalPushNumber();
     push->m_sendTime      = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND;
@@ -409,6 +441,8 @@ QString PushNotification::getTopicStringFromIndex(const PUSH_NOTIFY_TOPIC topic)
         return NOTIFY_TOPIC_NEW_FREE_TICKET;
     case PUSH_NOT_NEW_AWAY_ACCEPT:
         return NOTIFY_TOPIC_NEW_AWAY_ACCEPT;
+    case PUSH_NOT_NEW_FAN_NEWS:
+        return NOTIFY_TOPIC_NEW_FANCLUB_NEWS;
     default:
         return NOTIFY_TOPIC_GENERAL;
     }

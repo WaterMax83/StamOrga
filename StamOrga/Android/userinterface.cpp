@@ -146,6 +146,11 @@ qint32 UserInterface::startGetFanclubNewsItem(const quint32 newsIndex)
     return this->m_pConHandle->startGetFanclubNewsItem(newsIndex);
 }
 
+qint32 UserInterface::startDeleteFanclubNewsItem(const quint32 newsIndex)
+{
+    return this->m_pConHandle->startDeleteFanclubNewsItem(newsIndex);
+}
+
 qint32 UserInterface::startListFanclubNews()
 {
     return this->m_pConHandle->startListFanclubNews();
@@ -243,6 +248,10 @@ void UserInterface::slCommandFinished(quint32 command, qint32 result)
 
     case OP_CODE_CMD_REQ::REQ_GET_NEWS_DATA_ITEM:
         emit this->notifyGetFanclubNewsItemFinished(result);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_DEL_NEWS_DATA_ITEM:
+        emit this->notifyDeleteFanclubNewsItemFinished(result);
         break;
 
     default:

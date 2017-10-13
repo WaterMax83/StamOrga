@@ -40,6 +40,7 @@ FanclubNews::FanclubNews()
 
         this->m_pConfigSettings->beginGroup(GROUP_LIST_ITEM);
         int sizeOfArray = this->m_pConfigSettings->beginReadArray(CONFIG_LIST_ARRAY);
+        this->m_lInteralList.clear();
 
         for (int i = 0; i < sizeOfArray; i++) {
             this->m_pConfigSettings->setArrayIndex(i);
@@ -74,7 +75,7 @@ FanclubNews::FanclubNews()
     }
     this->m_lAddItemProblems.clear();
 
-    this->sortItemListByTime();
+    this->sortItemListByTimeDescending();
 
     if (bProblems)
         this->saveCurrentInteralList();
@@ -108,7 +109,7 @@ int FanclubNews::addNewFanclubNews(const QString header, const QByteArray info, 
 
     this->addNewNewsData(item, false);
 
-    this->sortItemListByTime();
+    this->sortItemListByTimeDescending();
 
     this->setNewUpdateTime();
 
@@ -118,7 +119,7 @@ int FanclubNews::addNewFanclubNews(const QString header, const QByteArray info, 
 
 int FanclubNews::changeFanclubNews(const quint32 newsIndex, const QString header, const QByteArray info, const quint32 userID)
 {
-    NewsData* pItem =  (NewsData*)this->getItem(newsIndex);
+    NewsData* pItem = (NewsData*)this->getItem(newsIndex);
     if (pItem == NULL)
         return ERROR_CODE_NOT_FOUND;
 
@@ -126,21 +127,21 @@ int FanclubNews::changeFanclubNews(const quint32 newsIndex, const QString header
     if (pItem->m_itemName != header) {
         if (this->updateItemValue(pItem, ITEM_NAME, QVariant(header))) {
             pItem->m_itemName = header;
-            bChangedItem = true;
+            bChangedItem      = true;
         }
     }
 
     if (pItem->m_newsText != info) {
         if (this->updateItemValue(pItem, NEWS_DATA_TEXT, QVariant(info))) {
             pItem->m_newsText = info;
-            bChangedItem = true;
+            bChangedItem      = true;
         }
     }
 
     if (pItem->m_userID != userID) {
         if (this->updateItemValue(pItem, NEWS_DATA_USERID, QVariant(userID))) {
             pItem->m_userID = userID;
-            bChangedItem = true;
+            bChangedItem    = true;
         }
     }
 
@@ -148,6 +149,8 @@ int FanclubNews::changeFanclubNews(const quint32 newsIndex, const QString header
         qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
         if (this->updateItemValue(pItem, ITEM_TIMESTAMP, QVariant(timestamp)))
             pItem->m_timestamp = timestamp;
+
+        this->sortItemListByTimeDescending();
     }
 
     return ERROR_CODE_SUCCESS;

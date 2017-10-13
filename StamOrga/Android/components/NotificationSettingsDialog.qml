@@ -31,6 +31,8 @@ Dialog {
     property alias enableMeetingChanged : changedMeeting.checked
     property alias enableNewFreeTicket : newFreeTicket.checked
     property alias enableNewAwayAccept : newAwayAccept.checked
+    property alias enableFanclubNews: newFanclubNews.checked
+    property alias visibleFanclubNews: rowFanclubNews.visible
 
     signal acceptedDialog()
 
@@ -140,6 +142,24 @@ Dialog {
             }
             CheckBox {
                  id: newAwayAccept
+            }
+        }
+
+        RowLayout {
+            id: rowFanclubNews
+            Layout.preferredWidth: parent.width
+            Layout.fillWidth: true
+
+            Text {
+                id: text6
+                text: qsTr("Fanclub Nachrichten:")
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                font.pixelSize: 14
+                color: "white"
+            }
+            CheckBox {
+                 id: newFanclubNews
             }
         }
 

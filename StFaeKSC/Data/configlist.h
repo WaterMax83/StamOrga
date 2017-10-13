@@ -30,9 +30,16 @@ public:
     QString m_itemName;
     qint64  m_timestamp;
 
-    static bool compareTimeStampFunction(ConfigItem* p1, ConfigItem* p2)
+    static bool compareTimeStampFunctionAscending(ConfigItem* p1, ConfigItem* p2)
     {
         if (p1->m_timestamp > p2->m_timestamp)
+            return false;
+        return true;
+    }
+
+    static bool compareTimeStampFunctionDescending(ConfigItem* p1, ConfigItem* p2)
+    {
+        if (p1->m_timestamp < p2->m_timestamp)
             return false;
         return true;
     }
@@ -75,7 +82,8 @@ public:
 
     qint64 getLastUpdateTime();
 
-    void sortItemListByTime();
+    void sortItemListByTimeAscending();
+    void sortItemListByTimeDescending();
 
 protected:
     QList<ConfigItem*> m_lInteralList;

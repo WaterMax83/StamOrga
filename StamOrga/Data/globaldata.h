@@ -134,6 +134,7 @@ public:
     Q_INVOKABLE QString getSeasonTicketLastLocalUpdateString();
     qint64              getSeasonTicketLastLocalUpdate();
     qint64              getSeasonTicketLastServerUpdate();
+    void                resetSeasonTicketLastServerUpdate();
 
     Q_INVOKABLE MeetingInfo* getMeetingInfo() { return &this->m_meetingInfo; }
 
@@ -152,6 +153,7 @@ public:
     Q_INVOKABLE QString getNewsDataLastLocalUpdateString();
     qint64              getNewsDataLastLocalUpdate();
     qint64              getNewsDataLastServerUpdate();
+    void                resetNewsDataLastServerUpdate();
 
     QString getCurrentAppGUID() { return this->m_AppInstanceGUID; }
     QString getCurrentAppToken() { return this->m_pushNotificationToken; }

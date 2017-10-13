@@ -435,13 +435,14 @@ qint32 DataHandling::getHandleAvailableTicketListResponse(MessageProtocol* msg, 
         }
         quint32           ticketIndex = qFromLittleEndian(*((quint32*)(pData + offset)));
         SeasonTicketItem* item        = this->m_pGlobalData->getSeasonTicket(ticketIndex);
+        offset += 4;
         if (item != NULL)
             item->setTicketState(TICKET_STATE_RESERVED);
         else {
             qWarning().noquote() << QString("Ticket with number %1 is missing for availableTicket Reserved").arg(ticketIndex);
             result = ERROR_CODE_MISSING_TICKET;
+            continue;
         }
-        offset += 4;
         QString name(pData + offset);
         item->setReserveName(name);
         offset += name.size() + 1;
@@ -458,6 +459,23 @@ qint32 DataHandling::getHandleAvailableTicketListResponse(MessageProtocol* msg, 
 }
 
 qint32 DataHandling::getHandleChangeMeetingResponse(MessageProtocol* msg)
+{
+    if (msg->getDataLength() < 12)
+        return ERROR_CODE_WRONG_SIZE;
+
+    const char* pData = msg->getPointerToData();
+    qint32      result;
+    memcpy(&result, pData, sizeof(quint32));
+    result = qFromLittleEndian(result);
+
+    qint64 messageID;
+    memcpy(&messageID, pData + sizeof(quint32), sizeof(qint64));
+    messageID = qFromLittleEndian(messageID);
+
+    return result;
+}
+
+qint32 DataHandling::getHandleAcceptMeetingResponse(MessageProtocol* msg)
 {
     if (msg->getDataLength() < 12)
         return ERROR_CODE_WRONG_SIZE;
@@ -563,8 +581,39 @@ qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg)
 }
 
 /* answer
+ * 0    qint32      result         4
+ * 4    qint32      newsIndex      4
+ * 8    qint64      messageId      8
+ */
+qint32 DataHandling::getHandleFanclubNewsChangeResponse(MessageProtocol* msg, QString& returnData)
+{
+    if (msg->getDataLength() < 16)
+        return ERROR_CODE_WRONG_SIZE;
+
+    const char* pData = msg->getPointerToData();
+    qint32      result;
+    memcpy(&result, pData, sizeof(qint32));
+    result = qFromLittleEndian(result);
+    pData += sizeof(qint32);
+
+    qint32 newsIndex;
+    memcpy(&newsIndex, pData, sizeof(qint32));
+    newsIndex = qFromLittleEndian(newsIndex);
+    pData += sizeof(qint32);
+
+    returnData = QString::number(newsIndex);
+
+    qint64 messageID;
+    memcpy(&messageID, pData, sizeof(qint64));
+    messageID = qFromLittleEndian(messageID);
+
+    return result;
+}
+
+
+/* answer
  * 0    quint32      result         4
- * 4    quint32      updateIndex         4
+ * 4    quint32      updateIndex    4
  * 8    qint64       updateTime     8
  * 16   quint32      index          4
  * 20   qint64       time           8

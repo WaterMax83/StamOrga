@@ -103,7 +103,7 @@ void GamePlay::setEnableAddGame(bool enable)
     this->m_bIsUserGameAddingEnabled = enable;
 }
 
-bool GamePlay::compareTimeStampFunction(GamePlay* p1, GamePlay* p2)
+bool GamePlay::compareTimeStampFunctionAscending(GamePlay* p1, GamePlay* p2)
 {
     if (p1->m_timestamp > p2->m_timestamp)
         return false;

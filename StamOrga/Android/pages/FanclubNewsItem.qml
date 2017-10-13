@@ -44,6 +44,7 @@ Item {
                 width: parent.width
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
                 Layout.fillHeight: false
+                Layout.topMargin: 10
             }
 
             MyComponents.EditableTextWithHint {
@@ -52,7 +53,7 @@ Item {
                 imageSource: ""
                 width: parent.width
                 enabled: isEditMode
-                color: isEditMode ? "#FFFFFF" : "#AAAAAA";
+                color: isEditMode ? "#FFFFFF" : "#CCFFFF";
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
                 onTextInputChanged: checkNewTextInput();
             }
@@ -72,7 +73,7 @@ Item {
                         background: Rectangle {
                             implicitWidth: parent.width
                             implicitHeight: parent.height
-                            color: isEditMode ? "#FFFFFF" : "#AAAAAA";
+                            color: isEditMode ? "#FFFFFF" : "#CCFFFF";
                         }
                         leftPadding: 5
                         rightPadding: 5
@@ -159,6 +160,7 @@ Item {
             isEditMode = true;
             updateHeaderFromMain("", "")
             isStartupDone = true;
+            isTextChanged = false;
             return;
         }
 

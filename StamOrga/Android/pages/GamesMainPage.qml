@@ -39,27 +39,13 @@ Page {
         rows: 3
         columns: 2
 
-        ColumnLayout {
-            id: columnLayoutBusyInfo
-            spacing: 5
+        MyComponents.BusyLoadingIndicator {
+            id: busyIndicatorGames
+            width: parent.width
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+            Layout.fillHeight: false
             Layout.topMargin: 10
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-
-            BusyIndicator {
-                id: busyLoadingIndicatorGames
-                visible: false
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-            }
-
-            Text {
-                id: txtInfoLoadingGames
-                visible: true
-                color: "white"
-                font.pixelSize: 12
-                horizontalAlignment: Text.AlignHCenter
-                Layout.alignment:  Qt.AlignHCenter | Qt.AlignVCenter
-            }
-
+            infoVisible: true
         }
 
         TabBar {
@@ -96,7 +82,7 @@ Page {
                 onAcceptedChangeGame: startEditGame(dialog);
                 onDragStarted: {
                     movedInfoIndex = 1; movedStartY = contentY;
-                    movedStartMargin = columnLayoutBusyInfo.Layout.topMargin > 0 ? 10 : -movedInfoHeigth;
+                    movedStartMargin = busyIndicatorGames.Layout.topMargin > 0 ? 10 : -movedInfoHeigth;
                 }
                 onDragEnded: { movedInfoIndex = 0; checkMovedInfoEnd(movedStartY - contentY); }
                 onContentYChanged : checkMovedInfo(1, movedStartY - contentY);
@@ -109,7 +95,7 @@ Page {
                 onAcceptedChangeGame: startEditGame(dialog);
                 onDragStarted: {
                     movedInfoIndex = 2; movedStartY = contentY;
-                    movedStartMargin = columnLayoutBusyInfo.Layout.topMargin > 0 ? 10 : -movedInfoHeigth;
+                    movedStartMargin = busyIndicatorGames.Layout.topMargin > 0 ? 10 : -movedInfoHeigth;
                 }
                 onDragEnded: { movedInfoIndex = 0; checkMovedInfoEnd(movedStartY - contentY); }
                 onContentYChanged : checkMovedInfo(2, movedStartY - contentY);
@@ -119,14 +105,14 @@ Page {
 
     NumberAnimation {
         id: animateMoveInfoUp
-        target: columnLayoutBusyInfo
+        target: busyIndicatorGames
         property: "Layout.topMargin"
         to: -movedInfoHeigth
         duration: 250
     }
     NumberAnimation {
         id: animateMoveInfoDown
-        target: columnLayoutBusyInfo
+        target: busyIndicatorGames
         property: "Layout.topMargin"
         to: 10
         duration: 250
@@ -138,11 +124,11 @@ Page {
 
         if (movedStartMargin === 10) {
             if (diff < 0)
-                columnLayoutBusyInfo.Layout.topMargin = Math.max(-movedInfoHeigth, (diff * 0.5) + 10);
+                busyIndicatorGames.Layout.topMargin = Math.max(-movedInfoHeigth, (diff * 0.5) + 10);
         } else if (movedStartMargin === -movedInfoHeigth) {
 
             if (diff > 0)
-                columnLayoutBusyInfo.Layout.topMargin = Math.min(10, -movedInfoHeigth + (diff * 0.5));
+                busyIndicatorGames.Layout.topMargin = Math.min(10, -movedInfoHeigth + (diff * 0.5));
         }
     }
 
@@ -163,7 +149,7 @@ Page {
     property int movedInfoIndex : 0
     property int movedStartY : 0
     property int movedStartMargin : 10
-    property int movedInfoHeigth : txtInfoLoadingGames.height
+    property int movedInfoHeigth : busyIndicatorGames.infoHeight
 
     property var addGameDialog;
 
@@ -201,11 +187,11 @@ Page {
                                                   dialog.score.trim());
         if (result !== 1) {
             toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
-            busyLoadingIndicatorGames.visible = true
+            busyIndicatorGames.loadingVisible = true
             if (changeGameDialog.index === 0)
-                txtInfoLoadingGames.text = "Füge Spiel hinzu"
+                busyIndicatorGames.infoText = "Füge Spiel hinzu"
             else
-                txtInfoLoadingGames.text = "Ändere Spiel"
+                busyIndicatorGames.infoText = "Ändere Spiel"
         }
     }
 
@@ -214,13 +200,13 @@ Page {
     function notifyUserIntGamesListFinished(result) {
         if (result !== 1) {
             toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
-            busyLoadingIndicatorGames.visible = false
+            busyIndicatorGames.loadingVisible = false
             showListedGames()
         }
     }
 
     function notifyUserIntGamesInfoListFinished(result) {
-        busyLoadingIndicatorGames.visible = false
+        busyIndicatorGames.loadingVisible = false
         if (result === 1)
             toastManager.show("Spiele geladen", 2000)
         else
@@ -265,15 +251,15 @@ Page {
         gamesListPagePast.showListedGames()
 
         if (globalUserData.getGamePlayLength() > 0) {
-            txtInfoLoadingGames.text = "Letztes Update am " + globalUserData.getGamePlayLastUpdateString()
+            busyIndicatorGames.infoText = "Letztes Update am " + globalUserData.getGamePlayLastUpdateString()
         } else
-            txtInfoLoadingGames.text = "Keine Daten gespeichert\nZiehen zum Aktualisieren"
+            busyIndicatorGames.infoText = "Keine Daten gespeichert\nZiehen zum Aktualisieren"
     }
 
     function showLoadingGameInfos(text)
     {
-        busyLoadingIndicatorGames.visible = true
-        txtInfoLoadingGames.text = text
+        busyIndicatorGames.loadingVisible = true
+        busyIndicatorGames.infoText = text
     }
 
 }

@@ -31,8 +31,8 @@ Rectangle {
 
     width: parent.width
     height: childrenRect.height * 1.1
-    property color gradColorStart: "#2D882D"
-    property color gradColorStop: "#2F512F"
+    property color gradColorStart: "#003333"
+    property color gradColorStop: "#008080"
     gradient: Gradient {
         GradientStop {
             position: 0

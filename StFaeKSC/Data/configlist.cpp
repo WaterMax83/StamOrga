@@ -40,7 +40,7 @@ qint32 ConfigList::removeItem(const QString name)
             this->m_lInteralList.removeAt(i);
             this->saveCurrentInteralList();
 
-            qInfo() << QString("removed Item \"%1\"").arg(name);
+            qInfo().noquote() << QString("removed Item \"%1\"").arg(name);
             return ERROR_CODE_SUCCESS;
         }
     }
@@ -59,13 +59,13 @@ qint32 ConfigList::removeItem(const quint32 index)
             this->m_lInteralList.removeAt(i);
             this->saveCurrentInteralList();
 
-            qInfo() << QString("removed Item \"%1\"").arg(name);
+            qInfo().noquote() << QString("removed Item \"%1\"").arg(name);
             return ERROR_CODE_SUCCESS;
         }
     }
 
     CONSOLE_WARNING(QString("Could not find item \"%1\"").arg(index))
-    return ERROR_CODE_COMMON;
+    return ERROR_CODE_NOT_FOUND;
 }
 
 bool ConfigList::itemExists(QString name)
@@ -238,11 +238,18 @@ qint64 ConfigList::setNewUpdateTime(qint64 timeStamp)
     return this->getLastUpdateTime();
 }
 
-void ConfigList::sortItemListByTime()
+void ConfigList::sortItemListByTimeAscending()
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
-    std::sort(this->m_lInteralList.begin(), this->m_lInteralList.end(), ConfigItem::compareTimeStampFunction);
+    std::sort(this->m_lInteralList.begin(), this->m_lInteralList.end(), ConfigItem::compareTimeStampFunctionAscending);
+}
+
+void ConfigList::sortItemListByTimeDescending()
+{
+    QMutexLocker locker(&this->m_mInternalInfoMutex);
+
+    std::sort(this->m_lInteralList.begin(), this->m_lInteralList.end(), ConfigItem::compareTimeStampFunctionDescending);
 }
 
 

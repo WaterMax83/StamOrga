@@ -41,6 +41,9 @@ public:
 
     Q_INVOKABLE void saveGlobalSettings();
 
+    bool updateConnectionStatus(bool connected);
+    void updatePushNotification(void);
+
     QString debugIP()
     {
         QMutexLocker lock(&this->m_mutex);
@@ -115,11 +118,13 @@ public:
     Q_INVOKABLE bool isNotificationChangedMeetingEnabled();
     Q_INVOKABLE bool isNotificationNewFreeTicketEnabled();
     Q_INVOKABLE bool isNotificationNewAwayAcceptEnabled();
+    Q_INVOKABLE bool isNotificationFanclubNewsEnabled();
     Q_INVOKABLE void setNotificationNewAppVersionEnabled(bool enable);
     Q_INVOKABLE void setNotificationNewMeetingEnabled(bool enable);
     Q_INVOKABLE void setNotificationChangedMeetingEnabled(bool enable);
     Q_INVOKABLE void setNotificationNewFreeTicketEnabled(bool enabled);
     Q_INVOKABLE void setNotificationNewAwayAcceptEnabled(bool enable);
+    Q_INVOKABLE void setNotificationFanclubNewsEnabled(bool enable);
 
 signals:
     void debugIPChanged();
@@ -134,6 +139,7 @@ public slots:
 
 private:
     GlobalData*  m_pGlobalData;
+    bool         m_alreadyConnected;
     bool         m_useReadableName;
     bool         m_loadGameInfo;
     bool         m_saveInfosOnApp;

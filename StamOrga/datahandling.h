@@ -38,7 +38,9 @@ public:
     qint32 getHandleChangeTicketStateResponse(MessageProtocol* msg);
     qint32 getHandleAvailableTicketListResponse(MessageProtocol* msg, const quint32 gameIndex);
     qint32 getHandleChangeMeetingResponse(MessageProtocol* msg);
+    qint32 getHandleAcceptMeetingResponse(MessageProtocol* msg);
     qint32 getHandleLoadMeetingInfo(MessageProtocol* msg);
+    qint32 getHandleFanclubNewsChangeResponse(MessageProtocol* msg, QString& returnData);
     qint32 getHandleFanclubNewsListResponse(MessageProtocol* msg);
     qint32 getHandleFanclubNewsItemResponse(MessageProtocol* msg);
 

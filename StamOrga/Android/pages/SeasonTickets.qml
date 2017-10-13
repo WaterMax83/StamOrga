@@ -75,6 +75,7 @@ Flickable {
                 width: parent.width
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
                 Layout.fillHeight: false
+                Layout.topMargin: 10
                 infoVisible: true
             }
 
@@ -138,6 +139,10 @@ Flickable {
         if (result === 1) {
             updateSeasonTicketList()
             toastManager.show("Karte erfolgreich gelöscht", 2000);
+        } else {
+            toastManager.show(userInt.getErrorCodeToString(result), 4000);
+            busyIndicatorTicket.loadingVisible = false;
+            busyIndicatorTicket.infoText = "Dauerkarte konnte nicht gelöscht werden"
         }
     }
 
@@ -287,7 +292,6 @@ Flickable {
         busyIndicatorTicket.loadingVisible = true;
         busyIndicatorTicket.infoText = "Lösche Dauerkarte"
         userIntTicket.startRemoveSeasonTicket(m_ticketNameToChangeIndex)
-        console.log("Lösche Dauerkarte")
     }
 
     function acceptedEditSeasonTicketDialog(text, discount) {

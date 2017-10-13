@@ -164,6 +164,8 @@ void GlobalData::loadGlobalSettings()
     this->m_pMainUserSettings->endArray();
     this->m_pMainUserSettings->endGroup();
     this->m_bSeasonTicketLastUpdateDidChanges = false;
+
+    this->resetNewsDataLastServerUpdate();
 }
 
 void GlobalData::saveGlobalUserSettings()
@@ -192,7 +194,7 @@ void GlobalData::saveCurrentGamesList(qint64 timestamp)
         return;
     this->m_gpLastServerUpdateTimeStamp = timestamp;
 
-    std::sort(this->m_lGamePlay.begin(), this->m_lGamePlay.end(), GamePlay::compareTimeStampFunction);
+    std::sort(this->m_lGamePlay.begin(), this->m_lGamePlay.end(), GamePlay::compareTimeStampFunctionAscending);
 
     if (!g_GlobalSettings->saveInfosOnApp())
         return;
@@ -537,13 +539,25 @@ qint64 GlobalData::getSeasonTicketLastServerUpdate()
     return this->m_stLastServerUpdateTimeStamp;
 }
 
+void GlobalData::resetSeasonTicketLastServerUpdate()
+{
+    this->m_stLastServerUpdateTimeStamp = 0;
+}
+
 void GlobalData::saveCurrentNewsDataList(qint64 timestamp)
 {
     QMutexLocker lock(&this->m_mutexNewsData);
 
     this->m_ndLastServerUpdateTimeStamp = timestamp;
 
+    std::sort(this->m_lNewsDataItems.begin(), this->m_lNewsDataItems.end(), NewsDataItem::compareTimeStampFunctionDescending);
+
     /* Data is not saved */
+}
+
+void GlobalData::resetNewsDataLastServerUpdate()
+{
+    this->m_ndLastServerUpdateTimeStamp = 0;
 }
 
 void GlobalData::startUpdateNewsDataItem(const quint16 updateIndex)
@@ -586,7 +600,9 @@ NewsDataItem* GlobalData::createNewNewsDataItem(quint32 newsIndex, QString heade
         pItem->setTimeStamp(QDateTime::currentMSecsSinceEpoch());
         pItem->setHeader(header);
         pItem->setInfo(info);
-        pItem->setUser(this->m_userName);
+        pItem->setUser(this->m_readableName);
+
+        std::sort(this->m_lNewsDataItems.begin(), this->m_lNewsDataItems.end(), NewsDataItem::compareTimeStampFunctionDescending);
         return pItem;
     }
 
@@ -595,11 +611,12 @@ NewsDataItem* GlobalData::createNewNewsDataItem(quint32 newsIndex, QString heade
     pItem->setTimeStamp(QDateTime::currentMSecsSinceEpoch());
     pItem->setHeader(header);
     pItem->setInfo(info);
-    pItem->setUser(this->m_userName);
+    pItem->setUser(this->m_readableName);
 
     QQmlEngine::setObjectOwnership(pItem, QQmlEngine::CppOwnership);
     this->addNewNewsDataItem(pItem, UpdateIndex::UpdateAll);
 
+    std::sort(this->m_lNewsDataItems.begin(), this->m_lNewsDataItems.end(), NewsDataItem::compareTimeStampFunctionDescending);
     return pItem;
 }
 

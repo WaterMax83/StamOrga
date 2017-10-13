@@ -27,6 +27,7 @@ ColumnLayout {
     property alias loadingVisible : busyLoadingIndicator.visible
     property alias infoText: txtInfo.text
     property alias infoVisible: txtInfo.visible
+    property alias infoHeight: txtInfo.height
 
     spacing: 0
     width: parent.width

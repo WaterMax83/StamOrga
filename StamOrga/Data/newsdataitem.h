@@ -74,6 +74,8 @@ public:
         return QDateTime::fromMSecsSinceEpoch(this->m_timestamp).toString("ddd, dd.MM.yy hh:mm");
     }
 
+    static bool compareTimeStampFunctionDescending(NewsDataItem* p1, NewsDataItem* p2);
+
 signals:
     void userChanged();
     void headerChanged();

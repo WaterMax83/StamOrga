@@ -26,9 +26,6 @@ import "../components" as MyComponents
 
 Flickable {
     id: flickableFanclubNewsList
-//    property UserInterface userIntTicket
-//    flickingHorizontally: false
-//    flickingVertically: true
     flickableDirection: Flickable.VerticalFlick
 
     contentHeight: mainPaneFanClubNewsList.height
@@ -79,6 +76,7 @@ Flickable {
                 width: parent.width
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
                 Layout.fillHeight: false
+                Layout.topMargin: 10
                 infoVisible: true
             }
 
@@ -139,6 +137,17 @@ Flickable {
         showNewsDataList();
     }
 
+    function notifyDeleteFanclubNewsItemFinished(result) {
+        if (result === 1) {
+            toastManager.show("Nachricht erfolgreich gelöscht", 2000);
+            updateFanclubNewsList();
+        } else {
+            toastManager.show(userInt.getErrorCodeToString(result), 4000);
+            busyIndicatorNewsList.loadingVisible = false;
+            busyIndicatorNewsList.infoText = "Nachricht konnte nicht gelöscht werden"
+        }
+    }
+
     function showNewsDataList() {
 
         for (var j = columnLayoutFanClubList.children.length; j > 0; j--) {
@@ -168,9 +177,49 @@ Flickable {
                 }
             }
             onPressAndHold: {
+                if (!globalUserData.userIsFanclubEditEnabled() &&  !userInt.isDebuggingEnabled())
+                    return;
 
+                m_newsItemEditIndex = sender.index;
+                newsItemClickedMenu.open();
             }
         }
+    }
+
+    property var m_newsItemEditIndex;
+
+    Menu {
+            id: newsItemClickedMenu
+            x: (flickableFanclubNewsList.width - width) / 2
+            y: flickableFanclubNewsList.height / 6
+
+            background: Rectangle {
+                    implicitWidth: menuItemDelete.width
+                    color: "#4f4f4f"
+                }
+
+            MenuItem {
+                id: menuItemDelete
+                text: "Löschen"
+                onClicked: {
+                    var component = Qt.createComponent("../components/AcceptDialog.qml");
+                    if (component.status === Component.Ready) {
+                        var dialog = component.createObject(flickableFanclubNewsList,{popupType: 1});
+                        dialog.headerText = "Bestätigung";
+                        dialog.parentHeight = flickableFanclubNewsList.height
+                        dialog.parentWidth = flickableFanclubNewsList.width
+                        dialog.textToAccept = "Soll die Nachricht wirklich gelöscht werden?";
+                        dialog.acceptedDialog.connect(acceptedDeletingNews);
+                        dialog.open();
+                    }
+                }
+            }
+    }
+
+    function acceptedDeletingNews() {
+        busyIndicatorNewsList.loadingVisible = true;
+        busyIndicatorNewsList.infoText = "Lösche Nachricht"
+        userInt.startDeleteFanclubNewsItem(m_newsItemEditIndex);
     }
 
     function notifyUserIntConnectionFinished(result) {}

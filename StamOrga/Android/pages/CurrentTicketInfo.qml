@@ -336,7 +336,6 @@ Flickable {
             showInfoHeader("", false)
         } else {
             toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
-            txtInfoCurrentGame.text = "Karten konnten nicht geladen werden"
             showInfoHeader("Karten konnten nicht geladen werden", false)
         }
         showInternalTicketList(result);
@@ -393,11 +392,9 @@ Flickable {
             listViewReservedTickets.implicitHeight = 0;
             listViewFreeTickets.implicitHeight = 0;
 
-//            txtInfoCurrentGame.visible = true;
         }
 
 
-//        txtInfoCurrentGame.text = "Letztes Update am "
-//                + globalUserData.getSeasonTicketLastLocalUpdateString()
+
     }
 }

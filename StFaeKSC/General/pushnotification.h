@@ -39,7 +39,8 @@ enum PUSH_NOTIFY_TOPIC {
     PUSH_NOT_NEW_MEETING     = 2,
     PUSH_NOT_CHG_MEETING     = 3,
     PUSH_NOT_NEW_TICKET      = 4,
-    PUSH_NOT_NEW_AWAY_ACCEPT = 5
+    PUSH_NOT_NEW_AWAY_ACCEPT = 5,
+    PUSH_NOT_NEW_FAN_NEWS    = 6
 };
 
 
@@ -102,7 +103,7 @@ public:
     qint64 sendNewTicketNotification(const QString body, const qint32 userID, const quint32 gameIndex, const quint32 ticketIndex);
     qint64 removeNewTicketNotification(const quint32 gameIndex, const quint32 ticketIndex);
     qint64 sendNewFirstAwayAccept(const QString body, const qint32 userID);
-
+    qint64 sendNewFanclubNewsNotification(const QString body, const qint32 userID);
 
 signals:
     void sendNewNotificationSignal(void);

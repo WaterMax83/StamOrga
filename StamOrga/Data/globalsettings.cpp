@@ -32,6 +32,8 @@
 #define SETT_SAVE_INFOS_ON_APP      "SaveInfosOnApp"
 #define SETT_CHANGE_DEFAULT_FONT    "ChangeDefaultFont"
 #define SETT_ENABLE_NOTIFICATION    "EnableNotification"
+
+#define SETT_ALREADY_CONNECTED      "AlreadyConnected"
 // clang-format on
 
 GlobalSettings::GlobalSettings(QObject* parent)
@@ -55,35 +57,9 @@ void GlobalSettings::initialize(GlobalData* pGlobalData, QGuiApplication* app)
     this->setChangeDefaultFont(this->m_pGlobalData->m_pMainUserSettings->value(SETT_CHANGE_DEFAULT_FONT, "Default").toString());
     this->m_notificationEnabledValue = this->m_pGlobalData->m_pMainUserSettings->value(SETT_ENABLE_NOTIFICATION, 0x00000000FFFFFFFF).toULongLong();
 
+    this->m_alreadyConnected = this->m_pGlobalData->m_pMainUserSettings->value(SETT_ALREADY_CONNECTED, false).toBool();
+
     this->m_pGlobalData->m_pMainUserSettings->endGroup();
-
-    if (this->isNotificationNewAppVersionEnabled())
-        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_APP_VERSION);
-    else
-        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_APP_VERSION);
-
-    if (this->isNotificationNewMeetingEnabled())
-        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_MEETING);
-    else
-        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_MEETING);
-
-    if (this->isNotificationChangedMeetingEnabled())
-        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_CHANGE_MEETING);
-    else
-        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_CHANGE_MEETING);
-
-    if (this->isNotificationNewFreeTicketEnabled())
-        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_FREE_TICKET);
-    else
-        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_FREE_TICKET);
-
-    if (this->isNotificationNewAwayAcceptEnabled())
-        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_AWAY_ACCEPT);
-    else
-        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_AWAY_ACCEPT);
-
-    PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_GENERAL);
-    PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_GENERAL_BACKUP);
 
     connect(app, &QGuiApplication::applicationStateChanged, this, &GlobalSettings::stateFromAppChanged);
 }
@@ -107,6 +83,67 @@ void GlobalSettings::saveGlobalSettings()
     this->m_pGlobalData->m_pMainUserSettings->endGroup();
 
     this->m_pGlobalData->m_pMainUserSettings->sync();
+
+    this->updatePushNotification();
+}
+
+bool GlobalSettings::updateConnectionStatus(bool connected)
+{
+    if (connected != this->m_alreadyConnected) {
+        this->m_alreadyConnected = connected;
+        this->updatePushNotification();
+        QMutexLocker lock(&this->m_pGlobalData->m_mutexUser);
+
+        this->m_pGlobalData->m_pMainUserSettings->beginGroup("GLOBAL_SETTINGS");
+
+        this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_ALREADY_CONNECTED, this->m_alreadyConnected);
+
+        this->m_pGlobalData->m_pMainUserSettings->endGroup();
+        return true;
+    }
+    return false;
+}
+
+void GlobalSettings::updatePushNotification()
+{
+    if (this->m_alreadyConnected && this->isNotificationNewAppVersionEnabled())
+        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_APP_VERSION);
+    else
+        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_APP_VERSION);
+
+    if (this->m_alreadyConnected && this->isNotificationNewMeetingEnabled())
+        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_MEETING);
+    else
+        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_MEETING);
+
+    if (this->m_alreadyConnected && this->isNotificationChangedMeetingEnabled())
+        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_CHANGE_MEETING);
+    else
+        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_CHANGE_MEETING);
+
+    if (this->m_alreadyConnected && this->isNotificationNewFreeTicketEnabled())
+        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_FREE_TICKET);
+    else
+        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_FREE_TICKET);
+
+    if (this->m_alreadyConnected && this->isNotificationNewAwayAcceptEnabled())
+        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_AWAY_ACCEPT);
+    else
+        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_AWAY_ACCEPT);
+
+    if (this->m_alreadyConnected && this->isNotificationFanclubNewsEnabled()) {
+        if (this->m_pGlobalData->userIsFanclubEnabled())
+            PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_FANCLUB_NEWS);
+    } else
+        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_FANCLUB_NEWS);
+
+    if (this->m_alreadyConnected) {
+        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_GENERAL);
+        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_GENERAL_BACKUP);
+    } else {
+        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_GENERAL);
+        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_GENERAL_BACKUP);
+    }
 }
 
 void GlobalSettings::setChangeDefaultFont(QString font)
@@ -141,7 +178,11 @@ QString GlobalSettings::getVersionChangeInfo()
 {
     QString rValue;
 
-    rValue.append("<b>V1.0.3:</b>(25.08.2017)<br>");
+    rValue.append("<b>V1.0.4:</b>(XX.XX.XXXX)<br>");
+    rValue.append("- Fanclub Nachrichten (Mitglieder)<br>");
+    rValue.append("- neue Notification \"Erster Auswärtsfahrer\" & \"Fanclub Nachricht\"<br>");
+
+    rValue.append("<br><b>V1.0.3:</b>(25.08.2017)<br>");
     rValue.append("- Push Notifications (Android)<br>");
     rValue.append("- Schrift änderbar (Windows)<br>");
     rValue.append("- Infos über Ort bei Spieltagstickets<br>");
@@ -161,7 +202,7 @@ QString GlobalSettings::getVersionChangeInfo()
     rValue.append("- Versionshistorie hinzugefügt<br>");
     rValue.append("- Diverse Fehler beseitigt<br>");
 
-    rValue.append("<br><b>V1.0.0:</b><br>");
+    rValue.append("<br><b>V1.0.0:</b>(30.06.2017)<br>");
     rValue.append("Erste Version<br>");
 
     if (this->m_lastShownVersion != STAM_ORGA_VERSION_S) {
@@ -219,6 +260,7 @@ void GlobalSettings::stateFromAppChanged(Qt::ApplicationState state)
 #define NOT_OFFSET_CHGGAME 2
 #define NOT_OFFSET_NEWTICK 3
 #define NOT_OFFSET_NEWAWAY 4
+#define NOT_OFFSET_FANCLUB 5
 
 bool GlobalSettings::isNotificationNewAppVersionEnabled()
 {
@@ -240,48 +282,62 @@ bool GlobalSettings::isNotificationNewAwayAcceptEnabled()
 {
     return (this->m_notificationEnabledValue & (1 << NOT_OFFSET_NEWAWAY)) ? true : false;
 }
+bool GlobalSettings::isNotificationFanclubNewsEnabled()
+{
+    return (this->m_notificationEnabledValue & (1 << NOT_OFFSET_FANCLUB)) ? true : false;
+}
+
 void GlobalSettings::setNotificationNewAppVersionEnabled(bool enable)
 {
     this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_NEWAPPV);
     this->m_notificationEnabledValue |= (enable ? 1 : 0) << NOT_OFFSET_NEWAPPV;
-    if (enable)
-        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_APP_VERSION);
-    else
-        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_APP_VERSION);
+    //    if (enable)
+    //        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_APP_VERSION);
+    //    else
+    //        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_APP_VERSION);
 }
 void GlobalSettings::setNotificationNewMeetingEnabled(bool enable)
 {
     this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_NEWMEET);
     this->m_notificationEnabledValue |= (enable ? 1 : 0) << NOT_OFFSET_NEWMEET;
-    if (enable)
-        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_MEETING);
-    else
-        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_MEETING);
+    //    if (enable)
+    //        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_MEETING);
+    //    else
+    //        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_MEETING);
 }
 void GlobalSettings::setNotificationChangedMeetingEnabled(bool enable)
 {
     this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_CHGGAME);
     this->m_notificationEnabledValue |= (enable ? 1 : 0) << NOT_OFFSET_CHGGAME;
-    if (enable)
-        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_CHANGE_MEETING);
-    else
-        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_CHANGE_MEETING);
+    //    if (enable)
+    //        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_CHANGE_MEETING);
+    //    else
+    //        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_CHANGE_MEETING);
 }
 void GlobalSettings::setNotificationNewFreeTicketEnabled(bool enable)
 {
     this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_NEWTICK);
     this->m_notificationEnabledValue |= (enable ? 1 : 0) << NOT_OFFSET_NEWTICK;
-    if (enable)
-        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_FREE_TICKET);
-    else
-        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_FREE_TICKET);
+    //    if (enable)
+    //        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_FREE_TICKET);
+    //    else
+    //        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_FREE_TICKET);
 }
 void GlobalSettings::setNotificationNewAwayAcceptEnabled(bool enable)
 {
     this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_NEWAWAY);
     this->m_notificationEnabledValue |= (enable ? 1 : 0) << NOT_OFFSET_NEWAWAY;
-    if (enable)
-        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_AWAY_ACCEPT);
-    else
-        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_AWAY_ACCEPT);
+    //    if (enable)
+    //        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_AWAY_ACCEPT);
+    //    else
+    //        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_AWAY_ACCEPT);
+}
+void GlobalSettings::setNotificationFanclubNewsEnabled(bool enable)
+{
+    this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_FANCLUB);
+    this->m_notificationEnabledValue |= (enable ? 1 : 0) << NOT_OFFSET_FANCLUB;
+    //    if (enable)
+    //        PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_FANCLUB_NEWS);
+    //    else
+    //        PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_FANCLUB_NEWS);
 }

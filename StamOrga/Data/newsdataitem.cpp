@@ -22,3 +22,11 @@ NewsDataItem::NewsDataItem(QObject* parent)
     : QObject(parent)
 {
 }
+
+
+bool NewsDataItem::compareTimeStampFunctionDescending(NewsDataItem* p1, NewsDataItem* p2)
+{
+    if (p1->m_timestamp < p2->m_timestamp)
+        return false;
+    return true;
+}

@@ -22,7 +22,7 @@ import QtQuick.Layouts 1.0
 
 import com.watermax.demo 1.0
 
-//import "../components" as MyComponents
+import "../components" as MyComponents
 
 Flickable {
     id: flickableUser
@@ -37,25 +37,13 @@ Flickable {
         Column {
             width: parent.width
 
-            ColumnLayout {
+            MyComponents.BusyLoadingIndicator {
+                id: busyIndicatorUserlogin
                 width: parent.width
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-
-                BusyIndicator {
-                    id: busyConnectIndicator
-                    opacity: 1
-                    visible: false
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                }
-
-                Text {
-                    id: txtInfoConnecting
-                    visible: false
-                    font.pixelSize: 12
-                    color: "white"
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                    Layout.bottomMargin: 35
-                }
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                Layout.fillHeight: false
+                Layout.topMargin: 10
+                infoVisible: true
             }
 
             ColumnLayout {
@@ -73,15 +61,6 @@ Flickable {
                     visible: userIntUser.isDebuggingEnabled()
                     Layout.bottomMargin: 35
                 }
-
-    //            SpinBox {
-    //                id: spBoxPort
-    //                to: 100000
-    //                from: 1
-    //                value: globalUserData.conMasterPort
-    //                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-    //            }
-
 
                 Text {
                     text: qsTr("Login / Email")
@@ -145,9 +124,9 @@ Flickable {
 
                         if (userIntUser.startMainConnection(txtUserName.text.trim(), txtPassWord.text.trim()) > 0) {
                             btnSendData.enabled = false
-                            busyConnectIndicator.visible = true;
-                            txtInfoConnecting.text = "Verbinde ..."
-                            txtInfoConnecting.visible = true;
+                            busyIndicatorUserlogin.loadingVisible = true;
+                            busyIndicatorUserlogin.infoText = "Verbinde ..."
+                            busyIndicatorUserlogin.infoVisible = true;
                         }
                     }
                 }
@@ -182,9 +161,9 @@ Flickable {
                     }
 
                     function acceptedEditReadableName(text) {
-                        busyConnectIndicator.visible = true;
-                        txtInfoConnecting.visible = true;
-                        txtInfoConnecting.text = "Ändere Nutzernamen"
+                        busyIndicatorUserlogin.loadingVisible = true;
+                        busyIndicatorUserlogin.infoVisible = true;
+                        busyIndicatorUserlogin.infoText = "Ändere Nutzernamen"
                         userIntUser.startUpdateReadableName(text)
                     }
                 }
@@ -245,45 +224,45 @@ Flickable {
 
     function notifyUserIntConnectionFinished(result) {
         btnSendData.enabled = true
-        busyConnectIndicator.visible = false;
+        busyIndicatorUserlogin.loadingVisible = false;
         if (result === 1) {
-            txtInfoConnecting.text = "Verbindung erfolgreich";
+            busyIndicatorUserlogin.infoText = "Verbindung erfolgreich";
             toastManager.show("Verbindung erfolgreich", 2000)
             updateUserColumnView(false);
         }
         else {
             if (result === -21)
                 txtPassWord.text = "";
-            txtInfoConnecting.visible = false;
-            txtInfoConnecting.text = userIntUser.getErrorCodeToString(result);
+            busyIndicatorUserlogin.infoVisible = false;
+            busyIndicatorUserlogin.infoText = userIntUser.getErrorCodeToString(result);
             toastManager.show(userIntUser.getErrorCodeToString(result), 5000)
             updateUserColumnView(true);
         }
     }
 
     function notifyUserIntUpdatePasswordFinished(result) {
-        busyConnectIndicator.visible = false;
-        txtInfoConnecting.visible = false;
+        busyIndicatorUserlogin.loadingVisible = false;
+        busyIndicatorUserlogin.infoVisible = false;
         if (result === 1) {
             toastManager.show("Passwort erfolgreich geändert", 2000)
-            txtInfoConnecting.visible = false;
+            busyIndicatorUserlogin.infoVisible = false;
         }
         else {
-            txtInfoConnecting.text = "Fehler beim Passwort ändern"
+            busyIndicatorUserlogin.infoText = "Fehler beim Passwort ändern"
             toastManager.show(userIntUser.getErrorCodeToString(result), 5000)
         }
     }
 
 
     function notifyUserIntUpdateReadableNameFinished(result) {
-        busyConnectIndicator.visible = false;
+        busyIndicatorUserlogin.loadingVisible = false;
 
         if (result === 1) {
             toastManager.show("Nutzername erfolgreich geändert", 2000)
-            txtInfoConnecting.visible = false;
+            busyIndicatorUserlogin.infoVisible = false;
         }
         else {
-            txtInfoConnecting.text = "Fehler beim Namen ändern"
+            busyIndicatorUserlogin.infoText = "Fehler beim Namen ändern"
             toastManager.show(userIntUser.getErrorCodeToString(result), 5000)
         }
     }
@@ -327,9 +306,9 @@ Flickable {
                 changePassWordDialog.open()
             } else if (txtnewPassWord.text.trim() == txtnewPassWordReplay.text.trim()) {
                 userIntUser.startUpdateUserPassword(txtnewPassWord.text.trim())
-                busyConnectIndicator.visible = true;
-                txtInfoConnecting.visible = true;
-                txtInfoConnecting.text = "Ändere Passwort"
+                busyIndicatorUserlogin.loadingVisible = true;
+                busyIndicatorUserlogin.infoVisible = true;
+                busyIndicatorUserlogin.infoText = "Ändere Passwort"
                 changePassWordDialog.close()
             } else {
                 labelPasswordDiffer.visible = true

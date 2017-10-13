@@ -25,7 +25,7 @@
 #include "../Common/General/globalfunctions.h"
 #include "listeduser.h"
 
-ListedUser *g_ListedUser = NULL;
+ListedUser* g_ListedUser = NULL;
 
 ListedUser::ListedUser()
 {
@@ -335,19 +335,17 @@ quint32 ListedUser::getUserProperties(QString name)
     return 0;
 }
 
-QString ListedUser::getReadableName(QString name)
+QString ListedUser::getReadableName(quint32 userIndex)
 {
+    UserLogin* pLogin = (UserLogin*)(this->getItem(userIndex));
+    if (pLogin == NULL)
+        return "";
+
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
-    for (int i = 0; i < this->getNumberOfInternalList(); i++) {
-        UserLogin* pLogin = (UserLogin*)(this->getItemFromArrayIndex(i));
-        if (pLogin == NULL)
-            continue;
-        if (pLogin->m_itemName == name)
-            return pLogin->m_readName;
-    }
-    return "";
+    return pLogin->m_readName;
 }
+
 QString ListedUser::getSalt(QString name)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);

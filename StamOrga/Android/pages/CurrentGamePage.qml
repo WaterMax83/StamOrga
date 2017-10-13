@@ -46,25 +46,13 @@ Item {
                 Layout.alignment: Qt.AlignTop
             }
 
-            ColumnLayout {
-                id: columnLayoutBusyInfoCurrGame
-                spacing: 0
+            MyComponents.BusyLoadingIndicator {
+                id: busyIndicatorCurrentGame
                 width: parent.width
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-
-                BusyIndicator {
-                    id: busyLoadingIndicatorCurrentGames
-                    visible: false
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                }
-
-                Text {
-                    id: txtInfoCurrentGame
-                    visible: false
-                    color: "white"
-                    font.pixelSize: 12
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                }
+                Layout.fillHeight: false
+                Layout.topMargin: 10
+                infoVisible: true
             }
 
             TabBar {
@@ -113,12 +101,12 @@ Item {
 
     function currentTicketInfoNewHeaderInfo(text, load) {
         if (swipeViewCurrentHomeGame.currentItem === currentTicketInfo) {
-            busyLoadingIndicatorCurrentGames.visible = load;
+            busyIndicatorCurrentGame.loadingVisible = load;
             if (text === "")
-                txtInfoCurrentGame.visible = false
+                busyIndicatorCurrentGame.infoVisible = false;
             else
-                txtInfoCurrentGame.visible = true;
-            txtInfoCurrentGame.text = text;
+                busyIndicatorCurrentGame.infoVisible = true;
+            busyIndicatorCurrentGame.infoText = text;
         }
     }
 
@@ -134,12 +122,12 @@ Item {
 
     function currentMeetInfoNewHeaderInfo(text, load) {
         if (swipeViewCurrentHomeGame.currentItem === currentMeetInfo) {
-            busyLoadingIndicatorCurrentGames.visible = load;
+            busyIndicatorCurrentGame.loadingVisible = load
             if (text === "")
-                txtInfoCurrentGame.visible = false
+                busyIndicatorCurrentGame.infoVisible = false;
             else
-                txtInfoCurrentGame.visible = true;
-            txtInfoCurrentGame.text = text;
+                busyIndicatorCurrentGame.infoVisible = true;
+            busyIndicatorCurrentGame.infoText = text;
         }
     }
 

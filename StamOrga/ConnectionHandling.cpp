@@ -22,6 +22,7 @@
 #include "../Common/General/globaltiming.h"
 #include "../Common/Network/messagecommand.h"
 #include "../Common/Network/messageprotocol.h"
+#include "../Data/globalsettings.h"
 #include "connectionhandling.h"
 
 #define TIMER_DIFF_MSEC 10 * 1000
@@ -285,6 +286,15 @@ qint32 ConnectionHandling::startGetFanclubNewsItem(const quint32 newsIndex)
     return ERROR_CODE_SUCCESS;
 }
 
+qint32 ConnectionHandling::startDeleteFanclubNewsItem(const quint32 newsIndex)
+{
+    DataConRequest req(OP_CODE_CMD_REQ::REQ_DEL_NEWS_DATA_ITEM);
+    req.m_lData.append(QString::number(newsIndex));
+    this->sendNewRequest(req);
+
+    return ERROR_CODE_SUCCESS;
+}
+
 /*
  * Answer function after connection with username
  */
@@ -306,11 +316,17 @@ void ConnectionHandling::slMainConReqFin(qint32 result, const QString msg, const
         this->stopDataConnection();
         emit this->sNotifyConnectionFinished(result);
 
+        if (result == ERROR_CODE_NO_USER)
+            g_GlobalSettings->updateConnectionStatus(false);
+
         while (this->m_lErrorMainCon.size() > 0) {
             DataConRequest request = this->m_lErrorMainCon.last();
             request.m_result       = result;
             this->slDataConLastRequestFinished(request);
             this->m_lErrorMainCon.removeLast();
+        }
+
+        if (result == ERROR_CODE_NO_USER) {
         }
     }
 }
@@ -381,6 +397,8 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
                 this->slDataConLastRequestFinished(newReq);
                 this->m_lErrorMainCon.removeLast();
             }
+            if (request.m_result == ERROR_CODE_WRONG_PASSWORD)
+                g_GlobalSettings->updateConnectionStatus(false);
         }
 
         emit this->sNotifyConnectionFinished(request.m_result);
@@ -388,6 +406,11 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
 
     case OP_CODE_CMD_REQ::REQ_GET_VERSION:
         emit this->sNotifyVersionRequest(request.m_result, request.m_returnData);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
+        g_GlobalSettings->updateConnectionStatus(false);
+        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
         break;
 
     case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
@@ -423,6 +446,11 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
         break;
     }
 
+    case OP_CODE_CMD_REQ::REQ_REMOVE_TICKET:
+        this->m_pGlobalData->resetSeasonTicketLastServerUpdate();
+        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
+        break;
+
     case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS: {
 
         static quint32 retryGetTicketCount = 0;
@@ -452,6 +480,10 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
         }
         break;
     }
+    case OP_CODE_CMD_REQ::REQ_DEL_NEWS_DATA_ITEM:
+        this->m_pGlobalData->resetNewsDataLastServerUpdate();
+        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
+        break;
 
     default:
         emit this->sNotifyCommandFinished(request.m_request, request.m_result);
