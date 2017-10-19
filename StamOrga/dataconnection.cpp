@@ -594,10 +594,12 @@ qint32 DataConnection::sendMessageRequest(MessageProtocol* msg, DataConRequest r
         else
             currentSendSize = totalPacketSize - sendBytes;
 
+
         qint64 rValue = this->m_pDataUdpSocket->writeDatagram(pData + sendBytes,
                                                               currentSendSize,
                                                               this->m_hDataReceiver,
                                                               this->m_pGlobalData->conDataPort());
+
         if (rValue < 0) {
             request.m_result = ERROR_CODE_ERR_SEND;
             emit this->notifyLastRequestFinished(request);

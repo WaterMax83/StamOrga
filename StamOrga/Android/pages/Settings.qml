@@ -144,7 +144,18 @@ Item {
                    Layout.fillWidth: true
                    model: fontFamiliesModel
                    textRole: "display"
+//                   textRole: "text"
                    onCurrentIndexChanged: valueWasEditedEnableSave();
+//                   delegate: Item {
+//                               height: 40; width: cbfontFamilies.width
+//                               Text {
+//                                   anchors.centerIn: parent
+//                                   text: modelData
+//                                   font.family: modelData
+//                                   font.pixelSize: 20
+//                                   color: "white"
+//                               }
+//                           }
                }
 
            }

@@ -190,8 +190,14 @@ void GlobalData::saveCurrentGamesList(qint64 timestamp)
 {
     QMutexLocker lock(&this->m_mutexGame);
 
-    if (this->m_gpLastServerUpdateTimeStamp == timestamp && !this->m_bGamePlayLastUpdateDidChanges)
+    if (this->m_gpLastServerUpdateTimeStamp == timestamp && !this->m_bGamePlayLastUpdateDidChanges) {
+        if (!g_GlobalSettings->saveInfosOnApp())
+            return;
+        this->m_pMainUserSettings->beginGroup(GAMES_GROUP);
+        this->m_pMainUserSettings->setValue("LocalGamesUpdateTime", this->m_gpLastLocalUpdateTimeStamp);
+        this->m_pMainUserSettings->endGroup();
         return;
+    }
     this->m_gpLastServerUpdateTimeStamp = timestamp;
 
     std::sort(this->m_lGamePlay.begin(), this->m_lGamePlay.end(), GamePlay::compareTimeStampFunctionAscending);
@@ -429,8 +435,14 @@ void GlobalData::saveCurrentSeasonTickets(qint64 timestamp)
 {
     QMutexLocker lock(&this->m_mutexTicket);
 
-    if (this->m_stLastServerUpdateTimeStamp == timestamp && !this->m_bSeasonTicketLastUpdateDidChanges)
+    if (this->m_stLastServerUpdateTimeStamp == timestamp && !this->m_bSeasonTicketLastUpdateDidChanges) {
+        if (!g_GlobalSettings->saveInfosOnApp())
+            return;
+        this->m_pMainUserSettings->beginGroup(SEASONTICKET_GROUP);
+        this->m_pMainUserSettings->setValue("LocalTicketsUpdateTime", this->m_stLastLocalUpdateTimeStamp);
+        this->m_pMainUserSettings->endGroup();
         return;
+    }
 
     this->m_stLastServerUpdateTimeStamp = timestamp;
 

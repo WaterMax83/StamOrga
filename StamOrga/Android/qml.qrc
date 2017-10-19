@@ -72,5 +72,6 @@
         <file>images/cut.png</file>
         <file>images/paste.png</file>
         <file>components/NewsDataItem.qml</file>
+        <file>components/CustomButton.qml</file>
     </qresource>
 </RCC>

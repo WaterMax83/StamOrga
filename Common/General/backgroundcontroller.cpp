@@ -82,7 +82,8 @@ void BackgroundController::finishedThread()
 
 void BackgroundController::finishedBackgroundWorker(const int& result)
 {
-    disconnect(this->m_worker, &BackgroundWorker::notifyBackgroundWorkerFinished, this, &BackgroundController::finishedBackgroundWorker);
+    Q_UNUSED(result);
+    //    disconnect(this->m_worker, &BackgroundWorker::notifyBackgroundWorkerFinished, this, &BackgroundController::finishedBackgroundWorker);
 
     if (this->m_bCleanupAfterWorkerFinished)
         this->CleanupBackgroundWorker();

@@ -106,7 +106,7 @@ Flickable {
                     Layout.bottomMargin: 35
                 }
 
-                Button {
+                MyComponents.CustomButton {
                     id: btnSendData
                     text: qsTr("Verbinden")
                     implicitWidth: Math.max(parent.width / 4 * 2, contentWidth)
@@ -137,11 +137,12 @@ Flickable {
                 width: parent.width
                 spacing: 5
 
-                Button {
+                  MyComponents.CustomButton {
                     id: btnChangeReadableName
                     implicitWidth: parent.width / 4 * 3
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     transformOrigin: Item.Center
+                    font.family: txtInfoReadableName.font
                     onClicked: {
                         var component = Qt.createComponent("../components/EditableTextDialog.qml");
                         if (component.status === Component.Ready) {
@@ -189,7 +190,7 @@ Flickable {
                     Layout.bottomMargin: 35
                 }
 
-                Button {
+                MyComponents.CustomButton {
                     id: btnChangePassWord
                     text: qsTr("Passwort ändern")
                     implicitWidth: parent.width / 4 * 2

@@ -22,6 +22,8 @@ import QtQuick.Layouts 1.0
 
 import com.watermax.demo 1.0
 
+import "../components" as MyComponents
+
 Flickable {
    id: flickableLogging
    contentHeight: mainPaneLogging.height
@@ -53,7 +55,7 @@ Flickable {
                color: "white"
            }
 
-           Button {
+           MyComponents.CustomButton {
                text: "Kopieren"
                implicitWidth: parent.width / 3 * 2
                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
@@ -63,7 +65,7 @@ Flickable {
                }
            }
 
-           Button {
+           MyComponents.CustomButton {
                text: "Löschen"
                implicitWidth: parent.width / 3 * 2
                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter

@@ -66,7 +66,6 @@ qint32 ConnectionHandling::startMainConnection(QString name, QString passw)
     }
 
     this->stopDataConnection();
-    QThread::msleep(20);
 
     if (this->m_pMainCon == NULL) {
         this->m_pMainCon = new MainConnection(this->m_pGlobalData);
@@ -521,6 +520,8 @@ void ConnectionHandling::startDataConnection()
             this, &ConnectionHandling::slDataConLastRequestFinished);
 
     this->m_ctrlDataCon.Start(this->m_pDataCon, false);
+
+    QThread::msleep(25);
 }
 
 void ConnectionHandling::stopDataConnection()
@@ -536,6 +537,8 @@ void ConnectionHandling::stopDataConnection()
                this, &ConnectionHandling::slDataConLastRequestFinished);
 
     this->m_ctrlDataCon.Stop();
+
+    QThread::msleep(50);
 }
 
 

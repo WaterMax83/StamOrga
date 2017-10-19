@@ -211,18 +211,19 @@ Flickable {
                 implicitHeight: textInfo.height > 0 ? textInfo.height : listViewItemHeight
                 color: isEditMode ? "#FFFFFF" : "#AAAAAA";
                 visible: isInfoVisible
-                Text {
-                    id: hintTextInfo
-                    anchors { fill: parent; leftMargin: 14 }
-                    verticalAlignment: Text.AlignVCenter
-                    color: "#808080"
-                    text: "Info"
-                    opacity: textInfo.text.length ? 0 : 1
-                }
+//                Text {
+//                    id: hintTextInfo
+//                    anchors { fill: parent; leftMargin: 14 }
+//                    verticalAlignment: Text.AlignVCenter
+//                    color: "#808080"
+//                    text: "Info"
+//                    opacity: textInfo.text.length ? 0 : 1
+//                }
                 TextArea {
                     id: textInfo
                     width: parent.width
                     color: "#505050"
+                    placeholderText: "Information"
                     leftPadding: 5
                     font.pixelSize: 16
                     enabled: isEditMode
