@@ -39,6 +39,11 @@ Item {
             Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
             spacing: 0
 
+            Text {
+                id: txtForFontFamily
+                visible: false
+            }
+
             MyComponents.Games {
                 id: gameHeader
                 anchors.left: parent.left
@@ -65,6 +70,7 @@ Item {
                   Repeater {
                       model: tabModel
                       delegate: TabButton {
+                          font.family: txtForFontFamily.font
                           text: model.text
                       }
                   }

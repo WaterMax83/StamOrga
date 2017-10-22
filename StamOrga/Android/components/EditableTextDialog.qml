@@ -22,7 +22,9 @@ import QtQuick.Layouts 1.0
 
 import com.watermax.demo 1.0
 
-Dialog {
+import "../components" as MyComponents
+
+MyComponents.CustomDialog {
     property int parentWidth : 540
     property int parentHeight : 960
     property int textMinSize : 3
@@ -62,8 +64,14 @@ Dialog {
         width: editableTextDialog.width
         spacing: 20
 
+        Text {
+            id: txtForFontFamily
+            visible: false
+        }
+
         TextField {
             id: txtEditableText
+            font.family: txtForFontFamily.font
             implicitWidth: editableTextDialogColumn.width / 4 * 3
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
         }

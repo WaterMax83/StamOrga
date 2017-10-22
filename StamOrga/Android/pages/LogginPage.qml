@@ -36,12 +36,18 @@ Flickable {
            width: parent.width
            spacing: 5
            ComboBox {
-                id: logFilesCombo
+               id: logFilesCombo
+               font.family: txtForFontFamily.font
                model: globalUserData.getCurrentLogFileList()
                anchors.horizontalCenter: parent.horizontalCenter
                onCurrentIndexChanged: {
                    txtLogging.text = globalUserData.getCurrentLoggingList(logFilesCombo.currentIndex);
                }
+           }
+
+           Text {
+               id: txtForFontFamily
+               visible: false
            }
 
            Text {
@@ -57,6 +63,7 @@ Flickable {
 
            MyComponents.CustomButton {
                text: "Kopieren"
+               font.family: txtForFontFamily.font
                implicitWidth: parent.width / 3 * 2
                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                onClicked: {
@@ -67,6 +74,7 @@ Flickable {
 
            MyComponents.CustomButton {
                text: "Löschen"
+               font.family: txtForFontFamily.font
                implicitWidth: parent.width / 3 * 2
                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                onClicked: {

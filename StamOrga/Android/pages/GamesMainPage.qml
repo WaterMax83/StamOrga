@@ -58,9 +58,11 @@ Page {
 
                 TabButton {
                     text: "Aktuell"
+                    font.family: txtForFontFamily.font
                 }
                 TabButton {
                     text: "Vergangenheit"
+                    font.family: txtForFontFamily.font
                 }
         }
 
@@ -100,6 +102,10 @@ Page {
                 onDragEnded: { movedInfoIndex = 0; checkMovedInfoEnd(movedStartY - contentY); }
                 onContentYChanged : checkMovedInfo(2, movedStartY - contentY);
             }
+        }
+        Text {
+            id: txtForFontFamily
+            visible: false
         }
     }
 
@@ -169,6 +175,7 @@ Page {
                 dialog.competitionIndex = 2;
                 dialog.date = "";
                 dialog.index = 0;
+                dialog.font.family= txtForFontFamily.font
                 dialog.acceptedDialog.connect(acceptedAddGameDialog);
                 addGameDialog = dialog
                 dialog.open();

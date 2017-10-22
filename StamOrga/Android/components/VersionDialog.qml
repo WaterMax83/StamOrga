@@ -21,8 +21,9 @@ import QtQuick.Controls 2.1
 import QtQuick.Layouts 1.0
 
 import com.watermax.demo 1.0
+import "../components" as MyComponents
 
-Dialog {
+MyComponents.CustomDialog {
     property int parentWidth : 540
     property int parentHeight : 960
     property alias versionText: versionDialogTextUpdate.text

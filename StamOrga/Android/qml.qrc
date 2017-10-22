@@ -73,5 +73,6 @@
         <file>images/paste.png</file>
         <file>components/NewsDataItem.qml</file>
         <file>components/CustomButton.qml</file>
+        <file>components/CustomDialog.qml</file>
     </qresource>
 </RCC>

@@ -177,6 +177,11 @@ Flickable {
         }
     }
 
+    Text {
+        id: txtForFontFamily
+        visible: false
+    }
+
     ScrollIndicator.vertical: ScrollIndicator {
     }
 
@@ -200,6 +205,7 @@ Flickable {
             dialog.parentHeight = mainWindow.height
             dialog.parentWidth =  mainPaneCurrentGame.width
             dialog.textMinSize = 4;
+            dialog.font.family= txtForFontFamily.font
             dialog.acceptedTextEdit.connect(acceptedEditReserveNameDialog);
             dialog.open();
         }
@@ -228,6 +234,7 @@ Flickable {
             }
         MenuItem {
             id: menuItemFree
+            font.family: txtForFontFamily.font
             text : "Freigeben"
             onClicked: freeTicketItem();
         }
@@ -249,18 +256,21 @@ Flickable {
 
         MenuItem {
             id: menuItemFreeFromReserve
+            font.family: txtForFontFamily.font
             text: "Freigeben"
             onClicked: freeTicketItem();
         }
 
         MenuItem {
             id: menuItemBlockFromReserve
+            font.family: txtForFontFamily.font
             text: "Sperren"
             onClicked: blockTicketItem();
         }
 
         MenuItem {
             id: menuItemChangeReserve
+            font.family: txtForFontFamily.font
             text: "Reservierung ändern"
             onClicked: reserveTicketItem("Reservierung ändern");
         }
@@ -282,12 +292,14 @@ Flickable {
 
         MenuItem {
             id: menuItemReserve
+            font.family: txtForFontFamily.font
             text: "Reservieren"
             onClicked: reserveTicketItem("Reserviere für");
         }
 
         MenuItem {
             id: menuItemBlock
+            font.family: txtForFontFamily.font
             text: "Sperren"
             onClicked: blockTicketItem();
         }

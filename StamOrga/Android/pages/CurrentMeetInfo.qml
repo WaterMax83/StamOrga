@@ -75,6 +75,11 @@ Flickable {
             id: mainColumnLayoutCurrentMeetInfo
             width: parent.width
 
+            Text {
+                id: txtForFontFamily
+                visible: false
+            }
+
             RowLayout {
                 width: parent.width
                 spacing: 20
@@ -221,6 +226,7 @@ Flickable {
 //                }
                 TextArea {
                     id: textInfo
+                    font.family: txtForFontFamily.font
                     width: parent.width
                     color: "#505050"
                     placeholderText: "Information"
@@ -342,6 +348,7 @@ Flickable {
 
             MenuItem {
                 id: menuItemAccept
+                font.family: txtForFontFamily.font
                 visible: menuAcceptValue !== 1 ? true : false
                 height: visible ? implicitHeight : 0
                 text: "Zusagen"
@@ -353,6 +360,7 @@ Flickable {
 
             MenuItem {
                 id: menuItemInterest
+                font.family: txtForFontFamily.font
                 text: "Interesse/Vorbehalt"
                 visible: menuAcceptValue !== 2 ? true : false
                 height: visible ? implicitHeight : 0
@@ -364,6 +372,7 @@ Flickable {
 
             MenuItem {
                 id: menuItemDecline
+                font.family: txtForFontFamily.font
                 text: "Absagen"
                 visible: menuAcceptValue !== 3 ? true : false
                 height: visible ? implicitHeight : 0
@@ -397,6 +406,7 @@ Flickable {
             dialog.textMinSize = 4;
             dialog.editableText = text;
             dialog.acceptedTextEdit.connect(acceptedEditTextDialogAccept);
+            dialog.font.family= txtForFontFamily.font
             dialog.open();
         }
     }
@@ -511,6 +521,7 @@ Flickable {
                     dialog.parentWidth = mainPaneCurrentGame.width
                     dialog.textToAccept = "Der Name exisitiert bereits.\n\nZum Ändern eines vorhanden Eintrags auf den Namen klicken.";
                     dialog.showCancelButton = false
+                    dialog.font.family= txtForFontFamily.font
                     dialog.open();
                 }
             }

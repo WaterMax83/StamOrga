@@ -33,6 +33,11 @@ Item {
            width: parent.width
            spacing: 20
 
+           Text {
+               id: txtForFontFamily
+               visible: false
+           }
+
            RowLayout {
                Layout.preferredWidth: parent.width
                Layout.fillWidth: true
@@ -120,6 +125,7 @@ Item {
                            dialog.enableFanclubNews = notifyFanclubNews;
                            dialog.visibleFanclubNews = globalUserData.userIsFanclubEnabled();
                            dialog.acceptedDialog.connect(acceptedNotificationDialog);
+                           dialog.font.family= txtForFontFamily.font
                            notifyDialog = dialog;
                            dialog.open();
                        }
@@ -130,7 +136,8 @@ Item {
            RowLayout {
                Layout.preferredWidth: parent.width
                Layout.fillWidth: true
-               visible: !userInt.isDeviceMobile() || userInt.isDebuggingEnabled()
+//               visible: !userInt.isDeviceMobile() || userInt.isDebuggingEnabled()
+               visible: true
 
                Text {
                    id: text5

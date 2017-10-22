@@ -158,6 +158,8 @@ public:
     QString getCurrentAppGUID() { return this->m_AppInstanceGUID; }
     QString getCurrentAppToken() { return this->m_pushNotificationToken; }
 
+    bool isIPLookUpDone() { return this->m_bIpAdressWasSet; }
+
 signals:
     void
     userNameChanged();
@@ -185,6 +187,7 @@ private:
     quint32 m_uMasterPort;
     quint16 m_uDataPort;
     quint32 m_userIndex;
+    bool    m_bIpAdressWasSet;
 
     quint32 m_UserProperties;
 

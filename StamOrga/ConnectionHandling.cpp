@@ -365,7 +365,7 @@ void ConnectionHandling::sendNewRequest(DataConRequest request)
     } else {
         this->m_lErrorMainCon.prepend(request);
         if (this->m_lErrorMainCon.size() == 1) {
-            qInfo().noquote() << QString("Trying to restart connection from ConnectionHandling");
+            qInfo().noquote() << QString("Trying to restart connection from ConnectionHandling ") << QThread::currentThreadId();
             this->startMainConnection(this->m_pGlobalData->userName(), this->m_pGlobalData->passWord());
         }
     }

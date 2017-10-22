@@ -43,6 +43,15 @@ int MainConnection::DoBackgroundWork()
         return -1;
     }
 
+    /* Wait till IP address was set */
+    qint32 sleepCounter = 0;
+    while (!this->m_pGlobalData->isIPLookUpDone()) {
+        QThread::msleep(100);
+        sleepCounter++;
+        if (sleepCounter >= 10)
+            break;
+    }
+
     connect(this->m_pMasterUdpSocket, &QUdpSocket::readyRead, this, &MainConnection::slotReadyReadMasterPort);
     typedef void (QAbstractSocket::*QAbstractSocketErrorSignal)(QAbstractSocket::SocketError);
     connect(this->m_pMasterUdpSocket, static_cast<QAbstractSocketErrorSignal>(&QAbstractSocket::error), this, &MainConnection::slotSocketMainError);
@@ -62,6 +71,7 @@ void MainConnection::slotNewBindingPortRequest()
         this->m_pMasterUdpSocket->disconnectFromHost();
     this->m_pMasterUdpSocket->bind();
     this->m_hMasterReceiver = QHostAddress(this->m_pGlobalData->ipAddr());
+    qDebug() << "Master Setting New Binding Request";
 }
 
 void MainConnection::slotSendNewMainConRequest(QString username)

@@ -52,8 +52,14 @@ Flickable {
                 Layout.fillWidth: true
                 spacing: 5
 
+                Text {
+                    id: txtForFontFamily
+                    visible: false
+                }
+
                 TextField {
                     id: txtIPAddress
+                    font.family: txtForFontFamily.font
                     text: globalUserData.ipAddr
                     padding: 10
                     implicitWidth: parent.width / 3 * 2
@@ -71,6 +77,7 @@ Flickable {
 
                 TextField {
                     id: txtUserName
+                    font.family: txtForFontFamily.font
                     text: globalUserData.userName
                     padding: 10
                     implicitWidth: parent.width / 3 * 2
@@ -95,6 +102,7 @@ Flickable {
 
                 TextField {
                     id: txtPassWord
+                    font.family: txtForFontFamily.font
                     text: globalUserData.passWord.length === 0 ? "" : "dEf1AuLt"
                     padding: 10
                     implicitWidth: parent.width / 3 * 2
@@ -108,6 +116,7 @@ Flickable {
 
                 MyComponents.CustomButton {
                     id: btnSendData
+                    font.family: txtForFontFamily.font
                     text: qsTr("Verbinden")
                     implicitWidth: Math.max(parent.width / 4 * 2, contentWidth)
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
@@ -139,10 +148,10 @@ Flickable {
 
                   MyComponents.CustomButton {
                     id: btnChangeReadableName
+                    font.family: txtForFontFamily.font
                     implicitWidth: parent.width / 4 * 3
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     transformOrigin: Item.Center
-                    font.family: txtInfoReadableName.font
                     onClicked: {
                         var component = Qt.createComponent("../components/EditableTextDialog.qml");
                         if (component.status === Component.Ready) {
@@ -151,6 +160,7 @@ Flickable {
                                 dialog.headerText = "Nutzername anlegen";
                             else
                                 dialog.headerText = "Nutzername ändern";
+                            dialog.font.family= txtForFontFamily.font
                             dialog.parentHeight = flickableUser.height
                             dialog.parentWidth = flickableUser.width
                             dialog.textMinSize = 4;
@@ -192,6 +202,7 @@ Flickable {
 
                 MyComponents.CustomButton {
                     id: btnChangePassWord
+                    font.family: txtForFontFamily.font
                     text: qsTr("Passwort ändern")
                     implicitWidth: parent.width / 4 * 2
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
@@ -289,8 +300,9 @@ Flickable {
         }
     }
 
-    Dialog {
+    MyComponents.CustomDialog {
         id: changePassWordDialog
+        font.family: txtForFontFamily.font
         x: Math.round((flickableUser.width - width) / 2)
         y: Math.round(flickableUser.height / 6)
         width: Math.round(Math.min(flickableUser.width, flickableUser.height) / 3 * 2)
@@ -341,6 +353,7 @@ Flickable {
 
                 TextField {
                     id: txtnewPassWord
+                    font.family: txtForFontFamily.font
                     text: globalUserData.passWord
                     implicitWidth: changePasswordColumn.width / 4 * 3
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
@@ -362,6 +375,7 @@ Flickable {
 
                 TextField {
                     id: txtnewPassWordReplay
+                    font.family: txtForFontFamily.font
                     text: globalUserData.passWord
                     implicitWidth: changePasswordColumn.width / 4 * 3
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter

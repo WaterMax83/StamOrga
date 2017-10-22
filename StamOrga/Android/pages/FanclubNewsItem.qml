@@ -39,6 +39,11 @@ Item {
             width: parent.width
             height: parent.height
 
+            Text {
+                id: txtForFontFamily
+                visible: false
+            }
+
             MyComponents.BusyLoadingIndicator {
                 id: busyIndicatorNews
                 width: parent.width
@@ -68,6 +73,7 @@ Item {
 
                     TextArea.flickable: TextArea {
                         id: textAreaInfo
+                        font.family: txtForFontFamily.font
                         width: parent.width
                         color: "#505050"
                         background: Rectangle {

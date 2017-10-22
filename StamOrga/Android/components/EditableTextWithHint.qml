@@ -43,6 +43,7 @@ Rectangle {
 
     TextInput {
         id: inputText
+        font.family: hintText.font
         anchors { fill:parent; leftMargin: 5 }
         verticalAlignment: Text.AlignVCenter
         font.pixelSize: 16

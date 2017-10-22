@@ -22,7 +22,9 @@ import QtQuick.Layouts 1.0
 
 import com.watermax.demo 1.0
 
-Dialog {
+import "../components" as MyComponents
+
+MyComponents.CustomDialog {
     property int parentWidth : 540
     property int parentHeight : 960
     property int textMinSize : 3
@@ -62,6 +64,11 @@ Dialog {
         spacing: 20
         width: editSeasonTicketDlg.width
 
+        Text {
+            id: txtForFontFamily
+            visible: false
+        }
+
         ColumnLayout {
             id: columnLayoutAddTicketName
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
@@ -76,6 +83,7 @@ Dialog {
 
             TextField {
                 id: txtnewSeasonTicketName
+                font.family: txtForFontFamily.font
                 implicitWidth: addSeasonTicketColumn.width / 4 * 3
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             }
@@ -83,6 +91,7 @@ Dialog {
 
         CheckBox {
             id: chBoxDiscount
+            font.family: txtForFontFamily.font
             text: "ermäßigt"
             checked: false
         }

@@ -22,7 +22,9 @@ import QtQuick.Layouts 1.0
 
 import com.watermax.demo 1.0
 
-Dialog {
+import "../components" as MyComponents
+
+MyComponents.CustomDialog {
     property int parentWidth : 540
     property int parentHeight : 960
     property alias textToAccept : labelAcceptText.text

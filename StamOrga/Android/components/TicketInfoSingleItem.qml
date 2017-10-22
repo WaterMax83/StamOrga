@@ -66,6 +66,11 @@ RowLayout {
         onClicked: clickedItem();
     }
 
+    Text {
+        id: txtForFontFamily
+        visible: false
+    }
+
     MouseArea {
         anchors.fill: imageInfoItemButton
         onClicked: {
@@ -77,6 +82,7 @@ RowLayout {
                 dialog.parentWidth = mainPaneCurrentGame.width
                 dialog.textToAccept = "Die Karte von<br><br><b>" + itemModel.title + "</b><br><br>befindet sich aktuell bei<br><br> <b>" + itemModel.place + "</b>";
                 dialog.showCancelButton = false
+                dialog.font.family= txtForFontFamily.font
                 dialog.open();
             }
         }

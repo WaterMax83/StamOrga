@@ -105,6 +105,7 @@ Flickable {
                 dialog.editableText = "";
             dialog.checkBoxState = false
             dialog.acceptedSeasonTicketEdit.connect(acceptedAddSeasonTicketDialog);
+            dialog.font.family= txtForFontFamily.font
             dialog.open();
         } else
             console.log(component.errorString());
@@ -200,6 +201,11 @@ Flickable {
         }
     }
 
+    Text {
+        id: txtForFontFamily
+        visible: false
+    }
+
 
 
     ScrollIndicator.vertical: ScrollIndicator { }
@@ -220,6 +226,7 @@ Flickable {
 
             MenuItem {
                 id: menuItemEdit
+                font.family: txtForFontFamily.font
                 onClicked: {
                     var component = Qt.createComponent("../components/EditSeasonTicketDialog.qml");
                     if (component.status === Component.Ready) {
@@ -228,6 +235,7 @@ Flickable {
                         dialog.parentHeight = flickableTickets.height
                         dialog.parentWidth =  flickableTickets.width
                         dialog.textMinSize = 4;
+                        dialog.font.family= txtForFontFamily.font
                         dialog.editableText = m_ticketNameToChange;
                         if (m_ticketDiscountToChange === 0)
                             dialog.checkBoxState = false
@@ -241,6 +249,7 @@ Flickable {
             }
             MenuItem {
                 id: menuItemChangePlace
+                font.family: txtForFontFamily.font
                 onClicked: {
                     var component = Qt.createComponent("../components/EditableTextDialog.qml");
                     if (component.status === Component.Ready) {
@@ -249,6 +258,7 @@ Flickable {
                         dialog.parentHeight = flickableTickets.height
                         dialog.parentWidth = flickableTickets.width
                         dialog.textMinSize = 4;
+                        dialog.font.family= txtForFontFamily.font
                         dialog.acceptedTextEdit.connect(acceptedEditNewSeasonTicketPlace);
                         dialog.open();
                     }
@@ -256,6 +266,7 @@ Flickable {
             }
             MenuItem {
                 id: menuItemRemove
+                font.family: txtForFontFamily.font
                 onClicked: {
                     var component = Qt.createComponent("../components/AcceptDialog.qml");
                     if (component.status === Component.Ready) {
@@ -263,6 +274,7 @@ Flickable {
                         dialog.headerText = "Bestätigung";
                         dialog.parentHeight = flickableTickets.height
                         dialog.parentWidth = flickableTickets.width
+                        dialog.font.family= txtForFontFamily.font
                         dialog.textToAccept = "Soll die Dauerkarte " + m_ticketNameToChange + " wirklich gelöscht werden?";
                         dialog.acceptedDialog.connect(acceptedDeletingTicket);
                         dialog.open();

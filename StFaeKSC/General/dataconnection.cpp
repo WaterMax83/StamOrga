@@ -322,7 +322,7 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
 
         wAckArray.device()->seek(ackArray.size());
         wAckArray << quint16(game.toUtf8().size() + GAMES_OFFSET);
-        if (msg->getVersion() >= MSG_HEADER_ADD_FANCLUB || pGame->m_competition != pGame->m_competition)
+        if (msg->getVersion() >= MSG_HEADER_ADD_FANCLUB || pGame->m_competition != BADISCHER_POKAL)
             wAckArray << quint8(pGame->m_saisonIndex);
         else {
             if (pGame->m_saisonIndex > 6)

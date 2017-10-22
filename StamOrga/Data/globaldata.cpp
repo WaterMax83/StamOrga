@@ -90,6 +90,7 @@ GlobalData::GlobalData(QObject* parent)
 
 void GlobalData::loadGlobalSettings()
 {
+    this->m_bIpAdressWasSet = false;
     QHostInfo::lookupHost("watermax83.ddns.net", this, SLOT(callBackLookUpHost(QHostInfo)));
 
     qInfo().noquote() << this->m_pMainUserSettings->fileName();
@@ -693,20 +694,21 @@ void GlobalData::copyTextToClipBoard(QString text)
 
 void GlobalData::callBackLookUpHost(const QHostInfo& host)
 {
-    QString lastIP;
+    QString newChangedIP;
+    QString currentIP = this->ipAddr();
     if (host.addresses().size() > 0) {
         this->setIpAddr(host.addresses().value(0).toString());
-        lastIP = host.addresses().value(0).toString();
+        newChangedIP = host.addresses().value(0).toString();
     }
 
     if (g_GlobalSettings->debugIP() != "") {
         this->setIpAddr(g_GlobalSettings->debugIP());
-        lastIP = g_GlobalSettings->debugIP();
+        newChangedIP = g_GlobalSettings->debugIP();
     }
 #ifdef QT_DEBUG
 //    if (this->m_debugIP != "") {
 //        this->setIpAddr(this->m_debugIP);
-//        lastIP = this->m_debugIP;
+//        newChangedIP = this->m_debugIP;
 //    }
 #ifdef Q_OS_ANDROID
 
@@ -717,7 +719,7 @@ void GlobalData::callBackLookUpHost(const QHostInfo& host)
             if (item.bearerType() == QNetworkConfiguration::BearerWLAN) {
                 if (item.state() == QNetworkConfiguration::StateFlag::Active) {
                     this->setIpAddr(g_GlobalSettings->debugIPWifi());
-                    lastIP = g_GlobalSettings->debugIPWifi();
+                    newChangedIP = g_GlobalSettings->debugIPWifi();
                 }
                 //                 qDebug() << "Wifi " << item.name();
                 //                 qDebug() << "state " << item.state();
@@ -727,8 +729,15 @@ void GlobalData::callBackLookUpHost(const QHostInfo& host)
 #endif // ANDROID
 #endif // DEBUG
 
-    if (host.addresses().size() > 0)
-        qInfo().noquote() << QString("Setting IP Address: %1").arg(lastIP);
+    if (newChangedIP.isEmpty())
+        newChangedIP = this->ipAddr();
+
+    //    if (host.addresses().size() > 0)
+    qInfo().noquote() << QString("Setting IP Address: %1").arg(newChangedIP) << QThread::currentThreadId();
+
+    if (currentIP != newChangedIP)
+        this->saveGlobalUserSettings();
+    this->m_bIpAdressWasSet = true;
 }
 
 #ifdef Q_OS_ANDROID

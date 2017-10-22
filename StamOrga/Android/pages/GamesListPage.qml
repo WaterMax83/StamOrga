@@ -163,6 +163,11 @@ Flickable {
         }
     }
 
+    Text {
+        id: txtForFontFamily
+        visible: false
+    }
+
     Menu {
         id: pressAndHoldCurrentGameMenu
         x: (mainItemGamesMainPage.width - width) / 2
@@ -175,6 +180,7 @@ Flickable {
 
         MenuItem {
             id: menuItemEditGame
+            font.family: txtForFontFamily.font
             height: visible ? implicitHeight : 0
             text: "Spiel editieren"
             onClicked: {
@@ -191,6 +197,7 @@ Flickable {
                     dialog.competitionIndex = menuSender.competitionValue() - 1;
                     dialog.date = menuSender.timestamp;
                     dialog.index = menuSender.index;
+                    dialog.font.family= txtForFontFamily.font
                     dialog.acceptedDialog.connect(acceptedChangeGameDialog);
                     changeGameDialog = dialog
                     dialog.open();
@@ -200,6 +207,7 @@ Flickable {
 
         MenuItem {
             id: menuItemFixedGameTime
+            font.family: txtForFontFamily.font
             height: visible ? implicitHeight : 0
             text: "Spiel fest terminieren"
             onClicked: userIntGames.startSetFixedGameTime(menuSender.index, 1)
@@ -207,6 +215,7 @@ Flickable {
 
         MenuItem {
             id: menuItemNotFixedGameTime
+            font.family: txtForFontFamily.font
             height: visible ? implicitHeight : 0
             text: "Spiel nicht fest terminieren"
             onClicked: userIntGames.startSetFixedGameTime(menuSender.index, 0)
