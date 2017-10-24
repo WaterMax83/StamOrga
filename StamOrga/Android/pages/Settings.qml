@@ -150,10 +150,11 @@ Item {
                    id: cbfontFamilies
                    Layout.fillWidth: true
                    model: fontFamiliesModel
+//                   model: Qt.fontFamilies()
                    textRole: "display"
 //                   textRole: "text"
                    onCurrentIndexChanged: valueWasEditedEnableSave();
-//                   delegate: Item {
+//                   delegate:  MenuItem {
 //                               height: 40; width: cbfontFamilies.width
 //                               Text {
 //                                   anchors.centerIn: parent

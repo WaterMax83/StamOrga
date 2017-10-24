@@ -89,6 +89,7 @@ int main(int argc, char* argv[])
     engine.rootContext()->setContextProperty("globalUserData", &globalUserData);
     engine.rootContext()->setContextProperty("globalSettings", &globalSettings);
     engine.rootContext()->setContextProperty("fontFamiliesModel", &fontFamiliesModel);
+    //    engine.rootContext()->setContextProperty("fontFamiliesModel", QVariant::fromValue(fontFamilies));
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));
 
     // load settings to update data

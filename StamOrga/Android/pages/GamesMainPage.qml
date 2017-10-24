@@ -155,7 +155,7 @@ Page {
     property int movedInfoIndex : 0
     property int movedStartY : 0
     property int movedStartMargin : 10
-    property int movedInfoHeigth : busyIndicatorGames.infoHeight
+    property int movedInfoHeigth : busyIndicatorGames.infoHeight + 5
 
     property var addGameDialog;
 

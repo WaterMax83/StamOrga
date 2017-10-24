@@ -404,11 +404,11 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
         break;
 
     case OP_CODE_CMD_REQ::REQ_GET_VERSION:
+        g_GlobalSettings->updateConnectionStatus(true);
         emit this->sNotifyVersionRequest(request.m_result, request.m_returnData);
         break;
 
     case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
-        g_GlobalSettings->updateConnectionStatus(false);
         emit this->sNotifyCommandFinished(request.m_request, request.m_result);
         break;
 

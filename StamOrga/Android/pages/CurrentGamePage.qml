@@ -56,7 +56,7 @@ Item {
                 width: parent.width
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
                 Layout.fillHeight: false
-                Layout.topMargin: 10
+                Layout.topMargin: 5
                 infoVisible: true
             }
 
@@ -183,7 +183,7 @@ Item {
     property int movedInfoIndex : 0
     property int movedStartY : 0
     property int movedStartMargin : 0
-    property int movedInfoHeigth : gameHeader.height + 15
+    property int movedInfoHeigth : gameHeader.height + 20
 
     function toolButtonClicked() {
 

@@ -178,7 +178,7 @@ QString GlobalSettings::getVersionChangeInfo()
 {
     QString rValue;
 
-    rValue.append("<b>V1.0.4:</b>(XX.XX.XXXX)<br>");
+    rValue.append("<b>V1.0.4:</b>(24.10.2017)<br>");
     rValue.append("- Fanclub Nachrichten (Mitglieder)<br>");
     rValue.append("- neue Notification \"Erster Auswärtsfahrer\" & \"Fanclub Nachricht\"<br>");
     rValue.append("- Schrift änderbar (Android)<br>");

@@ -111,6 +111,7 @@ void PushNotificationInformationHandler::unSubscribeFromTopic(QString topic)
 #ifdef QT_DEBUG
     topic.append("Debug");
 #endif
+
     QAndroidJniObject javaNotification = QAndroidJniObject::fromString(topic);
     QAndroidJniObject::callStaticMethod<void>("org/qtproject/example/MainActivity",
                                               "UnRegisterFromTopic",
