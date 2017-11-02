@@ -28,6 +28,7 @@
 #include "../Data/listeduser.h"
 #include "../Data/meetinginfo.h"
 #include "../Data/seasonticket.h"
+#include "../Data/userevents.h"
 
 class GlobalData
 {
@@ -54,14 +55,18 @@ public:
     quint16 getAcceptedNumber(const quint32 gamesIndex, const quint32 state);
     quint16 getMeetingInfoValue(const quint32 gamesIndex);
 
+    qint32 addNewUserEvent(QString type, QString info);
+
     ListedUser                   m_UserList;
     Games                        m_GamesList;
     SeasonTicket                 m_SeasonTicket;
     FanclubNews                  m_fanclubNews;
     QList<AvailableGameTickets*> m_availableTickets;
     QList<MeetingInfo*>          m_meetingInfos;
+    QList<UserEvents*>           m_userEvents;
     QMutex                       m_globalDataMutex;
     bool                         m_initalized;
+
 };
 
 #endif // GLOBALDATA_H

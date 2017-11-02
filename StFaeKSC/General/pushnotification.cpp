@@ -140,6 +140,8 @@ qint64 PushNotification::sendNewVersionNotification(const QString body)
     push->m_sendMessageID = getNextInternalPushNumber();
     push->m_sendTime      = QDateTime::currentMSecsSinceEpoch();
     push->m_userID        = -1;
+    push->m_type          = "NeueVersion";
+    push->m_info          = "1.1.1";
 
     this->insertNewNotification(push);
 
@@ -400,9 +402,11 @@ void PushNotification::finished(QNetworkReply* reply)
     if (this->m_lastPushNotify != NULL)
         sendNumber = this->m_lastPushNotify->m_sendMessageID;
 
-    if (reply->error() == QNetworkReply::NetworkError::NoError)
+    if (reply->error() == QNetworkReply::NetworkError::NoError) {
         qInfo().noquote() << QString("Finished Notification %2: %1").arg(QString(reply->readAll())).arg(sendNumber);
-    else
+
+        this->m_pGlobalData->addNewUserEvent(this->m_lastPushNotify->m_type, this->m_lastPushNotify->m_info);
+    }else
         qWarning().noquote() << QString("Error finishing Notification to %3, %1:%2").arg(reply->error()).arg(reply->errorString()).arg(sendNumber);
 
     if (this->m_lastPushNotify != NULL)

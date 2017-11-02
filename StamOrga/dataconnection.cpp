@@ -32,7 +32,11 @@ DataConnection::DataConnection(GlobalData* pData)
     this->SetWorkerName("DataConnection");
     this->m_pGlobalData        = pData;
     this->m_bRequestLoginAgain = false;
-    this->m_hash               = new QCryptographicHash(QCryptographicHash::Sha3_512);
+#if QT_VERSION < QT_VERSION_CHECK(5, 9, 0)
+    this->m_hash = new QCryptographicHash(QCryptographicHash::Sha3_512);
+#else
+    this->m_hash = new QCryptographicHash(QCryptographicHash::Keccak_512);
+#endif
 }
 
 
@@ -135,6 +139,14 @@ void DataConnection::checkNewOncomingData()
 
         case OP_CODE_CMD_RES::ACK_GET_USER_PROPS:
             request.m_result = this->m_pDataHandle->getHandleUserPropsResponse(msg);
+            break;
+
+        case OP_CODE_CMD_RES::ACK_GET_USER_EVENTS:
+            request.m_result = this->m_pDataHandle->getHandleUserEventsResponse(msg);
+            break;
+
+        case OP_CODE_CMD_RES::ACK_SET_USER_EVENTS:
+            request.m_result = msg->getIntData();
             break;
 
         case OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN:
@@ -303,6 +315,27 @@ void DataConnection::startSendUserPropsRequest(DataConRequest request)
     offset += sizeof(qint32);
 
     MessageProtocol msg(request.m_request, &data[0], offset);
+    this->sendMessageRequest(&msg, request);
+}
+
+void DataConnection::startSendGetUserEventsRequest(DataConRequest request)
+{
+    char data[8];
+    memset(&data[0], 0x0, 8);
+
+    MessageProtocol msg(request.m_request, &data[0], 8);
+    this->sendMessageRequest(&msg, request);
+}
+
+void DataConnection::startSendSetUserEventsRequest(DataConRequest request)
+{
+    qint32 data[3];
+
+    qint64 eventID = qToLittleEndian(request.m_lData.at(0).toLongLong());
+    memcpy(&data[0], &eventID, sizeof(qint64));
+    data[2] = qToLittleEndian(request.m_lData.at(1).toInt()); // Status
+
+    MessageProtocol msg(request.m_request, (char*)&data[0], 12);
     this->sendMessageRequest(&msg, request);
 }
 
@@ -683,6 +716,14 @@ void DataConnection::startSendNewRequest(DataConRequest request)
 
     case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
         this->startSendUserPropsRequest(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_GET_USER_EVENTS:
+        this->startSendGetUserEventsRequest(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_SET_USER_EVENTS:
+        this->startSendSetUserEventsRequest(request);
         break;
 
     case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:

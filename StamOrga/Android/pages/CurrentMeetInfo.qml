@@ -162,6 +162,7 @@ Flickable {
                 id: textWhere
                 hint: "Wo"
                 imageSource: "../images/place.png"
+                enableImage: true
                 width: parent.width
                 enabled: isEditMode
                 color: isEditMode ? "#FFFFFF" : "#AAAAAA";
@@ -172,6 +173,7 @@ Flickable {
                 id: textWhen
                 hint: "Wann"
                 imageSource: "../images/time.png"
+                enableImage: true
                 width: parent.width
                 enabled: isEditMode
                 color: isEditMode ? "#FFFFFF" : "#AAAAAA";

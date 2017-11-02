@@ -33,6 +33,8 @@ public:
 
     MessageProtocol* requestCheckUserLogin(MessageProtocol* msg);
     MessageProtocol* requestGetUserProperties(MessageProtocol* msg);
+    MessageProtocol* requestGetUserEvents(MessageProtocol* msg);
+    MessageProtocol* requestSetUserEvents(MessageProtocol* msg);
     MessageProtocol* requestUserChangeLogin(MessageProtocol* msg);
     MessageProtocol* requestUserChangeReadname(MessageProtocol* msg);
     MessageProtocol* requestGetProgramVersion(MessageProtocol* msg);

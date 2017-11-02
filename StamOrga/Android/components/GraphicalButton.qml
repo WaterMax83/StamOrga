@@ -29,11 +29,11 @@ Rectangle {
     id: rectButton
     width: 30
     height: 30
-    color: enabled ? "Blue" : "BlueGrey"
+    color: enabled ? "#2196F3" : "BlueGrey"
     radius: 8
     onEnabledChanged: {
         if (enabled)
-            color = "Blue";
+            color = "#2196F3";
         else
             color = "BlueGrey"
     }
@@ -46,7 +46,7 @@ Rectangle {
         onClicked: {
             animateButton.stop()
             if (rectButton.enabled) {
-                rectButton.color = "Blue"
+                rectButton.color = "#2196F3"
                 clickedButton();
             }
         }
@@ -59,7 +59,7 @@ Rectangle {
         id: animateButton
         target: rectButton
         property: "color"
-        from: "Blue"
+        from: "#2196F3"
         to: "LightBlue"
         duration: 250
     }

@@ -37,7 +37,11 @@ ListedUser::ListedUser()
     }
     g_ListedUser = this;
 
+#if QT_VERSION < QT_VERSION_CHECK(5,9,0)
     this->m_hash = new QCryptographicHash(QCryptographicHash::Sha3_512);
+#else
+    this->m_hash = new QCryptographicHash(QCryptographicHash::Keccak_512);
+#endif
 
     this->m_pConfigSettings = new QSettings(configSetFilePath, QSettings::IniFormat);
     this->m_pConfigSettings->setIniCodec(("UTF-8"));
@@ -90,7 +94,7 @@ ListedUser::ListedUser()
         this->saveCurrentInteralList();
 }
 
-int ListedUser::addNewUser(const QString& name, const QString& password, quint32 props)
+int ListedUser::addNewUser(const QString name, const QString password, quint32 props)
 {
     if (name.length() < MIN_SIZE_USERNAME) {
         CONSOLE_WARNING(QString("Name \"%1\" is too short").arg(name));
@@ -109,10 +113,10 @@ int ListedUser::addNewUser(const QString& name, const QString& password, quint32
     qint64  timestamp = QDateTime::currentDateTime().toMSecsSinceEpoch();
     QString salt      = createRandomString(8);
 
-    QString passWord;
+    QString intPassWord = password;
     if (password == "")
-        passWord         = name;
-    QString hashPassword = this->createHashPassword(passWord, salt);
+        intPassWord         = name;
+    QString hashPassword = this->createHashPassword(intPassWord, salt);
 
     this->m_pConfigSettings->beginGroup(GROUP_LIST_ITEM);
     this->m_pConfigSettings->beginWriteArray(CONFIG_LIST_ARRAY);
@@ -133,7 +137,7 @@ int ListedUser::addNewUser(const QString& name, const QString& password, quint32
     UserLogin* login = new UserLogin(name, timestamp, newIndex, hashPassword, salt, 0x0, "");
     this->addNewUserLogin(login, false);
 
-    qInfo() << QString("Added new user: %1").arg(name);
+    qInfo().noquote() << QString("Added new user: %1").arg(name);
     return newIndex;
 }
 
@@ -219,6 +223,9 @@ bool ListedUser::userCheckPasswordHash(QString name, QString hash, QString rando
         if (pLogin == NULL)
             continue;
         if (pLogin->m_itemName == name) {
+
+            qDebug() << random;
+            qDebug() << pLogin->m_salt;
 
             QString passWordWithRandowm = this->createHashPassword(pLogin->m_password, random);
             if (passWordWithRandowm == hash)

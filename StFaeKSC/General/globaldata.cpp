@@ -526,3 +526,10 @@ qint32 GlobalData::requestAcceptMeetingInfo(const quint32 gameIndex, const quint
 
     return ERROR_CODE_SUCCESS;
 }
+
+qint32 GlobalData::addNewUserEvent(QString type, QString info)
+{
+    UserEvents* pUserEvent = new UserEvents();
+    pUserEvent->initialize(type, info);
+    return 0;
+}

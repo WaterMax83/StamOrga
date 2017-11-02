@@ -144,6 +144,14 @@ MessageProtocol* UdpDataServer::checkNewMessage(MessageProtocol* msg)
             ack = this->m_pDataConnection->requestGetUserProperties(msg);
             break;
 
+        case OP_CODE_CMD_REQ::REQ_GET_USER_EVENTS:
+            ack = this->m_pDataConnection->requestGetUserEvents(msg);
+            break;
+
+        case OP_CODE_CMD_REQ::REQ_SET_USER_EVENTS:
+            ack = this->m_pDataConnection->requestSetUserEvents(msg);
+            break;
+
         case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
             ack = this->m_pDataConnection->requestUserChangeLogin(msg);
             break;

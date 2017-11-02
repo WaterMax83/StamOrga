@@ -38,6 +38,8 @@ public:
     qint32 startMainConnection(QString name, QString passw);
     qint32 startGettingVersionInfo();
     qint32 startGettingUserProps();
+    qint32 startGettingUserEvents();
+    qint32 startSettingUserEvents(qint64 eventID, qint32 status);
     bool startUpdatePassword(QString newPassWord);
     qint32 startUpdateReadableName(QString name);
     qint32 startListGettingGames();

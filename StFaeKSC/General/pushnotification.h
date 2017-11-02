@@ -53,6 +53,10 @@ struct PushNotifyInfo {
     qint32            m_userID;
     quint32           m_internalIndex1;
     quint32           m_internalIndex2;
+
+    /* For user Events */
+    QString m_type;
+    QString m_info;
 };
 
 class AppTokenUID : public ConfigItem

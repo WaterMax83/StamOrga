@@ -25,29 +25,6 @@ import QtQuick.Controls.Material.impl 2.1
 import com.watermax.demo 1.0
 
 Button {
-//    id: control
-//    text: qsTr("Button")
-
-//    contentItem: Text {
-//        text: control.text
-//        font: control.font
-//        opacity: enabled ? 1.0 : 0.3
-////        color: control.down ? "#1e7696" : "#1099a0"
-//        color: "white"
-//        horizontalAlignment: Text.AlignHCenter
-//        verticalAlignment: Text.AlignVCenter
-//        elide: Text.ElideRight
-//    }
-
-//    background: Rectangle {
-//        implicitWidth: 30
-//        implicitHeight: 10
-//        opacity: enabled ? 1 : 0.3
-//        color: "#484848"
-//        border.color: control.down ? "#1e7696" : "#1099a0"
-//        border.width: 2
-//        radius: 5
-//    }
     id: control
 
         implicitWidth: Math.max(background ? background.implicitWidth : 0,

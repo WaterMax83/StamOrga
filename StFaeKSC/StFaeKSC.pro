@@ -49,7 +49,8 @@ SOURCES += main.cpp \
     Data/availablegameticket.cpp \
     Data/meetinginfo.cpp \
     General/pushnotification.cpp \
-    Data/fanclubnews.cpp
+    Data/fanclubnews.cpp \
+    Data/userevents.cpp
 
 HEADERS += \
     ../Common/General/backgroundcontroller.h \
@@ -77,7 +78,8 @@ HEADERS += \
     Data/availablegameticket.h \
     Data/meetinginfo.h \
     General/pushnotification.h \
-    Data/fanclubnews.h
+    Data/fanclubnews.h \
+    Data/userevents.h
 
 
 unix {

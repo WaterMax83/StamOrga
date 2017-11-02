@@ -80,6 +80,8 @@ private:
     void startSendLoginRequest(DataConRequest request);
     void startSendVersionRequest(DataConRequest request);
     void startSendUserPropsRequest(DataConRequest request);
+    void startSendGetUserEventsRequest(DataConRequest request);
+    void startSendSetUserEventsRequest(DataConRequest request);
     void startSendUpdPassRequest(DataConRequest request);
     void startSendReadableNameRequest(DataConRequest request);
     void startSendGamesListRequest(DataConRequest request);

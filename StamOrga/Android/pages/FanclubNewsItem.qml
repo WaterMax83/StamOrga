@@ -55,7 +55,7 @@ Item {
             MyComponents.EditableTextWithHint {
                 id: textHeader
                 hint: "Überschrift"
-                imageSource: ""
+//                imageSource: ""
                 width: parent.width
                 enabled: isEditMode
                 color: isEditMode ? "#FFFFFF" : "#CCFFFF";

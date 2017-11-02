@@ -46,6 +46,7 @@ Page {
             Layout.fillHeight: false
             Layout.topMargin: 10
             infoVisible: true
+            Layout.columnSpan: 2
         }
 
         TabBar {

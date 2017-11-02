@@ -96,6 +96,22 @@ qint32 ConnectionHandling::startGettingUserProps()
     return ERROR_CODE_SUCCESS;
 }
 
+qint32 ConnectionHandling::startGettingUserEvents()
+{
+    DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_USER_EVENTS);
+    this->sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 ConnectionHandling::startSettingUserEvents(qint64 eventID, qint32 status)
+{
+    DataConRequest req(OP_CODE_CMD_REQ::REQ_SET_USER_EVENTS);
+    req.m_lData.append(QString::number(eventID));
+    req.m_lData.append(QString::number(status));
+    this->sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
+}
+
 bool ConnectionHandling::startUpdatePassword(QString newPassWord)
 {
     DataConRequest req(OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN);
@@ -381,6 +397,7 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
         if (request.m_result == ERROR_CODE_SUCCESS) {
             this->startGettingVersionInfo();
             this->startGettingUserProps();
+            this->startGettingUserEvents();
             QThread::msleep(10);
             this->m_pGlobalData->setbIsConnected(true);
             this->checkTimeoutResult(request.m_result); // call again to set last successfull timer

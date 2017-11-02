@@ -60,6 +60,11 @@ qint32 UserInterface::startMainConnection(QString name, QString passw)
     return this->m_pConHandle->startMainConnection(name, passw);
 }
 
+qint32 UserInterface::startSetUserEvents(qint64 eventID, qint32 status)
+{
+    return this->m_pConHandle->startSettingUserEvents(eventID, status);
+}
+
 qint32 UserInterface::startUpdateUserPassword(QString newPassw)
 {
     return this->m_pConHandle->startUpdatePassword(newPassw);
@@ -252,6 +257,11 @@ void UserInterface::slCommandFinished(quint32 command, qint32 result)
 
     case OP_CODE_CMD_REQ::REQ_DEL_NEWS_DATA_ITEM:
         emit this->notifyDeleteFanclubNewsItemFinished(result);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_GET_USER_EVENTS:
+    case OP_CODE_CMD_REQ::REQ_SET_USER_EVENTS:
+        qDebug() << "acknowledge " << command;
         break;
 
     default:

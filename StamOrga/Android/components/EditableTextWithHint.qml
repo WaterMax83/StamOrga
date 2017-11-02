@@ -28,6 +28,7 @@ Rectangle {
     property alias hint: hintText.text
     property alias input: inputText.displayText
     property alias imageSource: rightImage.source
+    property bool  enableImage: false
 
     signal textInputChanged();
 
@@ -59,14 +60,14 @@ Rectangle {
 
     Image {
         id: rightImage
-        width: source.length > 0 ? parent.height : 0
+        width: enableImage ? parent.height : 0
         height: parent.height
         anchors.right: parent.right
     }
     ColorOverlay {
         anchors.fill: rightImage
         source: rightImage
-        color: "#000000"
+        color: "#2196F3"
     }
 
     property bool isInit: false
@@ -75,6 +76,7 @@ Rectangle {
         isInit = true;
         inputText.text = text;
         isInit = false;
+        console.log("Init Function " + rightImage2.source.length);
     }
 }
 

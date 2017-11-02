@@ -115,6 +115,20 @@ qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol* msg)
     return rValue;
 }
 
+qint32 DataHandling::getHandleUserEventsResponse(MessageProtocol *msg)
+{
+    if (msg->getDataLength() < 4)
+        return ERROR_CODE_WRONG_SIZE;
+
+    const char* pData = msg->getPointerToData();
+    qint32      rValue;
+    memcpy(&rValue, pData, sizeof(qint32));
+
+    rValue     = qFromLittleEndian(rValue);
+
+    return rValue;
+}
+
 #define GAMES_OFFSET (1 + 1 + 8 + 4)
 
 qint32 DataHandling::getHandleGamesListResponse(MessageProtocol* msg)
