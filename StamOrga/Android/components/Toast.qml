@@ -16,7 +16,7 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.7
+import QtQuick 2.9
 
 /**
 * @brief An Android-like timed message text in a box that selfdestroys when finished if desired

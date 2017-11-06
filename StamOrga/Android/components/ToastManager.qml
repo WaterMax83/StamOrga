@@ -16,7 +16,7 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.7
+import QtQuick 2.9
 
 /**
  * @brief Manager that creates Toasts dynamically
