@@ -115,30 +115,30 @@ MessageProtocol* DataConnection::requestGetUserProperties(MessageProtocol* msg)
     return ack;
 }
 
-MessageProtocol* DataConnection::requestGetUserEvents(MessageProtocol *msg)
+MessageProtocol* DataConnection::requestGetUserEvents(MessageProtocol* msg)
 {
-    if (msg->getDataLength() <= 8) {
+    if (msg->getDataLength() < 8) {
         qWarning().noquote() << QString("Getting no data from %1 for get events").arg(this->m_pUserConData->m_userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_USER_EVENTS, ERROR_CODE_WRONG_SIZE);
     }
 
-//    qint64 timestamp;
-//    memcpy(&timestamp, msg->getPointerToData(), sizeof(qint64));
-//    timestamp = qFromLittleEndian(timestamp);
+    //    qint64 timestamp;
+    //    memcpy(&timestamp, msg->getPointerToData(), sizeof(qint64));
+    //    timestamp = qFromLittleEndian(timestamp);
 
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_USER_EVENTS, ERROR_CODE_SUCCESS);
 }
 
-MessageProtocol* DataConnection::requestSetUserEvents(MessageProtocol *msg)
+MessageProtocol* DataConnection::requestSetUserEvents(MessageProtocol* msg)
 {
-    if (msg->getDataLength() <= 8) {
+    if (msg->getDataLength() < 8) {
         qWarning().noquote() << QString("Getting no data from %1 for set events").arg(this->m_pUserConData->m_userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_SET_USER_EVENTS, ERROR_CODE_WRONG_SIZE);
     }
 
-//    qint64 timestamp;
-//    memcpy(&timestamp, msg->getPointerToData(), sizeof(qint64));
-//    timestamp = qFromLittleEndian(timestamp);
+    //    qint64 timestamp;
+    //    memcpy(&timestamp, msg->getPointerToData(), sizeof(qint64));
+    //    timestamp = qFromLittleEndian(timestamp);
 
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_SET_USER_EVENTS, ERROR_CODE_SUCCESS);
 }
@@ -241,7 +241,7 @@ MessageProtocol* DataConnection::requestGetProgramVersion(MessageProtocol* msg)
     wVersion.setByteOrder(QDataStream::LittleEndian);
     wVersion << ERROR_CODE_SUCCESS;
 
-//#define VERSION_TEST
+#define VERSION_TEST
 #ifdef VERSION_TEST
 #define ORGA_VERSION_I 0x0B0A0000 // VX.Y.Z => 0xXXYYZZZZ
 #define ORGA_VERSION_S "VB.A.0"

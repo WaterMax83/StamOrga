@@ -60,7 +60,8 @@ qint32 DataHandling::getHandleVersionResponse(MessageProtocol* msg, QString* ver
 
     if ((uVersion & 0xFFFFFF00) > (STAM_ORGA_VERSION_I & 0xFFFFFF00)) {
         version->append(QString("Deine Version: %2<br>Aktuelle Version: %1<br><br>").arg(remVersion, STAM_ORGA_VERSION_S));
-        version->append(QString(STAM_ORGA_VERSION_LINK).arg(remVersion.toLower(), remVersion));
+        version->append(QString(STAM_ORGA_VERSION_LINK_WITH_TEXT).arg(remVersion.toLower(), remVersion));
+        this->m_pGlobalData->setUpdateLink(QString(STAM_ORGA_VERSION_LINK).arg(remVersion.toLower()));
         //#ifdef Q_OS_WIN
         //        version->append(QString("<a href=\"https://github.com/WaterMax83/StamOrga/releases/download/%1/StamOrga.Winx64.%1.exe\">Lade %2</a>\n")
         //                            .arg(remVersion.toLower(), remVersion));
@@ -115,7 +116,7 @@ qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol* msg)
     return rValue;
 }
 
-qint32 DataHandling::getHandleUserEventsResponse(MessageProtocol *msg)
+qint32 DataHandling::getHandleUserEventsResponse(MessageProtocol* msg)
 {
     if (msg->getDataLength() < 4)
         return ERROR_CODE_WRONG_SIZE;
@@ -124,7 +125,7 @@ qint32 DataHandling::getHandleUserEventsResponse(MessageProtocol *msg)
     qint32      rValue;
     memcpy(&rValue, pData, sizeof(qint32));
 
-    rValue     = qFromLittleEndian(rValue);
+    rValue = qFromLittleEndian(rValue);
 
     return rValue;
 }

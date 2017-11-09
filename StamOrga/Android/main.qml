@@ -62,6 +62,22 @@ ApplicationWindow {
                     horizontalAlignment: Image.AlignHCenter
                     verticalAlignment: Image.AlignVCenter
                     source: stackView.depth > 1 ? "images/back.png" : "images/drawer.png"
+                    Rectangle {
+                        visible: stackView.depth > 1 ? false : true
+                        width: parent.width / 2
+                        height: parent.height / 2
+                        radius: width*0.5
+                        anchors.bottom: parent.bottom
+                        anchors.right: parent.right
+                        color: "red"
+                        Text {
+                              id: txtNumberToolButtonEventCount
+                              anchors.verticalCenter: parent.verticalCenter
+                              anchors.horizontalCenter: parent.horizontalCenter
+                              color: "white"
+                              text: "1"
+                        }
+                    }
                 }
                 onClicked: {
                     if (stackView.depth > 1) {
@@ -139,14 +155,18 @@ ApplicationWindow {
                     text: model.title
                     highlighted: ListView.isCurrentItem
                     onClicked: {
-                        titleLabel.text = model.title
-                        if (model.imgsource !== "") {
-                            imageToolButton.visible = true
-                            imageToolButton.source = model.imgsource
-                        } else {
-                            imageToolButton.visible = false
+                        if (model.element) {
+                            titleLabel.text = model.title
+                            if (model.imgsource) {
+                                imageToolButton.visible = true
+                                imageToolButton.source = model.imgsource
+                            } else {
+                                imageToolButton.visible = false
+                            }
+                            stackView.push(model.element)
+                        } else if (model.link) {
+                            Qt.openUrlExternally(model.link);
                         }
-                        stackView.push(model.element)
 
                         drawer.close()
                     }
@@ -169,18 +189,18 @@ ApplicationWindow {
                             append({
                                        title: "Fanclub",
                                        element: viewFanclubNewList,
-                                       imgsource: ""
+//                                       imgsource: ""
                                    })
                         append({
                                    title: "Einstellungen",
                                    element: viewSettingsPage,
-                                   imgsource: ""
+//                                   imgsource: ""
                                })
                         if (userInt.isDebuggingEnabled())
                             append({
                                        title: "Logging",
                                        element: viewLoggingPage,
-                                       imgsource: ""
+//                                       imgsource: ""
                                    })
                     }
                 }
@@ -270,10 +290,19 @@ ApplicationWindow {
                     dialog.parentWidth = stackView.width
                     dialog.open()
                 }
+
+                if (!isNewVersionElementShown) {
+                    isNewVersionElementShown = true;
+                    listViewListModel.append({
+                                            title: "Update",
+                                            link: globalUserData.getUpdateLink(),
+                                        })
+                }
             }
         }
         property bool isLoggingWindowShown : false;
         property bool isFanclubNewsWindowShown : false;
+        property bool isNewVersionElementShown : false;
         onNotifyUserPropertiesFinished: {
             if (result > 0 && !userInt.isDebuggingEnabled()) {
                 if (!isLoggingWindowShown) {

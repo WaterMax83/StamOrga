@@ -405,8 +405,8 @@ void PushNotification::finished(QNetworkReply* reply)
     if (reply->error() == QNetworkReply::NetworkError::NoError) {
         qInfo().noquote() << QString("Finished Notification %2: %1").arg(QString(reply->readAll())).arg(sendNumber);
 
-        this->m_pGlobalData->addNewUserEvent(this->m_lastPushNotify->m_type, this->m_lastPushNotify->m_info);
-    }else
+        this->m_pGlobalData->addNewUserEvent(this->m_lastPushNotify->m_type, this->m_lastPushNotify->m_info, this->m_lastPushNotify->m_userID);
+    } else
         qWarning().noquote() << QString("Error finishing Notification to %3, %1:%2").arg(reply->error()).arg(reply->errorString()).arg(sendNumber);
 
     if (this->m_lastPushNotify != NULL)

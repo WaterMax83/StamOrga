@@ -171,7 +171,7 @@ QString GlobalSettings::getCurrentVersion()
 
 QString GlobalSettings::getCurrentVersionLink()
 {
-    return QString(STAM_ORGA_VERSION_LINK).arg(QString(STAM_ORGA_VERSION_S).toLower(), STAM_ORGA_VERSION_S);
+    return QString(STAM_ORGA_VERSION_LINK_WITH_TEXT).arg(QString(STAM_ORGA_VERSION_S).toLower(), STAM_ORGA_VERSION_S);
 }
 
 QString GlobalSettings::getVersionChangeInfo()

@@ -496,8 +496,7 @@ qint32 GlobalData::requestAcceptMeetingInfo(const quint32 gameIndex, const quint
             if (result == ERROR_CODE_SUCCESS) {
                 qInfo().noquote() << QString("Changed Acceptation of %2 at game %1").arg(pGame->m_index).arg(name);
                 /* Send an info if the first person is going to a game which is not at home */
-                if (pGame->m_away == "KSC" && acceptValue == ACCEPT_STATE_ACCEPT &&
-                    mInfo->getAcceptedNumber(ACCEPT_STATE_ACCEPT) == 1) {
+                if (pGame->m_away == "KSC" && acceptValue == ACCEPT_STATE_ACCEPT && mInfo->getAcceptedNumber(ACCEPT_STATE_ACCEPT) == 1) {
                     QString body = QString(BODY_NEW_AWAY_ACCEPT).arg(name, pGame->m_itemName);
                     messageID    = g_pushNotify->sendNewFirstAwayAccept(body, userID);
                 }
@@ -527,9 +526,9 @@ qint32 GlobalData::requestAcceptMeetingInfo(const quint32 gameIndex, const quint
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 GlobalData::addNewUserEvent(QString type, QString info)
+qint32 GlobalData::addNewUserEvent(QString type, QString info, qint32 userID)
 {
     UserEvents* pUserEvent = new UserEvents();
-    pUserEvent->initialize(type, info);
+    pUserEvent->initialize(type, info, userID);
     return 0;
 }

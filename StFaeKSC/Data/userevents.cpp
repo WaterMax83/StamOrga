@@ -28,7 +28,7 @@ UserEvents::UserEvents()
 {
 }
 
-qint32 UserEvents::initialize(QString type, QString info)
+qint32 UserEvents::initialize(QString type, QString info, qint32 userID)
 {
     this->m_type      = type;
     this->m_info      = info;
@@ -53,6 +53,9 @@ qint32 UserEvents::initialize(QString type, QString info)
 
     this->m_pConfigSettings->endGroup();
 
+    if (userID > 0)
+        this->addNewUser(userID);
+
     return ERROR_CODE_SUCCESS;
 }
 
@@ -63,8 +66,8 @@ qint32 UserEvents::initialize(QString filePath)
 
     this->m_pConfigSettings->beginGroup("UserEventHeader");
 
-    this->m_type        = this->m_pConfigSettings->value("type", 0).toString();
-    this->m_info = this->m_pConfigSettings->value("info", 0).toString();
+    this->m_type      = this->m_pConfigSettings->value("type", 0).toString();
+    this->m_info      = this->m_pConfigSettings->value("info", 0).toString();
     this->m_timestamp = this->m_pConfigSettings->value("timestamp", 0).toLongLong();
 
     this->m_pConfigSettings->endGroup();
@@ -83,7 +86,7 @@ qint32 UserEvents::initialize(QString filePath)
         for (int i = 0; i < sizeOfArray; i++) {
             this->m_pConfigSettings->setArrayIndex(i);
 
-            quint32 userID     = this->m_pConfigSettings->value(EVENT_USER_ID, 0x0).toUInt();
+            quint32 userID = this->m_pConfigSettings->value(EVENT_USER_ID, 0x0).toUInt();
 
             if (userID != 0 && !this->m_lUserIDs.contains(userID))
                 this->m_lUserIDs.append(userID);

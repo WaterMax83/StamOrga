@@ -31,8 +31,7 @@
 #define EVENT_USER_ID       "userID"
 // clang-format on
 
-struct CompilerTest{
-
+struct CompilerTest {
 };
 
 class UserEvents : public ConfigList
@@ -41,7 +40,7 @@ public:
     UserEvents();
     ~UserEvents();
 
-    qint32 initialize(QString type, QString info);
+    qint32 initialize(QString type, QString info, qint32 userID = -1);
     qint32 initialize(QString filePath);
 
     bool addNewUser(const quint32 userID);
@@ -53,8 +52,8 @@ private:
     void saveCurrentInteralList() override;
 
     QList<quint32> m_lUserIDs;
-    QString m_type;
-    QString m_info;
-    qint64  m_timestamp;
+    QString        m_type;
+    QString        m_info;
+    qint64         m_timestamp;
 };
 #endif // USEREVENTS_H
