@@ -127,7 +127,7 @@ bool UserEvents::addNewUser(const quint32 userID)
     return true;
 }
 
-bool UserEvents::userGetEvent(const quint32 userID)
+bool UserEvents::getHasUserGotEvent(const quint32 userID)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
@@ -154,6 +154,20 @@ void UserEvents::saveCurrentInteralList()
     this->m_pConfigSettings->endGroup();
 
     // qDebug().noquote() << QString("saved current User List with %1 entries").arg(this->getNumberOfInternalList());
+}
+
+QString UserEvents::getInfo()
+{
+    QMutexLocker locker(&this->m_mInternalInfoMutex);
+
+    return this->m_info;
+}
+
+QString UserEvents::getType()
+{
+    QMutexLocker locker(&this->m_mInternalInfoMutex);
+
+    return this->m_type;
 }
 
 

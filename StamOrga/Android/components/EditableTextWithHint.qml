@@ -76,7 +76,6 @@ Rectangle {
         isInit = true;
         inputText.text = text;
         isInit = false;
-        console.log("Init Function " + rightImage2.source.length);
     }
 }
 

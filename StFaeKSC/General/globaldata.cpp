@@ -21,6 +21,9 @@
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QtEndian>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 
 #include "../Common/General/globalfunctions.h"
 #include "globaldata.h"
@@ -72,6 +75,18 @@ void GlobalData::initialize()
             this->m_meetingInfos.append(mInfo);
         else
             delete mInfo;
+    }
+
+    userSetDir.setPath(userSetDirPath + "UserEvents/");
+    nameFilter << "Event_*.ini";
+    infoConfigList = userSetDir.entryList(nameFilter, QDir::Files | QDir::Readable);
+    foreach (QString file, infoConfigList) {
+        UserEvents* mEvent = new UserEvents();
+
+        if (mEvent->initialize(userSetDir.path() + "/" + file) >= 0)
+            this->m_userEvents.append(mEvent);
+        else
+            delete mEvent;
     }
 
     this->m_initalized = true;
@@ -528,7 +543,45 @@ qint32 GlobalData::requestAcceptMeetingInfo(const quint32 gameIndex, const quint
 
 qint32 GlobalData::addNewUserEvent(QString type, QString info, qint32 userID)
 {
+    for(int i=0; i< this->m_userEvents.size(); i++ ) {
+        if (this->m_userEvents[i]->getType() == type) {
+            if (this->m_userEvents[i]->getInfo() == info)
+                return ERROR_CODE_SUCCESS;
+        }
+    }
+
     UserEvents* pUserEvent = new UserEvents();
-    pUserEvent->initialize(type, info, userID);
-    return 0;
+    if (pUserEvent->initialize(type, info, userID) == ERROR_CODE_SUCCESS)
+        this->m_userEvents.append(pUserEvent);
+    else
+        delete pUserEvent;
+
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 GlobalData::getCurrentUserEvents(QByteArray &destArray, qint32 userID)
+{
+    QJsonArray jsArr;
+    for(int i=0; i< this->m_userEvents.size(); i++ ) {
+        if (this->m_userEvents[i]->getHasUserGotEvent(userID))
+            continue;
+
+        /*
+         * transport information
+         */
+        QJsonObject json;
+        json.insert("type", this->m_userEvents[i]->getType());
+        json.insert("info", this->m_userEvents[i]->getInfo());
+
+        jsArr.append(json);
+    }
+
+    QJsonObject jsRootObj;
+    jsRootObj.insert("version", "1.0.0");
+    jsRootObj.insert("events", jsArr);
+
+    QJsonDocument jsDoc(jsRootObj);
+    destArray = jsDoc.toJson(QJsonDocument::Compact);
+
+    return ERROR_CODE_SUCCESS;
 }

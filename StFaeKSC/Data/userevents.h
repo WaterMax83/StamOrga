@@ -31,9 +31,6 @@
 #define EVENT_USER_ID       "userID"
 // clang-format on
 
-struct CompilerTest {
-};
-
 class UserEvents : public ConfigList
 {
 public:
@@ -45,7 +42,10 @@ public:
 
     bool addNewUser(const quint32 userID);
 
-    bool userGetEvent(const quint32 userID);
+    bool getHasUserGotEvent(const quint32 userID);
+
+    QString getType();
+    QString getInfo();
 
 
 private:

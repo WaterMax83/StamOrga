@@ -42,6 +42,7 @@ SOURCES += main.cpp \
     ../Data/seasonticket.cpp \
     ../Data/meetinginfo.cpp \
     ../Data/globalsettings.cpp \
+    ../Data/appuserevents.cpp \
     source/pushnotification.cpp
 
 
@@ -91,6 +92,7 @@ HEADERS += \
     ../Data/newsdataitem.h \
     ../Data/acceptmeetinginfo.h \
     ../Data/globalsettings.h \
+    ../Data/appuserevents.h \
     source/pushnotification.h
 
 #android{

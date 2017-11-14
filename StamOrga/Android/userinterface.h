@@ -133,6 +133,7 @@ signals:
     void notifyFanclubNewsListFinished(qint32 result);
     void notifyGetFanclubNewsItemFinished(qint32 result);
     void notifyDeleteFanclubNewsItemFinished(qint32 result);
+    void notifyGetUserEvents(qint32 result);
 
 public slots:
     void slConnectionRequestFinished(qint32 result);

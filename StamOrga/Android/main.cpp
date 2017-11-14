@@ -31,6 +31,7 @@
 #include "../../Common/General/backgroundcontroller.h"
 #include "../../Common/General/config.h"
 #include "../../Common/General/globalfunctions.h"
+#include "../Data/appuserevents.h"
 #include "../Data/globaldata.h"
 #include "../Data/globalsettings.h"
 #include "../dataconnection.h"
@@ -38,6 +39,7 @@
 
 
 GlobalSettings* g_GlobalSettings;
+AppUserEvents*  g_AppUserEvents;
 
 int main(int argc, char* argv[])
 {
@@ -60,6 +62,9 @@ int main(int argc, char* argv[])
 
     GlobalData globalUserData;
     globalSettings.initialize(&globalUserData, &app);
+
+    AppUserEvents appUserEvents;
+    g_AppUserEvents = &appUserEvents;
 
     QFontDatabase base;
     QStringList   fontFamilies = base.families();
@@ -89,6 +94,7 @@ int main(int argc, char* argv[])
     engine.rootContext()->setContextProperty("globalUserData", &globalUserData);
     engine.rootContext()->setContextProperty("globalSettings", &globalSettings);
     engine.rootContext()->setContextProperty("fontFamiliesModel", &fontFamiliesModel);
+    engine.rootContext()->setContextProperty("appUserEvents", &appUserEvents);
     //    engine.rootContext()->setContextProperty("fontFamiliesModel", QVariant::fromValue(fontFamilies));
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));
 

@@ -470,7 +470,7 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
     case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS: {
 
         static quint32 retryGetTicketCount = 0;
-        if (request.m_result == ERROR_CODE_UPDATE_LIST) {
+        if (request.m_result == ERROR_CODE_UPDATE_LIST || request.m_result == ERROR_CODE_MISSING_TICKET) {
             if (retryGetTicketCount < 3) {
                 this->startListSeasonTickets();
                 retryGetTicketCount++;

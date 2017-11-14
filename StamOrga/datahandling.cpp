@@ -16,13 +16,20 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 #include <QtCore/QtEndian>
 #include <QtQml/QQmlEngine>
 
 #include "../Common/General/config.h"
 #include "../Common/General/globalfunctions.h"
+#include "../Data/appuserevents.h"
 #include "../Data/gameplay.h"
 #include "datahandling.h"
+
+
+extern AppUserEvents* g_AppUserEvents;
 
 DataHandling::DataHandling(GlobalData* pData)
 {
@@ -124,9 +131,20 @@ qint32 DataHandling::getHandleUserEventsResponse(MessageProtocol* msg)
     const char* pData = msg->getPointerToData();
     qint32      rValue;
     memcpy(&rValue, pData, sizeof(qint32));
-
     rValue = qFromLittleEndian(rValue);
 
+    if (msg->getDataLength() > 4) {
+        QByteArray  jsonByteArray(pData + sizeof(qint32));
+        QJsonObject jsRoot = QJsonDocument::fromJson(jsonByteArray).object();
+        if (!jsRoot.contains("events") || !jsRoot.value("events").isArray())
+            return ERROR_CODE_WRONG_PARAMETER;
+
+        QJsonArray jsArr = jsRoot.value("events").toArray();
+        for (int i = 0; i < jsArr.size(); i++) {
+            QJsonObject jsObj = jsArr.at(i).toObject();
+            g_AppUserEvents->addNewUserEvents(jsObj);
+        }
+    }
     return rValue;
 }
 

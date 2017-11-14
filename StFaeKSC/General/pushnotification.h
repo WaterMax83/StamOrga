@@ -55,7 +55,6 @@ struct PushNotifyInfo {
     quint32           m_internalIndex2;
 
     /* For user Events */
-    QString m_type;
     QString m_info;
 };
 

@@ -140,8 +140,7 @@ qint64 PushNotification::sendNewVersionNotification(const QString body)
     push->m_sendMessageID = getNextInternalPushNumber();
     push->m_sendTime      = QDateTime::currentMSecsSinceEpoch();
     push->m_userID        = -1;
-    push->m_type          = "NeueVersion";
-    push->m_info          = "1.1.1";
+    push->m_info          = STAM_ORGA_VERSION_S;
 
     this->insertNewNotification(push);
 
@@ -405,7 +404,10 @@ void PushNotification::finished(QNetworkReply* reply)
     if (reply->error() == QNetworkReply::NetworkError::NoError) {
         qInfo().noquote() << QString("Finished Notification %2: %1").arg(QString(reply->readAll())).arg(sendNumber);
 
-        this->m_pGlobalData->addNewUserEvent(this->m_lastPushNotify->m_type, this->m_lastPushNotify->m_info, this->m_lastPushNotify->m_userID);
+        if (!this->m_lastPushNotify->m_info.isEmpty()) {
+            QString sendTopic = this->getTopicStringFromIndex(this->m_lastPushNotify->m_topic);
+            this->m_pGlobalData->addNewUserEvent(sendTopic, this->m_lastPushNotify->m_info, this->m_lastPushNotify->m_userID);
+        }
     } else
         qWarning().noquote() << QString("Error finishing Notification to %3, %1:%2").arg(reply->error()).arg(reply->errorString()).arg(sendNumber);
 

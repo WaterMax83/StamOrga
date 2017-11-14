@@ -32,6 +32,8 @@ ApplicationWindow {
     height: userInt.isDeviceMobile() ? 960 : 600
     title: qsTr("StamOrga")
 
+    property int iMainToolButtonEventCount : 0
+
     onClosing: {
         if (userInt.isDeviceMobile() && stackView.depth > 1) {
             close.accepted = false
@@ -62,21 +64,9 @@ ApplicationWindow {
                     horizontalAlignment: Image.AlignHCenter
                     verticalAlignment: Image.AlignVCenter
                     source: stackView.depth > 1 ? "images/back.png" : "images/drawer.png"
-                    Rectangle {
-                        visible: stackView.depth > 1 ? false : true
-                        width: parent.width / 2
-                        height: parent.height / 2
-                        radius: width*0.5
-                        anchors.bottom: parent.bottom
-                        anchors.right: parent.right
-                        color: "red"
-                        Text {
-                              id: txtNumberToolButtonEventCount
-                              anchors.verticalCenter: parent.verticalCenter
-                              anchors.horizontalCenter: parent.horizontalCenter
-                              color: "white"
-                              text: "1"
-                        }
+                    MyComponents.EventIndicator {
+                        disableVisibility: stackView.depth > 1 ? true : false
+                        eventCount : iMainToolButtonEventCount
                     }
                 }
                 onClicked: {
@@ -332,6 +322,9 @@ ApplicationWindow {
                 else
                     updateHeaderFromMain("StamOrga", "")
             }
+        }
+        onNotifyGetUserEvents: {
+            iMainToolButtonEventCount = appUserEvents.getCurrentMainEventCounter();
         }
 
         onNotifyUpdatePasswordRequestFinished: {

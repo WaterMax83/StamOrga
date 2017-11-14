@@ -126,7 +126,13 @@ MessageProtocol* DataConnection::requestGetUserEvents(MessageProtocol* msg)
     //    memcpy(&timestamp, msg->getPointerToData(), sizeof(qint64));
     //    timestamp = qFromLittleEndian(timestamp);
 
-    return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_USER_EVENTS, ERROR_CODE_SUCCESS);
+    QByteArray userEvents;
+    qint32 rCode = this->m_pGlobalData->getCurrentUserEvents(userEvents, this->m_pUserConData->m_userID);
+    rCode = qToLittleEndian(rCode);
+    userEvents.prepend(sizeof(qint32), 0x0);
+    memcpy((void*)userEvents.constData(), &rCode, sizeof(qint32));
+
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_USER_EVENTS, userEvents);
 }
 
 MessageProtocol* DataConnection::requestSetUserEvents(MessageProtocol* msg)
@@ -241,7 +247,7 @@ MessageProtocol* DataConnection::requestGetProgramVersion(MessageProtocol* msg)
     wVersion.setByteOrder(QDataStream::LittleEndian);
     wVersion << ERROR_CODE_SUCCESS;
 
-#define VERSION_TEST
+//#define VERSION_TEST
 #ifdef VERSION_TEST
 #define ORGA_VERSION_I 0x0B0A0000 // VX.Y.Z => 0xXXYYZZZZ
 #define ORGA_VERSION_S "VB.A.0"

@@ -74,5 +74,6 @@
         <file>components/NewsDataItem.qml</file>
         <file>components/CustomButton.qml</file>
         <file>components/CustomDialog.qml</file>
+        <file>components/EventIndicator.qml</file>
     </qresource>
 </RCC>
