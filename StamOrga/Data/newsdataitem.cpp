@@ -21,6 +21,7 @@
 NewsDataItem::NewsDataItem(QObject* parent)
     : QObject(parent)
 {
+    this->m_bIsEvent = false;
 }
 
 

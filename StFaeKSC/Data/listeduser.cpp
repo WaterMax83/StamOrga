@@ -37,7 +37,7 @@ ListedUser::ListedUser()
     }
     g_ListedUser = this;
 
-#if QT_VERSION < QT_VERSION_CHECK(5,9,0)
+#if QT_VERSION < QT_VERSION_CHECK(5, 9, 0)
     this->m_hash = new QCryptographicHash(QCryptographicHash::Sha3_512);
 #else
     this->m_hash = new QCryptographicHash(QCryptographicHash::Keccak_512);
@@ -115,7 +115,7 @@ int ListedUser::addNewUser(const QString name, const QString password, quint32 p
 
     QString intPassWord = password;
     if (password == "")
-        intPassWord         = name;
+        intPassWord      = name;
     QString hashPassword = this->createHashPassword(intPassWord, salt);
 
     this->m_pConfigSettings->beginGroup(GROUP_LIST_ITEM);
@@ -223,9 +223,6 @@ bool ListedUser::userCheckPasswordHash(QString name, QString hash, QString rando
         if (pLogin == NULL)
             continue;
         if (pLogin->m_itemName == name) {
-
-            qDebug() << random;
-            qDebug() << pLogin->m_salt;
 
             QString passWordWithRandowm = this->createHashPassword(pLogin->m_password, random);
             if (passWordWithRandowm == hash)

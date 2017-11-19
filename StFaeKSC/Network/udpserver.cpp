@@ -42,7 +42,7 @@ int UdpServer::DoBackgroundWork()
     connect(this->m_pUdpMasterSocket, &QUdpSocket::readyRead, this, &UdpServer::readyReadMasterPort);
     connect(this->m_pUdpMasterSocket, &QUdpSocket::readChannelFinished, this, &UdpServer::readChannelFinished);
 
-    qDebug() << "Started Master UDP Server";
+    qInfo().noquote() << "Started Master UDP Server";
 
     return 0;
 }

@@ -672,6 +672,18 @@ qint64 GlobalData::getNewsDataLastServerUpdate()
     return this->m_ndLastServerUpdateTimeStamp;
 }
 
+
+bool GlobalData::setNewsDataItemHasEvent(quint32 newsIndex)
+{
+    for (int i = 0; i < this->m_lNewsDataItems.count(); i++) {
+        if (this->m_lNewsDataItems[i]->index() == newsIndex) {
+            this->m_lNewsDataItems[i]->setIsEvent(true);
+            return true;
+        }
+    }
+    return false;
+}
+
 QString GlobalData::getCurrentLoggingList(int index)
 {
     return this->m_logApp->getCurrentLoggingList(index);

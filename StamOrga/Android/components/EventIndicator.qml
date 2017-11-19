@@ -28,7 +28,7 @@ Rectangle {
     property bool disableVisibility : false;
 
     visible: disableVisibility ? false : ((eventCount > 0) ? true : false)
-    width: parent.width / 2
+    width: parent.height / 2
     height: parent.height / 2
     radius: width*0.5
     anchors.top: parent.top

@@ -22,6 +22,8 @@ import QtQuick.Layouts 1.2
 
 import com.watermax.demo 1.0
 
+import "../components" as MyComponents
+
 Rectangle {
     id: newsRectangleItem
     property var m_newsDataItem
@@ -47,6 +49,12 @@ Rectangle {
     radius: 5
     border.color: "grey"
     border.width: 2
+
+    MyComponents.EventIndicator {
+        id: eventIndicator
+        disableVisibility: true
+        eventCount : 1
+    }
 
     ColumnLayout {
         id: columnLayoutNewsItem
@@ -122,6 +130,7 @@ Rectangle {
             labelHeaderItem.text = newsDataItem.header
             labelUserName.text = "von " + newsDataItem.user;
             labelTime.text = newsDataItem.timestampReadableLine();
+            eventIndicator.disableVisibility = !newsDataItem.event
         }
     }
 }

@@ -23,21 +23,39 @@
 AppUserEvents::AppUserEvents(QObject* parent)
     : QObject(parent)
 {
+    this->m_eventNewAppVersion  = false;
+    this->m_eventNewFanclubNews = 0;
 }
 
+
+void AppUserEvents::initialize(GlobalData* pGlobalData)
+{
+    this->m_pGlobalData = pGlobalData;
+}
 
 void AppUserEvents::addNewUserEvents(QJsonObject& jsObj)
 {
 
     QString info = jsObj.value("info").toString();
-    if (jsObj.value("type") == NOTIFY_TOPIC_NEW_APP_VERSION) {
+    QString type = jsObj.value("type").toString();
+    if (type == NOTIFY_TOPIC_NEW_APP_VERSION) {
 
         this->m_eventNewAppVersion = false;
         if (QString::compare(STAM_ORGA_VERSION_S, info) >= 0)
             return; /* already have newest version */
         else
             this->m_eventNewAppVersion = true;
+    } else if (type == NOTIFY_TOPIC_NEW_FANCLUB_NEWS) {
+
+        this->m_pGlobalData->setNewsDataItemHasEvent(info.toUInt());
+        this->m_eventNewFanclubNews++;
     }
+}
+
+void AppUserEvents::resetCurrentEvents()
+{
+    this->m_eventNewAppVersion  = false;
+    this->m_eventNewFanclubNews = 0;
 }
 
 
@@ -48,5 +66,20 @@ qint32 AppUserEvents::getCurrentMainEventCounter()
     if (this->m_eventNewAppVersion)
         rValue++;
 
+    if (this->m_eventNewFanclubNews)
+        rValue += this->m_eventNewFanclubNews;
+
     return rValue;
+}
+
+qint32 AppUserEvents::getCurrentUpdateEventCounter()
+{
+    if (this->m_eventNewAppVersion)
+        return 1;
+    return 0;
+}
+
+qint32 AppUserEvents::getCurrentFanclubEventCounter()
+{
+    return this->m_eventNewFanclubNews;
 }

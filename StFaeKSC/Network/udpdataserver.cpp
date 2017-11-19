@@ -37,7 +37,7 @@ int UdpDataServer::DoBackgroundWork()
 {
     this->m_pUdpSocket = new QUdpSocket();
     if (!this->m_pUdpSocket->bind(QHostAddress::Any, this->m_pUsrConData->m_dstDataPort)) {
-        qDebug() << QString("Error binding socket  for port %1: %2\n").arg(this->m_pUsrConData->m_dstDataPort).arg(this->m_pUdpSocket->errorString());
+        qWarning().noquote() << QString("Error binding socket  for port %1: %2\n").arg(this->m_pUsrConData->m_dstDataPort).arg(this->m_pUdpSocket->errorString());
         return -1;
     }
     connect(this->m_pUdpSocket, &QUdpSocket::readyRead, this, &UdpDataServer::readyReadSocketPort);

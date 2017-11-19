@@ -64,6 +64,7 @@ int main(int argc, char* argv[])
     globalSettings.initialize(&globalUserData, &app);
 
     AppUserEvents appUserEvents;
+    appUserEvents.initialize(&globalUserData);
     g_AppUserEvents = &appUserEvents;
 
     QFontDatabase base;

@@ -29,6 +29,7 @@ class NewsDataItem : public QObject
     Q_PROPERTY(QString header READ header WRITE setHeader NOTIFY headerChanged)
     Q_PROPERTY(quint32 index READ index WRITE setIndex NOTIFY indexChanged)
     Q_PROPERTY(QString info READ info WRITE setInfo NOTIFY infoChanged)
+    Q_PROPERTY(bool event READ isEvent NOTIFY eventChanged)
 public:
     explicit NewsDataItem(QObject* parent = 0);
 
@@ -68,7 +69,19 @@ public:
         }
     }
 
-    void setTimeStamp(qint64 timestamp) { this->m_timestamp = timestamp; }
+    bool isEvent() { return this->m_bIsEvent; }
+    void setIsEvent(bool event)
+    {
+        if (this->m_bIsEvent != event) {
+            this->m_bIsEvent = event;
+            emit this->eventChanged();
+        }
+    }
+
+    void setTimeStamp(qint64 timestamp)
+    {
+        this->m_timestamp = timestamp;
+    }
     Q_INVOKABLE QString timestampReadableLine()
     {
         return QDateTime::fromMSecsSinceEpoch(this->m_timestamp).toString("ddd, dd.MM.yy hh:mm");
@@ -81,6 +94,7 @@ signals:
     void headerChanged();
     void infoChanged();
     void indexChanged();
+    void eventChanged();
 
 public slots:
 
@@ -90,6 +104,7 @@ private:
     QString m_info;
     quint32 m_index;
     qint64  m_timestamp;
+    bool    m_bIsEvent;
 };
 
 #endif // NEWSDATAITEM_H

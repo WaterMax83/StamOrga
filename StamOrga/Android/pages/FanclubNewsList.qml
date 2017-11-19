@@ -148,6 +148,10 @@ Flickable {
         }
     }
 
+    function notifyGetUserEvents() {
+        showNewsDataList();
+    }
+
     function showNewsDataList() {
 
         for (var j = columnLayoutFanClubList.children.length; j > 0; j--) {

@@ -127,8 +127,8 @@ MessageProtocol* DataConnection::requestGetUserEvents(MessageProtocol* msg)
     //    timestamp = qFromLittleEndian(timestamp);
 
     QByteArray userEvents;
-    qint32 rCode = this->m_pGlobalData->getCurrentUserEvents(userEvents, this->m_pUserConData->m_userID);
-    rCode = qToLittleEndian(rCode);
+    qint32     rCode = this->m_pGlobalData->getCurrentUserEvents(userEvents, this->m_pUserConData->m_userID);
+    rCode            = qToLittleEndian(rCode);
     userEvents.prepend(sizeof(qint32), 0x0);
     memcpy((void*)userEvents.constData(), &rCode, sizeof(qint32));
 
@@ -1034,7 +1034,7 @@ MessageProtocol* DataConnection::requestChangeNewsData(MessageProtocol* msg)
         rCode = this->m_pGlobalData->m_fanclubNews.addNewFanclubNews(header, infoCompressed, this->m_pUserConData->m_userID);
         if (rCode > ERROR_CODE_NO_ERROR) {
             qInfo().noquote() << QString("User %1 added news %2").arg(this->m_pUserConData->m_userName, header);
-            qint64 messageID = g_pushNotify->sendNewFanclubNewsNotification("Es gibt eine neue Nachricht", this->m_pUserConData->m_userID);
+            qint64 messageID = g_pushNotify->sendNewFanclubNewsNotification("Es gibt eine neue Nachricht", this->m_pUserConData->m_userID, rCode);
             returnData[0]    = qToLittleEndian(ERROR_CODE_SUCCESS);
             returnData[1]    = qToLittleEndian(rCode);
             memcpy(&returnData[2], &messageID, sizeof(qint64));
@@ -1044,7 +1044,7 @@ MessageProtocol* DataConnection::requestChangeNewsData(MessageProtocol* msg)
         rCode = this->m_pGlobalData->m_fanclubNews.changeFanclubNews(newsIndex, header, infoCompressed, this->m_pUserConData->m_userID);
         if (rCode == ERROR_CODE_SUCCESS) {
             qInfo().noquote() << QString("User %1 changed news %2").arg(this->m_pUserConData->m_userName, header);
-            qint64 messageID = g_pushNotify->sendNewFanclubNewsNotification("Eine Nachricht wurde geändert", this->m_pUserConData->m_userID);
+            qint64 messageID = g_pushNotify->sendNewFanclubNewsNotification("Eine Nachricht wurde geändert", this->m_pUserConData->m_userID, newsIndex);
             returnData[0]    = qToLittleEndian(ERROR_CODE_SUCCESS);
             returnData[1]    = qToLittleEndian(newsIndex);
             memcpy(&returnData[2], &messageID, sizeof(qint64));

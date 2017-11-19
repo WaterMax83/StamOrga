@@ -160,6 +160,10 @@ ApplicationWindow {
 
                         drawer.close()
                     }
+                    MyComponents.EventIndicator {
+                        disableVisibility: model.event ? false : true
+                        eventCount : model.event
+                    }
                 }
 
                 model: ListModel {
@@ -179,18 +183,16 @@ ApplicationWindow {
                             append({
                                        title: "Fanclub",
                                        element: viewFanclubNewList,
-//                                       imgsource: ""
+                                       event: 0
                                    })
                         append({
                                    title: "Einstellungen",
                                    element: viewSettingsPage,
-//                                   imgsource: ""
                                })
                         if (userInt.isDebuggingEnabled())
                             append({
                                        title: "Logging",
                                        element: viewLoggingPage,
-//                                       imgsource: ""
                                    })
                     }
                 }
@@ -286,6 +288,7 @@ ApplicationWindow {
                     listViewListModel.append({
                                             title: "Update",
                                             link: globalUserData.getUpdateLink(),
+                                            event : 0
                                         })
                 }
             }
@@ -325,6 +328,17 @@ ApplicationWindow {
         }
         onNotifyGetUserEvents: {
             iMainToolButtonEventCount = appUserEvents.getCurrentMainEventCounter();
+
+            for(var i=0; i< listViewListModel.count; i++) {
+                if (listViewListModel.get(i).title === "Update")
+                    listViewListModel.get(i).event = appUserEvents.getCurrentUpdateEventCounter();
+                else if (listViewListModel.get(i).title === "Fanclub")
+                    listViewListModel.get(i).event = appUserEvents.getCurrentFanclubEventCounter();
+            }
+
+            if (stackView.currentItem === viewFanclubNewList) {
+                stackView.currentItem.notifyGetUserEvents();
+            }
         }
 
         onNotifyUpdatePasswordRequestFinished: {

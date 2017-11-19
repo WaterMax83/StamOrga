@@ -263,7 +263,7 @@ qint64 PushNotification::sendNewFirstAwayAccept(const QString body, const qint32
     return push->m_sendMessageID;
 }
 
-qint64 PushNotification::sendNewFanclubNewsNotification(const QString body, const qint32 userID)
+qint64 PushNotification::sendNewFanclubNewsNotification(const QString body, const qint32 userID, const qint32 newsID)
 {
     if (!this->m_initialized)
         return ERROR_CODE_NOT_READY;
@@ -286,6 +286,7 @@ qint64 PushNotification::sendNewFanclubNewsNotification(const QString body, cons
     push->m_sendMessageID = getNextInternalPushNumber();
     push->m_sendTime      = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND;
     push->m_userID        = userID;
+    push->m_info          = QString::number(newsID);
 
     this->insertNewNotification(push);
 
@@ -347,6 +348,10 @@ void PushNotification::slotConnectionTimeout()
 {
     QMutexLocker lock(&this->m_notifyMutex);
 
+    if (this->m_doNotUseSSLbecauseOfVersion && !this->m_lastPushNotify->m_info.isEmpty()) {
+        QString sendTopic = this->getTopicStringFromIndex(this->m_lastPushNotify->m_topic);
+        this->m_pGlobalData->addNewUserEvent(sendTopic, this->m_lastPushNotify->m_info, this->m_lastPushNotify->m_userID);
+    }
     qint64 sendNumber = -1;
     if (this->m_lastPushNotify != NULL) {
         sendNumber = this->m_lastPushNotify->m_sendMessageID;
@@ -424,7 +429,7 @@ void PushNotification::sslErrors(QNetworkReply* reply, QList<QSslError> errors)
 
     this->m_connectionTimeoutTimer->stop();
 
-    qDebug() << "There was an error sending the notification";
+    qDebug().noquote() << "There was an error sending the notification";
     Q_UNUSED(reply);
     Q_UNUSED(errors);
     if (this->m_lastPushNotify != NULL)

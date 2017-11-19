@@ -53,8 +53,12 @@ qint32 UserEvents::initialize(QString type, QString info, qint32 userID)
 
     this->m_pConfigSettings->endGroup();
 
+#ifndef QT_DEBUG
     if (userID > 0)
         this->addNewUser(userID);
+#else
+    Q_UNUSED(userID);
+#endif
 
     return ERROR_CODE_SUCCESS;
 }

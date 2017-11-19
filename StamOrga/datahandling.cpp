@@ -134,6 +134,8 @@ qint32 DataHandling::getHandleUserEventsResponse(MessageProtocol* msg)
     rValue = qFromLittleEndian(rValue);
 
     if (msg->getDataLength() > 4) {
+        g_AppUserEvents->resetCurrentEvents();
+
         QByteArray  jsonByteArray(pData + sizeof(qint32));
         QJsonObject jsRoot = QJsonDocument::fromJson(jsonByteArray).object();
         if (!jsRoot.contains("events") || !jsRoot.value("events").isArray())

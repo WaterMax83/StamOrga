@@ -20,10 +20,10 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
-#include <QtCore/QtEndian>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
+#include <QtCore/QtEndian>
 
 #include "../Common/General/globalfunctions.h"
 #include "globaldata.h"
@@ -345,7 +345,6 @@ qint32 GlobalData::requestChangeMeetingInfo(const quint32 gameIndex, const quint
 #endif
 
     qint32 result = ERROR_CODE_SUCCESS;
-    //    quint32 userID = this->m_UserList.getItemIndex(userName);
     foreach (MeetingInfo* mInfo, this->m_meetingInfos) {
         if (mInfo->getGameIndex() == gameIndex) {
 
@@ -543,7 +542,7 @@ qint32 GlobalData::requestAcceptMeetingInfo(const quint32 gameIndex, const quint
 
 qint32 GlobalData::addNewUserEvent(QString type, QString info, qint32 userID)
 {
-    for(int i=0; i< this->m_userEvents.size(); i++ ) {
+    for (int i = 0; i < this->m_userEvents.size(); i++) {
         if (this->m_userEvents[i]->getType() == type) {
             if (this->m_userEvents[i]->getInfo() == info)
                 return ERROR_CODE_SUCCESS;
@@ -559,10 +558,10 @@ qint32 GlobalData::addNewUserEvent(QString type, QString info, qint32 userID)
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 GlobalData::getCurrentUserEvents(QByteArray &destArray, qint32 userID)
+qint32 GlobalData::getCurrentUserEvents(QByteArray& destArray, qint32 userID)
 {
     QJsonArray jsArr;
-    for(int i=0; i< this->m_userEvents.size(); i++ ) {
+    for (int i = 0; i < this->m_userEvents.size(); i++) {
         if (this->m_userEvents[i]->getHasUserGotEvent(userID))
             continue;
 
