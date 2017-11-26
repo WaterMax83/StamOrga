@@ -35,6 +35,8 @@ public:
 
     Q_INVOKABLE qint32 startMainConnection(QString name, QString passw);
 
+    Q_INVOKABLE qint32 startGetUserEvents();
+
     Q_INVOKABLE qint32 startSetUserEvents(qint64 eventID, qint32 status);
 
     Q_INVOKABLE qint32 startListGettingGames();

@@ -60,6 +60,11 @@ qint32 UserInterface::startMainConnection(QString name, QString passw)
     return this->m_pConHandle->startMainConnection(name, passw);
 }
 
+qint32 UserInterface::startGetUserEvents()
+{
+    return this->m_pConHandle->startGettingUserEvents();
+}
+
 qint32 UserInterface::startSetUserEvents(qint64 eventID, qint32 status)
 {
     return this->m_pConHandle->startSettingUserEvents(eventID, status);
@@ -191,8 +196,10 @@ void UserInterface::slCommandFinished(quint32 command, qint32 result)
 
     case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
         emit this->notifyGamesListFinished(result);
-        if (result == ERROR_CODE_SUCCESS)
+        if (result == ERROR_CODE_SUCCESS) {
+            this->m_pConHandle->startGettingUserEvents();
             this->m_pConHandle->startListGettingGamesInfo();
+        }
         break;
 
     case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST:

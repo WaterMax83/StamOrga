@@ -105,7 +105,7 @@ public:
     qint64 sendChangeMeetingNotification(const QString body, const qint32 userID, const quint32 gameIndex);
     qint64 sendNewTicketNotification(const QString body, const qint32 userID, const quint32 gameIndex, const quint32 ticketIndex);
     qint64 removeNewTicketNotification(const quint32 gameIndex, const quint32 ticketIndex);
-    qint64 sendNewFirstAwayAccept(const QString body, const qint32 userID);
+    qint64 sendNewFirstAwayAccept(const QString body, const qint32 userID, const quint32 gameIndex);
     qint64 sendNewFanclubNewsNotification(const QString body, const qint32 userID, const qint32 newsID);
 
 signals:

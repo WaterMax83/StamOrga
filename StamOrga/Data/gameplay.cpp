@@ -30,6 +30,7 @@ GamePlay::GamePlay(QObject* parent)
     this->m_interestedMeeting        = 0;
     this->m_declinedMeeting          = 0;
     this->m_meetingInfo              = 0;
+    this->m_eventCount               = 0;
     this->m_bIsUserGameAddingEnabled = false;
 }
 

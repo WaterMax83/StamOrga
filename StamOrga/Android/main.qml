@@ -80,7 +80,6 @@ ApplicationWindow {
 
             Text {
                 id: titleLabel
-                //                text: listView.currentItem ? listView.currentItem.text : "StamOrga"
                 color: "white"
                 font.pixelSize: 25
                 elide: Text.ElideRight
@@ -222,7 +221,8 @@ ApplicationWindow {
         initialItem: viewMainGames
 
         onCurrentItemChanged: {
-            stackView.currentItem.pageOpenedUpdateView()
+            if (stackView.currentItem.pageOpenedUpdateView)
+                stackView.currentItem.pageOpenedUpdateView()
         }
     }
 
@@ -336,9 +336,8 @@ ApplicationWindow {
                     listViewListModel.get(i).event = appUserEvents.getCurrentFanclubEventCounter();
             }
 
-            if (stackView.currentItem === viewFanclubNewList) {
-                stackView.currentItem.notifyGetUserEvents();
-            }
+            if (stackView.currentItem.notifyGetUserEvents)
+                stackView.currentItem.notifyGetUserEvents(result);
         }
 
         onNotifyUpdatePasswordRequestFinished: {

@@ -23,6 +23,13 @@
 #include <QtCore/QJsonObject>
 
 #include "globaldata.h"
+#include "userinterface.h"
+
+struct EventInfo {
+    QString m_type;
+    QString m_info;
+    qint64  m_eventID;
+};
 
 class AppUserEvents : public QObject
 {
@@ -36,10 +43,11 @@ public:
 
     void resetCurrentEvents();
 
-
     Q_INVOKABLE qint32 getCurrentMainEventCounter();
     Q_INVOKABLE qint32 getCurrentUpdateEventCounter();
     Q_INVOKABLE qint32 getCurrentFanclubEventCounter();
+
+    Q_INVOKABLE qint32 clearUserEventFanclub(UserInterface* pInt, qint32 info);
 
 signals:
 
@@ -49,7 +57,8 @@ private:
     bool   m_eventNewAppVersion;
     qint32 m_eventNewFanclubNews;
 
-    GlobalData* m_pGlobalData;
+    GlobalData*       m_pGlobalData;
+    QList<EventInfo*> m_lEvents;
 };
 
 #endif // APPUSEREVENTS_H

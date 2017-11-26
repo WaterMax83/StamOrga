@@ -174,6 +174,13 @@ QString UserEvents::getType()
     return this->m_type;
 }
 
+qint64 UserEvents::getEventID()
+{
+    QMutexLocker locker(&this->m_mInternalInfoMutex);
+
+    return this->m_timestamp;
+}
+
 
 UserEvents::~UserEvents()
 {

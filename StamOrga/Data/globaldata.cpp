@@ -432,6 +432,24 @@ qint64 GlobalData::getGamePlayLastServerUpdate()
     return this->m_gpLastServerUpdateTimeStamp;
 }
 
+void GlobalData::resetAllGamePlayEvents()
+{
+    for (int i = 0; i < this->m_lGamePlay.count(); i++) {
+        this->m_lGamePlay[i]->setEvent(0);
+    }
+}
+
+bool GlobalData::setGamePlayItemHasEvent(quint32 gameIndex)
+{
+    for (int i = 0; i < this->m_lGamePlay.count(); i++) {
+        if (this->m_lGamePlay[i]->index() == gameIndex) {
+            this->m_lGamePlay[i]->setEvent(this->m_lGamePlay[i]->getEvent() + 1);
+            return true;
+        }
+    }
+    return false;
+}
+
 void GlobalData::saveCurrentSeasonTickets(qint64 timestamp)
 {
     QMutexLocker lock(&this->m_mutexTicket);
@@ -672,6 +690,12 @@ qint64 GlobalData::getNewsDataLastServerUpdate()
     return this->m_ndLastServerUpdateTimeStamp;
 }
 
+void GlobalData::resetAllNewsDataEvents()
+{
+    for (int i = 0; i < this->m_lNewsDataItems.count(); i++) {
+        this->m_lNewsDataItems[i]->setIsEvent(false);
+    }
+}
 
 bool GlobalData::setNewsDataItemHasEvent(quint32 newsIndex)
 {

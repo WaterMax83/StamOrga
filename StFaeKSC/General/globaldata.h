@@ -55,8 +55,9 @@ public:
     quint16 getAcceptedNumber(const quint32 gamesIndex, const quint32 state);
     quint16 getMeetingInfoValue(const quint32 gamesIndex);
 
-    qint32 addNewUserEvent(QString type, QString info, qint32 userID);
-    qint32 getCurrentUserEvents(QByteArray& destArray, qint32 userID);
+    qint32 addNewUserEvent(const QString type, const QString info, const qint32 userID);
+    qint32 getCurrentUserEvents(QByteArray& destArray, const qint32 userID);
+    qint32 acceptUserEvent(const qint64 eventID, const qint32 userID, const qint32 status);
 
     ListedUser                   m_UserList;
     Games                        m_GamesList;

@@ -127,6 +127,10 @@ Flickable {
 
     function notifyFanclubNewsListFinished(result){
         if (result === 1) {
+            if (appUserEvents.getCurrentFanclubEventCounter() > 0) {
+                userInt.startGetUserEvents();
+                return;
+            }
             toastManager.show("Liste erfolgreich geladen", 2000);
             busyIndicatorNewsList.loadingVisible = false;
         } else {
@@ -148,7 +152,16 @@ Flickable {
         }
     }
 
-    function notifyGetUserEvents() {
+    function notifyGetUserEvents(result) {
+        if (result === 1) {
+            toastManager.show("Liste erfolgreich geladen", 2000);
+            busyIndicatorNewsList.loadingVisible = false;
+        } else {
+            toastManager.show(userInt.getErrorCodeToString(result), 4000);
+            busyIndicatorNewsList.loadingVisible = false;
+            busyIndicatorNewsList.infoText = "Fehler beim Laden der Events"
+        }
+
         showNewsDataList();
     }
 
@@ -178,6 +191,9 @@ Flickable {
                     var sprite = stackView.push(component)
                     sprite.userIntCurrentNews = userInt
                     sprite.startShowElements(sender, false);
+
+                    if (sender.event)
+                        appUserEvents.clearUserEventFanclub(userInt, sender.index);
                 }
             }
             onPressAndHold: {

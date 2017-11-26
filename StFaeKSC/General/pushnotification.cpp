@@ -160,6 +160,7 @@ qint64 PushNotification::sendNewMeetingNotification(const QString body, const qi
     push->m_sendTime       = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND; // 5min
     push->m_userID         = userID;
     push->m_internalIndex1 = gameIndex;
+    push->m_info           = QString::number(gameIndex);
 
     this->insertNewNotification(push);
 
@@ -192,6 +193,7 @@ qint64 PushNotification::sendChangeMeetingNotification(const QString body, const
     push->m_sendTime       = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND;
     push->m_userID         = userID;
     push->m_internalIndex1 = gameIndex;
+    push->m_info           = QString::number(gameIndex);
 
     this->insertNewNotification(push);
 
@@ -225,6 +227,7 @@ qint64 PushNotification::sendNewTicketNotification(const QString body, const qin
     push->m_userID         = userID;
     push->m_internalIndex1 = gameIndex;
     push->m_internalIndex2 = ticketIndex;
+    push->m_info           = QString::number(gameIndex);
 
     this->insertNewNotification(push);
 
@@ -245,7 +248,7 @@ qint64 PushNotification::removeNewTicketNotification(const quint32 gameIndex, co
     return -1;
 }
 
-qint64 PushNotification::sendNewFirstAwayAccept(const QString body, const qint32 userID)
+qint64 PushNotification::sendNewFirstAwayAccept(const QString body, const qint32 userID, const quint32 gameIndex)
 {
     if (!this->m_initialized)
         return ERROR_CODE_NOT_READY;
@@ -257,6 +260,7 @@ qint64 PushNotification::sendNewFirstAwayAccept(const QString body, const qint32
     push->m_sendMessageID = getNextInternalPushNumber();
     push->m_sendTime      = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND;
     push->m_userID        = userID;
+    push->m_info          = QString::number(gameIndex);
 
     this->insertNewNotification(push);
 

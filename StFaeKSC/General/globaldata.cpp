@@ -512,7 +512,7 @@ qint32 GlobalData::requestAcceptMeetingInfo(const quint32 gameIndex, const quint
                 /* Send an info if the first person is going to a game which is not at home */
                 if (pGame->m_away == "KSC" && acceptValue == ACCEPT_STATE_ACCEPT && mInfo->getAcceptedNumber(ACCEPT_STATE_ACCEPT) == 1) {
                     QString body = QString(BODY_NEW_AWAY_ACCEPT).arg(name, pGame->m_itemName);
-                    messageID    = g_pushNotify->sendNewFirstAwayAccept(body, userID);
+                    messageID    = g_pushNotify->sendNewFirstAwayAccept(body, userID, gameIndex);
                 }
             } else
                 qWarning().noquote() << QString("Error setting Acceptation at game %1: %2").arg(pGame->m_index).arg(result);
@@ -529,7 +529,7 @@ qint32 GlobalData::requestAcceptMeetingInfo(const quint32 gameIndex, const quint
         /* Send an info if the first person is going to an game which is not at home */
         if (pGame->m_away == "KSC" && acceptValue == ACCEPT_STATE_ACCEPT) {
             QString body = QString(BODY_NEW_AWAY_ACCEPT).arg(name, pGame->m_itemName);
-            messageID    = g_pushNotify->sendNewFirstAwayAccept(body, userID);
+            messageID    = g_pushNotify->sendNewFirstAwayAccept(body, userID, gameIndex);
         }
     } else {
         delete mInfo;
@@ -540,14 +540,15 @@ qint32 GlobalData::requestAcceptMeetingInfo(const quint32 gameIndex, const quint
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 GlobalData::addNewUserEvent(QString type, QString info, qint32 userID)
+qint32 GlobalData::addNewUserEvent(const QString type, const QString info, const qint32 userID)
 {
-    for (int i = 0; i < this->m_userEvents.size(); i++) {
-        if (this->m_userEvents[i]->getType() == type) {
-            if (this->m_userEvents[i]->getInfo() == info)
-                return ERROR_CODE_SUCCESS;
-        }
-    }
+    /* We need userevents with same type and info */
+    //    for (int i = 0; i < this->m_userEvents.size(); i++) {
+    //        if (this->m_userEvents[i]->getType() == type) {
+    //            if (this->m_userEvents[i]->getInfo() == info)
+    //                return ERROR_CODE_SUCCESS;
+    //        }
+    //    }
 
     UserEvents* pUserEvent = new UserEvents();
     if (pUserEvent->initialize(type, info, userID) == ERROR_CODE_SUCCESS)
@@ -558,7 +559,7 @@ qint32 GlobalData::addNewUserEvent(QString type, QString info, qint32 userID)
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 GlobalData::getCurrentUserEvents(QByteArray& destArray, qint32 userID)
+qint32 GlobalData::getCurrentUserEvents(QByteArray& destArray, const qint32 userID)
 {
     QJsonArray jsArr;
     for (int i = 0; i < this->m_userEvents.size(); i++) {
@@ -571,6 +572,7 @@ qint32 GlobalData::getCurrentUserEvents(QByteArray& destArray, qint32 userID)
         QJsonObject json;
         json.insert("type", this->m_userEvents[i]->getType());
         json.insert("info", this->m_userEvents[i]->getInfo());
+        json.insert("id", this->m_userEvents[i]->getEventID());
 
         jsArr.append(json);
     }
@@ -581,6 +583,20 @@ qint32 GlobalData::getCurrentUserEvents(QByteArray& destArray, qint32 userID)
 
     QJsonDocument jsDoc(jsRootObj);
     destArray = jsDoc.toJson(QJsonDocument::Compact);
+
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 GlobalData::acceptUserEvent(const qint64 eventID, const qint32 userID, const qint32 status)
+{
+    foreach (UserEvents* pEvent, this->m_userEvents) {
+        if (pEvent->getEventID() == eventID) {
+            pEvent->addNewUser(userID);
+            break;
+        }
+    }
+
+    Q_UNUSED(status);
 
     return ERROR_CODE_SUCCESS;
 }

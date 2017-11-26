@@ -36,11 +36,12 @@ class GamePlay : public QObject
     Q_PROPERTY(quint32 index READ index WRITE setIndex NOTIFY indexChanged)
     Q_PROPERTY(bool timeFixed READ timeFixed WRITE setTimeFixed NOTIFY timeFixedChanged)
     Q_PROPERTY(quint8 seasonIndex READ seasonIndex WRITE setSeasonIndex NOTIFY seasonIndexChanged)
+    Q_PROPERTY(quint32 event READ getEvent NOTIFY eventChanged)
 public:
     explicit GamePlay(QObject* parent = 0);
 
     QString home() { return this->m_home; }
-    void setHome(const QString& home)
+    void    setHome(const QString& home)
     {
         if (this->m_home != home) {
             this->m_home = home;
@@ -49,7 +50,7 @@ public:
     }
 
     QString away() { return this->m_away; }
-    void setAway(const QString& away)
+    void    setAway(const QString& away)
     {
         if (this->m_away != away) {
             this->m_away = away;
@@ -58,7 +59,7 @@ public:
     }
 
     QString score() { return this->m_score; }
-    void setScore(const QString& score)
+    void    setScore(const QString& score)
     {
         if (this->m_score != score) {
             this->m_score = score;
@@ -102,7 +103,7 @@ public:
     }
 
     quint8 index() { return this->m_index; }
-    void setIndex(const quint8 index)
+    void   setIndex(const quint8 index)
     {
         if (this->m_index != index) {
             this->m_index = index;
@@ -124,7 +125,7 @@ public:
 
 
     quint8 seasonIndex() { return this->m_seasonIndex; }
-    void setSeasonIndex(const quint8 seasonIndex)
+    void   setSeasonIndex(const quint8 seasonIndex)
     {
         if (this->m_seasonIndex != seasonIndex) {
             this->m_seasonIndex = seasonIndex;
@@ -132,10 +133,19 @@ public:
         }
     }
 
+    quint32 getEvent() { return this->m_eventCount; }
+    void    setEvent(quint32 event)
+    {
+        if (this->m_eventCount != event) {
+            this->m_eventCount = event;
+            emit this->eventChanged();
+        }
+    }
+
     Q_INVOKABLE QString getCompetitionLine();
 
     Q_INVOKABLE quint16 getFreeTickets() { return this->m_freeTickets; }
-    void setFreeTickets(quint16 number)
+    void                setFreeTickets(quint16 number)
     {
         this->m_freeTickets = number;
     }
@@ -151,25 +161,25 @@ public:
     }
 
     Q_INVOKABLE quint16 getAcceptedMeetingCount() { return this->m_acceptedMeeting; }
-    void setAcceptedMeetingCount(quint16 number)
+    void                setAcceptedMeetingCount(quint16 number)
     {
         this->m_acceptedMeeting = number;
     }
 
     Q_INVOKABLE quint16 getInterestedMeetingCount() { return this->m_interestedMeeting; }
-    void setInterestedMeetingCount(quint16 number)
+    void                setInterestedMeetingCount(quint16 number)
     {
         this->m_interestedMeeting = number;
     }
 
     Q_INVOKABLE quint16 getDeclinedMeetingCount() { return this->m_declinedMeeting; }
-    void setDeclinedMeetingCount(quint16 number)
+    void                setDeclinedMeetingCount(quint16 number)
     {
         this->m_declinedMeeting = number;
     }
 
     Q_INVOKABLE quint16 getMeetingInfo() { return this->m_meetingInfo; }
-    void setMeetingInfo(quint16 number)
+    void                setMeetingInfo(quint16 number)
     {
         this->m_meetingInfo = number;
     }
@@ -193,6 +203,7 @@ signals:
     void indexChanged();
     void timeFixedChanged();
     void seasonIndexChanged();
+    void eventChanged();
 
 public slots:
 
@@ -213,6 +224,7 @@ private:
     quint16          m_declinedMeeting;
     quint16          m_meetingInfo;
     bool             m_bIsUserGameAddingEnabled;
+    quint32          m_eventCount;
 };
 
 #endif // GAMEPLAY_H

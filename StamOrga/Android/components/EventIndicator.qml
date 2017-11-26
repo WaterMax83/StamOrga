@@ -26,10 +26,11 @@ import com.watermax.demo 1.0
 Rectangle {
     property int eventCount;
     property bool disableVisibility : false;
+    property int itemSize : parent.height
 
     visible: disableVisibility ? false : ((eventCount > 0) ? true : false)
-    width: parent.height / 2
-    height: parent.height / 2
+    width: itemSize / 2
+    height: itemSize / 2
     radius: width*0.5
     anchors.top: parent.top
     anchors.right: parent.right

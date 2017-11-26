@@ -46,6 +46,7 @@ public:
 
     QString getType();
     QString getInfo();
+    qint64  getEventID();
 
 
 private:

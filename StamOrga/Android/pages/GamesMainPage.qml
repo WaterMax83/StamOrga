@@ -223,6 +223,10 @@ Page {
         showListedGames()
     }
 
+    function notifyGetUserEvents(result) {
+        showListedGames();
+    }
+
     function notifyGameChangedFinished(result) {
         if (result === 1) {
             showLoadingGameInfos("Lade Spielinfos")

@@ -137,16 +137,21 @@ MessageProtocol* DataConnection::requestGetUserEvents(MessageProtocol* msg)
 
 MessageProtocol* DataConnection::requestSetUserEvents(MessageProtocol* msg)
 {
-    if (msg->getDataLength() < 8) {
+    if (msg->getDataLength() < 12) {
         qWarning().noquote() << QString("Getting no data from %1 for set events").arg(this->m_pUserConData->m_userName);
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_SET_USER_EVENTS, ERROR_CODE_WRONG_SIZE);
     }
 
-    //    qint64 timestamp;
-    //    memcpy(&timestamp, msg->getPointerToData(), sizeof(qint64));
-    //    timestamp = qFromLittleEndian(timestamp);
+    qint64 eventID;
+    memcpy(&eventID, msg->getPointerToData(), sizeof(qint64));
+    eventID = qFromLittleEndian(eventID);
+    qint32 status;
+    memcpy(&status, msg->getPointerToData() + sizeof(qint64), sizeof(qint32));
+    status = qFromLittleEndian(status);
 
-    return new MessageProtocol(OP_CODE_CMD_RES::ACK_SET_USER_EVENTS, ERROR_CODE_SUCCESS);
+    qint32 rCode = this->m_pGlobalData->acceptUserEvent(eventID, this->m_pUserConData->m_userID, status);
+
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_SET_USER_EVENTS, rCode);
 }
 
 /*

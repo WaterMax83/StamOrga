@@ -23,6 +23,8 @@ import QtGraphicalEffects 1.0
 
 import com.watermax.demo 1.0
 
+import "../components" as MyComponents
+
 Rectangle {
     id: mainRectangleGame
     property var m_gamePlayItem
@@ -49,6 +51,14 @@ Rectangle {
     radius: 8
     border.color: "grey"
     border.width: 2
+
+    MyComponents.EventIndicator {
+        id: eventIndicator
+        disableVisibility: true
+        eventCount : 1
+        itemSize: labelLineDate.height * 2
+    }
+
     ColumnLayout {
         id: columnLayout
         width: mainRectangleGame.width
@@ -300,6 +310,15 @@ Rectangle {
                     mainRectangleGame.gradColorStop = "#905090"
                 }
             }
+
+            var eventCount = gamePlayItem.event;
+            if (eventCount > 0) {
+                eventIndicator.disableVisibility = false;
+                eventIndicator.eventCount = eventCount;
+            } else
+                eventIndicator.disableVisibility = true;
+
+
 
             var fixed = gamePlayItem.timeFixed
 //            console.log("Fixed = " + fixed);

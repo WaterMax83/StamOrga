@@ -35,27 +35,47 @@ void AppUserEvents::initialize(GlobalData* pGlobalData)
 
 void AppUserEvents::addNewUserEvents(QJsonObject& jsObj)
 {
+    EventInfo* pEvent = new EventInfo();
+    pEvent->m_info    = jsObj.value("info").toString();
+    pEvent->m_type    = jsObj.value("type").toString();
+    pEvent->m_eventID = static_cast<qint64>(jsObj.value("id").toDouble());
 
-    QString info = jsObj.value("info").toString();
-    QString type = jsObj.value("type").toString();
-    if (type == NOTIFY_TOPIC_NEW_APP_VERSION) {
+    if (pEvent->m_type == NOTIFY_TOPIC_NEW_APP_VERSION) {
 
         this->m_eventNewAppVersion = false;
-        if (QString::compare(STAM_ORGA_VERSION_S, info) >= 0)
+        if (QString::compare(STAM_ORGA_VERSION_S, pEvent->m_info) >= 0)
             return; /* already have newest version */
         else
             this->m_eventNewAppVersion = true;
-    } else if (type == NOTIFY_TOPIC_NEW_FANCLUB_NEWS) {
+    } else if (pEvent->m_type == NOTIFY_TOPIC_NEW_FANCLUB_NEWS) {
 
-        this->m_pGlobalData->setNewsDataItemHasEvent(info.toUInt());
+        this->m_pGlobalData->setNewsDataItemHasEvent(pEvent->m_info.toUInt());
         this->m_eventNewFanclubNews++;
-    }
+    } else if (pEvent->m_type == NOTIFY_TOPIC_NEW_FREE_TICKET) {
+
+        this->m_pGlobalData->setGamePlayItemHasEvent(pEvent->m_info.toUInt());
+    } else if (pEvent->m_type == NOTIFY_TOPIC_NEW_MEETING || pEvent->m_type == NOTIFY_TOPIC_CHANGE_MEETING) {
+
+        this->m_pGlobalData->setGamePlayItemHasEvent(pEvent->m_info.toUInt());
+    } else if (pEvent->m_type == NOTIFY_TOPIC_NEW_AWAY_ACCEPT) {
+
+        this->m_pGlobalData->setGamePlayItemHasEvent(pEvent->m_info.toUInt());
+    } else
+        return;
+
+    this->m_lEvents.append(pEvent);
 }
 
 void AppUserEvents::resetCurrentEvents()
 {
     this->m_eventNewAppVersion  = false;
     this->m_eventNewFanclubNews = 0;
+    this->m_pGlobalData->resetAllGamePlayEvents();
+    this->m_pGlobalData->resetAllNewsDataEvents();
+    for (int i = this->m_lEvents.count() - 1; i >= 0; i--) {
+        delete this->m_lEvents[i];
+        this->m_lEvents.removeAt(i);
+    }
 }
 
 
@@ -82,4 +102,22 @@ qint32 AppUserEvents::getCurrentUpdateEventCounter()
 qint32 AppUserEvents::getCurrentFanclubEventCounter()
 {
     return this->m_eventNewFanclubNews;
+}
+
+qint32 AppUserEvents::clearUserEventFanclub(UserInterface* pInt, qint32 info)
+{
+    qDebug() << this->m_lEvents.count();
+    for (int i = this->m_lEvents.count() - 1; i >= 0; i--) {
+        if (this->m_lEvents[i]->m_type == NOTIFY_TOPIC_NEW_FANCLUB_NEWS) {
+
+            if (this->m_lEvents[i]->m_info.toInt() == info) {
+                this->m_eventNewFanclubNews--;
+                qDebug() << "Set Event " << this->m_lEvents[i]->m_eventID;
+                pInt->startSetUserEvents(this->m_lEvents[i]->m_eventID, 0);
+                delete this->m_lEvents[i];
+                this->m_lEvents.removeAt(i);
+            }
+        }
+    }
+    return ERROR_CODE_SUCCESS;
 }
