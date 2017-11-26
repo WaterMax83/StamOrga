@@ -104,19 +104,48 @@ qint32 AppUserEvents::getCurrentFanclubEventCounter()
     return this->m_eventNewFanclubNews;
 }
 
-qint32 AppUserEvents::clearUserEventFanclub(UserInterface* pInt, qint32 info)
+qint32 AppUserEvents::clearUserEventFanclub(UserInterface* pInt, qint32 newsIndex)
 {
-    qDebug() << this->m_lEvents.count();
     for (int i = this->m_lEvents.count() - 1; i >= 0; i--) {
         if (this->m_lEvents[i]->m_type == NOTIFY_TOPIC_NEW_FANCLUB_NEWS) {
 
-            if (this->m_lEvents[i]->m_info.toInt() == info) {
+            if (this->m_lEvents[i]->m_info.toInt() == newsIndex) {
                 this->m_eventNewFanclubNews--;
-                qDebug() << "Set Event " << this->m_lEvents[i]->m_eventID;
                 pInt->startSetUserEvents(this->m_lEvents[i]->m_eventID, 0);
                 delete this->m_lEvents[i];
                 this->m_lEvents.removeAt(i);
             }
+        }
+    }
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 AppUserEvents::clearUserEventGamPlay(UserInterface* pInt, qint32 gameIndex)
+{
+    for (int i = this->m_lEvents.count() - 1; i >= 0; i--) {
+        if (this->m_lEvents[i]->m_type == NOTIFY_TOPIC_NEW_FREE_TICKET
+            || this->m_lEvents[i]->m_type == NOTIFY_TOPIC_NEW_AWAY_ACCEPT
+            || this->m_lEvents[i]->m_type == NOTIFY_TOPIC_CHANGE_MEETING
+            || this->m_lEvents[i]->m_type == NOTIFY_TOPIC_NEW_MEETING) {
+
+            if (this->m_lEvents[i]->m_info.toInt() == gameIndex) {
+                pInt->startSetUserEvents(this->m_lEvents[i]->m_eventID, 0);
+                delete this->m_lEvents[i];
+                this->m_lEvents.removeAt(i);
+            }
+        }
+    }
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 AppUserEvents::clearUserEventUpdate(UserInterface* pInt)
+{
+    for (int i = this->m_lEvents.count() - 1; i >= 0; i--) {
+        if (this->m_lEvents[i]->m_type == NOTIFY_TOPIC_NEW_APP_VERSION) {
+            this->m_eventNewAppVersion = false;
+            pInt->startSetUserEvents(this->m_lEvents[i]->m_eventID, 0);
+            delete this->m_lEvents[i];
+            this->m_lEvents.removeAt(i);
         }
     }
     return ERROR_CODE_SUCCESS;

@@ -210,6 +210,10 @@ Item {
 
     function pageOpenedUpdateView() {}
 
+    function notifyGetUserEvents(result) {
+        gameHeader.showGamesInfo(m_gamePlayCurrentItem)
+    }
+
     function notifyUserIntSeasonTicketListFinished(result) {
         currentTicketInfo.notifyUserIntSeasonTicketListFinished(result);
     }

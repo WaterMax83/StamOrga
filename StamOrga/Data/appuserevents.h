@@ -47,7 +47,9 @@ public:
     Q_INVOKABLE qint32 getCurrentUpdateEventCounter();
     Q_INVOKABLE qint32 getCurrentFanclubEventCounter();
 
-    Q_INVOKABLE qint32 clearUserEventFanclub(UserInterface* pInt, qint32 info);
+    Q_INVOKABLE qint32 clearUserEventFanclub(UserInterface* pInt, qint32 newsIndex);
+    Q_INVOKABLE qint32 clearUserEventGamPlay(UserInterface* pInt, qint32 gameIndex);
+    Q_INVOKABLE qint32 clearUserEventUpdate(UserInterface* pInt);
 
 signals:
 

@@ -155,6 +155,8 @@ ApplicationWindow {
                             stackView.push(model.element)
                         } else if (model.link) {
                             Qt.openUrlExternally(model.link);
+                            if (model.title === "Update")
+                                appUserEvents.clearUserEventUpdate(userInt);
                         }
 
                         drawer.close()

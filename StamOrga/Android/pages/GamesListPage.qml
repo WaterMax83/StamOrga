@@ -132,6 +132,10 @@ Flickable {
                         updateHeaderFromMain("Heimspiel", "")
                     else
                         updateHeaderFromMain("Auswärts", "")
+
+                    if (sender.event > 0)
+                        appUserEvents.clearUserEventGamPlay(userIntGames, sender.index);
+
                 } else
                     console.error("Fehler beim laden von der Spielseite " + component.errorString())
             }

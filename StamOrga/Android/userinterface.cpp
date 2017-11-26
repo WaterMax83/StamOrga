@@ -271,7 +271,8 @@ void UserInterface::slCommandFinished(quint32 command, qint32 result)
         break;
 
     case OP_CODE_CMD_REQ::REQ_SET_USER_EVENTS:
-        qDebug() << "acknowledge " << command;
+        if (result == ERROR_CODE_SUCCESS)
+            this->startGetUserEvents();
         break;
 
     default:
