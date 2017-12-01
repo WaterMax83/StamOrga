@@ -65,6 +65,7 @@ GlobalData::GlobalData(QObject* parent)
     this->m_ctrlLog.Start(this->m_logApp, false);
 
     QQmlEngine::setObjectOwnership(&this->m_meetingInfo, QQmlEngine::CppOwnership);
+    QQmlEngine::setObjectOwnership(&this->m_awayTripInfo, QQmlEngine::CppOwnership);
 
     this->m_pMainUserSettings = new QSettings();
     this->m_pMainUserSettings->setIniCodec(("UTF-8"));

@@ -131,14 +131,15 @@ qint32 UserInterface::startChangeGame(const quint32 index, const quint32 sIndex,
     return this->m_pConHandle->startChangeGame(index, sIndex, competition, home, away, date, score);
 }
 
-qint32 UserInterface::startSaveMeetingInfo(const quint32 gameIndex, const QString when, const QString where, const QString info)
+qint32 UserInterface::startSaveMeetingInfo(const quint32 gameIndex, const QString when, const QString where, const QString info,
+                                           const quint32 type)
 {
-    return this->m_pConHandle->startSaveMeetingInfo(gameIndex, when, where, info);
+    return this->m_pConHandle->startSaveMeetingInfo(gameIndex, when, where, info, type);
 }
 
-qint32 UserInterface::startLoadMeetingInfo(const quint32 gameIndex)
+qint32 UserInterface::startLoadMeetingInfo(const quint32 gameIndex, const quint32 type)
 {
-    return this->m_pConHandle->startLoadMeetingInfo(gameIndex);
+    return this->m_pConHandle->startLoadMeetingInfo(gameIndex, type);
 }
 
 qint32 UserInterface::startAcceptMeetingInfo(const quint32 gameIndex, const quint32 accept, const QString name, const quint32 acceptIndex)
@@ -242,12 +243,24 @@ void UserInterface::slCommandFinished(quint32 command, qint32 result)
         emit this->notifyChangedMeetingInfoFinished(result);
         break;
 
+    case OP_CODE_CMD_REQ::REQ_CHANGE_AWAYTRIP_INFO:
+        emit this->notifyChangedAwayTripInfoFinished(result);
+        break;
+
     case OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO:
         emit this->notifyLoadMeetingInfoFinished(result);
         break;
 
+    case OP_CODE_CMD_REQ::REQ_GET_AWAYTRIP_INFO:
+        emit this->notifyLoadAwayTripInfoFinished(result);
+        break;
+
     case OP_CODE_CMD_REQ::REQ_ACCEPT_MEETING:
         emit this->notifyAcceptMeetingFinished(result);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_ACCEPT_AWAYTRIP:
+        emit this->notifyAcceptAwayTripFinished(result);
         break;
 
     case OP_CODE_CMD_REQ::REQ_CHANGE_NEWS_DATA:

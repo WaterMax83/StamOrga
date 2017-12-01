@@ -209,11 +209,19 @@ MessageProtocol* UdpDataServer::checkNewMessage(MessageProtocol* msg)
             break;
 
         case OP_CODE_CMD_REQ::REQ_CHANGE_MEETING_INFO:
-            ack = this->m_pDataConnection->requestChangeMeetingInfo(msg);
+            ack = this->m_pDataConnection->requestChangeMeetingInfo(msg, OP_CODE_CMD_RES::ACK_CHANGE_MEETING_INFO);
+            break;
+
+        case OP_CODE_CMD_REQ::REQ_CHANGE_AWAYTRIP_INFO:
+            ack = this->m_pDataConnection->requestChangeMeetingInfo(msg, OP_CODE_CMD_RES::ACK_CHANGE_AWAYTRIP_INFO);
             break;
 
         case OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO:
-            ack = this->m_pDataConnection->requestGetMeetingInfo(msg);
+            ack = this->m_pDataConnection->requestGetMeetingInfo(msg, OP_CODE_CMD_RES::ACK_GET_MEETING_INFO);
+            break;
+
+        case OP_CODE_CMD_REQ::REQ_GET_AWAYTRIP_INFO:
+            ack = this->m_pDataConnection->requestGetMeetingInfo(msg, OP_CODE_CMD_RES::ACK_GET_AWAYTRIP_INFO);
             break;
 
         case OP_CODE_CMD_REQ::REQ_ACCEPT_MEETING:

@@ -111,6 +111,11 @@ enum UpdateIndex {
     UpdateDiff = 1,
 };
 
+enum MeetingType {
+    MEETING_TYPE_MEETING  = 0,
+    MEETING_TYPE_AWAYTRIP = 1,
+};
+
 extern CompetitionIndex getCompetitionIndex(QString comp);
 extern QString getCompetitionString(CompetitionIndex index);
 extern QString createRandomString(qint32 size);

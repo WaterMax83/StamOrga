@@ -75,9 +75,13 @@ public:
 
     quint16 getAcceptedNumber(const quint32 state);
 
+
     //    qint32 getTicketState(quint32 ticketID);
     //    QString getTicketName(quint32 ticketID);
-
+protected:
+    virtual QString getMeetingsHeadName();
+    virtual QString getMeetingHeader();
+    virtual quint32 getMeetingType();
 
 private:
     quint32 m_year;
@@ -88,6 +92,7 @@ private:
     QString m_when;
     QString m_where;
     QString m_info;
+    quint32 m_type;
 
     void saveCurrentInteralList() override;
 

@@ -138,7 +138,13 @@ public:
     qint64              getSeasonTicketLastServerUpdate();
     void                resetSeasonTicketLastServerUpdate();
 
-    Q_INVOKABLE MeetingInfo* getMeetingInfo() { return &this->m_meetingInfo; }
+    Q_INVOKABLE MeetingInfo* getMeetingInfo(quint32 type)
+    {
+        if (type == MEETING_TYPE_MEETING)
+            return &this->m_meetingInfo;
+        else
+            return &this->m_awayTripInfo;
+    }
 
 
     void          saveCurrentNewsDataList(qint64 timestamp);
@@ -219,6 +225,7 @@ private:
     bool                     m_bSeasonTicketLastUpdateDidChanges;
 
     MeetingInfo m_meetingInfo;
+    MeetingInfo m_awayTripInfo;
 
     QList<NewsDataItem*> m_lNewsDataItems;
     qint64               m_ndLastLocalUpdateTimeStamp;

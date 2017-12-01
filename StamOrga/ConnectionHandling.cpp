@@ -235,16 +235,22 @@ qint32 ConnectionHandling::startChangeGame(const quint32 index, const quint32 sI
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 ConnectionHandling::startSaveMeetingInfo(const quint32 gameIndex, const QString when, const QString where, const QString info)
+qint32 ConnectionHandling::startSaveMeetingInfo(const quint32 gameIndex, const QString when, const QString where, const QString info,
+                                                const quint32 type)
 {
-    MeetingInfo* pInfo = this->m_pGlobalData->getMeetingInfo();
+    MeetingInfo* pInfo = this->m_pGlobalData->getMeetingInfo(type);
 
     if (pInfo->when() != when || pInfo->where() != where || pInfo->info() != info) {
-        DataConRequest req(OP_CODE_CMD_REQ::REQ_CHANGE_MEETING_INFO);
+        DataConRequest req;
+        if (type == MEETING_TYPE_MEETING)
+            req.m_request = OP_CODE_CMD_REQ::REQ_CHANGE_MEETING_INFO;
+        else
+            req.m_request = OP_CODE_CMD_REQ::REQ_CHANGE_AWAYTRIP_INFO;
         req.m_lData.append(QString::number(gameIndex));
         req.m_lData.append(when);
         req.m_lData.append(where);
         req.m_lData.append(info);
+        req.m_lData.append(QString::number(type));
         this->sendNewRequest(req);
 
         return ERROR_CODE_SUCCESS;
@@ -252,10 +258,15 @@ qint32 ConnectionHandling::startSaveMeetingInfo(const quint32 gameIndex, const Q
     return ERROR_CODE_NO_ERROR;
 }
 
-qint32 ConnectionHandling::startLoadMeetingInfo(const quint32 gameIndex)
+qint32 ConnectionHandling::startLoadMeetingInfo(const quint32 gameIndex, const quint32 type)
 {
-    DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO);
+    DataConRequest req;
+    if (type == MEETING_TYPE_MEETING)
+        req.m_request = OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO;
+    else
+        req.m_request = OP_CODE_CMD_REQ::REQ_GET_AWAYTRIP_INFO;
     req.m_lData.append(QString::number(gameIndex));
+    req.m_lData.append(QString::number(type));
     this->sendNewRequest(req);
 
     return ERROR_CODE_SUCCESS;
@@ -482,6 +493,7 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
         break;
     }
     case OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO:
+    case OP_CODE_CMD_REQ::REQ_GET_AWAYTRIP_INFO:
         emit this->sNotifyCommandFinished(request.m_request, request.m_result);
         if (request.m_result == ERROR_CODE_NOT_FOUND)
             return;

@@ -537,13 +537,13 @@ qint32 DataHandling::getHandleAcceptMeetingResponse(MessageProtocol* msg)
  *      quint32     acceptValue     4
  *      QString     name            Z
  */
-qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg)
+qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg, const quint32 type)
 {
     if (msg->getDataLength() < 4)
         return ERROR_CODE_WRONG_SIZE;
 
     const char*  pData = msg->getPointerToData();
-    MeetingInfo* pInfo = this->m_pGlobalData->getMeetingInfo();
+    MeetingInfo* pInfo = this->m_pGlobalData->getMeetingInfo(type);
     quint32      gameIndex;
     qint32       result;
     memcpy(&result, pData, sizeof(quint32));

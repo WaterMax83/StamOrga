@@ -50,7 +50,8 @@ SOURCES += main.cpp \
     Data/meetinginfo.cpp \
     General/pushnotification.cpp \
     Data/fanclubnews.cpp \
-    Data/userevents.cpp
+    Data/userevents.cpp \
+    Data/awaytripinfo.cpp
 
 HEADERS += \
     ../Common/General/backgroundcontroller.h \
@@ -79,7 +80,8 @@ HEADERS += \
     Data/meetinginfo.h \
     General/pushnotification.h \
     Data/fanclubnews.h \
-    Data/userevents.h
+    Data/userevents.h \
+    Data/awaytripinfo.h
 
 
 unix {

@@ -64,9 +64,10 @@ public:
     Q_INVOKABLE qint32 startChangeGame(const quint32 index, const quint32 sIndex, const QString competition,
                                        const QString home, const QString away, const QString date, const QString score);
 
-    Q_INVOKABLE qint32 startSaveMeetingInfo(const quint32 gameIndex, const QString when, const QString where, const QString info);
+    Q_INVOKABLE qint32 startSaveMeetingInfo(const quint32 gameIndex, const QString when, const QString where, const QString info,
+                                            const quint32 type);
 
-    Q_INVOKABLE qint32 startLoadMeetingInfo(const quint32 gameIndex);
+    Q_INVOKABLE qint32 startLoadMeetingInfo(const quint32 gameIndex, const quint32 type);
 
     Q_INVOKABLE qint32 startAcceptMeetingInfo(const quint32 gameIndex, const quint32 accept,
                                               const QString name, const quint32 acceptIndex = 0);
@@ -129,8 +130,11 @@ signals:
     void notifyAvailableTicketListFinsished(qint32 result);
     void notifyChangedGameFinished(qint32 result);
     void notifyChangedMeetingInfoFinished(qint32 result);
+    void notifyChangedAwayTripInfoFinished(qint32 result);
     void notifyLoadMeetingInfoFinished(qint32 result);
+    void notifyLoadAwayTripInfoFinished(qint32 result);
     void notifyAcceptMeetingFinished(qint32 result);
+    void notifyAcceptAwayTripFinished(qint32 result);
     void notifyChangeNewsDataFinished(qint32 result);
     void notifyFanclubNewsListFinished(qint32 result);
     void notifyGetFanclubNewsItemFinished(qint32 result);

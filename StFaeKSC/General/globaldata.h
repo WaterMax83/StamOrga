@@ -23,6 +23,7 @@
 #include <QtCore/QMutex>
 
 #include "../Data/availablegameticket.h"
+#include "../Data/awaytripinfo.h"
 #include "../Data/fanclubnews.h"
 #include "../Data/games.h"
 #include "../Data/listeduser.h"
@@ -45,8 +46,8 @@ public:
 
     qint32 requestChangeMeetingInfo(const quint32 gameIndex, const quint32 version,
                                     const QString when, const QString where, const QString info,
-                                    const qint32 userID, qint64& messageID);
-    qint32 requestGetMeetingInfo(const quint32 gameIndex, const quint32 version, char* pData, quint32& size);
+                                    const qint32 userID, const quint32 type, qint64& messageID);
+    qint32 requestGetMeetingInfo(const quint32 gameIndex, const quint32 version, char* pData, const quint32 type, quint32& size);
     qint32 requestAcceptMeetingInfo(const quint32 gameIndex, const quint32 version, const quint32 acceptValue,
                                     const quint32 acceptIndex, const QString name,
                                     const qint32 userID, qint64& messageID);
@@ -65,6 +66,7 @@ public:
     FanclubNews                  m_fanclubNews;
     QList<AvailableGameTickets*> m_availableTickets;
     QList<MeetingInfo*>          m_meetingInfos;
+    QList<AwayTripInfo*>         m_awayTripInfos;
     QList<UserEvents*>           m_userEvents;
     QMutex                       m_globalDataMutex;
     bool                         m_initalized;

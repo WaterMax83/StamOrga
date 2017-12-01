@@ -216,11 +216,16 @@ void DataConnection::checkNewOncomingData()
             break;
 
         case OP_CODE_CMD_RES::ACK_CHANGE_MEETING_INFO:
+        case OP_CODE_CMD_RES::ACK_CHANGE_AWAYTRIP_INFO:
             request.m_result = this->m_pDataHandle->getHandleChangeMeetingResponse(msg);
             break;
 
         case OP_CODE_CMD_RES::ACK_GET_MEETING_INFO:
-            request.m_result = this->m_pDataHandle->getHandleLoadMeetingInfo(msg);
+            request.m_result = this->m_pDataHandle->getHandleLoadMeetingInfo(msg, MEETING_TYPE_MEETING);
+            break;
+
+        case OP_CODE_CMD_RES::ACK_GET_AWAYTRIP_INFO:
+            request.m_result = this->m_pDataHandle->getHandleLoadMeetingInfo(msg, MEETING_TYPE_AWAYTRIP);
             break;
 
         case OP_CODE_CMD_RES::ACK_ACCEPT_MEETING:
@@ -381,7 +386,7 @@ void DataConnection::startSendGamesListRequest(DataConRequest request)
         data[0] = qToLittleEndian(UpdateIndex::UpdateDiff);
     else
         data[0] = qToLittleEndian(UpdateIndex::UpdateAll);
-    timeStamp   = qToLittleEndian(this->m_pGlobalData->getGamePlayLastServerUpdate());
+    timeStamp = qToLittleEndian(this->m_pGlobalData->getGamePlayLastServerUpdate());
     memcpy(&data[1], &timeStamp, sizeof(qint64));
 
     MessageProtocol msg(request.m_request, (char*)(&data[0]), sizeof(quint32) * 3);
@@ -512,6 +517,8 @@ void DataConnection::startSendChangeMeetingInfo(DataConRequest request)
     data.append(char(0x00));
     data.append(request.m_lData.at(3)); /* info */
     data.append(char(0x00));
+    wData.device()->seek(data.length());
+    wData << request.m_lData.at(4).toUInt();
 
     MessageProtocol msg(request.m_request, data);
     this->sendMessageRequest(&msg, request);
@@ -519,10 +526,11 @@ void DataConnection::startSendChangeMeetingInfo(DataConRequest request)
 
 void DataConnection::startSendGetMeetingInfo(DataConRequest request)
 {
-    quint32 data;
-    data = qToLittleEndian(request.m_lData.at(0).toUInt()); /* game Index */
+    quint32 data[2];
+    data[0] = qToLittleEndian(request.m_lData.at(0).toUInt()); /* game Index */
+    data[1] = qToLittleEndian(request.m_lData.at(1).toUInt()); /* type */
 
-    MessageProtocol msg(request.m_request, data);
+    MessageProtocol msg(request.m_request, (char*)&data[0], 8);
     this->sendMessageRequest(&msg, request);
 }
 
@@ -779,14 +787,17 @@ void DataConnection::startSendNewRequest(DataConRequest request)
         break;
 
     case OP_CODE_CMD_REQ::REQ_CHANGE_MEETING_INFO:
+    case OP_CODE_CMD_REQ::REQ_CHANGE_AWAYTRIP_INFO:
         this->startSendChangeMeetingInfo(request);
         break;
 
     case OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO:
+    case OP_CODE_CMD_REQ::REQ_GET_AWAYTRIP_INFO:
         this->startSendGetMeetingInfo(request);
         break;
 
     case OP_CODE_CMD_REQ::REQ_ACCEPT_MEETING:
+    case OP_CODE_CMD_REQ::REQ_ACCEPT_AWAYTRIP:
         this->startSendAcceptMeeting(request);
         break;
 

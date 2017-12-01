@@ -28,6 +28,7 @@ Flickable {
     clip: true
     height: parent.height * 1.2
     contentHeight: mainPaneCurrentMeetInfo.height
+    property int meetingType: 0
 
     signal showInfoHeader(var text, var load);
 
@@ -45,7 +46,7 @@ Flickable {
     onDragEnded: {
         if (flickableCurrentMeetInfo.contentY < -100) {
             showInfoHeader("Aktualisiere Daten", true)
-            userIntCurrentGame.startLoadMeetingInfo(m_gamePlayCurrentItem.index);
+            userIntCurrentGame.startLoadMeetingInfo(m_gamePlayCurrentItem.index, meetingType);
         }
     }
 
@@ -99,7 +100,8 @@ Flickable {
                     enabled: isEditMode ? true : false
                     onClickedButton: {
                         isEditMode = false;
-                        var result = userIntCurrentGame.startSaveMeetingInfo(m_gamePlayCurrentItem.index, textWhen.input, textWhere.input, textInfo.text);
+                        var result = userIntCurrentGame.startSaveMeetingInfo(m_gamePlayCurrentItem.index, textWhen.input, textWhere.input,
+                                                                             textInfo.text, meetingType);
                         if (result === 0)
                             toastManager.show("Keine Änderung, nichts gespeichert", 2000);
                         else {
@@ -431,7 +433,7 @@ Flickable {
     property bool userClosedAccept: false
 
     function showAllInfoAboutGame() {
-        meetingInfo = globalUserData.getMeetingInfo();
+        meetingInfo = globalUserData.getMeetingInfo(meetingType);
         loadMeetingInfo();
     }
 
@@ -453,7 +455,10 @@ Flickable {
 
     function notifyLoadMeetingInfoFinished(result) {
         if (result === 1) {
-            toastManager.show("Info übers Treffen geladen", 2000);
+            if (meetingType === 0)
+                toastManager.show("Info übers Treffen geladen", 2000);
+            else
+                toastManager.show("Info über die Fahrt geladen", 2000);
             textInfo.text = meetingInfo.info();
             textWhen.init(meetingInfo.when())
             textWhere.init(meetingInfo.where())
@@ -461,7 +466,10 @@ Flickable {
                 isInfoVisible = true;
             showInfoHeader("", false)
         } else if (result === -5) {
-            toastManager.show("Bisher noch kein Treffen gespeichert", 2000);
+            if (meetingType === 0)
+                toastManager.show("Bisher noch kein Treffen gespeichert", 2000);
+            else
+                toastManager.show("Bisher noch keine Fahrt gespeichert", 2000);
             textInfo.text = "";
             textWhen.init("")
             textWhere.init("")
@@ -539,7 +547,7 @@ Flickable {
         listViewModelAcceptedUsers.clear();
         meetingInfo.clearAcceptInfoList();
         showInfoHeader("Aktualisiere Daten", true)
-        userIntCurrentGame.startLoadMeetingInfo(m_gamePlayCurrentItem.index);
+        userIntCurrentGame.startLoadMeetingInfo(m_gamePlayCurrentItem.index, meetingType);
     }
 
 }

@@ -126,8 +126,29 @@ Item {
         onContentYChanged : checkMovedInfo(2, movedStartY - contentY);
     }
 
+    CurrentMeetInfo {
+        id: currentAwayTripInfo
+        onDragStarted: {
+            movedInfoIndex = 2; movedStartY = contentY;
+            movedStartMargin = gameHeader.Layout.topMargin === 0 ? 0 : -movedInfoHeigth;
+        }
+        onDragEnded: { movedInfoIndex = 0; checkMovedInfoEnd(movedStartY - contentY); }
+        onContentYChanged : checkMovedInfo(2, movedStartY - contentY);
+    }
+
     function currentMeetInfoNewHeaderInfo(text, load) {
         if (swipeViewCurrentHomeGame.currentItem === currentMeetInfo) {
+            busyIndicatorCurrentGame.loadingVisible = load
+            if (text === "")
+                busyIndicatorCurrentGame.infoVisible = false;
+            else
+                busyIndicatorCurrentGame.infoVisible = true;
+            busyIndicatorCurrentGame.infoText = text;
+        }
+    }
+
+    function currentAwayTriptInfoNewHeaderInfo(text, load) {
+        if (swipeViewCurrentHomeGame.currentItem === currentAwayTripInfo) {
             busyIndicatorCurrentGame.loadingVisible = load
             if (text === "")
                 busyIndicatorCurrentGame.infoVisible = false;
@@ -204,8 +225,18 @@ Item {
         tabModel.append({ "text": "Treffen"});
         swipeViewCurrentHomeGame.addItem(currentMeetInfo)
 
+        currentMeetInfo.meetingType = 0;
         currentMeetInfo.showInfoHeader.connect(currentMeetInfoNewHeaderInfo);
         currentMeetInfo.showAllInfoAboutGame();
+
+        if (!sender.isGameAHomeGame()) {
+            tabModel.append({ "text": "Fahrt"});
+            swipeViewCurrentHomeGame.addItem(currentAwayTripInfo)
+
+            currentAwayTripInfo.meetingType = 1;
+            currentAwayTripInfo.showInfoHeader.connect(currentAwayTriptInfoNewHeaderInfo);
+            currentAwayTripInfo.showAllInfoAboutGame();
+        }
     }
 
     function pageOpenedUpdateView() {}
@@ -240,6 +271,21 @@ Item {
 
     function notifyAcceptMeetingFinished(result) {
         currentMeetInfo.notifyAcceptMeetingFinished(result);
+    }
+
+
+    function notifyChangedAwayTripInfoFinished(result) {
+        currentAwayTripInfo.notifyChangedMeetingInfoFinished(result);
+    }
+
+    function notifyLoadAwayTripInfoFinished(result) {
+        currentAwayTripInfo.notifyLoadMeetingInfoFinished(result);
+        if (result === 1)
+            gameHeader.showGamesInfo(m_gamePlayCurrentItem)
+    }
+
+    function notifyAcceptAwayTripFinished(result) {
+        currentAwayTripInfo.notifyAcceptMeetingFinished(result);
     }
 
     function notifyUserIntConnectionFinished(result) {}

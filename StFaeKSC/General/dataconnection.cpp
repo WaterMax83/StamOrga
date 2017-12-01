@@ -893,12 +893,12 @@ MessageProtocol* DataConnection::requestChangeGame(MessageProtocol* msg)
  * X   QString       where
  * Y   QString       info
  */
-MessageProtocol* DataConnection::requestChangeMeetingInfo(MessageProtocol* msg)
+MessageProtocol* DataConnection::requestChangeMeetingInfo(MessageProtocol* msg, const quint32 ack)
 {
     qint32 rCode;
     if (msg->getDataLength() <= 4) {
         qWarning().noquote() << QString("Wrong message size for change meeting for user %1").arg(this->m_pUserConData->m_userName);
-        return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_MEETING_INFO, ERROR_CODE_WRONG_SIZE);
+        return new MessageProtocol(ack, ERROR_CODE_WRONG_SIZE);
     }
 
     const char* pData = msg->getPointerToData();
@@ -912,33 +912,39 @@ MessageProtocol* DataConnection::requestChangeMeetingInfo(MessageProtocol* msg)
     QString where(QByteArray(pData + offset));
     offset += where.toUtf8().size() + 1;
     QString info(QByteArray(pData + offset));
+    offset += info.toUtf8().size() + 1;
+
+    quint32 type = MEETING_TYPE_MEETING;
+    if (offset + 4 <= msg->getDataLength())
+        memcpy(&type, pData + offset, sizeof(quint32));
+    type = qFromLittleEndian(type);
 
     qint64 messageID = -1;
-    rCode            = this->m_pGlobalData->requestChangeMeetingInfo(gameIndex, 0, when, where, info, this->m_pUserConData->m_userID, messageID);
+    rCode            = this->m_pGlobalData->requestChangeMeetingInfo(gameIndex, 0, when, where, info, this->m_pUserConData->m_userID, type, messageID);
     if (rCode == ERROR_CODE_SUCCESS)
         qInfo().noquote() << QString("User %1 set MeetingInfo of game %2")
                                  .arg(this->m_pUserConData->m_userName)
                                  .arg(this->m_pGlobalData->m_GamesList.getItemName(gameIndex));
 
     if (msg->getVersion() < MSG_HEADER_VERSION_MESSAGE_ID)
-        return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_MEETING_INFO, rCode);
+        return new MessageProtocol(ack, rCode);
 
     qint32 data[3];
     data[0]   = qToLittleEndian(rCode);
     messageID = qToLittleEndian(messageID);
     memcpy(&data[1], &messageID, sizeof(qint64));
-    return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_MEETING_INFO, (char*)&data[0], sizeof(qint32) * 3);
+    return new MessageProtocol(ack, (char*)&data[0], sizeof(qint32) * 3);
 }
 
 /*  request
  * 0   quint32      gameIndex       4
  */
-MessageProtocol* DataConnection::requestGetMeetingInfo(MessageProtocol* msg)
+MessageProtocol* DataConnection::requestGetMeetingInfo(MessageProtocol* msg, const quint32 ack)
 {
     qint32 rCode;
-    if (msg->getDataLength() != 4) {
+    if (msg->getDataLength() < 4) {
         qWarning().noquote() << QString("Wrong message size for get meeting for user %1").arg(this->m_pUserConData->m_userName);
-        return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_MEETING_INFO, ERROR_CODE_WRONG_SIZE);
+        return new MessageProtocol(ack, ERROR_CODE_WRONG_SIZE);
     }
 
     const char* pData = msg->getPointerToData();
@@ -946,23 +952,28 @@ MessageProtocol* DataConnection::requestGetMeetingInfo(MessageProtocol* msg)
     memcpy(&gameIndex, pData, sizeof(quint32));
     gameIndex = qFromLittleEndian(gameIndex);
 
+    quint32 type = MEETING_TYPE_MEETING;
+    if (msg->getDataLength() >= 8)
+        memcpy(&type, pData + sizeof(quint32), sizeof(quint32));
+    type = qFromLittleEndian(type);
+
     quint32 size = 10000;
     char    buffer[10000];
 
-    if ((rCode = this->m_pGlobalData->requestGetMeetingInfo(gameIndex, 0, &buffer[0], size)) == ERROR_CODE_SUCCESS) {
+    if ((rCode = this->m_pGlobalData->requestGetMeetingInfo(gameIndex, 0, &buffer[0], type, size)) == ERROR_CODE_SUCCESS) {
         GamesPlay* pGame = (GamesPlay*)this->m_pGlobalData->m_GamesList.getItem(gameIndex);
         qInfo().noquote() << QString("User %1 got MeetingInfo of game %2:%3:%4")
                                  .arg(this->m_pUserConData->m_userName)
                                  .arg(gameIndex)
                                  .arg(pGame->m_competition)
                                  .arg(pGame->m_saisonIndex);
-        return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_MEETING_INFO, &buffer[0], size);
+        return new MessageProtocol(ack, &buffer[0], size);
     }
     qInfo().noquote() << QString("User %1 got MeetingInfo of game %2 with result %3")
                              .arg(this->m_pUserConData->m_userName)
                              .arg(this->m_pGlobalData->m_GamesList.getItemName(gameIndex))
                              .arg(rCode);
-    return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_MEETING_INFO, rCode);
+    return new MessageProtocol(ack, rCode);
 }
 
 /*  request

@@ -24,9 +24,12 @@
 
 
 // clang-format off
+#define MEETING_HEADER          "MeetingHeader"
+
 #define MEET_INFO_HEAD_WHEN     "when"
 #define MEET_INFO_HEAD_WHERE    "where"
 #define MEET_INFO_HEAD_INFO     "infoseg"
+#define MEET_INFO_HEAD_TYPE     "type"
 
 #define MEET_INFO_STATE         "acceptState"
 #define MEET_INFO_USER_ID       "userID"
@@ -36,6 +39,21 @@ MeetingInfo::MeetingInfo()
 {
 }
 
+QString MeetingInfo::getMeetingsHeadName()
+{
+    return "Meetings";
+}
+
+QString MeetingInfo::getMeetingHeader()
+{
+    return MEETING_HEADER;
+}
+
+quint32 MeetingInfo::getMeetingType()
+{
+    return MEETING_TYPE_MEETING;
+}
+
 qint32 MeetingInfo::initialize(quint32 year, quint32 competition, quint32 seasonIndex, quint32 index)
 {
     this->m_year        = year;
@@ -43,8 +61,8 @@ qint32 MeetingInfo::initialize(quint32 year, quint32 competition, quint32 season
     this->m_seasonIndex = seasonIndex;
     this->m_gameIndex   = index;
 
-    QString configSetFilePath = getUserHomeConfigPath() + "/Settings/Meetings/";
-    configSetFilePath.append(QString("Meetings_Game_%1.ini").arg(index));
+    QString configSetFilePath = getUserHomeConfigPath() + "/Settings/" + this->getMeetingsHeadName() + "/";
+    configSetFilePath.append(QString("%1_Game_%2.ini").arg(this->getMeetingsHeadName()).arg(index));
 
     if (!checkFilePathExistAndCreate(configSetFilePath)) {
         CONSOLE_CRITICAL(QString("Could not create File for UserSettings"));
@@ -54,7 +72,7 @@ qint32 MeetingInfo::initialize(quint32 year, quint32 competition, quint32 season
     this->m_pConfigSettings = new QSettings(configSetFilePath, QSettings::IniFormat);
     this->m_pConfigSettings->setIniCodec(("UTF-8"));
 
-    this->m_pConfigSettings->beginGroup("MeetingHeader");
+    this->m_pConfigSettings->beginGroup(this->getMeetingHeader());
 
     this->m_pConfigSettings->setValue("year", this->m_year);
     this->m_pConfigSettings->setValue("competition", this->m_competition);
@@ -64,6 +82,7 @@ qint32 MeetingInfo::initialize(quint32 year, quint32 competition, quint32 season
     this->m_pConfigSettings->setValue(MEET_INFO_HEAD_WHEN, this->m_when);
     this->m_pConfigSettings->setValue(MEET_INFO_HEAD_WHERE, this->m_where);
     this->m_pConfigSettings->setValue(MEET_INFO_HEAD_INFO, this->m_info);
+    this->m_pConfigSettings->setValue(MEET_INFO_HEAD_TYPE, this->getMeetingType());
 
     this->m_pConfigSettings->endGroup();
 
@@ -75,7 +94,7 @@ qint32 MeetingInfo::initialize(QString filePath)
     this->m_pConfigSettings = new QSettings(filePath, QSettings::IniFormat);
     this->m_pConfigSettings->setIniCodec(("UTF-8"));
 
-    this->m_pConfigSettings->beginGroup("MeetingHeader");
+    this->m_pConfigSettings->beginGroup(this->getMeetingHeader());
 
     this->m_year        = this->m_pConfigSettings->value("year", 0).toUInt();
     this->m_competition = this->m_pConfigSettings->value("competition", 0).toUInt();
@@ -85,6 +104,7 @@ qint32 MeetingInfo::initialize(QString filePath)
     this->m_when  = this->m_pConfigSettings->value(MEET_INFO_HEAD_WHEN, "").toString();
     this->m_where = this->m_pConfigSettings->value(MEET_INFO_HEAD_WHERE, "").toString();
     this->m_info  = this->m_pConfigSettings->value(MEET_INFO_HEAD_INFO, "").toString();
+    this->m_type  = this->m_pConfigSettings->value(MEET_INFO_HEAD_TYPE, 0).toUInt();
 
     this->m_pConfigSettings->endGroup();
 
@@ -252,7 +272,7 @@ bool MeetingInfo::updateHeaderValue(QString key, QVariant value)
     bool         rValue = true;
     QMutexLocker locker(&this->m_mConfigIniMutex);
 
-    this->m_pConfigSettings->beginGroup("MeetingHeader");
+    this->m_pConfigSettings->beginGroup(this->getMeetingHeader());
     this->m_pConfigSettings->setValue(key, value);
     this->m_pConfigSettings->endGroup();
     return rValue;

@@ -364,6 +364,9 @@ ApplicationWindow {
         onNotifyChangedMeetingInfoFinished: stackView.currentItem.notifyChangedMeetingInfoFinished(result);
         onNotifyLoadMeetingInfoFinished: stackView.currentItem.notifyLoadMeetingInfoFinished(result);
         onNotifyAcceptMeetingFinished: stackView.currentItem.notifyAcceptMeetingFinished(result);
+        onNotifyChangedAwayTripInfoFinished: stackView.currentItem.notifyChangedAwayTripInfoFinished(result);
+        onNotifyLoadAwayTripInfoFinished: stackView.currentItem.notifyLoadAwayTripInfoFinished(result);
+        onNotifyAcceptAwayTripFinished: stackView.currentItem.notifyAcceptAwayTripFinished(result);
 
         onNotifyChangeNewsDataFinished: stackView.currentItem.notifyChangeNewsDataFinished(result);
         onNotifyFanclubNewsListFinished: stackView.currentItem.notifyFanclubNewsListFinished(result);

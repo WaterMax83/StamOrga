@@ -49,8 +49,8 @@ public:
     MessageProtocol* requestChangeStateSeasonTicket(MessageProtocol* msg);
     MessageProtocol* requestGetAvailableTicketList(MessageProtocol* msg);
     MessageProtocol* requestChangeGame(MessageProtocol* msg);
-    MessageProtocol* requestChangeMeetingInfo(MessageProtocol* msg);
-    MessageProtocol* requestGetMeetingInfo(MessageProtocol* msg);
+    MessageProtocol* requestChangeMeetingInfo(MessageProtocol* msg, const quint32 ack);
+    MessageProtocol* requestGetMeetingInfo(MessageProtocol* msg, const quint32 ack);
     MessageProtocol* requestAcceptMeeting(MessageProtocol* msg);
     MessageProtocol* requestChangeNewsData(MessageProtocol* msg);
     MessageProtocol* requestGetNewsDataList(MessageProtocol* msg);
