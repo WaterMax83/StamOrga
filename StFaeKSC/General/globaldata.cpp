@@ -514,7 +514,8 @@ qint32 GlobalData::requestGetMeetingInfo(const quint32 gameIndex, const quint32 
  */
 qint32 GlobalData::requestAcceptMeetingInfo(const quint32 gameIndex, const quint32 version,
                                             const quint32 acceptValue, const quint32 acceptIndex,
-                                            const QString name, const qint32 userID, qint64& messageID)
+                                            const QString name, const qint32 userID, const quint32 type,
+                                            qint64& messageID)
 {
     if (!this->m_initalized)
         return ERROR_CODE_NOT_READY;
@@ -531,8 +532,15 @@ qint32 GlobalData::requestAcceptMeetingInfo(const quint32 gameIndex, const quint
         return ERROR_CODE_IN_PAST;
 #endif
 
+    QList<MeetingInfo*>* pList;
+    if (type == MEETING_TYPE_MEETING)
+        pList = &this->m_meetingInfos;
+    else
+        pList = (QList<MeetingInfo*>*)&this->m_awayTripInfos;
+
     qint32 result = ERROR_CODE_SUCCESS;
-    foreach (MeetingInfo* mInfo, this->m_meetingInfos) {
+    for (int i = 0; i < pList->size(); i++) {
+        MeetingInfo* mInfo = pList->at(i);
         if (mInfo->getGameIndex() == gameIndex) {
             if (acceptIndex == 0)
                 result = mInfo->addNewAcceptation(acceptValue, userID, name);
@@ -541,7 +549,7 @@ qint32 GlobalData::requestAcceptMeetingInfo(const quint32 gameIndex, const quint
             if (result == ERROR_CODE_SUCCESS) {
                 qInfo().noquote() << QString("Changed Acceptation of %2 at game %1").arg(pGame->m_index).arg(name);
                 /* Send an info if the first person is going to a game which is not at home */
-                if (pGame->m_away == "KSC" && acceptValue == ACCEPT_STATE_ACCEPT && mInfo->getAcceptedNumber(ACCEPT_STATE_ACCEPT) == 1) {
+                if (type == MEETING_TYPE_AWAYTRIP && pGame->m_away == "KSC" && acceptValue == ACCEPT_STATE_ACCEPT && mInfo->getAcceptedNumber(ACCEPT_STATE_ACCEPT) == 1) {
                     QString body = QString(BODY_NEW_AWAY_ACCEPT).arg(name, pGame->m_itemName);
                     messageID    = g_pushNotify->sendNewFirstAwayAccept(body, userID, gameIndex);
                 }
@@ -553,12 +561,12 @@ qint32 GlobalData::requestAcceptMeetingInfo(const quint32 gameIndex, const quint
 
     MeetingInfo* mInfo = new MeetingInfo();
     if (mInfo->initialize(pGame->m_saison, pGame->m_competition, pGame->m_saisonIndex, pGame->m_index)) {
-        this->m_meetingInfos.append(mInfo);
+        pList->append(mInfo);
         result = mInfo->addNewAcceptation(acceptValue, userID, name);
         qInfo().noquote() << QString("Changed Acceptation of %2 at game %1").arg(pGame->m_index).arg(name);
 
         /* Send an info if the first person is going to an game which is not at home */
-        if (pGame->m_away == "KSC" && acceptValue == ACCEPT_STATE_ACCEPT) {
+        if (type == MEETING_TYPE_AWAYTRIP && pGame->m_away == "KSC" && acceptValue == ACCEPT_STATE_ACCEPT) {
             QString body = QString(BODY_NEW_AWAY_ACCEPT).arg(name, pGame->m_itemName);
             messageID    = g_pushNotify->sendNewFirstAwayAccept(body, userID, gameIndex);
         }

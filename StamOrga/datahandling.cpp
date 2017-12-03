@@ -596,20 +596,24 @@ qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg, const quint3
         pInfo->addNewAcceptInfo(ami);
         counter++;
 
-        if (value == ACCEPT_STATE_ACCEPT)
-            acceptMeeting++;
-        else if (value == ACCEPT_STATE_MAYBE)
-            interestMeeting++;
-        else if (value == ACCEPT_STATE_DECLINE)
-            declineMeeting++;
+        if (type == MEETING_TYPE_MEETING) {
+            if (value == ACCEPT_STATE_ACCEPT)
+                acceptMeeting++;
+            else if (value == ACCEPT_STATE_MAYBE)
+                interestMeeting++;
+            else if (value == ACCEPT_STATE_DECLINE)
+                declineMeeting++;
+        }
     }
 
     GamePlay* game = this->m_pGlobalData->getGamePlay(gameIndex);
     if (game != NULL) {
-        game->setAcceptedMeetingCount(acceptMeeting);
-        game->setInterestedMeetingCount(interestMeeting);
-        game->setDeclinedMeetingCount(declineMeeting);
-        game->setMeetingInfo(1);
+        if (type == MEETING_TYPE_MEETING) {
+            game->setAcceptedMeetingCount(acceptMeeting);
+            game->setInterestedMeetingCount(interestMeeting);
+            game->setDeclinedMeetingCount(declineMeeting);
+            game->setMeetingInfo(1);
+        }
     }
 
     return result;

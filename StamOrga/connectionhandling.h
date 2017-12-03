@@ -40,7 +40,7 @@ public:
     qint32 startGettingUserProps();
     qint32 startGettingUserEvents();
     qint32 startSettingUserEvents(qint64 eventID, qint32 status);
-    bool   startUpdatePassword(QString newPassWord);
+    bool startUpdatePassword(QString newPassWord);
     qint32 startUpdateReadableName(QString name);
     qint32 startListGettingGames();
     qint32 startListGettingGamesInfo();
@@ -57,7 +57,8 @@ public:
                                 const quint32 type);
     qint32 startLoadMeetingInfo(const quint32 gameIndex, const quint32 type);
     qint32 startAcceptMeetingInfo(const quint32 gameIndex, const quint32 accept,
-                                  const QString name, const quint32 acceptIndex = 0);
+                                  const QString name, const quint32 type,
+                                  const quint32 acceptIndex = 0);
 
     qint32 startChangeFanclubNews(const quint32 newsIndex, const QString header,
                                   const QString info);

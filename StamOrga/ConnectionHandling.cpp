@@ -272,13 +272,20 @@ qint32 ConnectionHandling::startLoadMeetingInfo(const quint32 gameIndex, const q
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 ConnectionHandling::startAcceptMeetingInfo(const quint32 gameIndex, const quint32 accept, const QString name, const quint32 acceptIndex)
+qint32 ConnectionHandling::startAcceptMeetingInfo(const quint32 gameIndex, const quint32 accept,
+                                                  const QString name, const quint32 type,
+                                                  const quint32 acceptIndex)
 {
-    DataConRequest req(OP_CODE_CMD_REQ::REQ_ACCEPT_MEETING);
+    DataConRequest req;
+    if (type == MEETING_TYPE_MEETING)
+        req.m_request = OP_CODE_CMD_REQ::REQ_ACCEPT_MEETING;
+    else
+        req.m_request = OP_CODE_CMD_REQ::REQ_ACCEPT_AWAYTRIP;
     req.m_lData.append(QString::number(gameIndex));
     req.m_lData.append(QString::number(accept));
     req.m_lData.append(QString::number(acceptIndex));
     req.m_lData.append(name);
+    req.m_lData.append(QString::number(type));
     this->sendNewRequest(req);
 
     return ERROR_CODE_SUCCESS;

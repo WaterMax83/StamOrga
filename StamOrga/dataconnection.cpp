@@ -229,6 +229,7 @@ void DataConnection::checkNewOncomingData()
             break;
 
         case OP_CODE_CMD_RES::ACK_ACCEPT_MEETING:
+        case OP_CODE_CMD_RES::ACK_ACCEPT_AWAYTRIP:
             request.m_result = this->m_pDataHandle->getHandleAcceptMeetingResponse(msg);
             break;
 
@@ -386,7 +387,7 @@ void DataConnection::startSendGamesListRequest(DataConRequest request)
         data[0] = qToLittleEndian(UpdateIndex::UpdateDiff);
     else
         data[0] = qToLittleEndian(UpdateIndex::UpdateAll);
-    timeStamp = qToLittleEndian(this->m_pGlobalData->getGamePlayLastServerUpdate());
+    timeStamp   = qToLittleEndian(this->m_pGlobalData->getGamePlayLastServerUpdate());
     memcpy(&data[1], &timeStamp, sizeof(qint64));
 
     MessageProtocol msg(request.m_request, (char*)(&data[0]), sizeof(quint32) * 3);

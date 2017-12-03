@@ -51,7 +51,7 @@ public:
     MessageProtocol* requestChangeGame(MessageProtocol* msg);
     MessageProtocol* requestChangeMeetingInfo(MessageProtocol* msg, const quint32 ack);
     MessageProtocol* requestGetMeetingInfo(MessageProtocol* msg, const quint32 ack);
-    MessageProtocol* requestAcceptMeeting(MessageProtocol* msg);
+    MessageProtocol* requestAcceptMeeting(MessageProtocol* msg, const quint32 ack, const MeetingType type);
     MessageProtocol* requestChangeNewsData(MessageProtocol* msg);
     MessageProtocol* requestGetNewsDataList(MessageProtocol* msg);
     MessageProtocol* requestGetNewsDataItem(MessageProtocol* msg);

@@ -357,7 +357,7 @@ Flickable {
                 height: visible ? implicitHeight : 0
                 text: "Zusagen"
                 onClicked: {
-                    userIntCurrentGame.startAcceptMeetingInfo(m_gamePlayCurrentItem.index, 1, menuAcceptText, menuAcceptIndex);
+                    userIntCurrentGame.startAcceptMeetingInfo(m_gamePlayCurrentItem.index, 1, menuAcceptText, meetingType, menuAcceptIndex);
                     showInfoHeader("Ändere Teilnahme", true)
                 }
             }
@@ -369,7 +369,7 @@ Flickable {
                 visible: menuAcceptValue !== 2 ? true : false
                 height: visible ? implicitHeight : 0
                 onClicked: {
-                    userIntCurrentGame.startAcceptMeetingInfo(m_gamePlayCurrentItem.index, 2, menuAcceptText, menuAcceptIndex);
+                    userIntCurrentGame.startAcceptMeetingInfo(m_gamePlayCurrentItem.index, 2, menuAcceptText, meetingType, menuAcceptIndex);
                     showInfoHeader("Ändere Teilnahme", true)
                 }
             }
@@ -381,7 +381,7 @@ Flickable {
                 visible: menuAcceptValue !== 3 ? true : false
                 height: visible ? implicitHeight : 0
                 onClicked: {
-                    userIntCurrentGame.startAcceptMeetingInfo(m_gamePlayCurrentItem.index, 3, menuAcceptText, menuAcceptIndex);
+                    userIntCurrentGame.startAcceptMeetingInfo(m_gamePlayCurrentItem.index, 3, menuAcceptText, meetingType, menuAcceptIndex);
                     showInfoHeader("Ändere Teilnahme", true)
                 }
             }
@@ -416,7 +416,7 @@ Flickable {
     }
 
     function acceptedEditTextDialogAccept(text) {
-        userIntCurrentGame.startAcceptMeetingInfo(m_gamePlayCurrentItem.index, menuAcceptValue, text, menuAcceptIndex);
+        userIntCurrentGame.startAcceptMeetingInfo(m_gamePlayCurrentItem.index, menuAcceptValue, text, meetingType, menuAcceptIndex);
         showInfoHeader("Ändere Teilnahme", true)
     }
 

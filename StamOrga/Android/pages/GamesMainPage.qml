@@ -46,7 +46,7 @@ Page {
             Layout.fillHeight: false
             Layout.topMargin: 10
             infoVisible: true
-            Layout.columnSpan: 2
+            Layout.columnSpan: 1
         }
 
         TabBar {
@@ -55,6 +55,7 @@ Page {
                 anchors.right: parent.right
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
                 currentIndex: swipeViewGamesMainPage.currentIndex
+                Layout.columnSpan: 2
 
 
                 TabButton {
@@ -104,10 +105,12 @@ Page {
                 onContentYChanged : checkMovedInfo(2, movedStartY - contentY);
             }
         }
-        Text {
-            id: txtForFontFamily
-            visible: false
-        }
+
+    }
+
+    Text {
+        id: txtForFontFamily
+        visible: false
     }
 
     NumberAnimation {

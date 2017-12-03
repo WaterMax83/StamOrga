@@ -142,9 +142,11 @@ qint32 UserInterface::startLoadMeetingInfo(const quint32 gameIndex, const quint3
     return this->m_pConHandle->startLoadMeetingInfo(gameIndex, type);
 }
 
-qint32 UserInterface::startAcceptMeetingInfo(const quint32 gameIndex, const quint32 accept, const QString name, const quint32 acceptIndex)
+qint32 UserInterface::startAcceptMeetingInfo(const quint32 gameIndex, const quint32 accept,
+                                             const QString name, const quint32 type,
+                                             const quint32 acceptIndex)
 {
-    return this->m_pConHandle->startAcceptMeetingInfo(gameIndex, accept, name, acceptIndex);
+    return this->m_pConHandle->startAcceptMeetingInfo(gameIndex, accept, name, type, acceptIndex);
 }
 
 qint32 UserInterface::startChangeFanclubNews(const quint32 newsIndex, const QString header, const QString info)

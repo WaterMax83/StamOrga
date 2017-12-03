@@ -982,12 +982,12 @@ MessageProtocol* DataConnection::requestGetMeetingInfo(MessageProtocol* msg, con
  * 8   quint32      acceptIndex     4
  * 12   QString      name            4
  */
-MessageProtocol* DataConnection::requestAcceptMeeting(MessageProtocol* msg)
+MessageProtocol* DataConnection::requestAcceptMeeting(MessageProtocol* msg, const quint32 ack, const MeetingType type)
 {
     qint32 rCode;
     if (msg->getDataLength() < 16) {
         qWarning().noquote() << QString("Wrong message size for accept meeting for user %1").arg(this->m_pUserConData->m_userName);
-        return new MessageProtocol(OP_CODE_CMD_RES::ACK_ACCEPT_MEETING, ERROR_CODE_WRONG_SIZE);
+        return new MessageProtocol(ack, ERROR_CODE_WRONG_SIZE);
     }
 
     const quint32* pData = (quint32*)msg->getPointerToData();
@@ -1000,7 +1000,7 @@ MessageProtocol* DataConnection::requestAcceptMeeting(MessageProtocol* msg)
     QString name(QByteArray((char*)(pData + 3)));
 
     qint64 messageID;
-    rCode = this->m_pGlobalData->requestAcceptMeetingInfo(gameIndex, 0, acceptValue, acceptIndex, name, this->m_pUserConData->m_userID, messageID);
+    rCode = this->m_pGlobalData->requestAcceptMeetingInfo(gameIndex, 0, acceptValue, acceptIndex, name, this->m_pUserConData->m_userID, type, messageID);
     if (rCode == ERROR_CODE_SUCCESS) {
         qInfo().noquote() << QString("User %1 accepted MeetingInfo of game %2 with value %3")
                                  .arg(this->m_pUserConData->m_userName)
@@ -1008,13 +1008,13 @@ MessageProtocol* DataConnection::requestAcceptMeeting(MessageProtocol* msg)
                                  .arg(acceptValue);
     }
     if (msg->getVersion() <= MSG_HEADER_VERSION_MESSAGE_ID)
-        return new MessageProtocol(OP_CODE_CMD_RES::ACK_ACCEPT_MEETING, rCode);
+        return new MessageProtocol(ack, rCode);
 
     qint32 data[3];
     data[0]   = qToLittleEndian(rCode);
     messageID = qToLittleEndian(messageID);
     memcpy(&data[1], &messageID, sizeof(qint64));
-    return new MessageProtocol(OP_CODE_CMD_RES::ACK_ACCEPT_MEETING, (char*)&data[0], sizeof(qint32) * 3);
+    return new MessageProtocol(ack, (char*)&data[0], sizeof(qint32) * 3);
 }
 
 /* request

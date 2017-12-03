@@ -211,7 +211,6 @@ MessageProtocol* UdpDataServer::checkNewMessage(MessageProtocol* msg)
         case OP_CODE_CMD_REQ::REQ_CHANGE_MEETING_INFO:
             ack = this->m_pDataConnection->requestChangeMeetingInfo(msg, OP_CODE_CMD_RES::ACK_CHANGE_MEETING_INFO);
             break;
-
         case OP_CODE_CMD_REQ::REQ_CHANGE_AWAYTRIP_INFO:
             ack = this->m_pDataConnection->requestChangeMeetingInfo(msg, OP_CODE_CMD_RES::ACK_CHANGE_AWAYTRIP_INFO);
             break;
@@ -219,13 +218,15 @@ MessageProtocol* UdpDataServer::checkNewMessage(MessageProtocol* msg)
         case OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO:
             ack = this->m_pDataConnection->requestGetMeetingInfo(msg, OP_CODE_CMD_RES::ACK_GET_MEETING_INFO);
             break;
-
         case OP_CODE_CMD_REQ::REQ_GET_AWAYTRIP_INFO:
             ack = this->m_pDataConnection->requestGetMeetingInfo(msg, OP_CODE_CMD_RES::ACK_GET_AWAYTRIP_INFO);
             break;
 
         case OP_CODE_CMD_REQ::REQ_ACCEPT_MEETING:
-            ack = this->m_pDataConnection->requestAcceptMeeting(msg);
+            ack = this->m_pDataConnection->requestAcceptMeeting(msg, OP_CODE_CMD_RES::ACK_ACCEPT_MEETING, MEETING_TYPE_MEETING);
+            break;
+        case OP_CODE_CMD_REQ::REQ_ACCEPT_AWAYTRIP:
+            ack = this->m_pDataConnection->requestAcceptMeeting(msg, OP_CODE_CMD_RES::ACK_ACCEPT_AWAYTRIP, MEETING_TYPE_AWAYTRIP);
             break;
 
         case OP_CODE_CMD_REQ::REQ_CHANGE_NEWS_DATA:
