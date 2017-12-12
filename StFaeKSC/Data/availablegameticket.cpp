@@ -164,6 +164,7 @@ qint32 AvailableGameTickets::changeTicketState(quint32 ticketID, quint32 userID,
     //        qWarning().noquote() << QString("Could not change available ticket, state 0 is not allowed ").arg(state);
     //        return ERROR_CODE_COMMON;
     //    }
+    QMutexLocker locker(&this->m_mInternalInfoMutex);
 
     qint64 timestamp = QDateTime::currentDateTime().toMSecsSinceEpoch();
 
@@ -274,4 +275,68 @@ bool AvailableGameTickets::addNewAvailableTicket(AvailableTicketInfo* ticket, bo
 
     this->addNewConfigItem(ticket, &this->m_lInteralList);
     return true;
+}
+
+qint32 AvailableGameTickets::checkConsistency()
+{
+    this->m_mInternalInfoMutex.lock();
+
+    for (int i = 0; i < this->m_lInteralList.size(); i++) {
+        AvailableTicketInfo* pWrittenTicket = this->getWrittenTicketInfo(i);
+        if (pWrittenTicket == NULL)
+            continue;
+
+        this->m_mInternalInfoMutex.unlock();
+        AvailableTicketInfo* pTicketInfo = (AvailableTicketInfo*)this->getItem(pWrittenTicket->m_index);
+        this->m_mInternalInfoMutex.lock();
+        if (pTicketInfo == NULL) {
+            delete pWrittenTicket;
+            continue;
+        }
+
+        if (pTicketInfo->m_userID != pWrittenTicket->m_userID)
+            this->updateItemValue(pTicketInfo, AVAILABLE_USER_ID, QVariant(pTicketInfo->m_userID), this->m_lastUpdateTimeStamp);
+
+        if (pTicketInfo->m_state != pWrittenTicket->m_state)
+            this->updateItemValue(pTicketInfo, AVAILABLE_STATE, QVariant(pTicketInfo->m_state), this->m_lastUpdateTimeStamp);
+
+        if (pTicketInfo->m_itemName != pWrittenTicket->m_itemName)
+            this->updateItemValue(pTicketInfo, ITEM_NAME, QVariant(pTicketInfo->m_itemName), this->m_lastUpdateTimeStamp);
+
+        if (pTicketInfo->m_timestamp != pWrittenTicket->m_timestamp)
+            this->updateItemValue(pTicketInfo, ITEM_TIMESTAMP, QVariant(pTicketInfo->m_timestamp), this->m_lastUpdateTimeStamp);
+
+        delete pWrittenTicket;
+    }
+
+    this->m_mInternalInfoMutex.unlock();
+
+    return ERROR_CODE_SUCCESS;
+}
+
+AvailableTicketInfo* AvailableGameTickets::getWrittenTicketInfo(const qint32 arrayIndex)
+{
+    QMutexLocker lock(&this->m_mConfigIniMutex);
+
+    this->m_pConfigSettings->beginGroup(GROUP_LIST_ITEM);
+    int sizeOfArray = this->m_pConfigSettings->beginReadArray(CONFIG_LIST_ARRAY);
+    if (arrayIndex >= sizeOfArray)
+        return NULL;
+
+    this->m_pConfigSettings->setArrayIndex(arrayIndex);
+    QString name      = this->m_pConfigSettings->value(ITEM_NAME, "").toString();
+    quint32 index     = this->m_pConfigSettings->value(ITEM_INDEX, 0).toUInt();
+    qint64  timestamp = this->m_pConfigSettings->value(ITEM_TIMESTAMP, 0x0).toULongLong();
+
+    quint32 ticketID = this->m_pConfigSettings->value(AVAILABLE_TICKET_ID, 0x0).toUInt();
+    quint32 userID   = this->m_pConfigSettings->value(AVAILABLE_USER_ID, 0x0).toUInt();
+    quint32 state    = this->m_pConfigSettings->value(AVAILABLE_STATE, 0).toUInt();
+
+    this->m_pConfigSettings->endArray();
+    this->m_pConfigSettings->endGroup();
+
+    if (ticketID == 0 || userID == 0 || state == 0)
+        return NULL;
+
+    return new AvailableTicketInfo(name, timestamp, index, ticketID, userID, state);
 }

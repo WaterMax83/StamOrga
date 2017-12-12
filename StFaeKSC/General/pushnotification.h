@@ -108,6 +108,8 @@ public:
     qint64 sendNewFirstAwayAccept(const QString body, const qint32 userID, const quint32 gameIndex);
     qint64 sendNewFanclubNewsNotification(const QString body, const qint32 userID, const qint32 newsID);
 
+    virtual qint32 checkConsistency() { return -12; }
+
 signals:
     void sendNewNotificationSignal(void);
 

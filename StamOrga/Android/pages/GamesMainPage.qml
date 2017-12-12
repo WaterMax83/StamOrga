@@ -39,6 +39,19 @@ Page {
         rows: 3
         columns: 2
 
+        Text {
+            id: txtForFontFamily
+            visible: false
+        }
+
+//        MyComponents.Games {
+//            id: gameHeader
+//            visible: true
+//            anchors.left: parent.left
+//            anchors.right: parent.right
+//            Layout.alignment: Qt.AlignTop
+//        }
+
         MyComponents.BusyLoadingIndicator {
             id: busyIndicatorGames
             width: parent.width
@@ -46,7 +59,7 @@ Page {
             Layout.fillHeight: false
             Layout.topMargin: 10
             infoVisible: true
-            Layout.columnSpan: 1
+            Layout.columnSpan: 2
         }
 
         TabBar {
@@ -106,11 +119,6 @@ Page {
             }
         }
 
-    }
-
-    Text {
-        id: txtForFontFamily
-        visible: false
     }
 
     NumberAnimation {

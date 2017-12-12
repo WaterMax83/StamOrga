@@ -64,6 +64,8 @@ public:
     qint32 getTicketState(quint32 ticketID);
     QString getTicketName(quint32 ticketID);
 
+    virtual qint32 checkConsistency();
+
 
 private:
     quint32 m_year;
@@ -71,10 +73,11 @@ private:
     quint32 m_seasonIndex;
     quint32 m_gameIndex;
 
-
     void saveCurrentInteralList() override;
 
     bool addNewAvailableTicket(AvailableTicketInfo* ticket, bool checkItem = true);
+
+    AvailableTicketInfo* getWrittenTicketInfo(const qint32 arrayIndex);
 };
 
 #endif // AVAILABLEGAMETICKET_H

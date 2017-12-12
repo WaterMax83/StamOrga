@@ -27,6 +27,7 @@
 #include "../Common/General/config.h"
 #include "../Common/General/globalfunctions.h"
 #include "../Common/General/logging.h"
+#include "Data/checkconsistentdata.h"
 #include "Data/readonlinegames.h"
 #include "General/console.h"
 #include "General/globaldata.h"
@@ -66,6 +67,11 @@ int main(int argc, char* argv[])
     online->initialize(&globalData);
     ctrlReadOnline.Start(online, false);
 
+    BackgroundController ctrlConsistent;
+    CheckConsistentData* checkConsistData = new CheckConsistentData();
+    checkConsistData->initialize(&globalData);
+    ctrlConsistent.Start(checkConsistData, false);
+
 
     /* TODO: Connect for ctrlUdp::notifyBackgroundWorkerFinished */
 
@@ -78,6 +84,9 @@ int main(int argc, char* argv[])
     ctrlReadOnline.Stop();
     ctrlUdp.Stop();
     delete con;
+
+    delete checkConsistData;
+    delete online;
 
     return result;
 }

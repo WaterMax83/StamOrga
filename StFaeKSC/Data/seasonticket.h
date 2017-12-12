@@ -68,6 +68,8 @@ public:
     int changeSeasonTicketInfos(const quint32 index, const qint32 discount, const QString name, const QString place);
     int showAllSeasonTickets();
 
+    virtual qint32 checkConsistency() { return -12; }
+
 
 private:
     void saveCurrentInteralList() override;

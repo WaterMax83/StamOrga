@@ -415,7 +415,6 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
         if (request.m_result == ERROR_CODE_SUCCESS) {
             this->startGettingVersionInfo();
             this->startGettingUserProps();
-            this->startGettingUserEvents();
             QThread::msleep(10);
             this->m_pGlobalData->setbIsConnected(true);
             this->checkTimeoutResult(request.m_result); // call again to set last successfull timer
@@ -444,7 +443,11 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
         return;
 
     case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
+        if (request.m_result == ERROR_CODE_SUCCESS) {
+            this->startGettingUserEvents();
+        }
         emit this->sNotifyCommandFinished(request.m_request, request.m_result);
+
         break;
 
     case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:

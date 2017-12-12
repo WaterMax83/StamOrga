@@ -82,6 +82,8 @@ public:
 
     qint64 getLastUpdateTime();
 
+    virtual qint32 checkConsistency() = 0;
+
     void sortItemListByTimeAscending();
     void sortItemListByTimeDescending();
 

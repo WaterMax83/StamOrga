@@ -159,12 +159,15 @@ ApplicationWindow {
                                 appUserEvents.clearUserEventUpdate(userInt);
                         }
 
+                        console.log("Höhe " + height + " Breite " + width);
+
                         drawer.close()
                     }
                     MyComponents.EventIndicator {
                         disableVisibility: model.event ? false : true
-                        eventCount : model.event
+                        eventCount : model.event ? model.event : 88
                     }
+                    onHeightChanged: console.log("Neue Hoehe fuer Listview " + height);
                 }
 
                 model: ListModel {
@@ -299,6 +302,7 @@ ApplicationWindow {
         property bool isFanclubNewsWindowShown : false;
         property bool isNewVersionElementShown : false;
         onNotifyUserPropertiesFinished: {
+            console.log("Hier kommen die User Properties " + result)
             if (result > 0 && !userInt.isDebuggingEnabled()) {
                 if (!isLoggingWindowShown) {
                     isLoggingWindowShown = true;
@@ -311,12 +315,14 @@ ApplicationWindow {
                     }
                 }
                 if (!isFanclubNewsWindowShown) {
+                    console.log("Showing Fanclub")
                     isFanclubNewsWindowShown = true;
                     if (globalUserData.userIsFanclubEnabled()) {
                         listViewListModel.insert(2, {
                                                 title: "Fanclub",
                                                 element: viewFanclubNewList,
-                                                imgsource: ""
+                                                imgsource: "",
+                                                event : 0
                                             })
                     }
                 }
@@ -331,11 +337,15 @@ ApplicationWindow {
         onNotifyGetUserEvents: {
             iMainToolButtonEventCount = appUserEvents.getCurrentMainEventCounter();
 
+            console.log("Hier werden die UserEvents gesetzt " + listViewListModel.count)
             for(var i=0; i< listViewListModel.count; i++) {
+                console.log("Aktuelle Reihe: " + listViewListModel.get(i).title )
                 if (listViewListModel.get(i).title === "Update")
                     listViewListModel.get(i).event = appUserEvents.getCurrentUpdateEventCounter();
-                else if (listViewListModel.get(i).title === "Fanclub")
+                else if (listViewListModel.get(i).title === "Fanclub") {
                     listViewListModel.get(i).event = appUserEvents.getCurrentFanclubEventCounter();
+                    console.log("Setting " + appUserEvents.getCurrentFanclubEventCounter());
+                }
             }
 
             if (stackView.currentItem.notifyGetUserEvents)

@@ -75,6 +75,17 @@ Flickable {
             width: parent.width
             spacing: 10
 
+            MyComponents.BusyLoadingIndicator {
+                id: busyIndicatorGames
+                width: parent.width
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                Layout.fillHeight: false
+                Layout.topMargin: 10
+                infoVisible: true
+                infoText: "Hallo Test"
+//                Layout.columnSpan: 2
+            }
+
             Column {
                 id: columnLayoutGames
                 anchors.right: parent.right

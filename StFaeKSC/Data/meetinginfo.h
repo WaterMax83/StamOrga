@@ -75,6 +75,8 @@ public:
 
     quint16 getAcceptedNumber(const quint32 state);
 
+    virtual qint32 checkConsistency() { return -12; }
+
 
     //    qint32 getTicketState(quint32 ticketID);
     //    QString getTicketName(quint32 ticketID);

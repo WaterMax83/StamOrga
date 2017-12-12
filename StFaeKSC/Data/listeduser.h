@@ -90,6 +90,8 @@ public:
         return NULL;
     }
 
+    virtual qint32 checkConsistency() { return -12; }
+
 private:
     void saveCurrentInteralList() override;
 

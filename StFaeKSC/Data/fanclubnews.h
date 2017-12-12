@@ -44,7 +44,7 @@ public:
     }
 
     QByteArray m_newsText;
-    quint32 m_userID;
+    quint32    m_userID;
 };
 
 class FanclubNews : public ConfigList
@@ -57,6 +57,8 @@ public:
     int changeFanclubNews(const quint32 newsIndex, const QString header, const QByteArray info, const quint32 userID);
 
     int showNewsData();
+
+    virtual qint32 checkConsistency() { return -12; }
 
 private:
     void saveCurrentInteralList() override;

@@ -51,7 +51,8 @@ SOURCES += main.cpp \
     General/pushnotification.cpp \
     Data/fanclubnews.cpp \
     Data/userevents.cpp \
-    Data/awaytripinfo.cpp
+    Data/awaytripinfo.cpp \
+    Data/checkconsistentdata.cpp
 
 HEADERS += \
     ../Common/General/backgroundcontroller.h \
@@ -81,7 +82,8 @@ HEADERS += \
     General/pushnotification.h \
     Data/fanclubnews.h \
     Data/userevents.h \
-    Data/awaytripinfo.h
+    Data/awaytripinfo.h \
+    Data/checkconsistentdata.h
 
 
 unix {

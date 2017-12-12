@@ -83,6 +83,8 @@ public:
 
     GamesPlay* gameExists(quint8 sIndex, CompetitionIndex comp, quint16 saison, qint64 timestamp);
 
+    virtual qint32 checkConsistency() { return -12; }
+
 private:
     void saveCurrentInteralList() override;
 

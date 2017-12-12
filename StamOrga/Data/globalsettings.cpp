@@ -179,8 +179,9 @@ QString GlobalSettings::getVersionChangeInfo()
     QString rValue;
 
     rValue.append("<b>V1.0.5:</b>(XX.XX.XXXX)<br>");
-    rValue.append("- Infos über letzte Neuigkeiten<br>");
+    rValue.append("- Infos über letzte Neuigkeiten markieren<br>");
     rValue.append("- Framework Version aktualisiert<br>");
+    rValue.append("- Fahrt bei Auswärtsspiel hinzugefügt<br>");
 
     rValue.append("<br><b>V1.0.4:</b>(24.10.2017)<br>");
     rValue.append("- Fanclub Nachrichten (Mitglieder)<br>");
