@@ -159,15 +159,12 @@ ApplicationWindow {
                                 appUserEvents.clearUserEventUpdate(userInt);
                         }
 
-                        console.log("Höhe " + height + " Breite " + width);
-
                         drawer.close()
                     }
                     MyComponents.EventIndicator {
                         disableVisibility: model.event ? false : true
-                        eventCount : model.event ? model.event : 88
+                        eventCount : model.event ? model.event : 0
                     }
-                    onHeightChanged: console.log("Neue Hoehe fuer Listview " + height);
                 }
 
                 model: ListModel {
@@ -276,16 +273,17 @@ ApplicationWindow {
         onNotifyVersionRequestFinished: {
             //            stackView.currentItem.notifyUserIntVersionRequestFinished(result, msg);
             if (result === 5) {
-                var component = Qt.createComponent(
-                            "/components/VersionDialog.qml")
-                if (component.status === Component.Ready) {
-                    var dialog = component.createObject(stackView, {
-                                                            popupType: 1
-                                                        })
-                    dialog.versionText = msg
-                    dialog.parentHeight = stackView.height
-                    dialog.parentWidth = stackView.width
-                    dialog.open()
+                if (globalSettings.useVersionPopup) {
+                    var component = Qt.createComponent("/components/VersionDialog.qml")
+                    if (component.status === Component.Ready) {
+                        var dialog = component.createObject(stackView, {
+                                                                popupType: 1
+                                                            })
+                        dialog.versionText = msg
+                        dialog.parentHeight = stackView.height
+                        dialog.parentWidth = stackView.width
+                        dialog.open()
+                    }
                 }
 
                 if (!isNewVersionElementShown) {
@@ -302,7 +300,6 @@ ApplicationWindow {
         property bool isFanclubNewsWindowShown : false;
         property bool isNewVersionElementShown : false;
         onNotifyUserPropertiesFinished: {
-            console.log("Hier kommen die User Properties " + result)
             if (result > 0 && !userInt.isDebuggingEnabled()) {
                 if (!isLoggingWindowShown) {
                     isLoggingWindowShown = true;
@@ -315,7 +312,6 @@ ApplicationWindow {
                     }
                 }
                 if (!isFanclubNewsWindowShown) {
-                    console.log("Showing Fanclub")
                     isFanclubNewsWindowShown = true;
                     if (globalUserData.userIsFanclubEnabled()) {
                         listViewListModel.insert(2, {
@@ -337,14 +333,11 @@ ApplicationWindow {
         onNotifyGetUserEvents: {
             iMainToolButtonEventCount = appUserEvents.getCurrentMainEventCounter();
 
-            console.log("Hier werden die UserEvents gesetzt " + listViewListModel.count)
             for(var i=0; i< listViewListModel.count; i++) {
-                console.log("Aktuelle Reihe: " + listViewListModel.get(i).title )
                 if (listViewListModel.get(i).title === "Update")
                     listViewListModel.get(i).event = appUserEvents.getCurrentUpdateEventCounter();
                 else if (listViewListModel.get(i).title === "Fanclub") {
                     listViewListModel.get(i).event = appUserEvents.getCurrentFanclubEventCounter();
-                    console.log("Setting " + appUserEvents.getCurrentFanclubEventCounter());
                 }
             }
 
@@ -387,7 +380,7 @@ ApplicationWindow {
     Connections {
        target: globalSettings
        onSendAppStateChangedToActive: {
-           viewMainGames.showLoadingGameInfos("Lade Spielinfos")
+           viewMainGames.showLoadingGameInfos("Lade Spielinfos", true)
            if (value === 1)
                userInt.startListGettingGamesInfo();
            else if (value === 2)

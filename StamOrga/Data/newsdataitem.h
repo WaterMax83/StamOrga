@@ -29,7 +29,7 @@ class NewsDataItem : public QObject
     Q_PROPERTY(QString header READ header WRITE setHeader NOTIFY headerChanged)
     Q_PROPERTY(quint32 index READ index WRITE setIndex NOTIFY indexChanged)
     Q_PROPERTY(QString info READ info WRITE setInfo NOTIFY infoChanged)
-    Q_PROPERTY(bool event READ isEvent NOTIFY eventChanged)
+    Q_PROPERTY(qint32 event READ event NOTIFY eventChanged)
 public:
     explicit NewsDataItem(QObject* parent = 0);
 
@@ -69,11 +69,11 @@ public:
         }
     }
 
-    bool isEvent() { return this->m_bIsEvent; }
-    void setIsEvent(bool event)
+    qint32 event() { return this->m_eventCnt; }
+    void setEvent(qint32 event)
     {
-        if (this->m_bIsEvent != event) {
-            this->m_bIsEvent = event;
+        if (this->m_eventCnt != event) {
+            this->m_eventCnt = event;
             emit this->eventChanged();
         }
     }
@@ -104,7 +104,7 @@ private:
     QString m_info;
     quint32 m_index;
     qint64  m_timestamp;
-    bool    m_bIsEvent;
+    qint32  m_eventCnt;
 };
 
 #endif // NEWSDATAITEM_H

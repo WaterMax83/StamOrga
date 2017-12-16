@@ -22,8 +22,12 @@ import QtQuick.Layouts 1.2
 
 import com.watermax.demo 1.0
 
-Item {
-   id: itemSettings
+Flickable {
+   id: flickableSettings
+
+   contentHeight: mainPaneSettings.height
+
+   boundsBehavior: Flickable.StopAtBounds
 
    Pane {
        id: mainPaneSettings
@@ -98,6 +102,25 @@ Item {
            RowLayout {
                Layout.preferredWidth: parent.width
                Layout.fillWidth: true
+
+               Text {
+                   id: text5
+                   text: qsTr("Nutze Popup als Versionsinfo:")
+                   Layout.fillWidth: true
+                   Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                   font.pixelSize: 14
+                   color: "white"
+               }
+               CheckBox {
+                    id: usePopupForVersionInfo
+                    checked: globalSettings.useVersionPopup
+                    onCheckedChanged: valueWasEditedEnableSave()
+               }
+           }
+
+           RowLayout {
+               Layout.preferredWidth: parent.width
+               Layout.fillWidth: true
                visible: userInt.isDeviceMobile() || userInt.isDebuggingEnabled()
 
                Text {
@@ -140,7 +163,7 @@ Item {
                visible: true
 
                Text {
-                   id: text5
+                   id: textFontFamilies
                    text: qsTr("Schrift:")
                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                    font.pixelSize: 14
@@ -235,6 +258,8 @@ Item {
        }
    }
 
+   ScrollIndicator.vertical: ScrollIndicator { }
+
     function toolButtonClicked() {
         var saveSettings = false;
         var saveFonts = false;
@@ -251,6 +276,11 @@ Item {
 
         if (globalSettings.saveInfosOnApp !== saveInfosOnApp.checked) {
            globalSettings.saveInfosOnApp = saveInfosOnApp.checked;
+           saveSettings = true;
+        }
+
+        if (globalSettings.useVersionPopup !== usePopupForVersionInfo.checked) {
+           globalSettings.useVersionPopup = usePopupForVersionInfo.checked;
            saveSettings = true;
         }
 

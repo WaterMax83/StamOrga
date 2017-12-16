@@ -40,6 +40,8 @@ void AppUserEvents::addNewUserEvents(QJsonObject& jsObj)
     pEvent->m_type    = jsObj.value("type").toString();
     pEvent->m_eventID = static_cast<qint64>(jsObj.value("id").toDouble());
 
+    //    qDebug() << "New Event " << pEvent->m_info << " " << pEvent->m_type;
+
     if (pEvent->m_type == NOTIFY_TOPIC_NEW_APP_VERSION) {
 
         this->m_eventNewAppVersion = false;
@@ -49,8 +51,12 @@ void AppUserEvents::addNewUserEvents(QJsonObject& jsObj)
             this->m_eventNewAppVersion = true;
     } else if (pEvent->m_type == NOTIFY_TOPIC_NEW_FANCLUB_NEWS) {
 
-        this->m_pGlobalData->setNewsDataItemHasEvent(pEvent->m_info.toUInt());
-        this->m_eventNewFanclubNews++;
+        if (this->m_pGlobalData->userIsFanclubEnabled()) {
+            this->m_pGlobalData->setNewsDataItemHasEvent(pEvent->m_info.toUInt());
+            this->m_eventNewFanclubNews++;
+        } else {
+            this->m_eventNewFanclubNews = 0;
+        }
     } else if (pEvent->m_type == NOTIFY_TOPIC_NEW_FREE_TICKET) {
 
         this->m_pGlobalData->setGamePlayItemHasEvent(pEvent->m_info.toUInt());

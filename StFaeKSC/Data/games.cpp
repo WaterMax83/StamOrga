@@ -299,8 +299,8 @@ GamesPlay* Games::gameExists(quint8 sIndex, CompetitionIndex comp, quint16 saiso
             continue;
         if (pGame->m_saisonIndex == sIndex && pGame->m_competition == comp && pGame->m_saison == saison) {
             QDateTime oldData = QDateTime::fromMSecsSinceEpoch(pGame->m_timestamp);
-            if (date.date().year() == oldData.date().year())
-                return pGame;
+            //if (date.date().year() == oldData.date().year())
+            //    return pGame;
         }
         /* Game also exists when it is the exact timestamp, to change wrong competition or seasonIndex */
         if (pGame->m_timestamp == timestamp && (pGame->m_competition == comp || pGame->m_saisonIndex == sIndex))

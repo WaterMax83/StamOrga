@@ -34,6 +34,7 @@ class GlobalSettings : public QObject
     Q_PROPERTY(bool useReadableName READ useReadableName WRITE setUseReadableName NOTIFY useReadableNameChanged)
     Q_PROPERTY(bool loadGameInfo READ loadGameInfo WRITE setLoadGameInfo NOTIFY loadGameInfoChanged)
     Q_PROPERTY(bool saveInfosOnApp READ saveInfosOnApp WRITE setSaveInfosOnApp NOTIFY saveInfosOnAppChanged)
+    Q_PROPERTY(bool useVersionPopup READ useVersionPopup WRITE setUseVersionPopup NOTIFY useVersionPopupChanged)
 public:
     explicit GlobalSettings(QObject* parent = 0);
 
@@ -97,11 +98,18 @@ public:
         emit this->saveInfosOnAppChanged();
     }
 
+    bool useVersionPopup() { return this->m_useVersionPopup; }
+    void setUseVersionPopup(bool use)
+    {
+        this->m_useVersionPopup = use;
+        emit this->useVersionPopupChanged();
+    }
+
     Q_INVOKABLE QString getChangeDefaultFont() { return this->m_changeDefaultFont; }
-    Q_INVOKABLE void setChangeDefaultFont(QString font);
+    Q_INVOKABLE void    setChangeDefaultFont(QString font);
 
     Q_INVOKABLE qint64 getCurrentFontIndex() { return this->m_currentFontIndex; }
-    void setCurrentFontList(QStringList* list);
+    void               setCurrentFontList(QStringList* list);
 
     Q_INVOKABLE QString getCurrentVersion();
 
@@ -132,6 +140,7 @@ signals:
     void useReadableNameChanged();
     void loadGameInfoChanged();
     void saveInfosOnAppChanged();
+    void useVersionPopupChanged();
     void sendAppStateChangedToActive(quint32 value);
 
 public slots:
@@ -143,6 +152,7 @@ private:
     bool         m_useReadableName;
     bool         m_loadGameInfo;
     bool         m_saveInfosOnApp;
+    bool         m_useVersionPopup;
     QString      m_debugIP;
     QString      m_debugIPWifi;
     QMutex       m_mutex;

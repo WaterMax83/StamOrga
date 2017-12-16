@@ -44,23 +44,15 @@ Page {
             visible: false
         }
 
-//        MyComponents.Games {
-//            id: gameHeader
-//            visible: true
-//            anchors.left: parent.left
-//            anchors.right: parent.right
-//            Layout.alignment: Qt.AlignTop
+//        MyComponents.BusyLoadingIndicator {
+//            id: busyIndicatorGames
+//            width: parent.width
+//            Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+//            Layout.fillHeight: false
+//            Layout.topMargin: 10
+//            infoVisible: true
+//            Layout.columnSpan: 2
 //        }
-
-        MyComponents.BusyLoadingIndicator {
-            id: busyIndicatorGames
-            width: parent.width
-            Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-            Layout.fillHeight: false
-            Layout.topMargin: 10
-            infoVisible: true
-            Layout.columnSpan: 2
-        }
 
         TabBar {
                 id: tabBarGamesMainPage
@@ -95,79 +87,79 @@ Page {
             MyPages.GamesListPage {
                 id: gamesListPagePresent
                 showOnlyPastGames : false
-                onShowInfoHeader: showLoadingGameInfos(text);
+                onShowInfoHeader: showLoadingGameInfos(text, true);
                 onAcceptedChangeGame: startEditGame(dialog);
-                onDragStarted: {
-                    movedInfoIndex = 1; movedStartY = contentY;
-                    movedStartMargin = busyIndicatorGames.Layout.topMargin > 0 ? 10 : -movedInfoHeigth;
-                }
-                onDragEnded: { movedInfoIndex = 0; checkMovedInfoEnd(movedStartY - contentY); }
-                onContentYChanged : checkMovedInfo(1, movedStartY - contentY);
+//                onDragStarted: {
+//                    movedInfoIndex = 1; movedStartY = contentY;
+//                    movedStartMargin = busyIndicatorGames.Layout.topMargin > 0 ? 10 : -movedInfoHeigth;
+//                }
+//                onDragEnded: { movedInfoIndex = 0; checkMovedInfoEnd(movedStartY - contentY); }
+//                onContentYChanged : checkMovedInfo(1, movedStartY - contentY);
 
             }
             MyPages.GamesListPage {
                 id: gamesListPagePast
                 showOnlyPastGames : true
-                onShowInfoHeader: showLoadingGameInfos(text);
+                onShowInfoHeader: showLoadingGameInfos(text, true);
                 onAcceptedChangeGame: startEditGame(dialog);
-                onDragStarted: {
-                    movedInfoIndex = 2; movedStartY = contentY;
-                    movedStartMargin = busyIndicatorGames.Layout.topMargin > 0 ? 10 : -movedInfoHeigth;
-                }
-                onDragEnded: { movedInfoIndex = 0; checkMovedInfoEnd(movedStartY - contentY); }
-                onContentYChanged : checkMovedInfo(2, movedStartY - contentY);
+//                onDragStarted: {
+//                    movedInfoIndex = 2; movedStartY = contentY;
+//                    movedStartMargin = busyIndicatorGames.Layout.topMargin > 0 ? 10 : -movedInfoHeigth;
+//                }
+//                onDragEnded: { movedInfoIndex = 0; checkMovedInfoEnd(movedStartY - contentY); }
+//                onContentYChanged : checkMovedInfo(2, movedStartY - contentY);
             }
         }
 
     }
 
-    NumberAnimation {
-        id: animateMoveInfoUp
-        target: busyIndicatorGames
-        property: "Layout.topMargin"
-        to: -movedInfoHeigth
-        duration: 250
-    }
-    NumberAnimation {
-        id: animateMoveInfoDown
-        target: busyIndicatorGames
-        property: "Layout.topMargin"
-        to: 10
-        duration: 250
-    }
+//    NumberAnimation {
+//        id: animateMoveInfoUp
+//        target: busyIndicatorGames
+//        property: "Layout.topMargin"
+//        to: -movedInfoHeigth
+//        duration: 250
+//    }
+//    NumberAnimation {
+//        id: animateMoveInfoDown
+//        target: busyIndicatorGames
+//        property: "Layout.topMargin"
+//        to: 10
+//        duration: 250
+//    }
 
-    function checkMovedInfo(index, diff) {
-        if (movedInfoIndex !== index)
-            return;
+//    function checkMovedInfo(index, diff) {
+//        if (movedInfoIndex !== index)
+//            return;
 
-        if (movedStartMargin === 10) {
-            if (diff < 0)
-                busyIndicatorGames.Layout.topMargin = Math.max(-movedInfoHeigth, (diff * 0.5) + 10);
-        } else if (movedStartMargin === -movedInfoHeigth) {
+//        if (movedStartMargin === 10) {
+//            if (diff < 0)
+//                busyIndicatorGames.Layout.topMargin = Math.max(-movedInfoHeigth, (diff * 0.5) + 10);
+//        } else if (movedStartMargin === -movedInfoHeigth) {
 
-            if (diff > 0)
-                busyIndicatorGames.Layout.topMargin = Math.min(10, -movedInfoHeigth + (diff * 0.5));
-        }
-    }
+//            if (diff > 0)
+//                busyIndicatorGames.Layout.topMargin = Math.min(10, -movedInfoHeigth + (diff * 0.5));
+//        }
+//    }
 
-    function checkMovedInfoEnd(diff){
-        if (movedStartMargin === 10) {
-            if (diff < -10)
-                animateMoveInfoUp.start()
-            else
-                animateMoveInfoDown.start()
-        } else if (movedStartMargin === -movedInfoHeigth){
-            if (diff > 10)
-                animateMoveInfoDown.start()
-            else
-                animateMoveInfoUp.start()
-        }
-    }
+//    function checkMovedInfoEnd(diff){
+//        if (movedStartMargin === 10) {
+//            if (diff < -10)
+//                animateMoveInfoUp.start()
+//            else
+//                animateMoveInfoDown.start()
+//        } else if (movedStartMargin === -movedInfoHeigth){
+//            if (diff > 10)
+//                animateMoveInfoDown.start()
+//            else
+//                animateMoveInfoUp.start()
+//        }
+//    }
 
-    property int movedInfoIndex : 0
-    property int movedStartY : 0
-    property int movedStartMargin : 10
-    property int movedInfoHeigth : busyIndicatorGames.infoHeight + 5
+//    property int movedInfoIndex : 0
+//    property int movedStartY : 0
+//    property int movedStartMargin : 10
+//    property int movedInfoHeigth : busyIndicatorGames.infoHeight + 5
 
     property var addGameDialog;
 
@@ -206,11 +198,15 @@ Page {
                                                   dialog.score.trim());
         if (result !== 1) {
             toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
-            busyIndicatorGames.loadingVisible = true
-            if (changeGameDialog.index === 0)
-                busyIndicatorGames.infoText = "Füge Spiel hinzu"
-            else
-                busyIndicatorGames.infoText = "Ändere Spiel"
+//            busyIndicatorGames.loadingVisible = true
+            if (changeGameDialog.index === 0) {
+//                busyIndicatorGames.infoText = "Füge Spiel hinzu"
+                showLoadingGameInfos("Füge Spiel hinzu", true);
+            }
+            else {
+//                busyIndicatorGames.infoText = "Ändere Spiel"
+                showLoadingGameInfos("Ändere Spiel", true);
+            }
         }
     }
 
@@ -219,17 +215,21 @@ Page {
     function notifyUserIntGamesListFinished(result) {
         if (result !== 1) {
             toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
-            busyIndicatorGames.loadingVisible = false
+//            busyIndicatorGames.loadingVisible = false
+            showLoadingGameInfos("", false);
             showListedGames()
         }
     }
 
     function notifyUserIntGamesInfoListFinished(result) {
-        busyIndicatorGames.loadingVisible = false
-        if (result === 1)
+//        busyIndicatorGames.loadingVisible = false
+        showLoadingGameInfos("", false);
+        if (result === 1) {
             toastManager.show("Spiele geladen", 2000)
-        else
+        }
+        else{
             toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
+        }
 
         showListedGames()
     }
@@ -240,7 +240,7 @@ Page {
 
     function notifyGameChangedFinished(result) {
         if (result === 1) {
-            showLoadingGameInfos("Lade Spielinfos")
+            showLoadingGameInfos("Lade Spielinfos", true)
             userIntGames.startListGettingGames()
             gamesListPagePresent.cleanGameLayout();
             gamesListPagePast.cleanGameLayout();
@@ -251,7 +251,7 @@ Page {
 
     function notifySetGamesFixedTimeFinished(result) {
         if (result === 1) {
-            showLoadingGameInfos("Lade Spielinfos")
+            showLoadingGameInfos("Lade Spielinfos", true)
             userIntGames.startListGettingGames()
             gamesListPagePresent.cleanGameLayout();
             gamesListPagePast.cleanGameLayout();
@@ -274,15 +274,20 @@ Page {
         gamesListPagePast.showListedGames()
 
         if (globalUserData.getGamePlayLength() > 0) {
-            busyIndicatorGames.infoText = "Letztes Update am " + globalUserData.getGamePlayLastUpdateString()
-        } else
-            busyIndicatorGames.infoText = "Keine Daten gespeichert\nZiehen zum Aktualisieren"
+//            busyIndicatorGames.infoText = "Letztes Update am " + globalUserData.getGamePlayLastUpdateString()
+            showLoadingGameInfos("Letztes Update am " + globalUserData.getGamePlayLastUpdateString(), false);
+        } else {
+//            busyIndicatorGames.infoText = "Keine Daten gespeichert\nZiehen zum Aktualisieren"
+            showLoadingGameInfos("Keine Daten gespeichert\nZiehen zum Aktualisieren", false);
+        }
     }
 
-    function showLoadingGameInfos(text)
+    function showLoadingGameInfos(text, loading)
     {
-        busyIndicatorGames.loadingVisible = true
-        busyIndicatorGames.infoText = text
+        gamesListPagePresent.showLoadingGameInfosInternal(text, loading);
+        gamesListPagePast.showLoadingGameInfosInternal(text, loading);
+//        busyIndicatorGames.loadingVisible = true
+//        busyIndicatorGames.infoText = text
     }
 
 }

@@ -278,7 +278,8 @@ Flickable {
                 id: listViewAcceptedUsers
                 visible: isAcceptVisible
                 interactive: false
-                implicitWidth: mainColumnLayoutCurrentGame.width
+//                implicitWidth: mainColumnLayoutCurrentGame.width
+                implicitWidth: parent.width
 
                 delegate: RowLayout {
                     id: singleRowAccepted

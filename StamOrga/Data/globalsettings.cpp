@@ -30,6 +30,7 @@
 #define SETT_LAST_SHOWN_VERSION     "LastShownVersion"
 #define SETT_LOAD_GAME_INFO         "LoadGameInfo"
 #define SETT_SAVE_INFOS_ON_APP      "SaveInfosOnApp"
+#define SETT_USE_VERSION_POPUP      "UseVersionPopup"
 #define SETT_CHANGE_DEFAULT_FONT    "ChangeDefaultFont"
 #define SETT_ENABLE_NOTIFICATION    "EnableNotification"
 
@@ -51,6 +52,7 @@ void GlobalSettings::initialize(GlobalData* pGlobalData, QGuiApplication* app)
     this->setUseReadableName(this->m_pGlobalData->m_pMainUserSettings->value(SETT_USE_READABLE_NAME, true).toBool());
     this->setLoadGameInfo(this->m_pGlobalData->m_pMainUserSettings->value(SETT_LOAD_GAME_INFO, true).toBool());
     this->setSaveInfosOnApp(this->m_pGlobalData->m_pMainUserSettings->value(SETT_SAVE_INFOS_ON_APP, true).toBool());
+    this->setUseVersionPopup(this->m_pGlobalData->m_pMainUserSettings->value(SETT_USE_VERSION_POPUP, true).toBool());
     this->setDebugIP(this->m_pGlobalData->m_pMainUserSettings->value(SETT_DEBUG_IP, "").toString());
     this->setDebugIPWifi(this->m_pGlobalData->m_pMainUserSettings->value(SETT_DEBUG_IP_WIFI, "").toString());
     this->m_lastShownVersion = this->m_pGlobalData->m_pMainUserSettings->value(SETT_LAST_SHOWN_VERSION, "").toString();
@@ -74,6 +76,7 @@ void GlobalSettings::saveGlobalSettings()
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_USE_READABLE_NAME, this->m_useReadableName);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_LOAD_GAME_INFO, this->m_loadGameInfo);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_SAVE_INFOS_ON_APP, this->m_saveInfosOnApp);
+    this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_USE_VERSION_POPUP, this->m_useVersionPopup);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_DEBUG_IP, this->m_debugIP);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_DEBUG_IP_WIFI, this->m_debugIPWifi);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_LAST_SHOWN_VERSION, this->m_lastShownVersion);
@@ -178,10 +181,11 @@ QString GlobalSettings::getVersionChangeInfo()
 {
     QString rValue;
 
-    rValue.append("<b>V1.0.5:</b>(XX.XX.XXXX)<br>");
+    rValue.append("<b>V1.0.5:</b>(16.12.2017)<br>");
     rValue.append("- Infos über letzte Neuigkeiten markieren<br>");
     rValue.append("- Framework Version aktualisiert<br>");
     rValue.append("- Fahrt bei Auswärtsspiel hinzugefügt<br>");
+    rValue.append("- Versionsupdate über Listview<br>");
 
     rValue.append("<br><b>V1.0.4:</b>(24.10.2017)<br>");
     rValue.append("- Fanclub Nachrichten (Mitglieder)<br>");

@@ -694,7 +694,7 @@ qint64 GlobalData::getNewsDataLastServerUpdate()
 void GlobalData::resetAllNewsDataEvents()
 {
     for (int i = 0; i < this->m_lNewsDataItems.count(); i++) {
-        this->m_lNewsDataItems[i]->setIsEvent(false);
+        this->m_lNewsDataItems[i]->setEvent(0);
     }
 }
 
@@ -702,7 +702,7 @@ bool GlobalData::setNewsDataItemHasEvent(quint32 newsIndex)
 {
     for (int i = 0; i < this->m_lNewsDataItems.count(); i++) {
         if (this->m_lNewsDataItems[i]->index() == newsIndex) {
-            this->m_lNewsDataItems[i]->setIsEvent(true);
+            this->m_lNewsDataItems[i]->setEvent(this->m_lNewsDataItems[i]->event() + 1);
             return true;
         }
     }

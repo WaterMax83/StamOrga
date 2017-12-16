@@ -52,8 +52,8 @@ Rectangle {
 
     MyComponents.EventIndicator {
         id: eventIndicator
-        disableVisibility: true
-        eventCount : 1
+        disableVisibility: false
+        eventCount : 0
     }
 
     ColumnLayout {
@@ -130,7 +130,7 @@ Rectangle {
             labelHeaderItem.text = newsDataItem.header
             labelUserName.text = "von " + newsDataItem.user;
             labelTime.text = newsDataItem.timestampReadableLine();
-            eventIndicator.disableVisibility = !newsDataItem.event
+            eventIndicator.eventCount = newsDataItem.event
         }
     }
 }

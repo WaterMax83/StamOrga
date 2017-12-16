@@ -82,8 +82,6 @@ Flickable {
                 Layout.fillHeight: false
                 Layout.topMargin: 10
                 infoVisible: true
-                infoText: "Hallo Test"
-//                Layout.columnSpan: 2
             }
 
             Column {
@@ -246,5 +244,12 @@ Flickable {
     }
 
     ScrollIndicator.vertical: ScrollIndicator {
+    }
+
+    function showLoadingGameInfosInternal(text, loading)
+    {
+        busyIndicatorGames.loadingVisible = loading
+        if (text !== "")
+            busyIndicatorGames.infoText = text
     }
 }
