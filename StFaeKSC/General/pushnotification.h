@@ -65,9 +65,10 @@ public:
     QString m_fcmToken;
     quint32 m_userIndex;
     qint32  m_oSystem;
+    QString m_version;
 
     AppTokenUID(QString guid, QString token, qint64 timestamp, quint32 userIndex,
-                qint32 system, quint32 index)
+                qint32 system, quint32 index, QString version)
     {
         this->m_itemName  = "";
         this->m_timestamp = timestamp;
@@ -77,6 +78,7 @@ public:
         this->m_guid      = guid;
         this->m_fcmToken  = token;
         this->m_oSystem   = system;
+        this->m_version   = version;
     }
 };
 
@@ -85,6 +87,7 @@ public:
 #define APP_TOKEN_TOKEN     "Token"
 #define APP_TOKEN_USERINDEX "UserIndex"
 #define APP_TOKEN_SYSTEM    "OS"
+#define APP_TOKEN_VERSION   "Version"
 // clang-format on
 
 class PushNotification : public BackgroundWorker, public ConfigList
@@ -96,7 +99,8 @@ public:
 
     void initialize(GlobalData* pGlobalData);
 
-    qint32 addNewAppInformation(QString guid, QString fcmToken, qint32 system, quint32 userIndex);
+    qint32 addNewAppInformation(const QString guid, const QString fcmToken, const qint32 system, const quint32 userIndex);
+    qint32 addNewVersionInformation(const QString guid, const QString version);
 
     void showCurrentTokenInformation();
 

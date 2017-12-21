@@ -71,6 +71,7 @@ protected:
     int DoBackgroundWork();
 
 private:
+    bool             m_initialized;
     QFile*           m_logFile;
     QList<LogEntry*> m_logEntries;
     QMutex           m_internalMutex;

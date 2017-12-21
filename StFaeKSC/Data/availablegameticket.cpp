@@ -294,18 +294,22 @@ qint32 AvailableGameTickets::checkConsistency()
             continue;
         }
 
-        if (pTicketInfo->m_userID != pWrittenTicket->m_userID)
+        if (pTicketInfo->m_userID != pWrittenTicket->m_userID) {
             this->updateItemValue(pTicketInfo, AVAILABLE_USER_ID, QVariant(pTicketInfo->m_userID), this->m_lastUpdateTimeStamp);
-
-        if (pTicketInfo->m_state != pWrittenTicket->m_state)
+            qInfo().noquote() << QString("Fix consistency of userID at game %1 to %2").arg(this->m_gameIndex).arg(pTicketInfo->m_userID);
+        }
+        if (pTicketInfo->m_state != pWrittenTicket->m_state) {
             this->updateItemValue(pTicketInfo, AVAILABLE_STATE, QVariant(pTicketInfo->m_state), this->m_lastUpdateTimeStamp);
-
-        if (pTicketInfo->m_itemName != pWrittenTicket->m_itemName)
+            qInfo().noquote() << QString("Fix consistency of state at game %1 to %2").arg(this->m_gameIndex).arg(pTicketInfo->m_state);
+        }
+        if (pTicketInfo->m_itemName != pWrittenTicket->m_itemName) {
             this->updateItemValue(pTicketInfo, ITEM_NAME, QVariant(pTicketInfo->m_itemName), this->m_lastUpdateTimeStamp);
-
-        if (pTicketInfo->m_timestamp != pWrittenTicket->m_timestamp)
+            qInfo().noquote() << QString("Fix consistency of name at game %1 to %2").arg(this->m_gameIndex).arg(pTicketInfo->m_itemName);
+        }
+        if (pTicketInfo->m_timestamp != pWrittenTicket->m_timestamp) {
             this->updateItemValue(pTicketInfo, ITEM_TIMESTAMP, QVariant(pTicketInfo->m_timestamp), this->m_lastUpdateTimeStamp);
-
+            qInfo().noquote() << QString("Fix consistency of timestamp at game %1 to %2").arg(this->m_gameIndex).arg(pTicketInfo->m_timestamp);
+        }
         delete pWrittenTicket;
     }
 

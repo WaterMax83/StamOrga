@@ -78,8 +78,12 @@ Flickable {
                implicitWidth: parent.width / 3 * 2
                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                onClicked: {
-                    globalUserData.deleteCurrentLoggingFile(logFilesCombo.currentIndex);
-                    pageOpenedUpdateView();
+                   globalUserData.deleteCurrentLoggingFile(logFilesCombo.currentIndex);
+                   if (logFilesCombo.count > 0)
+                       txtLogging.text = globalUserData.getCurrentLoggingList(logFilesCombo.currentIndex);
+                   else
+                       txtLogging.text = globalUserData.getCurrentLoggingList(0);
+//                   pageOpenedUpdateView();
                }
            }
        }

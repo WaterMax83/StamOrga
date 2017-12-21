@@ -309,11 +309,20 @@ quint16 GlobalData::getAcceptedNumber(const quint32 gamesIndex, const quint32 st
     if (pGame == NULL)
         return 0;
 
+    quint16 rValue = 0;
     foreach (MeetingInfo* info, this->m_meetingInfos) {
-        if (info->getGameIndex() == gamesIndex)
-            return info->getAcceptedNumber(state);
+        if (info->getGameIndex() == gamesIndex) {
+            rValue += info->getAcceptedNumber(state);
+            break;
+        }
     }
-    return 0;
+    foreach (MeetingInfo* info, this->m_awayTripInfos) {
+        if (info->getGameIndex() == gamesIndex) {
+            rValue += info->getAcceptedNumber(state);
+            break;
+        }
+    }
+    return rValue;
 }
 
 quint16 GlobalData::getMeetingInfoValue(const quint32 gamesIndex)
@@ -329,7 +338,28 @@ quint16 GlobalData::getMeetingInfoValue(const quint32 gamesIndex)
 
     foreach (MeetingInfo* info, this->m_meetingInfos) {
         if (info->getGameIndex() == gamesIndex) {
-            return 1;
+            QString sInfo, when, where;
+            info->getMeetingInfo(when, where, sInfo);
+            if (!when.isEmpty() || !where.isEmpty() || !sInfo.isEmpty())
+                return 1;
+            if (info->getAcceptedNumber(ACCEPT_STATE_ACCEPT) > 0)
+                return 1;
+            if (info->getAcceptedNumber(ACCEPT_STATE_MAYBE) > 0)
+                return 1;
+            break;
+        }
+    }
+    foreach (MeetingInfo* info, this->m_awayTripInfos) {
+        if (info->getGameIndex() == gamesIndex) {
+            QString sInfo, when, where;
+            info->getMeetingInfo(when, where, sInfo);
+            if (!when.isEmpty() || !where.isEmpty() || !sInfo.isEmpty())
+                return 1;
+            if (info->getAcceptedNumber(ACCEPT_STATE_ACCEPT) > 0)
+                return 1;
+            if (info->getAcceptedNumber(ACCEPT_STATE_MAYBE) > 0)
+                return 1;
+            break;
         }
     }
     return 0;
@@ -559,7 +589,11 @@ qint32 GlobalData::requestAcceptMeetingInfo(const quint32 gameIndex, const quint
         }
     }
 
-    MeetingInfo* mInfo = new MeetingInfo();
+    MeetingInfo* mInfo;
+    if (type == MEETING_TYPE_MEETING)
+        mInfo = new MeetingInfo();
+    else
+        mInfo = new AwayTripInfo();
     if (mInfo->initialize(pGame->m_saison, pGame->m_competition, pGame->m_saisonIndex, pGame->m_index)) {
         pList->append(mInfo);
         result = mInfo->addNewAcceptation(acceptValue, userID, name);

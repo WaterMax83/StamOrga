@@ -479,7 +479,8 @@ qint64 PushNotification::getNextInternalPushNumber()
     return savedIndex;
 }
 
-qint32 PushNotification::addNewAppInformation(QString guid, QString fcmToken, qint32 system, quint32 userIndex)
+qint32 PushNotification::addNewAppInformation(const QString guid, const QString fcmToken,
+                                              const qint32 system, const quint32 userIndex)
 {
     qint64       timestamp = QDateTime::currentMSecsSinceEpoch();
     AppTokenUID* app;
@@ -522,6 +523,7 @@ qint32 PushNotification::addNewAppInformation(QString guid, QString fcmToken, qi
     this->m_pConfigSettings->setValue(APP_TOKEN_TOKEN, fcmToken);
     this->m_pConfigSettings->setValue(APP_TOKEN_SYSTEM, system);
     this->m_pConfigSettings->setValue(APP_TOKEN_USERINDEX, userIndex);
+    this->m_pConfigSettings->setValue(APP_TOKEN_VERSION, "");
 
     this->m_pConfigSettings->endArray();
     this->m_pConfigSettings->endGroup();
@@ -529,12 +531,35 @@ qint32 PushNotification::addNewAppInformation(QString guid, QString fcmToken, qi
 
     this->m_mConfigIniMutex.unlock();
 
-    app = new AppTokenUID(guid, fcmToken, timestamp, userIndex, system, newIndex);
+    app = new AppTokenUID(guid, fcmToken, timestamp, userIndex, system, newIndex, "");
 
     this->addNewAppToken(app, false);
 
     qInfo().noquote() << QString("Added new App Information: %1").arg(guid);
     return newIndex;
+}
+
+qint32 PushNotification::addNewVersionInformation(const QString guid, const QString version)
+{
+    qint64       timestamp = QDateTime::currentMSecsSinceEpoch();
+    AppTokenUID* app;
+    if ((app = this->appInfoExists(guid)) != NULL) {
+
+        this->m_mInternalInfoMutex.lock();
+
+        if (app->m_version != version) {
+            if (this->updateItemValue(app, APP_TOKEN_VERSION, QVariant(version)))
+                app->m_version = version;
+
+            if (this->updateItemValue(app, ITEM_TIMESTAMP, QVariant(timestamp)))
+                app->m_timestamp = timestamp;
+        }
+
+        this->m_mInternalInfoMutex.unlock();
+        return app->m_index;
+    }
+
+    return ERROR_CODE_SUCCESS;
 }
 
 AppTokenUID* PushNotification::appInfoExists(QString guid)
@@ -570,8 +595,9 @@ void PushNotification::loadCurrentInteralList()
             QString token     = this->m_pConfigSettings->value(APP_TOKEN_TOKEN, "").toString();
             qint32  system    = this->m_pConfigSettings->value(APP_TOKEN_SYSTEM, -1).toInt();
             quint32 userIndex = this->m_pConfigSettings->value(APP_TOKEN_USERINDEX, 0).toUInt();
+            QString version   = this->m_pConfigSettings->value(APP_TOKEN_VERSION, "").toString();
 
-            AppTokenUID* app = new AppTokenUID(guid, token, timestamp, userIndex, system, index);
+            AppTokenUID* app = new AppTokenUID(guid, token, timestamp, userIndex, system, index, version);
 
             if (!this->addNewAppToken(app))
                 bProblems = true;
@@ -616,13 +642,15 @@ void PushNotification::showCurrentTokenInformation()
         AppTokenUID* app = (AppTokenUID*)(this->getItemFromArrayIndex(i));
         if (app == NULL)
             continue;
-        QString date  = QDateTime::fromMSecsSinceEpoch(app->m_timestamp).toString("dd.MM.yyyy hh:mm");
-        QString token = app->m_fcmToken == "" ? "Kein Token" : app->m_fcmToken;
+        QString date    = QDateTime::fromMSecsSinceEpoch(app->m_timestamp).toString("dd.MM.yyyy hh:mm");
+        QString token   = app->m_fcmToken == "" ? "Kein Token" : app->m_fcmToken;
+        QString version = app->m_version == "" ? "Keine Version" : app->m_version;
         std::cout << QString("%1: ").arg(app->m_index).toStdString()
                   << this->m_pGlobalData->m_UserList.getItemName(app->m_userIndex).toStdString()
                   << (QString(" - %1 - %3 - %2").arg(date, app->m_guid).arg(app->m_oSystem)).toStdString()
                   << std::endl
-                  << token.toStdString() << std::endl;
+                  << "\t" << token.toStdString() << std::endl
+                  << "\t" << version.toStdString() << std::endl;
     }
 }
 
@@ -648,6 +676,7 @@ void PushNotification::saveCurrentInteralList()
         this->m_pConfigSettings->setValue(APP_TOKEN_TOKEN, pItem->m_fcmToken);
         this->m_pConfigSettings->setValue(APP_TOKEN_SYSTEM, pItem->m_oSystem);
         this->m_pConfigSettings->setValue(APP_TOKEN_USERINDEX, pItem->m_userIndex);
+        this->m_pConfigSettings->setValue(APP_TOKEN_VERSION, pItem->m_version);
     }
 
     this->m_pConfigSettings->endArray();
