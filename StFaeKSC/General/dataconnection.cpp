@@ -472,7 +472,7 @@ MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol* msg)
         quint16 acceptedMeeting = this->m_pGlobalData->getAcceptedNumber(pGame->m_index, ACCEPT_STATE_ACCEPT);
         quint16 interestMeeting = this->m_pGlobalData->getAcceptedNumber(pGame->m_index, ACCEPT_STATE_MAYBE);
         quint16 declinedMeeting = this->m_pGlobalData->getAcceptedNumber(pGame->m_index, ACCEPT_STATE_DECLINE);
-        quint16 meetInfo        = qToLittleEndian(this->m_pGlobalData->getMeetingInfoValue(pGame->m_index));
+        quint16 meetInfo        = this->m_pGlobalData->getMeetingInfoValue(pGame->m_index);
 
         if (freeTickets == 0 && reservedTickets == 0 && acceptedMeeting == 0 && interestMeeting == 0 && declinedMeeting == 0 && meetInfo == 0)
             continue;
@@ -505,6 +505,7 @@ MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol* msg)
         memcpy(&buffer[offset], &declinedMeeting, sizeof(quint16));
         offset += sizeof(quint16);
 
+        meetInfo = qToLittleEndian(meetInfo);
         memcpy(&buffer[offset], &meetInfo, sizeof(quint16));
         offset += sizeof(quint16);
     }

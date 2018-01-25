@@ -206,6 +206,87 @@ Rectangle {
                 }
             }
 
+            Image {
+                id: imageTripIsPresent
+                anchors.top : parent.top
+                Layout.rightMargin: acceptedTripItem.visible ? 0 : 5
+                anchors.topMargin: 3
+                Layout.alignment: Qt.AlignRight
+                Layout.preferredWidth: labelLineDate.height / 1.2
+                Layout.preferredHeight: labelLineDate.height / 1.2
+                source: "../images/train.png";
+                visible: false
+            }
+
+
+            RowLayout {
+                id: acceptedTripItem
+                visible: false
+                spacing: 0
+                Layout.rightMargin: interestMeetingItem.visible ? 0 : freeTicketsItem.visible ? 10 : 5
+                Text {
+                    id: labelAcceptedTrip
+                    topPadding: 3
+                    color: "white"
+                    font.pixelSize: 14
+                    Layout.alignment: Qt.AlignRight
+                }
+
+                Item {
+                    Layout.preferredHeight: labelAcceptedTrip.height / 1.2
+                    Layout.preferredWidth: labelAcceptedTrip.height / 1.2
+                    anchors.top : parent.top
+                    anchors.right: parent. right
+
+                    anchors.topMargin: 3
+                    Layout.alignment: Qt.AlignRight
+                    Image {
+                        id: imageAcceptedTrip
+                        anchors.fill: parent
+                        source: "../images/done.png";
+                    }
+                    ColorOverlay {
+                        anchors.fill: imageAcceptedTrip
+                        source: imageAcceptedTrip
+                        color: "green"
+                    }
+                }
+            }
+
+            RowLayout {
+                id: interestTripItem
+                visible: false
+                spacing: 0
+                Layout.rightMargin: freeTicketsItem.visible ? 10 : 5
+                Text {
+                    id: labelInterestTrip
+                    topPadding: 3
+                    color: "white"
+                    font.pixelSize: 14
+                    Layout.alignment: Qt.AlignRight
+                }
+
+                Item {
+                    Layout.preferredHeight: labelInterestTrip.height / 1.2
+                    Layout.preferredWidth: labelInterestTrip.height / 1.2
+                    anchors.top : parent.top
+                    anchors.right: parent. right
+
+                    anchors.topMargin: 3
+                    Layout.alignment: Qt.AlignRight
+                    Image {
+                        id: imageInterestTrip
+                        anchors.fill: parent
+                        source: "../images/help.png";
+                    }
+                    ColorOverlay {
+                        anchors.fill: imageInterestTrip
+                        source: imageInterestTrip
+                        color: "orange"
+                    }
+                }
+            }
+
             RowLayout {
                 id: freeTicketsItem
                 visible: false
@@ -337,6 +418,21 @@ Rectangle {
                 if (interestMeeting > 0) {
                     interestMeetingItem.visible = true;
                     labelInterestMeeting.text = interestMeeting;
+                }
+            }
+
+            var tripPresend = gamePlayItem.getTripInfo();
+            if (tripPresend > 0) {
+                imageTripIsPresent.visible = true
+                var acceptedTrip = gamePlayItem.getAcceptedTripCount();
+                if (acceptedTrip > 0) {
+                    acceptedTripItem.visible = true;
+                    labelAcceptedTrip.text = acceptedTrip;
+                }
+                var interestTrip = gamePlayItem.getInterestedTripCount();
+                if (interestTrip > 0) {
+                    interestTripItem.visible = true;
+                    labelInterestTrip.text = interestTrip;
                 }
             }
 

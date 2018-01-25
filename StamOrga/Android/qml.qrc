@@ -75,5 +75,7 @@
         <file>components/CustomButton.qml</file>
         <file>components/CustomDialog.qml</file>
         <file>components/EventIndicator.qml</file>
+        <file>images/+material/train.png</file>
+        <file>images/train.png</file>
     </qresource>
 </RCC>

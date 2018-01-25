@@ -78,6 +78,7 @@ void GlobalData::initialize()
     }
 
     userSetDir.setPath(userSetDirPath + "AwayTrips/");
+    nameFilter.clear();
     nameFilter << "AwayTrips_Game_*.ini";
     infoConfigList = userSetDir.entryList(nameFilter, QDir::Files | QDir::Readable);
     foreach (QString file, infoConfigList) {

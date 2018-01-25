@@ -596,14 +596,14 @@ qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg, const quint3
         pInfo->addNewAcceptInfo(ami);
         counter++;
 
-        if (type == MEETING_TYPE_MEETING) {
-            if (value == ACCEPT_STATE_ACCEPT)
-                acceptMeeting++;
-            else if (value == ACCEPT_STATE_MAYBE)
-                interestMeeting++;
-            else if (value == ACCEPT_STATE_DECLINE)
-                declineMeeting++;
-        }
+        //        if (type == MEETING_TYPE_MEETING) {
+        if (value == ACCEPT_STATE_ACCEPT)
+            acceptMeeting++;
+        else if (value == ACCEPT_STATE_MAYBE)
+            interestMeeting++;
+        else if (value == ACCEPT_STATE_DECLINE)
+            declineMeeting++;
+        //        }
     }
 
     GamePlay* game = this->m_pGlobalData->getGamePlay(gameIndex);
@@ -613,6 +613,11 @@ qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg, const quint3
             game->setInterestedMeetingCount(interestMeeting);
             game->setDeclinedMeetingCount(declineMeeting);
             game->setMeetingInfo(1);
+        } else if (type == MEETING_TYPE_AWAYTRIP) {
+            game->setAcceptedTripCount(acceptMeeting);
+            game->setInterestedTripCount(interestMeeting);
+            game->setDeclinedTripCount(declineMeeting);
+            game->setTripInfo(1);
         }
     }
 
