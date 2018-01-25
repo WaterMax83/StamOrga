@@ -94,7 +94,11 @@ MessageProtocol* DataConnection::requestGetUserProperties(MessageProtocol* msg)
         memcpy(&system, pData + offset, sizeof(qint32));
         system = qFromLittleEndian(system);
 
+        this->m_pUserConData->m_guid = guid;
         g_pushNotify->addNewAppInformation(guid, token, system, this->m_pUserConData->m_userID);
+
+        if (!this->m_pUserConData->m_version.isEmpty())
+            g_pushNotify->addNewVersionInformation(guid, this->m_pUserConData->m_version);
     }
 
     QByteArray  answer;
@@ -265,6 +269,9 @@ MessageProtocol* DataConnection::requestGetProgramVersion(MessageProtocol* msg)
     ownVersion.append(QString(STAM_ORGA_VERSION_S));
 #endif
 
+    this->m_pUserConData->m_version = remVersion;
+    if (!this->m_pUserConData->m_guid.isEmpty())
+        g_pushNotify->addNewVersionInformation(this->m_pUserConData->m_guid, remVersion);
 
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_VERSION, ownVersion);
 }

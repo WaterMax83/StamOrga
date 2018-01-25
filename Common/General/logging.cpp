@@ -48,8 +48,9 @@ void logMyMessageLogginOutPut(QtMsgType type, const QMessageLogContext& context,
 Logging::Logging(QObject* parent)
     : BackgroundWorker(parent)
 {
-    this->m_logFile   = NULL;
-    this->m_hourTimer = NULL;
+    this->m_logFile     = NULL;
+    this->m_hourTimer   = NULL;
+    this->m_initialized = false;
 }
 
 void Logging::initialize()
@@ -72,7 +73,6 @@ int Logging::DoBackgroundWork()
     this->slotEveryHourTimeout();
 
     QString loggingPath = this->createLoggingFilePath();
-
     if (loggingPath.size() > 0) {
 
         /* Read all old log files */
@@ -89,6 +89,8 @@ int Logging::DoBackgroundWork()
     }
 
     connect(this, &Logging::signalNewLogEntries, this, &Logging::slotNewLogEntries);
+
+    this->m_initialized = true;
 
     return 0;
 }
@@ -109,6 +111,9 @@ void Logging::addNewEntry(QtMsgType type, /*const QMessageLogContext context, */
 
 int Logging::showLoggingInfo(quint16 numbOfLines)
 {
+    if (!this->m_initialized)
+        return 0;
+
     QMutexLocker lock(&this->m_internalMutex);
 
     QList<QString> aList = this->m_currentLogging.split("\n");
@@ -128,6 +133,9 @@ int Logging::showLoggingInfo(quint16 numbOfLines)
 
 void Logging::clearCurrentLoggingList(int index)
 {
+    if (!this->m_initialized)
+        return;
+
     if (this->m_lastLogFiles.size() > 0 && index >= 0 && index < this->m_lastLogFiles.size()) {
         QFile file(this->m_lastLogFiles[index]);
         if (file.open(QFile::WriteOnly)) {
@@ -142,6 +150,9 @@ void Logging::clearCurrentLoggingList(int index)
 
 QString Logging::getCurrentLoggingList(int index)
 {
+    if (!this->m_initialized)
+        return "";
+
     if (this->m_lastLogFiles.size() > 0 && index >= 0 && index < this->m_lastLogFiles.size()) {
         QFile file(this->m_lastLogFiles[index]);
         if (file.open(QFile::ReadOnly))
@@ -153,9 +164,12 @@ QString Logging::getCurrentLoggingList(int index)
 
 QStringList Logging::getLogFileDates()
 {
+    QStringList rValue;
+    if (!this->m_initialized)
+        return rValue;
+
     QMutexLocker lock(&this->m_internalMutex);
 
-    QStringList rValue;
     foreach (QString file, this->m_lastLogFiles) {
         QFileInfo info(file);
         rValue.append(info.fileName().replace(".log", ""));
@@ -189,6 +203,9 @@ QString Logging::createLoggingFilePath()
 
 void Logging::slotNewLogEntries()
 {
+    if (!this->m_initialized)
+        return;
+
     while (true) {
 
         this->m_entryListMutex.lock();
@@ -266,7 +283,7 @@ void Logging::slotEveryHourTimeout()
             else
                 qWarning().noquote() << QString("Could not create symbolic link for current log file %1").arg(loggingPath);
 #endif
-            if (!this->m_lastLogFiles.contains(loggingPath))
+            if (this->m_initialized && !this->m_lastLogFiles.contains(loggingPath))
                 this->m_lastLogFiles.append(loggingPath);
         }
     }

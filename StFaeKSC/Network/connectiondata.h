@@ -29,6 +29,8 @@ struct UserConData {
     QString      m_userName;
     qint32       m_userID;
     QString      m_randomLogin;
+    QString      m_guid;
+    QString      m_version;
     bool         m_bIsConnected;
 };
 
