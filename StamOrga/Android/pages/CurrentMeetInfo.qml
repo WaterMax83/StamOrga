@@ -163,7 +163,7 @@ Flickable {
             MyComponents.EditableTextWithHint {
                 id: textWhere
                 hint: "Wo"
-                imageSource: "../images/place.png"
+                imageSource: meetingType === 0 ? "../images/place.png" : "../images/train.png"
                 enableImage: true
                 width: parent.width
                 enabled: isEditMode

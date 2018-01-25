@@ -53,8 +53,8 @@ public:
                                     const qint32 userID, const quint32 type, qint64& messageID);
 
     quint16 getTicketNumber(const quint32 gamesIndex, const quint32 state);
-    quint16 getAcceptedNumber(const quint32 gamesIndex, const quint32 state);
-    quint16 getMeetingInfoValue(const quint32 gamesIndex);
+    quint16 getAcceptedNumber(const quint32 type, const quint32 gamesIndex, const quint32 state);
+    quint16 getMeetingInfoValue(const quint32 type, const quint32 gamesIndex);
 
     qint32 addNewUserEvent(const QString type, const QString info, const qint32 userID);
     qint32 getCurrentUserEvents(QByteArray& destArray, const qint32 userID);

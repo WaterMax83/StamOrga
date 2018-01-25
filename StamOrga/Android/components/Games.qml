@@ -406,6 +406,9 @@ Rectangle {
             if (!gamePlayItem.timeFixed)
                 labelLineTimeNotFixed.visible = true
 
+            acceptedMeetingItem.visible = false;
+            interestMeetingItem.visible = false;
+            imageMeetingIsPresent.visible = false;
             var meetingPresent = gamePlayItem.getMeetingInfo();
             if (meetingPresent > 0) {
                 imageMeetingIsPresent.visible = true
@@ -413,7 +416,8 @@ Rectangle {
                 if (acceptedMeeting > 0) {
                     acceptedMeetingItem.visible = true;
                     labelAcceptedMeeting.text = acceptedMeeting;
-                }
+                } else
+
                 var interestMeeting = gamePlayItem.getInterestedMeetingCount();
                 if (interestMeeting > 0) {
                     interestMeetingItem.visible = true;
@@ -421,6 +425,9 @@ Rectangle {
                 }
             }
 
+            acceptedTripItem.visible = false;
+            interestTripItem.visible = false;
+            imageTripIsPresent.visible = false;
             var tripPresend = gamePlayItem.getTripInfo();
             if (tripPresend > 0) {
                 imageTripIsPresent.visible = true

@@ -423,6 +423,8 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
  */
 
 #define GAME_INFO_SIZE 18
+#define GAME_INFO_TRIP 8
+
 MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol* msg)
 {
     if (msg->getDataLength() != 8) {
@@ -452,7 +454,10 @@ MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol* msg)
 
     offset += sizeof(quint32); // status is not yet used
 
-    quint16 size = qToLittleEndian(GAME_INFO_SIZE);
+    quint16 sizeOfGame = GAME_INFO_SIZE;
+    if (msg->getVersion() >= MSG_HEADER_ADD_AWAYTRIP_INFO)
+        sizeOfGame += GAME_INFO_TRIP;
+    quint16 size = qToLittleEndian(sizeOfGame);
     memcpy(&buffer[offset], &size, sizeof(quint16));
     offset += sizeof(quint32); // reserved is not yet used
 
@@ -463,7 +468,7 @@ MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol* msg)
 
     for (qint32 i = 0; i < numbOfGames; i++) {
 
-        if (offset + GAME_INFO_SIZE > 5000)
+        if (offset + sizeOfGame > 5000)
             break;
 
         GamesPlay* pGame = (GamesPlay*)(this->m_pGlobalData->m_GamesList.getRequestConfigItemFromListIndex(i));
@@ -476,12 +481,18 @@ MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol* msg)
         quint16 freeTickets     = this->m_pGlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_FREE);
         quint16 blockTickets    = this->m_pGlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_BLOCKED);
         quint16 reservedTickets = this->m_pGlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_RESERVED);
-        quint16 acceptedMeeting = this->m_pGlobalData->getAcceptedNumber(pGame->m_index, ACCEPT_STATE_ACCEPT);
-        quint16 interestMeeting = this->m_pGlobalData->getAcceptedNumber(pGame->m_index, ACCEPT_STATE_MAYBE);
-        quint16 declinedMeeting = this->m_pGlobalData->getAcceptedNumber(pGame->m_index, ACCEPT_STATE_DECLINE);
-        quint16 meetInfo        = this->m_pGlobalData->getMeetingInfoValue(pGame->m_index);
+        quint16 acceptedMeeting = this->m_pGlobalData->getAcceptedNumber(MEETING_TYPE_MEETING, pGame->m_index, ACCEPT_STATE_ACCEPT);
+        quint16 interestMeeting = this->m_pGlobalData->getAcceptedNumber(MEETING_TYPE_MEETING, pGame->m_index, ACCEPT_STATE_MAYBE);
+        quint16 declinedMeeting = this->m_pGlobalData->getAcceptedNumber(MEETING_TYPE_MEETING, pGame->m_index, ACCEPT_STATE_DECLINE);
+        quint16 meetInfo        = this->m_pGlobalData->getMeetingInfoValue(MEETING_TYPE_MEETING, pGame->m_index);
+        quint16 acceptedTrip    = this->m_pGlobalData->getAcceptedNumber(MEETING_TYPE_AWAYTRIP, pGame->m_index, ACCEPT_STATE_ACCEPT);
+        quint16 interestTrip    = this->m_pGlobalData->getAcceptedNumber(MEETING_TYPE_AWAYTRIP, pGame->m_index, ACCEPT_STATE_MAYBE);
+        quint16 declinedTrip    = this->m_pGlobalData->getAcceptedNumber(MEETING_TYPE_AWAYTRIP, pGame->m_index, ACCEPT_STATE_DECLINE);
+        quint16 tripInfo        = this->m_pGlobalData->getMeetingInfoValue(MEETING_TYPE_AWAYTRIP, pGame->m_index);
 
-        if (freeTickets == 0 && reservedTickets == 0 && acceptedMeeting == 0 && interestMeeting == 0 && declinedMeeting == 0 && meetInfo == 0)
+        if (freeTickets == 0 && reservedTickets == 0 &&
+            acceptedMeeting == 0 && interestMeeting == 0 && declinedMeeting == 0 && meetInfo == 0 &&
+            acceptedTrip == 0 && interestTrip == 0 && declinedTrip == 0 && tripInfo == 0)
             continue;
 
         quint32 gameIndex = qToLittleEndian(pGame->m_index);
@@ -515,6 +526,24 @@ MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol* msg)
         meetInfo = qToLittleEndian(meetInfo);
         memcpy(&buffer[offset], &meetInfo, sizeof(quint16));
         offset += sizeof(quint16);
+
+        if (msg->getVersion() >= MSG_HEADER_ADD_AWAYTRIP_INFO) {
+            acceptedTrip = qToLittleEndian(acceptedTrip);
+            memcpy(&buffer[offset], &acceptedTrip, sizeof(quint16));
+            offset += sizeof(quint16);
+
+            interestTrip = qToLittleEndian(interestTrip);
+            memcpy(&buffer[offset], &interestTrip, sizeof(quint16));
+            offset += sizeof(quint16);
+
+            declinedTrip = qToLittleEndian(declinedTrip);
+            memcpy(&buffer[offset], &declinedTrip, sizeof(quint16));
+            offset += sizeof(quint16);
+
+            tripInfo = qToLittleEndian(tripInfo);
+            memcpy(&buffer[offset], &tripInfo, sizeof(quint16));
+            offset += sizeof(quint16);
+        }
     }
 
     qInfo().noquote() << QString("User %1 request Games Info List").arg(this->m_pUserConData->m_userName);

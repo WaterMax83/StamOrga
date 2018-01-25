@@ -40,6 +40,7 @@ struct msg_Header {
 #define MSG_HEADER_VERSION_GAME_LIST    0x3
 #define MSG_HEADER_VERSION_MESSAGE_ID   0x4     // V1.0.3
 #define MSG_HEADER_ADD_FANCLUB          0x5     // 20.09.17 for V1.0.4
+#define MSG_HEADER_ADD_AWAYTRIP_INFO    0x6     // 25.01.18 for V1.0.6
 // clang-format on
 
 #define MSG_HEADER_VERSION MSG_HEADER_ADD_FANCLUB

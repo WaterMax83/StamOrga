@@ -299,7 +299,7 @@ quint16 GlobalData::getTicketNumber(const quint32 gamesIndex, const quint32 stat
     return 0;
 }
 
-quint16 GlobalData::getAcceptedNumber(const quint32 gamesIndex, const quint32 state)
+quint16 GlobalData::getAcceptedNumber(const quint32 type, const quint32 gamesIndex, const quint32 state)
 {
     if (!this->m_initalized)
         return ERROR_CODE_NOT_READY;
@@ -311,22 +311,25 @@ quint16 GlobalData::getAcceptedNumber(const quint32 gamesIndex, const quint32 st
         return 0;
 
     quint16 rValue = 0;
-    foreach (MeetingInfo* info, this->m_meetingInfos) {
-        if (info->getGameIndex() == gamesIndex) {
-            rValue += info->getAcceptedNumber(state);
-            break;
+    if (type == MEETING_TYPE_MEETING) {
+        foreach (MeetingInfo* info, this->m_meetingInfos) {
+            if (info->getGameIndex() == gamesIndex) {
+                rValue += info->getAcceptedNumber(state);
+                break;
+            }
         }
-    }
-    foreach (MeetingInfo* info, this->m_awayTripInfos) {
-        if (info->getGameIndex() == gamesIndex) {
-            rValue += info->getAcceptedNumber(state);
-            break;
+    } else if (type == MEETING_TYPE_AWAYTRIP) {
+        foreach (MeetingInfo* info, this->m_awayTripInfos) {
+            if (info->getGameIndex() == gamesIndex) {
+                rValue += info->getAcceptedNumber(state);
+                break;
+            }
         }
     }
     return rValue;
 }
 
-quint16 GlobalData::getMeetingInfoValue(const quint32 gamesIndex)
+quint16 GlobalData::getMeetingInfoValue(const quint32 type, const quint32 gamesIndex)
 {
     if (!this->m_initalized)
         return ERROR_CODE_NOT_READY;
@@ -337,30 +340,33 @@ quint16 GlobalData::getMeetingInfoValue(const quint32 gamesIndex)
     if (pGame == NULL)
         return 0;
 
-    foreach (MeetingInfo* info, this->m_meetingInfos) {
-        if (info->getGameIndex() == gamesIndex) {
-            QString sInfo, when, where;
-            info->getMeetingInfo(when, where, sInfo);
-            if (!when.isEmpty() || !where.isEmpty() || !sInfo.isEmpty())
-                return 1;
-            if (info->getAcceptedNumber(ACCEPT_STATE_ACCEPT) > 0)
-                return 1;
-            if (info->getAcceptedNumber(ACCEPT_STATE_MAYBE) > 0)
-                return 1;
-            break;
+    if (type == MEETING_TYPE_MEETING) {
+        foreach (MeetingInfo* info, this->m_meetingInfos) {
+            if (info->getGameIndex() == gamesIndex) {
+                QString sInfo, when, where;
+                info->getMeetingInfo(when, where, sInfo);
+                if (!when.isEmpty() || !where.isEmpty() || !sInfo.isEmpty())
+                    return 1;
+                if (info->getAcceptedNumber(ACCEPT_STATE_ACCEPT) > 0)
+                    return 1;
+                if (info->getAcceptedNumber(ACCEPT_STATE_MAYBE) > 0)
+                    return 1;
+                break;
+            }
         }
-    }
-    foreach (MeetingInfo* info, this->m_awayTripInfos) {
-        if (info->getGameIndex() == gamesIndex) {
-            QString sInfo, when, where;
-            info->getMeetingInfo(when, where, sInfo);
-            if (!when.isEmpty() || !where.isEmpty() || !sInfo.isEmpty())
-                return 1;
-            if (info->getAcceptedNumber(ACCEPT_STATE_ACCEPT) > 0)
-                return 1;
-            if (info->getAcceptedNumber(ACCEPT_STATE_MAYBE) > 0)
-                return 1;
-            break;
+    } else if (type == MEETING_TYPE_AWAYTRIP) {
+        foreach (MeetingInfo* info, this->m_awayTripInfos) {
+            if (info->getGameIndex() == gamesIndex) {
+                QString sInfo, when, where;
+                info->getMeetingInfo(when, where, sInfo);
+                if (!when.isEmpty() || !where.isEmpty() || !sInfo.isEmpty())
+                    return 1;
+                if (info->getAcceptedNumber(ACCEPT_STATE_ACCEPT) > 0)
+                    return 1;
+                if (info->getAcceptedNumber(ACCEPT_STATE_MAYBE) > 0)
+                    return 1;
+                break;
+            }
         }
     }
     return 0;
