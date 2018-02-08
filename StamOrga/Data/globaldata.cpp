@@ -66,6 +66,7 @@ GlobalData::GlobalData(QObject* parent)
 
     QQmlEngine::setObjectOwnership(&this->m_meetingInfo, QQmlEngine::CppOwnership);
     QQmlEngine::setObjectOwnership(&this->m_awayTripInfo, QQmlEngine::CppOwnership);
+    QQmlEngine::setObjectOwnership(&this->m_favoriteGame, QQmlEngine::CppOwnership);
 
     this->m_pMainUserSettings = new QSettings();
     this->m_pMainUserSettings->setIniCodec(("UTF-8"));
@@ -168,6 +169,8 @@ void GlobalData::loadGlobalSettings()
     this->m_bSeasonTicketLastUpdateDidChanges = false;
 
     this->resetNewsDataLastServerUpdate();
+
+    this->m_favoriteGame.initialize();
 }
 
 void GlobalData::saveGlobalUserSettings()

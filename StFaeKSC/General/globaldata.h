@@ -29,6 +29,7 @@
 #include "../Data/listeduser.h"
 #include "../Data/meetinginfo.h"
 #include "../Data/seasonticket.h"
+#include "../Data/statistic.h"
 #include "../Data/userevents.h"
 
 class GlobalData
@@ -69,7 +70,11 @@ public:
     QList<AwayTripInfo*>         m_awayTripInfos;
     QList<UserEvents*>           m_userEvents;
     QMutex                       m_globalDataMutex;
-    bool                         m_initalized;
+    qint32                       m_currentSeason;
+
+private:
+    bool      m_initalized;
+    Statistic m_statistic;
 };
 
 #endif // GLOBALDATA_H

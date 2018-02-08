@@ -59,17 +59,33 @@ ColumnLayout {
 
         Image {
             id: imageInfoItemButton
-            height: textItemName.height
-            width: textItemName.height
+            Layout.preferredHeight: textItemName.height / 10 * 11
+            Layout.preferredWidth:  textItemName.height / 10 * 11
             anchors.left: textItemName.right
             anchors.leftMargin: textItemName.width > textReservedFor.width ? 35 : 35 + (textReservedFor.width - textItemName.width)
             source: "../images/info.png"
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            var component = Qt.createComponent("../components/AcceptDialog.qml");
+                            if (component.status === Component.Ready) {
+                                var dialog = component.createObject(mainPaneCurrentGame,{popupType: 1});
+                                dialog.headerText = "Information";
+                                dialog.parentHeight = mainPaneCurrentGame.height
+                                dialog.parentWidth = mainPaneCurrentGame.width
+                                dialog.textToAccept = "Die Karte von<br><br><b>" + itemModel.title + "</b><br><br>befindet sich aktuell bei<br><br> <b>" + itemModel.place + "</b>";
+                                dialog.showCancelButton = false
+                                dialog.font.family= txtForFontFamily.font
+                                dialog.open();
+                            }
+                        }
+                    }
         }
         MouseArea {
-            anchors.top: imageInfoItemButton.top
-            anchors.bottom: imageInfoItemButton.bottom
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
             anchors.left: imageItemReserved.left
-            anchors.right: imageInfoItemButton.right
+            anchors.right: imageInfoItemButton.left
             onClicked: clickedItem();
         }
 
@@ -78,22 +94,6 @@ ColumnLayout {
             visible: false
         }
 
-        MouseArea {
-            anchors.fill: imageInfoItemButton
-            onClicked: {
-                var component = Qt.createComponent("../components/AcceptDialog.qml");
-                if (component.status === Component.Ready) {
-                    var dialog = component.createObject(mainPaneCurrentGame,{popupType: 1});
-                    dialog.headerText = "Information";
-                    dialog.parentHeight = mainPaneCurrentGame.height
-                    dialog.parentWidth = mainPaneCurrentGame.width
-                    dialog.textToAccept = "Die Karte von<br><br><b>" + itemModel.title + "</b><br><br>befindet sich aktuell bei<br><br> <b>" + itemModel.place + "</b>";
-                    dialog.showCancelButton = false
-                    dialog.font.family= txtForFontFamily.font
-                    dialog.open();
-                }
-            }
-        }
     }
 
     Text {
@@ -112,6 +112,8 @@ ColumnLayout {
         anchors.bottom: parent.bottom
         anchors.left: rowItemReserved.left
         anchors.right: textReservedFor.right
-        onClicked: clickedItem();
+        onClicked: {
+            clickedItem();
+        }
     }
 }

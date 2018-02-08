@@ -77,5 +77,9 @@
         <file>components/EventIndicator.qml</file>
         <file>images/+material/train.png</file>
         <file>images/train.png</file>
+        <file>images/+material/star.png</file>
+        <file>images/+material/star_border.png</file>
+        <file>images/star.png</file>
+        <file>images/star_border.png</file>
     </qresource>
 </RCC>

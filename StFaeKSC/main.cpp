@@ -34,6 +34,7 @@
 #include "General/pushnotification.h"
 #include "Network/udpserver.h"
 
+GlobalData* g_GlobalData;
 
 int main(int argc, char* argv[])
 {
@@ -43,7 +44,8 @@ int main(int argc, char* argv[])
     QCoreApplication::setApplicationName("StFaeKSC");
 
     GlobalData globalData;
-    Console*   con = new Console(&globalData);
+    g_GlobalData = &globalData;
+    Console* con = new Console(&globalData);
     globalData.initialize();
 
     PushNotification pushNotify;
@@ -69,7 +71,7 @@ int main(int argc, char* argv[])
 
     BackgroundController ctrlConsistent;
     CheckConsistentData* checkConsistData = new CheckConsistentData();
-    checkConsistData->initialize(&globalData);
+    checkConsistData->initialize();
     ctrlConsistent.Start(checkConsistData, false);
 
 

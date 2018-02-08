@@ -59,6 +59,7 @@ ApplicationWindow {
             anchors.fill: parent
 
             ToolButton {
+                implicitHeight: 50
                 contentItem: Image {
                     fillMode: Image.Pad
                     horizontalAlignment: Image.AlignHCenter
@@ -89,9 +90,10 @@ ApplicationWindow {
             }
 
             ToolButton {
+                implicitHeight: 50
                 contentItem: Image {
                     id: imageToolButton
-                    fillMode: Image.Pad
+                    fillMode: Image.PreserveAspectFit
                     horizontalAlignment: Image.AlignHCenter
                     verticalAlignment: Image.AlignVCenter
 //                    source: "images/refresh.png"

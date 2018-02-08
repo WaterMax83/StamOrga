@@ -32,6 +32,7 @@
 #include "../../Common/General/config.h"
 #include "../../Common/General/globalfunctions.h"
 #include "../Data/appuserevents.h"
+#include "../Data/favoritegame.h"
 #include "../Data/globaldata.h"
 #include "../Data/globalsettings.h"
 #include "../dataconnection.h"
@@ -40,6 +41,7 @@
 
 GlobalSettings* g_GlobalSettings;
 AppUserEvents*  g_AppUserEvents;
+GlobalData*     g_GlobalData;
 
 int main(int argc, char* argv[])
 {
@@ -55,11 +57,13 @@ int main(int argc, char* argv[])
     qRegisterMetaType<NewsDataItem*>("NewsDataItem*");
     qRegisterMetaType<AcceptMeetingInfo*>("AcceptMeetingInfo*");
     qRegisterMetaType<DataConRequest>("DataConRequest");
+    qRegisterMetaType<FavoriteGame*>("FavoriteGame*");
 
     GlobalSettings globalSettings;
     g_GlobalSettings = &globalSettings;
 
     GlobalData globalUserData;
+    g_GlobalData = &globalUserData;
     globalSettings.initialize(&globalUserData, &app);
 
     AppUserEvents appUserEvents;

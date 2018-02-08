@@ -42,6 +42,12 @@ void GlobalData::initialize()
 
     QStringList nameFilter;
 
+    QDate date = QDate::currentDate();
+    if (date.month() >= 6)
+        this->m_currentSeason = date.year();
+    else
+        this->m_currentSeason = date.year() - 1;
+
     nameFilter << "Tickets_Game_*.ini";
     QStringList infoConfigList = userSetDir.entryList(nameFilter, QDir::Files | QDir::Readable);
     foreach (QString file, infoConfigList) {
@@ -102,6 +108,8 @@ void GlobalData::initialize()
         else
             delete mEvent;
     }
+
+    this->m_statistic.initialize();
 
     this->m_initalized = true;
 }
@@ -175,7 +183,7 @@ qint32 GlobalData::requestChangeStateSeasonTicket(const quint32 ticketIndex, con
     AvailableGameTickets* ticket = new AvailableGameTickets();
     if (ticket->initialize(pGame->m_saison, pGame->m_competition, pGame->m_saisonIndex, pGame->m_index)) {
         this->m_availableTickets.append(ticket);
-        result = ticket->addNewTicket(ticketIndex, userID, TICKET_STATE_FREE, reserveName);
+        ticket->addNewTicket(ticketIndex, userID, TICKET_STATE_FREE, reserveName);
         qInfo().noquote() << QString("Changed ticketState from %1 at game %2 to %3").arg(pTicket->m_itemName).arg(pGame->m_index).arg(TICKET_STATE_FREE);
         QString body = QString("Karte \'%1\' beim Spiel %2 : %3 ist frei").arg(pTicket->m_itemName, pGame->m_itemName, pGame->m_away);
         messageID    = g_pushNotify->sendNewTicketNotification(body, userID, gameIndex, ticketIndex);
@@ -434,7 +442,7 @@ qint32 GlobalData::requestChangeMeetingInfo(const quint32 gameIndex, const quint
 
     if (mInfo->initialize(pGame->m_saison, pGame->m_competition, pGame->m_saisonIndex, pGame->m_index)) {
         pList->append(mInfo);
-        result = mInfo->changeMeetingInfo(when, where, info);
+        mInfo->changeMeetingInfo(when, where, info);
         qInfo().noquote() << QString("Added MeetingInfo at game %1:%2, %3").arg(pGame->m_itemName, pGame->m_away).arg(pGame->m_index);
         QString body = QString(BODY_ADD_MEETING).arg(pGame->m_itemName, pGame->m_away);
         messageID    = g_pushNotify->sendNewMeetingNotification(body, userID, gameIndex);
@@ -603,7 +611,7 @@ qint32 GlobalData::requestAcceptMeetingInfo(const quint32 gameIndex, const quint
         mInfo = new AwayTripInfo();
     if (mInfo->initialize(pGame->m_saison, pGame->m_competition, pGame->m_saisonIndex, pGame->m_index)) {
         pList->append(mInfo);
-        result = mInfo->addNewAcceptation(acceptValue, userID, name);
+        mInfo->addNewAcceptation(acceptValue, userID, name);
         qInfo().noquote() << QString("Changed Acceptation of %2 at game %1").arg(pGame->m_index).arg(name);
 
         /* Send an info if the first person is going to an game which is not at home */
@@ -630,6 +638,8 @@ qint32 GlobalData::addNewUserEvent(const QString type, const QString info, const
     //        }
     //    }
 
+    QMutexLocker lock(&this->m_globalDataMutex);
+
     UserEvents* pUserEvent = new UserEvents();
     if (pUserEvent->initialize(type, info, userID) == ERROR_CODE_SUCCESS)
         this->m_userEvents.append(pUserEvent);
@@ -641,6 +651,8 @@ qint32 GlobalData::addNewUserEvent(const QString type, const QString info, const
 
 qint32 GlobalData::getCurrentUserEvents(QByteArray& destArray, const qint32 userID)
 {
+    QMutexLocker lock(&this->m_globalDataMutex);
+
     QJsonArray jsArr;
     for (int i = 0; i < this->m_userEvents.size(); i++) {
         if (this->m_userEvents[i]->getHasUserGotEvent(userID))
@@ -669,6 +681,8 @@ qint32 GlobalData::getCurrentUserEvents(QByteArray& destArray, const qint32 user
 
 qint32 GlobalData::acceptUserEvent(const qint64 eventID, const qint32 userID, const qint32 status)
 {
+    QMutexLocker lock(&this->m_globalDataMutex);
+
     foreach (UserEvents* pEvent, this->m_userEvents) {
         if (pEvent->getEventID() == eventID) {
             pEvent->addNewUser(userID);

@@ -9,6 +9,6 @@
 ###########################################################################################
 
 
-STAMORGA_VERSION=1.0.5
+STAMORGA_VERSION=1.0.6
 
 DEFINES += STAMORGA_VERSION=\\\"$${STAMORGA_VERSION}\\\"

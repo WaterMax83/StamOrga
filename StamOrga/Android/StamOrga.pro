@@ -43,6 +43,7 @@ SOURCES += main.cpp \
     ../Data/meetinginfo.cpp \
     ../Data/globalsettings.cpp \
     ../Data/appuserevents.cpp \
+    ../Data/favoritegame.cpp \
     source/pushnotification.cpp
 
 
@@ -93,6 +94,7 @@ HEADERS += \
     ../Data/acceptmeetinginfo.h \
     ../Data/globalsettings.h \
     ../Data/appuserevents.h \
+    ../Data/favoritegame.h \
     source/pushnotification.h
 
 #android{

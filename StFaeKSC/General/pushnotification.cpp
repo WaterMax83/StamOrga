@@ -413,7 +413,7 @@ void PushNotification::finished(QNetworkReply* reply)
     if (reply->error() == QNetworkReply::NetworkError::NoError) {
         qInfo().noquote() << QString("Finished Notification %2: %1").arg(QString(reply->readAll())).arg(sendNumber);
 
-        if (!this->m_lastPushNotify->m_info.isEmpty()) {
+        if (this->m_lastPushNotify != NULL && !this->m_lastPushNotify->m_info.isEmpty()) {
             QString sendTopic = this->getTopicStringFromIndex(this->m_lastPushNotify->m_topic);
             this->m_pGlobalData->addNewUserEvent(sendTopic, this->m_lastPushNotify->m_info, this->m_lastPushNotify->m_userID);
         }

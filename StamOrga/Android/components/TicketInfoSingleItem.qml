@@ -30,6 +30,7 @@ RowLayout {
 
     Rectangle {
         id: imageItemInfo
+        anchors.verticalCenter: parent.verticalCenter
         anchors.left: parent.left
         anchors.leftMargin: parent.height
         width: parent.height / 4 * 2
@@ -51,10 +52,12 @@ RowLayout {
 
     Image {
         id: imageInfoItemButton
-        height: parent.height
-        width: parent.height
+        Layout.preferredHeight: parent.height / 5 * 4
+        Layout.preferredWidth:  parent.height / 5 * 4
+        anchors.verticalCenter: parent.verticalCenter
         anchors.left: textItemName.right
         anchors.leftMargin: 35
+        fillMode: Image.PreserveAspectFit
         source: "../images/info.png"
     }
 
@@ -63,7 +66,9 @@ RowLayout {
         anchors.bottom: parent.bottom
         anchors.left: imageItemInfo.left
         anchors.right: textItemName.right
-        onClicked: clickedItem();
+        onClicked: {
+            clickedItem();
+        }
     }
 
     Text {

@@ -70,8 +70,8 @@ qint32 UserEvents::initialize(QString filePath)
 
     this->m_pConfigSettings->beginGroup("UserEventHeader");
 
-    this->m_type      = this->m_pConfigSettings->value("type", 0).toString();
-    this->m_info      = this->m_pConfigSettings->value("info", 0).toString();
+    this->m_type      = this->m_pConfigSettings->value("type", "").toString();
+    this->m_info      = this->m_pConfigSettings->value("info", "").toString();
     this->m_timestamp = this->m_pConfigSettings->value("timestamp", 0).toLongLong();
 
     this->m_pConfigSettings->endGroup();
@@ -179,6 +179,20 @@ qint64 UserEvents::getEventID()
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
     return this->m_timestamp;
+}
+
+qint32 UserEvents::checkCanEventRunOut(quint32& gameIndex)
+{
+    if (this->m_type == NOTIFY_TOPIC_NEW_FREE_TICKET
+        || this->m_type == NOTIFY_TOPIC_CHANGE_MEETING
+        || this->m_type == NOTIFY_TOPIC_NEW_MEETING
+        || this->m_type == NOTIFY_TOPIC_NEW_AWAY_ACCEPT) {
+
+        gameIndex = this->m_info.toInt();
+        return ERROR_CODE_UPDATE_LIST;
+    }
+
+    return ERROR_CODE_SUCCESS;
 }
 
 

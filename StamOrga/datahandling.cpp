@@ -263,6 +263,11 @@ qint32 DataHandling::getHandleGamesInfoListResponse(MessageProtocol* msg)
             play->setAcceptedMeetingCount(0);
             play->setInterestedMeetingCount(0);
             play->setDeclinedMeetingCount(0);
+            play->setMeetingInfo(0);
+            play->setAcceptedTripCount(0);
+            play->setInterestedTripCount(0);
+            play->setDeclinedTripCount(0);
+            play->setTripInfo(0);
         }
     }
 
@@ -319,6 +324,28 @@ qint32 DataHandling::getHandleGamesInfoListResponse(MessageProtocol* msg)
         offset += sizeof(quint16);
 
         play->setMeetingInfo(meetInfo);
+
+        memcpy(&acceptMeet, pData + offset, sizeof(quint16));
+        acceptMeet = qFromLittleEndian(acceptMeet);
+        offset += sizeof(quint16);
+
+        memcpy(&interestMeet, pData + offset, sizeof(quint16));
+        interestMeet = qFromLittleEndian(interestMeet);
+        offset += sizeof(quint16);
+
+        memcpy(&declineMeet, pData + offset, sizeof(quint16));
+        declineMeet = qFromLittleEndian(declineMeet);
+        offset += sizeof(quint16);
+
+        play->setAcceptedTripCount(acceptMeet);
+        play->setInterestedTripCount(interestMeet);
+        play->setDeclinedTripCount(declineMeet);
+
+        memcpy(&meetInfo, pData + offset, sizeof(quint16));
+        meetInfo = qFromLittleEndian(meetInfo);
+        offset += sizeof(quint16);
+
+        play->setTripInfo(meetInfo);
     }
 
     return rValue;

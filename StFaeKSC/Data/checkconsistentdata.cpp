@@ -16,7 +16,12 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QDateTime>
+
+#include "../General/globaldata.h"
 #include "checkconsistentdata.h"
+
+extern GlobalData* g_GlobalData;
 
 CheckConsistentData::CheckConsistentData(QObject* parent)
     : BackgroundWorker(parent)
@@ -24,9 +29,8 @@ CheckConsistentData::CheckConsistentData(QObject* parent)
 }
 
 
-qint32 CheckConsistentData::initialize(GlobalData* globalData)
+qint32 CheckConsistentData::initialize()
 {
-    this->m_pGlobalData = globalData;
 
     return ERROR_CODE_SUCCESS;
 }
@@ -34,10 +38,11 @@ qint32 CheckConsistentData::initialize(GlobalData* globalData)
 int CheckConsistentData::DoBackgroundWork()
 {
     this->m_timer = new QTimer();
-    this->m_timer->setSingleShot(false);
-    this->m_timer->setInterval(60 * 60 * 1000); // 1h
+    this->m_timer->setSingleShot(true);
 
     connect(this->m_timer, &QTimer::timeout, this, &CheckConsistentData::slotTimerFired);
+
+    this->m_timer->start(5000); /*Wait 5s at the beginning */
 
     return ERROR_CODE_SUCCESS;
 }
@@ -45,9 +50,33 @@ int CheckConsistentData::DoBackgroundWork()
 
 void CheckConsistentData::slotTimerFired()
 {
-    qInfo().noquote() << "Starting consitency check";
+    qInfo().noquote() << "Starting consistency check";
 
-    foreach (AvailableGameTickets* pGameTicket, this->m_pGlobalData->m_availableTickets) {
+    QMutexLocker lock(&g_GlobalData->m_globalDataMutex);
+
+    /* Check if server data is consistent with savings */
+    foreach (AvailableGameTickets* pGameTicket, g_GlobalData->m_availableTickets) {
         pGameTicket->checkConsistency();
     }
+
+    quint32 gameIndex;
+    qint64  yesterday = QDateTime::currentDateTime().addDays(-1).toMSecsSinceEpoch();
+    for (int i = g_GlobalData->m_userEvents.count() - 1; i >= 0; i--) {
+        if (g_GlobalData->m_userEvents.at(i)->checkCanEventRunOut(gameIndex) == ERROR_CODE_UPDATE_LIST) {
+            GamesPlay* pGame = (GamesPlay*)g_GlobalData->m_GamesList.getItem(gameIndex);
+            if (pGame == NULL)
+                continue;
+            if (pGame->m_timestamp < yesterday) {
+                QString fileName = g_GlobalData->m_userEvents.at(i)->getFileName();
+                QFile   eventFile(fileName);
+                if (eventFile.exists() && eventFile.remove()) {
+                    g_GlobalData->m_userEvents.at(i)->terminate();
+                    qInfo().noquote() << QString("Delete Event of game %1:%2, because it is too old").arg(pGame->m_itemName, pGame->m_away);
+                    g_GlobalData->m_userEvents.removeAt(i);
+                }
+            }
+        }
+    }
+
+    this->m_timer->start(3 * 60 * 60 * 1000); // 3h
 }

@@ -16,34 +16,43 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CHECKCONSISTENTDATA_H
-#define CHECKCONSISTENTDATA_H
+#ifndef FAVORITEGAME_H
+#define FAVORITEGAME_H
 
+#include <QList>
+#include <QMutex>
 #include <QObject>
-#include <QTimer>
+#include <QSettings>
 
-#include "../Common/General/backgroundworker.h"
+struct FavGameInfo {
+    quint32 m_gameIndex;
+    qint32  m_favIndex;
+};
 
-class CheckConsistentData : public BackgroundWorker
+class FavoriteGame : public QObject
 {
     Q_OBJECT
 public:
-    explicit CheckConsistentData(QObject* parent = nullptr);
+    explicit FavoriteGame(QObject* parent = nullptr);
+    ~FavoriteGame();
 
-    qint32 initialize();
+    int initialize();
 
-protected:
-    int DoBackgroundWork() override;
+    int terminate();
+
+    Q_INVOKABLE int getFavoriteGameIndex(quint32 gameIndex);
+
+    Q_INVOKABLE int setFavoriteGameIndex(quint32 gameIndex, qint32 favIndex);
 
 signals:
 
 public slots:
 
-private slots:
-    void slotTimerFired();
-
 private:
-    QTimer* m_timer;
+    bool                m_initialized;
+    QSettings*          m_settings;
+    QList<FavGameInfo*> m_lFavGames;
+    QMutex              m_mutex;
 };
 
-#endif // CHECKCONSISTENTDATA_H
+#endif // FAVORITEGAME_H

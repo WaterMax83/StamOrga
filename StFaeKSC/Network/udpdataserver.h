@@ -23,23 +23,21 @@
 #include <QtCore/QTimer>
 #include <QtNetwork/QUdpSocket>
 
-#include "connectiondata.h"
-#include "../General/globaldata.h"
-#include "../General/dataconnection.h"
 #include "../Common/General/backgroundworker.h"
 #include "../Common/Network/messagebuffer.h"
+#include "../General/dataconnection.h"
+#include "../General/globaldata.h"
+#include "connectiondata.h"
 
 class UdpDataServer : public BackgroundWorker
 {
     Q_OBJECT
 public:
-    UdpDataServer(UserConData *pUsrConData, GlobalData *pGlobalData);
+    UdpDataServer(UserConData* pUsrConData, GlobalData* pGlobalData);
     ~UdpDataServer();
 
 protected:
     int DoBackgroundWork() override;
-
-    QString m_workerName = "UDPServer";
 
 signals:
     void notifyConnectionTimedOut(quint16 port);
@@ -50,19 +48,19 @@ private slots:
     void onConnectionLoginTimeout();
 
 private:
-    GlobalData      *m_pGlobalData;
-    UserConData     *m_pUsrConData;
-    DataConnection  *m_pDataConnection = NULL;
+    GlobalData*     m_pGlobalData;
+    UserConData*    m_pUsrConData;
+    DataConnection* m_pDataConnection = NULL;
 
-    QUdpSocket      *m_pUdpSocket = NULL;
-    MessageBuffer   m_msgBuffer;
+    QUdpSocket*   m_pUdpSocket = NULL;
+    MessageBuffer m_msgBuffer;
 
-    QTimer          *m_pConLoginTimer = NULL;
-    QTimer          *m_pConResetTimer = NULL;
+    QTimer* m_pConLoginTimer = NULL;
+    QTimer* m_pConResetTimer = NULL;
 
     void checkNewOncomingData();
 
-    MessageProtocol *checkNewMessage(MessageProtocol *msg);
+    MessageProtocol* checkNewMessage(MessageProtocol* msg);
 };
 
 #endif // UDPDATASERVER_H

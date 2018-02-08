@@ -137,10 +137,6 @@ Flickable {
                     var sprite = stackView.push(component)
                     sprite.userIntCurrentGame = userIntGames
                     sprite.showAllInfoAboutGame(sender)
-                    if (sender.isGameAHomeGame())
-                        updateHeaderFromMain("Heimspiel", "")
-                    else
-                        updateHeaderFromMain("Auswärts", "")
 
                     if (sender.event > 0)
                         appUserEvents.clearUserEventGamPlay(userIntGames, sender.index);

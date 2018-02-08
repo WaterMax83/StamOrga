@@ -52,7 +52,8 @@ SOURCES += main.cpp \
     Data/fanclubnews.cpp \
     Data/userevents.cpp \
     Data/awaytripinfo.cpp \
-    Data/checkconsistentdata.cpp
+    Data/checkconsistentdata.cpp \
+    Data/statistic.cpp
 
 HEADERS += \
     ../Common/General/backgroundcontroller.h \
@@ -83,7 +84,8 @@ HEADERS += \
     Data/fanclubnews.h \
     Data/userevents.h \
     Data/awaytripinfo.h \
-    Data/checkconsistentdata.h
+    Data/checkconsistentdata.h \
+    Data/statistic.h
 
 
 unix {

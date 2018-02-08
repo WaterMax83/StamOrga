@@ -387,9 +387,10 @@ Flickable {
                                                        menuOpen: false
                                                    })
             }
+
             /* Does not work in defintion for freeTickets, so set it here */
             listViewBlockedTickets.implicitHeight = listViewModelBlockedTickets.count * listViewItemHeight
-            listViewReservedTickets.implicitHeight = listViewModelReservedTickets.count * listViewItemHeight * ( 20 / 12)
+            listViewReservedTickets.implicitHeight = listViewModelReservedTickets.count * listViewItemHeight * ( 19 / 10)
             listViewFreeTickets.implicitHeight = listViewModelFreeTickets.count * listViewItemHeight
 
             txtInfoCurrentGameBlockedTickets.visible = true

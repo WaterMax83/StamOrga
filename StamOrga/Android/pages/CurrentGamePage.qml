@@ -207,7 +207,19 @@ Item {
     property int movedInfoHeigth : gameHeader.height + 20
 
     function toolButtonClicked() {
+        var favGame = globalUserData.getFavoriteGameHandler();
+        var favIndex = favGame.getFavoriteGameIndex(m_gamePlayCurrentItem.index);
 
+        if (favIndex <= 0) {
+            favGame.setFavoriteGameIndex(m_gamePlayCurrentItem.index, 1);
+            updateHeaderFromMain("", "images/star.png")
+            toastManager.show("Spiel als Favorit markiert", 2000);
+        }else {
+            favGame.setFavoriteGameIndex(m_gamePlayCurrentItem.index, 0);
+            updateHeaderFromMain("", "images/star_border.png")
+            toastManager.show("Spiel als Favorit entfernt", 2000);
+        }
+        gameHeader.showGamesInfo(m_gamePlayCurrentItem)
     }
 
     function showAllInfoAboutGame(sender) {
@@ -237,9 +249,22 @@ Item {
             currentAwayTripInfo.showInfoHeader.connect(currentAwayTriptInfoNewHeaderInfo);
             currentAwayTripInfo.showAllInfoAboutGame();
         }
+
+        var favGame = globalUserData.getFavoriteGameHandler();
+        var icon = "";
+        var favIndex = favGame.getFavoriteGameIndex(sender.index);
+        if (favIndex <= 0)
+            icon = "images/star_border.png"
+        else
+            icon = "images/star.png";
+
+        if (sender.isGameAHomeGame())
+            updateHeaderFromMain("Heimspiel", icon)
+        else
+            updateHeaderFromMain("Auswärts", icon)
     }
 
-    function pageOpenedUpdateView() {}
+    function pageOpenedUpdateView() { }
 
     function notifyGetUserEvents(result) {
         gameHeader.showGamesInfo(m_gamePlayCurrentItem)

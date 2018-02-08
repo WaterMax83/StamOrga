@@ -28,6 +28,7 @@
 #include "../../Common/General/backgroundcontroller.h"
 #include "../../Common/General/globalfunctions.h"
 #include "../../Common/General/logging.h"
+#include "favoritegame.h"
 #include "gameplay.h"
 #include "meetinginfo.h"
 #include "newsdataitem.h"
@@ -165,6 +166,8 @@ public:
     void                resetAllNewsDataEvents();
     bool                setNewsDataItemHasEvent(quint32 newsIndex);
 
+    Q_INVOKABLE FavoriteGame* getFavoriteGameHandler() { return &this->m_favoriteGame; }
+
     QString getCurrentAppGUID() { return this->m_AppInstanceGUID; }
     QString getCurrentAppToken() { return this->m_pushNotificationToken; }
 
@@ -237,6 +240,8 @@ private:
     QString                             m_AppInstanceGUID;
 
     QString m_updateLink;
+
+    FavoriteGame m_favoriteGame;
 
     Logging*             m_logApp;
     BackgroundController m_ctrlLog;

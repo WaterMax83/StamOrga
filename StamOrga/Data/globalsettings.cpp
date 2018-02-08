@@ -181,17 +181,20 @@ QString GlobalSettings::getVersionChangeInfo()
 {
     QString rValue;
 
-    rValue.append("<b>V1.0.6:</b>(XX.XX.2018)<br>");
+    rValue.append("<b>V1.0.6:</b>(08.02.2018)<br>");
+    rValue.append("- Infos über Fahrt in der Übersicht<br>");
+    rValue.append("- Icons überarbeitet<br>");
+    rValue.append("- Spiel als Favorit markieren<br>");
 
     rValue.append("<br><b>V1.0.5:</b>(16.12.2017)<br>");
     rValue.append("- Infos über letzte Neuigkeiten markieren<br>");
     rValue.append("- Framework Version aktualisiert<br>");
     rValue.append("- Fahrt bei Auswärtsspiel hinzugefügt<br>");
-    rValue.append("- Versionsupdate über Listview<br>");
+    rValue.append("- Versionsupdate über Liste<br>");
 
     rValue.append("<br><b>V1.0.4:</b>(24.10.2017)<br>");
     rValue.append("- Fanclub Nachrichten (Mitglieder)<br>");
-    rValue.append("- neue Notification \"Erster Auswärtsfahrer\" & \"Fanclub Nachricht\"<br>");
+    rValue.append("- neue Benachrichtigung \"Erster Auswärtsfahrer\" & \"Fanclub Nachricht\"<br>");
     rValue.append("- Schrift änderbar (Android)<br>");
     rValue.append("- Verbindungsfehler beim Start behoben<br>");
 

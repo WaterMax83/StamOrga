@@ -21,6 +21,7 @@
 
 #include "../Common/General/config.h"
 #include "../Common/General/globalfunctions.h"
+#include "../Common/General/globaltiming.h"
 #include "../Common/Network/messagecommand.h"
 #include "../Data/seasonticket.h"
 #include "dataconnection.h"
@@ -474,8 +475,9 @@ MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol* msg)
         GamesPlay* pGame = (GamesPlay*)(this->m_pGlobalData->m_GamesList.getRequestConfigItemFromListIndex(i));
         if (pGame == NULL)
             continue;
+
 #ifndef QT_DEBUG
-        if (pGame->m_timestamp < currentTime)
+        if (pGame->m_timestamp < currentTime + 2 * MSEC_PER_HOUR)
             continue;
 #endif
         quint16 freeTickets     = this->m_pGlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_FREE);
@@ -490,9 +492,7 @@ MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol* msg)
         quint16 declinedTrip    = this->m_pGlobalData->getAcceptedNumber(MEETING_TYPE_AWAYTRIP, pGame->m_index, ACCEPT_STATE_DECLINE);
         quint16 tripInfo        = this->m_pGlobalData->getMeetingInfoValue(MEETING_TYPE_AWAYTRIP, pGame->m_index);
 
-        if (freeTickets == 0 && reservedTickets == 0 &&
-            acceptedMeeting == 0 && interestMeeting == 0 && declinedMeeting == 0 && meetInfo == 0 &&
-            acceptedTrip == 0 && interestTrip == 0 && declinedTrip == 0 && tripInfo == 0)
+        if (freeTickets == 0 && reservedTickets == 0 && acceptedMeeting == 0 && interestMeeting == 0 && declinedMeeting == 0 && meetInfo == 0 && acceptedTrip == 0 && interestTrip == 0 && declinedTrip == 0 && tripInfo == 0)
             continue;
 
         quint32 gameIndex = qToLittleEndian(pGame->m_index);

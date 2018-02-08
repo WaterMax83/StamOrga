@@ -74,6 +74,8 @@ public:
     qint32 getItemIndex(const QString name);
     QString getItemName(quint32 index);
 
+    QString getFileName();
+
     virtual ConfigItem* getRequestConfigItemFromListIndex(int index)
     {
         QMutexLocker lock(&this->m_mInternalInfoMutex);
@@ -86,6 +88,8 @@ public:
 
     void sortItemListByTimeAscending();
     void sortItemListByTimeDescending();
+
+    qint32 terminate();
 
 protected:
     QList<ConfigItem*> m_lInteralList;

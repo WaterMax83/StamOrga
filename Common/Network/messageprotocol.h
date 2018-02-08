@@ -43,7 +43,7 @@ struct msg_Header {
 #define MSG_HEADER_ADD_AWAYTRIP_INFO    0x6     // 25.01.18 for V1.0.6
 // clang-format on
 
-#define MSG_HEADER_VERSION MSG_HEADER_ADD_FANCLUB
+#define MSG_HEADER_VERSION MSG_HEADER_ADD_AWAYTRIP_INFO
 
 #define MAX_DATAGRAMM_SIZE 512
 

@@ -124,6 +124,13 @@ QString ConfigList::getItemName(quint32 index)
     return "";
 }
 
+QString ConfigList::getFileName()
+{
+    QMutexLocker locker(&this->m_mConfigIniMutex);
+
+    return this->m_pConfigSettings->fileName();
+}
+
 ConfigItem* ConfigList::getItemFromArrayIndex(int index)
 {
     if (index >= this->getNumberOfInternalList())
@@ -250,6 +257,23 @@ void ConfigList::sortItemListByTimeDescending()
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
     std::sort(this->m_lInteralList.begin(), this->m_lInteralList.end(), ConfigItem::compareTimeStampFunctionDescending);
+}
+
+qint32 ConfigList::terminate()
+{
+    QMutexLocker locker(&this->m_mConfigIniMutex);
+
+    if (this->m_pConfigSettings != NULL)
+        delete this->m_pConfigSettings;
+    this->m_pConfigSettings = NULL;
+
+    for (int i = 0; i < this->m_lInteralList.size(); i++)
+        delete this->m_lInteralList[i];
+
+    for (int i = 0; i < this->m_lAddItemProblems.size(); i++)
+        delete this->m_lAddItemProblems[i];
+
+    return ERROR_CODE_SUCCESS;
 }
 
 

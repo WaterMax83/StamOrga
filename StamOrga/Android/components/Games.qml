@@ -392,6 +392,17 @@ Rectangle {
                 }
             }
 
+            var favGame = globalUserData.getFavoriteGameHandler();
+            var favIndex = favGame.getFavoriteGameIndex(gamePlayItem.index);
+            if (favIndex <= 0) {
+                mainRectangleGame.border.color = "grey";
+                mainRectangleGame.border.width = 2;
+            }
+            else{
+                mainRectangleGame.border.color = "orange";
+                mainRectangleGame.border.width = 3;
+            }
+
             var eventCount = gamePlayItem.event;
             if (eventCount > 0) {
                 eventIndicator.disableVisibility = false;
