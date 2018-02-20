@@ -26,10 +26,12 @@
 #include "../Common/General/globalfunctions.h"
 #include "../Data/appuserevents.h"
 #include "../Data/gameplay.h"
+#include "../Data/statistic.h"
 #include "datahandling.h"
 
 
 extern AppUserEvents* g_AppUserEvents;
+extern Statistic*     g_Statistics;
 
 DataHandling::DataHandling(GlobalData* pData)
 {
@@ -599,6 +601,8 @@ qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg, const quint3
     pInfo->setWhere(where);
     pInfo->setInfo(info);
 
+    bool bInfoSet = (when.isEmpty() && where.isEmpty() && info.isEmpty()) ? false : true;
+
     quint32 size = msg->getDataLength();
     quint32 index, value, userID;
     pInfo->clearAcceptInfoList();
@@ -639,12 +643,18 @@ qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg, const quint3
             game->setAcceptedMeetingCount(acceptMeeting);
             game->setInterestedMeetingCount(interestMeeting);
             game->setDeclinedMeetingCount(declineMeeting);
-            game->setMeetingInfo(1);
+            if (bInfoSet || acceptMeeting > 0 || interestMeeting > 0)
+                game->setMeetingInfo(1);
+            else
+                game->setMeetingInfo(0);
         } else if (type == MEETING_TYPE_AWAYTRIP) {
             game->setAcceptedTripCount(acceptMeeting);
             game->setInterestedTripCount(interestMeeting);
             game->setDeclinedTripCount(declineMeeting);
-            game->setTripInfo(1);
+            if (bInfoSet || acceptMeeting > 0 || interestMeeting > 0)
+                game->setTripInfo(1);
+            else
+                game->setMeetingInfo(0);
         }
     }
 
@@ -791,4 +801,23 @@ qint32 DataHandling::getHandleFanclubNewsItemResponse(MessageProtocol* msg)
     pItem->setInfo(info);
 
     return ERROR_CODE_SUCCESS;
+}
+
+qint32 DataHandling::getHandleStatisticsCommandResponse(MessageProtocol* msg)
+{
+    if (msg->getDataLength() < 4)
+        return ERROR_CODE_WRONG_SIZE;
+
+    const char* pData = msg->getPointerToData();
+    qint32      rValue;
+    memcpy(&rValue, pData, sizeof(qint32));
+    rValue = qFromLittleEndian(rValue);
+
+    if (msg->getDataLength() > 4 && rValue == ERROR_CODE_SUCCESS) {
+
+        QByteArray jsonByteArray(pData + sizeof(qint32));
+        rValue = g_Statistics->handleStatisticResponse(jsonByteArray);
+    }
+
+    return rValue;
 }

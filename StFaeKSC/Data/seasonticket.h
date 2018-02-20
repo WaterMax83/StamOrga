@@ -31,11 +31,12 @@ struct TicketInfo : public ConfigItem {
     quint32 m_userIndex;
     quint8  m_discount;
     QString m_place;
+    qint64  m_creation;
 
     TicketInfo(QString user, quint32 userIndex,
                QString ticketName, qint64 timestamp,
                quint8 discount, QString place,
-               quint32 index)
+               quint32 index, qint64 creation)
     {
         this->m_itemName  = ticketName;
         this->m_timestamp = timestamp;
@@ -45,6 +46,7 @@ struct TicketInfo : public ConfigItem {
         this->m_userIndex = userIndex;
         this->m_discount  = discount;
         this->m_place     = place;
+        this->m_creation  = creation;
     }
 };
 
@@ -53,6 +55,7 @@ struct TicketInfo : public ConfigItem {
 #define TICKET_USER_INDEX "userIndex"
 #define TICKET_DISCOUNT "discount"
 #define TICKET_PLACE "place"
+#define TICKET_CREATE "creation"
 
 #define TICKET_INDEX_GROUP "IndexCount"
 #define TICKET_MAX_COUNT "CurrentCount"

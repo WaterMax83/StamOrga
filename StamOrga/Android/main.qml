@@ -182,6 +182,10 @@ ApplicationWindow {
                                    element: viewSeasonTickets,
                                    imgsource: "images/add.png"
                                })
+                        append({
+                                   title: "Statistik",
+                                   element: viewStatistics,
+                               })
                         if (userInt.isDebuggingEnabled())
                             append({
                                        title: "Fanclub",
@@ -254,6 +258,11 @@ ApplicationWindow {
         }
     }
     Component {
+        id: viewStatistics
+        MyPages.Statistics {}
+    }
+
+    Component {
         id: viewSettingsPage
         MyPages.Settings {}
     }
@@ -270,7 +279,8 @@ ApplicationWindow {
         id: userInt
         globalData: globalUserData
         onNotifyConnectionFinished: {
-            stackView.currentItem.notifyUserIntConnectionFinished(result)
+            if (stackView.currentItem.notifyUserIntConnectionFinished)
+                stackView.currentItem.notifyUserIntConnectionFinished(result)
         }
         onNotifyVersionRequestFinished: {
             //            stackView.currentItem.notifyUserIntVersionRequestFinished(result, msg);
@@ -377,6 +387,8 @@ ApplicationWindow {
         onNotifyFanclubNewsListFinished: stackView.currentItem.notifyFanclubNewsListFinished(result);
         onNotifyGetFanclubNewsItemFinished: stackView.currentItem.notifyGetFanclubNewsItemFinished(result);
         onNotifyDeleteFanclubNewsItemFinished: stackView.currentItem.notifyDeleteFanclubNewsItemFinished(result);
+
+        onNotifyStatisticsCommandFinished: stackView.currentItem.notifyStatisticsCommandFinished(result);
     }
 
     Connections {

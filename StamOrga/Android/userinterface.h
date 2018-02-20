@@ -82,6 +82,8 @@ public:
 
     Q_INVOKABLE qint32 startDeleteFanclubNewsItem(const quint32 newsIndex);
 
+    Q_INVOKABLE qint32 startStatisticsCommand(const QByteArray& command);
+
     Q_INVOKABLE bool isDebuggingEnabled()
     {
 #ifdef QT_DEBUG
@@ -141,6 +143,7 @@ signals:
     void notifyGetFanclubNewsItemFinished(qint32 result);
     void notifyDeleteFanclubNewsItemFinished(qint32 result);
     void notifyGetUserEvents(qint32 result);
+    void notifyStatisticsCommandFinished(qint32 result);
 
 public slots:
     void slConnectionRequestFinished(qint32 result);

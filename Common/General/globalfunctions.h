@@ -74,6 +74,7 @@ extern bool checkFilePathExistAndCreate(const QString& path);
 #define ERROR_CODE_UPDATE_FUNCTION      -13
 #define ERROR_CODE_UPDATE_LIST          -14
 #define ERROR_CODE_NOT_READY            -15
+#define ERROR_CODE_MISSING_PARAMETER    -16
 #define ERROR_CODE_NO_USER              -20
 #define ERROR_CODE_WRONG_PASSWORD       -21
 // clang-format on

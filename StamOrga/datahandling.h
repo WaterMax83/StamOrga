@@ -44,6 +44,7 @@ public:
     qint32 getHandleFanclubNewsChangeResponse(MessageProtocol* msg, QString& returnData);
     qint32 getHandleFanclubNewsListResponse(MessageProtocol* msg);
     qint32 getHandleFanclubNewsItemResponse(MessageProtocol* msg);
+    qint32 getHandleStatisticsCommandResponse(MessageProtocol* msg);
 
 private:
     GlobalData* m_pGlobalData;

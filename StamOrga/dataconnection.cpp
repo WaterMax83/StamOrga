@@ -249,6 +249,11 @@ void DataConnection::checkNewOncomingData()
             request.m_result = msg->getIntData();
             break;
 
+        case OP_CODE_CMD_RES::ACK_CMD_STATISTIC:
+            request.m_result = this->m_pDataHandle->getHandleStatisticsCommandResponse(msg);
+            break;
+
+
         default:
             delete msg;
             continue;
@@ -387,7 +392,7 @@ void DataConnection::startSendGamesListRequest(DataConRequest request)
         data[0] = qToLittleEndian(UpdateIndex::UpdateDiff);
     else
         data[0] = qToLittleEndian(UpdateIndex::UpdateAll);
-    timeStamp   = qToLittleEndian(this->m_pGlobalData->getGamePlayLastServerUpdate());
+    timeStamp = qToLittleEndian(this->m_pGlobalData->getGamePlayLastServerUpdate());
     memcpy(&data[1], &timeStamp, sizeof(qint64));
 
     MessageProtocol msg(request.m_request, (char*)(&data[0]), sizeof(quint32) * 3);
@@ -608,6 +613,15 @@ void DataConnection::startSendDeleteNewDataItem(DataConRequest request)
     this->sendMessageRequest(&msg, request);
 }
 
+void DataConnection::startSendStatisticsCommand(DataConRequest request)
+{
+    QByteArray data = request.m_lData.at(0).toUtf8();
+
+    MessageProtocol msg(request.m_request, data);
+    this->sendMessageRequest(&msg, request);
+}
+
+
 void DataConnection::slotConnectionTimeoutFired()
 {
     qInfo().noquote() << "DataConnection: Timeout from Data UdpServer";
@@ -816,6 +830,10 @@ void DataConnection::startSendNewRequest(DataConRequest request)
 
     case OP_CODE_CMD_REQ::REQ_DEL_NEWS_DATA_ITEM:
         this->startSendDeleteNewDataItem(request);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_CMD_STATISTIC:
+        this->startSendStatisticsCommand(request);
         break;
 
     default:

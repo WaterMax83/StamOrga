@@ -51,8 +51,14 @@ SeasonTicket::SeasonTicket()
             quint32 userIndex = this->m_pConfigSettings->value(TICKET_USER_INDEX, 0).toUInt();
             quint8  discount  = quint8(this->m_pConfigSettings->value(TICKET_DISCOUNT, 0).toUInt());
             QString place     = this->m_pConfigSettings->value(TICKET_PLACE, "").toString();
+            qint64  creation  = this->m_pConfigSettings->value(TICKET_CREATE, 0).toULongLong();
 
-            TicketInfo* info = new TicketInfo(user, userIndex, ticketName, timestamp, discount, place, index);
+            if (creation == 0) {
+                creation  = QDateTime::fromString("10.07.2017", "dd.MM.yyyy").toMSecsSinceEpoch();
+                bProblems = true;
+            }
+
+            TicketInfo* info = new TicketInfo(user, userIndex, ticketName, timestamp, discount, place, index, creation);
             if (!this->addNewTicketInfo(info))
                 bProblems = true;
         }
@@ -103,6 +109,7 @@ int SeasonTicket::addNewSeasonTicket(QString user, quint32 userIndex, QString ti
     this->m_pConfigSettings->setValue(TICKET_USER_INDEX, userIndex);
     this->m_pConfigSettings->setValue(TICKET_DISCOUNT, discount);
     this->m_pConfigSettings->setValue(TICKET_PLACE, ticketName);
+    this->m_pConfigSettings->setValue(TICKET_CREATE, timestamp);
 
     this->m_pConfigSettings->endArray();
     this->m_pConfigSettings->endGroup();
@@ -112,7 +119,7 @@ int SeasonTicket::addNewSeasonTicket(QString user, quint32 userIndex, QString ti
 
     this->setNewUpdateTime();
 
-    TicketInfo* info = new TicketInfo(user, userIndex, ticketName, timestamp, discount, ticketName, newIndex);
+    TicketInfo* info = new TicketInfo(user, userIndex, ticketName, timestamp, discount, ticketName, newIndex, timestamp);
     this->addNewTicketInfo(info, false);
 
     //    qInfo() << (QString("Added new ticket: %1").arg(ticketName));
@@ -197,6 +204,7 @@ void SeasonTicket::saveCurrentInteralList()
         this->m_pConfigSettings->setValue(TICKET_USER_INDEX, pItem->m_userIndex);
         this->m_pConfigSettings->setValue(TICKET_PLACE, pItem->m_place);
         this->m_pConfigSettings->setValue(TICKET_DISCOUNT, pItem->m_discount);
+        this->m_pConfigSettings->setValue(TICKET_CREATE, pItem->m_creation);
     }
 
     this->m_pConfigSettings->endArray();

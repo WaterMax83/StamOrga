@@ -56,6 +56,7 @@ public:
     MessageProtocol* requestGetNewsDataList(MessageProtocol* msg);
     MessageProtocol* requestGetNewsDataItem(MessageProtocol* msg);
     MessageProtocol* requestDeleteNewsDataItem(MessageProtocol* msg);
+    MessageProtocol* requestCommandStatistic(MessageProtocol* msg);
 
     void setUserConnectionData(UserConData* pUsrConData) { this->m_pUserConData = pUsrConData; }
 

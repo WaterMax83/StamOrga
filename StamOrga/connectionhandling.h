@@ -40,7 +40,7 @@ public:
     qint32 startGettingUserProps();
     qint32 startGettingUserEvents();
     qint32 startSettingUserEvents(qint64 eventID, qint32 status);
-    bool startUpdatePassword(QString newPassWord);
+    bool   startUpdatePassword(QString newPassWord);
     qint32 startUpdateReadableName(QString name);
     qint32 startListGettingGames();
     qint32 startListGettingGamesInfo();
@@ -65,6 +65,7 @@ public:
     qint32 startListFanclubNews();
     qint32 startGetFanclubNewsItem(const quint32 newsIndex);
     qint32 startDeleteFanclubNewsItem(const quint32 newsIndex);
+    qint32 startStatisticsCommand(const QByteArray& command);
 
 
     void setGlobalData(GlobalData* pData)

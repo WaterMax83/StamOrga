@@ -169,6 +169,11 @@ qint32 UserInterface::startListFanclubNews()
     return this->m_pConHandle->startListFanclubNews();
 }
 
+qint32 UserInterface::startStatisticsCommand(const QByteArray& command)
+{
+    return this->m_pConHandle->startStatisticsCommand(command);
+}
+
 void UserInterface::slConnectionRequestFinished(qint32 result)
 {
     emit this->notifyConnectionFinished(result);
@@ -288,6 +293,10 @@ void UserInterface::slCommandFinished(quint32 command, qint32 result)
     case OP_CODE_CMD_REQ::REQ_SET_USER_EVENTS:
         if (result == ERROR_CODE_SUCCESS)
             this->startGetUserEvents();
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_CMD_STATISTIC:
+        emit this->notifyStatisticsCommandFinished(result);
         break;
 
     default:

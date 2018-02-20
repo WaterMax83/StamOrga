@@ -22,6 +22,7 @@
 #include <QList>
 #include <QObject>
 #include <QTimer>
+#include <QMutex>
 
 #include "../Common/General/backgroundcontroller.h"
 #include "../Common/General/backgroundworker.h"
@@ -30,17 +31,17 @@
 struct StatsTickets {
     StatsTickets()
     {
-        this->m_index     = -1;
+        this->m_userIndex = -1;
         this->m_free      = 0;
         this->m_reserved  = 0;
-        this->m_used      = 0;
+        this->m_blocked   = 0;
         this->m_timestamp = 0;
     }
-    qint32  m_index;
+    quint32 m_userIndex;
     QString m_name;
     qint32  m_free;
     qint32  m_reserved;
-    qint32  m_used;
+    qint32  m_blocked;
     qint64  m_timestamp;
 };
 
@@ -51,6 +52,8 @@ public:
     explicit Statistic(QObject* parent = nullptr);
 
     int initialize();
+
+    qint32 handleStatisticCommand(QByteArray& cmd, QByteArray& answer);
 
 signals:
 
@@ -63,6 +66,7 @@ protected:
     BackgroundController* m_bckGrndCtrl;
     QTimer*               m_cycleTimer;
     QList<StatsTickets*>  m_statsTickets;
+    QMutex                m_statsMutex;
 };
 
 #endif // CYCLECHECK_H

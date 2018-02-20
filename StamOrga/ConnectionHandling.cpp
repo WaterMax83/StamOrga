@@ -328,6 +328,15 @@ qint32 ConnectionHandling::startDeleteFanclubNewsItem(const quint32 newsIndex)
     return ERROR_CODE_SUCCESS;
 }
 
+qint32 ConnectionHandling::startStatisticsCommand(const QByteArray& command)
+{
+    DataConRequest req(OP_CODE_CMD_REQ::REQ_CMD_STATISTIC);
+    req.m_lData.append(QString(command));
+    this->sendNewRequest(req);
+
+    return ERROR_CODE_SUCCESS;
+}
+
 /*
  * Answer function after connection with username
  */

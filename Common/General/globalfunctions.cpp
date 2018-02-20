@@ -101,6 +101,8 @@ QString getErrorCodeString(qint32 code)
         return QString("Liste muss aktualisiert werden: %1").arg(code);
     case ERROR_CODE_NOT_READY:
         return QString("Server is not nicht bereit: %1").arg(code);
+    case ERROR_CODE_MISSING_PARAMETER:
+        return QString("A Parameter is missing: %1").arg(code);
     default:
         return QString("Unbekannter Fehler: %1").arg(code);
     }

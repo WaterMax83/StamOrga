@@ -9,7 +9,7 @@
 ###########################################################################################
 
 
-QT += qml quick network widgets
+QT += qml quick network widgets charts
 
 android{
     QT += androidextras
@@ -44,6 +44,7 @@ SOURCES += main.cpp \
     ../Data/globalsettings.cpp \
     ../Data/appuserevents.cpp \
     ../Data/favoritegame.cpp \
+    ../Data/statistic.cpp \
     source/pushnotification.cpp
 
 
@@ -95,6 +96,7 @@ HEADERS += \
     ../Data/globalsettings.h \
     ../Data/appuserevents.h \
     ../Data/favoritegame.h \
+    ../Data/statistic.h \
     source/pushnotification.h
 
 #android{

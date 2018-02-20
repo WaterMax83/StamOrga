@@ -101,14 +101,15 @@ private:
     void startSendGetNewsDataList(DataConRequest request);
     void startSendGetNewDataItem(DataConRequest request);
     void startSendDeleteNewDataItem(DataConRequest request);
+    void startSendStatisticsCommand(DataConRequest request);
 
 
-    void   checkNewOncomingData();
-    qint32 sendMessageRequest(MessageProtocol* msg, DataConRequest request);
-    void removeActualRequest(quint32 req);
+    void           checkNewOncomingData();
+    qint32         sendMessageRequest(MessageProtocol* msg, DataConRequest request);
+    void           removeActualRequest(quint32 req);
     DataConRequest getActualRequest(quint32 req);
-    QString getActualRequestData(quint32 req, qint32 index);
-    QString createHashValue(const QString first, const QString second);
+    QString        getActualRequestData(quint32 req, qint32 index);
+    QString        createHashValue(const QString first, const QString second);
 
     bool m_bRequestLoginAgain;
     void sendActualRequestsAgain(qint32 result);
