@@ -19,11 +19,30 @@
 #ifndef CYCLECHECK_H
 #define CYCLECHECK_H
 
+#include <QList>
 #include <QObject>
 #include <QTimer>
 
 #include "../Common/General/backgroundcontroller.h"
 #include "../Common/General/backgroundworker.h"
+
+
+struct StatsTickets {
+    StatsTickets()
+    {
+        this->m_index     = -1;
+        this->m_free      = 0;
+        this->m_reserved  = 0;
+        this->m_used      = 0;
+        this->m_timestamp = 0;
+    }
+    qint32  m_index;
+    QString m_name;
+    qint32  m_free;
+    qint32  m_reserved;
+    qint32  m_used;
+    qint64  m_timestamp;
+};
 
 class Statistic : public BackgroundWorker
 {
@@ -43,6 +62,7 @@ protected:
 
     BackgroundController* m_bckGrndCtrl;
     QTimer*               m_cycleTimer;
+    QList<StatsTickets*>  m_statsTickets;
 };
 
 #endif // CYCLECHECK_H

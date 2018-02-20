@@ -207,7 +207,7 @@ int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sInde
     return newIndex;
 }
 
-int Games::showAllGames()
+int Games::showAllGames(const bool showUpdate)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
@@ -217,19 +217,17 @@ int Games::showAllGames()
             continue;
         QString date   = QDateTime::fromMSecsSinceEpoch(pGame->m_timestamp).toString("dd.MM.yyyy hh:mm");
         QString update = QDateTime::fromMSecsSinceEpoch(pGame->m_lastUpdate).toString("dd.MM.yyyy hh:mm");
-        QString output;
-        if (pGame->m_score.size() > 0)
-            output = QString("%1: %2 - %3 %4 - %5 = %6\t %7")
-                         .arg(pGame->m_saisonIndex, 2, 10, QChar('0'))
-                         .arg(pGame->m_competition)
-                         .arg(date, pGame->m_itemName, pGame->m_away, pGame->m_score, update);
-        else
-            output = QString("%1: %2 - %3 %4 - %5\t %6")
-                         .arg(pGame->m_saisonIndex, 2, 10, QChar('0'))
-                         .arg(pGame->m_competition)
-                         .arg(date, pGame->m_itemName, pGame->m_away, update);
-        if (pGame->m_scheduled)
-            output.append(" *");
+        QString output = QString("%1:  %2").arg(pGame->m_index, 3, 10).arg(pGame->m_saisonIndex, 2, 10);
+        output.append(QString("  %1  %2 ").arg(pGame->m_competition).arg(date));
+        if (!showUpdate) {
+            output.append(QString("%1 - %2").arg(pGame->m_itemName, -22).arg(pGame->m_away, -22));
+            if (pGame->m_score.size() > 0)
+                output.append(QString(" %1 ").arg(pGame->m_score));
+            if (pGame->m_scheduled)
+                output.append(" *");
+        } else
+            output.append(" - " + update);
+
         std::cout << output.toStdString() << std::endl;
     }
     return 0;

@@ -102,7 +102,7 @@ public:
     qint32 addNewAppInformation(const QString guid, const QString fcmToken, const qint32 system, const quint32 userIndex);
     qint32 addNewVersionInformation(const QString guid, const QString version);
 
-    void showCurrentTokenInformation();
+    void showCurrentTokenInformation(const QString cmd);
 
     qint64 sendNewVersionNotification(const QString body);
     qint64 sendNewMeetingNotification(const QString body, const qint32 userID, const quint32 gameIndex);

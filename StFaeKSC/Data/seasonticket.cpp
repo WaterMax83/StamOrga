@@ -166,9 +166,10 @@ int SeasonTicket::showAllSeasonTickets()
         TicketInfo* pTicket = (TicketInfo*)(this->getItemFromArrayIndex(i));
         if (pTicket == NULL)
             continue;
-        QString date = QDateTime::fromMSecsSinceEpoch(pTicket->m_timestamp).toString("dd.MM.yyyy hh:mm");
-        QString output;
-        output = QString("%1: %2 - %3 - %4 - %5").arg(pTicket->m_itemName).arg(pTicket->m_discount).arg(pTicket->m_place, date, pTicket->m_user);
+        QString date   = QDateTime::fromMSecsSinceEpoch(pTicket->m_timestamp).toString("dd.MM.yyyy hh:mm");
+        QString output = QString("%1: %2").arg(pTicket->m_itemName, -20).arg(pTicket->m_discount);
+        output.append(QString(" - %1 - %2").arg(date).arg(pTicket->m_place, -20));
+        output.append(QString(" - %1").arg(pTicket->m_user));
         std::cout << output.toStdString() << std::endl;
     }
     return 0;

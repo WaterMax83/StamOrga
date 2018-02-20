@@ -169,7 +169,9 @@ int FanclubNews::showNewsData()
         QString date   = QDateTime::fromMSecsSinceEpoch(pItem->m_timestamp).toString("dd.MM.yyyy hh:mm");
         QString output = QString("%1 - %2: %3 - %4")
                              .arg(pItem->m_index, 2, 10, QChar('0'))
-                             .arg(date, g_ListedUser->getItemName(pItem->m_userID), pItem->m_itemName);
+                             .arg(date)
+                             .arg(g_ListedUser->getItemName(pItem->m_userID), -15)
+                             .arg(pItem->m_itemName);
 
         std::cout << output.toStdString() << std::endl;
     }

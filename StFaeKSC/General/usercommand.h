@@ -28,6 +28,7 @@
 #include "../Common/General/logging.h"
 #include "../Data/readdatacsv.h"
 #include "../General/globaldata.h"
+#include "pushnotification.h"
 
 class UserCommand
 {
@@ -42,7 +43,7 @@ public:
         if (list.value(1) == "add" && list.size() == 3) {
             int result = pUsers->addNewUser(list.value(2));
             if (result > 0)
-                std::cout << QString("Added new user: %1").arg(list.value(2)).toStdString() <<  std::endl;
+                std::cout << QString("Added new user: %1").arg(list.value(2)).toStdString() << std::endl;
             return result;
         } else if (list.value(1) == "remove" && list.size() == 3)
             return pUsers->removeItem(list.value(2));
@@ -94,7 +95,9 @@ public:
             return ShowGamesCommandHelp();
 
         if (list.value(1) == "show" && list.size() == 2)
-            return pGames->showAllGames();
+            return pGames->showAllGames(false);
+        else if (list.value(1) == "show" && list.size() == 3 && list.value(2) == "update")
+            return pGames->showAllGames(true);
 
         return ShowGamesCommandHelp();
     }
@@ -135,6 +138,18 @@ public:
         return ShowFanclubNewsHelp();
     }
 
+    static int runTokenCommand(const QString& cmd)
+    {
+        QStringList list = cmd.split(' ');
+        if (list.size() != 2 || list.value(0) != "token")
+            return ShowTokenHelp();
+
+        if (list.value(1) == "token" || list.value(1) == "guid" || list.value(1) == "version")
+            g_pushNotify->showCurrentTokenInformation(list.value(1));
+
+        return ShowTokenHelp();
+    }
+
 private:
     static int ShowUserCommandHelp()
     {
@@ -158,7 +173,7 @@ private:
     {
         std::cout << "Games functions - Usage\n\n";
 
-        std::cout << "show\t\t\t"
+        std::cout << "show [update]\t\t\t"
                   << "show all games" << std::endl;
 
         return 0;
@@ -190,6 +205,20 @@ private:
 
         std::cout << "show\t\t\t"
                   << "show all news" << std::endl;
+
+        return 0;
+    }
+
+    static int ShowTokenHelp()
+    {
+        std::cout << "Token functions - Usage\n\n";
+
+        std::cout << "token\t\t\t"
+                  << "show all token information" << std::endl;
+        std::cout << "guid\t\t\t"
+                  << "show all guid information" << std::endl;
+        std::cout << "version\t\t\t"
+                  << "show all version information" << std::endl;
 
         return 0;
     }

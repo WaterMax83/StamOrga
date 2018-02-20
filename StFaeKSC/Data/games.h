@@ -76,7 +76,7 @@ public:
     int addNewGame(QString home, QString away, qint64 timestamp,
                    quint8 sIndex, QString score, CompetitionIndex comp,
                    quint16 season = 0, qint64 lastUpdate = 0);
-    int showAllGames();
+    int showAllGames(const bool showUpdate);
 
     int changeScheduledValue(const quint32 gameIndex, const quint32 fixedTime);
 

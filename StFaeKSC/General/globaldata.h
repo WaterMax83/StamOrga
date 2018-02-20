@@ -70,7 +70,7 @@ public:
     QList<AwayTripInfo*>         m_awayTripInfos;
     QList<UserEvents*>           m_userEvents;
     QMutex                       m_globalDataMutex;
-    qint32                       m_currentSeason;
+    quint32                      m_currentSeason;
 
 private:
     bool      m_initalized;

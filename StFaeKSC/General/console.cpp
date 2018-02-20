@@ -30,7 +30,6 @@
 #include "../Common/General/globalfunctions.h"
 #include "console.h"
 #include "usercommand.h"
-#include "pushnotification.h"
 
 
 #define SETTINGS_PATH "/Settings/settings.ini"
@@ -97,8 +96,8 @@ void Console::readCommand()
             UserCommand::runGameCommand(qLine, &this->m_pGlobalData->m_GamesList);
         } else if (qLine == "ticket" || qLine.left(7) == "ticket ") {
             UserCommand::runTicketCommand(qLine, &this->m_pGlobalData->m_SeasonTicket);
-        }else if (qLine == "token") {
-            g_pushNotify->showCurrentTokenInformation();
+        } else if (qLine == "token" || qLine.left(6) == "token ") {
+            UserCommand::runTokenCommand(qLine);
         } else if (qLine == "news" || qLine.left(5) == "news ") {
             UserCommand::runFanclubNewsCommand(qLine, &this->m_pGlobalData->m_fanclubNews);
         } else if (qLine == "read" || qLine.left(5) == "read ") {

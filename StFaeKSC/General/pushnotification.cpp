@@ -634,9 +634,11 @@ bool PushNotification::addNewAppToken(AppTokenUID* app, bool checkApp)
     return true;
 }
 
-void PushNotification::showCurrentTokenInformation()
+void PushNotification::showCurrentTokenInformation(const QString cmd)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
+
+    //    if (cmd ==)
 
     for (int i = 0; i < this->getNumberOfInternalList(); i++) {
         AppTokenUID* app = (AppTokenUID*)(this->getItemFromArrayIndex(i));
@@ -645,12 +647,16 @@ void PushNotification::showCurrentTokenInformation()
         QString date    = QDateTime::fromMSecsSinceEpoch(app->m_timestamp).toString("dd.MM.yyyy hh:mm");
         QString token   = app->m_fcmToken == "" ? "Kein Token" : app->m_fcmToken;
         QString version = app->m_version == "" ? "Keine Version" : app->m_version;
-        std::cout << QString("%1: ").arg(app->m_index).toStdString()
-                  << this->m_pGlobalData->m_UserList.getItemName(app->m_userIndex).toStdString()
-                  << (QString(" - %1 - %3 - %2").arg(date, app->m_guid).arg(app->m_oSystem)).toStdString()
-                  << std::endl
-                  << "\t" << token.toStdString() << std::endl
-                  << "\t" << version.toStdString() << std::endl;
+        QString output  = QString("%1: %2").arg(app->m_index, 2, 10).arg(date);
+        output.append(QString(" - %1").arg(this->m_pGlobalData->m_UserList.getItemName(app->m_userIndex)));
+        if (cmd == "token")
+            output.append(QString(" - %1").arg(token));
+        else if (cmd == "guid")
+            output.append(QString(" - %1").arg(app->m_guid));
+        else if (cmd == "version")
+            output.append(QString(" - %1 %2").arg(version).arg(app->m_oSystem));
+
+        std::cout << output.toStdString() << std::endl;
     }
 }
 
