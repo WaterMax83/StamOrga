@@ -60,6 +60,7 @@ int main(int argc, char* argv[])
     qRegisterMetaType<AcceptMeetingInfo*>("AcceptMeetingInfo*");
     qRegisterMetaType<DataConRequest>("DataConRequest");
     qRegisterMetaType<FavoriteGame*>("FavoriteGame*");
+    qRegisterMetaType<StatBars*>("StatBars*");
 
     GlobalSettings globalSettings;
     g_GlobalSettings = &globalSettings;

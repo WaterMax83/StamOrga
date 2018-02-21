@@ -29,8 +29,8 @@
 #include "../Data/listeduser.h"
 #include "../Data/meetinginfo.h"
 #include "../Data/seasonticket.h"
-#include "../Data/statistic.h"
 #include "../Data/userevents.h"
+#include "../Data/statistic.h"
 
 class GlobalData
 {

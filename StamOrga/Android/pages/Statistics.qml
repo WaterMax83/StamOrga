@@ -27,87 +27,95 @@ import "../components" as MyComponents
 
 Item {
     id: tmp
-    Pane {
-        id: mainPaneStatistic
-        width: parent.width
-        height: parent.height
 
-        ColumnLayout {
-            id: mainColumnLayoutStatistic
-            anchors.fill: parent
+    ColumnLayout {
+        id: mainColumnLayoutStatistic
+        anchors.fill: parent
+        Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+        spacing: 0
+
+        ComboBox {
+            id: comboStatisticOverview
+            Layout.leftMargin: 10
+            Layout.rightMargin: 10
+            Layout.topMargin: 10
+            font.family: txtForFontFamily.font
+            model: statistics.getCurrentOverviewList()
+            anchors.horizontalCenter: parent.horizontalCenter
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignTop
+            onCurrentIndexChanged: {
+                if (iLoadingIndex < 0 || bComboBoxIndexEnabled === false)
+                    return;
+
+                statistics.loadStatisticContent(comboStatisticOverview.currentIndex);
+                busyIndicatorStatistic.loadingVisible = true;
+                chartView.visible = false;
+                iLoadingIndex = 1;
+
+            }
+        }
+
+        Text {
+            id: txtForFontFamily
+            visible: false
+        }
+
+        MyComponents.BusyLoadingIndicator {
+            id: busyIndicatorStatistic
+            visible: !chartView.visible
+            width: parent.width
             Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-            spacing: 0
+            Layout.fillHeight: false
+            Layout.topMargin: 5
+            infoVisible: false
+        }
 
-            ComboBox {
-                id: comboStatisticOverview
-                font.family: txtForFontFamily.font
-                model: statistics.getCurrentOverviewList()
-                anchors.horizontalCenter: parent.horizontalCenter
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignTop
-                onCurrentIndexChanged: {
-                    if (iLoadingIndex < 0 || bComboBoxIndexEnabled === false)
-                        return;
-
+        MyComponents.CustomButton {
+            id: loadAgainButton
+            visible: false
+            text: "Erneut laden"
+            font.family: txtForFontFamily.font
+            implicitWidth: parent.width / 3 * 2
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            onClicked: {
+                loadAgainButton.visible = false;
+                busyIndicatorStatistic.infoVisible = false;
+                if (iLoadingIndex === 0)
+                    statistics.loadStatisticOverview();
+                else
                     statistics.loadStatisticContent(comboStatisticOverview.currentIndex);
-                    busyIndicatorStatistic.loadingVisible = true;
-                    chartView.visible = false;
-                    iLoadingIndex = 1;
-
-                }
+                busyIndicatorStatistic.loadingVisible = true;
+                chartView.visible = false;
             }
+        }
 
-            Text {
-                id: txtForFontFamily
-                visible: false
-            }
+        Flickable {
+            id: statFlickable
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            clip: true
 
-            MyComponents.BusyLoadingIndicator {
-                id: busyIndicatorStatistic
-                width: parent.width
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                Layout.fillHeight: false
-                Layout.topMargin: 5
-                infoVisible: false
-            }
-
-            MyComponents.CustomButton {
-                id: loadAgainButton
-                visible: false
-                text: "Erneut laden"
-                font.family: txtForFontFamily.font
-                implicitWidth: parent.width / 3 * 2
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                onClicked: {
-                    loadAgainButton.visible = false;
-                    busyIndicatorStatistic.infoVisible = false;
-                    if (iLoadingIndex === 0)
-                        statistics.loadStatisticOverview();
-                    else
-                        statistics.loadStatisticContent(comboStatisticOverview.currentIndex);
-                    busyIndicatorStatistic.loadingVisible = true;
-                    chartView.visible = false;
-                }
-            }
+            boundsBehavior: Flickable.StopAtBounds
+            contentHeight: chartView.height
 
             ChartView {
                 id: chartView
-                title: "Stacked Bar series"
-//                anchors.fill: parent
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-//                legend.alignment: Qt.AlignBottom
+                title: statistics.title
+                width: parent.width
+                height: Math.max(mainColumnLayoutStatistic.height - comboStatisticOverview.height,
+                                 statistics.height * txtForFontFamily.height * 3)
                 antialiasing: true
 
                 HorizontalStackedBarSeries {
                     id: mySeries
                     axisY: BarCategoryAxis {
-//                        categories: ["2004", "2005", "2006", "2007", "2008", "2009" ]
                         categories: statistics.categories
                     }
-                    BarSet { label: "Bob"; values: [2, 2, 3, 4, 5, 6] }
-                    BarSet { label: "Susan"; values: [5, 1, 2, 4, 1, 7] }
-                    BarSet { label: "James"; values: [3, 5, 8, 13, 5, 8] }
+                    axisX: ValueAxis {
+                        min: 0
+                        max: statistics.maxX
+                    }
                 }
             }
         }
@@ -125,15 +133,12 @@ Item {
         chartView.visible = false;
         iLoadingIndex = 0;
 
-//        mySeries.
-
     }
 
 
     function notifyStatisticsCommandFinished(result) {
-        console.log("Finished command " + result + " " + iLoadingIndex);
-
         busyIndicatorStatistic.loadingVisible = false;
+        loadAgainButton.visible = false;
 
         if (result === 1) {
 
@@ -147,14 +152,10 @@ Item {
 
                 mySeries.clear();
 
-                var index = 0;
-                while(1) {
-                    var title = statistics.getNextBarSetTitle(index);
-                    if (title === "")
-                        break;
-                    var values = statistics.getNextBarSetValues(index);
-                    index++;
-                    mySeries.append(title, values);
+                for(var index = 0; index < statistics.getStatBarCount(); index++) {
+                    var barInfo = statistics.getNextStatBar(index);
+                    var bar = mySeries.append(barInfo.title, barInfo.values);
+                    bar.color = barInfo.color;
                 }
                 chartView.visible = true;
             }

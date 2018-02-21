@@ -68,7 +68,7 @@ void Statistic::slotCycleTimerFired()
             continue;
 
         StatsTickets* pStats = new StatsTickets();
-        pStats->m_userIndex  = pTicket->m_userIndex;
+        pStats->m_ticketIndex  = pTicket->m_index;
         pStats->m_name       = pTicket->m_itemName;
         pStats->m_timestamp  = pTicket->m_creation;
 
@@ -104,10 +104,10 @@ void Statistic::slotCycleTimerFired()
 
             /* add counter for free or reserved */
             foreach (StatsTickets* pStats, this->m_statsTickets) {
-                if (pStats->m_userIndex != pTicket->m_userID)
+                if (pStats->m_ticketIndex != pTicket->m_ticketID)
                     continue;
 
-                if (pTicket->m_state != TICKET_STATE_BLOCKED) {
+                if (pTicket->m_state != TICKET_STATE_BLOCKED && pStats->m_blocked > 0) {
                     pStats->m_blocked--;
                     if (pTicket->m_state == TICKET_STATE_FREE)
                         pStats->m_free++;
@@ -155,44 +155,18 @@ qint32 Statistic::handleStatisticCommand(QByteArray& command, QByteArray& answer
     }
 
     QJsonObject rootObjAnswer;
+    qint32 rValue = ERROR_CODE_SUCCESS;
     if (cmd == "overview") {
         QJsonArray parameter;
         parameter.append("Dauerkarten");
-        parameter.append("FillBlock");
 
         rootObjAnswer.insert("parameter", parameter);
 
     } else if (cmd == "content") {
+
         QString para = rootObj.value("parameter").toString("");
         if (para == "Dauerkarten") {
-            QJsonArray categories;
-
-            QJsonArray blocked, reserved, free;
-            foreach (StatsTickets* pStats, this->m_statsTickets) {
-                QString name = pStats->m_name;
-                if (name.size() > 8)
-                    name.resize(8);
-                categories.append(name);
-
-                blocked.append(pStats->m_blocked);
-                reserved.append(pStats->m_reserved);
-                free.append(pStats->m_free);
-            }
-
-            QJsonObject barBlocked, barReserved, barFree;
-            barBlocked.insert("title", "Geht selbst");
-            barReserved.insert("title", "Reserviert");
-            barFree.insert("title", "Frei");
-            barBlocked.insert("values", blocked);
-            barReserved.insert("values", reserved);
-            barFree.insert("values", free);
-            QJsonArray bars;
-            bars.append(barBlocked);
-            bars.append(barReserved);
-            bars.append(barFree);
-
-            rootObjAnswer.insert("categories", categories);
-            rootObjAnswer.insert("bars", bars);
+            this->handleSeasonTicketCommand(rootObjAnswer);
         } else
             return ERROR_CODE_NOT_POSSIBLE;
     } else
@@ -203,6 +177,58 @@ qint32 Statistic::handleStatisticCommand(QByteArray& command, QByteArray& answer
 
     answer.clear();
     answer.append(QJsonDocument(rootObjAnswer).toJson(QJsonDocument::Compact));
+
+    return rValue;
+}
+
+qint32 Statistic::handleSeasonTicketCommand(QJsonObject& rootObjAnswer)
+{
+    QJsonArray categories;
+
+    QJsonArray blocked, reserved, free;
+    qint32 maxX = 0;
+    foreach (StatsTickets* pStats, this->m_statsTickets) {
+        QString name = pStats->m_name;
+        /* clean name to 8 characters and check if not already used */
+        if (name.size() > 8)
+            name.resize(8);
+        qint32 index = 0;
+        while(categories.contains(name)) {
+            name.resize(7);
+            name.append(QString::number(index++));
+        }
+        categories.append(name);
+
+        blocked.append(pStats->m_blocked);
+        reserved.append(pStats->m_reserved);
+        free.append(pStats->m_free);
+
+        qint32 tmp = pStats->m_blocked + pStats->m_free + pStats->m_reserved;
+        if (tmp > maxX)
+            maxX = tmp;
+    }
+
+    QJsonObject barBlocked, barReserved, barFree;
+    barBlocked.insert("title", "Geht selbst");
+    barReserved.insert("title", "Reserviert");
+    barFree.insert("title", "Frei");
+    barBlocked.insert("values", blocked);
+    barReserved.insert("values", reserved);
+    barFree.insert("values", free);
+    barBlocked.insert("color", "red");
+    barReserved.insert("color", "yellow");
+    barFree.insert("color", "green");
+
+    QJsonArray bars;
+    bars.append(barBlocked);
+    bars.append(barReserved);
+    bars.append(barFree);
+
+    qint32 currentSeason = g_GlobalData->m_currentSeason % 2000;
+    rootObjAnswer.insert("categories", categories);
+    rootObjAnswer.insert("bars", bars);
+    rootObjAnswer.insert("title", QString("Dauerkarten %1/%2").arg(currentSeason).arg(currentSeason + 1));
+    rootObjAnswer.insert("maxX", maxX);
 
     return ERROR_CODE_SUCCESS;
 }

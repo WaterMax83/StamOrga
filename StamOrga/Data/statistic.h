@@ -31,10 +31,29 @@
 
 QT_CHARTS_USE_NAMESPACE
 
+class StatBars : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(QString title READ title)
+    Q_PROPERTY(QList<QVariant> values READ values)
+    Q_PROPERTY(QString color READ color)
+public:
+    QString         title() { return this->m_title; }
+    QList<QVariant> values() { return this->m_values; }
+    QString         color() { return this->m_color; }
+
+    QString         m_title;
+    QList<QVariant> m_values;
+    QString         m_color;
+};
+
 class Statistic : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QStringList categories READ categories NOTIFY categoriesChanged)
+    Q_PROPERTY(QStringList categories READ categories NOTIFY propertiesChanged)
+    Q_PROPERTY(QString title READ title NOTIFY propertiesChanged)
+    Q_PROPERTY(qint32 maxX READ maxX NOTIFY propertiesChanged)
+    Q_PROPERTY(qint32 height READ height NOTIFY propertiesChanged)
 public:
     explicit Statistic(QObject* parent = nullptr);
 
@@ -50,13 +69,16 @@ public:
 
     Q_INVOKABLE QStringList getCurrentOverviewList();
 
-    Q_INVOKABLE QString getNextBarSetTitle(const qint32 index);
-    Q_INVOKABLE QList<QVariant> getNextBarSetValues(const qint32 index);
+    Q_INVOKABLE StatBars* getNextStatBar(const qint32 index);
+    Q_INVOKABLE qint32 getStatBarCount() { return this->m_statBars.count(); }
 
     QStringList categories() { return this->m_categories; }
+    QString     title() { return this->m_title; }
+    qint32      maxX() { return this->m_maxX; }
+    qint32      height() { return this->m_categories.count(); }
 
 signals:
-    void categoriesChanged();
+    void propertiesChanged();
 
 public slots:
 
@@ -64,7 +86,10 @@ private:
     UserInterface* m_userInterface;
     QStringList    m_overView;
 
-    QStringList m_categories;
+    QStringList      m_categories;
+    QString          m_title;
+    qint32           m_maxX;
+    QList<StatBars*> m_statBars;
 
     qint32 startSendCommand(QJsonObject& rootObj);
 };

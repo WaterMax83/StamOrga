@@ -31,13 +31,13 @@
 struct StatsTickets {
     StatsTickets()
     {
-        this->m_userIndex = -1;
+        this->m_ticketIndex = -1;
         this->m_free      = 0;
         this->m_reserved  = 0;
         this->m_blocked   = 0;
         this->m_timestamp = 0;
     }
-    quint32 m_userIndex;
+    quint32 m_ticketIndex;
     QString m_name;
     qint32  m_free;
     qint32  m_reserved;
@@ -67,6 +67,8 @@ protected:
     QTimer*               m_cycleTimer;
     QList<StatsTickets*>  m_statsTickets;
     QMutex                m_statsMutex;
+
+    qint32 handleSeasonTicketCommand(QJsonObject& rootObjAnswer);
 };
 
 #endif // CYCLECHECK_H

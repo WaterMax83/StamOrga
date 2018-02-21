@@ -181,7 +181,10 @@ QString GlobalSettings::getVersionChangeInfo()
 {
     QString rValue;
 
-    rValue.append("<b>V1.0.6:</b>(08.02.2018)<br>");
+    rValue.append("<b>V1.0.7:</b>(XX.0X.2018)<br>");
+    rValue.append("- Statistic hinzugefügt<br>");
+
+    rValue.append("<br><b>V1.0.6:</b>(08.02.2018)<br>");
     rValue.append("- Infos über Fahrt in der Übersicht<br>");
     rValue.append("- Icons überarbeitet<br>");
     rValue.append("- Spiel als Favorit markieren<br>");

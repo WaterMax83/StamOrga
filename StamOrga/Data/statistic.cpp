@@ -51,6 +51,7 @@ qint32 Statistic::loadStatisticOverview()
 
 qint32 Statistic::handleStatisticResponse(QByteArray& data)
 {
+
     QJsonParseError jerror;
     QJsonObject     rootObj = QJsonDocument::fromJson(data, &jerror).object();
     if (jerror.error != QJsonParseError::NoError) {
@@ -81,9 +82,29 @@ qint32 Statistic::handleStatisticResponse(QByteArray& data)
         for (int i = 0; i < cat.count(); i++)
             this->m_categories.append(cat.at(i).toString(""));
 
-        QJsonArray bars = rootObj.value("bars").toArray();
+        this->m_title = rootObj.value("title").toString("NoTitle");
 
-        emit this->categoriesChanged();
+        this->m_maxX = rootObj.value("maxX").toInt();
+
+        for (int i = 0; i < this->m_statBars.count(); i++)
+            delete this->m_statBars.at(i);
+        this->m_statBars.clear();
+        QJsonArray bars = rootObj.value("bars").toArray();
+        for (int i = 0; i < bars.count(); i++) {
+            QJsonObject bar = bars.at(i).toObject();
+
+            StatBars* pBar        = new StatBars();
+            pBar->m_title         = bar.value("title").toString();
+            pBar->m_color         = bar.value("color").toString();
+            QJsonArray jsonValues = bar.value("values").toArray();
+            for (int j = 0; j < jsonValues.count(); j++)
+                pBar->m_values.append(jsonValues.at(j).toInt());
+
+            QQmlEngine::setObjectOwnership(pBar, QQmlEngine::CppOwnership);
+            this->m_statBars.append(pBar);
+        }
+
+        emit this->propertiesChanged();
     } else
         return ERROR_CODE_NOT_FOUND;
 
@@ -112,22 +133,12 @@ QStringList Statistic::getCurrentOverviewList()
     return this->m_overView;
 }
 
-QString Statistic::getNextBarSetTitle(const qint32 index)
+StatBars* Statistic::getNextStatBar(const qint32 index)
 {
-    if (index > 5)
-        return "";
+    if (this->m_statBars.count() <= index)
+        return NULL;
 
-    return QString::number(index);
-}
-
-QList<QVariant> Statistic::getNextBarSetValues(const qint32 index)
-{
-    QList<QVariant> values;
-
-    for (int i = 0; i < 5; i++)
-        values.append(index * i);
-
-    return values;
+    return this->m_statBars.at(index);
 }
 
 qint32 Statistic::startSendCommand(QJsonObject& rootObj)
