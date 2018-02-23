@@ -20,9 +20,9 @@
 #define CYCLECHECK_H
 
 #include <QList>
+#include <QMutex>
 #include <QObject>
 #include <QTimer>
-#include <QMutex>
 
 #include "../Common/General/backgroundcontroller.h"
 #include "../Common/General/backgroundworker.h"
@@ -32,10 +32,10 @@ struct StatsTickets {
     StatsTickets()
     {
         this->m_ticketIndex = -1;
-        this->m_free      = 0;
-        this->m_reserved  = 0;
-        this->m_blocked   = 0;
-        this->m_timestamp = 0;
+        this->m_free        = 0;
+        this->m_reserved    = 0;
+        this->m_blocked     = 0;
+        this->m_timestamp   = 0;
     }
     quint32 m_ticketIndex;
     QString m_name;
@@ -43,6 +43,18 @@ struct StatsTickets {
     qint32  m_reserved;
     qint32  m_blocked;
     qint64  m_timestamp;
+};
+
+struct StatsReserved {
+    QString m_name  = "";
+    qint32  m_count = 0;
+
+    static bool compareCountFunctionAscending(StatsReserved* p1, StatsReserved* p2)
+    {
+        if (p1->m_count > p2->m_count)
+            return false;
+        return true;
+    }
 };
 
 class Statistic : public BackgroundWorker
@@ -67,8 +79,10 @@ protected:
     QTimer*               m_cycleTimer;
     QList<StatsTickets*>  m_statsTickets;
     QMutex                m_statsMutex;
+    QList<StatsReserved*> m_reservedTicketNames;
 
     qint32 handleSeasonTicketCommand(QJsonObject& rootObjAnswer);
+    qint32 handleReservesCommand(QJsonObject& rootObjAnswer);
 };
 
 #endif // CYCLECHECK_H

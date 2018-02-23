@@ -61,16 +61,24 @@ void Statistic::slotCycleTimerFired()
     QMutexLocker lock0(&g_GlobalData->m_globalDataMutex);
     QMutexLocker lock1(&this->m_statsMutex);
 
+    foreach (StatsTickets* pStats, this->m_statsTickets)
+        delete pStats;
+    this->m_statsTickets.clear();
+    foreach (StatsReserved* pRes, this->m_reservedTicketNames)
+        delete pRes;
+    this->m_reservedTicketNames.clear();
+
+
     /* First collect all tickets */
     for (int i = 0; i < g_GlobalData->m_SeasonTicket.getNumberOfInternalList(); i++) {
         TicketInfo* pTicket = (TicketInfo*)g_GlobalData->m_SeasonTicket.getRequestConfigItemFromListIndex(i);
         if (pTicket == NULL)
             continue;
 
-        StatsTickets* pStats = new StatsTickets();
-        pStats->m_ticketIndex  = pTicket->m_index;
-        pStats->m_name       = pTicket->m_itemName;
-        pStats->m_timestamp  = pTicket->m_creation;
+        StatsTickets* pStats  = new StatsTickets();
+        pStats->m_ticketIndex = pTicket->m_index;
+        pStats->m_name        = pTicket->m_itemName;
+        pStats->m_timestamp   = pTicket->m_creation;
 
         this->m_statsTickets.append(pStats);
     }
@@ -81,6 +89,9 @@ void Statistic::slotCycleTimerFired()
     for (int i = 0; i < g_GlobalData->m_GamesList.getNumberOfInternalList(); i++) {
         GamesPlay* pGame = (GamesPlay*)g_GlobalData->m_GamesList.getRequestConfigItemFromListIndex(i);
         if (pGame == NULL || pGame->m_saison != g_GlobalData->m_currentSeason || pGame->m_timestamp > currentTimeStamp)
+            continue;
+
+        if (pGame->m_itemName != "KSC" || pGame->m_competition > LIGA_3 || pGame->m_competition < BUNDESLIGA_1)
             continue;
 
         foreach (StatsTickets* pStats, this->m_statsTickets) {
@@ -95,6 +106,9 @@ void Statistic::slotCycleTimerFired()
         GamesPlay* pGame = (GamesPlay*)g_GlobalData->m_GamesList.getItem(pAvTick->getGameIndex());
 
         if (pGame == NULL || pGame->m_saison != g_GlobalData->m_currentSeason || pGame->m_timestamp > currentTimeStamp)
+            continue;
+
+        if (pGame->m_itemName != "KSC" || pGame->m_competition > LIGA_3 || pGame->m_competition < BUNDESLIGA_1)
             continue;
 
         for (int i = 0; i < pAvTick->getNumberOfInternalList(); i++) {
@@ -115,8 +129,27 @@ void Statistic::slotCycleTimerFired()
                         pStats->m_reserved++;
                 }
             }
+
+            if (pTicket->m_state == TICKET_STATE_RESERVED) {
+                bool bFoundItem = false;
+                foreach (StatsReserved* pRes, this->m_reservedTicketNames) {
+                    if (pRes->m_name == pTicket->m_itemName) {
+                        pRes->m_count++;
+                        bFoundItem = true;
+                        break;
+                    }
+                }
+                if (!bFoundItem) {
+                    StatsReserved* pRes = new StatsReserved();
+                    pRes->m_name        = pTicket->m_itemName;
+                    pRes->m_count       = 1;
+                    this->m_reservedTicketNames.append(pRes);
+                }
+            }
         }
     }
+
+    std::sort(this->m_reservedTicketNames.begin(), this->m_reservedTicketNames.end(), StatsReserved::compareCountFunctionAscending);
 
     this->m_cycleTimer->start(6 * 60 * 60 * 1000);
 }
@@ -130,12 +163,20 @@ void Statistic::slotCycleTimerFired()
  *      "cmd":  "overview"  -> get groups of statistic
  * }
  *
+ * Request
+ * {
+ *      "type": "Statistic",
+ *      "version": "V1.0"       // not used at the moment
+ *      "cmd":  "content"           -> get content of the parameter
+ *      "parameter": "Dauerkarten"  -> get content of Dauerkarten
+ * }
+ *
  * Answer
  * {
  *      "type": "Statistic",
- *
- *      "cmd": "overview"   -> send groups of statistic
- *      "parameter": [{"value":"SeasonTickets"},{"value":"Stats2"}]
+ *      "cmd": "overview"                                                       -> send groups of statistic
+ *      "parameter": [{"value":"SeasonTickets"},{"value":"Reservierungen"}]     -> these are the groups
+ * }
  */
 qint32 Statistic::handleStatisticCommand(QByteArray& command, QByteArray& answer)
 {
@@ -155,19 +196,22 @@ qint32 Statistic::handleStatisticCommand(QByteArray& command, QByteArray& answer
     }
 
     QJsonObject rootObjAnswer;
-    qint32 rValue = ERROR_CODE_SUCCESS;
+    qint32      rValue = ERROR_CODE_SUCCESS;
     if (cmd == "overview") {
         QJsonArray parameter;
         parameter.append("Dauerkarten");
+        parameter.append("Reservierungen");
 
         rootObjAnswer.insert("parameter", parameter);
 
     } else if (cmd == "content") {
 
         QString para = rootObj.value("parameter").toString("");
-        if (para == "Dauerkarten") {
+        if (para == "Dauerkarten")
             this->handleSeasonTicketCommand(rootObjAnswer);
-        } else
+        else if (para == "Reservierungen")
+            this->handleReservesCommand(rootObjAnswer);
+        else
             return ERROR_CODE_NOT_POSSIBLE;
     } else
         return ERROR_CODE_NOT_POSSIBLE;
@@ -181,19 +225,31 @@ qint32 Statistic::handleStatisticCommand(QByteArray& command, QByteArray& answer
     return rValue;
 }
 
+/* Answer
+ * {
+ *      "type": "Statistic",
+ *      "cmd": "content"                    -> send content of chart
+ *      "title": "Dauerkarten 17/18",       -> title of the chart
+ *      "maxX": 12,                         -> max value of the X-Axis
+ *      "categories": ["Name1", "Name2"]    -> names of the Y-Axis
+ *      "bars": [{                          -> the bars to show
+ *                  "title":"frei",
+ *                  "color":"green",
+ *                  "values": [1,2,3,4]
+ *              }]
+ * }
+ */
 qint32 Statistic::handleSeasonTicketCommand(QJsonObject& rootObjAnswer)
 {
-    QJsonArray categories;
-
-    QJsonArray blocked, reserved, free;
-    qint32 maxX = 0;
+    QJsonArray categories, blocked, reserved, free;
+    qint32     maxX = 0;
     foreach (StatsTickets* pStats, this->m_statsTickets) {
         QString name = pStats->m_name;
         /* clean name to 8 characters and check if not already used */
         if (name.size() > 8)
             name.resize(8);
         qint32 index = 0;
-        while(categories.contains(name)) {
+        while (categories.contains(name)) {
             name.resize(7);
             name.append(QString::number(index++));
         }
@@ -228,6 +284,50 @@ qint32 Statistic::handleSeasonTicketCommand(QJsonObject& rootObjAnswer)
     rootObjAnswer.insert("categories", categories);
     rootObjAnswer.insert("bars", bars);
     rootObjAnswer.insert("title", QString("Dauerkarten %1/%2").arg(currentSeason).arg(currentSeason + 1));
+    rootObjAnswer.insert("maxX", maxX);
+
+    return ERROR_CODE_SUCCESS;
+}
+
+/* Answer
+ * {
+ *      "type": "Statistic",
+ *      "cmd": "content"                    -> send content of chart
+ *      "title": "Reservierungen 17/18",    -> title of the chart
+ *      "maxX": 12,                         -> max value of the X-Axis
+ *      "categories": ["Name1", "Name2"]    -> names of the Y-Axis
+ *      "bars": [{                          -> the bars to show
+ *                  "title":"reserviert",
+ *                  "color":"yellow",
+ *                  "values": [1,2,3,4]
+ *              }]
+ * }
+ */
+qint32 Statistic::handleReservesCommand(QJsonObject& rootObjAnswer)
+{
+    QJsonArray categories, reserved;
+    qint32     maxX = 0;
+    foreach (StatsReserved* pRes, this->m_reservedTicketNames) {
+        categories.append(pRes->m_name);
+
+        reserved.append(pRes->m_count);
+
+        if (pRes->m_count > maxX)
+            maxX = pRes->m_count;
+    }
+
+    QJsonObject barReserved;
+    barReserved.insert("title", "Reserviert");
+    barReserved.insert("values", reserved);
+    barReserved.insert("color", "yellow");
+
+    QJsonArray bars;
+    bars.append(barReserved);
+
+    qint32 currentSeason = g_GlobalData->m_currentSeason % 2000;
+    rootObjAnswer.insert("categories", categories);
+    rootObjAnswer.insert("bars", bars);
+    rootObjAnswer.insert("title", QString("Reservierungen %1/%2").arg(currentSeason).arg(currentSeason + 1));
     rootObjAnswer.insert("maxX", maxX);
 
     return ERROR_CODE_SUCCESS;
