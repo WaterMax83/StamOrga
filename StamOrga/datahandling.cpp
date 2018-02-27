@@ -87,23 +87,13 @@ qint32 DataHandling::getHandleVersionResponse(MessageProtocol* msg, QString* ver
 
 qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol* msg)
 {
-    if (msg->getDataLength() < 12)
-        return ERROR_CODE_WRONG_SIZE;
+    QByteArray  data(msg->getPointerToData());
+    QJsonObject rootObj = QJsonDocument::fromJson(data).object();
 
-    const char* pData = msg->getPointerToData();
-    quint32     properties, offset = 0;
-    qint32      rValue, index;
-    memcpy(&rValue, pData, sizeof(quint32));
-    offset += sizeof(qint32);
-    if (msg->getDataLength() >= 12) {
-        memcpy(&properties, pData + offset, sizeof(quint32));
-        offset += sizeof(quint32);
-        memcpy(&index, pData + offset, sizeof(quint32));
-        offset += sizeof(qint32);
-    }
-    rValue     = qFromLittleEndian(rValue);
-    properties = qFromLittleEndian(properties);
-    index      = qFromLittleEndian(index);
+    qint32  rValue       = rootObj.value("rvalue").toInt(ERROR_CODE_MISSING_PARAMETER);
+    qint32  index        = rootObj.value("index").toInt(-1);
+    qint32  properties   = rootObj.value("property").toInt(0);
+    QString readableName = rootObj.value("readableName").toString();
 
     this->m_pGlobalData->setUserIndex(index);
 
@@ -117,8 +107,6 @@ qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol* msg)
         qInfo().noquote() << QString("Setting user properties to 0x%1").arg(QString::number(properties, 16));
     } else
         this->m_pGlobalData->SetUserProperties(0x0);
-
-    QString readableName(QByteArray(pData + offset));
 
     this->m_pGlobalData->setReadableName(readableName);
 

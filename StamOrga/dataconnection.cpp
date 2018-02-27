@@ -17,6 +17,8 @@
 */
 
 #include <QtCore/QDataStream>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 
 #include "../Common/General/config.h"
 #include "../Common/General/globalfunctions.h"
@@ -306,26 +308,20 @@ void DataConnection::startSendVersionRequest(DataConRequest request)
 
 void DataConnection::startSendUserPropsRequest(DataConRequest request)
 {
-    quint32 offset = 0;
-    char    data[200];
-    memset(&data[0], 0x0, 200);
-    QByteArray tmp = this->m_pGlobalData->getCurrentAppGUID().toUtf8();
-    memcpy(&data[offset], tmp.constData(), tmp.length());
-    offset += (tmp.length() + 1);
-    tmp = this->m_pGlobalData->getCurrentAppToken().toUtf8();
-    memcpy(&data[offset], tmp.constData(), tmp.length());
-    offset += (tmp.length() + 1);
+    QJsonObject rootObj;
+    rootObj.insert("guid", this->m_pGlobalData->getCurrentAppGUID());
+    rootObj.insert("token", this->m_pGlobalData->getCurrentAppToken());
 #ifdef Q_OS_WIN
-    qint32 os = qToLittleEndian(1);
+    rootObj.insert("os", 1);
 #elif defined(Q_OS_ANDROID)
-    qint32 os = qToLittleEndian(2);
+    rootObj.insert("os", 2);
 #elif defined(Q_OS_IOS)
-    qint32 os = qToLittleEndian(3);
+    rootObj.insert("os", 3);
 #endif
-    memcpy(&data[offset], &os, sizeof(qint32));
-    offset += sizeof(qint32);
 
-    MessageProtocol msg(request.m_request, &data[0], offset);
+    QByteArray data = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+
+    MessageProtocol msg(request.m_request, data);
     this->sendMessageRequest(&msg, request);
 }
 

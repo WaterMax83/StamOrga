@@ -61,12 +61,21 @@ void Statistic::slotCycleTimerFired()
     QMutexLocker lock0(&g_GlobalData->m_globalDataMutex);
     QMutexLocker lock1(&this->m_statsMutex);
 
+    /* Clear all info */
     foreach (StatsTickets* pStats, this->m_statsTickets)
         delete pStats;
     this->m_statsTickets.clear();
+
     foreach (StatsReserved* pRes, this->m_reservedTicketNames)
         delete pRes;
     this->m_reservedTicketNames.clear();
+
+    foreach (StatsMeeting* pMeet, this->m_meetingNames)
+        delete pMeet;
+    this->m_meetingNames.clear();
+    foreach (StatsMeeting* pMeet, this->m_awayTripNames)
+        delete pMeet;
+    this->m_awayTripNames.clear();
 
 
     /* First collect all tickets */
@@ -133,7 +142,7 @@ void Statistic::slotCycleTimerFired()
             if (pTicket->m_state == TICKET_STATE_RESERVED) {
                 bool bFoundItem = false;
                 foreach (StatsReserved* pRes, this->m_reservedTicketNames) {
-                    if (pRes->m_name == pTicket->m_itemName) {
+                    if (this->cleanName(pRes->m_name) == this->cleanName(pTicket->m_itemName)) {
                         pRes->m_count++;
                         bFoundItem = true;
                         break;
@@ -149,9 +158,78 @@ void Statistic::slotCycleTimerFired()
         }
     }
 
+    foreach (MeetingInfo* pMeetingInfo, g_GlobalData->m_meetingInfos) {
+        for (int i = 0; i < pMeetingInfo->getNumberOfInternalList(); i++) {
+            AcceptMeetingInfo* pInfo = (AcceptMeetingInfo*)pMeetingInfo->getRequestConfigItemFromListIndex(i);
+            if (pInfo == NULL)
+                continue;
+
+            bool bFoundItem = false;
+            foreach (StatsMeeting* pMeet, this->m_meetingNames) {
+                if (this->cleanName(pMeet->m_name) == this->cleanName(pInfo->m_itemName)) {
+                    bFoundItem = true;
+                    if (pInfo->m_state == ACCEPT_STATE_ACCEPT)
+                        pMeet->m_accepted++;
+                    else if (pInfo->m_state == ACCEPT_STATE_MAYBE)
+                        pMeet->m_interested++;
+                    break;
+                }
+            }
+            if (!bFoundItem && pInfo->m_state != ACCEPT_STATE_DECLINE) {
+                StatsMeeting* pMeet = new StatsMeeting();
+                pMeet->m_name       = pInfo->m_itemName;
+                if (pInfo->m_state == ACCEPT_STATE_ACCEPT)
+                    pMeet->m_accepted++;
+                else if (pInfo->m_state == ACCEPT_STATE_MAYBE)
+                    pMeet->m_interested++;
+                this->m_meetingNames.append(pMeet);
+            }
+        }
+    }
+
+    foreach (AwayTripInfo* pMeetingInfo, g_GlobalData->m_awayTripInfos) {
+        for (int i = 0; i < pMeetingInfo->getNumberOfInternalList(); i++) {
+            AcceptMeetingInfo* pInfo = (AcceptMeetingInfo*)pMeetingInfo->getRequestConfigItemFromListIndex(i);
+            if (pInfo == NULL)
+                continue;
+
+            bool bFoundItem = false;
+            foreach (StatsMeeting* pMeet, this->m_awayTripNames) {
+                if (this->cleanName(pMeet->m_name) == this->cleanName(pInfo->m_itemName)) {
+                    bFoundItem = true;
+                    if (pInfo->m_state == ACCEPT_STATE_ACCEPT)
+                        pMeet->m_accepted++;
+                    else if (pInfo->m_state == ACCEPT_STATE_MAYBE)
+                        pMeet->m_interested++;
+                    break;
+                }
+            }
+            if (!bFoundItem && pInfo->m_state != ACCEPT_STATE_DECLINE) {
+                StatsMeeting* pMeet = new StatsMeeting();
+                pMeet->m_name       = pInfo->m_itemName;
+                if (pInfo->m_state == ACCEPT_STATE_ACCEPT)
+                    pMeet->m_accepted++;
+                else if (pInfo->m_state == ACCEPT_STATE_MAYBE)
+                    pMeet->m_interested++;
+                this->m_awayTripNames.append(pMeet);
+            }
+        }
+    }
+
+
+    std::sort(this->m_statsTickets.begin(), this->m_statsTickets.end(), StatsTickets::compareCountFunctionAscending);
     std::sort(this->m_reservedTicketNames.begin(), this->m_reservedTicketNames.end(), StatsReserved::compareCountFunctionAscending);
+    std::sort(this->m_meetingNames.begin(), this->m_meetingNames.end(), StatsMeeting::compareCountFunctionAscending);
+    std::sort(this->m_awayTripNames.begin(), this->m_awayTripNames.end(), StatsMeeting::compareCountFunctionAscending);
 
     this->m_cycleTimer->start(6 * 60 * 60 * 1000);
+}
+
+QString Statistic::cleanName(QString name)
+{
+    QString rValue = name.toLower();
+
+    return rValue.replace(".", "");
 }
 
 
@@ -201,6 +279,8 @@ qint32 Statistic::handleStatisticCommand(QByteArray& command, QByteArray& answer
         QJsonArray parameter;
         parameter.append("Dauerkarten");
         parameter.append("Reservierungen");
+        parameter.append("Treffen");
+        parameter.append("Auswärtsfahrt");
 
         rootObjAnswer.insert("parameter", parameter);
 
@@ -211,6 +291,10 @@ qint32 Statistic::handleStatisticCommand(QByteArray& command, QByteArray& answer
             this->handleSeasonTicketCommand(rootObjAnswer);
         else if (para == "Reservierungen")
             this->handleReservesCommand(rootObjAnswer);
+        else if (para == "Treffen")
+            this->handleMeetingCommand(rootObjAnswer);
+        else if (para == "Auswärtsfahrt")
+            this->handleAwayTripCommand(rootObjAnswer);
         else
             return ERROR_CODE_NOT_POSSIBLE;
     } else
@@ -298,7 +382,7 @@ qint32 Statistic::handleSeasonTicketCommand(QJsonObject& rootObjAnswer)
  *      "categories": ["Name1", "Name2"]    -> names of the Y-Axis
  *      "bars": [{                          -> the bars to show
  *                  "title":"reserviert",
- *                  "color":"yellow",
+ *                  "color":"orange",
  *                  "values": [1,2,3,4]
  *              }]
  * }
@@ -317,9 +401,9 @@ qint32 Statistic::handleReservesCommand(QJsonObject& rootObjAnswer)
     }
 
     QJsonObject barReserved;
-    barReserved.insert("title", "Reserviert");
+    barReserved.insert("title", "reserviert von");
     barReserved.insert("values", reserved);
-    barReserved.insert("color", "yellow");
+    barReserved.insert("color", "orange");
 
     QJsonArray bars;
     bars.append(barReserved);
@@ -328,6 +412,114 @@ qint32 Statistic::handleReservesCommand(QJsonObject& rootObjAnswer)
     rootObjAnswer.insert("categories", categories);
     rootObjAnswer.insert("bars", bars);
     rootObjAnswer.insert("title", QString("Reservierungen %1/%2").arg(currentSeason).arg(currentSeason + 1));
+    rootObjAnswer.insert("maxX", maxX);
+
+    return ERROR_CODE_SUCCESS;
+}
+
+/* Answer
+ * {
+ *      "type": "Statistic",
+ *      "cmd": "content"                    -> send content of chart
+ *      "title": "Treffen 17/18",    -> title of the chart
+ *      "maxX": 12,                         -> max value of the X-Axis
+ *      "categories": ["Name1", "Name2"]    -> names of the Y-Axis
+ *      "bars": [{                          -> the bars to show
+ *                  "title":"Zugesagt",
+ *                  "color":"green",
+ *                  "values": [1,2,3,4]
+ *              },
+ *              {
+ *                  "title":"Interesse",
+ *                  "color":"yellow",
+ *                  "values": [1,2,3,4]
+ *              }]
+ * }
+ */
+qint32 Statistic::handleMeetingCommand(QJsonObject& rootObjAnswer)
+{
+    QJsonArray categories, accepted, interested;
+    qint32     maxX = 0;
+    foreach (StatsMeeting* pRes, this->m_meetingNames) {
+        categories.append(pRes->m_name);
+
+        accepted.append(pRes->m_accepted);
+        interested.append(pRes->m_interested);
+
+        if (pRes->m_accepted + pRes->m_interested > maxX)
+            maxX = pRes->m_accepted + pRes->m_interested;
+    }
+
+    QJsonObject barReserved, barInterested;
+    barReserved.insert("title", "Zugesagt");
+    barReserved.insert("values", accepted);
+    barReserved.insert("color", "green");
+    barInterested.insert("title", "Interesse");
+    barInterested.insert("values", interested);
+    barInterested.insert("color", "yellow");
+
+    QJsonArray bars;
+    bars.append(barReserved);
+    bars.append(barInterested);
+
+    qint32 currentSeason = g_GlobalData->m_currentSeason % 2000;
+    rootObjAnswer.insert("categories", categories);
+    rootObjAnswer.insert("bars", bars);
+    rootObjAnswer.insert("title", QString("Treffen %1/%2").arg(currentSeason).arg(currentSeason + 1));
+    rootObjAnswer.insert("maxX", maxX);
+
+    return ERROR_CODE_SUCCESS;
+}
+
+/* Answer
+ * {
+ *      "type": "Statistic",
+ *      "cmd": "content"                    -> send content of chart
+ *      "title": "Auswärtsfahrt 17/18",    -> title of the chart
+ *      "maxX": 12,                         -> max value of the X-Axis
+ *      "categories": ["Name1", "Name2"]    -> names of the Y-Axis
+ *      "bars": [{                          -> the bars to show
+ *                  "title":"Zugesagt",
+ *                  "color":"green",
+ *                  "values": [1,2,3,4]
+ *              },
+ *              {
+ *                  "title":"Interesse",
+ *                  "color":"yellow",
+ *                  "values": [1,2,3,4]
+ *              }]
+ * }
+ */
+qint32 Statistic::handleAwayTripCommand(QJsonObject& rootObjAnswer)
+{
+    QJsonArray categories, accepted, interested;
+    qint32     maxX = 0;
+    foreach (StatsMeeting* pRes, this->m_awayTripNames) {
+        categories.append(pRes->m_name);
+
+        accepted.append(pRes->m_accepted);
+        interested.append(pRes->m_interested);
+
+        if (pRes->m_accepted + pRes->m_interested > maxX)
+            maxX = pRes->m_accepted + pRes->m_interested;
+    }
+
+    QJsonObject barReserved, barInterested;
+    barReserved.insert("title", "Zugesagt");
+    barReserved.insert("values", accepted);
+    barReserved.insert("color", "green");
+    barInterested.insert("title", "Interesse");
+    barInterested.insert("values", interested);
+    barInterested.insert("color", "yellow");
+
+    QJsonArray bars;
+    bars.append(barReserved);
+    bars.append(barInterested);
+
+    qint32 currentSeason = g_GlobalData->m_currentSeason % 2000;
+    rootObjAnswer.insert("categories", categories);
+    rootObjAnswer.insert("bars", bars);
+    rootObjAnswer.insert("title", QString("Auswärtsfahrt %1/%2").arg(currentSeason).arg(currentSeason + 1));
     rootObjAnswer.insert("maxX", maxX);
 
     return ERROR_CODE_SUCCESS;

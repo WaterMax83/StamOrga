@@ -130,6 +130,7 @@ Flickable {
                         var globalCoordinates = singleReservedRow.mapToItem(flickableCurrentTicketInfo, 0, 0)
                         clickedReservedMenu.y = globalCoordinates.y - singleReservedRow.height / 2
                         menuTicketIndex = model.index
+                        menuTicketReserveName = model.reserve
                         clickedReservedMenu.open();
                         model.menuOpen = true
                     }
@@ -186,6 +187,7 @@ Flickable {
     }
 
     property int menuTicketIndex
+    property string menuTicketReserveName
 
     function freeTicketItem() {
         userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 2);
@@ -197,14 +199,15 @@ Flickable {
         showInfoHeader("Sperre Karte", true)
     }
 
-    function reserveTicketItem(text) {
+    function reserveTicketItem(header, text) {
         var component = Qt.createComponent("../components/EditableTextDialog.qml");
         if (component.status === Component.Ready) {
             var dialog = component.createObject(mainPaneCurrentGame,{popupType: 1});
-            dialog.headerText = text;
+            dialog.headerText = header;
             dialog.parentHeight = mainWindow.height
             dialog.parentWidth =  mainPaneCurrentGame.width
             dialog.textMinSize = 4;
+            dialog.editableText = text;
             dialog.font.family= txtForFontFamily.font
             dialog.acceptedTextEdit.connect(acceptedEditReserveNameDialog);
             dialog.open();
@@ -272,7 +275,7 @@ Flickable {
             id: menuItemChangeReserve
             font.family: txtForFontFamily.font
             text: "Reservierung ändern"
-            onClicked: reserveTicketItem("Reservierung ändern");
+            onClicked: reserveTicketItem("Reservierung ändern", menuTicketReserveName);
         }
     }
 
@@ -294,7 +297,7 @@ Flickable {
             id: menuItemReserve
             font.family: txtForFontFamily.font
             text: "Reservieren"
-            onClicked: reserveTicketItem("Reserviere für");
+            onClicked: reserveTicketItem("Reserviere für", globalUserData.readableName);
         }
 
         MenuItem {
@@ -338,7 +341,6 @@ Flickable {
         listViewReservedTickets.implicitHeight = 0;
         listViewFreeTickets.implicitHeight = 0;
         showInfoHeader("Aktualisiere Daten", true);
-//        console.log("Aktualisisere Daten")
         userIntCurrentGame.startRequestAvailableTickets(m_gamePlayCurrentItem.index);
     }
 

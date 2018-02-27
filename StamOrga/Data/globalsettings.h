@@ -31,7 +31,7 @@ class GlobalSettings : public QObject
     Q_OBJECT
     Q_PROPERTY(QString debugIP READ debugIP WRITE setDebugIP NOTIFY debugIPChanged)
     Q_PROPERTY(QString debugIPWifi READ debugIPWifi WRITE setDebugIPWifi NOTIFY debugIPWifiChanged)
-    Q_PROPERTY(bool useReadableName READ useReadableName WRITE setUseReadableName NOTIFY useReadableNameChanged)
+    //    Q_PROPERTY(bool useReadableName READ useReadableName WRITE setUseReadableName NOTIFY useReadableNameChanged)
     Q_PROPERTY(bool loadGameInfo READ loadGameInfo WRITE setLoadGameInfo NOTIFY loadGameInfoChanged)
     Q_PROPERTY(bool saveInfosOnApp READ saveInfosOnApp WRITE setSaveInfosOnApp NOTIFY saveInfosOnAppChanged)
     Q_PROPERTY(bool useVersionPopup READ useVersionPopup WRITE setUseVersionPopup NOTIFY useVersionPopupChanged)
@@ -77,12 +77,12 @@ public:
         }
     }
 
-    bool useReadableName() { return this->m_useReadableName; }
-    void setUseReadableName(bool enable)
-    {
-        this->m_useReadableName = enable;
-        emit this->useReadableNameChanged();
-    }
+    //    bool useReadableName() { return this->m_useReadableName; }
+    //    void setUseReadableName(bool enable)
+    //    {
+    //        this->m_useReadableName = enable;
+    //        emit this->useReadableNameChanged();
+    //    }
 
     bool loadGameInfo() { return this->m_loadGameInfo; }
     void setLoadGameInfo(bool load)
@@ -147,9 +147,9 @@ public slots:
     void stateFromAppChanged(Qt::ApplicationState state);
 
 private:
-    GlobalData*  m_pGlobalData;
-    bool         m_alreadyConnected;
-    bool         m_useReadableName;
+    GlobalData* m_pGlobalData;
+    bool        m_alreadyConnected;
+    //    bool         m_useReadableName;
     bool         m_loadGameInfo;
     bool         m_saveInfosOnApp;
     bool         m_useVersionPopup;

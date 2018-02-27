@@ -181,7 +181,7 @@ Flickable {
                 Text {
                     id: txtInfoReadableName
     //                width: parent.width / 3 * 2
-                    text: qsTr("Der Nutzername dient als Vorauswahl für alle editierbaren Textfelder")
+                    text: qsTr("Der Nutzername dient als Anzeige für andere Nutzer und zur Vorauswahl für editierbare Textfelder")
                     horizontalAlignment: Text.AlignHCenter
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     wrapMode: Text.WordWrap
@@ -212,6 +212,25 @@ Flickable {
                         txtnewPassWordReplay.text = ""
                         changePassWordDialog.open()
                     }
+                }
+
+                ToolSeparator {
+                    id: toolSeparator4
+                    orientation: "Horizontal"
+                    implicitWidth: parent.width / 3 * 1
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    Layout.bottomMargin: 30
+                    Layout.topMargin: 30
+                }
+
+                MyComponents.CustomButton {
+                    id: btnBacktoStart
+                    font.family: txtForFontFamily.font
+                    text: qsTr("< Zurück zur StartSeite")
+                    implicitWidth: parent.width / 4 * 3
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    transformOrigin: Item.Center
+                    onClicked: stackView.pop()
                 }
 
             }

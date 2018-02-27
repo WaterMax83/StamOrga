@@ -123,10 +123,10 @@ Flickable {
                     onClickedButton: {
                         menuAcceptValue = 1;
                         menuAcceptIndex = 0;
-                        if (globalSettings.useReadableName)
+//                        if (globalSettings.useReadableName)
                             showTextDialogAccept("Zusagen", globalUserData.readableName);
-                        else
-                            showTextDialogAccept("Zusagen", "");
+//                        else
+//                            showTextDialogAccept("Zusagen", "");
                     }
                     Layout.alignment: Qt.AlignRight
                 }
@@ -137,10 +137,10 @@ Flickable {
                     onClickedButton: {
                         menuAcceptValue = 2;
                         menuAcceptIndex = 0;
-                        if (globalSettings.useReadableName)
+//                        if (globalSettings.useReadableName)
                             showTextDialogAccept("Interesse/Vorbehalt", globalUserData.readableName);
-                        else
-                            showTextDialogAccept("Interesse/Vorbehalt", "");
+//                        else
+//                            showTextDialogAccept("Interesse/Vorbehalt", "");
                     }
                     Layout.alignment: Qt.AlignRight
                 }
@@ -151,10 +151,10 @@ Flickable {
                     onClickedButton: {
                         menuAcceptValue = 3;
                         menuAcceptIndex = 0;
-                        if (globalSettings.useReadableName)
+//                        if (globalSettings.useReadableName)
                             showTextDialogAccept("Absagen", globalUserData.readableName);
-                        else
-                            showTextDialogAccept("Absagen", "");
+//                        else
+//                            showTextDialogAccept("Absagen", "");
                     }
                     Layout.alignment: Qt.AlignRight
                 }

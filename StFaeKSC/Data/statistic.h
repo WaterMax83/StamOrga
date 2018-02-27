@@ -43,6 +43,31 @@ struct StatsTickets {
     qint32  m_reserved;
     qint32  m_blocked;
     qint64  m_timestamp;
+
+    static bool compareCountFunctionAscending(StatsTickets* p1, StatsTickets* p2)
+    {
+        qint32 cnt1 = p1->m_blocked + p1->m_free + p1->m_reserved;
+        qint32 cnt2 = p2->m_blocked + p2->m_free + p2->m_reserved;
+        if (cnt1 > cnt2)
+            return false;
+        else if (cnt1 == cnt2) {
+            if (p1->m_blocked > p2->m_blocked)
+                return false;
+            else if (p1->m_blocked == p2->m_blocked) {
+                if (p1->m_reserved > p2->m_reserved)
+                    return false;
+                else if (p1->m_reserved == p2->m_reserved) {
+                    if (p1->m_free > p2->m_free)
+                        return false;
+                    else if (p1->m_free == p2->m_free) {
+                        if (p1->m_name.compare(p2->m_name) > 0)
+                            return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
 };
 
 struct StatsReserved {
@@ -53,6 +78,37 @@ struct StatsReserved {
     {
         if (p1->m_count > p2->m_count)
             return false;
+        else if (p1->m_count == p2->m_count) {
+            if (p1->m_name.compare(p2->m_name) > 0)
+                return false;
+        }
+        return true;
+    }
+};
+
+struct StatsMeeting {
+    QString m_name       = "";
+    qint32  m_accepted   = 0;
+    qint32  m_interested = 0;
+
+    static bool compareCountFunctionAscending(StatsMeeting* p1, StatsMeeting* p2)
+    {
+        qint32 cnt1 = p1->m_accepted + p1->m_interested;
+        qint32 cnt2 = p2->m_accepted + p2->m_interested;
+        if (cnt1 > cnt2)
+            return false;
+        else if (cnt1 == cnt2) {
+            if (p1->m_accepted > p2->m_accepted)
+                return false;
+            else if (p1->m_accepted == p2->m_accepted) {
+                if (p1->m_interested > p2->m_interested)
+                    return false;
+                else if (p1->m_interested == p2->m_interested) {
+                    if (p1->m_name.compare(p2->m_name) > 0)
+                        return false;
+                }
+            }
+        }
         return true;
     }
 };
@@ -80,9 +136,15 @@ protected:
     QList<StatsTickets*>  m_statsTickets;
     QMutex                m_statsMutex;
     QList<StatsReserved*> m_reservedTicketNames;
+    QList<StatsMeeting*>  m_meetingNames;
+    QList<StatsMeeting*>  m_awayTripNames;
+
+    QString cleanName(QString name);
 
     qint32 handleSeasonTicketCommand(QJsonObject& rootObjAnswer);
     qint32 handleReservesCommand(QJsonObject& rootObjAnswer);
+    qint32 handleMeetingCommand(QJsonObject& rootObjAnswer);
+    qint32 handleAwayTripCommand(QJsonObject& rootObjAnswer);
 };
 
 #endif // CYCLECHECK_H

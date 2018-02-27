@@ -42,24 +42,24 @@ Flickable {
                visible: false
            }
 
-           RowLayout {
-               Layout.preferredWidth: parent.width
-               Layout.fillWidth: true
+//           RowLayout {
+//               Layout.preferredWidth: parent.width
+//               Layout.fillWidth: true
 
-               Text {
-                   id: text2
-                   text: qsTr("Benutze Nutzername:")
-                   Layout.fillWidth: true
-                   Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                   color: "white"
-                   font.pixelSize: 14
-               }
-               CheckBox {
-                    id: useReadableName
-                    checked: globalSettings.useReadableName
-                    onCheckedChanged: valueWasEditedEnableSave()
-               }
-           }
+//               Text {
+//                   id: text2
+//                   text: qsTr("Benutze Nutzername:")
+//                   Layout.fillWidth: true
+//                   Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+//                   color: "white"
+//                   font.pixelSize: 14
+//               }
+//               CheckBox {
+//                    id: useReadableName
+//                    checked: globalSettings.useReadableName
+//                    onCheckedChanged: valueWasEditedEnableSave()
+//               }
+//           }
 
            RowLayout {
                Layout.preferredWidth: parent.width
@@ -264,10 +264,10 @@ Flickable {
         var saveSettings = false;
         var saveFonts = false;
 
-        if (globalSettings.useReadableName !== useReadableName.checked) {
-           globalSettings.useReadableName = useReadableName.checked;
-           saveSettings = true;
-        }
+//        if (globalSettings.useReadableName !== useReadableName.checked) {
+//           globalSettings.useReadableName = useReadableName.checked;
+//           saveSettings = true;
+//        }
 
         if (globalSettings.loadGameInfo !== loadGameInfo.checked) {
            globalSettings.loadGameInfo = loadGameInfo.checked;

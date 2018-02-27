@@ -49,7 +49,7 @@ void GlobalSettings::initialize(GlobalData* pGlobalData, QGuiApplication* app)
 
     this->m_pGlobalData->m_pMainUserSettings->beginGroup("GLOBAL_SETTINGS");
 
-    this->setUseReadableName(this->m_pGlobalData->m_pMainUserSettings->value(SETT_USE_READABLE_NAME, true).toBool());
+    //    this->setUseReadableName(this->m_pGlobalData->m_pMainUserSettings->value(SETT_USE_READABLE_NAME, true).toBool());
     this->setLoadGameInfo(this->m_pGlobalData->m_pMainUserSettings->value(SETT_LOAD_GAME_INFO, true).toBool());
     this->setSaveInfosOnApp(this->m_pGlobalData->m_pMainUserSettings->value(SETT_SAVE_INFOS_ON_APP, true).toBool());
     this->setUseVersionPopup(this->m_pGlobalData->m_pMainUserSettings->value(SETT_USE_VERSION_POPUP, true).toBool());
@@ -73,7 +73,7 @@ void GlobalSettings::saveGlobalSettings()
 
     this->m_pGlobalData->m_pMainUserSettings->beginGroup("GLOBAL_SETTINGS");
 
-    this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_USE_READABLE_NAME, this->m_useReadableName);
+    //    this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_USE_READABLE_NAME, this->m_useReadableName);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_LOAD_GAME_INFO, this->m_loadGameInfo);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_SAVE_INFOS_ON_APP, this->m_saveInfosOnApp);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_USE_VERSION_POPUP, this->m_useVersionPopup);

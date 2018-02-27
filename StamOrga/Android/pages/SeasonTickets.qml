@@ -99,10 +99,10 @@ Flickable {
             dialog.parentHeight = flickableTickets.height
             dialog.parentWidth =  flickableTickets.width
             dialog.textMinSize = 4;
-            if (globalSettings.useReadableName)
+//            if (globalSettings.useReadableName)
                 dialog.editableText = globalUserData.readableName;
-            else
-                dialog.editableText = "";
+//            else
+//                dialog.editableText = "";
             dialog.checkBoxState = false
             dialog.acceptedSeasonTicketEdit.connect(acceptedAddSeasonTicketDialog);
             dialog.font.family= txtForFontFamily.font

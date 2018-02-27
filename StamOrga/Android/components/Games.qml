@@ -270,7 +270,7 @@ Rectangle {
                     Layout.preferredHeight: labelInterestTrip.height / 1.2
                     Layout.preferredWidth: labelInterestTrip.height / 1.2
                     anchors.top : parent.top
-                    anchors.right: parent. right
+                    anchors.right: parent.right
 
                     anchors.topMargin: 3
                     Layout.alignment: Qt.AlignRight
@@ -290,7 +290,7 @@ Rectangle {
             RowLayout {
                 id: freeTicketsItem
                 visible: false
-                spacing: 5
+                spacing: 8
                 Text {
                     id: labelFreeTickets
                     topPadding: 3
@@ -299,16 +299,15 @@ Rectangle {
                     Layout.alignment: Qt.AlignRight
                 }
 
-                Rectangle {
+                Image {
+                    Layout.preferredHeight: labelFreeTickets.height / 1.2
+                    Layout.preferredWidth: labelFreeTickets.height / 1.2
                     anchors.top : parent.top
-                    anchors.right: parent. right
+                    anchors.right: parent.right
                     anchors.rightMargin: 5
-                    anchors.topMargin: 5
+                    anchors.topMargin: 4
                     Layout.alignment: Qt.AlignRight
-                    width: labelFreeTickets.height / 1.5
-                    height: labelFreeTickets.height / 1.5
-                    radius: width * 0.5
-                    color: "green"
+                    source: "../images/card.png";
                 }
             }
         }

@@ -82,5 +82,7 @@
         <file>images/star.png</file>
         <file>images/star_border.png</file>
         <file>pages/Statistics.qml</file>
+        <file>images/+material/card.png</file>
+        <file>images/card.png</file>
     </qresource>
 </RCC>

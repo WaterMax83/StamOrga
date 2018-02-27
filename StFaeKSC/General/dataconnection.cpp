@@ -18,6 +18,8 @@
 
 #include <QtCore/QDataStream>
 #include <QtCore/QDateTime>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 
 #include "../Common/General/config.h"
 #include "../Common/General/globalfunctions.h"
@@ -70,54 +72,75 @@ MessageProtocol* DataConnection::requestCheckUserLogin(MessageProtocol* msg)
 }
 
 /* Request
- * 0                GUID            X
- * X                Token           Y
- * X+Y              OS              4
+ * 0                guid            X
+ * X                token           Y
+ * X+Y              os              4
  */
 
 /* Answer
  * 0                Header          12
- * 12               SUCCESS         4
- * 16               PROPS           4
+ * 12               rvalue          4
+ * 16               property        4
  * 20               index           4
  * 24               readableName    X
  */
 MessageProtocol* DataConnection::requestGetUserProperties(MessageProtocol* msg)
 {
-    if (msg->getDataLength() > 0) {
-        const char* pData  = msg->getPointerToData();
-        quint32     offset = 0;
-        QString     guid(QByteArray(pData + offset));
-        offset += guid.toUtf8().length() + 1;
-        QString token(QByteArray(pData + offset));
-        offset += token.toUtf8().length() + 1;
-        qint32 system;
-        memcpy(&system, pData + offset, sizeof(qint32));
-        system = qFromLittleEndian(system);
+    QByteArray answer;
+    QString    readableName = this->m_pGlobalData->m_UserList.getReadableName(this->m_pUserConData->m_userID);
+    if (msg->getVersion() < MSG_HEADER_JSON_USERPROPS) {
+        if (msg->getDataLength() > 0) {
+            const char* pData  = msg->getPointerToData();
+            quint32     offset = 0;
+            QString     guid(QByteArray(pData + offset));
+            offset += guid.toUtf8().length() + 1;
+            QString token(QByteArray(pData + offset));
+            offset += token.toUtf8().length() + 1;
+            qint32 system;
+            memcpy(&system, pData + offset, sizeof(qint32));
+            system = qFromLittleEndian(system);
+
+            this->m_pUserConData->m_guid = guid;
+            g_pushNotify->addNewAppInformation(guid, token, system, this->m_pUserConData->m_userID);
+
+            if (!this->m_pUserConData->m_version.isEmpty())
+                g_pushNotify->addNewVersionInformation(guid, this->m_pUserConData->m_version);
+        }
+
+        QDataStream wAnswer(&answer, QIODevice::WriteOnly);
+        wAnswer.setByteOrder(QDataStream::LittleEndian);
+        wAnswer << ERROR_CODE_SUCCESS;
+        wAnswer << this->m_pGlobalData->m_UserList.getUserProperties(this->m_pUserConData->m_userName);
+        wAnswer << this->m_pGlobalData->m_UserList.getItemIndex(this->m_pUserConData->m_userName);
+
+        answer.append(readableName.toUtf8());
+        answer.append((char)0x00);
+
+    } else {
+        QByteArray  data(msg->getPointerToData());
+        QJsonObject rootObj = QJsonDocument::fromJson(data).object();
+        QString     guid    = rootObj.value("guid").toString();
+        QString     token   = rootObj.value("token").toString();
+        qint32      os      = rootObj.value("os").toInt();
 
         this->m_pUserConData->m_guid = guid;
-        g_pushNotify->addNewAppInformation(guid, token, system, this->m_pUserConData->m_userID);
+        g_pushNotify->addNewAppInformation(guid, token, os, this->m_pUserConData->m_userID);
 
         if (!this->m_pUserConData->m_version.isEmpty())
             g_pushNotify->addNewVersionInformation(guid, this->m_pUserConData->m_version);
+
+        QJsonObject rootObjAns;
+        rootObjAns.insert("rvalue", ERROR_CODE_SUCCESS);
+        rootObjAns.insert("property", (qint32) this->m_pGlobalData->m_UserList.getUserProperties(this->m_pUserConData->m_userName));
+        rootObjAns.insert("index", this->m_pGlobalData->m_UserList.getItemIndex(this->m_pUserConData->m_userName));
+        rootObjAns.insert("readableName", readableName);
+
+        answer = QJsonDocument(rootObjAns).toJson(QJsonDocument::Compact);
     }
-
-    QByteArray  answer;
-    QDataStream wAnswer(&answer, QIODevice::WriteOnly);
-    wAnswer.setByteOrder(QDataStream::LittleEndian);
-    wAnswer << ERROR_CODE_SUCCESS;
-    wAnswer << this->m_pGlobalData->m_UserList.getUserProperties(this->m_pUserConData->m_userName);
-    wAnswer << this->m_pGlobalData->m_UserList.getItemIndex(this->m_pUserConData->m_userName);
-
-    QString readableName = this->m_pGlobalData->m_UserList.getReadableName(this->m_pUserConData->m_userID);
-    answer.append(readableName.toUtf8());
-    answer.append((char)0x00);
 
     qInfo().noquote() << QString("User %1 getting user properties %2").arg(this->m_pUserConData->m_userName, readableName);
 
-    MessageProtocol* ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_USER_PROPS, answer);
-
-    return ack;
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_USER_PROPS, answer);
 }
 
 MessageProtocol* DataConnection::requestGetUserEvents(MessageProtocol* msg)
