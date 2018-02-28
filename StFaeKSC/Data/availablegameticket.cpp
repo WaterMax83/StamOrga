@@ -158,7 +158,7 @@ qint32 AvailableGameTickets::addNewTicket(quint32 ticketID, quint32 userID, quin
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 AvailableGameTickets::changeTicketState(quint32 ticketID, qint32 userID, quint32 state, QString name)
+qint32 AvailableGameTickets::changeTicketState(qint32 ticketID, qint32 userID, quint32 state, QString name)
 {
     //    if (state == TICKET_STATE_BLOCKED) {
     //        qWarning().noquote() << QString("Could not change available ticket, state 0 is not allowed ").arg(state);

@@ -27,7 +27,7 @@
 #include "configlist.h"
 
 struct AvailableTicketInfo : public ConfigItem {
-    quint32 m_ticketID;
+    qint32 m_ticketID;
     qint32  m_userID;
     quint32 m_state;
 
@@ -55,7 +55,7 @@ public:
     qint32 initialize(QString filePath);
 
     qint32 addNewTicket(quint32 ticketID, quint32 userID, quint32 state, QString name = "");
-    qint32 changeTicketState(quint32 ticketID, quint32 userID, quint32 state, QString name = "");
+    qint32 changeTicketState(qint32 ticketID, qint32 userID, quint32 state, QString name = "");
 
     quint32 getGameIndex() { return this->m_gameIndex; }
 
