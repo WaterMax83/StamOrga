@@ -53,7 +53,7 @@ ColumnLayout {
             anchors.leftMargin: 10
             anchors.verticalCenter: parent.verticalCenter
             Layout.alignment: Qt.AlignVCenter
-            color: "white"
+            color: itemModel.isTicketYourOwn ? "orange" : "white"
             font.pixelSize: listViewItemHeight / 5 * 3
         }
 

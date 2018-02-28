@@ -25,24 +25,27 @@
 #include <QSettings>
 
 struct FavGameInfo {
-    quint32 m_gameIndex;
-    qint32  m_favIndex;
+    qint32 m_gameIndex;
+    qint32 m_favIndex;
 };
 
-class FavoriteGame : public QObject
+class GameUserData : public QObject
 {
     Q_OBJECT
 public:
-    explicit FavoriteGame(QObject* parent = nullptr);
-    ~FavoriteGame();
+    explicit GameUserData(QObject* parent = nullptr);
+    ~GameUserData();
 
     int initialize();
 
     int terminate();
 
-    Q_INVOKABLE int getFavoriteGameIndex(quint32 gameIndex);
+    Q_INVOKABLE int getFavoriteGameIndex(qint32 gameIndex);
+    Q_INVOKABLE int setFavoriteGameIndex(qint32 gameIndex, qint32 favIndex);
 
-    Q_INVOKABLE int setFavoriteGameIndex(quint32 gameIndex, qint32 favIndex);
+    Q_INVOKABLE int getTicketGameIndex(qint32 gameIndex);
+    int setTicketGameIndex(qint32 gameIndex, qint32 favIndex);
+    void clearTicketGameList();
 
 signals:
 
@@ -52,7 +55,11 @@ private:
     bool                m_initialized;
     QSettings*          m_settings;
     QList<FavGameInfo*> m_lFavGames;
+    QList<FavGameInfo*> m_lTicketGames;
     QMutex              m_mutex;
+
+    int getGameIndex(QList<FavGameInfo*>* pList, const qint32 gameIndex);
+    int setGameIndex(QList<FavGameInfo*>* pList, const qint32 gameIndex, qint32 favIndex, bool writeToStorage = false);
 };
 
 #endif // FAVORITEGAME_H

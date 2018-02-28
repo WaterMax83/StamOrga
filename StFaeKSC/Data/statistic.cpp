@@ -228,6 +228,7 @@ void Statistic::slotCycleTimerFired()
 QString Statistic::cleanName(QString name)
 {
     QString rValue = name.toLower();
+    rValue.replace("'", "");
 
     return rValue.replace(".", "");
 }

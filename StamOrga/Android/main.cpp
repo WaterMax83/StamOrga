@@ -32,7 +32,7 @@
 #include "../../Common/General/config.h"
 #include "../../Common/General/globalfunctions.h"
 #include "../Data/appuserevents.h"
-#include "../Data/favoritegame.h"
+#include "../Data/gameuserdata.h"
 #include "../Data/globaldata.h"
 #include "../Data/globalsettings.h"
 #include "../Data/statistic.h"
@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
     qRegisterMetaType<NewsDataItem*>("NewsDataItem*");
     qRegisterMetaType<AcceptMeetingInfo*>("AcceptMeetingInfo*");
     qRegisterMetaType<DataConRequest>("DataConRequest");
-    qRegisterMetaType<FavoriteGame*>("FavoriteGame*");
+    qRegisterMetaType<GameUserData*>("GameUserData*");
     qRegisterMetaType<StatBars*>("StatBars*");
 
     GlobalSettings globalSettings;

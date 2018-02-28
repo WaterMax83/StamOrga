@@ -163,8 +163,14 @@ Rectangle {
                 labelInfoDiscount.text = "Nein";
             else
                 labelInfoDiscount.text = "Ja";
-            if (m_SeasonTicketItem.isTicketYourOwn())
-                ticketRectangleItem.border.color = "#EF9A9A"
+            if (m_SeasonTicketItem.isTicketYourOwn()) {
+                ticketRectangleItem.border.color = "orange";
+                ticketRectangleItem.border.width = 3;
+            } else {
+                ticketRectangleItem.border.color = "grey";
+                ticketRectangleItem.border.width = 2;
+            }
+
 
 
         }

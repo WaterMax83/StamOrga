@@ -63,6 +63,8 @@ QString getErrorCodeString(qint32 code)
     switch (code) {
     case ERROR_CODE_NEW_VERSION:
         return QString("neue Version: %1").arg(code);
+    case ERROR_CODE_UPDATE_APP:
+        return QString("Bitte App updaten: %1").arg(code);
     case ERROR_CODE_SUCCESS:
         return QString("Erfolgreich: %1").arg(code);
     case ERROR_CODE_NO_ERROR:

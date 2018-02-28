@@ -21,6 +21,8 @@
 
 #include <QtCore/QList>
 #include <QtCore/QMutex>
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
 
 #include "../Data/availablegameticket.h"
 #include "../Data/awaytripinfo.h"
@@ -44,6 +46,7 @@ public:
                                           const qint32 userID, qint64& messageID);
     qint32 requestBlockSeasonTicket(quint32 ticketIndex, quint32 gameIndex, const QString userName);
     qint32 requestGetAvailableSeasonTicket(const quint32 gameIndex, const QString userName, QByteArray& data);
+    qint32 requestGetAvailableTicketFromUser(const qint32 userID, QJsonArray& arrTickets);
 
     qint32 requestChangeMeetingInfo(const quint32 gameIndex, const quint32 version,
                                     const QString when, const QString where, const QString info,

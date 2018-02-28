@@ -487,6 +487,7 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
                 return;
             }
         }
+        this->startGettingUserProps();
         emit this->sNotifyCommandFinished(request.m_request, request.m_result);
         retryGetGamesInfoCount = 0;
         break;
@@ -494,6 +495,11 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
 
     case OP_CODE_CMD_REQ::REQ_REMOVE_TICKET:
         this->m_pGlobalData->resetSeasonTicketLastServerUpdate();
+        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET:
+        this->startGettingUserProps();
         emit this->sNotifyCommandFinished(request.m_request, request.m_result);
         break;
 

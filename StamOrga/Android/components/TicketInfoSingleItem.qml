@@ -46,7 +46,7 @@ RowLayout {
         anchors.leftMargin: 10
         anchors.verticalCenter: parent.verticalCenter
         Layout.alignment: Qt.AlignVCenter
-        color: "white"
+        color: itemModel.isTicketYourOwn ? "orange" : "white"
         font.pixelSize: parent.height / 5 * 3
     }
 

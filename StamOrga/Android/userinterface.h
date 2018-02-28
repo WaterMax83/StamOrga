@@ -155,6 +155,7 @@ public slots:
 
 private:
     ConnectionHandling* m_pConHandle;
+    QMutex              m_notifyMutex;
 };
 
 #endif // USERINTERFACE_H

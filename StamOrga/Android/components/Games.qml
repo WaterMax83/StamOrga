@@ -142,7 +142,7 @@ Rectangle {
                 id: acceptedMeetingItem
                 visible: false
                 spacing: 0
-                Layout.rightMargin: interestMeetingItem.visible ? 0 : freeTicketsItem.visible ? 10 : 5
+                Layout.rightMargin: interestMeetingItem.visible ? 0 : acceptedTripItem.visible ? 10 : 5
                 Text {
                     id: labelAcceptedMeeting
                     topPadding: 3
@@ -176,7 +176,7 @@ Rectangle {
                 id: interestMeetingItem
                 visible: false
                 spacing: 0
-                Layout.rightMargin: freeTicketsItem.visible ? 10 : 5
+                Layout.rightMargin: acceptedTripItem.visible ? 10 : 5
                 Text {
                     id: labelInterestMeeting
                     topPadding: 3
@@ -299,7 +299,7 @@ Rectangle {
                     Layout.alignment: Qt.AlignRight
                 }
 
-                Image {
+                Item {
                     Layout.preferredHeight: labelFreeTickets.height / 1.2
                     Layout.preferredWidth: labelFreeTickets.height / 1.2
                     anchors.top : parent.top
@@ -307,7 +307,16 @@ Rectangle {
                     anchors.rightMargin: 5
                     anchors.topMargin: 4
                     Layout.alignment: Qt.AlignRight
-                    source: "../images/card.png";
+                    Image {
+                        id: imageTicketItems
+                        anchors.fill: parent
+                        source: "../images/card.png";
+                    }
+                    ColorOverlay {
+                        id: colorOverlayTicketItem
+                        anchors.fill: imageTicketItems
+                        source: imageTicketItems
+                    }
                 }
             }
         }
@@ -391,8 +400,8 @@ Rectangle {
                 }
             }
 
-            var favGame = globalUserData.getFavoriteGameHandler();
-            var favIndex = favGame.getFavoriteGameIndex(gamePlayItem.index);
+            var gameUserData = globalUserData.getGameUserDataHandler();
+            var favIndex = gameUserData.getFavoriteGameIndex(gamePlayItem.index);
             if (favIndex <= 0) {
                 mainRectangleGame.border.color = "grey";
                 mainRectangleGame.border.width = 2;
@@ -401,6 +410,13 @@ Rectangle {
                 mainRectangleGame.border.color = "orange";
                 mainRectangleGame.border.width = 3;
             }
+            var ticketIndex = gameUserData.getTicketGameIndex(gamePlayItem.index);
+            if (ticketIndex === 2)
+                colorOverlayTicketItem.color = "green";
+            else if (ticketIndex === 3)
+                colorOverlayTicketItem.color = "orange";
+            else
+                colorOverlayTicketItem.color = "transparent"
 
             var eventCount = gamePlayItem.event;
             if (eventCount > 0) {
@@ -457,7 +473,7 @@ Rectangle {
                 return;
 
             var freeTickets = gamePlayItem.getFreeTickets();
-            if (freeTickets > 0) {
+            if (freeTickets > 0 || ticketIndex > 1) {
                 freeTicketsItem.visible = true;
                 labelFreeTickets.text = freeTickets;
             } else {

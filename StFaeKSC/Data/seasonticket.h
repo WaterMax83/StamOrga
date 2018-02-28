@@ -28,12 +28,12 @@
 
 struct TicketInfo : public ConfigItem {
     QString m_user;
-    quint32 m_userIndex;
+    qint32  m_userIndex;
     quint8  m_discount;
     QString m_place;
     qint64  m_creation;
 
-    TicketInfo(QString user, quint32 userIndex,
+    TicketInfo(QString user, qint32 userIndex,
                QString ticketName, qint64 timestamp,
                quint8 discount, QString place,
                quint32 index, qint64 creation)

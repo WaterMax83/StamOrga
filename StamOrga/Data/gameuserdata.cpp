@@ -16,7 +16,7 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "favoritegame.h"
+#include "gameuserdata.h"
 #include "gameplay.h"
 #include "globaldata.h"
 
@@ -27,14 +27,14 @@ extern GlobalData* g_GlobalData;
 #define VAL_GAME_INDEX "GameIndex"
 #define VAL_FAV_INDEX "FavIndex"
 
-FavoriteGame::FavoriteGame(QObject* parent)
+GameUserData::GameUserData(QObject* parent)
     : QObject(parent)
 {
     this->m_initialized = false;
     this->m_settings    = NULL;
 }
 
-FavoriteGame::~FavoriteGame()
+GameUserData::~GameUserData()
 {
     if (this->m_settings != NULL)
         delete this->m_settings;
@@ -44,7 +44,7 @@ FavoriteGame::~FavoriteGame()
     this->m_lFavGames.clear();
 }
 
-int FavoriteGame::initialize()
+int GameUserData::initialize()
 {
     QMutexLocker lock(&m_mutex);
 
@@ -64,7 +64,7 @@ int FavoriteGame::initialize()
     for (int i = 0; i < count; i++) {
         this->m_settings->setArrayIndex(i);
         FavGameInfo* fGame = new FavGameInfo();
-        fGame->m_gameIndex = this->m_settings->value(VAL_GAME_INDEX).toUInt();
+        fGame->m_gameIndex = this->m_settings->value(VAL_GAME_INDEX).toInt();
         fGame->m_favIndex  = this->m_settings->value(VAL_FAV_INDEX).toInt();
 
         /* remove games which are older */
@@ -104,69 +104,109 @@ int FavoriteGame::initialize()
 }
 
 
-int FavoriteGame::getFavoriteGameIndex(quint32 gameIndex)
+int GameUserData::getFavoriteGameIndex(qint32 gameIndex)
 {
     if (!this->m_initialized)
         return -1;
 
+    return this->getGameIndex(&this->m_lFavGames, gameIndex);
+}
+
+int GameUserData::setFavoriteGameIndex(qint32 gameIndex, qint32 favIndex)
+{
+    if (!this->m_initialized)
+        return -1;
+
+    return this->setGameIndex(&this->m_lFavGames, gameIndex, favIndex, true);
+}
+
+int GameUserData::getTicketGameIndex(qint32 gameIndex)
+{
+    if (!this->m_initialized)
+        return -1;
+
+    return this->getGameIndex(&this->m_lTicketGames, gameIndex);
+}
+
+int GameUserData::setTicketGameIndex(qint32 gameIndex, qint32 favIndex)
+{
+    if (!this->m_initialized)
+        return -1;
+
+    return this->setGameIndex(&this->m_lTicketGames, gameIndex, favIndex);
+}
+
+void GameUserData::clearTicketGameList()
+{
     QMutexLocker lock(&m_mutex);
 
-    foreach (FavGameInfo* favGame, this->m_lFavGames) {
-        if (favGame->m_gameIndex == gameIndex)
-            return favGame->m_favIndex;
+    for (int i = 0; i < this->m_lTicketGames.count(); i++)
+        delete this->m_lTicketGames.at(i);
+    this->m_lTicketGames.clear();
+}
+
+int GameUserData::getGameIndex(QList<FavGameInfo*>* pList, const qint32 gameIndex)
+{
+    QMutexLocker lock(&m_mutex);
+
+    for (int i = 0; i < pList->count(); i++) {
+        if (pList->at(i)->m_gameIndex == gameIndex)
+            return pList->at(i)->m_favIndex;
     }
 
     return 0;
 }
 
-int FavoriteGame::setFavoriteGameIndex(quint32 gameIndex, qint32 favIndex)
+int GameUserData::setGameIndex(QList<FavGameInfo*>* pList, const qint32 gameIndex,
+                               qint32 favIndex, bool writeToStorage)
 {
-    if (!this->m_initialized)
-        return -1;
-
     QMutexLocker lock(&m_mutex);
 
-    foreach (FavGameInfo* favGame, this->m_lFavGames) {
-        if (favGame->m_gameIndex == gameIndex) {
-            favGame->m_favIndex = favIndex;
-            this->m_settings->beginGroup(GROUP_FAVGAME);
-            int count = this->m_settings->beginReadArray("item");
-            for (int i = 0; i < count; i++) {
-                this->m_settings->setArrayIndex(i);
-                quint32 gIndex = this->m_settings->value(VAL_GAME_INDEX).toUInt();
-                if (gIndex == gameIndex) {
-                    this->m_settings->setValue(VAL_FAV_INDEX, favIndex);
-                    break;
+    for (int i = 0; i < pList->count(); i++) {
+        if (pList->at(i)->m_gameIndex == gameIndex) {
+            pList->at(i)->m_favIndex = favIndex;
+            if (writeToStorage) {
+                this->m_settings->beginGroup(GROUP_FAVGAME);
+                int count = this->m_settings->beginReadArray("item");
+                for (int i = 0; i < count; i++) {
+                    this->m_settings->setArrayIndex(i);
+                    qint32 gIndex = this->m_settings->value(VAL_GAME_INDEX).toInt();
+                    if (gIndex == gameIndex) {
+                        this->m_settings->setValue(VAL_FAV_INDEX, favIndex);
+                        break;
+                    }
                 }
+                this->m_settings->endArray();
+                this->m_settings->endGroup();
             }
-            this->m_settings->endArray();
-            this->m_settings->endGroup();
             return 0;
         }
     }
 
-    this->m_settings->beginGroup(GROUP_FAVGAME);
-    this->m_settings->beginWriteArray("item");
-    this->m_settings->setArrayIndex(this->m_lFavGames.count());
+    if (writeToStorage) {
+        this->m_settings->beginGroup(GROUP_FAVGAME);
+        this->m_settings->beginWriteArray("item");
+        this->m_settings->setArrayIndex(pList->count());
 
-    this->m_settings->setValue(VAL_GAME_INDEX, gameIndex);
-    this->m_settings->setValue(VAL_FAV_INDEX, favIndex);
+        this->m_settings->setValue(VAL_GAME_INDEX, gameIndex);
+        this->m_settings->setValue(VAL_FAV_INDEX, favIndex);
 
-    this->m_settings->endArray();
-    this->m_settings->endGroup();
-    this->m_settings->sync();
+        this->m_settings->endArray();
+        this->m_settings->endGroup();
+        this->m_settings->sync();
+    }
 
 
     FavGameInfo* favGame = new FavGameInfo();
     favGame->m_gameIndex = gameIndex;
     favGame->m_favIndex  = favIndex;
-    this->m_lFavGames.append(favGame);
+    pList->append(favGame);
 
     return 0;
 }
 
 
-int FavoriteGame::terminate()
+int GameUserData::terminate()
 {
     QMutexLocker lock(&m_mutex);
 
@@ -179,6 +219,10 @@ int FavoriteGame::terminate()
     for (int i = 0; i < this->m_lFavGames.count(); i++)
         delete this->m_lFavGames.at(i);
     this->m_lFavGames.clear();
+
+    for (int i = 0; i < this->m_lTicketGames.count(); i++)
+        delete this->m_lTicketGames.at(i);
+    this->m_lTicketGames.clear();
 
     return 0;
 }

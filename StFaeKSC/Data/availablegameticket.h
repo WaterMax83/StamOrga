@@ -28,12 +28,12 @@
 
 struct AvailableTicketInfo : public ConfigItem {
     quint32 m_ticketID;
-    quint32 m_userID;
+    qint32  m_userID;
     quint32 m_state;
 
     AvailableTicketInfo(QString name, qint64 timestamp,
                         quint32 index, quint32 ticketID,
-                        quint32 userID, quint32 state)
+                        qint32 userID, quint32 state)
     {
         this->m_itemName  = name;
         this->m_index     = index;

@@ -193,6 +193,8 @@ void UserInterface::slUpdatePasswordRequestFinished(qint32 result, QString newPa
 
 void UserInterface::slCommandFinished(quint32 command, qint32 result)
 {
+    QMutexLocker lock(&this->m_notifyMutex);
+
     switch (command) {
     case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
         emit this->notifyUserPropertiesFinished(result);

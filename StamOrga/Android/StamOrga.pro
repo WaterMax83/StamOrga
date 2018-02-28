@@ -43,9 +43,9 @@ SOURCES += main.cpp \
     ../Data/meetinginfo.cpp \
     ../Data/globalsettings.cpp \
     ../Data/appuserevents.cpp \
-    ../Data/favoritegame.cpp \
     ../Data/statistic.cpp \
-    source/pushnotification.cpp
+    source/pushnotification.cpp \
+    ../Data/gameuserdata.cpp
 
 
 RESOURCES += qml.qrc
@@ -95,9 +95,9 @@ HEADERS += \
     ../Data/acceptmeetinginfo.h \
     ../Data/globalsettings.h \
     ../Data/appuserevents.h \
-    ../Data/favoritegame.h \
     ../Data/statistic.h \
-    source/pushnotification.h
+    source/pushnotification.h \
+    ../Data/gameuserdata.h
 
 #android{
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android

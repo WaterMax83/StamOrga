@@ -49,6 +49,7 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 Layout.alignment: Qt.AlignTop
+                onPressedAndHoldCurrentGame: Qt.openUrlExternally("https://www.youtube.com/watch?v=4DNGMoMNLRY");
             }
 
             MyComponents.BusyLoadingIndicator {
@@ -207,7 +208,7 @@ Item {
     property int movedInfoHeigth : gameHeader.height + 20
 
     function toolButtonClicked() {
-        var favGame = globalUserData.getFavoriteGameHandler();
+        var favGame = globalUserData.getGameUserDataHandler();
         var favIndex = favGame.getFavoriteGameIndex(m_gamePlayCurrentItem.index);
 
         if (favIndex <= 0) {
@@ -250,7 +251,7 @@ Item {
             currentAwayTripInfo.showAllInfoAboutGame();
         }
 
-        var favGame = globalUserData.getFavoriteGameHandler();
+        var favGame = globalUserData.getGameUserDataHandler();
         var icon = "";
         var favIndex = favGame.getFavoriteGameIndex(sender.index);
         if (favIndex <= 0)
@@ -267,6 +268,10 @@ Item {
     function pageOpenedUpdateView() { }
 
     function notifyGetUserEvents(result) {
+        gameHeader.showGamesInfo(m_gamePlayCurrentItem)
+    }
+
+    function notifyGetUserProperties(result) {
         gameHeader.showGamesInfo(m_gamePlayCurrentItem)
     }
 

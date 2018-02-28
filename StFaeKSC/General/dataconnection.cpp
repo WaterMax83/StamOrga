@@ -111,7 +111,7 @@ MessageProtocol* DataConnection::requestGetUserProperties(MessageProtocol* msg)
         wAnswer.setByteOrder(QDataStream::LittleEndian);
         wAnswer << ERROR_CODE_SUCCESS;
         wAnswer << this->m_pGlobalData->m_UserList.getUserProperties(this->m_pUserConData->m_userName);
-        wAnswer << this->m_pGlobalData->m_UserList.getItemIndex(this->m_pUserConData->m_userName);
+        wAnswer << this->m_pUserConData->m_userID;
 
         answer.append(readableName.toUtf8());
         answer.append((char)0x00);
@@ -132,8 +132,12 @@ MessageProtocol* DataConnection::requestGetUserProperties(MessageProtocol* msg)
         QJsonObject rootObjAns;
         rootObjAns.insert("rvalue", ERROR_CODE_SUCCESS);
         rootObjAns.insert("property", (qint32) this->m_pGlobalData->m_UserList.getUserProperties(this->m_pUserConData->m_userName));
-        rootObjAns.insert("index", this->m_pGlobalData->m_UserList.getItemIndex(this->m_pUserConData->m_userName));
+        rootObjAns.insert("index", this->m_pUserConData->m_userID);
         rootObjAns.insert("readableName", readableName);
+
+        QJsonArray arrTickets;
+        if (this->m_pGlobalData->requestGetAvailableTicketFromUser(this->m_pUserConData->m_userID, arrTickets) == ERROR_CODE_SUCCESS)
+            rootObjAns.insert("tickets", arrTickets);
 
         answer = QJsonDocument(rootObjAns).toJson(QJsonDocument::Compact);
     }
@@ -711,7 +715,7 @@ MessageProtocol* DataConnection::requestAddSeasonTicket(MessageProtocol* msg)
     QString ticketName(QByteArray(pData + 6, actLength));
 
     QString userName  = this->m_pUserConData->m_userName;
-    qint32  userIndex = this->m_pGlobalData->m_UserList.getItemIndex(userName);
+    qint32  userIndex = this->m_pUserConData->m_userID;
     qint32  rCode     = this->m_pGlobalData->m_SeasonTicket.addNewSeasonTicket(userName, userIndex, ticketName, discount);
     if (rCode > ERROR_CODE_NO_ERROR) {
         qInfo().noquote() << QString("User %1 added SeasonTicket %2")

@@ -66,7 +66,7 @@ GlobalData::GlobalData(QObject* parent)
 
     QQmlEngine::setObjectOwnership(&this->m_meetingInfo, QQmlEngine::CppOwnership);
     QQmlEngine::setObjectOwnership(&this->m_awayTripInfo, QQmlEngine::CppOwnership);
-    QQmlEngine::setObjectOwnership(&this->m_favoriteGame, QQmlEngine::CppOwnership);
+    QQmlEngine::setObjectOwnership(&this->m_gameUserData, QQmlEngine::CppOwnership);
 
     this->m_pMainUserSettings = new QSettings();
     this->m_pMainUserSettings->setIniCodec(("UTF-8"));
@@ -170,7 +170,7 @@ void GlobalData::loadGlobalSettings()
 
     this->resetNewsDataLastServerUpdate();
 
-    this->m_favoriteGame.initialize();
+    this->m_gameUserData.initialize();
 }
 
 void GlobalData::saveGlobalUserSettings()
@@ -545,7 +545,7 @@ SeasonTicketItem* GlobalData::getSeasonTicketFromArrayIndex(int index)
     return NULL;
 }
 
-SeasonTicketItem* GlobalData::getSeasonTicket(quint32 ticketIndex)
+SeasonTicketItem* GlobalData::getSeasonTicket(qint32 ticketIndex)
 {
     QMutexLocker lock(&this->m_mutexTicket);
 
@@ -819,4 +819,9 @@ bool GlobalData::userIsFanclubEditEnabled()
 void GlobalData::SetUserProperties(quint32 value)
 {
     this->m_UserProperties = value;
+}
+
+quint32 GlobalData::getUserProperties()
+{
+    return this->m_UserProperties;
 }

@@ -289,6 +289,45 @@ qint32 GlobalData::requestGetAvailableSeasonTicket(const quint32 gameIndex, cons
     return ERROR_CODE_SUCCESS;
 }
 
+qint32 GlobalData::requestGetAvailableTicketFromUser(const qint32 userID, QJsonArray &arrTickets)
+{
+    if (!this->m_initalized)
+        return ERROR_CODE_NOT_READY;
+
+    QMutexLocker lock(&this->m_globalDataMutex);
+
+    qint64 currentTimeStamp = QDateTime::currentMSecsSinceEpoch();
+    foreach (AvailableGameTickets* pAvTicket, this->m_availableTickets) {
+        GamesPlay* pGame = (GamesPlay*)this->m_GamesList.getItem(pAvTicket->getGameIndex());
+        if (pGame == NULL || pGame->m_timestamp < currentTimeStamp) // past is not important
+            continue;
+
+        for (int i = 0; i < pAvTicket->getNumberOfInternalList(); i++) {
+            AvailableTicketInfo* pTicketInfo = (AvailableTicketInfo*)pAvTicket->getRequestConfigItemFromListIndex(i);
+            if (pTicketInfo == NULL || pTicketInfo->m_state == TICKET_STATE_BLOCKED)
+                continue;
+
+            QJsonObject gameObj;
+            /* First check if user reserved this ticket */
+            if (pTicketInfo->m_userID == userID && pTicketInfo->m_state == TICKET_STATE_RESERVED) {
+                gameObj.insert("type", "reserved");
+            } else { /* Then check if this users card is not blocked */
+                TicketInfo* pTicket = (TicketInfo*) this->m_SeasonTicket.getItem(pTicketInfo->m_ticketID);
+                if (pTicket == NULL || pTicket->m_userIndex != userID)  // only tickets from this user
+                    continue;
+                gameObj.insert("type", "free");
+            }
+
+            gameObj.insert("gameIndex", (qint32)pGame->m_index);
+            arrTickets.append(gameObj);
+            break;
+        }
+
+    }
+
+    return ERROR_CODE_SUCCESS;
+}
+
 quint16 GlobalData::getTicketNumber(const quint32 gamesIndex, const quint32 state)
 {
     if (!this->m_initalized)

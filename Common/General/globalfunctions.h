@@ -57,6 +57,7 @@ extern bool checkFilePathExistAndCreate(const QString& path);
 
 // clang-format off
 #define ERROR_CODE_NEW_VERSION          5
+#define ERROR_CODE_UPDATE_APP           4
 #define ERROR_CODE_SUCCESS              1
 #define ERROR_CODE_NO_ERROR             0
 #define ERROR_CODE_COMMON               -1

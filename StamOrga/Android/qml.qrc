@@ -84,5 +84,17 @@
         <file>pages/Statistics.qml</file>
         <file>images/+material/card.png</file>
         <file>images/card.png</file>
+        <file>images/+material/account.png</file>
+        <file>images/+material/bug.png</file>
+        <file>images/+material/group.png</file>
+        <file>images/+material/history.png</file>
+        <file>images/+material/settings.png</file>
+        <file>images/account.png</file>
+        <file>images/bug.png</file>
+        <file>images/group.png</file>
+        <file>images/history.png</file>
+        <file>images/settings.png</file>
+        <file>images/+material/download.png</file>
+        <file>images/download.png</file>
     </qresource>
 </RCC>

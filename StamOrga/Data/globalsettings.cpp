@@ -183,6 +183,8 @@ QString GlobalSettings::getVersionChangeInfo()
 
     rValue.append("<b>V1.0.7:</b>(XX.0X.2018)<br>");
     rValue.append("- Statistic hinzugefügt<br>");
+    rValue.append("- Icons in Drawer<br>");
+    rValue.append("- Easteregg versteckt<br>");
 
     rValue.append("<br><b>V1.0.6:</b>(08.02.2018)<br>");
     rValue.append("- Infos über Fahrt in der Übersicht<br>");

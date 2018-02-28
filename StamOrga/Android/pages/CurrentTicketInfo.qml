@@ -369,7 +369,9 @@ Flickable {
                                                         title: seasonTicketItem.name + discount,
                                                         index: seasonTicketItem.index,
                                                         place: seasonTicketItem.place,
-                                                        menuOpen: false
+//                                                        userIndex: seasonTicketItem.userIndex,
+                                                        menuOpen: false,
+                                                        isTicketYourOwn : seasonTicketItem.isTicketYourOwn()
                                                     });
                 }
                 else if (seasonTicketItem.getTicketState() === 3) {
@@ -378,7 +380,9 @@ Flickable {
                                                         reserve: seasonTicketItem.getTicketReserveName(),
                                                         index: seasonTicketItem.index,
                                                         place: seasonTicketItem.place,
-                                                        menuOpen: false
+//                                                        userIndex: seasonTicketItem.userIndex,
+                                                        menuOpen: false,
+                                                        isTicketYourOwn : seasonTicketItem.isTicketYourOwn()
                                                     });
                 }
                 else
@@ -386,7 +390,9 @@ Flickable {
                                                        title: seasonTicketItem.name + discount,
                                                        index: seasonTicketItem.index,
                                                        place: seasonTicketItem.place,
-                                                       menuOpen: false
+//                                                       userIndex: seasonTicketItem.userIndex,
+                                                       menuOpen: false,
+                                                       isTicketYourOwn : seasonTicketItem.isTicketYourOwn()
                                                    })
             }
 

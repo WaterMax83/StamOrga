@@ -30,7 +30,8 @@ class SeasonTicketItem : public QObject
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QString place READ place WRITE setPlace NOTIFY placeChanged)
     Q_PROPERTY(quint8 discount READ discount WRITE setDiscount NOTIFY discountChanged)
-    Q_PROPERTY(quint32 index READ index WRITE setIndex NOTIFY indexChanged)
+    Q_PROPERTY(qint32 index READ index NOTIFY indexChanged)
+    Q_PROPERTY(qint32 userIndex READ userIndex NOTIFY userIndexChanged)
 public:
     explicit SeasonTicketItem(QObject* parent = 0);
 
@@ -61,8 +62,8 @@ public:
         }
     }
 
-    quint32 index() { return this->m_index; }
-    void setIndex(const quint32 index)
+    qint32 index() { return this->m_index; }
+    void setIndex(const qint32 index)
     {
         if (this->m_index != index) {
             this->m_index = index;
@@ -70,16 +71,17 @@ public:
         }
     }
 
-    quint32 userIndex() { return this->m_userIndex; }
-    void setUserIndex(const quint32 userIndex)
+    qint32 userIndex() { return this->m_userIndex; }
+    void setUserIndex(const qint32 userIndex)
     {
         if (this->m_userIndex != userIndex) {
             this->m_userIndex = userIndex;
+            emit this->userIndexChanged();
         }
     }
 
     Q_INVOKABLE bool isTicketYourOwn() { return this->m_ownTicket; }
-    void checkTicketOwn(quint32 userIndex)
+    void checkTicketOwn(qint32 userIndex)
     {
         if (this->m_userIndex == userIndex)
             this->m_ownTicket = true;
@@ -113,6 +115,7 @@ signals:
     void placeChanged();
     void discountChanged();
     void indexChanged();
+    void userIndexChanged();
 
 public slots:
 
@@ -120,8 +123,8 @@ private:
     QString m_name;
     QString m_place;
     quint8  m_discount;
-    quint32 m_index;
-    quint32 m_userIndex;
+    qint32  m_index;
+    qint32  m_userIndex;
     bool    m_ownTicket;
 
     quint32 m_ticketState;

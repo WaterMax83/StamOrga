@@ -238,6 +238,10 @@ Page {
         showListedGames();
     }
 
+    function notifyGetUserProperties(result) {
+        showListedGames();
+    }
+
     function notifyGameChangedFinished(result) {
         if (result === 1) {
             showLoadingGameInfos("Lade Spielinfos", true)

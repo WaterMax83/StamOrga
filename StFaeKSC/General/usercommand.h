@@ -144,8 +144,10 @@ public:
         if (list.size() != 2 || list.value(0) != "token")
             return ShowTokenHelp();
 
-        if (list.value(1) == "token" || list.value(1) == "guid" || list.value(1) == "version")
+        if (list.value(1) == "token" || list.value(1) == "guid" || list.value(1) == "version") {
             g_pushNotify->showCurrentTokenInformation(list.value(1));
+            return ERROR_CODE_SUCCESS;
+        }
 
         return ShowTokenHelp();
     }

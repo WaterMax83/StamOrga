@@ -93,7 +93,7 @@ ApplicationWindow {
                 implicitHeight: 50
                 contentItem: Image {
                     id: imageToolButton
-                    fillMode: Image.PreserveAspectFit
+                    fillMode: Image.Pad
                     horizontalAlignment: Image.AlignHCenter
                     verticalAlignment: Image.AlignVCenter
 //                    source: "images/refresh.png"
@@ -140,34 +140,9 @@ ApplicationWindow {
                 currentIndex: -1
                 implicitWidth: drawer.width
                 implicitHeight: drawer.height
+                highlight: highlightBar
 
-                delegate: ItemDelegate {
-                    width: parent.width
-                    text: model.title
-                    highlighted: ListView.isCurrentItem
-                    onClicked: {
-                        if (model.element) {
-                            titleLabel.text = model.title
-                            if (model.imgsource) {
-                                imageToolButton.visible = true
-                                imageToolButton.source = model.imgsource
-                            } else {
-                                imageToolButton.visible = false
-                            }
-                            stackView.push(model.element)
-                        } else if (model.link) {
-                            Qt.openUrlExternally(model.link);
-                            if (model.title === "Update")
-                                appUserEvents.clearUserEventUpdate(userInt);
-                        }
-
-                        drawer.close()
-                    }
-                    MyComponents.EventIndicator {
-                        disableVisibility: model.event ? false : true
-                        eventCount : model.event ? model.event : 0
-                    }
-                }
+                delegate: listDelegate
 
                 model: ListModel {
                     id: listViewListModel
@@ -175,31 +150,37 @@ ApplicationWindow {
                         append({
                                    title: "Benutzerprofil",
                                    element: viewUserLogin,
-                                   imgsource: "images/menu.png"
+                                   toolButtonImgSource: "images/menu.png",
+                                   listImgSource : "images/account.png"
                                })
                         append({
                                    title: "Dauerkarten",
                                    element: viewSeasonTickets,
-                                   imgsource: "images/add.png"
+                                   toolButtonImgSource: "images/add.png",
+                                   listImgSource : "images/card.png"
                                })
                         append({
                                    title: "Statistik",
                                    element: viewStatistics,
+                                   listImgSource : "images/history.png"
                                })
                         if (userInt.isDebuggingEnabled())
                             append({
                                        title: "Fanclub",
                                        element: viewFanclubNewList,
-                                       event: 0
+                                       event: 0,
+                                       listImgSource : "images/group.png"
                                    })
                         append({
                                    title: "Einstellungen",
                                    element: viewSettingsPage,
+                                   listImgSource : "images/settings.png"
                                })
                         if (userInt.isDebuggingEnabled())
                             append({
                                        title: "Logging",
                                        element: viewLoggingPage,
+                                       listImgSource : "images/bug.png"
                                    })
                     }
                 }
@@ -242,6 +223,74 @@ ApplicationWindow {
 
     MyComponents.ToastManager {
         id: toastManager
+    }
+
+    Component {
+            id: highlightBar
+            Rectangle {
+                width: listView.width
+                height: 50
+                color: "#808080"
+            }
+        }
+
+    Component {
+        id: listDelegate
+        Item {
+            id: delegateItem
+            width: listView.width
+            height: 50
+
+            RowLayout {
+                anchors.fill: parent
+                Image {
+                    Layout.preferredHeight: parent.height / 1.5
+                    Layout.preferredWidth: parent.height / 1.5
+                    Layout.leftMargin: 10
+                    horizontalAlignment: Qt.AlignHCenter
+                    verticalAlignment: Qt.AlignVCenter
+                    source: listImgSource
+                }
+
+                Text {
+                    height: parent.height
+                    text: title
+                    color: "white"
+                    font.pixelSize: 16
+                    elide: Text.ElideRight
+                    verticalAlignment: Qt.AlignVCenter
+                    Layout.leftMargin: 10
+                    Layout.fillWidth: true
+                }
+            }
+            MyComponents.EventIndicator {
+                disableVisibility: event ? false : true
+                eventCount : event ? event : 0
+            }
+            MouseArea {
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: {
+                     listView.currentIndex = index
+                    if (model.element) {
+                        titleLabel.text = title
+                        if (toolButtonImgSource) {
+                            imageToolButton.visible = true
+                            imageToolButton.source = toolButtonImgSource
+                        } else {
+                            imageToolButton.visible = false
+                        }
+                        stackView.push(element)
+                    } else if (link) {
+                        Qt.openUrlExternally(link);
+                        if (model.title === "Update")
+                            appUserEvents.clearUserEventUpdate(userInt);
+                    }
+
+                    drawer.close()
+                }
+            }
+        }
     }
 
     /* Need components because otherwise they will be shown in main view */
@@ -303,7 +352,8 @@ ApplicationWindow {
                     listViewListModel.append({
                                             title: "Update",
                                             link: globalUserData.getUpdateLink(),
-                                            event : 0
+                                            event : 0,
+                                            listImgSource : "images/download.png"
                                         })
                 }
             }
@@ -319,7 +369,8 @@ ApplicationWindow {
                         listViewListModel.append({
                                                 title: "Logging",
                                                 element: viewLoggingPage,
-                                                imgsource: ""
+                                                toolButtonImgSource: "",
+                                                listImgSource : "images/bug.png"
                                             })
                     }
                 }
@@ -329,8 +380,9 @@ ApplicationWindow {
                         listViewListModel.insert(2, {
                                                 title: "Fanclub",
                                                 element: viewFanclubNewList,
-                                                imgsource: "",
-                                                event : 0
+                                                toolButtonImgSource: "",
+                                                event : 0,
+                                                listImgSource : "images/group.png"
                                             })
                     }
                 }
@@ -341,6 +393,8 @@ ApplicationWindow {
                 else
                     updateHeaderFromMain("StamOrga", "")
             }
+            if (stackView.currentItem.notifyGetUserProperties)
+                stackView.currentItem.notifyGetUserProperties(result);
         }
         onNotifyGetUserEvents: {
             iMainToolButtonEventCount = appUserEvents.getCurrentMainEventCounter();

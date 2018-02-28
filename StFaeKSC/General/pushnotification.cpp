@@ -488,12 +488,15 @@ qint32 PushNotification::addNewAppInformation(const QString guid, const QString 
 
         this->m_mInternalInfoMutex.lock();
 
+        bool bChanged = false;
         if (app->m_fcmToken != fcmToken) {
             if (this->updateItemValue(app, APP_TOKEN_TOKEN, QVariant(fcmToken)))
                 app->m_fcmToken = fcmToken;
 
             if (this->updateItemValue(app, ITEM_TIMESTAMP, QVariant(timestamp)))
                 app->m_timestamp = timestamp;
+
+            bChanged = true;
         }
 
         if (app->m_userIndex != userIndex) {
@@ -502,9 +505,15 @@ qint32 PushNotification::addNewAppInformation(const QString guid, const QString 
 
             if (this->updateItemValue(app, ITEM_TIMESTAMP, QVariant(timestamp)))
                 app->m_timestamp = timestamp;
+
+            bChanged = true;
         }
 
         this->m_mInternalInfoMutex.unlock();
+
+        if(bChanged)
+            this->sortItemListByTimeAscending();
+
         return app->m_index;
     }
 
@@ -534,6 +543,8 @@ qint32 PushNotification::addNewAppInformation(const QString guid, const QString 
     app = new AppTokenUID(guid, fcmToken, timestamp, userIndex, system, newIndex, "");
 
     this->addNewAppToken(app, false);
+
+    this->sortItemListByTimeAscending();
 
     qInfo().noquote() << QString("Added new App Information: %1").arg(guid);
     return newIndex;
@@ -618,6 +629,8 @@ void PushNotification::loadCurrentInteralList()
 
     if (bProblems)
         this->saveCurrentInteralList();
+
+    this->sortItemListByTimeAscending();
 }
 
 bool PushNotification::addNewAppToken(AppTokenUID* app, bool checkApp)
@@ -638,8 +651,6 @@ void PushNotification::showCurrentTokenInformation(const QString cmd)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
-    //    if (cmd ==)
-
     for (int i = 0; i < this->getNumberOfInternalList(); i++) {
         AppTokenUID* app = (AppTokenUID*)(this->getItemFromArrayIndex(i));
         if (app == NULL)
@@ -648,13 +659,13 @@ void PushNotification::showCurrentTokenInformation(const QString cmd)
         QString token   = app->m_fcmToken == "" ? "Kein Token" : app->m_fcmToken;
         QString version = app->m_version == "" ? "Keine Version" : app->m_version;
         QString output  = QString("%1: %2").arg(app->m_index, 2, 10).arg(date);
-        output.append(QString(" - %1").arg(this->m_pGlobalData->m_UserList.getItemName(app->m_userIndex)));
+        output.append(QString(" - %1").arg(this->m_pGlobalData->m_UserList.getItemName(app->m_userIndex), 15));
         if (cmd == "token")
             output.append(QString(" - %1").arg(token));
         else if (cmd == "guid")
             output.append(QString(" - %1").arg(app->m_guid));
         else if (cmd == "version")
-            output.append(QString(" - %1 %2").arg(version).arg(app->m_oSystem));
+            output.append(QString(" - %1 %2").arg(version, 15).arg(app->m_oSystem));
 
         std::cout << output.toStdString() << std::endl;
     }

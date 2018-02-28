@@ -103,12 +103,29 @@ qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol* msg)
         seasonTicket->checkTicketOwn(index);
 
     if (rValue == ERROR_CODE_SUCCESS) {
-        this->m_pGlobalData->SetUserProperties(properties);
-        qInfo().noquote() << QString("Setting user properties to 0x%1").arg(QString::number(properties, 16));
+        if (this->m_pGlobalData->getUserProperties() != (quint32)properties) {
+            this->m_pGlobalData->SetUserProperties(properties);
+            qInfo().noquote() << QString("Setting user properties to 0x%1").arg(QString::number(properties, 16));
+        }
     } else
         this->m_pGlobalData->SetUserProperties(0x0);
 
     this->m_pGlobalData->setReadableName(readableName);
+
+    if (rootObj.contains("tickets")) {
+        GameUserData* pGameUserData = this->m_pGlobalData->getGameUserDataHandler();
+        pGameUserData->clearTicketGameList();
+
+        QJsonArray arrTickets = rootObj.value("tickets").toArray();
+        for (int i = 0; i < arrTickets.count(); i++) {
+            QJsonObject ticket    = arrTickets.at(i).toObject();
+            qint32      gameIndex = ticket.value("gameIndex").toInt(-1);
+            if (ticket.value("type").toString("") == "reserved")
+                pGameUserData->setTicketGameIndex(gameIndex, TICKET_STATE_RESERVED);
+            else if (ticket.value("type").toString("") == "free")
+                pGameUserData->setTicketGameIndex(gameIndex, TICKET_STATE_FREE);
+        }
+    }
 
     return rValue;
 }
