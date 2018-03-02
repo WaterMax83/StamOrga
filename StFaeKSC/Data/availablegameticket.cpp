@@ -194,7 +194,7 @@ qint32 AvailableGameTickets::changeTicketState(qint32 ticketID, qint32 userID, q
     return ERROR_CODE_NOT_FOUND;
 }
 
-qint32 AvailableGameTickets::getTicketState(quint32 ticketID)
+qint32 AvailableGameTickets::getTicketState(qint32 ticketID)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
@@ -206,7 +206,7 @@ qint32 AvailableGameTickets::getTicketState(quint32 ticketID)
     return TICKET_STATE_NOT_POSSIBLE;
 }
 
-QString AvailableGameTickets::getTicketName(quint32 ticketID)
+QString AvailableGameTickets::getTicketName(qint32 ticketID)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 

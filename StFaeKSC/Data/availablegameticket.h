@@ -27,7 +27,7 @@
 #include "configlist.h"
 
 struct AvailableTicketInfo : public ConfigItem {
-    qint32 m_ticketID;
+    qint32  m_ticketID;
     qint32  m_userID;
     quint32 m_state;
 
@@ -61,8 +61,8 @@ public:
 
     quint16 getTicketNumber(const quint32 state);
 
-    qint32 getTicketState(quint32 ticketID);
-    QString getTicketName(quint32 ticketID);
+    qint32 getTicketState(qint32 ticketID);
+    QString getTicketName(qint32 ticketID);
 
     virtual qint32 checkConsistency();
 

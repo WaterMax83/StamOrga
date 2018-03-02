@@ -215,23 +215,23 @@ Page {
     function notifyUserIntGamesListFinished(result) {
         if (result !== 1) {
             toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
-//            busyIndicatorGames.loadingVisible = false
             showLoadingGameInfos("", false);
             showListedGames()
         }
     }
 
     function notifyUserIntGamesInfoListFinished(result) {
-//        busyIndicatorGames.loadingVisible = false
         showLoadingGameInfos("", false);
         if (result === 1) {
             toastManager.show("Spiele geladen", 2000)
         }
         else{
             toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
+            /* If success then user properties will be called */
+            showListedGames()
         }
 
-        showListedGames()
+
     }
 
     function notifyGetUserEvents(result) {
@@ -239,7 +239,8 @@ Page {
     }
 
     function notifyGetUserProperties(result) {
-        showListedGames();
+        if (result !== 1) /* If success then user events will be called */
+            showListedGames();
     }
 
     function notifyGameChangedFinished(result) {
@@ -270,6 +271,7 @@ Page {
             updateHeaderFromMain("StamOrga", "images/add.png")
         else
             updateHeaderFromMain("StamOrga", "")
+
         showListedGames()
     }
 
@@ -278,10 +280,8 @@ Page {
         gamesListPagePast.showListedGames()
 
         if (globalUserData.getGamePlayLength() > 0) {
-//            busyIndicatorGames.infoText = "Letztes Update am " + globalUserData.getGamePlayLastUpdateString()
             showLoadingGameInfos("Letztes Update am " + globalUserData.getGamePlayLastUpdateString(), false);
         } else {
-//            busyIndicatorGames.infoText = "Keine Daten gespeichert\nZiehen zum Aktualisieren"
             showLoadingGameInfos("Keine Daten gespeichert\nZiehen zum Aktualisieren", false);
         }
     }
@@ -290,8 +290,6 @@ Page {
     {
         gamesListPagePresent.showLoadingGameInfosInternal(text, loading);
         gamesListPagePast.showLoadingGameInfosInternal(text, loading);
-//        busyIndicatorGames.loadingVisible = true
-//        busyIndicatorGames.infoText = text
     }
 
 }

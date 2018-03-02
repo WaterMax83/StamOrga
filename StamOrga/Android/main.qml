@@ -162,7 +162,7 @@ ApplicationWindow {
                         append({
                                    title: "Statistik",
                                    element: viewStatistics,
-                                   listImgSource : "images/history.png"
+                                   listImgSource : "images/chart.png"
                                })
                         if (userInt.isDebuggingEnabled())
                             append({

@@ -37,7 +37,7 @@ struct StatsTickets {
         this->m_blocked     = 0;
         this->m_timestamp   = 0;
     }
-    quint32 m_ticketIndex;
+    qint32  m_ticketIndex;
     QString m_name;
     qint32  m_free;
     qint32  m_reserved;

@@ -181,10 +181,11 @@ QString GlobalSettings::getVersionChangeInfo()
 {
     QString rValue;
 
-    rValue.append("<b>V1.0.7:</b>(XX.0X.2018)<br>");
+    rValue.append("<b>V1.0.7:</b>(03.03.2018)<br>");
     rValue.append("- Statistic hinzugefügt<br>");
-    rValue.append("- Icons in Drawer<br>");
+    rValue.append("- Icons in Drawer und Übersicht überarbeitet<br>");
     rValue.append("- Easteregg versteckt<br>");
+    rValue.append("- Infos über eigene Karte und Reservierung in der Übersicht<br>");
 
     rValue.append("<br><b>V1.0.6:</b>(08.02.2018)<br>");
     rValue.append("- Infos über Fahrt in der Übersicht<br>");

@@ -108,13 +108,10 @@ Rectangle {
         }
 
         RowLayout {
-            id: layoutWhatLine
-
             anchors.right: parent.right
             anchors.left: parent.left
             Layout.preferredWidth: columnLayout.width
             Layout.fillWidth: true
-            spacing: 5
 
             Text {
                 id: labelLineWhat
@@ -125,220 +122,152 @@ Rectangle {
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
             }
-            Image {
-                id: imageMeetingIsPresent
-                anchors.top : parent.top
-                Layout.rightMargin: acceptedMeetingItem.visible ? 0 : 5
-                anchors.topMargin: 3
+
+            RowLayout {
                 Layout.alignment: Qt.AlignRight
-                Layout.preferredWidth: labelLineDate.height / 1.2
-                Layout.preferredHeight: labelLineDate.height / 1.2
-                source: "../images/place.png";
-                visible: false
-            }
+                Layout.rightMargin: 5
+                spacing: 5
 
 
-            RowLayout {
-                id: acceptedMeetingItem
-                visible: false
-                spacing: 0
-                Layout.rightMargin: interestMeetingItem.visible ? 0 : acceptedTripItem.visible ? 10 : 5
-                Text {
-                    id: labelAcceptedMeeting
-                    topPadding: 3
-                    color: "white"
-                    font.pixelSize: 14
-                    Layout.alignment: Qt.AlignRight
+                Image {
+                    id: imageTripIsPresent
+                    Layout.preferredWidth: labelLineDate.height / 1.2
+                    Layout.preferredHeight: labelLineDate.height / 1.2
+                    source: "../images/train.png";
+                    visible: false
                 }
 
-                Item {
-                    Layout.preferredHeight: labelAcceptedMeeting.height / 1.2
-                    Layout.preferredWidth: labelAcceptedMeeting.height / 1.2
-                    anchors.top : parent.top
-                    anchors.right: parent. right
 
-                    anchors.topMargin: 3
-                    Layout.alignment: Qt.AlignRight
-                    Image {
-                        id: imageAccpetedMeeting
-                        anchors.fill: parent
-                        source: "../images/done.png";
+                RowLayout {
+                    id: acceptedTripItem
+                    visible: false
+                    spacing: 1
+                    Text {
+                        id: labelAcceptedTrip
+                        color: "white"
+                        font.pixelSize: 14
                     }
-                    ColorOverlay {
-                        anchors.fill: imageAccpetedMeeting
-                        source: imageAccpetedMeeting
+
+                    Rectangle {
+                        width: labelAcceptedTrip.height / 1.5
+                        height: labelAcceptedTrip.height / 1.5
+                        radius: width * 0.5
                         color: "green"
+                        Image {
+                            anchors.fill: parent
+                            source: "../images/done.png";
+                        }
                     }
                 }
-            }
 
-            RowLayout {
-                id: interestMeetingItem
-                visible: false
-                spacing: 0
-                Layout.rightMargin: acceptedTripItem.visible ? 10 : 5
-                Text {
-                    id: labelInterestMeeting
-                    topPadding: 3
-                    color: "white"
-                    font.pixelSize: 14
-                    Layout.alignment: Qt.AlignRight
-                }
-
-                Item {
-                    Layout.preferredHeight: labelInterestMeeting.height / 1.2
-                    Layout.preferredWidth: labelInterestMeeting.height / 1.2
-                    anchors.top : parent.top
-                    anchors.right: parent. right
-
-                    anchors.topMargin: 3
-                    Layout.alignment: Qt.AlignRight
-                    Image {
-                        id: imageInterestMeeting
-                        anchors.fill: parent
-                        source: "../images/help.png";
+                RowLayout {
+                    id: interestTripItem
+                    visible: false
+                    spacing: 1
+                    Text {
+                        id: labelInterestTrip
+                        color: "white"
+                        font.pixelSize: 14
+                        Layout.alignment: Qt.AlignRight
                     }
-                    ColorOverlay {
-                        anchors.fill: imageInterestMeeting
-                        source: imageInterestMeeting
+
+                    Rectangle {
+                        width: labelInterestTrip.height / 1.5
+                        height: labelInterestTrip.height / 1.5
+                        radius: width * 0.5
                         color: "orange"
+                        Image {
+                            anchors.fill: parent
+                            source: "../images/help.png";
+                        }
                     }
                 }
             }
-
-            Image {
-                id: imageTripIsPresent
-                anchors.top : parent.top
-                Layout.rightMargin: acceptedTripItem.visible ? 0 : 5
-                anchors.topMargin: 3
-                Layout.alignment: Qt.AlignRight
-                Layout.preferredWidth: labelLineDate.height / 1.2
-                Layout.preferredHeight: labelLineDate.height / 1.2
-                source: "../images/train.png";
-                visible: false
-            }
-
-
-            RowLayout {
-                id: acceptedTripItem
-                visible: false
-                spacing: 0
-                Layout.rightMargin: interestMeetingItem.visible ? 0 : freeTicketsItem.visible ? 10 : 5
-                Text {
-                    id: labelAcceptedTrip
-                    topPadding: 3
-                    color: "white"
-                    font.pixelSize: 14
-                    Layout.alignment: Qt.AlignRight
-                }
-
-                Item {
-                    Layout.preferredHeight: labelAcceptedTrip.height / 1.2
-                    Layout.preferredWidth: labelAcceptedTrip.height / 1.2
-                    anchors.top : parent.top
-                    anchors.right: parent. right
-
-                    anchors.topMargin: 3
-                    Layout.alignment: Qt.AlignRight
-                    Image {
-                        id: imageAcceptedTrip
-                        anchors.fill: parent
-                        source: "../images/done.png";
-                    }
-                    ColorOverlay {
-                        anchors.fill: imageAcceptedTrip
-                        source: imageAcceptedTrip
-                        color: "green"
-                    }
-                }
-            }
-
-            RowLayout {
-                id: interestTripItem
-                visible: false
-                spacing: 0
-                Layout.rightMargin: freeTicketsItem.visible ? 10 : 5
-                Text {
-                    id: labelInterestTrip
-                    topPadding: 3
-                    color: "white"
-                    font.pixelSize: 14
-                    Layout.alignment: Qt.AlignRight
-                }
-
-                Item {
-                    Layout.preferredHeight: labelInterestTrip.height / 1.2
-                    Layout.preferredWidth: labelInterestTrip.height / 1.2
-                    anchors.top : parent.top
-                    anchors.right: parent.right
-
-                    anchors.topMargin: 3
-                    Layout.alignment: Qt.AlignRight
-                    Image {
-                        id: imageInterestTrip
-                        anchors.fill: parent
-                        source: "../images/help.png";
-                    }
-                    ColorOverlay {
-                        anchors.fill: imageInterestTrip
-                        source: imageInterestTrip
-                        color: "orange"
-                    }
-                }
-            }
-
-            RowLayout {
-                id: freeTicketsItem
-                visible: false
-                spacing: 8
-                Text {
-                    id: labelFreeTickets
-                    topPadding: 3
-                    color: "white"
-                    font.pixelSize: 14
-                    Layout.alignment: Qt.AlignRight
-                }
-
-                Item {
-                    Layout.preferredHeight: labelFreeTickets.height / 1.2
-                    Layout.preferredWidth: labelFreeTickets.height / 1.2
-                    anchors.top : parent.top
-                    anchors.right: parent.right
-                    anchors.rightMargin: 5
-                    anchors.topMargin: 4
-                    Layout.alignment: Qt.AlignRight
-                    Image {
-                        id: imageTicketItems
-                        anchors.fill: parent
-                        source: "../images/card.png";
-                    }
-                    ColorOverlay {
-                        id: colorOverlayTicketItem
-                        anchors.fill: imageTicketItems
-                        source: imageTicketItems
-                    }
-                }
-            }
-        }
-
-        Text {
-            id: labelLineHome
-            text: qsTr("Home")
-            leftPadding: 5
-            topPadding: 5
-            font.bold: true
-            color: "white"
-            font.pixelSize: 14
-            Layout.fillWidth: true
-            Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
         }
 
         RowLayout {
-            id: layoutExplicitGame
-
             anchors.right: parent.right
             anchors.left: parent.left
-            Layout.preferredWidth: columnLayout.width
+            Layout.preferredWidth: parent.width
+            Layout.fillWidth: true
+
+            Text {
+                id: labelLineHome
+                text: qsTr("Home")
+                leftPadding: 5
+                font.bold: true
+                color: "white"
+                font.pixelSize: 14
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
+            }
+
+            RowLayout {
+                Layout.alignment: Qt.AlignRight
+                Layout.rightMargin: 5
+                spacing: 5
+
+
+                Image {
+                    id: imageMeetingIsPresent
+                    Layout.preferredWidth: labelLineDate.height / 1.2
+                    Layout.preferredHeight: labelLineDate.height / 1.2
+                    source: "../images/place.png";
+                    visible: false
+                }
+
+
+                RowLayout {
+                    id: acceptedMeetingItem
+                    visible: false
+                    spacing: 1
+                    Text {
+                        id: labelAcceptedMeeting
+                        color: "white"
+                        font.pixelSize: 14
+
+                    }
+
+                    Rectangle {
+                        width: labelAcceptedMeeting.height / 1.5
+                        height: labelAcceptedMeeting.height / 1.5
+                        radius: width * 0.5
+                        color: "green"
+                        Image {
+                            anchors.fill: parent
+                            source: "../images/done.png";
+                        }
+                    }
+                }
+
+                RowLayout {
+                    id: interestMeetingItem
+                    visible: false
+                    spacing: 1
+                    Text {
+                        id: labelInterestMeeting
+                        color: "white"
+                        font.pixelSize: 14
+                    }
+
+                    Rectangle {
+                        width: labelInterestMeeting.height / 1.5
+                        height: labelInterestMeeting.height / 1.5
+                        radius: width * 0.5
+                        color: "orange"
+                        Image {
+                            anchors.fill: parent
+                            source: "../images/help.png";
+                        }
+                    }
+                }
+            }
+        }
+
+        RowLayout {
+            anchors.right: parent.right
+            anchors.left: parent.left
+            Layout.preferredWidth: parent.width
             Layout.fillWidth: true
 
             Text {
@@ -349,7 +278,7 @@ Rectangle {
                 color: "white"
                 font.pixelSize: 14
                 Layout.fillWidth: true
-                Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
+                Layout.alignment: Qt.AlignLeft // | Qt.AlignHCenter
             }
 
             Text {
@@ -358,8 +287,76 @@ Rectangle {
                 font.bold: true
                 color: "white"
                 font.pixelSize: 14
-                rightPadding: layoutExplicitGame.width / 100 * 30
-                Layout.alignment: Qt.AlignRight | Qt.AlignHCenter
+                rightPadding: parent.width / 100 * 30
+                Layout.alignment: Qt.AlignRight // | Qt.AlignHCenter
+            }
+
+            RowLayout {
+                Layout.alignment: Qt.AlignRight
+                Layout.rightMargin: 5
+                spacing: 5
+                Image {
+                    id: imageTicketItems
+                    Layout.preferredHeight: labelFreeTickets.height / 1.2
+                    Layout.preferredWidth: labelFreeTickets.height / 1.2
+                    visible: false
+                    source: "../images/card.png";
+                }
+                RowLayout {
+                    id: itemFreeTickets
+                    visible: false
+                    spacing: 1
+                    Text {
+                        id: labelFreeTickets
+                        color: "white"
+                        font.pixelSize: 14
+                    }
+
+                    Rectangle {
+                        width: labelFreeTickets.height / 1.5
+                        height: labelFreeTickets.height / 1.5
+                        radius: width * 0.5
+                        color: "green"
+                    }
+                }
+
+                Item {
+                    id: itemTicketBookmark
+                    Layout.preferredHeight: labelFreeTickets.height / 1.2
+                    Layout.preferredWidth: labelFreeTickets.height / 1.2
+                    Layout.leftMargin: 6    // to get offset same as line above
+                    visible: false
+
+                    Image {
+                        id: imageItemTicketBookmark
+                        anchors.fill : parent
+                        source: "../images/bookmark.png";
+                    }
+                    ColorOverlay {
+                        anchors.fill: imageItemTicketBookmark
+                        source: imageItemTicketBookmark
+                        color: "yellow"
+                    }
+                }
+
+                Item {
+                    id: itemTicketShare
+                    Layout.preferredHeight: labelFreeTickets.height / 1.2
+                    Layout.preferredWidth: labelFreeTickets.height / 1.2
+                    Layout.leftMargin: 6    // to get offset same as line above
+                    visible: false
+
+                    Image {
+                        id: imageItemTicketShare
+                        anchors.fill : parent
+                        source: "../images/share.png";
+                    }
+//                    ColorOverlay {
+//                        anchors.fill: imageItemTicketShare
+//                        source: imageItemTicketShare
+//                        color: "green"
+//                    }
+                }
             }
         }
 
@@ -410,13 +407,6 @@ Rectangle {
                 mainRectangleGame.border.color = "orange";
                 mainRectangleGame.border.width = 3;
             }
-            var ticketIndex = gameUserData.getTicketGameIndex(gamePlayItem.index);
-            if (ticketIndex === 2)
-                colorOverlayTicketItem.color = "green";
-            else if (ticketIndex === 3)
-                colorOverlayTicketItem.color = "orange";
-            else
-                colorOverlayTicketItem.color = "transparent"
 
             var eventCount = gamePlayItem.event;
             if (eventCount > 0) {
@@ -425,62 +415,89 @@ Rectangle {
             } else
                 eventIndicator.disableVisibility = true;
 
-
-
             var fixed = gamePlayItem.timeFixed
-//            console.log("Fixed = " + fixed);
             if (!gamePlayItem.timeFixed)
                 labelLineTimeNotFixed.visible = true
 
-            acceptedMeetingItem.visible = false;
-            interestMeetingItem.visible = false;
-            imageMeetingIsPresent.visible = false;
-            var meetingPresent = gamePlayItem.getMeetingInfo();
-            if (meetingPresent > 0) {
-                imageMeetingIsPresent.visible = true
-                var acceptedMeeting = gamePlayItem.getAcceptedMeetingCount();
-                if (acceptedMeeting > 0) {
-                    acceptedMeetingItem.visible = true;
-                    labelAcceptedMeeting.text = acceptedMeeting;
-                } else
 
-                var interestMeeting = gamePlayItem.getInterestedMeetingCount();
-                if (interestMeeting > 0) {
-                    interestMeetingItem.visible = true;
-                    labelInterestMeeting.text = interestMeeting;
-                }
-            }
+            showTripInfo(gamePlayItem);
 
-            acceptedTripItem.visible = false;
-            interestTripItem.visible = false;
-            imageTripIsPresent.visible = false;
-            var tripPresend = gamePlayItem.getTripInfo();
-            if (tripPresend > 0) {
-                imageTripIsPresent.visible = true
-                var acceptedTrip = gamePlayItem.getAcceptedTripCount();
-                if (acceptedTrip > 0) {
-                    acceptedTripItem.visible = true;
-                    labelAcceptedTrip.text = acceptedTrip;
-                }
-                var interestTrip = gamePlayItem.getInterestedTripCount();
-                if (interestTrip > 0) {
-                    interestTripItem.visible = true;
-                    labelInterestTrip.text = interestTrip;
-                }
-            }
+            showMeetingInfo(gamePlayItem);
 
-            if (!gamePlayItem.isGameASeasonTicketGame())
-                return;
-
-            var freeTickets = gamePlayItem.getFreeTickets();
-            if (freeTickets > 0 || ticketIndex > 1) {
-                freeTicketsItem.visible = true;
-                labelFreeTickets.text = freeTickets;
-            } else {
-                freeTicketsItem.visible = false;
-            }
+            showTicketInfo(gamePlayItem);
 
         }
+    }
+
+    function showTripInfo(gamePlayItem) {
+        acceptedTripItem.visible = false;
+        interestTripItem.visible = false;
+        imageTripIsPresent.visible = false;
+        var tripPresend = gamePlayItem.getTripInfo();
+        if (tripPresend > 0) {
+            imageTripIsPresent.visible = true
+            var acceptedTrip = gamePlayItem.getAcceptedTripCount();
+            if (acceptedTrip > 0) {
+                acceptedTripItem.visible = true;
+                labelAcceptedTrip.text = acceptedTrip;
+            }
+            var interestTrip = gamePlayItem.getInterestedTripCount();
+            if (interestTrip > 0) {
+                interestTripItem.visible = true;
+                labelInterestTrip.text = interestTrip;
+            }
+        }
+    }
+
+    function showMeetingInfo(gamePlayItem) {
+        acceptedMeetingItem.visible = false;
+        interestMeetingItem.visible = false;
+        imageMeetingIsPresent.visible = false;
+        var meetingPresent = gamePlayItem.getMeetingInfo();
+        if (meetingPresent > 0) {
+            imageMeetingIsPresent.visible = true
+            if (gamePlayItem.getAcceptedMeetingCount() > 0) {
+                acceptedMeetingItem.visible = true;
+                labelAcceptedMeeting.text = gamePlayItem.getAcceptedMeetingCount();
+            }
+
+            if (gamePlayItem.getInterestedMeetingCount() > 0) {
+                interestMeetingItem.visible = true;
+                labelInterestMeeting.text = gamePlayItem.getInterestedMeetingCount();
+            }
+        }
+    }
+
+    function showTicketInfo(gamePlayItem) {
+
+        if (!gamePlayItem.isGameASeasonTicketGame())
+            return;
+
+        var gameUserData = globalUserData.getGameUserDataHandler();
+        var ticketIndex = gameUserData.getTicketGameIndex(gamePlayItem.index);
+            if (ticketIndex === 2) {
+                itemTicketShare.visible = true;
+                itemTicketBookmark.visible = false;
+            } else if (ticketIndex === 3) {
+                itemTicketShare.visible = false;
+                itemTicketBookmark.visible = true;
+            }else {
+                itemTicketShare.visible = false;
+                itemTicketBookmark.visible = false;
+            }
+
+        var freeTickets = gamePlayItem.getFreeTickets();
+        if (freeTickets > 0) {
+            itemFreeTickets.visible = true;
+            labelFreeTickets.text = freeTickets;
+        } else {
+            itemFreeTickets.visible = false;
+        }
+
+        if (freeTickets > 0 || ticketIndex > 1)
+            imageTicketItems.visible = true;
+        else
+            itemFreeTickets.visible = false;
     }
 
 

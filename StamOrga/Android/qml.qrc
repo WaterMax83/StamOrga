@@ -96,5 +96,11 @@
         <file>images/settings.png</file>
         <file>images/+material/download.png</file>
         <file>images/download.png</file>
+        <file>images/+material/bookmark.png</file>
+        <file>images/+material/share.png</file>
+        <file>images/bookmark.png</file>
+        <file>images/chart.png</file>
+        <file>images/share.png</file>
+        <file>images/+material/chart.png</file>
     </qresource>
 </RCC>
