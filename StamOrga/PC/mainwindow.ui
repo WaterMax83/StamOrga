@@ -53,38 +53,6 @@
      <string>IPAddr</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>40</y>
-      <width>47</width>
-      <height>13</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Port</string>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="spBoxPort">
-    <property name="geometry">
-     <rect>
-      <x>70</x>
-      <y>38</y>
-      <width>131</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="minimum">
-     <number>100</number>
-    </property>
-    <property name="maximum">
-     <number>100000</number>
-    </property>
-    <property name="value">
-     <number>55000</number>
-    </property>
-   </widget>
    <widget class="QLineEdit" name="lEditSendUserName">
     <property name="geometry">
      <rect>

@@ -33,12 +33,27 @@ public:
 
     QString getIPAddr() { return this->m_ipAddr; }
 
+    QString getPassWord() { return this->m_passWord; }
+
+    QString getUserName() { return this->m_userName; }
+
+    QString getReadableName() { return this->m_readableName; }
+
+    QString getSalt() { return this->m_salt; }
+
+    qint32 getMasterConPort() { return 55000; }
+
 signals:
 
 public slots:
 
 private:
     QString m_ipAddr;
+    QString m_login;
+    QString m_passWord;
+    QString m_userName;
+    QString m_readableName;
+    QString m_salt;
 };
 
 #endif // CCONSETTINGS_H

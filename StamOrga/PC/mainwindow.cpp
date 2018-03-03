@@ -38,6 +38,9 @@ MainWindow::MainWindow(QWidget* parent)
 
     this->ui->lEditIpAddr->setText(g_ConSettings.getIPAddr());
 
+    this->ui->lEditSendUserName->setText(g_ConSettings.getUserName());
+    //    this->ui->lEditTextPassword->setText(g_ConSettings.getPassWord());
+
 
     //    this->m_pConHandling = new ConnectionHandling();
     //    connect(this->m_pConHandling, &ConnectionHandling::sNotifyConnectionFinished,
@@ -54,8 +57,7 @@ MainWindow::MainWindow(QWidget* parent)
     //    this->m_pGlobalData = new GlobalData();
     //    this->m_pGlobalData->loadGlobalSettings();
 
-    //    this->ui->lEditSendUserName->setText(this->m_pGlobalData->userName());
-    //    this->ui->lEditTextPassword->setText(this->m_pGlobalData->passWord());
+    //
     //
     //    this->ui->spBoxPort->setValue(this->m_pGlobalData->conMasterPort());
 

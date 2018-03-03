@@ -30,6 +30,9 @@ VERSION=$${STAMORGA_VERSION}
 SOURCES += main.cpp \
     ../Common/General/backgroundcontroller.cpp \
     ../Common/General/backgroundworker.cpp \
+    ../Common/General/logging.cpp \
+    ../Common/General/globalfunctions.cpp \
+    ../Common/General/cgendisposer.cpp \
     Network/udpserver.cpp \
     ../Common/Network/messagebuffer.cpp \
     ../Common/Network/messageprotocol.cpp \
@@ -37,8 +40,6 @@ SOURCES += main.cpp \
     General/globaldata.cpp \
     General/console.cpp \
     Network/udpdataserver.cpp \
-    ../Common/General/logging.cpp \
-    ../Common/General/globalfunctions.cpp \
     General/dataconnection.cpp \
     Data/listeduser.cpp \
     Data/games.cpp \
@@ -53,24 +54,26 @@ SOURCES += main.cpp \
     Data/userevents.cpp \
     Data/awaytripinfo.cpp \
     Data/checkconsistentdata.cpp \
-    Data/statistic.cpp
+    Data/statistic.cpp \
+
 
 HEADERS += \
     ../Common/General/backgroundcontroller.h \
     ../Common/General/backgroundworker.h \
     ../Common/General/config.h \
+    ../Common/General/cgendisposer.h \
+    ../Common/General/globaltiming.h \
+    ../Common/General/logging.h \
+    ../Common/General/globalfunctions.h \
     Network/udpserver.h \
     ../Common/Network/messagebuffer.h \
     ../Common/Network/messageprotocol.h \
-    ../Common/General/globaltiming.h \
     ../Common/Network/messagecommand.h \
     General/globaldata.h \
-    ../Common/General/globalfunctions.h \
     General/console.h \
     General/usercommand.h \
     Network/udpdataserver.h \
     Network/connectiondata.h \
-    ../Common/General/logging.h \
     General/dataconnection.h \
     Data/listeduser.h \
     Data/games.h \
@@ -85,7 +88,8 @@ HEADERS += \
     Data/userevents.h \
     Data/awaytripinfo.h \
     Data/checkconsistentdata.h \
-    Data/statistic.h
+    Data/statistic.h \
+
 
 
 unix {

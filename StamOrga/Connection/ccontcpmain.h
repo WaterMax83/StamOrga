@@ -43,7 +43,7 @@ signals:
     void connectionRequestFinished(qint32 result, const QString msg, const QString salt, const QString random);
 
 public slots:
-    //    void slotSendNewMainConRequest(QString username);
+    void slotSendNewMainConRequest(QString username);
     //    void slotNewBindingPortRequest();
 
 private slots:
@@ -54,15 +54,15 @@ private slots:
 
 
 private:
-    //    GlobalData*   m_pGlobalData;
-    //    MessageBuffer m_messageBuffer;
-    //    QString       m_userName;
+    MessageBuffer m_messageBuffer;
+    QString       m_userName;
+    bool          m_bIsConnecting;
 
     QTimer*      m_pConTimeout;
     QTcpSocket*  m_pMasterTcpSocket = NULL;
     QHostAddress m_hMasterReceiver;
 
-    //    void checkNewOncomingData();
+    void checkNewOncomingData();
 };
 
 #endif // CTCPMAINCON_H

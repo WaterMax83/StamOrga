@@ -20,6 +20,18 @@
 #include "../Common/General/globalfunctions.h"
 #include "../cstaglobalmanager.h"
 
+// clang-format off
+
+#define USER_GROUP      "USER_LOGIN"
+
+#define USER_IPADDR     "IPAddress"
+#define USER_USERNAME   "UserName"
+#define USER_PASSWORD   "Password"
+#define USER_SALT       "Salt"
+#define USER_READABLE   "ReadableName"
+
+// clang-format on
+
 cConSettings::cConSettings(QObject* parent)
     : cGenDisposer(parent)
 {
@@ -27,10 +39,19 @@ cConSettings::cConSettings(QObject* parent)
 
 qint32 cConSettings::initialize()
 {
+    QString value;
 
-    g_StaSettingsManager.getValue("USER_LOGIN", "IPAddress", this->m_ipAddr);
+    g_StaSettingsManager.getValue(USER_GROUP, USER_IPADDR, value);
+    this->m_ipAddr = value;
+    g_StaSettingsManager.getValue(USER_GROUP, USER_USERNAME, value);
+    this->m_userName = value;
+    g_StaSettingsManager.getValue(USER_GROUP, USER_PASSWORD, value);
+    this->m_passWord = value;
+    g_StaSettingsManager.getValue(USER_GROUP, USER_SALT, value);
+    this->m_salt = value;
+    g_StaSettingsManager.getValue(USER_GROUP, USER_READABLE, value);
+    this->m_readableName = value;
 
-    qDebug() << this->m_ipAddr;
 
     this->m_initialized = true;
 
