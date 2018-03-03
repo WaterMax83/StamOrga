@@ -34,6 +34,8 @@ public:
     MainConnection(GlobalData* pData);
     ~MainConnection();
 
+    qint32 initialize() { return ERROR_CODE_SUCCESS; }
+
     int DoBackgroundWork() override;
 
     QString m_workerName = "MainConnection";

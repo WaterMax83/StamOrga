@@ -66,6 +66,7 @@ int main(int argc, char* argv[])
     g_GlobalSettings = &globalSettings;
 
     GlobalData globalUserData;
+    globalUserData.initialize();
     g_GlobalData = &globalUserData;
     globalSettings.initialize(&globalUserData, &app);
 

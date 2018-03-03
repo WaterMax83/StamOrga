@@ -49,6 +49,8 @@ public:
     DataConnection(GlobalData* pData);
     ~DataConnection();
 
+    qint32 initialize() { return ERROR_CODE_SUCCESS; }
+
     int DoBackgroundWork() override;
 
     QString m_workerName = "DataConnection";

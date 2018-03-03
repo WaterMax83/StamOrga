@@ -34,6 +34,7 @@ SOURCES += main.cpp \
     ../../Common/Network/messagecommand.cpp \
     ../../Common/Network/messageprotocol.cpp \
     ../../Common/General/globalfunctions.cpp \
+    ../../Common/General/cgendisposer.cpp \
     ../dataconnection.cpp \
     ../datahandling.cpp \
     ../Data/globaldata.cpp \
@@ -85,6 +86,7 @@ HEADERS += \
     ../../Common/Network/messagecommand.h \
     ../../Common/Network/messageprotocol.h \
     ../../Common/General/globalfunctions.h \
+    ../../Common/General/cgendisposer.h \
     ../dataconnection.h \
     ../datahandling.h \
     ../Data/globaldata.h \

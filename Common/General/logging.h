@@ -45,7 +45,7 @@ class Logging : public BackgroundWorker
 public:
     explicit Logging(QObject* parent = 0);
 
-    void initialize();
+    qint32 initialize();
 
     void addNewEntry(QtMsgType type, /*const QMessageLogContext context,*/ const QString& msg);
 

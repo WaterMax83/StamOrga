@@ -32,22 +32,24 @@
 
 #include <QObject>
 
-class BackgroundWorker : public QObject
+#include "cgendisposer.h"
+
+class BackgroundWorker : public cGenDisposer
 {
     Q_OBJECT
 
 public:
-    explicit BackgroundWorker(QObject *parent = 0);
-    explicit BackgroundWorker(QString &name);
+    explicit BackgroundWorker(QObject* parent = 0);
+    explicit BackgroundWorker(QString& name);
     ~BackgroundWorker();
 
-    void SetWorkerName(const QString &value) { this->m_workerName = value; }
+    void     SetWorkerName(const QString& value) { this->m_workerName = value; }
     QString& GetWorkerName() { return this->m_workerName; }
 
 signals:
-    void notifyThreadInfo(const QString &info);
-    void notifyThreadError(const QString &error, const bool &stop);
-    void notifyBackgroundWorkerFinished(const int &result);
+    void notifyThreadInfo(const QString& info);
+    void notifyThreadError(const QString& error, const bool& stop);
+    void notifyBackgroundWorkerFinished(const int& result);
 
 public slots:
     void startBackgroundWork();
@@ -55,15 +57,14 @@ public slots:
 protected:
     virtual int DoBackgroundWork() = 0;
 
-    void Info(const QString &info);
-    void Error(const QString &error, const bool &stop = false);
+    void Info(const QString& info);
+    void Error(const QString& error, const bool& stop = false);
 
 
     bool IsStopRequested();
 
 private:
     QString m_workerName;
-
 };
 
 #endif // BACKGROUNDWORKER_H

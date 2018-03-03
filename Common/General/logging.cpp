@@ -53,7 +53,7 @@ Logging::Logging(QObject* parent)
     this->m_initialized = false;
 }
 
-void Logging::initialize()
+qint32 Logging::initialize()
 {
     // Set the global Message Pattern
     SetMessagePattern();
@@ -61,6 +61,8 @@ void Logging::initialize()
     g_Logging = this;
 
     qInstallMessageHandler(logMyMessageLogginOutPut);
+
+    return ERROR_CODE_SUCCESS;
 }
 
 int Logging::DoBackgroundWork()

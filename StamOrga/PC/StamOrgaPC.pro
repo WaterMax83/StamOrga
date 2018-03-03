@@ -11,6 +11,10 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = StamOrgaPC
 TEMPLATE = app
 
+include (../../StamOrga.pri)
+
+VERSION=$${STAMORGA_VERSION}
+
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -19,12 +23,14 @@ SOURCES += main.cpp\
     ../../Common/Network/messagecommand.cpp \
     ../../Common/General/backgroundcontroller.cpp \
     ../../Common/General/backgroundworker.cpp \
-    ../connectionhandling.cpp \
-    ../mainconnection.cpp \
-    ../globaldata.cpp \
-    ../dataconnection.cpp \
     ../../Common/General/globalfunctions.cpp \
-    ../datahandling.cpp
+    ../../Common/General/cgendisposer.cpp \
+    ../Connection/cconmanager.cpp \
+    ../Connection/ccontcpmain.cpp \
+    ../../cstaglobalmanager.cpp \
+    ../../cstasettingsmanager.cpp \
+    ../Connection/cconsettings.cpp
+
 
 HEADERS  += mainwindow.h \
     ../../Common/Network/messagebuffer.h \
@@ -33,12 +39,18 @@ HEADERS  += mainwindow.h \
     ../../Common/Network/messagecommand.h \
     ../../Common/General/backgroundcontroller.h \
     ../../Common/General/backgroundworker.h \
-    ../connectionhandling.h \
-    ../mainconnection.h \
-    ../globaldata.h \
-    ../dataconnection.h \
     ../../Common/General/globalfunctions.h \
     ../../Common/General/config.h \
-    ../datahandling.h
+    ../../Common/General/cgendisposer.h \
+    ../Connection/cconmanager.h \
+    ../Connection/ccontcpmain.h \
+    ../../cstaglobalmanager.h \
+    ../../cstasettingsmanager.h \
+    ../Connection/cconsettings.h
+
+
+INCLUDEPATH += \
+    ../ \
+    ../../Common/ \
 
 FORMS    += mainwindow.ui

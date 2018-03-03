@@ -78,6 +78,7 @@ extern bool checkFilePathExistAndCreate(const QString& path);
 #define ERROR_CODE_MISSING_PARAMETER    -16
 #define ERROR_CODE_NO_USER              -20
 #define ERROR_CODE_WRONG_PASSWORD       -21
+#define ERROR_CODE_NOT_INITIALIZED      -22
 // clang-format on
 
 extern QString getErrorCodeString(qint32 code);
@@ -119,8 +120,8 @@ enum MeetingType {
 };
 
 extern CompetitionIndex getCompetitionIndex(QString comp);
-extern QString getCompetitionString(CompetitionIndex index);
-extern QString createRandomString(qint32 size);
+extern QString          getCompetitionString(CompetitionIndex index);
+extern QString          createRandomString(qint32 size);
 
 // clang-format off
 #define USER_ENABLE_LOG                     0x0001

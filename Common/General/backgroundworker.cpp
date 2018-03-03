@@ -31,27 +31,27 @@
 #include "backgroundworker.h"
 
 
-BackgroundWorker::BackgroundWorker(QObject *parent) : QObject(parent)
+BackgroundWorker::BackgroundWorker(QObject* parent)
+    : cGenDisposer(parent)
 {
     this->SetWorkerName("BackgroundWorker");
 }
 
-BackgroundWorker::BackgroundWorker(QString &name)
+BackgroundWorker::BackgroundWorker(QString& name)
 {
     this->SetWorkerName(name);
 }
 
 BackgroundWorker::~BackgroundWorker()
 {
-
 }
 
-void BackgroundWorker::Info(const QString &info)
+void BackgroundWorker::Info(const QString& info)
 {
     emit notifyThreadInfo(info);
 }
 
-void BackgroundWorker::Error(const QString &error,  const bool &stop)
+void BackgroundWorker::Error(const QString& error, const bool& stop)
 {
     emit notifyThreadError(error, stop);
 }
@@ -67,4 +67,3 @@ bool BackgroundWorker::IsStopRequested()
 {
     return QThread::currentThread()->isInterruptionRequested();
 }
-

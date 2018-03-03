@@ -19,9 +19,15 @@
 #include "mainwindow.h"
 #include <QApplication>
 
-int main(int argc, char *argv[])
+#include "../cstaglobalmanager.h"
+
+int main(int argc, char* argv[])
 {
     QApplication a(argc, argv);
+
+    cStaGlobalManager globalManager;
+    globalManager.initialize();
+
     MainWindow w;
     w.show();
 
