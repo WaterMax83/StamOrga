@@ -33,6 +33,7 @@ public:
     qint32 initialize() override;
 
     qint32 getValue(const QString group, const QString key, QString& value);
+    qint32 setValue(const QString group, const QString key, const QString value);
 
 signals:
 
@@ -41,5 +42,7 @@ public slots:
 private:
     QSettings* m_pMainUserSettings;
 };
+
+extern cStaSettingsManager g_StaSettingsManager;
 
 #endif // CSTASETTINGSMANAGER_H

@@ -31,7 +31,8 @@ public:
 
     qint32 initialize() override;
 
-    QString getIPAddr() { return this->m_ipAddr; }
+    QString getIPAddr();
+    void setIPAddr(const QString ipAddr);
 
     QString getPassWord() { return this->m_passWord; }
 
@@ -55,5 +56,7 @@ private:
     QString m_readableName;
     QString m_salt;
 };
+
+extern cConSettings g_ConSettings;
 
 #endif // CCONSETTINGS_H

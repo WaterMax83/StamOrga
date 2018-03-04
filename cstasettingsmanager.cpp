@@ -19,6 +19,9 @@
 #include "cstasettingsmanager.h"
 #include "../Common/General/globalfunctions.h"
 
+
+cStaSettingsManager g_StaSettingsManager;
+
 cStaSettingsManager::cStaSettingsManager(QObject* parent)
     : cGenDisposer(parent)
 {
@@ -46,6 +49,22 @@ qint32 cStaSettingsManager::getValue(const QString group, const QString key, QSt
     value = this->m_pMainUserSettings->value(key, "").toString();
 
     this->m_pMainUserSettings->endGroup();
+
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 cStaSettingsManager::setValue(const QString group, const QString key, const QString value)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    this->m_pMainUserSettings->beginGroup(group);
+
+    this->m_pMainUserSettings->setValue(key, value);
+
+    this->m_pMainUserSettings->endGroup();
+
+    this->m_pMainUserSettings->sync();
 
     return ERROR_CODE_SUCCESS;
 }

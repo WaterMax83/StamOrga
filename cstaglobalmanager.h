@@ -22,11 +22,7 @@
 #include <QObject>
 
 #include "../Common/General/cgendisposer.h"
-#include "Connection/cconsettings.h"
-#include "cstasettingsmanager.h"
 
-extern cStaSettingsManager g_StaSettingsManager;
-extern cConSettings        g_ConSettings;
 
 class cStaGlobalManager : public cGenDisposer
 {

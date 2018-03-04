@@ -18,10 +18,11 @@
 #include <QtGui/QGuiApplication>
 
 #include "../Common/General/globalfunctions.h"
+#include "Connection/cconmanager.h"
+#include "Connection/cconsettings.h"
 #include "cstaglobalmanager.h"
+#include "cstasettingsmanager.h"
 
-cStaSettingsManager g_StaSettingsManager;
-cConSettings        g_ConSettings;
 
 cStaGlobalManager::cStaGlobalManager(QObject* parent)
     : cGenDisposer(parent)
@@ -38,8 +39,10 @@ qint32 cStaGlobalManager::initialize()
     rCode = g_StaSettingsManager.initialize();
 
     if (rCode == ERROR_CODE_SUCCESS)
-        g_ConSettings.initialize();
+        rCode = g_ConSettings.initialize();
 
+    if (rCode == ERROR_CODE_SUCCESS)
+        rCode = g_ConManager.initialize();
 
     if (rCode == ERROR_CODE_SUCCESS)
         this->m_initialized = true;

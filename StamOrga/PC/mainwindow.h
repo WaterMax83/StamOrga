@@ -39,7 +39,7 @@ public:
 
 private slots:
     //    void on_btnSendData_clicked();
-    //    void connectionFinished(qint32 result);
+    void connectionFinished(const qint32 result, const QString msg);
     //    void versionRequestFinished(qint32 result, QString msg);
     //    void propertyRequestFinished(qint32 result, quint32 value);
     //    void updatePasswordFinished(qint32 result);
@@ -49,10 +49,12 @@ private slots:
 
     //    void on_btnGetGamesList_clicked();
 
+    void on_btnLogin_clicked();
+
 private:
     Ui::MainWindow* ui;
 
-    //    ConnectionHandling* m_pConHandling;
+    //    cConManager* m_pConHandling;
     //    GlobalData*         m_pGlobalData;
 };
 

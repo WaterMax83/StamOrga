@@ -18,7 +18,7 @@
 
 #include "cconsettings.h"
 #include "../Common/General/globalfunctions.h"
-#include "../cstaglobalmanager.h"
+#include "../cstasettingsmanager.h"
 
 // clang-format off
 
@@ -31,6 +31,9 @@
 #define USER_READABLE   "ReadableName"
 
 // clang-format on
+
+
+cConSettings g_ConSettings;
 
 cConSettings::cConSettings(QObject* parent)
     : cGenDisposer(parent)
@@ -56,4 +59,18 @@ qint32 cConSettings::initialize()
     this->m_initialized = true;
 
     return ERROR_CODE_SUCCESS;
+}
+
+QString cConSettings::getIPAddr()
+{
+    return this->m_ipAddr;
+}
+
+
+void cConSettings::setIPAddr(const QString ipaddr)
+{
+    if (this->m_ipAddr != ipaddr) {
+        this->m_ipAddr = ipaddr;
+        g_StaSettingsManager.setValue(USER_GROUP, USER_IPADDR, ipaddr);
+    }
 }

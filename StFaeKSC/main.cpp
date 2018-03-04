@@ -33,6 +33,7 @@
 #include "General/globaldata.h"
 #include "General/pushnotification.h"
 #include "Network/udpserver.h"
+#include "Network/ccontcpmainserver.h"
 
 GlobalData* g_GlobalData;
 
@@ -55,13 +56,17 @@ int main(int argc, char* argv[])
     qInfo().noquote() << QString("Starting StFaeKSC %1").arg(STAM_ORGA_VERSION_S);
 
     BackgroundController ctrlUdp;
+    BackgroundController ctrlTcp;
     if (argc > 1 && QString(argv[1]) == "-noServer") {
         qInfo() << "Starting only as a deamon without a server";
     } else {
 
         UdpServer* udpServ = new UdpServer(&globalData);
-
         ctrlUdp.Start(udpServ, false);
+
+        cConTcpMain* tcpMain = new cConTcpMain();
+        tcpMain->initialize();
+        ctrlTcp.Start(tcpMain, false);
     }
 
     BackgroundController ctrlReadOnline;

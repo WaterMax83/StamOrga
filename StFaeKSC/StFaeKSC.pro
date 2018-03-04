@@ -33,14 +33,15 @@ SOURCES += main.cpp \
     ../Common/General/logging.cpp \
     ../Common/General/globalfunctions.cpp \
     ../Common/General/cgendisposer.cpp \
-    Network/udpserver.cpp \
     ../Common/Network/messagebuffer.cpp \
     ../Common/Network/messageprotocol.cpp \
     ../Common/Network/messagecommand.cpp \
     General/globaldata.cpp \
     General/console.cpp \
-    Network/udpdataserver.cpp \
     General/dataconnection.cpp \
+    General/pushnotification.cpp \
+    Network/udpdataserver.cpp \
+    Network/udpserver.cpp \
     Data/listeduser.cpp \
     Data/games.cpp \
     Data/readdatacsv.cpp \
@@ -49,12 +50,12 @@ SOURCES += main.cpp \
     Data/readonlinegames.cpp \
     Data/availablegameticket.cpp \
     Data/meetinginfo.cpp \
-    General/pushnotification.cpp \
     Data/fanclubnews.cpp \
     Data/userevents.cpp \
     Data/awaytripinfo.cpp \
     Data/checkconsistentdata.cpp \
     Data/statistic.cpp \
+    Network/ccontcpmainserver.cpp
 
 
 HEADERS += \
@@ -65,16 +66,17 @@ HEADERS += \
     ../Common/General/globaltiming.h \
     ../Common/General/logging.h \
     ../Common/General/globalfunctions.h \
-    Network/udpserver.h \
     ../Common/Network/messagebuffer.h \
     ../Common/Network/messageprotocol.h \
     ../Common/Network/messagecommand.h \
     General/globaldata.h \
     General/console.h \
     General/usercommand.h \
+    General/dataconnection.h \
+    General/pushnotification.h \
     Network/udpdataserver.h \
     Network/connectiondata.h \
-    General/dataconnection.h \
+    Network/udpserver.h \
     Data/listeduser.h \
     Data/games.h \
     Data/readdatacsv.h \
@@ -83,14 +85,12 @@ HEADERS += \
     Data/readonlinegames.h \
     Data/availablegameticket.h \
     Data/meetinginfo.h \
-    General/pushnotification.h \
     Data/fanclubnews.h \
     Data/userevents.h \
     Data/awaytripinfo.h \
     Data/checkconsistentdata.h \
     Data/statistic.h \
-
-
+    Network/ccontcpmainserver.h
 
 unix {
 #    QMAKE_POST_LINK = mkdir -p $$OUTPUT_FOLDER && cp $$TARGET $$OUTPUT_FOLDER

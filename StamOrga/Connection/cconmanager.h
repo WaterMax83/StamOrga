@@ -23,19 +23,22 @@
 #include <QtCore/QTimer>
 
 #include "../Common/General/backgroundcontroller.h"
+#include "../Common/General/cgendisposer.h"
 //#include "../Data/globaldata.h"
 //#include "dataconnection.h"
-//#include "mainconnection.h"
+#include "ccontcpmain.h"
 
 
-class ConnectionHandling : public QObject
+class cConManager : public cGenDisposer
 {
     Q_OBJECT
 public:
-    explicit ConnectionHandling(QObject* parent = 0);
-    ~ConnectionHandling();
+    explicit cConManager(QObject* parent = 0);
+    ~cConManager();
 
-    //    qint32 startMainConnection(QString name, QString passw);
+    qint32 initialize();
+
+    qint32 startMainConnection(QString name, QString passw);
     //    qint32 startGettingVersionInfo();
     //    qint32 startGettingUserProps();
     //    qint32 startGettingUserEvents();
@@ -82,7 +85,7 @@ public:
     //    ConnectionInfo *GetConnectionInfo() { return &this->m_conInfo; }
 
 signals:
-    //    void sNotifyConnectionFinished(qint32 result);
+    void sNotifyConnectionFinished(const qint32 result, const QString msg);
     //    void sNotifyVersionRequest(qint32 result, QString msg);
     //    //    void sNotifyUserPropertiesRequest(qint32 result);
     //    void sNotifyUpdatePasswordRequest(qint32 result, QString newPassWord);
@@ -98,15 +101,15 @@ signals:
 public slots:
 
 private slots:
-    //    void slMainConReqFin(qint32 result, const QString msg, const QString salt, const QString random);
+    void slMainConReqFin(qint32 result, const QString msg, const QString salt, const QString random);
 
     //    void slDataConLastRequestFinished(DataConRequest request);
 
 private:
-    //    BackgroundController m_ctrlMainCon;
-    //    MainConnection*      m_pMainCon = NULL;
+    BackgroundController m_ctrlMainCon;
+    cConTcpMain*         m_pMainCon = NULL;
 
-    //    BackgroundController m_ctrlDataCon;
+    BackgroundController m_ctrlDataCon;
     //    DataConnection*      m_pDataCon = NULL;
 
     //    GlobalData* m_pGlobalData = NULL;
@@ -120,10 +123,16 @@ private:
 
     //    void checkTimeoutResult(qint32 result);
 
+    QString m_mainConRequestPassWord;
+    QString m_mainConRequestSalt;
+    QString m_mainConRequestRandom;
+
     //    void startDataConnection();
-    //    void stopDataConnection();
-    //    bool isDataConnectionActive() { return this->m_ctrlDataCon.IsRunning(); }
-    //    bool isMainConnectionActive() { return this->m_ctrlMainCon.IsRunning(); }
+    void stopDataConnection();
+    bool isDataConnectionActive() { return this->m_ctrlDataCon.IsRunning(); }
+    bool isMainConnectionActive() { return this->m_ctrlMainCon.IsRunning(); }
 };
+
+extern cConManager g_ConManager;
 
 #endif // CONNECTIONHANDLING_H

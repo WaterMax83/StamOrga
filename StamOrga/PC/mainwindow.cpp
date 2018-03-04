@@ -25,8 +25,8 @@
 
 #include "../../Common/General/globalfunctions.h"
 #include "../../Common/Network/messageprotocol.h"
-//#include "../../Common/General/globalfunctions.h"
-#include "../cstaglobalmanager.h"
+#include "Connection/cconmanager.h"
+#include "Connection/cconsettings.h"
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -42,16 +42,16 @@ MainWindow::MainWindow(QWidget* parent)
     //    this->ui->lEditTextPassword->setText(g_ConSettings.getPassWord());
 
 
-    //    this->m_pConHandling = new ConnectionHandling();
-    //    connect(this->m_pConHandling, &ConnectionHandling::sNotifyConnectionFinished,
-    //            this, &MainWindow::connectionFinished);
-    //    connect(this->m_pConHandling, &ConnectionHandling::sNotifyVersionRequest,
+    //    this->m_pConHandling = new cConManager();
+    connect(&g_ConManager, &cConManager::sNotifyConnectionFinished,
+            this, &MainWindow::connectionFinished);
+    //    connect(this->m_pConHandling, &cConManager::sNotifyVersionRequest,
     //            this, &MainWindow::versionRequestFinished);
-    //    connect(this->m_pConHandling, &ConnectionHandling::sNotifyUserPropertiesRequest,
+    //    connect(this->m_pConHandling, &cConManager::sNotifyUserPropertiesRequest,
     //            this, &MainWindow::propertyRequestFinished);
-    //    connect(this->m_pConHandling, &ConnectionHandling::sNotifyUpdatePasswordRequest,
+    //    connect(this->m_pConHandling, &cConManager::sNotifyUpdatePasswordRequest,
     //            this, &MainWindow::updatePasswordFinished);
-    //    connect(this->m_pConHandling, &ConnectionHandling::sNotifyGamesListRequest,
+    //    connect(this->m_pConHandling, &cConManager::sNotifyGamesListRequest,
     //            this, &MainWindow::getGamesListFinished);
 
     //    this->m_pGlobalData = new GlobalData();
@@ -83,20 +83,20 @@ MainWindow::~MainWindow()
 //    }
 //}
 
-//void MainWindow::connectionFinished(qint32 result)
-//{
-//    if (result >= ERROR_CODE_NO_ERROR) {
-//        this->ui->conResult->setStyleSheet("background-color:green");
-//        if (!this->m_pConHandling->startGettingInfo())
-//            this->ui->btnSendData->setEnabled(true);
-//        this->ui->btnUdpatePassword->setEnabled(true);
-//        this->ui->lEditTextUpdatePassword->setEnabled(true);
-//    }
-//    else {
-//        this->ui->conResult->setStyleSheet("background-color:red");
-//        this->ui->btnSendData->setEnabled(true);
-//    }
-//}
+void MainWindow::connectionFinished(qint32 result, const QString msg)
+{
+    if (result >= ERROR_CODE_NO_ERROR) {
+        this->ui->conResult->setStyleSheet("background-color:green");
+        //        if (!this->m_pConHandling->startGettingInfo())
+        //            this->ui->btnSendData->setEnabled(true);
+        //        this->ui->btnUdpatePassword->setEnabled(true);
+        //        this->ui->lEditTextUpdatePassword->setEnabled(true);
+    } else {
+        this->ui->conResult->setStyleSheet("background-color:red");
+        qWarning() << QString("Could not connect: %1:%2").arg(result).arg(msg);
+        //        this->ui->btnSendData->setEnabled(true);
+    }
+}
 
 //void MainWindow::versionRequestFinished(qint32 result, QString msg)
 //{
@@ -142,3 +142,17 @@ MainWindow::~MainWindow()
 //{
 //    qDebug() << QString("Getting Games list request answer: %1 ").arg(result);
 //}
+
+void MainWindow::on_btnLogin_clicked()
+{
+    g_ConSettings.setIPAddr(this->ui->lEditIpAddr->text());
+    QString passWord;
+    if (this->ui->lEditTextPassword->text().isEmpty())
+        passWord = g_ConSettings.getPassWord();
+    else
+        passWord = this->ui->lEditTextPassword->text();
+
+    qint32 rCode = g_ConManager.startMainConnection(this->ui->lEditSendUserName->text(), passWord);
+    if (rCode != ERROR_CODE_SUCCESS)
+        qWarning() << getErrorCodeString(rCode);
+}

@@ -19,11 +19,11 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QtEndian>
 
-#include "../cstaglobalmanager.h"
 #include "General/globalfunctions.h"
 #include "General/globaltiming.h"
 #include "Network/messagecommand.h"
 #include "Network/messageprotocol.h"
+#include "cconsettings.h"
 #include "ccontcpmain.h"
 
 cConTcpMain::cConTcpMain()
@@ -33,13 +33,15 @@ cConTcpMain::cConTcpMain()
     this->m_initialized = false;
 }
 
-qint32 cConTcpMain::initialize(QString host)
+qint32 cConTcpMain::initialize(QString host, const QString username)
 {
     this->m_initialized = true;
 
     this->m_hMasterReceiver = QHostAddress(host);
     if (m_hMasterReceiver.isNull())
         return ERROR_CODE_WRONG_PARAMETER;
+
+    this->m_userName = username;
 
     this->m_bIsConnecting = false;
     this->m_initialized   = true;
@@ -64,6 +66,7 @@ int cConTcpMain::DoBackgroundWork()
     //        sleepCounter++;
     //        if (sleepCounter >= 10)
     //            break;
+    //      TODO: enable this again for app
     //    }
 
     connect(this->m_pMasterTcpSocket, &QTcpSocket::connected, this, &cConTcpMain::slotMasterSocketConnected);
@@ -74,6 +77,10 @@ int cConTcpMain::DoBackgroundWork()
     this->m_pConTimeout = new QTimer();
     this->m_pConTimeout->setSingleShot(true);
     connect(this->m_pConTimeout, &QTimer::timeout, this, &cConTcpMain::slotConnectionTimeoutFired);
+
+    this->m_pMasterTcpSocket->connectToHost(this->m_hMasterReceiver, g_ConSettings.getMasterConPort());
+    this->m_pConTimeout->start(SOCKET_TIMEOUT_MS);
+    this->m_bIsConnecting = true;
 
     return 0;
 }
@@ -87,22 +94,6 @@ int cConTcpMain::DoBackgroundWork()
 //    this->m_hMasterReceiver = QHostAddress(this->m_pGlobalData->ipAddr());
 //    qDebug() << "Master Setting New Binding Request";
 //}
-
-void cConTcpMain::slotSendNewMainConRequest(QString username)
-{
-    if (!this->m_initialized) {
-        emit this->connectionRequestFinished(ERROR_CODE_NOT_INITIALIZED, "NotInitialized", "", "");
-        return;
-    }
-    if (this->m_bIsConnecting)
-        return;
-
-    this->m_userName = username;
-
-    this->m_pMasterTcpSocket->connectToHost(this->m_hMasterReceiver, g_ConSettings.getMasterConPort());
-    this->m_pConTimeout->start(SOCKET_TIMEOUT_MS);
-    this->m_bIsConnecting = true;
-}
 
 void cConTcpMain::slotMasterSocketConnected()
 {

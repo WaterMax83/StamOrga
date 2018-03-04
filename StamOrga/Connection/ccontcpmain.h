@@ -35,7 +35,7 @@ public:
     cConTcpMain();
     ~cConTcpMain();
 
-    qint32 initialize(QString host);
+    qint32 initialize(const QString host, const QString userName);
 
     int DoBackgroundWork() override;
 
@@ -43,7 +43,6 @@ signals:
     void connectionRequestFinished(qint32 result, const QString msg, const QString salt, const QString random);
 
 public slots:
-    void slotSendNewMainConRequest(QString username);
     //    void slotNewBindingPortRequest();
 
 private slots:
