@@ -74,3 +74,29 @@ void cConSettings::setIPAddr(const QString ipaddr)
         g_StaSettingsManager.setValue(USER_GROUP, USER_IPADDR, ipaddr);
     }
 }
+
+QString cConSettings::getUserName()
+{
+    return this->m_userName;
+}
+
+void cConSettings::setUserName(const QString name)
+{
+    if (this->m_userName != name) {
+        this->m_userName = name;
+        g_StaSettingsManager.setValue(USER_GROUP, USER_USERNAME, name);
+    }
+}
+
+QString cConSettings::getSalt()
+{
+    return this->m_salt;
+}
+
+void cConSettings::setSalt(const QString salt)
+{
+    if (this->m_salt != salt) {
+        this->m_salt = salt;
+        g_StaSettingsManager.setValue(USER_GROUP, USER_SALT, salt);
+    }
+}

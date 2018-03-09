@@ -27,9 +27,11 @@ SOURCES += main.cpp\
     ../../Common/General/cgendisposer.cpp \
     ../Connection/cconmanager.cpp \
     ../Connection/ccontcpmain.cpp \
-    ../../cstaglobalmanager.cpp \
-    ../../cstasettingsmanager.cpp \
-    ../Connection/cconsettings.cpp
+    ../Connection/ccontcpdata.cpp \
+    ../Connection/cconsettings.cpp \
+    ../cstaglobalmanager.cpp \
+    ../cstasettingsmanager.cpp \
+
 
 
 HEADERS  += mainwindow.h \
@@ -44,9 +46,11 @@ HEADERS  += mainwindow.h \
     ../../Common/General/cgendisposer.h \
     ../Connection/cconmanager.h \
     ../Connection/ccontcpmain.h \
-    ../../cstaglobalmanager.h \
-    ../../cstasettingsmanager.h \
-    ../Connection/cconsettings.h
+    ../Connection/ccontcpdata.h \
+    ../Connection/cconsettings.h \
+    ../cstaglobalmanager.h \
+    ../cstasettingsmanager.h \
+
 
 
 INCLUDEPATH += \

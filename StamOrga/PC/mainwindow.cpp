@@ -149,8 +149,10 @@ void MainWindow::on_btnLogin_clicked()
     QString passWord;
     if (this->ui->lEditTextPassword->text().isEmpty())
         passWord = g_ConSettings.getPassWord();
-    else
+    else {
         passWord = this->ui->lEditTextPassword->text();
+        g_ConSettings.setSalt("");
+    }
 
     qint32 rCode = g_ConManager.startMainConnection(this->ui->lEditSendUserName->text(), passWord);
     if (rCode != ERROR_CODE_SUCCESS)

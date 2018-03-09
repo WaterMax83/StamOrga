@@ -16,49 +16,33 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCONSETTINGS_H
-#define CCONSETTINGS_H
+#ifndef CSTASETTINGSMANAGER_H
+#define CSTASETTINGSMANAGER_H
 
 #include <QObject>
+#include <QtCore/QSettings>
 
 #include "../Common/General/cgendisposer.h"
 
-class cConSettings : public cGenDisposer
+class cStaSettingsManager : public cGenDisposer
 {
     Q_OBJECT
 public:
-    explicit cConSettings(QObject* parent = nullptr);
+    explicit cStaSettingsManager(QObject* parent = nullptr);
 
     qint32 initialize() override;
 
-    QString getIPAddr();
-    void    setIPAddr(const QString ipAddr);
-
-    QString getPassWord() { return this->m_passWord; }
-
-    QString getUserName();
-    void    setUserName(const QString name);
-
-    QString getReadableName() { return this->m_readableName; }
-
-    QString getSalt();
-    void    setSalt(const QString salt);
-
-    qint32 getMasterConPort() { return 55000; }
+    qint32 getValue(const QString group, const QString key, QString& value);
+    qint32 setValue(const QString group, const QString key, const QString value);
 
 signals:
 
 public slots:
 
 private:
-    QString m_ipAddr;
-    QString m_login;
-    QString m_passWord;
-    QString m_userName;
-    QString m_readableName;
-    QString m_salt;
+    QSettings* m_pMainUserSettings;
 };
 
-extern cConSettings g_ConSettings;
+extern cStaSettingsManager g_StaSettingsManager;
 
-#endif // CCONSETTINGS_H
+#endif // CSTASETTINGSMANAGER_H

@@ -17,6 +17,8 @@
 */
 
 #include <QtCore/QByteArray>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 #include <QtCore/QtEndian>
 
 #include "General/globalfunctions.h"
@@ -85,7 +87,6 @@ int cConTcpMain::DoBackgroundWork()
     return 0;
 }
 
-
 //void cConTcpMain::slotNewBindingPortRequest()
 //{
 //    if (this->m_pMasterUdpSocket->state() != QAbstractSocket::UnconnectedState)
@@ -126,8 +127,9 @@ void cConTcpMain::slotReadyReadMasterSocket()
     QByteArray datagram = this->m_pMasterTcpSocket->readAll();
     this->m_messageBuffer.StoreNewData(datagram);
 
+    qDebug() << "New Data " << datagram;
 
-    //    this->checkNewOncomingData();
+    this->checkNewOncomingData();
 }
 
 void cConTcpMain::checkNewOncomingData()
@@ -140,26 +142,21 @@ void cConTcpMain::checkNewOncomingData()
             if (msg->getDataLength() < 4)
                 emit this->connectionRequestFinished(ERROR_CODE_WRONG_SIZE, QString("Datalength %1 is wrong, expected >4").arg(msg->getDataLength()), "", "");
             else {
-                const char* pData = msg->getPointerToData();
-                qint32      rValue;
-                memcpy(&rValue, pData, sizeof(qint32));
-                if (qToLittleEndian(rValue) > ERROR_CODE_NO_ERROR) {
-                    if (msg->getDataLength() < 4 + 8 + 1)
-                        emit this->connectionRequestFinished(ERROR_CODE_WRONG_SIZE, QString("Datalength %1 is wrong, expected >13").arg(msg->getDataLength()), "", "");
-                    else {
-                        QString salt(pData + sizeof(qint32));
-                        QString random(pData + sizeof(qint32) + 1 + salt.toUtf8().size());
+                QByteArray  data(msg->getPointerToData());
+                QJsonObject rootObj = QJsonDocument::fromJson(data).object();
 
-                        //                        if (this->m_pGlobalData->userName() != this->m_userName) {
-                        //                            this->m_pGlobalData->setUserName(this->m_userName);
-                        //                            this->m_pGlobalData->saveGlobalUserSettings();
-                        //                        }
-                        emit this->connectionRequestFinished(qToLittleEndian(rValue), "", salt, random);
-                    }
+                qint32 rValue = rootObj.value("ack").toInt(ERROR_CODE_NO_USER);
+                if (rValue == ERROR_CODE_SUCCESS) {
+
+                    QString salt   = rootObj.value("salt").toString();
+                    QString random = rootObj.value("random").toString();
+                    qint32  port   = rootObj.value("port").toInt(-1);
+
+                    emit this->connectionRequestFinished(port, "", salt, random);
                 } else if (qToLittleEndian(rValue) == ERROR_CODE_NO_USER)
-                    emit this->connectionRequestFinished(qToLittleEndian(rValue), QString("Wrong user %1").arg(this->m_userName), "", "");
+                    emit this->connectionRequestFinished(rValue, QString("Wrong user %1").arg(this->m_userName), "", "");
                 else
-                    emit this->connectionRequestFinished(qToLittleEndian(rValue), QString("unkown error %1").arg(qToLittleEndian(rValue)), "", "");
+                    emit this->connectionRequestFinished(rValue, QString("unkown error %1").arg(rValue), "", "");
             }
         }
         delete msg;

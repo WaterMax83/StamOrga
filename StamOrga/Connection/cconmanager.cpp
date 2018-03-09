@@ -17,6 +17,8 @@
 */
 #include <QDebug>
 #include <QtCore/QDateTime>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 
 #include "../Common/General/globalfunctions.h"
 #include "../Common/General/globaltiming.h"
@@ -38,6 +40,14 @@ cConManager::cConManager(QObject* parent)
 
 qint32 cConManager::initialize()
 {
+    qRegisterMetaType<TcpDataConRequest*>("DataConRequest*");
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 9, 0)
+    this->m_hash = new QCryptographicHash(QCryptographicHash::Sha3_512);
+#else
+    this->m_hash = new QCryptographicHash(QCryptographicHash::Keccak_512);
+#endif
+
     this->m_initialized = true;
 
     return ERROR_CODE_SUCCESS;
@@ -49,32 +59,8 @@ qint32 cConManager::startMainConnection(QString name, QString passw)
     if (!this->m_initialized)
         return ERROR_CODE_NOT_INITIALIZED;
 
-    //    if (name != this->m_pGlobalData->userName()) {
-    //        this->m_lastSuccessTimeStamp = 0;
-    //        emit this->sSendNewBindingPortRequest();
-    //        QThread::msleep(10);
-    //    }
-
-    //    if (passw != this->m_pGlobalData->passWord())
-    //        this->stopDataConnection();
-
-    //    qint64 now = QDateTime::currentMSecsSinceEpoch();
     if (this->isMainConnectionActive())
         return ERROR_CODE_ALREADY_EXIST;
-
-    //        && (now - this->m_lastSuccessTimeStamp) < (CON_RESET_TIMEOUT_MSEC - TIMER_DIFF_MSEC)) {
-
-    //        if (this->m_pGlobalData->bIsConnected()
-    //            && (now - this->m_lastSuccessTimeStamp) < (CON_LOGIN_TIMEOUT_MSEC - TIMER_DIFF_MSEC)) {
-    //            emit this->sNotifyConnectionFinished(ERROR_CODE_SUCCESS);
-    //            qInfo().noquote() << "Did not log in again, should already be succesfull";
-    //            return ERROR_CODE_NO_ERROR;
-    //        }
-    //        this->startDataConnection();
-    //        QThread::msleep(10);
-    //        this->sendLoginRequest(passw);
-    //        return ERROR_CODE_SUCCESS;
-    //    }
 
     this->stopDataConnection();
 
@@ -84,14 +70,13 @@ qint32 cConManager::startMainConnection(QString name, QString passw)
         if (rCode != ERROR_CODE_SUCCESS)
             return rCode;
         connect(this->m_pMainCon, &cConTcpMain::connectionRequestFinished, this, &cConManager::slMainConReqFin);
-        //        connect(this, &cConManager::sStartSendMainConRequest, this->m_pMainCon, &MainConnection::slotSendNewMainConRequest);
-        //        connect(this, &cConManager::sSendNewBindingPortRequest, this->m_pMainCon, &MainConnection::slotNewBindingPortRequest);
         this->m_ctrlMainCon.Start(this->m_pMainCon, false);
-        //        QThread::msleep(20);
     }
 
+    this->m_mainConRequestUserName = name;
     this->m_mainConRequestPassWord = passw;
-    //    emit this->sStartSendMainConRequest(name);
+    this->m_mainConRequestDataPort = -1;
+    this->m_bIsConnecting          = true;
 
     return ERROR_CODE_SUCCESS;
 }
@@ -357,79 +342,112 @@ qint32 cConManager::startMainConnection(QString name, QString passw)
 void cConManager::slMainConReqFin(qint32 result, const QString msg, const QString salt, const QString random)
 {
     //    qDebug() << QString("Resul = %1: %2").arg(result).arg(msg);
-    //    if (result > ERROR_CODE_NO_ERROR) {
-    //        qInfo().noquote() << QString("Trying login request with port %1").arg(result);
-    //        this->m_pGlobalData->setConDataPort((quint16)result);
-    //        this->startDataConnection();
-    //        QThread::msleep(20);
-    //        mainConRequestSalt   = salt;
-    //        mainConRequestRandom = random;
-    //        this->sendLoginRequest(mainConRequestPassWord);
-    //        this->m_lastSuccessTimeStamp = QDateTime::currentMSecsSinceEpoch();
-    //    } else {
-    //        qWarning().noquote() << QString("Error main connecting: %1").arg(msg);
-    //        this->m_ctrlMainCon.Stop();
-    //        this->m_pMainCon = NULL;
-    //        this->stopDataConnection();
-    emit this->sNotifyConnectionFinished(result, msg);
+    if (result > ERROR_CODE_NO_ERROR) {
+        qInfo().noquote() << QString("Trying login request with port %1").arg(result);
+        this->m_mainConRequestDataPort = result;
+        this->m_mainConRequestSalt     = salt;
+        this->m_mainConRequestRandom   = random;
+        this->startDataConnection();
 
-    //        if (result == ERROR_CODE_NO_USER)
-    //            g_GlobalSettings->updateConnectionStatus(false);
+        if (g_ConSettings.getUserName() != m_mainConRequestUserName)
+            g_ConSettings.setUserName(m_mainConRequestUserName);
 
-    //        while (this->m_lErrorMainCon.size() > 0) {
-    //            DataConRequest request = this->m_lErrorMainCon.last();
-    //            request.m_result       = result;
-    //            this->slDataConLastRequestFinished(request);
-    //            this->m_lErrorMainCon.removeLast();
-    //        }
+        //        QThread::msleep(20);
 
-    //        if (result == ERROR_CODE_NO_USER) {
-    //        }
-    //    }
+        //        this->sendLoginRequest(mainConRequestPassWord);
+        //        this->m_lastSuccessTimeStamp = QDateTime::currentMSecsSinceEpoch();
+    } else {
+        //        qWarning().noquote() << QString("Error main connecting: %1").arg(msg);
+        //        this->m_ctrlMainCon.Stop();
+        //        this->m_pMainCon = NULL;
+        //        this->stopDataConnection();
+        this->m_bIsConnecting = false;
+        emit this->sNotifyConnectionFinished(result, msg);
+
+        //        if (result == ERROR_CODE_NO_USER)
+        //            g_GlobalSettings->updateConnectionStatus(false);
+
+        //        while (this->m_lErrorMainCon.size() > 0) {
+        //            DataConRequest request = this->m_lErrorMainCon.last();
+        //            request.m_result       = result;
+        //            this->slDataConLastRequestFinished(request);
+        //            this->m_lErrorMainCon.removeLast();
+        //        }
+
+        //        if (result == ERROR_CODE_NO_USER) {
+        //        }
+    }
     this->m_ctrlMainCon.Stop();
     this->m_pMainCon = NULL;
+}
+
+void cConManager::slotDataConnnectionFinished(qint32 result, const QString msg)
+{
+    //    if (this->m_bIsConnecting)
+    //        emit this->sNotifyConnectionFinished(result, msg);
+    //    this->m_bIsConnecting = false;
+
+    //    this->stopDataConnection();
+    if (result == ERROR_CODE_SUCCESS) {
+        this->sendLoginRequest();
+    } else {
+        emit this->sNotifyConnectionFinished(result, msg);
+        this->stopDataConnection();
+    }
 }
 
 ///*
 // * Functions for login
 // */
-//void cConManager::sendLoginRequest(QString password)
-//{
-//    this->startDataConnection(); // call it every time, if it is already started it just returns
+void cConManager::sendLoginRequest()
+{
+    QString passWord = this->m_mainConRequestPassWord;
+    if (g_ConSettings.getSalt() == "")
+        passWord = this->createHashValue(passWord, this->m_mainConRequestSalt);
 
-//    DataConRequest req;
-//    req.m_request = OP_CODE_CMD_REQ::REQ_LOGIN_USER;
-//    req.m_lData.append(password);
-//    req.m_lData.append(mainConRequestSalt);
 
-//    emit this->sStartSendNewRequest(req);
-//}
+    passWord = this->createHashValue(passWord, this->m_mainConRequestRandom);
+    QJsonObject rootObj;
+    rootObj.insert("passWord", passWord);
 
-//void cConManager::sendNewRequest(DataConRequest request)
-//{
-//    qint64 now = QDateTime::currentMSecsSinceEpoch();
-//    if ((now - this->m_lastSuccessTimeStamp) < (CON_RESET_TIMEOUT_MSEC - TIMER_DIFF_MSEC)) {
-//        this->startDataConnection();
+    TcpDataConRequest* req = new TcpDataConRequest();
+    req->m_request         = OP_CODE_CMD_REQ::REQ_LOGIN_USER;
+    req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
-//        if ((now - this->m_lastSuccessTimeStamp) < (CON_LOGIN_TIMEOUT_MSEC - TIMER_DIFF_MSEC)) {
-//            emit this->sStartSendNewRequest(request);
-//            return;
-//        } else {
-//            this->m_lErrorMainCon.prepend(request);
-//            if (this->m_lErrorMainCon.size() == 1) {
-//                qInfo().noquote() << QString("Trying to reconnect from cConManager");
-//                this->m_pGlobalData->setbIsConnected(false);
-//                this->sendLoginRequest(this->m_pGlobalData->passWord());
-//            }
-//        }
-//    } else {
-//        this->m_lErrorMainCon.prepend(request);
-//        if (this->m_lErrorMainCon.size() == 1) {
-//            qInfo().noquote() << QString("Trying to restart connection from cConManager ") << QThread::currentThreadId();
-//            this->startMainConnection(this->m_pGlobalData->userName(), this->m_pGlobalData->passWord());
-//        }
-//    }
-//}
+    this->sendNewRequest(req);
+}
+
+void cConManager::sendNewRequest(TcpDataConRequest* request)
+{
+    if (this->isDataConnectionActive()) {
+        emit this->signalStartSendNewRequest(request);
+    } else {
+        qInfo().noquote() << QString("Trying to restart connection from cConManager ") << QThread::currentThreadId();
+        this->startMainConnection(g_ConSettings.getUserName(), g_ConSettings.getPassWord());
+    }
+    //    qint64 now = QDateTime::currentMSecsSinceEpoch();
+    //    if ((now - this->m_lastSuccessTimeStamp) < (CON_RESET_TIMEOUT_MSEC - TIMER_DIFF_MSEC)) {
+    //        this->startDataConnection();
+
+    //        if ((now - this->m_lastSuccessTimeStamp) < (CON_LOGIN_TIMEOUT_MSEC - TIMER_DIFF_MSEC)) {
+    //            emit this->sStartSendNewRequest(request);
+    //            return;
+    //        } else {
+    //            this->m_lErrorMainCon.prepend(request);
+    //            if (this->m_lErrorMainCon.size() == 1) {
+    //                qInfo().noquote() << QString("Trying to reconnect from cConManager");
+    //                this->m_pGlobalData->setbIsConnected(false);
+    //                this->sendLoginRequest(this->m_pGlobalData->passWord());
+    //            }
+    //        }
+    //    } else {
+    //        this->m_lErrorMainCon.prepend(request);
+    //        if (this->m_lErrorMainCon.size() == 1) {
+    //            qInfo().noquote() << QString("Trying to restart connection from cConManager ") << QThread::currentThreadId();
+    //            this->startMainConnection(this->m_pGlobalData->userName(), this->m_pGlobalData->passWord());
+    //        }
+    //    }
+}
 
 
 //void cConManager::slDataConLastRequestFinished(DataConRequest request)
@@ -576,24 +594,38 @@ void cConManager::slMainConReqFin(qint32 result, const QString msg, const QStrin
 //        this->m_lastSuccessTimeStamp = QDateTime::currentMSecsSinceEpoch();
 //}
 
-//void cConManager::startDataConnection()
-//{
-//    if (this->isDataConnectionActive()) {
-//        this->m_pDataCon->setRandomLoginValue(mainConRequestRandom);
-//        return;
-//    }
+QString cConManager::createHashValue(const QString first, const QString second)
+{
+    this->m_hash->reset();
+    QByteArray tmp = first.toUtf8();
+    this->m_hash->addData(tmp.constData(), tmp.length());
+    tmp = second.toUtf8();
+    this->m_hash->addData(tmp.constData(), tmp.length());
 
-//    this->m_pDataCon = new DataConnection(this->m_pGlobalData);
+    return QString(this->m_hash->result());
+}
 
-//    connect(this, &cConManager::sStartSendNewRequest,
-//            this->m_pDataCon, &DataConnection::startSendNewRequest);
-//    connect(this->m_pDataCon, &DataConnection::notifyLastRequestFinished,
-//            this, &cConManager::slDataConLastRequestFinished);
+void cConManager::startDataConnection()
+{
+    if (this->isDataConnectionActive()) {
+        //        this->m_pDataCon->setRandomLoginValue(mainConRequestRandom);
+        return;
+    }
 
-//    this->m_ctrlDataCon.Start(this->m_pDataCon, false);
+    this->m_pDataCon = new cConTcpData();
+    this->m_pDataCon->initialize(g_ConSettings.getIPAddr(), this->m_mainConRequestDataPort);
 
-//    QThread::msleep(25);
-//}
+    connect(this->m_pDataCon, &cConTcpData::signalDataConnectionFinished,
+            this, &cConManager::slotDataConnnectionFinished);
+    connect(this, &cConManager::signalStartSendNewRequest,
+            this->m_pDataCon, &cConTcpData::startSendNewRequest);
+    //        connect(this->m_pDataCon, &cConTcpData::notifyLastRequestFinished,
+    //                this, &cConManager::slDataConLastRequestFinished);
+
+    this->m_ctrlDataCon.Start(this->m_pDataCon, false);
+
+    QThread::msleep(25);
+}
 
 void cConManager::stopDataConnection()
 {
@@ -602,11 +634,14 @@ void cConManager::stopDataConnection()
     if (!this->isDataConnectionActive())
         return;
 
-    //    disconnect(this, &cConManager::sStartSendNewRequest,
-    //               this->m_pDataCon, &DataConnection::startSendNewRequest);
-    //    disconnect(this->m_pDataCon, &DataConnection::notifyLastRequestFinished,
+    disconnect(this->m_pDataCon, &cConTcpData::signalDataConnectionFinished,
+               this, &cConManager::slotDataConnnectionFinished);
+    disconnect(this, &cConManager::signalStartSendNewRequest,
+               this->m_pDataCon, &cConTcpData::startSendNewRequest);
+    //    disconnect(this->m_pDataCon, &cConTcpData::notifyLastRequestFinished,
     //               this, &cConManager::slDataConLastRequestFinished);
 
+    this->m_pDataCon->terminate();
     this->m_ctrlDataCon.Stop();
 
     QThread::msleep(50);
@@ -615,8 +650,8 @@ void cConManager::stopDataConnection()
 
 cConManager::~cConManager()
 {
-    //    if (this->isDataConnectionActive())
-    //        this->stopDataConnection();
+    if (this->m_hash)
+        delete this->m_hash;
 
     //    if (this->isMainConnectionActive())
     //        this->m_ctrlMainCon.Stop();

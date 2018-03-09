@@ -25,7 +25,7 @@
 #include "../Common/General/backgroundcontroller.h"
 #include "../Common/General/cgendisposer.h"
 //#include "../Data/globaldata.h"
-//#include "dataconnection.h"
+#include "ccontcpdata.h"
 #include "ccontcpmain.h"
 
 
@@ -96,12 +96,13 @@ signals:
 
     //    void sSendNewBindingPortRequest();
 
-    //    void sStartSendNewRequest(DataConRequest request);
+    void signalStartSendNewRequest(TcpDataConRequest* request);
 
 public slots:
 
 private slots:
     void slMainConReqFin(qint32 result, const QString msg, const QString salt, const QString random);
+    void slotDataConnnectionFinished(qint32 result, const QString msg);
 
     //    void slDataConLastRequestFinished(DataConRequest request);
 
@@ -110,7 +111,9 @@ private:
     cConTcpMain*         m_pMainCon = NULL;
 
     BackgroundController m_ctrlDataCon;
-    //    DataConnection*      m_pDataCon = NULL;
+    cConTcpData*         m_pDataCon = NULL;
+
+    bool m_bIsConnecting = false;
 
     //    GlobalData* m_pGlobalData = NULL;
 
@@ -118,16 +121,21 @@ private:
 
     //    QList<DataConRequest> m_lErrorMainCon;
 
-    //    void sendLoginRequest(QString password);
-    //    void sendNewRequest(DataConRequest request);
+    void sendLoginRequest();
+    void sendNewRequest(TcpDataConRequest* request);
 
     //    void checkTimeoutResult(qint32 result);
 
+    QString m_mainConRequestUserName;
     QString m_mainConRequestPassWord;
     QString m_mainConRequestSalt;
     QString m_mainConRequestRandom;
+    quint16 m_mainConRequestDataPort;
 
-    //    void startDataConnection();
+    QCryptographicHash* m_hash = NULL;
+    QString             createHashValue(const QString first, const QString second);
+
+    void startDataConnection();
     void stopDataConnection();
     bool isDataConnectionActive() { return this->m_ctrlDataCon.IsRunning(); }
     bool isMainConnectionActive() { return this->m_ctrlMainCon.IsRunning(); }

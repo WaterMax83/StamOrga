@@ -32,8 +32,9 @@
 #include "General/console.h"
 #include "General/globaldata.h"
 #include "General/pushnotification.h"
-#include "Network/udpserver.h"
+#include "Network/ccontcpmaindata.h"
 #include "Network/ccontcpmainserver.h"
+#include "Network/udpserver.h"
 
 GlobalData* g_GlobalData;
 
@@ -64,9 +65,11 @@ int main(int argc, char* argv[])
         UdpServer* udpServ = new UdpServer(&globalData);
         ctrlUdp.Start(udpServ, false);
 
-        cConTcpMain* tcpMain = new cConTcpMain();
+        cConTcpMainServer* tcpMain = new cConTcpMainServer();
         tcpMain->initialize();
         ctrlTcp.Start(tcpMain, false);
+
+        g_ConTcpMainData.initialize(&globalData.m_UserList);
     }
 
     BackgroundController ctrlReadOnline;

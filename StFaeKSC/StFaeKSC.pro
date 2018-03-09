@@ -55,7 +55,10 @@ SOURCES += main.cpp \
     Data/awaytripinfo.cpp \
     Data/checkconsistentdata.cpp \
     Data/statistic.cpp \
-    Network/ccontcpmainserver.cpp
+    Network/ccontcpmainserver.cpp \
+    Network/ccontcpmainsocket.cpp \
+    Network/ccontcpmaindata.cpp \
+    Network/ccontcpdataserver.cpp \
 
 
 HEADERS += \
@@ -90,7 +93,10 @@ HEADERS += \
     Data/awaytripinfo.h \
     Data/checkconsistentdata.h \
     Data/statistic.h \
-    Network/ccontcpmainserver.h
+    Network/ccontcpmainserver.h \
+    Network/ccontcpmainsocket.h \
+    Network/ccontcpmaindata.h \
+    Network/ccontcpdataserver.h \
 
 unix {
 #    QMAKE_POST_LINK = mkdir -p $$OUTPUT_FOLDER && cp $$TARGET $$OUTPUT_FOLDER

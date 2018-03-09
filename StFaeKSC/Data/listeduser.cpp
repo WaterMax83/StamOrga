@@ -149,7 +149,7 @@ int ListedUser::showAllUsers()
         UserLogin* pLogin = (UserLogin*)(this->getItemFromArrayIndex(i));
         if (pLogin == NULL)
             continue;
-        QString output = QString("%1 - %2").arg(pLogin->m_itemName, -20).arg(pLogin->m_readName, -20);
+        QString output = QString("%1 - %2").arg(pLogin->m_itemName, -25).arg(pLogin->m_readName, -20);
         output.append(QString(" : 0x%1").arg(QString::number(pLogin->m_properties, 16)));
         std::cout << output.toStdString() << std::endl;
     }

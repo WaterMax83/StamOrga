@@ -16,44 +16,51 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCONTCPMAIN_H
-#define CCONTCPMAIN_H
+#ifndef CCONTCPMAINSOCKET_H
+#define CCONTCPMAINSOCKET_H
 
-#include <QtCore/QList>
+//#include <QtCore/QList>
 #include <QtCore/QObject>
-#include <QtNetwork/QTcpServer>
+#include <QtCore/QTimer>
+#include <QtNetwork/QTcpSocket>
 
-#include "ccontcpmainsocket.h"
-#include <../Common/General/backgroundcontroller.h>
+//#include "connectiondata.h"
+//#include "udpdataserver.h"
+//#include "General/globaldata.h"
+//#include <../Common/General/backgroundcontroller.h>
 #include <../Common/General/backgroundworker.h>
-
-struct UserMainConnection {
-    quint16               m_remotePort;
-    cConTcpMainSocket*    m_pMainSocket;
-    BackgroundController* m_pctrlMainSocket;
-};
+#include <../Common/Network/messagebuffer.h>
 
 
-class cConTcpMainServer : public BackgroundWorker
+class cConTcpMainSocket : public BackgroundWorker
 {
     Q_OBJECT
 public:
-    cConTcpMainServer();
-    ~cConTcpMainServer();
+    cConTcpMainSocket();
+    ~cConTcpMainSocket();
 
-    qint32 initialize();
+    qint32 initialize(QTcpSocket* socket);
+
+    qint32 terminate();
+
+signals:
+    void signalSocketClosed(quint16 remotePort);
 
 protected:
     int DoBackgroundWork() override;
 
 private slots:
-    void slotSocketConnected();
-    void slotSocketClosed(quint16 remotePort);
+    void readyReadMasterPort();
+    void slotMainSocketError(QAbstractSocket::SocketError socketError);
+    void slotConnectionTimeoutFired();
+
 
 private:
-    QTcpServer* m_pTcpMasterServer = NULL;
+    QTcpSocket*   m_pTcpMasterSocket = NULL;
+    MessageBuffer m_msgBuffer;
+    QTimer*       m_pConTimeout = NULL;
 
-    QList<UserMainConnection*> m_lUserMainCons;
+    void checkNewOncomingData();
 };
 
-#endif // CCONTCPMAIN_H
+#endif // CCONTCPMAINSOCKET_H

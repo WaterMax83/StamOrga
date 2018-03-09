@@ -16,49 +16,25 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCONSETTINGS_H
-#define CCONSETTINGS_H
+#ifndef CSTAGLOBALMANAGER_H
+#define CSTAGLOBALMANAGER_H
 
 #include <QObject>
 
 #include "../Common/General/cgendisposer.h"
 
-class cConSettings : public cGenDisposer
+
+class cStaGlobalManager : public cGenDisposer
 {
     Q_OBJECT
 public:
-    explicit cConSettings(QObject* parent = nullptr);
+    explicit cStaGlobalManager(QObject* parent = nullptr);
 
-    qint32 initialize() override;
-
-    QString getIPAddr();
-    void    setIPAddr(const QString ipAddr);
-
-    QString getPassWord() { return this->m_passWord; }
-
-    QString getUserName();
-    void    setUserName(const QString name);
-
-    QString getReadableName() { return this->m_readableName; }
-
-    QString getSalt();
-    void    setSalt(const QString salt);
-
-    qint32 getMasterConPort() { return 55000; }
+    qint32 initialize();
 
 signals:
 
 public slots:
-
-private:
-    QString m_ipAddr;
-    QString m_login;
-    QString m_passWord;
-    QString m_userName;
-    QString m_readableName;
-    QString m_salt;
 };
 
-extern cConSettings g_ConSettings;
-
-#endif // CCONSETTINGS_H
+#endif // CSTAGLOBALMANAGER_H

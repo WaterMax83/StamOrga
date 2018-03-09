@@ -511,7 +511,7 @@ qint32 PushNotification::addNewAppInformation(const QString guid, const QString 
 
         this->m_mInternalInfoMutex.unlock();
 
-        if(bChanged)
+        if (bChanged)
             this->sortItemListByTimeAscending();
 
         return app->m_index;
@@ -659,7 +659,7 @@ void PushNotification::showCurrentTokenInformation(const QString cmd)
         QString token   = app->m_fcmToken == "" ? "Kein Token" : app->m_fcmToken;
         QString version = app->m_version == "" ? "Keine Version" : app->m_version;
         QString output  = QString("%1: %2").arg(app->m_index, 2, 10).arg(date);
-        output.append(QString(" - %1").arg(this->m_pGlobalData->m_UserList.getItemName(app->m_userIndex), 15));
+        output.append(QString(" - %1").arg(this->m_pGlobalData->m_UserList.getItemName(app->m_userIndex), 25));
         if (cmd == "token")
             output.append(QString(" - %1").arg(token));
         else if (cmd == "guid")
