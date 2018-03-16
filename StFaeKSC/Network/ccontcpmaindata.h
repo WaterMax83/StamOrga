@@ -20,6 +20,7 @@
 #define CCONTCPMAINDATA_H
 
 #include <QtCore/QList>
+#include <QtCore/QMutex>
 
 #include "../../Common/Network/messagebuffer.h"
 #include "../Common/General/backgroundcontroller.h"
@@ -46,12 +47,23 @@ public:
 
     MessageProtocol* getNewUserAcknowledge(const QString userName, const QHostAddress addr);
 
+    MessageProtocol* getUserCheckLogin(UserConData* pUserCon, MessageProtocol* request);
+
+    MessageProtocol* getUserCheckVersion(UserConData* pUserCon, MessageProtocol* request);
+
+    MessageProtocol* getUserProperties(UserConData* pUserCon, MessageProtocol* request);
+
+    MessageProtocol* getUserChangeReadableName(UserConData* pUserCon, MessageProtocol* request);
+
+    MessageProtocol* getUserChangePassword(UserConData* pUserCon, MessageProtocol* request);
+
 private slots:
     void slotServerClosed(quint16 destPort);
 
 private:
     ListedUser*               m_pListedUser;
     QList<TcpUserConnection*> m_lTcpUserCons;
+    QMutex                    m_mutex;
 
     quint16 getFreeDataPort();
 };

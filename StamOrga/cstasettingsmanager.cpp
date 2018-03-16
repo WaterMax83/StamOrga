@@ -55,6 +55,31 @@ qint32 cStaSettingsManager::getValue(const QString group, const QString key, QSt
 
 qint32 cStaSettingsManager::setValue(const QString group, const QString key, const QString value)
 {
+    return this->setValue(group, key, QVariant(value));
+}
+
+qint32 cStaSettingsManager::getBoolValue(const QString group, const QString key, bool& value)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    this->m_pMainUserSettings->beginGroup(group);
+
+    value = this->m_pMainUserSettings->value(key, false).toBool();
+
+    this->m_pMainUserSettings->endGroup();
+
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 cStaSettingsManager::setBoolValue(const QString group, const QString key, const bool value)
+{
+    return this->setValue(group, key, QVariant(value));
+}
+
+
+qint32 cStaSettingsManager::setValue(const QString group, const QString key, const QVariant value)
+{
     if (!this->m_initialized)
         return ERROR_CODE_NOT_INITIALIZED;
 

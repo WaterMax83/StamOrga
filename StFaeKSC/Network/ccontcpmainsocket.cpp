@@ -103,33 +103,6 @@ void cConTcpMainSocket::checkNewOncomingData()
     }
 }
 
-//void cConTcpMainSocket::onConnectionTimedOut(quint16 port)
-//{
-//    for (int i = 0; i < this->m_lUserCons.size(); i++) {
-//        if (this->m_lUserCons[i].userConData.m_dstDataPort == port) {
-//            qInfo().noquote() << QString("Connection timeout for user %1 with port %2").arg(this->m_lUserCons[i].userConData.m_userName).arg(port);
-//            this->m_lUserCons[i].pctrlUdpDataServer->Stop();
-//            delete this->m_lUserCons[i].pctrlUdpDataServer;
-//            this->m_lUserCons.removeAt(i);
-//            return;
-//        }
-//    }
-//}
-
-//UserConnection* cConTcpMainSocket::getUserMasterConnection(QHostAddress addr, quint16 port)
-//{
-//    for (int i = 0; i < this->m_lUserCons.size(); i++) {
-//        if (this->m_lUserCons[i].userConData.m_sender == addr && this->m_lUserCons[i].userConData.m_srcMasterPort == port)
-//            return &this->m_lUserCons[i];
-//    }
-//    return NULL;
-//}
-
-//void cConTcpMainSocket::readChannelFinished()
-//{
-//    //    qDebug() << "Signal readChannelFinished was called";
-//}
-
 qint32 cConTcpMainSocket::terminate()
 {
     if (this->m_pTcpMasterSocket != NULL)

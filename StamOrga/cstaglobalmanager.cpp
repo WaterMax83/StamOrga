@@ -19,8 +19,10 @@
 
 #include "../Common/General/globalfunctions.h"
 #include "Connection/cconmanager.h"
-#include "Connection/cconsettings.h"
+#include "Connection/cconusersettings.h"
+#include "Data/cdatappinfomanager.h"
 #include "cstaglobalmanager.h"
+#include "cstaglobalsettings.h"
 #include "cstasettingsmanager.h"
 
 
@@ -39,7 +41,13 @@ qint32 cStaGlobalManager::initialize()
     rCode = g_StaSettingsManager.initialize();
 
     if (rCode == ERROR_CODE_SUCCESS)
-        rCode = g_ConSettings.initialize();
+        rCode = g_StaGlobalSettings.initialize();
+
+    if (rCode == ERROR_CODE_SUCCESS)
+        rCode = g_DatAppInfoManager.initialize();
+
+    if (rCode == ERROR_CODE_SUCCESS)
+        rCode = g_ConUserSettings.initialize();
 
     if (rCode == ERROR_CODE_SUCCESS)
         rCode = g_ConManager.initialize();

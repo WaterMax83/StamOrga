@@ -25,7 +25,7 @@
 #include "General/globaltiming.h"
 #include "Network/messagecommand.h"
 #include "Network/messageprotocol.h"
-#include "cconsettings.h"
+#include "cconusersettings.h"
 #include "ccontcpmain.h"
 
 cConTcpMain::cConTcpMain()
@@ -80,21 +80,12 @@ int cConTcpMain::DoBackgroundWork()
     this->m_pConTimeout->setSingleShot(true);
     connect(this->m_pConTimeout, &QTimer::timeout, this, &cConTcpMain::slotConnectionTimeoutFired);
 
-    this->m_pMasterTcpSocket->connectToHost(this->m_hMasterReceiver, g_ConSettings.getMasterConPort());
+    this->m_pMasterTcpSocket->connectToHost(this->m_hMasterReceiver, g_ConUserSettings.getMasterConPort());
     this->m_pConTimeout->start(SOCKET_TIMEOUT_MS);
     this->m_bIsConnecting = true;
 
     return 0;
 }
-
-//void cConTcpMain::slotNewBindingPortRequest()
-//{
-//    if (this->m_pMasterUdpSocket->state() != QAbstractSocket::UnconnectedState)
-//        this->m_pMasterUdpSocket->disconnectFromHost();
-//    this->m_pMasterUdpSocket->bind();
-//    this->m_hMasterReceiver = QHostAddress(this->m_pGlobalData->ipAddr());
-//    qDebug() << "Master Setting New Binding Request";
-//}
 
 void cConTcpMain::slotMasterSocketConnected()
 {
@@ -126,8 +117,6 @@ void cConTcpMain::slotReadyReadMasterSocket()
 {
     QByteArray datagram = this->m_pMasterTcpSocket->readAll();
     this->m_messageBuffer.StoreNewData(datagram);
-
-    qDebug() << "New Data " << datagram;
 
     this->checkNewOncomingData();
 }

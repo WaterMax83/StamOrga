@@ -24,9 +24,11 @@
 #include "ui_mainwindow.h"
 
 #include "../../Common/General/globalfunctions.h"
+#include "../../Common/Network/messagecommand.h"
 #include "../../Common/Network/messageprotocol.h"
 #include "Connection/cconmanager.h"
-#include "Connection/cconsettings.h"
+#include "Connection/cconusersettings.h"
+#include "cstaglobalsettings.h"
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -34,35 +36,18 @@ MainWindow::MainWindow(QWidget* parent)
 {
     ui->setupUi(this);
 
-    //    SetMessagePattern();
+    SetMessagePattern();
 
-    this->ui->lEditIpAddr->setText(g_ConSettings.getIPAddr());
+    this->ui->lEditIpAddr->setText(g_ConUserSettings.getIPAddr());
 
-    this->ui->lEditSendUserName->setText(g_ConSettings.getUserName());
-    //    this->ui->lEditTextPassword->setText(g_ConSettings.getPassWord());
+    this->ui->lEditSendUserName->setText(g_ConUserSettings.getUserName());
 
-
-    //    this->m_pConHandling = new cConManager();
-    connect(&g_ConManager, &cConManager::sNotifyConnectionFinished,
+    connect(&g_ConManager, &cConManager::signalNotifyConnectionFinished,
             this, &MainWindow::connectionFinished);
-    //    connect(this->m_pConHandling, &cConManager::sNotifyVersionRequest,
-    //            this, &MainWindow::versionRequestFinished);
-    //    connect(this->m_pConHandling, &cConManager::sNotifyUserPropertiesRequest,
-    //            this, &MainWindow::propertyRequestFinished);
-    //    connect(this->m_pConHandling, &cConManager::sNotifyUpdatePasswordRequest,
-    //            this, &MainWindow::updatePasswordFinished);
-    //    connect(this->m_pConHandling, &cConManager::sNotifyGamesListRequest,
-    //            this, &MainWindow::getGamesListFinished);
+    connect(&g_ConManager, &cConManager::signalNotifyCommandFinished,
+            this, &MainWindow::slotNotifyCommandFinished);
 
-    //    this->m_pGlobalData = new GlobalData();
-    //    this->m_pGlobalData->loadGlobalSettings();
-
-    //
-    //
-    //    this->ui->spBoxPort->setValue(this->m_pGlobalData->conMasterPort());
-
-    //    this->ui->btnUdpatePassword->setEnabled(false);
-    //    this->ui->lEditTextUpdatePassword->setEnabled(false);
+    this->ui->lEditReadableName->setText(g_ConUserSettings.getReadableName());
 }
 
 MainWindow::~MainWindow()
@@ -70,91 +55,75 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-//void MainWindow::on_btnSendData_clicked()
-//{
-//    this->m_pConHandling->setGlobalData(this->m_pGlobalData);
-//    QString username = this->ui->lEditSendUserName->text();
-//    QString password = this->ui->lEditTextPassword->text();
-//    this->m_pGlobalData->setIpAddr(this->ui->lEditIpAddr->text());
-//    this->m_pGlobalData->setConMasterPort(this->ui->spBoxPort->value());
-//    if (this->m_pConHandling->startMainConnection(username, password))
-//    {
-//        this->ui->btnSendData->setEnabled(false);
-//    }
-//}
 
 void MainWindow::connectionFinished(qint32 result, const QString msg)
 {
     if (result >= ERROR_CODE_NO_ERROR) {
         this->ui->conResult->setStyleSheet("background-color:green");
-        //        if (!this->m_pConHandling->startGettingInfo())
-        //            this->ui->btnSendData->setEnabled(true);
-        //        this->ui->btnUdpatePassword->setEnabled(true);
-        //        this->ui->lEditTextUpdatePassword->setEnabled(true);
     } else {
         this->ui->conResult->setStyleSheet("background-color:red");
         qWarning() << QString("Could not connect: %1:%2").arg(result).arg(msg);
-        //        this->ui->btnSendData->setEnabled(true);
     }
 }
 
-//void MainWindow::versionRequestFinished(qint32 result, QString msg)
-//{
-//    this->ui->btnSendData->setEnabled(true);
-
-//    if (result == ERROR_CODE_NEW_VERSION) {
-//        QMessageBox msgBox;
-//        msgBox.setText(msg);
-//        msgBox.exec();
-//    } else
-//        this->ui->lEditTextVersion->setText(msg);
-//}
-
-//void MainWindow::propertyRequestFinished(qint32 result, quint32 value)
-//{
-//    if (result > ERROR_CODE_NO_ERROR) {
-//        this->ui->lEditTextProperties->setText("0x" + QString::number(value, 16));
-//    } else {
-//        this->ui->lEditTextProperties->setText(getErrorCodeString(result));
-//    }
-//}
-
-//void MainWindow::on_btnUdpatePassword_clicked()
-//{
-//    this->m_pConHandling->startUpdatePassword(this->ui->lEditTextUpdatePassword->text());
-//}
-
-//void MainWindow::updatePasswordFinished(qint32 result)
-//{
-//    if (result >= ERROR_CODE_NO_ERROR)
-//        this->ui->lEditTextUpdatePassword->setText("SUCCESS");
-//    else
-//        this->ui->lEditTextUpdatePassword->setText(getErrorCodeString(result));
-//}
-
-
-//void MainWindow::on_btnGetGamesList_clicked()
-//{
-//    this->m_pConHandling->startGetGamesList();
-//}
-
-//void MainWindow::getGamesListFinished(qint32 result)
-//{
-//    qDebug() << QString("Getting Games list request answer: %1 ").arg(result);
-//}
+void MainWindow::slotNotifyCommandFinished(quint32 command, qint32 result)
+{
+    switch (command) {
+    case OP_CODE_CMD_REQ::REQ_GET_VERSION:
+        if (result == ERROR_CODE_SUCCESS)
+            this->ui->lEditTextVersion->setText(g_StaGlobalSettings.getRemoteVersion());
+        break;
+    case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
+        if (result == ERROR_CODE_SUCCESS) {
+            this->ui->lEditTextProperties->setText(QString("0x%1").arg(g_ConUserSettings.getUserProperties(), 8, 16));
+            this->ui->lEditReadableName->setText(g_ConUserSettings.getReadableName());
+        }
+        break;
+    case OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME:
+        if (result == ERROR_CODE_SUCCESS)
+            qInfo() << "Update war erfolgreich";
+        break;
+    case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
+        if (result == ERROR_CODE_SUCCESS)
+            qInfo() << "Update password war erfolgreich";
+        break;
+    default:
+        break;
+    }
+}
 
 void MainWindow::on_btnLogin_clicked()
 {
-    g_ConSettings.setIPAddr(this->ui->lEditIpAddr->text());
+    g_ConUserSettings.setIPAddr(this->ui->lEditIpAddr->text());
     QString passWord;
     if (this->ui->lEditTextPassword->text().isEmpty())
-        passWord = g_ConSettings.getPassWord();
+        passWord = g_ConUserSettings.getPassWord();
     else {
         passWord = this->ui->lEditTextPassword->text();
-        g_ConSettings.setSalt("");
+        g_ConUserSettings.setSalt("");
     }
 
     qint32 rCode = g_ConManager.startMainConnection(this->ui->lEditSendUserName->text(), passWord);
     if (rCode != ERROR_CODE_SUCCESS)
         qWarning() << getErrorCodeString(rCode);
+}
+
+void MainWindow::on_btnSetReadableName_clicked()
+{
+    QString name = this->ui->lEditReadableName->text();
+    if (name.isEmpty())
+        qInfo() << "No readable name";
+    else if (name == g_ConUserSettings.getReadableName())
+        qInfo() << "Name nicht verändert";
+    else
+        g_ConUserSettings.startUpdateReadableName(name);
+}
+
+void MainWindow::on_btnUdpatePassword_clicked()
+{
+    QString password = this->ui->lEditTextUpdatePassword->text();
+    if (password.isEmpty())
+        qInfo() << "No password";
+    else
+        g_ConUserSettings.startUpdatePassword(password);
 }

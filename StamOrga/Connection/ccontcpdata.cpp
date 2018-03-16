@@ -22,22 +22,20 @@
 //#include "../Common/General/config.h"
 #include "../Common/General/globalfunctions.h"
 #include "../Common/General/globaltiming.h"
-//#include "../Common/Network/messagecommand.h"
+#include "../Common/Network/messagecommand.h"
 //#include "../Common/Network/messageprotocol.h"
 //#include "../Data/globalsettings.h"
+#include "../cstaglobalsettings.h"
+#include "cconmanager.h"
 #include "ccontcpdata.h"
+#include "cconusersettings.h"
 
 cConTcpData::cConTcpData()
     : BackgroundWorker()
 {
     this->SetWorkerName("cConTcpData");
     //    this->m_pGlobalData        = pData;
-    //    this->m_bRequestLoginAgain = false;
-    //#if QT_VERSION < QT_VERSION_CHECK(5, 9, 0)
-    //    this->m_hash = new QCryptographicHash(QCryptographicHash::Sha3_512);
-    //#else
-    //    this->m_hash = new QCryptographicHash(QCryptographicHash::Keccak_512);
-    //#endif
+    this->m_bRequestLoginAgain = false;
 }
 
 qint32 cConTcpData::initialize(QString host, qint32 port)
@@ -79,16 +77,14 @@ int cConTcpData::DoBackgroundWork()
 
 void cConTcpData::slotConnectionTimeoutFired()
 {
-    //    qInfo().noquote() << "cConTcpData: Timeout from Data UdpServer";
-    //    while (this->m_lActualRequest.size() > 0) {
-    //        DataConRequest request = this->m_lActualRequest.last();
-    //        request.m_result       = ERROR_CODE_TIMEOUT;
-    //        emit this->notifyLastRequestFinished(request);
-    //        this->m_lActualRequest.removeLast();
-    //    }
-    //    this->m_bRequestLoginAgain = false;
-
-    qDebug() << "TimeOut";
+    qInfo().noquote() << "cConTcpData: Timeout from Data UdpServer";
+    while (this->m_lActualRequest.size() > 0) {
+        TcpDataConRequest* request = this->m_lActualRequest.last();
+        request->m_result          = ERROR_CODE_TIMEOUT;
+        emit this->notifyLastRequestFinished(request);
+        this->m_lActualRequest.removeLast();
+    }
+    this->m_bRequestLoginAgain = false;
 
     emit this->signalDataConnectionFinished(ERROR_CODE_TIMEOUT, "Timeout");
 }
@@ -96,7 +92,14 @@ void cConTcpData::slotConnectionTimeoutFired()
 void cConTcpData::slotSocketDataError(QAbstractSocket::SocketError socketError)
 {
     this->m_pConTimeout->stop();
-    qCritical().noquote() << QString("Socket Error %1 - %2 ").arg(socketError).arg(this->m_pDataTcpSocket->errorString());
+    qWarning().noquote() << QString("Socket Error %1 - %2 ").arg(socketError).arg(this->m_pDataTcpSocket->errorString());
+    while (this->m_lActualRequest.size() > 0) {
+        TcpDataConRequest* request = this->m_lActualRequest.last();
+        request->m_result          = ERROR_CODE_TIMEOUT;
+        emit this->notifyLastRequestFinished(request);
+        this->m_lActualRequest.removeLast();
+    }
+    this->m_bRequestLoginAgain = false;
 
     emit this->signalDataConnectionFinished(ERROR_CODE_COMMON, this->m_pDataTcpSocket->errorString());
 }
@@ -113,254 +116,159 @@ void cConTcpData::slotDataSocketConnected()
  */
 void cConTcpData::slotReadyReadDataPort()
 {
-    //    while (this->m_pDataUdpSocket->hasPendingDatagrams()) {
-    //        QHostAddress sender;
-    //        quint16      port;
-    //        QByteArray   datagram;
-    //        datagram.resize(this->m_pDataUdpSocket->pendingDatagramSize());
+    QByteArray datagram = this->m_pDataTcpSocket->readAll();
+    this->m_messageBuffer.StoreNewData(datagram);
 
-    //        if (this->m_pDataUdpSocket->readDatagram(datagram.data(), datagram.size(), &sender, &port)) {
-    //            if (this->m_pGlobalData->conDataPort() == port
-    //                && this->m_hDataReceiver.toIPv4Address() == sender.toIPv4Address()) {
-
-    //                this->m_messageBuffer.StoreNewData(datagram);
-    //            }
-    //        }
-    //    }
-
-    //    this->checkNewOncomingData();
+    this->checkNewOncomingData();
 }
 
 /*
  * Function to check which data was received
  */
-//void cConTcpData::checkNewOncomingData()
-//{
-//    MessageProtocol* msg;
-//    while ((msg = this->m_messageBuffer.GetNextMessage()) != NULL) {
-
-//        DataConRequest request = this->getActualRequest(msg->getIndex() & 0x00FFFFFF);
-//        if (request.m_request == 0 && msg->getIndex() != OP_CODE_CMD_RES::ACK_NOT_LOGGED_IN)
-//            continue;
+void cConTcpData::checkNewOncomingData()
+{
+    MessageProtocol* msg;
+    while ((msg = this->m_messageBuffer.GetNextMessage()) != NULL) {
 
 
-//        switch (msg->getIndex()) {
-//        case OP_CODE_CMD_RES::ACK_LOGIN_USER:
-//            if (this->m_bRequestLoginAgain) {
-//                this->sendActualRequestsAgain(this->m_pDataHandle->getHandleLoginResponse(msg));
-
-//                this->m_bRequestLoginAgain = false;
-//                continue;
-//            } else {
-//                request.m_result = this->m_pDataHandle->getHandleLoginResponse(msg);
-//                if (request.m_result == ERROR_CODE_SUCCESS) {
-//                    QString passWord = request.m_lData.at(0);
-//                    QString salt     = request.m_lData.at(1);
-//                    if (this->m_pGlobalData->getSalt() == "")
-//                        passWord = this->createHashValue(passWord, salt);
-//                    if (this->m_pGlobalData->passWord() != passWord || this->m_pGlobalData->getSalt() != salt) {
-//                        this->m_pGlobalData->setPassWord(passWord);
-//                        this->m_pGlobalData->setSalt(salt);
-//                        this->m_pGlobalData->saveGlobalUserSettings();
-//                    }
-//                } else if (request.m_result == ERROR_CODE_WRONG_PASSWORD && this->m_pGlobalData->passWord() != "") {
-//                    this->m_pGlobalData->setPassWord("");
-//                    this->m_pGlobalData->setSalt("");
-//                    this->m_pGlobalData->saveGlobalUserSettings();
-//                }
-//            }
-
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_GET_VERSION:
-//            request.m_result = this->m_pDataHandle->getHandleVersionResponse(msg, &request.m_returnData);
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_GET_USER_PROPS:
-//            request.m_result = this->m_pDataHandle->getHandleUserPropsResponse(msg);
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_GET_USER_EVENTS:
-//            request.m_result = this->m_pDataHandle->getHandleUserEventsResponse(msg);
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_SET_USER_EVENTS:
-//            request.m_result = msg->getIntData();
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN:
-//            request.m_result = msg->getIntData();
-//            if (request.m_lData.size() > 0 && request.m_result == ERROR_CODE_SUCCESS) {
-//                request.m_returnData = this->createHashValue(request.m_lData.at(0), this->m_pGlobalData->getSalt());
-//            }
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_USER_CHANGE_READNAME:
-//            request.m_result = msg->getIntData();
-//            if (request.m_lData.size() > 0)
-//                request.m_returnData = request.m_lData.at(0);
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_NOT_LOGGED_IN:
-//            if (!this->m_bRequestLoginAgain) {
-//                DataConRequest conReq;
-//                conReq.m_request = OP_CODE_CMD_REQ::REQ_LOGIN_USER;
-//                conReq.m_lData.append(this->m_pGlobalData->passWord());
-//                conReq.m_lData.append(this->m_pGlobalData->getSalt());
-//                this->startSendLoginRequest(conReq);
-//                this->m_bRequestLoginAgain = true;
-//                delete msg;
-//                continue;
-//            }
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_GET_GAMES_LIST:
-//            request.m_result = this->m_pDataHandle->getHandleGamesListResponse(msg);
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_GET_GAMES_INFO_LIST:
-//            request.m_result = this->m_pDataHandle->getHandleGamesInfoListResponse(msg);
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_SET_FIXED_GAME_TIME:
-//            request.m_result = msg->getIntData();
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_ADD_TICKET:
-//            request.m_result = msg->getIntData();
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_REMOVE_TICKET:
-//            request.m_result = msg->getIntData();
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_CHANGE_TICKET:
-//            request.m_result = msg->getIntData();
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_GET_TICKETS_LIST:
-//            request.m_result = this->m_pDataHandle->getHandleSeasonTicketListResponse(msg);
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_STATE_CHANGE_SEASON_TICKET:
-//            request.m_result = this->m_pDataHandle->getHandleChangeTicketStateResponse(msg);
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_GET_AVAILABLE_TICKETS:
-//            request.m_result = this->m_pDataHandle->getHandleAvailableTicketListResponse(msg, request.m_lData.at(0).toUInt());
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_CHANGE_GAME:
-//            request.m_result = msg->getIntData();
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_CHANGE_MEETING_INFO:
-//        case OP_CODE_CMD_RES::ACK_CHANGE_AWAYTRIP_INFO:
-//            request.m_result = this->m_pDataHandle->getHandleChangeMeetingResponse(msg);
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_GET_MEETING_INFO:
-//            request.m_result = this->m_pDataHandle->getHandleLoadMeetingInfo(msg, MEETING_TYPE_MEETING);
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_GET_AWAYTRIP_INFO:
-//            request.m_result = this->m_pDataHandle->getHandleLoadMeetingInfo(msg, MEETING_TYPE_AWAYTRIP);
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_ACCEPT_MEETING:
-//        case OP_CODE_CMD_RES::ACK_ACCEPT_AWAYTRIP:
-//            request.m_result = this->m_pDataHandle->getHandleAcceptMeetingResponse(msg);
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_CHANGE_NEWS_DATA:
-//            request.m_result = this->m_pDataHandle->getHandleFanclubNewsChangeResponse(msg, request.m_returnData);
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_LIST:
-//            request.m_result = this->m_pDataHandle->getHandleFanclubNewsListResponse(msg);
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_ITEM:
-//            request.m_result = this->m_pDataHandle->getHandleFanclubNewsItemResponse(msg);
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_DEL_NEWS_DATA_ITEM:
-//            request.m_result = msg->getIntData();
-//            break;
-
-//        case OP_CODE_CMD_RES::ACK_CMD_STATISTIC:
-//            request.m_result = this->m_pDataHandle->getHandleStatisticsCommandResponse(msg);
-//            break;
+        if (msg->getIndex() == OP_CODE_CMD_RES::ACK_NOT_LOGGED_IN) {
+            this->m_pConTimeout->stop();
+            //            emit this->signalDataConnectionFinished(ERROR_CODE_NOT_LOGGED_IN, "Not logged in");
+            this->m_bRequestLoginAgain = true;
+            g_ConManager.sendLoginRequest();
+            return;
+        }
+        TcpDataConRequest* request = this->getActualRequest(msg->getIndex() & 0x00FFFFFF);
+        if (request == NULL)
+            continue;
 
 
-//        default:
-//            delete msg;
-//            continue;
-//        }
-//        emit this->notifyLastRequestFinished(request);
-//        this->removeActualRequest(request.m_request);
-//        if (this->m_lActualRequest.size() == 0)
-//            this->m_pConTimeout->stop();
-//        delete msg;
-//    }
-//}
+        switch (msg->getIndex()) {
+        case OP_CODE_CMD_RES::ACK_LOGIN_USER:
+            request->m_result = msg->getIntData();
+            if (this->m_bRequestLoginAgain) {
+                this->sendActualRequestsAgain(request->m_result);
 
-//void cConTcpData::startSendLoginRequest(DataConRequest request)
-//{
-//    QString passWord = request.m_lData.at(0);
-//    QString salt     = request.m_lData.at(1);
-//    if (this->m_pGlobalData->getSalt() == "")
-//        passWord = this->createHashValue(passWord, salt);
+                this->m_bRequestLoginAgain = false;
+                continue;
+            }
 
-//    passWord = this->createHashValue(passWord, this->m_randomLoginValue);
-//    QByteArray  aPassw;
-//    QDataStream wPassword(&aPassw, QIODevice::WriteOnly);
-//    wPassword.setByteOrder(QDataStream::LittleEndian);
-//    wPassword << quint16(passWord.toUtf8().size());
-//    aPassw.append(passWord);
-//    MessageProtocol msg(request.m_request, aPassw);
-//    this->sendMessageRequest(&msg, request);
-//}
+            break;
 
-//void cConTcpData::startSendVersionRequest(DataConRequest request)
-//{
-//    QByteArray  version;
-//    QDataStream wVersion(&version, QIODevice::WriteOnly);
-//    wVersion.setByteOrder(QDataStream::LittleEndian);
-//    wVersion << (quint32)STAM_ORGA_VERSION_I;
-//    QString sVersion = STAM_ORGA_VERSION_S;
-//#ifdef Q_OS_WIN
-//    sVersion.append("_Win");
-//#elif defined(Q_OS_ANDROID)
-//    sVersion.append("_Android");
-//#elif defined(Q_OS_IOS)
-//    sVersion.append(("_iOS");
-//#endif
-//    wVersion << quint16(sVersion.toUtf8().size());
+        case OP_CODE_CMD_RES::ACK_GET_VERSION:
+            request->m_result = g_StaGlobalSettings.handleVersionResponse(msg);
+            break;
 
-//    version.append(sVersion);
-//    MessageProtocol msg(request.m_request, version);
-//    this->sendMessageRequest(&msg, request);
-//}
+        case OP_CODE_CMD_RES::ACK_GET_USER_PROPS:
+            request->m_result = g_ConUserSettings.handleUserPropsResponse(msg);
+            break;
 
-//void cConTcpData::startSendUserPropsRequest(DataConRequest request)
-//{
-//    QJsonObject rootObj;
-//    rootObj.insert("guid", this->m_pGlobalData->getCurrentAppGUID());
-//    rootObj.insert("token", this->m_pGlobalData->getCurrentAppToken());
-//#ifdef Q_OS_WIN
-//    rootObj.insert("os", 1);
-//#elif defined(Q_OS_ANDROID)
-//    rootObj.insert("os", 2);
-//#elif defined(Q_OS_IOS)
-//    rootObj.insert("os", 3);
-//#endif
+            //        case OP_CODE_CMD_RES::ACK_GET_USER_EVENTS:
+            //            request.m_result = this->m_pDataHandle->getHandleUserEventsResponse(msg);
+            //            break;
 
-//    QByteArray data = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+            //        case OP_CODE_CMD_RES::ACK_SET_USER_EVENTS:
+            //            request.m_result = msg->getIntData();
+            //            break;
 
-//    MessageProtocol msg(request.m_request, data);
-//    this->sendMessageRequest(&msg, request);
-//}
+        case OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN:
+            request->m_result = g_ConUserSettings.handleUpdatePasswordResponse(msg);
+            break;
+
+        case OP_CODE_CMD_RES::ACK_USER_CHANGE_READNAME:
+            request->m_result = g_ConUserSettings.handleUpdateReadableNameResponse(msg);
+            break;
+
+            //        case OP_CODE_CMD_RES::ACK_GET_GAMES_LIST:
+            //            request.m_result = this->m_pDataHandle->getHandleGamesListResponse(msg);
+            //            break;
+
+            //        case OP_CODE_CMD_RES::ACK_GET_GAMES_INFO_LIST:
+            //            request.m_result = this->m_pDataHandle->getHandleGamesInfoListResponse(msg);
+            //            break;
+
+            //        case OP_CODE_CMD_RES::ACK_SET_FIXED_GAME_TIME:
+            //                    request.m_result = msg->getIntData();
+            //            break;
+
+            //        case OP_CODE_CMD_RES::ACK_ADD_TICKET:
+            //            request.m_result = msg->getIntData();
+            //            break;
+
+            //        case OP_CODE_CMD_RES::ACK_REMOVE_TICKET:
+            //            request.m_result = msg->getIntData();
+            //            break;
+
+            //        case OP_CODE_CMD_RES::ACK_CHANGE_TICKET:
+            //            request.m_result = msg->getIntData();
+            //            break;
+
+            //        case OP_CODE_CMD_RES::ACK_GET_TICKETS_LIST:
+            //            request.m_result = this->m_pDataHandle->getHandleSeasonTicketListResponse(msg);
+            //            break;
+
+            //        case OP_CODE_CMD_RES::ACK_STATE_CHANGE_SEASON_TICKET:
+            //            request.m_result = this->m_pDataHandle->getHandleChangeTicketStateResponse(msg);
+            //            break;
+
+            //        case OP_CODE_CMD_RES::ACK_GET_AVAILABLE_TICKETS:
+            //            request.m_result = this->m_pDataHandle->getHandleAvailableTicketListResponse(msg, request.m_lData.at(0).toUInt());
+            //            break;
+
+            //        case OP_CODE_CMD_RES::ACK_CHANGE_GAME:
+            //            request.m_result = msg->getIntData();
+            //            break;
+
+            //        case OP_CODE_CMD_RES::ACK_CHANGE_MEETING_INFO:
+            //        case OP_CODE_CMD_RES::ACK_CHANGE_AWAYTRIP_INFO:
+            //            request.m_result = this->m_pDataHandle->getHandleChangeMeetingResponse(msg);
+            //            break;
+
+            //        case OP_CODE_CMD_RES::ACK_GET_MEETING_INFO:
+            //            request.m_result = this->m_pDataHandle->getHandleLoadMeetingInfo(msg, MEETING_TYPE_MEETING);
+            //            break;
+
+            //        case OP_CODE_CMD_RES::ACK_GET_AWAYTRIP_INFO:
+            //            request.m_result = this->m_pDataHandle->getHandleLoadMeetingInfo(msg, MEETING_TYPE_AWAYTRIP);
+            //            break;
+
+            //        case OP_CODE_CMD_RES::ACK_ACCEPT_MEETING:
+            //        case OP_CODE_CMD_RES::ACK_ACCEPT_AWAYTRIP:
+            //            request.m_result = this->m_pDataHandle->getHandleAcceptMeetingResponse(msg);
+            //            break;
+
+            //        case OP_CODE_CMD_RES::ACK_CHANGE_NEWS_DATA:
+            //            request.m_result = this->m_pDataHandle->getHandleFanclubNewsChangeResponse(msg, request.m_returnData);
+            //            break;
+
+            //        case OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_LIST:
+            //            request.m_result = this->m_pDataHandle->getHandleFanclubNewsListResponse(msg);
+            //            break;
+
+            //        case OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_ITEM:
+            //            request.m_result = this->m_pDataHandle->getHandleFanclubNewsItemResponse(msg);
+            //            break;
+
+            //        case OP_CODE_CMD_RES::ACK_DEL_NEWS_DATA_ITEM:
+            //            request.m_result = msg->getIntData();
+            //            break;
+
+            //        case OP_CODE_CMD_RES::ACK_CMD_STATISTIC:
+            //            request.m_result = this->m_pDataHandle->getHandleStatisticsCommandResponse(msg);
+            //            break;
+
+
+        default:
+            delete msg;
+            continue;
+        }
+        emit this->notifyLastRequestFinished(request);
+        this->removeActualRequest(request);
+        if (this->m_lActualRequest.size() == 0)
+            this->m_pConTimeout->stop();
+        delete msg;
+    }
+}
 
 //void cConTcpData::startSendGetUserEventsRequest(DataConRequest request)
 //{
@@ -383,38 +291,6 @@ void cConTcpData::slotReadyReadDataPort()
 //    this->sendMessageRequest(&msg, request);
 //}
 
-//void cConTcpData::startSendUpdPassRequest(DataConRequest request)
-//{
-//    QByteArray  passReq;
-//    QDataStream wPassReq(&passReq, QIODevice::WriteOnly);
-//    wPassReq.setByteOrder(QDataStream::LittleEndian);
-
-//    QString newPassWord     = this->createHashValue(request.m_lData.at(0), this->m_pGlobalData->getSalt());
-//    QString currentPassWord = this->createHashValue(this->m_pGlobalData->passWord(), this->m_randomLoginValue);
-
-//    wPassReq << (qint16)currentPassWord.toUtf8().size();
-//    passReq.append(currentPassWord.toUtf8());
-//    wPassReq.device()->seek(passReq.length());
-
-//    wPassReq << (qint16)newPassWord.toUtf8().size();
-//    passReq.append(newPassWord.toUtf8());
-
-//    MessageProtocol msg(request.m_request, passReq);
-//    this->sendMessageRequest(&msg, request);
-//}
-
-//void cConTcpData::startSendReadableNameRequest(DataConRequest request)
-//{
-//    QString     name = request.m_lData.at(0);
-//    QByteArray  readName;
-//    QDataStream wReadName(&readName, QIODevice::WriteOnly);
-//    wReadName.setByteOrder(QDataStream::LittleEndian);
-//    wReadName << quint16(name.toUtf8().size());
-//    readName.append(name);
-
-//    MessageProtocol msg(request.m_request, readName);
-//    this->sendMessageRequest(&msg, request);
-//}
 
 //void cConTcpData::startSendGamesListRequest(DataConRequest request)
 //{
@@ -654,225 +530,178 @@ void cConTcpData::slotReadyReadDataPort()
 //    this->sendMessageRequest(&msg, request);
 //}
 
-//qint32 cConTcpData::sendMessageRequest(MessageProtocol* msg, DataConRequest request)
-//{
-//    if (this->m_pDataUdpSocket == NULL)
-//        return -1;
+qint32 cConTcpData::sendMessageRequest(MessageProtocol* msg, TcpDataConRequest* request)
+{
+    if (this->m_pDataTcpSocket == NULL)
+        return -1;
 
-//    quint32     sendBytes       = 0;
-//    quint32     totalPacketSize = msg->getNetworkSize();
-//    const char* pData           = msg->getNetworkProtocol();
+    quint32     sendBytes       = 0;
+    quint32     totalPacketSize = msg->getNetworkSize();
+    const char* pData           = msg->getNetworkProtocol();
 
-//    do {
-//        quint32 currentSendSize;
-//        if ((totalPacketSize - sendBytes) > MAX_DATAGRAMM_SIZE)
-//            currentSendSize = MAX_DATAGRAMM_SIZE;
-//        else
-//            currentSendSize = totalPacketSize - sendBytes;
-
-
-//        qint64 rValue = this->m_pDataUdpSocket->writeDatagram(pData + sendBytes,
-//                                                              currentSendSize,
-//                                                              this->m_hDataReceiver,
-//                                                              this->m_pGlobalData->conDataPort());
-
-//        if (rValue < 0) {
-//            request.m_result = ERROR_CODE_ERR_SEND;
-//            emit this->notifyLastRequestFinished(request);
-
-//            return rValue;
-//        }
-//        sendBytes += rValue;
-//        //                QThread::msleep(25);
-//    } while (sendBytes < totalPacketSize);
-
-//    this->m_pConTimeout->start();
-
-//    /* Only add when not sending request again */
-//    if (!this->m_bRequestLoginAgain) {
-//        this->m_lActualRequest.append(request);
-//    }
-
-//    return sendBytes;
-//}
-
-//void cConTcpData::removeActualRequest(quint32 req)
-//{
-//    for (int i = 0; i < this->m_lActualRequest.size(); i++) {
-//        if (this->m_lActualRequest[i].m_request == req) {
-//            //            if (this->m_lActualRequest[i].m_lData != NULL)
-//            //                delete this->m_lActualRequest[i].m_lData;
-//            this->m_lActualRequest.removeAt(i);
-//        }
-//    }
-//}
+    do {
+        quint32 currentSendSize;
+        if ((totalPacketSize - sendBytes) > MAX_DATAGRAMM_SIZE)
+            currentSendSize = MAX_DATAGRAMM_SIZE;
+        else
+            currentSendSize = totalPacketSize - sendBytes;
 
 
-//DataConRequest cConTcpData::getActualRequest(quint32 req)
-//{
-//    for (int i = 0; i < this->m_lActualRequest.size(); i++) {
-//        if (this->m_lActualRequest[i].m_request == req) {
-//            return this->m_lActualRequest[i];
-//        }
-//    }
-//    return DataConRequest(0);
-//}
+        qint64 rValue = this->m_pDataTcpSocket->write(pData + sendBytes, currentSendSize);
 
-//QString cConTcpData::getActualRequestData(quint32 req, qint32 index)
-//{
-//    for (int i = 0; i < this->m_lActualRequest.size(); i++) {
-//        if (this->m_lActualRequest[i].m_request == req) {
-//            if (this->m_lActualRequest[i].m_lData.size() > index)
-//                return this->m_lActualRequest[i].m_lData.at(index);
-//        }
-//    }
-//    return NULL;
-//}
+        if (rValue < 0) {
+            request->m_result = ERROR_CODE_ERR_SEND;
+            emit this->notifyLastRequestFinished(request);
 
-//void cConTcpData::sendActualRequestsAgain(qint32 result)
-//{
-//    if (result == ERROR_CODE_SUCCESS) {
-//        qInfo().noquote() << "cConTcpData: Trying to send the requests again";
-//        for (int i = 0; i < this->m_lActualRequest.size(); i++) {
-//            this->startSendNewRequest(this->m_lActualRequest[i]);
-//        }
-//    } else {
-//        while (this->m_lActualRequest.size() > 0) {
-//            DataConRequest request = this->m_lActualRequest.last();
-//            request.m_result       = result;
-//            emit this->notifyLastRequestFinished(request);
-//            this->m_lActualRequest.removeLast();
-//        }
-//    }
-//}
+            return rValue;
+        }
+        sendBytes += rValue;
+        //        //                QThread::msleep(25);
+    } while (sendBytes < totalPacketSize);
 
-//void cConTcpData::startSendNewRequest(DataConRequest request)
-//{
-//    switch (request.m_request) {
-//    case OP_CODE_CMD_REQ::REQ_LOGIN_USER:
-//        this->startSendLoginRequest(request);
-//        break;
+    this->m_pConTimeout->start();
 
-//    case OP_CODE_CMD_REQ::REQ_GET_VERSION:
-//        this->startSendVersionRequest(request);
-//        break;
+    //    /* Only add when not sending request again */
+    if (!this->m_bRequestLoginAgain) {
+        this->m_lActualRequest.append(request);
+    }
 
-//    case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
-//        this->startSendUserPropsRequest(request);
-//        break;
+    return sendBytes;
+}
 
-//    case OP_CODE_CMD_REQ::REQ_GET_USER_EVENTS:
-//        this->startSendGetUserEventsRequest(request);
-//        break;
+void cConTcpData::removeActualRequest(TcpDataConRequest* request)
+{
+    for (int i = 0; i < this->m_lActualRequest.size(); i++) {
+        if (this->m_lActualRequest[i] == request) {
+            //            if (this->m_lActualRequest[i].m_lData != NULL)
+            //                delete this->m_lActualRequest[i].m_lData;
+            this->m_lActualRequest.removeAt(i);
+        }
+    }
+}
 
-//    case OP_CODE_CMD_REQ::REQ_SET_USER_EVENTS:
-//        this->startSendSetUserEventsRequest(request);
-//        break;
 
-//    case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
-//        if (request.m_lData.size() > 0)
-//            this->startSendUpdPassRequest(request);
-//        break;
+TcpDataConRequest* cConTcpData::getActualRequest(quint32 req)
+{
+    for (int i = 0; i < this->m_lActualRequest.size(); i++) {
+        if (this->m_lActualRequest[i]->m_request == req) {
+            return this->m_lActualRequest[i];
+        }
+    }
+    return NULL;
+}
 
-//    case OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME:
-//        if (request.m_lData.size() > 0)
-//            this->startSendReadableNameRequest(request);
-//        break;
+void cConTcpData::sendActualRequestsAgain(qint32 result)
+{
+    if (result == ERROR_CODE_SUCCESS) {
+        qInfo().noquote() << "cConTcpData: Trying to send the requests again";
+        for (int i = 0; i < this->m_lActualRequest.size(); i++) {
+            this->startSendNewRequest(this->m_lActualRequest[i]);
+        }
+    } else {
+        while (this->m_lActualRequest.size() > 0) {
+            TcpDataConRequest* request = this->m_lActualRequest.last();
+            request->m_result          = result;
+            emit this->notifyLastRequestFinished(request);
+            this->m_lActualRequest.removeLast();
+        }
+    }
+}
 
-//    case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
-//        this->startSendGamesListRequest(request);
-//        break;
+void cConTcpData::startSendNewRequest(TcpDataConRequest* request)
+{
+    MessageProtocol msg(request->m_request, request->m_lData);
+    this->sendMessageRequest(&msg, request);
 
-//    case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST:
-//        this->startSendGamesInfoListRequest(request);
-//        break;
+    //    case OP_CODE_CMD_REQ::REQ_GET_USER_EVENTS:
+    //        this->startSendGetUserEventsRequest(request);
+    //        break;
 
-//    case OP_CODE_CMD_REQ::REQ_SET_FIXED_GAME_TIME:
-//        this->startSendSetGameTimeFixedRequest(request);
-//        break;
+    //    case OP_CODE_CMD_REQ::REQ_SET_USER_EVENTS:
+    //        this->startSendSetUserEventsRequest(request);
+    //        break;
 
-//    case OP_CODE_CMD_REQ::REQ_ADD_TICKET:
-//        if (request.m_lData.size() > 1)
-//            this->startSendAddSeasonTicket(request);
-//        break;
+    //    case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
+    //        this->startSendGamesListRequest(request);
+    //        break;
 
-//    case OP_CODE_CMD_REQ::REQ_REMOVE_TICKET:
-//        if (request.m_lData.size() > 0)
-//            this->startSendRemoveSeasonTicket(request);
-//        break;
+    //    case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST:
+    //        this->startSendGamesInfoListRequest(request);
+    //        break;
 
-//    case OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST:
-//        this->startSendSeasonTicketListRequest(request);
-//        break;
+    //    case OP_CODE_CMD_REQ::REQ_SET_FIXED_GAME_TIME:
+    //        this->startSendSetGameTimeFixedRequest(request);
+    //        break;
 
-//    case OP_CODE_CMD_REQ::REQ_CHANGE_TICKET:
-//        this->startSendEditSeasonTicket(request);
-//        break;
+    //    case OP_CODE_CMD_REQ::REQ_ADD_TICKET:
+    //        if (request.m_lData.size() > 1)
+    //            this->startSendAddSeasonTicket(request);
+    //        break;
 
-//    case OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET:
-//        this->startSendChangeTicketState(request);
-//        break;
+    //    case OP_CODE_CMD_REQ::REQ_REMOVE_TICKET:
+    //        if (request.m_lData.size() > 0)
+    //            this->startSendRemoveSeasonTicket(request);
+    //        break;
 
-//    case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS:
-//        this->startSendAvailableTicketListRequest(request);
-//        break;
+    //    case OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST:
+    //        this->startSendSeasonTicketListRequest(request);
+    //        break;
 
-//    case OP_CODE_CMD_REQ::REQ_CHANGE_GAME:
-//        this->startSendChangeGameRequest(request);
-//        break;
+    //    case OP_CODE_CMD_REQ::REQ_CHANGE_TICKET:
+    //        this->startSendEditSeasonTicket(request);
+    //        break;
 
-//    case OP_CODE_CMD_REQ::REQ_CHANGE_MEETING_INFO:
-//    case OP_CODE_CMD_REQ::REQ_CHANGE_AWAYTRIP_INFO:
-//        this->startSendChangeMeetingInfo(request);
-//        break;
+    //    case OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET:
+    //        this->startSendChangeTicketState(request);
+    //        break;
 
-//    case OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO:
-//    case OP_CODE_CMD_REQ::REQ_GET_AWAYTRIP_INFO:
-//        this->startSendGetMeetingInfo(request);
-//        break;
+    //    case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS:
+    //        this->startSendAvailableTicketListRequest(request);
+    //        break;
 
-//    case OP_CODE_CMD_REQ::REQ_ACCEPT_MEETING:
-//    case OP_CODE_CMD_REQ::REQ_ACCEPT_AWAYTRIP:
-//        this->startSendAcceptMeeting(request);
-//        break;
+    //    case OP_CODE_CMD_REQ::REQ_CHANGE_GAME:
+    //        this->startSendChangeGameRequest(request);
+    //        break;
 
-//    case OP_CODE_CMD_REQ::REQ_CHANGE_NEWS_DATA:
-//        this->startSendChangeNewsData(request);
-//        break;
+    //    case OP_CODE_CMD_REQ::REQ_CHANGE_MEETING_INFO:
+    //    case OP_CODE_CMD_REQ::REQ_CHANGE_AWAYTRIP_INFO:
+    //        this->startSendChangeMeetingInfo(request);
+    //        break;
 
-//    case OP_CODE_CMD_REQ::REQ_GET_NEWS_DATA_LIST:
-//        this->startSendGetNewsDataList(request);
-//        break;
+    //    case OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO:
+    //    case OP_CODE_CMD_REQ::REQ_GET_AWAYTRIP_INFO:
+    //        this->startSendGetMeetingInfo(request);
+    //        break;
 
-//    case OP_CODE_CMD_REQ::REQ_GET_NEWS_DATA_ITEM:
-//        this->startSendGetNewDataItem(request);
-//        break;
+    //    case OP_CODE_CMD_REQ::REQ_ACCEPT_MEETING:
+    //    case OP_CODE_CMD_REQ::REQ_ACCEPT_AWAYTRIP:
+    //        this->startSendAcceptMeeting(request);
+    //        break;
 
-//    case OP_CODE_CMD_REQ::REQ_DEL_NEWS_DATA_ITEM:
-//        this->startSendDeleteNewDataItem(request);
-//        break;
+    //    case OP_CODE_CMD_REQ::REQ_CHANGE_NEWS_DATA:
+    //        this->startSendChangeNewsData(request);
+    //        break;
 
-//    case OP_CODE_CMD_REQ::REQ_CMD_STATISTIC:
-//        this->startSendStatisticsCommand(request);
-//        break;
+    //    case OP_CODE_CMD_REQ::REQ_GET_NEWS_DATA_LIST:
+    //        this->startSendGetNewsDataList(request);
+    //        break;
 
-//    default:
-//        return;
-//    }
-//}
+    //    case OP_CODE_CMD_REQ::REQ_GET_NEWS_DATA_ITEM:
+    //        this->startSendGetNewDataItem(request);
+    //        break;
 
-//QString cConTcpData::createHashValue(const QString first, const QString second)
-//{
-//    this->m_hash->reset();
-//    QByteArray tmp = first.toUtf8();
-//    this->m_hash->addData(tmp.constData(), tmp.length());
-//    tmp = second.toUtf8();
-//    this->m_hash->addData(tmp.constData(), tmp.length());
+    //    case OP_CODE_CMD_REQ::REQ_DEL_NEWS_DATA_ITEM:
+    //        this->startSendDeleteNewDataItem(request);
+    //        break;
 
-//    QString hashPassword(this->m_hash->result());
+    //    case OP_CODE_CMD_REQ::REQ_CMD_STATISTIC:
+    //        this->startSendStatisticsCommand(request);
+    //        break;
 
-//    return hashPassword;
-//}
+    //    default:
+    //        return;
+    //    }
+}
 
 qint32 cConTcpData::terminate()
 {
@@ -891,12 +720,4 @@ qint32 cConTcpData::terminate()
 
 cConTcpData::~cConTcpData()
 {
-
-    //    if (this->m_pDataUdpSocket != NULL)
-    //        delete this->m_pDataUdpSocket;
-
-    //    if (this->m_pDataHandle != NULL)
-    //        delete this->m_pDataHandle;
-
-    //    delete this->m_hash;
 }

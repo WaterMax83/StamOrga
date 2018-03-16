@@ -26,7 +26,8 @@
 #include <QtNetwork/QTcpSocket>
 
 #include "../Common/General/backgroundworker.h"
-//#include "../Common/Network/messagebuffer.h"
+#include "../Common/Network/messagebuffer.h"
+#include "../Common/Network/messageprotocol.h"
 //#include "../Data/globaldata.h"
 //#include "datahandling.h"
 
@@ -34,7 +35,7 @@ struct TcpDataConRequest {
     quint32    m_request;
     QByteArray m_lData;
     qint32     m_result;
-    QString    m_returnData;
+    //    QString    m_sInfoData;
 
     TcpDataConRequest(quint32 req)
     {
@@ -64,11 +65,11 @@ public:
 
 
 signals:
-    //    void notifyLastRequestFinished(DataConRequest request);
+    void notifyLastRequestFinished(TcpDataConRequest* request);
     void signalDataConnectionFinished(qint32 result, const QString msg);
 
 public slots:
-    //    void startSendNewRequest(DataConRequest request);
+    void startSendNewRequest(TcpDataConRequest* request);
 
 private slots:
     void slotConnectionTimeoutFired();
@@ -77,16 +78,13 @@ private slots:
     void slotSocketDataError(QAbstractSocket::SocketError socketError);
 
 private:
-    QHostAddress m_hMasterReceiver;
-    quint16      m_dataPort;
-    //    GlobalData*   m_pGlobalData;
-    //    MessageBuffer m_messageBuffer;
+    QHostAddress  m_hMasterReceiver;
+    quint16       m_dataPort;
+    MessageBuffer m_messageBuffer;
     //    DataHandling* m_pDataHandle;
-    //    QString       m_randomLoginValue;
 
     QTimer*     m_pConTimeout;
     QTcpSocket* m_pDataTcpSocket = NULL;
-    //    QHostAddress m_hDataReceiver;
 
     //    void startSendLoginRequest(DataConRequest request);
     //    void startSendVersionRequest(DataConRequest request);
@@ -115,18 +113,15 @@ private:
     //    void startSendStatisticsCommand(DataConRequest request);
 
 
-    //    void           checkNewOncomingData();
-    //    qint32         sendMessageRequest(MessageProtocol* msg, DataConRequest request);
-    //    void           removeActualRequest(quint32 req);
-    //    DataConRequest getActualRequest(quint32 req);
-    //    QString        getActualRequestData(quint32 req, qint32 index);
-    //    QString        createHashValue(const QString first, const QString second);
+    void               checkNewOncomingData();
+    qint32             sendMessageRequest(MessageProtocol* msg, TcpDataConRequest* request);
+    void               removeActualRequest(TcpDataConRequest* request);
+    TcpDataConRequest* getActualRequest(quint32 req);
 
-    //    bool m_bRequestLoginAgain;
-    //    void sendActualRequestsAgain(qint32 result);
+    bool m_bRequestLoginAgain;
+    void sendActualRequestsAgain(qint32 result);
 
-    //    QList<DataConRequest> m_lActualRequest;
-    //    QCryptographicHash*   m_hash;
+    QList<TcpDataConRequest*> m_lActualRequest;
 };
 
 #endif // CCONTCPDATA_H

@@ -19,9 +19,14 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 
+#include "../Common/General/config.h"
 #include "../Common/General/globalfunctions.h"
 #include "../Common/Network/messagecommand.h"
+#include "../General/globaldata.h"
+#include "General/pushnotification.h"
 #include "ccontcpmaindata.h"
+
+extern GlobalData* g_GlobalData;
 
 cConTcpMainData g_ConTcpMainData;
 
@@ -43,12 +48,7 @@ MessageProtocol* cConTcpMainData::getNewUserAcknowledge(const QString userName, 
     qint32      userIndex = this->m_pListedUser->getItemIndex(userName);
     if (userIndex > 0) {
 
-        //                    if (this->m_lUserCons[i].userConData.m_dstDataPort == 0) { // when there is not already a port, create a new
-        //                        this->m_lUserCons[i].userConData.m_dstDataPort = this->getFreeDataPort();
         qInfo().noquote() << QString("Connected user %1").arg(userName);
-        //                                                         .arg(this->m_lUserCons[i].userConData.m_dstDataPort)
-        //                                                         .arg(this->m_lUserCons[i].userConData.m_sender.toString());
-        //                    }
 
         quint16 port = this->getFreeDataPort();
         rootObj.insert("port", port);
@@ -60,56 +60,165 @@ MessageProtocol* cConTcpMainData::getNewUserAcknowledge(const QString userName, 
 
         rootObj.insert("ack", ERROR_CODE_SUCCESS);
 
-
         TcpUserConnection* userCon           = new TcpUserConnection();
         userCon->m_userConData.m_dstDataPort = port;
         userCon->m_userConData.m_userName    = userName;
         userCon->m_userConData.m_userID      = userIndex;
         userCon->m_userConData.m_sender      = addr;
+        userCon->m_userConData.m_randomLogin = random;
         userCon->m_pDataServer               = new cConTcpDataServer();
         userCon->m_pDataServer->initialize(&userCon->m_userConData);
         this->connect(userCon->m_pDataServer, &cConTcpDataServer::signalServerClosed, this, &cConTcpMainData::slotServerClosed);
 
         userCon->m_pctrlTcpDataServer = new BackgroundController();
         userCon->m_pctrlTcpDataServer->Start(userCon->m_pDataServer, false);
+
+        QMutexLocker lock(&this->m_mutex);
+
         this->m_lTcpUserCons.append(userCon);
 
-        //                    /* Create new thread if it is not running and you got a port */
-        //                    if (this->m_lUserCons[i].userConData.m_dstDataPort && this->m_lUserCons[i].pctrlUdpDataServer == NULL) {
-        //                        this->m_lUserCons[i].userConData.m_userName = userName;
-        //                        this->m_lUserCons[i].userConData.m_userID   = userIndex;
-        //                        this->m_lUserCons[i].pDataServer            = new UdpDataServer(&this->m_lUserCons[i].userConData,
-        //                                                                             this->m_pGlobalData);
-        //                        connect(this->m_lUserCons[i].pDataServer, &UdpDataServer::notifyConnectionTimedOut, this, &cConTcpMainSocket::onConnectionTimedOut);
-        //                        this->m_lUserCons[i].pctrlUdpDataServer = new BackgroundController();
-        //                        this->m_lUserCons[i].pctrlUdpDataServer->Start(this->m_lUserCons[i].pDataServer, false);
-        //                    }
     } else {
         rootObj.insert("ack", ERROR_CODE_NO_USER);
         qInfo().noquote() << QString("Wrong user tried to connect: \"%1\"").arg(userName);
     }
-
 
     QByteArray data = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_CONNECT_USER, data);
 }
 
+MessageProtocol* cConTcpMainData::getUserCheckLogin(UserConData* pUserCon, MessageProtocol* request)
+{
+    QByteArray  data    = QByteArray(request->getPointerToData());
+    QJsonObject rootObj = QJsonDocument::fromJson(data).object();
+    QString     passW   = rootObj.value("passWord").toString();
+
+    qint32 result = this->m_pListedUser->userCheckPasswordHash(pUserCon->m_userName, passW, pUserCon->m_randomLogin);
+    if (result == ERROR_CODE_SUCCESS) {
+        pUserCon->m_bIsConnected = true;
+        qInfo().noquote() << QString("User %1 logged in").arg(pUserCon->m_userName);
+    } else {
+        pUserCon->m_bIsConnected = false;
+        qWarning().noquote() << QString("User %1 tried to login with wrong password").arg(pUserCon->m_userName);
+    }
+
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_LOGIN_USER, result);
+}
+
+MessageProtocol* cConTcpMainData::getUserCheckVersion(UserConData* pUserCon, MessageProtocol* request)
+{
+    QByteArray  data    = QByteArray(request->getPointerToData());
+    QJsonObject rootObj = QJsonDocument::fromJson(data).object();
+
+    quint32 intVersion = (quint32)rootObj.value("version").toDouble();
+    QString remVersion = rootObj.value("sVersion").toString();
+    qInfo().noquote() << QString("Version from %1 = %2:0x%3").arg(pUserCon->m_userName, remVersion).arg(intVersion, 8, 16);
+
+
+    QJsonObject rootAns;
+    rootAns.insert("ack", ERROR_CODE_SUCCESS);
+
+//#define VERSION_TEST
+#ifdef VERSION_TEST
+#define ORGA_VERSION_I 0x0B0A0000 // VX.Y.Z => 0xXXYYZZZZ
+#define ORGA_VERSION_S "VB.A.0"
+    rootAns.insert("version", (qint32)ORGA_VERSION_I);
+    rootAns.insert("sVersion", ORGA_VERSION_S);
+#else
+    rootAns.insert("version", (double)STAM_ORGA_VERSION_I);
+    rootAns.insert("sVersion", STAM_ORGA_VERSION_S);
+#endif
+
+    pUserCon->m_version = remVersion;
+    if (!pUserCon->m_guid.isEmpty())
+        g_pushNotify->addNewVersionInformation(pUserCon->m_guid, remVersion);
+
+    QByteArray answer = QJsonDocument(rootAns).toJson(QJsonDocument::Compact);
+
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_VERSION, answer);
+}
+
 void cConTcpMainData::slotServerClosed(quint16 destPort)
 {
+    QMutexLocker lock(&this->m_mutex);
+
     for (int i = 0; i < this->m_lTcpUserCons.count(); i++) {
         TcpUserConnection* pCon = this->m_lTcpUserCons.at(i);
         if (pCon->m_userConData.m_dstDataPort == destPort) {
             pCon->m_pDataServer->terminate();
-            pCon->m_pctrlTcpDataServer->Stop();
+            pCon->m_pctrlTcpDataServer->Stop(true);
             this->m_lTcpUserCons.removeAt(i);
             break;
         }
     }
 }
 
+MessageProtocol* cConTcpMainData::getUserProperties(UserConData* pUserCon, MessageProtocol* request)
+{
+    QByteArray  data(request->getPointerToData());
+    QJsonObject rootObj = QJsonDocument::fromJson(data).object();
+    QString     guid    = rootObj.value("guid").toString();
+    QString     token   = rootObj.value("token").toString();
+    qint32      os      = rootObj.value("os").toInt();
+
+    pUserCon->m_guid = guid;
+    g_pushNotify->addNewAppInformation(guid, token, os, pUserCon->m_userID);
+
+    if (!pUserCon->m_version.isEmpty())
+        g_pushNotify->addNewVersionInformation(guid, pUserCon->m_version);
+
+    QJsonObject rootObjAns;
+    rootObjAns.insert("ack", ERROR_CODE_SUCCESS);
+    rootObjAns.insert("property", (double)this->m_pListedUser->getUserProperties(pUserCon->m_userName));
+    rootObjAns.insert("index", pUserCon->m_userID);
+    rootObjAns.insert("readableName", this->m_pListedUser->getReadableName(pUserCon->m_userID));
+
+    QJsonArray arrTickets;
+    if (g_GlobalData->requestGetAvailableTicketFromUser(pUserCon->m_userID, arrTickets) == ERROR_CODE_SUCCESS)
+        rootObjAns.insert("tickets", arrTickets);
+
+    QByteArray answer = QJsonDocument(rootObjAns).toJson(QJsonDocument::Compact);
+
+    qInfo().noquote() << QString("User %1 getting user properties").arg(pUserCon->m_userName);
+
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_USER_PROPS, answer);
+}
+
+MessageProtocol* cConTcpMainData::getUserChangeReadableName(UserConData* pUserCon, MessageProtocol* request)
+{
+    QByteArray  data(request->getPointerToData());
+    QJsonObject rootObj      = QJsonDocument::fromJson(data).object();
+    QString     readableName = rootObj.value("reableName").toString();
+
+    if (!this->m_pListedUser->userChangeReadName(pUserCon->m_userName, readableName))
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_USER_CHANGE_READNAME, ERROR_CODE_COMMON);
+
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_USER_CHANGE_READNAME, ERROR_CODE_SUCCESS);
+}
+
+MessageProtocol* cConTcpMainData::getUserChangePassword(UserConData* pUserCon, MessageProtocol* request)
+{
+    QByteArray  data(request->getPointerToData());
+    QJsonObject rootObj         = QJsonDocument::fromJson(data).object();
+    QString     newPassword     = rootObj.value("new").toString();
+    QString     currentPassword = rootObj.value("current").toString();
+
+    bool rValue;
+    rValue = this->m_pListedUser->userCheckPasswordHash(pUserCon->m_userName, currentPassword, pUserCon->m_randomLogin);
+    if (!rValue)
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN, ERROR_CODE_WRONG_PASSWORD);
+
+    rValue = this->m_pListedUser->userChangePasswordHash(pUserCon->m_userName, newPassword);
+    if (rValue)
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN, ERROR_CODE_SUCCESS);
+    else
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN, ERROR_CODE_COMMON);
+}
+
 quint16 cConTcpMainData::getFreeDataPort()
 {
+    QMutexLocker lock(&this->m_mutex);
+
     quint16 retPort = TCP_PORT + 1;
     do {
         bool bAlreadyUsed = false;

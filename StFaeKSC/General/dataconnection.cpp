@@ -53,17 +53,14 @@ MessageProtocol* DataConnection::requestCheckUserLogin(MessageProtocol* msg)
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_LOGIN_USER, ERROR_CODE_WRONG_SIZE);
 
     QString passw(QByteArray(pData + 2, size));
-    bool    rValue;
     if (msg->getVersion() == MSG_HEADER_VERSION_START)
-        rValue = this->m_pGlobalData->m_UserList.userCheckPassword(this->m_pUserConData->m_userName, passw);
+        result = this->m_pGlobalData->m_UserList.userCheckPassword(this->m_pUserConData->m_userName, passw);
     else
-        rValue = this->m_pGlobalData->m_UserList.userCheckPasswordHash(this->m_pUserConData->m_userName, passw, this->m_pUserConData->m_randomLogin);
-    if (rValue) {
-        result                               = ERROR_CODE_SUCCESS;
+        result = this->m_pGlobalData->m_UserList.userCheckPasswordHash(this->m_pUserConData->m_userName, passw, this->m_pUserConData->m_randomLogin);
+    if (result == ERROR_CODE_SUCCESS) {
         this->m_pUserConData->m_bIsConnected = true;
         qInfo().noquote() << QString("User %1 logged in").arg(this->m_pUserConData->m_userName);
     } else {
-        result                               = ERROR_CODE_WRONG_PASSWORD;
         this->m_pUserConData->m_bIsConnected = false;
         qWarning().noquote() << QString("User %1 tried to login with wrong password").arg(this->m_pUserConData->m_userName);
     }

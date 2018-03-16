@@ -16,37 +16,43 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CSTASETTINGSMANAGER_H
-#define CSTASETTINGSMANAGER_H
+#ifndef CSTAGLOBALSETTINGS_H
+#define CSTAGLOBALSETTINGS_H
 
 #include <QObject>
-#include <QtCore/QSettings>
 
 #include "../Common/General/cgendisposer.h"
+#include "../Common/Network/messageprotocol.h"
 
-class cStaSettingsManager : public cGenDisposer
+class cStaGlobalSettings : public cGenDisposer
 {
     Q_OBJECT
 public:
-    explicit cStaSettingsManager(QObject* parent = nullptr);
+    explicit cStaGlobalSettings(QObject* parent = nullptr);
 
     qint32 initialize() override;
 
-    qint32 getValue(const QString group, const QString key, QString& value);
-    qint32 setValue(const QString group, const QString key, const QString value);
-    qint32 getBoolValue(const QString group, const QString key, bool& value);
-    qint32 setBoolValue(const QString group, const QString key, const bool value);
+    qint32 startGettingVersionInfo();
+    qint32 handleVersionResponse(MessageProtocol* msg);
+
+    void setAlreadyConnected(const bool con);
+
+    QString getRemoteVersion();
+    QString getUpdateLink();
+    QString getVersionInfo();
 
 signals:
 
 public slots:
 
 private:
-    QSettings* m_pMainUserSettings;
+    QString m_versionInfo;
+    QString m_remoteVersion;
+    QString m_updateLink;
 
-    qint32 setValue(const QString group, const QString key, const QVariant value);
+    bool m_bAlreadyConnected;
 };
 
-extern cStaSettingsManager g_StaSettingsManager;
+extern cStaGlobalSettings g_StaGlobalSettings;
 
-#endif // CSTASETTINGSMANAGER_H
+#endif // CSTAGLOBALSETTINGS_H

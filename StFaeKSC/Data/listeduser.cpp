@@ -210,12 +210,12 @@ bool ListedUser::userCheckPassword(QString name, QString passw)
     return false;
 }
 
-bool ListedUser::userCheckPasswordHash(QString name, QString hash, QString random)
+qint32 ListedUser::userCheckPasswordHash(QString name, QString hash, QString random)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
     if (name.length() < MIN_SIZE_USERNAME)
-        return false;
+        return ERROR_CODE_WRONG_SIZE;
 
     for (int i = 0; i < this->getNumberOfInternalList(); i++) {
         UserLogin* pLogin = (UserLogin*)(this->getItemFromArrayIndex(i));
@@ -225,11 +225,11 @@ bool ListedUser::userCheckPasswordHash(QString name, QString hash, QString rando
 
             QString passWordWithRandowm = this->createHashPassword(pLogin->m_password, random);
             if (passWordWithRandowm == hash)
-                return true;
-            return false;
+                return ERROR_CODE_SUCCESS;
+            return ERROR_CODE_WRONG_PASSWORD;
         }
     }
-    return false;
+    return ERROR_CODE_NOT_FOUND;
 }
 
 bool ListedUser::userChangePassword(QString name, QString passw)

@@ -75,7 +75,7 @@ public:
     int showAllUsers();
 
     bool userCheckPassword(QString name, QString passw);
-    bool userCheckPasswordHash(QString name, QString hash, QString random);
+    qint32 userCheckPasswordHash(QString name, QString hash, QString random);
     bool userChangePassword(QString name, QString passw);
     bool userChangePasswordHash(QString name, QString passw);
     bool userChangeProperties(QString name, quint32 props);

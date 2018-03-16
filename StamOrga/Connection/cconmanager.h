@@ -39,8 +39,6 @@ public:
     qint32 initialize();
 
     qint32 startMainConnection(QString name, QString passw);
-    //    qint32 startGettingVersionInfo();
-    //    qint32 startGettingUserProps();
     //    qint32 startGettingUserEvents();
     //    qint32 startSettingUserEvents(qint64 eventID, qint32 status);
     //    bool startUpdatePassword(QString newPassWord);
@@ -84,13 +82,16 @@ public:
 
     //    ConnectionInfo *GetConnectionInfo() { return &this->m_conInfo; }
 
+    void sendLoginRequest();
+    void sendNewRequest(TcpDataConRequest* request);
+
 signals:
-    void sNotifyConnectionFinished(const qint32 result, const QString msg);
+    void signalNotifyConnectionFinished(const qint32 result, const QString msg);
     //    void sNotifyVersionRequest(qint32 result, QString msg);
     //    //    void sNotifyUserPropertiesRequest(qint32 result);
     //    void sNotifyUpdatePasswordRequest(qint32 result, QString newPassWord);
 
-    //    void sNotifyCommandFinished(quint32 command, qint32 result);
+    void signalNotifyCommandFinished(quint32 command, qint32 result);
 
     //    void sStartSendMainConRequest(QString name);
 
@@ -104,7 +105,7 @@ private slots:
     void slMainConReqFin(qint32 result, const QString msg, const QString salt, const QString random);
     void slotDataConnnectionFinished(qint32 result, const QString msg);
 
-    //    void slDataConLastRequestFinished(DataConRequest request);
+    void slotDataConLastRequestFinished(TcpDataConRequest* request);
 
 private:
     BackgroundController m_ctrlMainCon;
@@ -119,21 +120,16 @@ private:
 
     //    qint64 m_lastSuccessTimeStamp;
 
-    //    QList<DataConRequest> m_lErrorMainCon;
+    QList<TcpDataConRequest*> m_lRequestConError;
 
-    void sendLoginRequest();
-    void sendNewRequest(TcpDataConRequest* request);
 
-    //    void checkTimeoutResult(qint32 result);
+    void checkTimeoutResult(qint32 result);
 
     QString m_mainConRequestUserName;
     QString m_mainConRequestPassWord;
     QString m_mainConRequestSalt;
     QString m_mainConRequestRandom;
     quint16 m_mainConRequestDataPort;
-
-    QCryptographicHash* m_hash = NULL;
-    QString             createHashValue(const QString first, const QString second);
 
     void startDataConnection();
     void stopDataConnection();

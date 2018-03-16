@@ -20,6 +20,7 @@
 #define CCONTCPDATASERVER_H
 
 #include <QtCore/QList>
+#include <QtCore/QMutex>
 #include <QtCore/QObject>
 #include <QtNetwork/QTcpServer>
 
@@ -49,12 +50,18 @@ private slots:
     void slotSocketConnected();
     void slotConnectionTimeoutFired();
     void slotDataSocketError(QAbstractSocket::SocketError socketError);
+    void readyReadDataPort();
 
 private:
-    QTcpServer*  m_pTcpDataServer = NULL;
-    UserConData* m_pUserConData   = NULL;
-    QTimer*      m_pConTimeout    = NULL;
-    QTcpSocket*  m_pTcpDataSocket = NULL;
+    QTcpServer*   m_pTcpDataServer = NULL;
+    UserConData*  m_pUserConData   = NULL;
+    QTimer*       m_pConTimeout    = NULL;
+    QTcpSocket*   m_pTcpDataSocket = NULL;
+    MessageBuffer m_msgBuffer;
+    QMutex        m_mutex;
+
+    void             checkNewOncomingData();
+    MessageProtocol* checkNewMessage(MessageProtocol* msg);
 };
 
 #endif // CCONTCPDATASERVER_H

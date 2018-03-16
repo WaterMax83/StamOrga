@@ -20,14 +20,16 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 
+
 #include "../Common/General/globalfunctions.h"
 #include "../Common/General/globaltiming.h"
 #include "../Common/Network/messagecommand.h"
 #include "../Common/Network/messageprotocol.h"
+#include "../cstaglobalsettings.h"
 #include "cconmanager.h"
-#include "cconsettings.h"
+#include "cconusersettings.h"
 
-#define TIMER_DIFF_MSEC 10 * 1000
+//#define TIMER_DIFF_MSEC 10 * 1000
 
 cConManager g_ConManager;
 
@@ -41,12 +43,6 @@ cConManager::cConManager(QObject* parent)
 qint32 cConManager::initialize()
 {
     qRegisterMetaType<TcpDataConRequest*>("DataConRequest*");
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 9, 0)
-    this->m_hash = new QCryptographicHash(QCryptographicHash::Sha3_512);
-#else
-    this->m_hash = new QCryptographicHash(QCryptographicHash::Keccak_512);
-#endif
 
     this->m_initialized = true;
 
@@ -66,7 +62,7 @@ qint32 cConManager::startMainConnection(QString name, QString passw)
 
     if (this->m_pMainCon == NULL) {
         this->m_pMainCon = new cConTcpMain();
-        qint32 rCode     = this->m_pMainCon->initialize(g_ConSettings.getIPAddr(), name);
+        qint32 rCode     = this->m_pMainCon->initialize(g_ConUserSettings.getIPAddr(), name);
         if (rCode != ERROR_CODE_SUCCESS)
             return rCode;
         connect(this->m_pMainCon, &cConTcpMain::connectionRequestFinished, this, &cConManager::slMainConReqFin);
@@ -80,20 +76,6 @@ qint32 cConManager::startMainConnection(QString name, QString passw)
 
     return ERROR_CODE_SUCCESS;
 }
-
-//qint32 cConManager::startGettingVersionInfo()
-//{
-//    DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_VERSION);
-//    this->sendNewRequest(req);
-//    return ERROR_CODE_SUCCESS;
-//}
-
-//qint32 cConManager::startGettingUserProps()
-//{
-//    DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_USER_PROPS);
-//    this->sendNewRequest(req);
-//    return ERROR_CODE_SUCCESS;
-//}
 
 //qint32 cConManager::startGettingUserEvents()
 //{
@@ -347,35 +329,31 @@ void cConManager::slMainConReqFin(qint32 result, const QString msg, const QStrin
         this->m_mainConRequestDataPort = result;
         this->m_mainConRequestSalt     = salt;
         this->m_mainConRequestRandom   = random;
+        g_ConUserSettings.setRandomLoginValue(random);
         this->startDataConnection();
 
-        if (g_ConSettings.getUserName() != m_mainConRequestUserName)
-            g_ConSettings.setUserName(m_mainConRequestUserName);
+        if (g_ConUserSettings.getUserName() != m_mainConRequestUserName)
+            g_ConUserSettings.setUserName(m_mainConRequestUserName);
 
         //        QThread::msleep(20);
 
         //        this->sendLoginRequest(mainConRequestPassWord);
         //        this->m_lastSuccessTimeStamp = QDateTime::currentMSecsSinceEpoch();
     } else {
-        //        qWarning().noquote() << QString("Error main connecting: %1").arg(msg);
-        //        this->m_ctrlMainCon.Stop();
-        //        this->m_pMainCon = NULL;
-        //        this->stopDataConnection();
+        qWarning().noquote() << QString("Error main connecting: %1").arg(msg);
+        this->stopDataConnection();
         this->m_bIsConnecting = false;
-        emit this->sNotifyConnectionFinished(result, msg);
+        emit this->signalNotifyConnectionFinished(result, msg);
 
-        //        if (result == ERROR_CODE_NO_USER)
-        //            g_GlobalSettings->updateConnectionStatus(false);
+        if (result == ERROR_CODE_NO_USER)
+            g_StaGlobalSettings.setAlreadyConnected(false);
 
-        //        while (this->m_lErrorMainCon.size() > 0) {
-        //            DataConRequest request = this->m_lErrorMainCon.last();
-        //            request.m_result       = result;
-        //            this->slDataConLastRequestFinished(request);
-        //            this->m_lErrorMainCon.removeLast();
-        //        }
-
-        //        if (result == ERROR_CODE_NO_USER) {
-        //        }
+        while (this->m_lRequestConError.size() > 0) {
+            TcpDataConRequest* request = this->m_lRequestConError.last();
+            request->m_result          = result;
+            this->slotDataConLastRequestFinished(request);
+            this->m_lRequestConError.removeLast();
+        }
     }
     this->m_ctrlMainCon.Stop();
     this->m_pMainCon = NULL;
@@ -383,35 +361,30 @@ void cConManager::slMainConReqFin(qint32 result, const QString msg, const QStrin
 
 void cConManager::slotDataConnnectionFinished(qint32 result, const QString msg)
 {
-    //    if (this->m_bIsConnecting)
-    //        emit this->sNotifyConnectionFinished(result, msg);
-    //    this->m_bIsConnecting = false;
-
-    //    this->stopDataConnection();
     if (result == ERROR_CODE_SUCCESS) {
         this->sendLoginRequest();
     } else {
-        emit this->sNotifyConnectionFinished(result, msg);
+        if (this->m_bIsConnecting)
+            emit this->signalNotifyConnectionFinished(result, msg);
         this->stopDataConnection();
     }
 }
 
-///*
-// * Functions for login
-// */
+/*
+ * Functions for login
+ */
 void cConManager::sendLoginRequest()
 {
     QString passWord = this->m_mainConRequestPassWord;
-    if (g_ConSettings.getSalt() == "")
-        passWord = this->createHashValue(passWord, this->m_mainConRequestSalt);
+    if (g_ConUserSettings.getSalt() == "")
+        passWord = g_ConUserSettings.createHashValue(passWord, this->m_mainConRequestSalt);
 
 
-    passWord = this->createHashValue(passWord, this->m_mainConRequestRandom);
+    passWord = g_ConUserSettings.createHashValue(passWord, this->m_mainConRequestRandom);
     QJsonObject rootObj;
     rootObj.insert("passWord", passWord);
 
-    TcpDataConRequest* req = new TcpDataConRequest();
-    req->m_request         = OP_CODE_CMD_REQ::REQ_LOGIN_USER;
+    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_LOGIN_USER);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
     this->sendNewRequest(req);
@@ -422,187 +395,175 @@ void cConManager::sendNewRequest(TcpDataConRequest* request)
     if (this->isDataConnectionActive()) {
         emit this->signalStartSendNewRequest(request);
     } else {
-        qInfo().noquote() << QString("Trying to restart connection from cConManager ") << QThread::currentThreadId();
-        this->startMainConnection(g_ConSettings.getUserName(), g_ConSettings.getPassWord());
-    }
-    //    qint64 now = QDateTime::currentMSecsSinceEpoch();
-    //    if ((now - this->m_lastSuccessTimeStamp) < (CON_RESET_TIMEOUT_MSEC - TIMER_DIFF_MSEC)) {
-    //        this->startDataConnection();
 
-    //        if ((now - this->m_lastSuccessTimeStamp) < (CON_LOGIN_TIMEOUT_MSEC - TIMER_DIFF_MSEC)) {
-    //            emit this->sStartSendNewRequest(request);
-    //            return;
-    //        } else {
-    //            this->m_lErrorMainCon.prepend(request);
-    //            if (this->m_lErrorMainCon.size() == 1) {
-    //                qInfo().noquote() << QString("Trying to reconnect from cConManager");
-    //                this->m_pGlobalData->setbIsConnected(false);
-    //                this->sendLoginRequest(this->m_pGlobalData->passWord());
-    //            }
-    //        }
-    //    } else {
-    //        this->m_lErrorMainCon.prepend(request);
-    //        if (this->m_lErrorMainCon.size() == 1) {
-    //            qInfo().noquote() << QString("Trying to restart connection from cConManager ") << QThread::currentThreadId();
-    //            this->startMainConnection(this->m_pGlobalData->userName(), this->m_pGlobalData->passWord());
-    //        }
-    //    }
+        this->m_lRequestConError.prepend(request);
+        if (this->m_lRequestConError.size() == 1) {
+            qInfo().noquote() << QString("Trying to restart connection from cConManager ");
+            this->startMainConnection(g_ConUserSettings.getUserName(), g_ConUserSettings.getPassWord());
+        }
+    }
 }
 
 
-//void cConManager::slDataConLastRequestFinished(DataConRequest request)
-//{
-//    this->checkTimeoutResult(request.m_result);
-
-//    switch (request.m_request) {
-//    case OP_CODE_CMD_REQ::REQ_LOGIN_USER:
-//        if (request.m_result == ERROR_CODE_SUCCESS) {
-//            this->startGettingVersionInfo();
-//            this->startGettingUserProps();
-//            QThread::msleep(10);
-//            this->m_pGlobalData->setbIsConnected(true);
-//            this->checkTimeoutResult(request.m_result); // call again to set last successfull timer
-//            while (this->m_lErrorMainCon.size() > 0) {
-//                this->sendNewRequest(this->m_lErrorMainCon.last());
-//                this->m_lErrorMainCon.removeLast();
-//            }
-//        } else {
-//            qWarning().noquote() << QString("Error Login: %1").arg(getErrorCodeString(request.m_result));
-//            while (this->m_lErrorMainCon.size() > 0) {
-//                DataConRequest newReq = this->m_lErrorMainCon.last();
-//                newReq.m_result       = request.m_result;
-//                this->slDataConLastRequestFinished(newReq);
-//                this->m_lErrorMainCon.removeLast();
-//            }
-//            if (request.m_result == ERROR_CODE_WRONG_PASSWORD)
-//                g_GlobalSettings->updateConnectionStatus(false);
-//        }
-
-//        emit this->sNotifyConnectionFinished(request.m_result);
-//        break;
-
-//    case OP_CODE_CMD_REQ::REQ_GET_VERSION:
-//        g_GlobalSettings->updateConnectionStatus(true);
-//        emit this->sNotifyVersionRequest(request.m_result, request.m_returnData);
-//        return;
-
-//    case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
-//        if (request.m_result == ERROR_CODE_SUCCESS) {
-//            this->startGettingUserEvents();
-//        }
-//        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
-
-//        break;
-
-//    case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
-//        if (request.m_result == ERROR_CODE_SUCCESS) {
-//            this->m_pGlobalData->setPassWord(request.m_returnData);
-//            this->m_pGlobalData->saveGlobalUserSettings();
-//        }
-
-//        emit this->sNotifyUpdatePasswordRequest(request.m_result, request.m_returnData);
-//        break;
-
-//    case OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME:
-//        if (request.m_result == ERROR_CODE_SUCCESS) {
-//            this->m_pGlobalData->setReadableName(request.m_returnData);
-//            this->m_pGlobalData->saveGlobalUserSettings();
-//        }
-
-//        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
-//        break;
-
-//    case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST: {
-
-//        static quint32 retryGetGamesInfoCount = 0;
-//        if (request.m_result == ERROR_CODE_UPDATE_LIST) {
-//            if (retryGetGamesInfoCount < 3) {
-//                this->startListGettingGames();
-//                retryGetGamesInfoCount++;
-//                return;
-//            }
-//        }
-//        this->startGettingUserProps();
-//        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
-//        retryGetGamesInfoCount = 0;
-//        break;
-//    }
-
-//    case OP_CODE_CMD_REQ::REQ_REMOVE_TICKET:
-//        this->m_pGlobalData->resetSeasonTicketLastServerUpdate();
-//        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
-//        break;
-
-//    case OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET:
-//        this->startGettingUserProps();
-//        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
-//        break;
-
-//    case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS: {
-
-//        static quint32 retryGetTicketCount = 0;
-//        if (request.m_result == ERROR_CODE_UPDATE_LIST || request.m_result == ERROR_CODE_MISSING_TICKET) {
-//            if (retryGetTicketCount < 3) {
-//                this->startListSeasonTickets();
-//                retryGetTicketCount++;
-//                return;
-//            }
-//        }
-//        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
-//        retryGetTicketCount = 0;
-//        break;
-//    }
-//    case OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO:
-//    case OP_CODE_CMD_REQ::REQ_GET_AWAYTRIP_INFO:
-//        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
-//        if (request.m_result == ERROR_CODE_NOT_FOUND)
-//            return;
-//        break;
-
-//    case OP_CODE_CMD_REQ::REQ_CHANGE_NEWS_DATA: {
-//        if (request.m_result != ERROR_CODE_SUCCESS)
-//            emit this->sNotifyCommandFinished(request.m_request, request.m_result);
-//        else {
-//            this->m_pGlobalData->createNewNewsDataItem(request.m_returnData.toInt(), request.m_lData[1], request.m_lData[2]);
-//            emit this->sNotifyCommandFinished(request.m_request, request.m_returnData.toInt());
-//        }
-//        break;
-//    }
-//    case OP_CODE_CMD_REQ::REQ_DEL_NEWS_DATA_ITEM:
-//        this->m_pGlobalData->resetNewsDataLastServerUpdate();
-//        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
-//        break;
-
-//    default:
-//        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
-//        break;
-//    }
-
-//    if (request.m_result != ERROR_CODE_SUCCESS)
-//        qWarning().noquote() << QString("Error receiving Command 0x%1 has result \"%2\"")
-//                                    .arg(QString::number(request.m_request, 16))
-//                                    .arg(getErrorCodeString(request.m_result));
-//}
-
-//void cConManager::checkTimeoutResult(qint32 result)
-//{
-//    if (result == ERROR_CODE_TIMEOUT) {
-//        this->stopDataConnection();
-//        this->m_lastSuccessTimeStamp = 0;
-//        emit this->sSendNewBindingPortRequest();
-//    } else if (this->m_pGlobalData->bIsConnected())
-//        this->m_lastSuccessTimeStamp = QDateTime::currentMSecsSinceEpoch();
-//}
-
-QString cConManager::createHashValue(const QString first, const QString second)
+void cConManager::slotDataConLastRequestFinished(TcpDataConRequest* request)
 {
-    this->m_hash->reset();
-    QByteArray tmp = first.toUtf8();
-    this->m_hash->addData(tmp.constData(), tmp.length());
-    tmp = second.toUtf8();
-    this->m_hash->addData(tmp.constData(), tmp.length());
+    this->checkTimeoutResult(request->m_result);
 
-    return QString(this->m_hash->result());
+    switch (request->m_request) {
+    case OP_CODE_CMD_REQ::REQ_LOGIN_USER:
+        if (request->m_result == ERROR_CODE_SUCCESS) {
+            g_StaGlobalSettings.startGettingVersionInfo();
+            g_ConUserSettings.startGettingUserProps();
+
+            while (this->m_lRequestConError.size() > 0) {
+                TcpDataConRequest* request = this->m_lRequestConError.last();
+                if (request->m_request != OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN)
+                    this->sendNewRequest(request);
+                else
+                    g_ConUserSettings.startUpdatePassword("");
+                this->m_lRequestConError.removeLast();
+            }
+            QString passWord = this->m_mainConRequestPassWord;
+            if (g_ConUserSettings.getSalt() == "")
+                passWord = g_ConUserSettings.createHashValue(passWord, this->m_mainConRequestSalt);
+
+            g_ConUserSettings.setSalt(this->m_mainConRequestSalt);
+            g_ConUserSettings.setPassWord(passWord);
+
+            emit this->signalNotifyConnectionFinished(request->m_result, "");
+        } else {
+            qWarning().noquote() << QString("Error Login: %1").arg(request->m_result);
+            while (this->m_lRequestConError.size() > 0) {
+                TcpDataConRequest* req = this->m_lRequestConError.last();
+                req->m_result          = request->m_result;
+                this->slotDataConLastRequestFinished(req);
+                this->m_lRequestConError.removeLast();
+            }
+            if (request->m_result == ERROR_CODE_WRONG_PASSWORD)
+                g_StaGlobalSettings.setAlreadyConnected(false);
+
+            g_ConUserSettings.setSalt("");
+            g_ConUserSettings.setPassWord("");
+            emit this->signalNotifyConnectionFinished(request->m_result, getErrorCodeString(request->m_result));
+        }
+
+        this->m_bIsConnecting = false;
+        break;
+
+        //    case OP_CODE_CMD_REQ::REQ_GET_VERSION:
+        //        g_GlobalSettings->updateConnectionStatus(true);
+        //        emit this->sNotifyVersionRequest(request.m_result, request.m_returnData);
+        //        return;
+
+        //    case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
+        //        if (request.m_result == ERROR_CODE_SUCCESS) {
+        //            this->startGettingUserEvents();
+        //        }
+        //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
+
+        //        break;
+
+        //    case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
+        //        if (request.m_result == ERROR_CODE_SUCCESS) {
+        //            this->m_pGlobalData->setPassWord(request.m_returnData);
+        //            this->m_pGlobalData->saveGlobalUserSettings();
+        //        }
+
+        //        emit this->sNotifyUpdatePasswordRequest(request.m_result, request.m_returnData);
+        //        break;
+
+        //    case OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME:
+        //        if (request.m_result == ERROR_CODE_SUCCESS) {
+        //            this->m_pGlobalData->setReadableName(request.m_returnData);
+        //            this->m_pGlobalData->saveGlobalUserSettings();
+        //        }
+
+        //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
+        //        break;
+
+        //    case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST: {
+
+        //        static quint32 retryGetGamesInfoCount = 0;
+        //        if (request.m_result == ERROR_CODE_UPDATE_LIST) {
+        //            if (retryGetGamesInfoCount < 3) {
+        //                this->startListGettingGames();
+        //                retryGetGamesInfoCount++;
+        //                return;
+        //            }
+        //        }
+        //        this->startGettingUserProps();
+        //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
+        //        retryGetGamesInfoCount = 0;
+        //        break;
+        //    }
+
+        //    case OP_CODE_CMD_REQ::REQ_REMOVE_TICKET:
+        //        this->m_pGlobalData->resetSeasonTicketLastServerUpdate();
+        //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
+        //        break;
+
+        //    case OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET:
+        //        this->startGettingUserProps();
+        //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
+        //        break;
+
+        //    case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS: {
+
+        //        static quint32 retryGetTicketCount = 0;
+        //        if (request.m_result == ERROR_CODE_UPDATE_LIST || request.m_result == ERROR_CODE_MISSING_TICKET) {
+        //            if (retryGetTicketCount < 3) {
+        //                this->startListSeasonTickets();
+        //                retryGetTicketCount++;
+        //                return;
+        //            }
+        //        }
+        //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
+        //        retryGetTicketCount = 0;
+        //        break;
+        //    }
+        //    case OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO:
+        //    case OP_CODE_CMD_REQ::REQ_GET_AWAYTRIP_INFO:
+        //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
+        //        if (request.m_result == ERROR_CODE_NOT_FOUND)
+        //            return;
+        //        break;
+
+        //    case OP_CODE_CMD_REQ::REQ_CHANGE_NEWS_DATA: {
+        //        if (request.m_result != ERROR_CODE_SUCCESS)
+        //            emit this->sNotifyCommandFinished(request.m_request, request.m_result);
+        //        else {
+        //            this->m_pGlobalData->createNewNewsDataItem(request.m_returnData.toInt(), request.m_lData[1], request.m_lData[2]);
+        //            emit this->sNotifyCommandFinished(request.m_request, request.m_returnData.toInt());
+        //        }
+        //        break;
+        //    }
+        //    case OP_CODE_CMD_REQ::REQ_DEL_NEWS_DATA_ITEM:
+        //        this->m_pGlobalData->resetNewsDataLastServerUpdate();
+        //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
+        //        break;
+
+    default:
+        emit this->signalNotifyCommandFinished(request->m_request, request->m_result);
+        break;
+    }
+
+    if (request->m_result != ERROR_CODE_SUCCESS)
+        qWarning().noquote() << QString("Error receiving Command 0x%1 has result \"%2\"")
+                                    .arg(request->m_request, 8, 16)
+                                    .arg(getErrorCodeString(request->m_result));
+
+    delete request;
+}
+
+void cConManager::checkTimeoutResult(qint32 result)
+{
+    if (result == ERROR_CODE_TIMEOUT) {
+        this->stopDataConnection();
+        //        this->m_lastSuccessTimeStamp = 0;
+        //        emit this->sSendNewBindingPortRequest();
+        //    } else if (this->m_pGlobalData->bIsConnected())
+        //        this->m_lastSuccessTimeStamp = QDateTime::currentMSecsSinceEpoch();
+    }
 }
 
 void cConManager::startDataConnection()
@@ -613,14 +574,14 @@ void cConManager::startDataConnection()
     }
 
     this->m_pDataCon = new cConTcpData();
-    this->m_pDataCon->initialize(g_ConSettings.getIPAddr(), this->m_mainConRequestDataPort);
+    this->m_pDataCon->initialize(g_ConUserSettings.getIPAddr(), this->m_mainConRequestDataPort);
 
     connect(this->m_pDataCon, &cConTcpData::signalDataConnectionFinished,
             this, &cConManager::slotDataConnnectionFinished);
     connect(this, &cConManager::signalStartSendNewRequest,
             this->m_pDataCon, &cConTcpData::startSendNewRequest);
-    //        connect(this->m_pDataCon, &cConTcpData::notifyLastRequestFinished,
-    //                this, &cConManager::slDataConLastRequestFinished);
+    connect(this->m_pDataCon, &cConTcpData::notifyLastRequestFinished,
+            this, &cConManager::slotDataConLastRequestFinished);
 
     this->m_ctrlDataCon.Start(this->m_pDataCon, false);
 
@@ -631,6 +592,8 @@ void cConManager::stopDataConnection()
 {
     //    this->m_pGlobalData->setbIsConnected(false);
 
+    this->m_bIsConnecting = false;
+
     if (!this->isDataConnectionActive())
         return;
 
@@ -638,8 +601,8 @@ void cConManager::stopDataConnection()
                this, &cConManager::slotDataConnnectionFinished);
     disconnect(this, &cConManager::signalStartSendNewRequest,
                this->m_pDataCon, &cConTcpData::startSendNewRequest);
-    //    disconnect(this->m_pDataCon, &cConTcpData::notifyLastRequestFinished,
-    //               this, &cConManager::slDataConLastRequestFinished);
+    disconnect(this->m_pDataCon, &cConTcpData::notifyLastRequestFinished,
+               this, &cConManager::slotDataConLastRequestFinished);
 
     this->m_pDataCon->terminate();
     this->m_ctrlDataCon.Stop();
@@ -650,8 +613,6 @@ void cConManager::stopDataConnection()
 
 cConManager::~cConManager()
 {
-    if (this->m_hash)
-        delete this->m_hash;
 
     //    if (this->isMainConnectionActive())
     //        this->m_ctrlMainCon.Stop();

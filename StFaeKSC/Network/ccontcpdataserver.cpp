@@ -25,7 +25,7 @@
 cConTcpDataServer::cConTcpDataServer()
     : BackgroundWorker()
 {
-    this->SetWorkerName("TCPDataServer");
+    //    this->SetWorkerName("TCPDataServer");
 }
 
 qint32 cConTcpDataServer::initialize(UserConData* pData)
@@ -43,6 +43,8 @@ int cConTcpDataServer::DoBackgroundWork()
 {
     if (!this->m_initialized)
         return ERROR_CODE_NOT_INITIALIZED;
+
+    QMutexLocker lock(&this->m_mutex);
 
     this->m_pTcpDataServer = new QTcpServer(this);
     if (!this->m_pTcpDataServer->listen(QHostAddress::Any, this->m_pUserConData->m_dstDataPort)) {
@@ -63,6 +65,8 @@ int cConTcpDataServer::DoBackgroundWork()
 
 void cConTcpDataServer::slotSocketConnected()
 {
+    QMutexLocker lock(&this->m_mutex);
+
     while (this->m_pTcpDataServer->hasPendingConnections()) {
         QTcpSocket* socket = this->m_pTcpDataServer->nextPendingConnection();
         if (socket == NULL)
@@ -82,54 +86,127 @@ void cConTcpDataServer::slotSocketConnected()
             continue;
         }
 
+        QString tmp = QString("Connected %1").arg(this->m_pUserConData->m_dstDataPort);
+        CONSOLE_INFO(tmp);
+
         this->m_pTcpDataSocket = socket;
         typedef void (QAbstractSocket::*QAbstractSocketErrorSignal)(QAbstractSocket::SocketError);
         connect(this->m_pTcpDataSocket, static_cast<QAbstractSocketErrorSignal>(&QAbstractSocket::error), this, &cConTcpDataServer::slotDataSocketError);
-
-        //        UserMainConnection* pMain = new UserMainConnection();
-        //        pMain->m_pMainSocket      = new cConTcpMainSocket();
-        //        pMain->m_pctrlMainSocket  = new BackgroundController();
-        //        pMain->m_remotePort       = socket->peerPort();
-        //        pMain->m_pMainSocket->initialize(socket);
-        //        this->connect(pMain->m_pMainSocket, &cConTcpMainSocket::signalSocketClosed, this, &cConTcpDataServer::slotSocketClosed);
-        //        pMain->m_pctrlMainSocket->Start(pMain->m_pMainSocket, false);
-
-        //        this->m_lUserMainCons.append(pMain);
+        connect(this->m_pTcpDataSocket, &QTcpSocket::readyRead, this, &cConTcpDataServer::readyReadDataPort);
     }
 }
 
 void cConTcpDataServer::slotConnectionTimeoutFired()
 {
-    emit this->signalServerClosed(this->m_pUserConData->m_dstDataPort);
+    QMutexLocker lock(&this->m_mutex);
+
     this->m_pTcpDataServer->close();
+
+    if (this->m_pTcpDataSocket != NULL)
+        delete this->m_pTcpDataSocket;
+    this->m_pTcpDataSocket = NULL;
+
+    QString tmp = QString("Timeout %1").arg(this->m_pUserConData->m_dstDataPort);
+    CONSOLE_INFO(tmp);
+
+    emit this->signalServerClosed(this->m_pUserConData->m_dstDataPort);
 }
 
 void cConTcpDataServer::slotDataSocketError(QAbstractSocket::SocketError socketError)
 {
+    QMutexLocker lock(&this->m_mutex);
+
     Q_UNUSED(socketError);
+
+    QString tmp = QString("Error %1").arg(this->m_pUserConData->m_dstDataPort);
+    CONSOLE_INFO(tmp);
 
     emit this->signalServerClosed(this->m_pUserConData->m_dstDataPort);
 }
 
+void cConTcpDataServer::readyReadDataPort()
+{
+    QMutexLocker lock(&this->m_mutex);
 
-//void cConTcpDataServer::slotSocketClosed(quint16 remotePort)
-//{
-//    for (int i = 0; i < this->m_lUserMainCons.size(); i++) {
-//        if (this->m_lUserMainCons[i]->m_remotePort == remotePort) {
-//            //            qInfo().noquote() << QString("Connection timeout for user %1 with port %2").arg(this->m_lUserCons[i].userConData.m_userName).arg(port);
-//            this->m_lUserMainCons[i]->m_pMainSocket->terminate();
-//            this->m_lUserMainCons[i]->m_pctrlMainSocket->Stop();
-//            delete this->m_lUserMainCons[i]->m_pctrlMainSocket;
-//            this->m_lUserMainCons.removeAt(i);
-//            return;
-//        }
-//    }
-//}
+    if (this->m_pTcpDataSocket == NULL)
+        return;
+
+    QString tmp = QString("Data %1").arg(this->m_pUserConData->m_dstDataPort);
+    CONSOLE_INFO(tmp);
+
+    QByteArray datagram = this->m_pTcpDataSocket->readAll();
+    this->m_msgBuffer.StoreNewData(datagram);
+
+    this->checkNewOncomingData();
+}
+
+void cConTcpDataServer::checkNewOncomingData()
+{
+    MessageProtocol* msg;
+
+    while ((msg = this->m_msgBuffer.GetNextMessage()) != NULL) {
+
+        MessageProtocol* ack = checkNewMessage(msg);
+
+        if (ack != NULL) {
+
+            quint32     sendBytes       = 0;
+            quint32     totalPacketSize = ack->getNetworkSize();
+            const char* pData           = ack->getNetworkProtocol();
+
+            do {
+                quint32 currentSendSize;
+                if ((totalPacketSize - sendBytes) > MAX_DATAGRAMM_SIZE)
+                    currentSendSize = MAX_DATAGRAMM_SIZE;
+                else
+                    currentSendSize = totalPacketSize - sendBytes;
+
+                qint64 rValue = this->m_pTcpDataSocket->write(pData + sendBytes, currentSendSize);
+                if (rValue < 0)
+                    break;
+                sendBytes += rValue;
+                //                QThread::msleep(25);
+            } while (sendBytes < totalPacketSize);
+
+            delete ack;
+        }
+        delete msg;
+    }
+}
+
+MessageProtocol* cConTcpDataServer::checkNewMessage(MessageProtocol* msg)
+{
+    MessageProtocol* ack = NULL;
+
+    if (this->m_pUserConData->m_bIsConnected && msg->getIndex() != OP_CODE_CMD_REQ::REQ_LOGIN_USER) {
+        //        ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_NOT_LOGGED_IN);
+        switch (msg->getIndex()) {
+        case OP_CODE_CMD_REQ::REQ_GET_VERSION:
+            ack = g_ConTcpMainData.getUserCheckVersion(this->m_pUserConData, msg);
+            break;
+        case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
+            ack = g_ConTcpMainData.getUserProperties(this->m_pUserConData, msg);
+            break;
+        case OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME:
+            ack = g_ConTcpMainData.getUserChangeReadableName(this->m_pUserConData, msg);
+            break;
+        case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
+            ack = g_ConTcpMainData.getUserChangePassword(this->m_pUserConData, msg);
+            break;
+        }
+    } else if (msg->getIndex() == OP_CODE_CMD_REQ::REQ_LOGIN_USER) {
+        ack = g_ConTcpMainData.getUserCheckLogin(this->m_pUserConData, msg);
+    } else
+        ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_NOT_LOGGED_IN);
+    return ack;
+}
 
 qint32 cConTcpDataServer::terminate()
 {
     if (!this->m_initialized)
         return ERROR_CODE_NOT_INITIALIZED;
+
+    QMutexLocker lock(&this->m_mutex);
 
     if (this->m_pTcpDataServer != NULL)
         this->m_pTcpDataServer->deleteLater();
@@ -142,6 +219,10 @@ qint32 cConTcpDataServer::terminate()
     if (this->m_pConTimeout != NULL)
         this->m_pConTimeout->deleteLater();
     this->m_pConTimeout = NULL;
+
+    if (this->m_pTcpDataSocket != NULL)
+        this->m_pTcpDataSocket->deleteLater();
+    this->m_pTcpDataSocket = NULL;
 
     this->m_initialized = false;
 

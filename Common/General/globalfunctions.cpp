@@ -107,6 +107,8 @@ QString getErrorCodeString(qint32 code)
         return QString("A Parameter is missing: %1").arg(code);
     case ERROR_CODE_NOT_INITIALIZED:
         return QString("Nicht initialisiert: %1").arg(code);
+    case ERROR_CODE_NOT_LOGGED_IN:
+        return QString("Nicht eingeloggt: %1").arg(code);
     default:
         return QString("Unbekannter Fehler: %1").arg(code);
     }

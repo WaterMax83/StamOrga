@@ -28,9 +28,11 @@ SOURCES += main.cpp\
     ../Connection/cconmanager.cpp \
     ../Connection/ccontcpmain.cpp \
     ../Connection/ccontcpdata.cpp \
-    ../Connection/cconsettings.cpp \
     ../cstaglobalmanager.cpp \
     ../cstasettingsmanager.cpp \
+    ../cstaglobalsettings.cpp \
+    ../Connection/cconusersettings.cpp \
+    ../Data/cdatappinfomanager.cpp
 
 
 
@@ -47,9 +49,11 @@ HEADERS  += mainwindow.h \
     ../Connection/cconmanager.h \
     ../Connection/ccontcpmain.h \
     ../Connection/ccontcpdata.h \
-    ../Connection/cconsettings.h \
     ../cstaglobalmanager.h \
     ../cstasettingsmanager.h \
+    ../cstaglobalsettings.h \
+    ../Connection/cconusersettings.h \
+    ../Data/cdatappinfomanager.h
 
 
 
