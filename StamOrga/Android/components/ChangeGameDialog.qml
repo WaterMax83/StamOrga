@@ -144,6 +144,21 @@ MyComponents.CustomDialog {
             implicitWidth: parent.width
             model: ["1.Bundesliga", "2.Bundesliga", "3.Liga", "DFB Pokal", "Badischer Pokal", "TestSpiel"]
             KeyNavigation.tab: inputDate
+//            onCurrentIndexChanged:  spBoxSeasonIndex.to = 38;
+            onCurrentTextChanged: {
+                if (currentText === "1.Bundesliga")
+                    spBoxSeasonIndex.to = 34;
+                else if (currentText === "2.Bundesliga")
+                    spBoxSeasonIndex.to = 34;
+                else if (currentText === "3.Liga")
+                    spBoxSeasonIndex.to = 38;
+                else if (currentText === "DFB Pokal")
+                    spBoxSeasonIndex.to = 10;
+                else if (currentText === "Badischer Pokal")
+                    spBoxSeasonIndex.to = 10;
+                else if (currentText === "TestSpiel")
+                    spBoxSeasonIndex.to = 34;
+            }
         }
 
         Rectangle {

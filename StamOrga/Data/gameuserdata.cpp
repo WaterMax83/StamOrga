@@ -51,14 +51,14 @@ int GameUserData::initialize()
     this->m_settings = new QSettings();
     this->m_settings->setIniCodec(("UTF-8"));
 
-    qint32 currentSeason;
-    QDate  date = QDate::currentDate();
-    if (date.month() >= 6)
-        currentSeason = date.year();
-    else
-        currentSeason = date.year() - 1;
+    //    qint32 currentSeason;
+    //    QDate  date = QDate::currentDate();
+    //    if (date.month() >= 6)
+    //        currentSeason = date.year();
+    //    else
+    //        currentSeason = date.year() - 1;
 
-    bool bSaveAgain = false;
+    //    bool bSaveAgain = false;
     this->m_settings->beginGroup(GROUP_FAVGAME);
     int count = this->m_settings->beginReadArray("item");
     for (int i = 0; i < count; i++) {
@@ -67,14 +67,16 @@ int GameUserData::initialize()
         fGame->m_gameIndex = this->m_settings->value(VAL_GAME_INDEX).toInt();
         fGame->m_favIndex  = this->m_settings->value(VAL_FAV_INDEX).toInt();
 
-        /* remove games which are older */
-        GamePlay* game = g_GlobalData->getGamePlay(fGame->m_gameIndex);
-        if (game != NULL) {
-            if (game->seasonIndex() < currentSeason) {
-                bSaveAgain = true;
-                continue;
-            }
-        }
+        //        /* remove games which are older */
+        //        GamePlay* game = g_GlobalData->getGamePlay(fGame->m_gameIndex);
+        //        if (game != NULL) {
+        //            qDebug() << game->seasonIndex();
+        //            qDebug() << currentSeason;
+        //            if (game->seasonIndex() < currentSeason) {
+        //                bSaveAgain = true;
+        //                continue;
+        //            }
+        //        }
 
         this->m_lFavGames.append(fGame);
     }
@@ -82,21 +84,21 @@ int GameUserData::initialize()
     this->m_settings->endArray();
     this->m_settings->endGroup();
 
-    if (bSaveAgain) {
-        this->m_settings->beginGroup(GROUP_FAVGAME);
-        this->m_settings->remove("");
-        this->m_settings->beginWriteArray("item");
+    //    if (bSaveAgain) {
+    //        this->m_settings->beginGroup(GROUP_FAVGAME);
+    //        this->m_settings->remove("");
+    //        this->m_settings->beginWriteArray("item");
 
-        for (int i = 0; i < this->m_lFavGames.count(); i++) {
-            this->m_settings->setArrayIndex(i);
+    //        for (int i = 0; i < this->m_lFavGames.count(); i++) {
+    //            this->m_settings->setArrayIndex(i);
 
-            this->m_settings->setValue(VAL_GAME_INDEX, this->m_lFavGames.at(i)->m_gameIndex);
-            this->m_settings->setValue(VAL_FAV_INDEX, this->m_lFavGames.at(i)->m_favIndex);
-        }
+    //            this->m_settings->setValue(VAL_GAME_INDEX, this->m_lFavGames.at(i)->m_gameIndex);
+    //            this->m_settings->setValue(VAL_FAV_INDEX, this->m_lFavGames.at(i)->m_favIndex);
+    //        }
 
-        this->m_settings->endArray();
-        this->m_settings->endGroup();
-    }
+    //        this->m_settings->endArray();
+    //        this->m_settings->endGroup();
+    //    }
 
     this->m_initialized = true;
 

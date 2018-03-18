@@ -215,7 +215,7 @@ qint32 ConnectionHandling::startChangeGame(const quint32 index, const quint32 sI
                                            const QString away, const QString date,
                                            const QString score)
 {
-    if (sIndex > 34 || competition == "" || home == "" || away == "" || date == "") {
+    if (sIndex > 38 || competition == "" || home == "" || away == "" || date == "") {
         qWarning().noquote() << "Standart parameter for changing game are wrong";
         return ERROR_CODE_WRONG_PARAMETER;
     }

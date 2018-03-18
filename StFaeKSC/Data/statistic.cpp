@@ -159,6 +159,11 @@ void Statistic::slotCycleTimerFired()
     }
 
     foreach (MeetingInfo* pMeetingInfo, g_GlobalData->m_meetingInfos) {
+        GamesPlay* pGame = (GamesPlay*)g_GlobalData->m_GamesList.getItem(pMeetingInfo->getGameIndex());
+
+        if (pGame == NULL || pGame->m_saison != g_GlobalData->m_currentSeason || pGame->m_timestamp > currentTimeStamp)
+            continue;
+
         for (int i = 0; i < pMeetingInfo->getNumberOfInternalList(); i++) {
             AcceptMeetingInfo* pInfo = (AcceptMeetingInfo*)pMeetingInfo->getRequestConfigItemFromListIndex(i);
             if (pInfo == NULL)
@@ -188,6 +193,11 @@ void Statistic::slotCycleTimerFired()
     }
 
     foreach (AwayTripInfo* pMeetingInfo, g_GlobalData->m_awayTripInfos) {
+        GamesPlay* pGame = (GamesPlay*)g_GlobalData->m_GamesList.getItem(pMeetingInfo->getGameIndex());
+
+        if (pGame == NULL || pGame->m_saison != g_GlobalData->m_currentSeason || pGame->m_timestamp > currentTimeStamp)
+            continue;
+
         for (int i = 0; i < pMeetingInfo->getNumberOfInternalList(); i++) {
             AcceptMeetingInfo* pInfo = (AcceptMeetingInfo*)pMeetingInfo->getRequestConfigItemFromListIndex(i);
             if (pInfo == NULL)

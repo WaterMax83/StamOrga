@@ -95,7 +95,7 @@ qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol* msg)
     qint32  properties   = rootObj.value("property").toInt(0);
     QString readableName = rootObj.value("readableName").toString();
 
-    qInfo().noquote() << rootObj.value("tickets");
+    //    qInfo().noquote() << rootObj.value("tickets");
 
     this->m_pGlobalData->setUserIndex(index);
 

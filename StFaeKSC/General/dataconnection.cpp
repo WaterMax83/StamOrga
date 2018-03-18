@@ -501,7 +501,7 @@ MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol* msg)
             continue;
 
 #ifndef QT_DEBUG
-        if (pGame->m_timestamp < currentTime + 2 * MSEC_PER_HOUR)
+        if (pGame->m_timestamp + 2 * MSEC_PER_HOUR < currentTime)
             continue;
 #endif
         quint16 freeTickets     = this->m_pGlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_FREE);
@@ -924,7 +924,7 @@ MessageProtocol* DataConnection::requestChangeGame(MessageProtocol* msg)
     quint32          sIndex = parts[5].toUInt();
     CompetitionIndex comp   = CompetitionIndex(parts[6].toUInt());
 
-    /* game already exists, shouls only be changed */
+    /* game already exists, should only be changed */
     if (index > 0) {
         quint16 saison;
         QDate   date = QDateTime::fromMSecsSinceEpoch(timestamp).date();

@@ -202,8 +202,8 @@ Flickable {
                     dialog.homeTeam = menuSender.home;
                     dialog.awayTeam = menuSender.away;
                     dialog.score = menuSender.score;
-                    dialog.seasonIndex = menuSender.seasonIndex;
                     dialog.competitionIndex = menuSender.competitionValue() - 1;
+                    dialog.seasonIndex = menuSender.seasonIndex;
                     dialog.date = menuSender.timestamp;
                     dialog.index = menuSender.index;
                     dialog.font.family= txtForFontFamily.font
