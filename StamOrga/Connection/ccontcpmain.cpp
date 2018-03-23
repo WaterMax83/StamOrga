@@ -25,8 +25,8 @@
 #include "General/globaltiming.h"
 #include "Network/messagecommand.h"
 #include "Network/messageprotocol.h"
-#include "cconusersettings.h"
 #include "ccontcpmain.h"
+#include "cconusersettings.h"
 
 cConTcpMain::cConTcpMain()
     : BackgroundWorker()
@@ -103,7 +103,7 @@ void cConTcpMain::slotMasterSocketConnected()
 void cConTcpMain::slotMainSocketError(QAbstractSocket::SocketError socketError)
 {
     qCritical().noquote() << QString("Socket Error %1 - %2 ").arg(socketError).arg(this->m_pMasterTcpSocket->errorString());
-    emit this->connectionRequestFinished(ERROR_CODE_COMMON, this->m_pMasterTcpSocket->errorString(), "", "");
+    emit this->connectionRequestFinished(ERROR_CODE_NO_CONNECTION, this->m_pMasterTcpSocket->errorString(), "", "");
 }
 
 void cConTcpMain::slotConnectionTimeoutFired()

@@ -20,6 +20,8 @@
 #define CSTAGLOBALMANAGER_H
 
 #include <QObject>
+#include <QtQml/QQmlApplicationEngine>
+#include <QtQml/QQmlContext>
 
 #include "../Common/General/cgendisposer.h"
 
@@ -31,6 +33,8 @@ public:
     explicit cStaGlobalManager(QObject* parent = nullptr);
 
     qint32 initialize();
+
+    void setQmlInformationClasses(QQmlApplicationEngine* engine);
 
 signals:
 

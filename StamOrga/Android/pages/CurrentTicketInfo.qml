@@ -297,7 +297,7 @@ Flickable {
             id: menuItemReserve
             font.family: txtForFontFamily.font
             text: "Reservieren"
-            onClicked: reserveTicketItem("Reserviere für", globalUserData.readableName);
+            onClicked: reserveTicketItem("Reserviere für", gConUserSettings.getReadableName());
         }
 
         MenuItem {
@@ -360,9 +360,9 @@ Flickable {
         listViewModelReservedTickets.clear()
         listViewModelFreeTickets.clear()
 
-        if (result === 1 && globalUserData.getSeasonTicketLength() > 0) {
-            for (var i = 0; i < globalUserData.getSeasonTicketLength(); i++) {
-                var seasonTicketItem = globalUserData.getSeasonTicketFromArrayIndex(i)
+        if (result === 1 && gDataTicketManager.getSeasonTicketLength() > 0) {
+            for (var i = 0; i < gDataTicketManager.getSeasonTicketLength(); i++) {
+                var seasonTicketItem = gDataTicketManager.getSeasonTicketFromArrayIndex(i)
                 var discount = seasonTicketItem.discount > 0 ? " *" : "";
                 if (seasonTicketItem.getTicketState() === 2) {
                     listViewModelFreeTickets.append({

@@ -43,8 +43,8 @@ public:
     QString getUserName();
     void    setUserName(const QString name);
 
-    QString getReadableName();
-    void    setReadableName(const QString name);
+    Q_INVOKABLE QString getReadableName();
+    void                setReadableName(const QString name);
 
     QString getSalt();
     void    setSalt(const QString salt);
@@ -57,11 +57,11 @@ public:
     qint32 startGettingUserProps();
     qint32 handleUserPropsResponse(MessageProtocol* msg);
 
-    qint32 startUpdateReadableName(QString name);
-    qint32 handleUpdateReadableNameResponse(MessageProtocol* msg);
+    Q_INVOKABLE qint32 startUpdateReadableName(QString name);
+    qint32             handleUpdateReadableNameResponse(MessageProtocol* msg);
 
-    qint32 startUpdatePassword(QString password);
-    qint32 handleUpdatePasswordResponse(MessageProtocol* msg);
+    Q_INVOKABLE qint32 startUpdatePassword(QString password);
+    qint32             handleUpdatePasswordResponse(MessageProtocol* msg);
 
     void setRandomLoginValue(const QString random) { this->m_currentRandomValue = random; }
 

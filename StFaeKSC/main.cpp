@@ -32,6 +32,7 @@
 #include "General/console.h"
 #include "General/globaldata.h"
 #include "General/pushnotification.h"
+#include "Manager/cglobalmanager.h"
 #include "Network/ccontcpmaindata.h"
 #include "Network/ccontcpmainserver.h"
 #include "Network/udpserver.h"
@@ -58,6 +59,7 @@ int main(int argc, char* argv[])
 
     BackgroundController ctrlUdp;
     BackgroundController ctrlTcp;
+    cGlobalManager       globalManager;
     if (argc > 1 && QString(argv[1]) == "-noServer") {
         qInfo() << "Starting only as a deamon without a server";
     } else {
@@ -69,6 +71,7 @@ int main(int argc, char* argv[])
         tcpMain->initialize();
         ctrlTcp.Start(tcpMain, false);
 
+        globalManager.initialize();
         g_ConTcpMainData.initialize(&globalData.m_UserList);
     }
 

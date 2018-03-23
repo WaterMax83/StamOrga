@@ -20,6 +20,8 @@
 #include "../Common/General/globalfunctions.h"
 
 
+#define GROUP_ARRAY_ITEM "item"
+
 cStaSettingsManager g_StaSettingsManager;
 
 cStaSettingsManager::cStaSettingsManager(QObject* parent)
@@ -38,19 +40,16 @@ qint32 cStaSettingsManager::initialize()
     return ERROR_CODE_SUCCESS;
 }
 
-
+/************************ QString values ******************************/
 qint32 cStaSettingsManager::getValue(const QString group, const QString key, QString& value)
 {
-    if (!this->m_initialized)
-        return ERROR_CODE_NOT_INITIALIZED;
+    QVariant vValue;
+    qint32   rValue = this->getValue(group, key, vValue, QVariant(""));
 
-    this->m_pMainUserSettings->beginGroup(group);
+    if (rValue == ERROR_CODE_SUCCESS)
+        value = vValue.toString();
 
-    value = this->m_pMainUserSettings->value(key, "").toString();
-
-    this->m_pMainUserSettings->endGroup();
-
-    return ERROR_CODE_SUCCESS;
+    return rValue;
 }
 
 qint32 cStaSettingsManager::setValue(const QString group, const QString key, const QString value)
@@ -58,18 +57,32 @@ qint32 cStaSettingsManager::setValue(const QString group, const QString key, con
     return this->setValue(group, key, QVariant(value));
 }
 
+qint32 cStaSettingsManager::getValue(const QString group, const QString key, const qint32 index, QString& value)
+{
+    QVariant vValue;
+    qint32   rValue = this->getValue(group, key, index, vValue, QVariant(""));
+
+    if (rValue == ERROR_CODE_SUCCESS)
+        value = vValue.toString();
+
+    return rValue;
+}
+
+qint32 cStaSettingsManager::setValue(const QString group, const QString key, const qint32 index, const QString value)
+{
+    return this->setValue(group, key, index, QVariant(value));
+}
+
+/************************ Boolean values ******************************/
 qint32 cStaSettingsManager::getBoolValue(const QString group, const QString key, bool& value)
 {
-    if (!this->m_initialized)
-        return ERROR_CODE_NOT_INITIALIZED;
+    QVariant vValue;
+    qint32   rValue = this->getValue(group, key, vValue, QVariant(false));
 
-    this->m_pMainUserSettings->beginGroup(group);
+    if (rValue == ERROR_CODE_SUCCESS)
+        value = vValue.toBool();
 
-    value = this->m_pMainUserSettings->value(key, false).toBool();
-
-    this->m_pMainUserSettings->endGroup();
-
-    return ERROR_CODE_SUCCESS;
+    return rValue;
 }
 
 qint32 cStaSettingsManager::setBoolValue(const QString group, const QString key, const bool value)
@@ -77,6 +90,69 @@ qint32 cStaSettingsManager::setBoolValue(const QString group, const QString key,
     return this->setValue(group, key, QVariant(value));
 }
 
+/************************ qint64 values ******************************/
+qint32 cStaSettingsManager::getInt64Value(const QString group, const QString key, qint64& value)
+{
+    QVariant vValue;
+    qint32   rValue = this->getValue(group, key, vValue, QVariant(0));
+
+    if (rValue == ERROR_CODE_SUCCESS)
+        value = vValue.toLongLong();
+
+    return rValue;
+}
+
+qint32 cStaSettingsManager::setInt64Value(const QString group, const QString key, const qint64 value)
+{
+    return this->setValue(group, key, QVariant(value));
+}
+
+qint32 cStaSettingsManager::getInt64Value(const QString group, const QString key, const qint32 index, qint64& value)
+{
+    QVariant vValue;
+    qint32   rValue = this->getValue(group, key, index, vValue, QVariant(0));
+
+    if (rValue == ERROR_CODE_SUCCESS)
+        value = vValue.toLongLong();
+
+    return rValue;
+}
+
+qint32 cStaSettingsManager::setInt64Value(const QString group, const QString key, const qint32 index, const qint64 value)
+{
+    return this->setValue(group, key, index, QVariant(value));
+}
+
+qint32 cStaSettingsManager::removeGroup(const QString group)
+{
+    qint32 rValue = ERROR_CODE_NOT_FOUND;
+    this->m_pMainUserSettings->beginGroup(group);
+
+    if (this->m_pMainUserSettings->childGroups().length() > 0 || this->m_pMainUserSettings->childKeys().length() > 0) {
+        this->m_pMainUserSettings->remove("");
+        rValue = ERROR_CODE_SUCCESS;
+    }
+
+    this->m_pMainUserSettings->endGroup();
+
+    return rValue;
+}
+
+
+/************************ private ******************************/
+qint32 cStaSettingsManager::getValue(const QString group, const QString key, QVariant& value, const QVariant defaultValue)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    this->m_pMainUserSettings->beginGroup(group);
+
+    value = this->m_pMainUserSettings->value(key, defaultValue);
+
+    this->m_pMainUserSettings->endGroup();
+
+    return ERROR_CODE_SUCCESS;
+}
 
 qint32 cStaSettingsManager::setValue(const QString group, const QString key, const QVariant value)
 {
@@ -87,6 +163,49 @@ qint32 cStaSettingsManager::setValue(const QString group, const QString key, con
 
     this->m_pMainUserSettings->setValue(key, value);
 
+    this->m_pMainUserSettings->endGroup();
+
+    this->m_pMainUserSettings->sync();
+
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 cStaSettingsManager::getValue(const QString group, const QString key, const qint32 index, QVariant& value, const QVariant defaultValue)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    this->m_pMainUserSettings->beginGroup(group);
+    qint32 count = this->m_pMainUserSettings->beginReadArray(GROUP_ARRAY_ITEM);
+    if (index >= count) {
+        this->m_pMainUserSettings->endArray();
+        this->m_pMainUserSettings->endGroup();
+
+        return ERROR_CODE_NOT_FOUND;
+    }
+
+    this->m_pMainUserSettings->setArrayIndex(index);
+
+    value = this->m_pMainUserSettings->value(key, defaultValue);
+
+    this->m_pMainUserSettings->endArray();
+    this->m_pMainUserSettings->endGroup();
+
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 cStaSettingsManager::setValue(const QString group, const QString key, const qint32 index, const QVariant value)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    this->m_pMainUserSettings->beginGroup(group);
+    this->m_pMainUserSettings->beginWriteArray(GROUP_ARRAY_ITEM);
+
+    this->m_pMainUserSettings->setArrayIndex(index);
+    this->m_pMainUserSettings->setValue(key, value);
+
+    this->m_pMainUserSettings->endArray();
     this->m_pMainUserSettings->endGroup();
 
     this->m_pMainUserSettings->sync();

@@ -19,12 +19,11 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 
-//#include "../Common/General/config.h"
+
 #include "../Common/General/globalfunctions.h"
 #include "../Common/General/globaltiming.h"
 #include "../Common/Network/messagecommand.h"
-//#include "../Common/Network/messageprotocol.h"
-//#include "../Data/globalsettings.h"
+#include "../Data/cdataticketmanager.h"
 #include "../cstaglobalsettings.h"
 #include "cconmanager.h"
 #include "ccontcpdata.h"
@@ -92,16 +91,16 @@ void cConTcpData::slotConnectionTimeoutFired()
 void cConTcpData::slotSocketDataError(QAbstractSocket::SocketError socketError)
 {
     this->m_pConTimeout->stop();
-    qWarning().noquote() << QString("Socket Error %1 - %2 ").arg(socketError).arg(this->m_pDataTcpSocket->errorString());
+    qWarning().noquote() << QString("Socket Error Data %1 - %2 ").arg(socketError).arg(this->m_pDataTcpSocket->errorString());
     while (this->m_lActualRequest.size() > 0) {
         TcpDataConRequest* request = this->m_lActualRequest.last();
-        request->m_result          = ERROR_CODE_TIMEOUT;
+        request->m_result          = ERROR_CODE_NO_CONNECTION;
         emit this->notifyLastRequestFinished(request);
         this->m_lActualRequest.removeLast();
     }
     this->m_bRequestLoginAgain = false;
 
-    emit this->signalDataConnectionFinished(ERROR_CODE_COMMON, this->m_pDataTcpSocket->errorString());
+    emit this->signalDataConnectionFinished(ERROR_CODE_NO_CONNECTION, this->m_pDataTcpSocket->errorString());
 }
 
 void cConTcpData::slotDataSocketConnected()
@@ -191,21 +190,17 @@ void cConTcpData::checkNewOncomingData()
             //                    request.m_result = msg->getIntData();
             //            break;
 
-            //        case OP_CODE_CMD_RES::ACK_ADD_TICKET:
-            //            request.m_result = msg->getIntData();
-            //            break;
+        case OP_CODE_CMD_RES::ACK_ADD_TICKET:
+            request->m_result = g_DataTicketManager.handleAddSeasonTicketResponse(msg);
+            break;
 
-            //        case OP_CODE_CMD_RES::ACK_REMOVE_TICKET:
-            //            request.m_result = msg->getIntData();
-            //            break;
+        case OP_CODE_CMD_RES::ACK_REMOVE_TICKET:
+            request->m_result = g_DataTicketManager.handleRemoveSeasonTicketResponse(msg);
+            break;
 
-            //        case OP_CODE_CMD_RES::ACK_CHANGE_TICKET:
-            //            request.m_result = msg->getIntData();
-            //            break;
-
-            //        case OP_CODE_CMD_RES::ACK_GET_TICKETS_LIST:
-            //            request.m_result = this->m_pDataHandle->getHandleSeasonTicketListResponse(msg);
-            //            break;
+        case OP_CODE_CMD_RES::ACK_GET_TICKETS_LIST:
+            request->m_result = g_DataTicketManager.handleListSeasonTicketsResponse(msg);
+            break;
 
             //        case OP_CODE_CMD_RES::ACK_STATE_CHANGE_SEASON_TICKET:
             //            request.m_result = this->m_pDataHandle->getHandleChangeTicketStateResponse(msg);
@@ -326,59 +321,10 @@ void cConTcpData::checkNewOncomingData()
 //    this->sendMessageRequest(&msg, request);
 //}
 
-//void cConTcpData::startSendAddSeasonTicket(DataConRequest request)
-//{
-//    QString     name = request.m_lData.at(1);
-//    QByteArray  seasonTicket;
-//    QDataStream wSeasonTicket(&seasonTicket, QIODevice::WriteOnly);
-//    wSeasonTicket.setByteOrder(QDataStream::LittleEndian);
-//    wSeasonTicket << request.m_lData.at(0).toUInt();
-//    wSeasonTicket << quint16(name.toUtf8().size());
-//    seasonTicket.append(name);
-
-//    MessageProtocol msg(request.m_request, seasonTicket);
-//    this->sendMessageRequest(&msg, request);
-//}
-
 //void cConTcpData::startSendRemoveSeasonTicket(DataConRequest request)
 //{
 //    quint32         index = request.m_lData.at(0).toUInt();
 //    MessageProtocol msg(request.m_request, index);
-//    this->sendMessageRequest(&msg, request);
-//}
-
-//void cConTcpData::startSendEditSeasonTicket(DataConRequest request)
-//{
-//    quint32    index    = qToLittleEndian(request.m_lData.at(0).toUInt());
-//    QByteArray name     = request.m_lData.at(1).toUtf8();
-//    QByteArray place    = request.m_lData.at(2).toUtf8();
-//    quint32    discount = qToLittleEndian(request.m_lData.at(3).toUInt());
-//    char       data[200];
-//    memset(&data[0], 0x0, 200);
-//    memcpy(&data[0], &index, sizeof(quint32));
-//    memcpy(&data[4], &discount, sizeof(quint32));
-//    memcpy(&data[8], name.constData(), name.length());
-//    memcpy(&data[9 + name.length()], place.constData(), place.length());
-
-//    quint32 size = 8 + name.length() + place.length() + 2;
-
-//    MessageProtocol msg(request.m_request, &data[0], size);
-//    this->sendMessageRequest(&msg, request);
-//}
-
-//void cConTcpData::startSendSeasonTicketListRequest(DataConRequest request)
-//{
-//    quint32 data[3];
-//    qint64  timeStamp = this->m_pGlobalData->getSeasonTicketLastLocalUpdate();
-//    if (timeStamp + TIMEOUT_UPDATE_TICKETS > QDateTime::currentMSecsSinceEpoch() && this->m_pGlobalData->getSeasonTicketLength() > 0)
-//        data[0] = qToLittleEndian(UpdateIndex::UpdateDiff);
-//    else
-//        data[0] = qToLittleEndian(UpdateIndex::UpdateAll);
-
-//    timeStamp = qToLittleEndian(this->m_pGlobalData->getSeasonTicketLastServerUpdate());
-//    memcpy(&data[1], &timeStamp, sizeof(qint64));
-
-//    MessageProtocol msg(request.m_request, (char*)(&data[0]), sizeof(quint32) * 3);
 //    this->sendMessageRequest(&msg, request);
 //}
 
@@ -633,22 +579,9 @@ void cConTcpData::startSendNewRequest(TcpDataConRequest* request)
     //        this->startSendSetGameTimeFixedRequest(request);
     //        break;
 
-    //    case OP_CODE_CMD_REQ::REQ_ADD_TICKET:
-    //        if (request.m_lData.size() > 1)
-    //            this->startSendAddSeasonTicket(request);
-    //        break;
-
     //    case OP_CODE_CMD_REQ::REQ_REMOVE_TICKET:
     //        if (request.m_lData.size() > 0)
     //            this->startSendRemoveSeasonTicket(request);
-    //        break;
-
-    //    case OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST:
-    //        this->startSendSeasonTicketListRequest(request);
-    //        break;
-
-    //    case OP_CODE_CMD_REQ::REQ_CHANGE_TICKET:
-    //        this->startSendEditSeasonTicket(request);
     //        break;
 
     //    case OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET:

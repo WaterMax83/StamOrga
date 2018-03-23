@@ -19,183 +19,182 @@
 #include <QtCore/QDebug>
 
 #include "../../Common/Network/messagecommand.h"
+#include "Connection/cconmanager.h"
+#include "Connection/cconusersettings.h"
 #include "userinterface.h"
 
 UserInterface::UserInterface(QObject* parent)
     : QObject(parent)
 {
-    this->m_pConHandle = new ConnectionHandling();
-    connect(this->m_pConHandle, &ConnectionHandling::sNotifyConnectionFinished,
-            this, &UserInterface::slConnectionRequestFinished);
-    connect(this->m_pConHandle, &ConnectionHandling::sNotifyVersionRequest,
-            this, &UserInterface::slVersionRequestFinished);
-    connect(this->m_pConHandle, &ConnectionHandling::sNotifyUpdatePasswordRequest,
-            this, &UserInterface::slUpdatePasswordRequestFinished);
+    connect(&g_ConManager, &cConManager::signalNotifyConnectionFinished,
+            this, &UserInterface::slotConnectionRequestFinished);
 
-
-    connect(this->m_pConHandle, &ConnectionHandling::sNotifyCommandFinished,
-            this, &UserInterface::slCommandFinished);
+    connect(&g_ConManager, &cConManager::signalNotifyCommandFinished,
+            this, &UserInterface::slotCommandFinished);
 }
 
 qint32 UserInterface::startMainConnection(QString name, QString passw)
 {
-    bool saveSettings = false;
-    if (name != this->m_pConHandle->getGlobalData()->userName()) {
-        saveSettings = true;
-        this->m_pConHandle->getGlobalData()->setUserName("");
-        this->m_pConHandle->getGlobalData()->setPassWord("");
-        this->m_pConHandle->getGlobalData()->setSalt("");
+    if (name != g_ConUserSettings.getUserName()) {
+        g_ConUserSettings.setUserName("");
+        g_ConUserSettings.setPassWord("");
+        g_ConUserSettings.setSalt("");
     }
     if (passw == "dEf1AuLt") {
-        passw = this->m_pConHandle->getGlobalData()->passWord();
+        passw = g_ConUserSettings.getPassWord();
     } else {
-        this->m_pConHandle->getGlobalData()->setPassWord("");
-        this->m_pConHandle->getGlobalData()->setSalt("");
-        saveSettings = true;
+        g_ConUserSettings.setPassWord("");
+        g_ConUserSettings.setSalt("");
     }
 
-    if (saveSettings)
-        this->m_pConHandle->getGlobalData()->saveGlobalUserSettings();
-
-    return this->m_pConHandle->startMainConnection(name, passw);
+    return g_ConManager.startMainConnection(name, passw);
 }
 
 qint32 UserInterface::startGetUserEvents()
 {
-    return this->m_pConHandle->startGettingUserEvents();
+    //    return this->m_pConHandle->startGettingUserEvents();
+    return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
 qint32 UserInterface::startSetUserEvents(qint64 eventID, qint32 status)
 {
-    return this->m_pConHandle->startSettingUserEvents(eventID, status);
-}
-
-qint32 UserInterface::startUpdateUserPassword(QString newPassw)
-{
-    return this->m_pConHandle->startUpdatePassword(newPassw);
-}
-
-qint32 UserInterface::startUpdateReadableName(QString name)
-{
-    return this->m_pConHandle->startUpdateReadableName(name);
+    //    return this->m_pConHandle->startSettingUserEvents(eventID, status);
+    return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
 qint32 UserInterface::startListGettingGames()
 {
-    return this->m_pConHandle->startListGettingGames();
+    //    return this->m_pConHandle->startListGettingGames();
+    return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
 qint32 UserInterface::startListGettingGamesInfo()
 {
-    return this->m_pConHandle->startListGettingGamesInfo();
+    //    return this->m_pConHandle->startListGettingGamesInfo();
+    return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
 qint32 UserInterface::startSetFixedGameTime(const quint32 gameIndex, const quint32 fixed)
 {
-    return this->m_pConHandle->startSetFixedGameTime(gameIndex, fixed);
+    //    return this->m_pConHandle->startSetFixedGameTime(gameIndex, fixed);
+    return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
 qint32 UserInterface::startAddSeasonTicket(QString name, quint32 discount)
 {
-    return this->m_pConHandle->startAddSeasonTicket(name, discount);
+    //    return this->m_pConHandle->startAddSeasonTicket(name, discount);
+    return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
 qint32 UserInterface::startRemoveSeasonTicket(quint32 index)
 {
-    return this->m_pConHandle->startRemoveSeasonTicket(index);
+    //    return this->m_pConHandle->startRemoveSeasonTicket(index);
+    return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
 qint32 UserInterface::startEditSeasonTicket(quint32 index, QString name, QString place, quint32 discount)
 {
-    return this->m_pConHandle->startEditSeasonTicket(index, name, place, discount);
+    //    return this->m_pConHandle->startEditSeasonTicket(index, name, place, discount);
+    return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
 qint32 UserInterface::startListSeasonTickets()
 {
-    return this->m_pConHandle->startListSeasonTickets();
+    //    return this->m_pConHandle->startListSeasonTickets();
+    return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
 qint32 UserInterface::startChangeAvailableTicketState(quint32 ticketIndex, quint32 gameIndex, quint32 state, QString name)
 {
-    return this->m_pConHandle->startChangeSeasonTicketState(ticketIndex, gameIndex, state, name);
+    //    return this->m_pConHandle->startChangeSeasonTicketState(ticketIndex, gameIndex, state, name);
+    return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
 qint32 UserInterface::startRequestAvailableTickets(quint32 gameIndex)
 {
-    return this->m_pConHandle->startListAvailableTicket(gameIndex);
+    //    return this->m_pConHandle->startListAvailableTicket(gameIndex);
+    return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
 qint32 UserInterface::startChangeGame(const quint32 index, const quint32 sIndex, const QString competition,
                                       const QString home, const QString away, const QString date, const QString score)
 {
-    return this->m_pConHandle->startChangeGame(index, sIndex, competition, home, away, date, score);
+    //    return this->m_pConHandle->startChangeGame(index, sIndex, competition, home, away, date, score);
+    return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
 qint32 UserInterface::startSaveMeetingInfo(const quint32 gameIndex, const QString when, const QString where, const QString info,
                                            const quint32 type)
 {
-    return this->m_pConHandle->startSaveMeetingInfo(gameIndex, when, where, info, type);
+    //    return this->m_pConHandle->startSaveMeetingInfo(gameIndex, when, where, info, type);
+    return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
 qint32 UserInterface::startLoadMeetingInfo(const quint32 gameIndex, const quint32 type)
 {
-    return this->m_pConHandle->startLoadMeetingInfo(gameIndex, type);
+    //    return this->m_pConHandle->startLoadMeetingInfo(gameIndex, type);
+    return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
 qint32 UserInterface::startAcceptMeetingInfo(const quint32 gameIndex, const quint32 accept,
                                              const QString name, const quint32 type,
                                              const quint32 acceptIndex)
 {
-    return this->m_pConHandle->startAcceptMeetingInfo(gameIndex, accept, name, type, acceptIndex);
+    //    return this->m_pConHandle->startAcceptMeetingInfo(gameIndex, accept, name, type, acceptIndex);
+    return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
 qint32 UserInterface::startChangeFanclubNews(const quint32 newsIndex, const QString header, const QString info)
 {
-    return this->m_pConHandle->startChangeFanclubNews(newsIndex, header, info);
+    //    return this->m_pConHandle->startChangeFanclubNews(newsIndex, header, info);
+    return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
 qint32 UserInterface::startGetFanclubNewsItem(const quint32 newsIndex)
 {
-    return this->m_pConHandle->startGetFanclubNewsItem(newsIndex);
+    //    return this->m_pConHandle->startGetFanclubNewsItem(newsIndex);
+    return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
 qint32 UserInterface::startDeleteFanclubNewsItem(const quint32 newsIndex)
 {
-    return this->m_pConHandle->startDeleteFanclubNewsItem(newsIndex);
+    //    return this->m_pConHandle->startDeleteFanclubNewsItem(newsIndex);
+    return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
 qint32 UserInterface::startListFanclubNews()
 {
-    return this->m_pConHandle->startListFanclubNews();
+    //    return this->m_pConHandle->startListFanclubNews();
+    return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
 qint32 UserInterface::startStatisticsCommand(const QByteArray& command)
 {
-    return this->m_pConHandle->startStatisticsCommand(command);
+    //    return this->m_pConHandle->startStatisticsCommand(command);
+    return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
-void UserInterface::slConnectionRequestFinished(qint32 result)
+void UserInterface::slotConnectionRequestFinished(qint32 result, const QString msg)
 {
-    emit this->notifyConnectionFinished(result);
-}
-
-void UserInterface::slVersionRequestFinished(qint32 result, QString msg)
-{
-    emit this->notifyVersionRequestFinished(result, msg);
+    emit this->notifyConnectionFinished(result, msg);
 }
 
 
-void UserInterface::slUpdatePasswordRequestFinished(qint32 result, QString newPassWord)
-{
-    emit this->notifyUpdatePasswordRequestFinished(result, newPassWord);
-}
-
-
-void UserInterface::slCommandFinished(quint32 command, qint32 result)
+void UserInterface::slotCommandFinished(quint32 command, qint32 result)
 {
     QMutexLocker lock(&this->m_notifyMutex);
 
+    //    qInfo() << "New Command " << command << " " << result;
+
     switch (command) {
+    case OP_CODE_CMD_REQ::REQ_GET_VERSION:
+        emit this->notifyVersionRequestFinished(result);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
+        emit this->notifyUpdatePasswordRequestFinished(result);
+        break;
+
     case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
         emit this->notifyUserPropertiesFinished(result);
         break;
@@ -206,10 +205,10 @@ void UserInterface::slCommandFinished(quint32 command, qint32 result)
 
     case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
         emit this->notifyGamesListFinished(result);
-        if (result == ERROR_CODE_SUCCESS) {
-            this->m_pConHandle->startGettingUserEvents();
-            this->m_pConHandle->startListGettingGamesInfo();
-        }
+        //        if (result == ERROR_CODE_SUCCESS) {
+        //            this->m_pConHandle->startGettingUserEvents();
+        //            this->m_pConHandle->startListGettingGamesInfo();
+        //        }
         break;
 
     case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST:

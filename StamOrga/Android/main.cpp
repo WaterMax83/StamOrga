@@ -36,6 +36,7 @@
 #include "../Data/globaldata.h"
 #include "../Data/globalsettings.h"
 #include "../Data/statistic.h"
+#include "../cstaglobalmanager.h"
 #include "../dataconnection.h"
 #include "userinterface.h"
 
@@ -61,6 +62,9 @@ int main(int argc, char* argv[])
     qRegisterMetaType<DataConRequest>("DataConRequest");
     qRegisterMetaType<GameUserData*>("GameUserData*");
     qRegisterMetaType<StatBars*>("StatBars*");
+
+    cStaGlobalManager staGlobalManager;
+    staGlobalManager.initialize();
 
     GlobalSettings globalSettings;
     g_GlobalSettings = &globalSettings;
@@ -103,6 +107,7 @@ int main(int argc, char* argv[])
 
     // engine to start qml display -> takes about half a second
     QQmlApplicationEngine engine;
+    staGlobalManager.setQmlInformationClasses(&engine);
     engine.rootContext()->setContextProperty("globalUserData", &globalUserData);
     engine.rootContext()->setContextProperty("globalSettings", &globalSettings);
     engine.rootContext()->setContextProperty("fontFamiliesModel", &fontFamiliesModel);

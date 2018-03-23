@@ -18,9 +18,11 @@
 
 #include <QtCore/QUuid>
 
+
+#include "cdatappinfomanager.h"
+
 #include "../Common/General/globalfunctions.h"
 #include "../cstasettingsmanager.h"
-#include "cdatappinfomanager.h"
 
 cDatAppInfoManager g_DatAppInfoManager;
 

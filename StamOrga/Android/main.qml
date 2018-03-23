@@ -91,13 +91,10 @@ ApplicationWindow {
 
             ToolButton {
                 implicitHeight: 50
-                contentItem: Image {
+                Image {
                     id: imageToolButton
-                    fillMode: Image.Pad
-                    horizontalAlignment: Image.AlignHCenter
-                    verticalAlignment: Image.AlignVCenter
-//                    source: "images/refresh.png"
-                    //                    visible: stackView.depth > 1 ? false : true
+                    anchors.fill: parent
+                    anchors.margins: 5
                 }
                 onClicked: {
                     if (imageToolButton.visible === true) {
@@ -150,36 +147,42 @@ ApplicationWindow {
                         append({
                                    title: "Benutzerprofil",
                                    element: viewUserLogin,
+                                   link: "",
                                    toolButtonImgSource: "images/menu.png",
                                    listImgSource : "images/account.png"
                                })
                         append({
                                    title: "Dauerkarten",
                                    element: viewSeasonTickets,
+                                   link: "",
                                    toolButtonImgSource: "images/add.png",
                                    listImgSource : "images/card.png"
                                })
                         append({
                                    title: "Statistik",
                                    element: viewStatistics,
+                                   link: "",
                                    listImgSource : "images/chart.png"
                                })
                         if (userInt.isDebuggingEnabled())
                             append({
                                        title: "Fanclub",
                                        element: viewFanclubNewList,
+                                       link: "",
                                        event: 0,
                                        listImgSource : "images/group.png"
                                    })
                         append({
                                    title: "Einstellungen",
                                    element: viewSettingsPage,
+                                   link: "",
                                    listImgSource : "images/settings.png"
                                })
                         if (userInt.isDebuggingEnabled())
                             append({
                                        title: "Logging",
                                        element: viewLoggingPage,
+                                       link: "",
                                        listImgSource : "images/bug.png"
                                    })
                     }
@@ -281,8 +284,8 @@ ApplicationWindow {
                             imageToolButton.visible = false
                         }
                         stackView.push(element)
-                    } else if (link) {
-                        Qt.openUrlExternally(link);
+                    } else if (model.link && model.link !== "") {
+                        Qt.openUrlExternally(model.link);
                         if (model.title === "Update")
                             appUserEvents.clearUserEventUpdate(userInt);
                     }
@@ -302,9 +305,7 @@ ApplicationWindow {
     }
     Component {
         id: viewSeasonTickets
-        MyPages.SeasonTickets {
-            userIntTicket: userInt
-        }
+        MyPages.SeasonTickets {}
     }
     Component {
         id: viewStatistics
@@ -326,13 +327,12 @@ ApplicationWindow {
 
     UserInterface {
         id: userInt
-        globalData: globalUserData
+//        globalData: globalUserData
         onNotifyConnectionFinished: {
             if (stackView.currentItem.notifyUserIntConnectionFinished)
-                stackView.currentItem.notifyUserIntConnectionFinished(result)
+                stackView.currentItem.notifyUserIntConnectionFinished(result, msg)
         }
         onNotifyVersionRequestFinished: {
-            //            stackView.currentItem.notifyUserIntVersionRequestFinished(result, msg);
             if (result === 5) {
                 if (globalSettings.useVersionPopup) {
                     var component = Qt.createComponent("/components/VersionDialog.qml")
@@ -340,18 +340,20 @@ ApplicationWindow {
                         var dialog = component.createObject(stackView, {
                                                                 popupType: 1
                                                             })
-                        dialog.versionText = msg
+                        dialog.versionText = gStaGlobalSettings.getVersionInfo();
                         dialog.parentHeight = stackView.height
                         dialog.parentWidth = stackView.width
                         dialog.open()
                     }
                 }
 
+                console.log(gStaGlobalSettings.getUpdateLink())
+
                 if (!isNewVersionElementShown) {
                     isNewVersionElementShown = true;
                     listViewListModel.append({
                                             title: "Update",
-                                            link: globalUserData.getUpdateLink(),
+                                            link: gStaGlobalSettings.getUpdateLink(),
                                             event : 0,
                                             listImgSource : "images/download.png"
                                         })

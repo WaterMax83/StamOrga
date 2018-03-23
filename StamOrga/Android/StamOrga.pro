@@ -35,6 +35,14 @@ SOURCES += main.cpp \
     ../../Common/Network/messageprotocol.cpp \
     ../../Common/General/globalfunctions.cpp \
     ../../Common/General/cgendisposer.cpp \
+    ../Connection/cconmanager.cpp \
+    ../Connection/ccontcpmain.cpp \
+    ../Connection/ccontcpdata.cpp \
+    ../Connection/cconusersettings.cpp \
+    ../cstaglobalmanager.cpp \
+    ../cstasettingsmanager.cpp \
+    ../cstaglobalsettings.cpp \
+    ../Data/cdatappinfomanager.cpp \
     ../dataconnection.cpp \
     ../datahandling.cpp \
     ../Data/globaldata.cpp \
@@ -46,7 +54,8 @@ SOURCES += main.cpp \
     ../Data/appuserevents.cpp \
     ../Data/statistic.cpp \
     source/pushnotification.cpp \
-    ../Data/gameuserdata.cpp
+    ../Data/gameuserdata.cpp \
+    ../Data/cdataticketmanager.cpp
 
 
 RESOURCES += qml.qrc
@@ -87,6 +96,14 @@ HEADERS += \
     ../../Common/Network/messageprotocol.h \
     ../../Common/General/globalfunctions.h \
     ../../Common/General/cgendisposer.h \
+    ../Connection/cconmanager.h \
+    ../Connection/ccontcpmain.h \
+    ../Connection/ccontcpdata.h \
+    ../Connection/cconusersettings.h \
+    ../cstaglobalmanager.h \
+    ../cstasettingsmanager.h \
+    ../cstaglobalsettings.h \
+    ../Data/cdatappinfomanager.h \
     ../dataconnection.h \
     ../datahandling.h \
     ../Data/globaldata.h \
@@ -99,9 +116,14 @@ HEADERS += \
     ../Data/appuserevents.h \
     ../Data/statistic.h \
     source/pushnotification.h \
-    ../Data/gameuserdata.h
+    ../Data/gameuserdata.h \
+    ../Data/cdataticketmanager.h
 
-#android{
+INCLUDEPATH += \
+    ../ \
+    ../../Common/ \
+
+android{
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 
     ################# adapt that accordingly #######################
@@ -110,7 +132,7 @@ HEADERS += \
 
     ANDROID_JAVA_SOURCES.files = $$files($$PWD/source/java/*.java)
     INSTALLS += ANDROID_JAVA_SOURCES
-#}
+}
 
 DISTFILES += \
     android/AndroidManifest.xml \

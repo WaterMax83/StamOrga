@@ -456,14 +456,14 @@ void DataConnection::startSendEditSeasonTicket(DataConRequest request)
 void DataConnection::startSendSeasonTicketListRequest(DataConRequest request)
 {
     quint32 data[3];
-    qint64  timeStamp = this->m_pGlobalData->getSeasonTicketLastLocalUpdate();
-    if (timeStamp + TIMEOUT_UPDATE_TICKETS > QDateTime::currentMSecsSinceEpoch() && this->m_pGlobalData->getSeasonTicketLength() > 0)
-        data[0] = qToLittleEndian(UpdateIndex::UpdateDiff);
-    else
-        data[0] = qToLittleEndian(UpdateIndex::UpdateAll);
+    //    qint64  timeStamp = this->m_pGlobalData->getSeasonTicketLastLocalUpdate();
+    //    if (timeStamp + TIMEOUT_UPDATE_TICKETS > QDateTime::currentMSecsSinceEpoch() && this->m_pGlobalData->getSeasonTicketLength() > 0)
+    //        data[0] = qToLittleEndian(UpdateIndex::UpdateDiff);
+    //    else
+    //        data[0] = qToLittleEndian(UpdateIndex::UpdateAll);
 
-    timeStamp = qToLittleEndian(this->m_pGlobalData->getSeasonTicketLastServerUpdate());
-    memcpy(&data[1], &timeStamp, sizeof(qint64));
+    //    timeStamp = qToLittleEndian(this->m_pGlobalData->getSeasonTicketLastServerUpdate());
+    //    memcpy(&data[1], &timeStamp, sizeof(qint64));
 
     MessageProtocol msg(request.m_request, (char*)(&data[0]), sizeof(quint32) * 3);
     this->sendMessageRequest(&msg, request);
@@ -488,10 +488,10 @@ void DataConnection::startSendChangeTicketState(DataConRequest request)
 void DataConnection::startSendAvailableTicketListRequest(DataConRequest request)
 {
     quint32 data[3];
-    qint64  timeStamp = qToLittleEndian(this->m_pGlobalData->getSeasonTicketLastServerUpdate());
+    //    qint64  timeStamp = qToLittleEndian(this->m_pGlobalData->getSeasonTicketLastServerUpdate());
 
-    data[0] = request.m_lData.at(0).toUInt();
-    memcpy(&data[1], &timeStamp, sizeof(qint64));
+    //    data[0] = request.m_lData.at(0).toUInt();
+    //    memcpy(&data[1], &timeStamp, sizeof(qint64));
 
     MessageProtocol msg(request.m_request, (char*)(&data[0]), sizeof(quint32) * 3);
     this->sendMessageRequest(&msg, request);

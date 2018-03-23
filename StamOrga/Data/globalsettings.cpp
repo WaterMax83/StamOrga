@@ -29,7 +29,6 @@
 #define SETT_DEBUG_IP_WIFI          "DebugIPWifi"
 #define SETT_LAST_SHOWN_VERSION     "LastShownVersion"
 #define SETT_LOAD_GAME_INFO         "LoadGameInfo"
-#define SETT_SAVE_INFOS_ON_APP      "SaveInfosOnApp"
 #define SETT_USE_VERSION_POPUP      "UseVersionPopup"
 #define SETT_CHANGE_DEFAULT_FONT    "ChangeDefaultFont"
 #define SETT_ENABLE_NOTIFICATION    "EnableNotification"
@@ -51,7 +50,6 @@ void GlobalSettings::initialize(GlobalData* pGlobalData, QGuiApplication* app)
 
     //    this->setUseReadableName(this->m_pGlobalData->m_pMainUserSettings->value(SETT_USE_READABLE_NAME, true).toBool());
     this->setLoadGameInfo(this->m_pGlobalData->m_pMainUserSettings->value(SETT_LOAD_GAME_INFO, true).toBool());
-    this->setSaveInfosOnApp(this->m_pGlobalData->m_pMainUserSettings->value(SETT_SAVE_INFOS_ON_APP, true).toBool());
     this->setUseVersionPopup(this->m_pGlobalData->m_pMainUserSettings->value(SETT_USE_VERSION_POPUP, true).toBool());
     this->setDebugIP(this->m_pGlobalData->m_pMainUserSettings->value(SETT_DEBUG_IP, "").toString());
     this->setDebugIPWifi(this->m_pGlobalData->m_pMainUserSettings->value(SETT_DEBUG_IP_WIFI, "").toString());
@@ -75,7 +73,6 @@ void GlobalSettings::saveGlobalSettings()
 
     //    this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_USE_READABLE_NAME, this->m_useReadableName);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_LOAD_GAME_INFO, this->m_loadGameInfo);
-    this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_SAVE_INFOS_ON_APP, this->m_saveInfosOnApp);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_USE_VERSION_POPUP, this->m_useVersionPopup);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_DEBUG_IP, this->m_debugIP);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_DEBUG_IP_WIFI, this->m_debugIPWifi);

@@ -124,7 +124,7 @@ Flickable {
                         menuAcceptValue = 1;
                         menuAcceptIndex = 0;
 //                        if (globalSettings.useReadableName)
-                            showTextDialogAccept("Zusagen", globalUserData.readableName);
+                            showTextDialogAccept("Zusagen", gConUserSettings.getReadableName());
 //                        else
 //                            showTextDialogAccept("Zusagen", "");
                     }
@@ -138,7 +138,7 @@ Flickable {
                         menuAcceptValue = 2;
                         menuAcceptIndex = 0;
 //                        if (globalSettings.useReadableName)
-                            showTextDialogAccept("Interesse/Vorbehalt", globalUserData.readableName);
+                            showTextDialogAccept("Interesse/Vorbehalt", gConUserSettings.getReadableName());
 //                        else
 //                            showTextDialogAccept("Interesse/Vorbehalt", "");
                     }
@@ -152,7 +152,7 @@ Flickable {
                         menuAcceptValue = 3;
                         menuAcceptIndex = 0;
 //                        if (globalSettings.useReadableName)
-                            showTextDialogAccept("Absagen", globalUserData.readableName);
+                            showTextDialogAccept("Absagen", gConUserSettings.getReadableName());
 //                        else
 //                            showTextDialogAccept("Absagen", "");
                     }

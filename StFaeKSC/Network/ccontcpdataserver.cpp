@@ -20,6 +20,7 @@
 #include "../Common/General/globalfunctions.h"
 #include "../Common/General/globaltiming.h"
 #include "../Common/Network/messagecommand.h"
+#include "../Manager/cticketmanager.h"
 #include "ccontcpmaindata.h"
 
 cConTcpDataServer::cConTcpDataServer()
@@ -192,6 +193,16 @@ MessageProtocol* cConTcpDataServer::checkNewMessage(MessageProtocol* msg)
             break;
         case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
             ack = g_ConTcpMainData.getUserChangePassword(this->m_pUserConData, msg);
+            break;
+
+        case OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST:
+            ack = g_TicketManager.getSeasonTicketList(this->m_pUserConData, msg);
+            break;
+        case OP_CODE_CMD_REQ::REQ_ADD_TICKET:
+            ack = g_TicketManager.getSeasonTicketAddRequest(this->m_pUserConData, msg);
+            break;
+        case OP_CODE_CMD_REQ::REQ_REMOVE_TICKET:
+            ack = g_TicketManager.getSeasonTicketRemoveRequest(this->m_pUserConData, msg);
             break;
         }
     } else if (msg->getIndex() == OP_CODE_CMD_REQ::REQ_LOGIN_USER) {

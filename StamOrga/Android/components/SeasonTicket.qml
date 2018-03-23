@@ -153,7 +153,7 @@ Rectangle {
     }
 
     function showTicketInfo(index) {
-        var seasonTicketItem = globalUserData.getSeasonTicketFromArrayIndex(index)
+        var seasonTicketItem = gDataTicketManager.getSeasonTicketFromArrayIndex(index)
 
         if (seasonTicketItem !== null) {
             m_SeasonTicketItem = seasonTicketItem

@@ -22,6 +22,7 @@
 #include "../Common/General/globalfunctions.h"
 #include "../Common/Network/messagecommand.h"
 #include "../Data/cdatappinfomanager.h"
+#include "../Data/cdataticketmanager.h"
 #include "../cstasettingsmanager.h"
 #include "cconmanager.h"
 #include "cconusersettings.h"
@@ -197,7 +198,7 @@ qint32 cConUserSettings::handleUserPropsResponse(MessageProtocol* msg)
     quint32 properties   = (quint32)rootObj.value("property").toDouble(0);
     QString readableName = rootObj.value("readableName").toString();
 
-    qInfo().noquote() << rootObj.value("tickets");
+    //    qInfo().noquote() << rootObj.value("tickets");
 
     this->setUserIndex(index);
     this->setReadableName(readableName);
@@ -210,13 +211,13 @@ qint32 cConUserSettings::handleUserPropsResponse(MessageProtocol* msg)
         this->setUserProperties(0);
 
 
-#ifdef Q_OS_ANDROID
     SeasonTicketItem* seasonTicket;
     int               i = 0;
-    while ((seasonTicket = this->m_pGlobalData->getSeasonTicketFromArrayIndex(i++)) != NULL)
+    while ((seasonTicket = g_DataTicketManager.getSeasonTicketFromArrayIndex(i++)) != NULL) {
         seasonTicket->checkTicketOwn(index);
+    }
 
-
+#ifdef Q_OS_ANDROID
     if (rootObj.contains("tickets")) {
         GameUserData* pGameUserData = this->m_pGlobalData->getGameUserDataHandler();
         pGameUserData->clearTicketGameList();

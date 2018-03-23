@@ -21,9 +21,6 @@
 
 #include <QMainWindow>
 
-//#include "../connectionhandling.h"
-//#include "../globaldata.h"
-
 namespace Ui
 {
     class MainWindow;

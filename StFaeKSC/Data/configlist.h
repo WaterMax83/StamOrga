@@ -26,7 +26,7 @@
 class ConfigItem
 {
 public:
-    quint32 m_index;
+    qint32  m_index;
     QString m_itemName;
     qint64  m_timestamp;
 
@@ -67,12 +67,12 @@ public:
     virtual qint32 getNumberOfInternalList() { return this->m_lInteralList.size(); }
 
     qint32 removeItem(const QString name);
-    qint32 removeItem(const quint32 index);
+    qint32 removeItem(const qint32 index);
     bool itemExists(QString name);
-    bool itemExists(quint32 index);
-    ConfigItem* getItem(quint32 index);
+    bool itemExists(qint32 index);
+    ConfigItem* getItem(qint32 index);
     qint32 getItemIndex(const QString name);
-    QString getItemName(quint32 index);
+    QString getItemName(qint32 index);
 
     QString getFileName();
 

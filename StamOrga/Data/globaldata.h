@@ -43,7 +43,7 @@ class GlobalData : public QObject
     Q_OBJECT
     Q_PROPERTY(QString userName READ userName WRITE setUserName NOTIFY userNameChanged)
     Q_PROPERTY(QString passWord READ passWord WRITE setPassWord NOTIFY passWordChanged)
-    Q_PROPERTY(QString readableName READ readableName WRITE setReadableName NOTIFY readableNameChanged)
+    //    Q_PROPERTY(QString readableName READ readableName WRITE setReadableName NOTIFY readableNameChanged)
     Q_PROPERTY(QString ipAddr READ ipAddr WRITE setIpAddr NOTIFY ipAddrChanged)
     Q_PROPERTY(quint32 conMasterPort READ conMasterPort WRITE setConMasterPort NOTIFY conMasterPortChanged)
     Q_PROPERTY(bool bIsConnected READ bIsConnected WRITE setbIsConnected NOTIFY bIsConnectedChanged)
@@ -63,8 +63,8 @@ public:
     QString getSalt() { return this->m_salt; }
     void    setSalt(QString salt) { this->m_salt = salt; }
 
-    QString readableName();
-    void    setReadableName(const QString& name);
+    //    QString readableName();
+    //    void    setReadableName(const QString& name);
 
     QString passWord();
     void    setPassWord(const QString& passw);
@@ -126,21 +126,21 @@ public:
     bool                setGamePlayItemHasEvent(quint32 gameIndex);
 
 
-    void saveCurrentSeasonTickets(qint64 timestamp);
+    //    void saveCurrentSeasonTickets(qint64 timestamp);
 
-    void        startUpdateSeasonTickets(const quint16 updateIndex);
-    void        addNewSeasonTicket(SeasonTicketItem* sTicket, const quint16 updateIndex = 0);
-    Q_INVOKABLE quint32 getSeasonTicketLength()
-    {
-        QMutexLocker lock(&this->m_mutexTicket);
-        return this->m_lSeasonTicket.size();
-    }
-    Q_INVOKABLE SeasonTicketItem* getSeasonTicketFromArrayIndex(int index);
-    SeasonTicketItem*             getSeasonTicket(qint32 ticketIndex);
-    Q_INVOKABLE QString getSeasonTicketLastLocalUpdateString();
-    qint64              getSeasonTicketLastLocalUpdate();
-    qint64              getSeasonTicketLastServerUpdate();
-    void                resetSeasonTicketLastServerUpdate();
+    //    void        startUpdateSeasonTickets(const quint16 updateIndex);
+    //    void        addNewSeasonTicket(SeasonTicketItem* sTicket, const quint16 updateIndex = 0);
+    //    Q_INVOKABLE quint32 getSeasonTicketLength()
+    //    {
+    //        QMutexLocker lock(&this->m_mutexTicket);
+    //        return this->m_lSeasonTicket.size();
+    //    }
+    //    Q_INVOKABLE SeasonTicketItem* getSeasonTicketFromArrayIndex(int index);
+    //    SeasonTicketItem*             getSeasonTicket(qint32 ticketIndex);
+    //    Q_INVOKABLE QString getSeasonTicketLastLocalUpdateString();
+    //    qint64              getSeasonTicketLastLocalUpdate();
+    //    qint64              getSeasonTicketLastServerUpdate();
+    //    void                resetSeasonTicketLastServerUpdate();
 
     Q_INVOKABLE MeetingInfo* getMeetingInfo(quint32 type)
     {
@@ -176,8 +176,8 @@ public:
 
     bool isIPLookUpDone() { return this->m_bIpAdressWasSet; }
 
-    void        setUpdateLink(QString link) { this->m_updateLink = link; }
-    Q_INVOKABLE QString getUpdateLink() { return this->m_updateLink; }
+    void setUpdateLink(QString link) { this->m_updateLink = link; }
+    //    Q_INVOKABLE QString getUpdateLink() { return this->m_updateLink; }
 
 signals:
     void

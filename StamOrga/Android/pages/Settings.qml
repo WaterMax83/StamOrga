@@ -94,7 +94,7 @@ Flickable {
                }
                CheckBox {
                     id: saveInfosOnApp
-                    checked: globalSettings.saveInfosOnApp
+                    checked: gStaGlobalSettings.getSaveInfosOnApp()
                     onCheckedChanged: valueWasEditedEnableSave()
                }
            }
@@ -274,8 +274,8 @@ Flickable {
            saveSettings = true;
         }
 
-        if (globalSettings.saveInfosOnApp !== saveInfosOnApp.checked) {
-           globalSettings.saveInfosOnApp = saveInfosOnApp.checked;
+        if (gStaGlobalSettings.getSaveInfosOnApp() !== saveInfosOnApp.checked) {
+           gStaGlobalSettings.setSaveInfosOnApp(saveInfosOnApp.checked);
            saveSettings = true;
         }
 
@@ -393,5 +393,5 @@ Flickable {
        valueWasEditedEnableSave();
    }
 
-   function notifyUserIntConnectionFinished(result) {}
+   function notifyUserIntConnectionFinished(result, msg) {}
 }

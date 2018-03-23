@@ -36,7 +36,7 @@ qint32 ConfigList::removeItem(const QString name)
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
     for (int i = 0; i < this->m_lInteralList.size(); i++) {
-        if (this->m_lInteralList[i]->m_index == (quint32)index) {
+        if (this->m_lInteralList[i]->m_index == index) {
             this->m_lInteralList.removeAt(i);
             this->saveCurrentInteralList();
 
@@ -49,7 +49,7 @@ qint32 ConfigList::removeItem(const QString name)
     return ERROR_CODE_COMMON;
 }
 
-qint32 ConfigList::removeItem(const quint32 index)
+qint32 ConfigList::removeItem(const qint32 index)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
@@ -80,7 +80,7 @@ bool ConfigList::itemExists(QString name)
     return false;
 }
 
-bool ConfigList::itemExists(quint32 index)
+bool ConfigList::itemExists(qint32 index)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
@@ -91,7 +91,7 @@ bool ConfigList::itemExists(quint32 index)
     return false;
 }
 
-ConfigItem* ConfigList::getItem(quint32 index)
+ConfigItem* ConfigList::getItem(qint32 index)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
@@ -113,7 +113,7 @@ qint32 ConfigList::getItemIndex(const QString name)
     return -1;
 }
 
-QString ConfigList::getItemName(quint32 index)
+QString ConfigList::getItemName(qint32 index)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
@@ -157,7 +157,7 @@ bool ConfigList::updateItemValue(ConfigItem* pItem, QString key, QVariant value,
     for (int i = 0; i < arrayCount; i++) {
         this->m_pConfigSettings->setArrayIndex(i);
         //        QString actName  = this->m_pConfigSettings->value(ITEM_NAME, "").toString();
-        quint32 actIndex = this->m_pConfigSettings->value(ITEM_INDEX, 0).toInt();
+        qint32 actIndex = this->m_pConfigSettings->value(ITEM_INDEX, 0).toInt();
         if (pItem->m_index == actIndex) {
 
             this->m_pConfigSettings->setValue(key, value);
@@ -186,7 +186,7 @@ void ConfigList::addNewConfigItem(ConfigItem* item, QList<ConfigItem*>* pList)
 
 quint32 ConfigList::getNextInternalIndex()
 {
-    quint32 savedIndex, usedIndex = 0;
+    qint32 savedIndex, usedIndex = 0;
 
     foreach (ConfigItem* item, this->m_lInteralList) {
         if (item->m_index > usedIndex)
@@ -196,7 +196,7 @@ quint32 ConfigList::getNextInternalIndex()
     QMutexLocker locker(&this->m_mConfigIniMutex);
 
     this->m_pConfigSettings->beginGroup(ITEM_INDEX_GROUP);
-    savedIndex = this->m_pConfigSettings->value(ITEM_MAX_INDEX, 0).toUInt();
+    savedIndex = this->m_pConfigSettings->value(ITEM_MAX_INDEX, 0).toInt();
 
     if (usedIndex > savedIndex)
         savedIndex = usedIndex;

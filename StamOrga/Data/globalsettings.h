@@ -33,7 +33,6 @@ class GlobalSettings : public QObject
     Q_PROPERTY(QString debugIPWifi READ debugIPWifi WRITE setDebugIPWifi NOTIFY debugIPWifiChanged)
     //    Q_PROPERTY(bool useReadableName READ useReadableName WRITE setUseReadableName NOTIFY useReadableNameChanged)
     Q_PROPERTY(bool loadGameInfo READ loadGameInfo WRITE setLoadGameInfo NOTIFY loadGameInfoChanged)
-    Q_PROPERTY(bool saveInfosOnApp READ saveInfosOnApp WRITE setSaveInfosOnApp NOTIFY saveInfosOnAppChanged)
     Q_PROPERTY(bool useVersionPopup READ useVersionPopup WRITE setUseVersionPopup NOTIFY useVersionPopupChanged)
 public:
     explicit GlobalSettings(QObject* parent = 0);
@@ -91,13 +90,6 @@ public:
         emit this->loadGameInfoChanged();
     }
 
-    bool saveInfosOnApp() { return this->m_saveInfosOnApp; }
-    void setSaveInfosOnApp(bool save)
-    {
-        this->m_saveInfosOnApp = save;
-        emit this->saveInfosOnAppChanged();
-    }
-
     bool useVersionPopup() { return this->m_useVersionPopup; }
     void setUseVersionPopup(bool use)
     {
@@ -151,7 +143,6 @@ private:
     bool        m_alreadyConnected;
     //    bool         m_useReadableName;
     bool         m_loadGameInfo;
-    bool         m_saveInfosOnApp;
     bool         m_useVersionPopup;
     QString      m_debugIP;
     QString      m_debugIPWifi;

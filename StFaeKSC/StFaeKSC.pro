@@ -59,6 +59,8 @@ SOURCES += main.cpp \
     Network/ccontcpmainsocket.cpp \
     Network/ccontcpmaindata.cpp \
     Network/ccontcpdataserver.cpp \
+    Manager/cticketmanager.cpp \
+    Manager/cglobalmanager.cpp
 
 
 HEADERS += \
@@ -97,6 +99,8 @@ HEADERS += \
     Network/ccontcpmainsocket.h \
     Network/ccontcpmaindata.h \
     Network/ccontcpdataserver.h \
+    Manager/cticketmanager.h \
+    Manager/cglobalmanager.h
 
 unix {
 #    QMAKE_POST_LINK = mkdir -p $$OUTPUT_FOLDER && cp $$TARGET $$OUTPUT_FOLDER

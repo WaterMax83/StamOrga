@@ -32,14 +32,17 @@ public:
 
     qint32 initialize() override;
 
+    Q_INVOKABLE bool getSaveInfosOnApp();
+    Q_INVOKABLE void setSaveInfosOnApp(const bool save);
+
     qint32 startGettingVersionInfo();
     qint32 handleVersionResponse(MessageProtocol* msg);
 
     void setAlreadyConnected(const bool con);
 
-    QString getRemoteVersion();
-    QString getUpdateLink();
-    QString getVersionInfo();
+    QString     getRemoteVersion();
+    Q_INVOKABLE QString getUpdateLink();
+    Q_INVOKABLE QString getVersionInfo();
 
 signals:
 
@@ -49,6 +52,7 @@ private:
     QString m_versionInfo;
     QString m_remoteVersion;
     QString m_updateLink;
+    bool    m_bSaveInfosOnApp;
 
     bool m_bAlreadyConnected;
 };

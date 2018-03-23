@@ -48,7 +48,7 @@ SeasonTicket::SeasonTicket()
             quint32 index      = this->m_pConfigSettings->value(ITEM_INDEX, 0).toInt();
 
             QString user      = this->m_pConfigSettings->value(TICKET_USER, "").toString();
-            qint32 userIndex = this->m_pConfigSettings->value(TICKET_USER_INDEX, 0).toInt();
+            qint32  userIndex = this->m_pConfigSettings->value(TICKET_USER_INDEX, 0).toInt();
             quint8  discount  = quint8(this->m_pConfigSettings->value(TICKET_DISCOUNT, 0).toUInt());
             QString place     = this->m_pConfigSettings->value(TICKET_PLACE, "").toString();
             qint64  creation  = this->m_pConfigSettings->value(TICKET_CREATE, 0).toULongLong();
@@ -83,7 +83,7 @@ SeasonTicket::SeasonTicket()
         this->saveCurrentInteralList();
 }
 
-int SeasonTicket::addNewSeasonTicket(QString user, quint32 userIndex, QString ticketName, quint8 discount)
+int SeasonTicket::addNewSeasonTicket(QString user, qint32 userIndex, QString ticketName, quint8 discount)
 {
     if (this->itemExists(ticketName)) {
         qInfo() << QString("SeasonTicket \"%1\" already exists, cannot add").arg(ticketName);
@@ -126,7 +126,7 @@ int SeasonTicket::addNewSeasonTicket(QString user, quint32 userIndex, QString ti
     return newIndex;
 }
 
-int SeasonTicket::changeSeasonTicketInfos(const quint32 index, const qint32 discount, const QString name, const QString place)
+int SeasonTicket::changeSeasonTicketInfos(const qint32 index, const qint32 discount, const QString name, const QString place)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 

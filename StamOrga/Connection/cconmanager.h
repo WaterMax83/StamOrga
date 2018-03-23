@@ -68,18 +68,6 @@ public:
     //    qint32 startDeleteFanclubNewsItem(const quint32 newsIndex);
     //    qint32 startStatisticsCommand(const QByteArray& command);
 
-
-    //    void setGlobalData(GlobalData* pData)
-    //    {
-    //        if (pData != NULL)
-    //            this->m_pGlobalData = pData;
-    //    }
-
-    //    GlobalData* getGlobalData()
-    //    {
-    //        return this->m_pGlobalData;
-    //    }
-
     //    ConnectionInfo *GetConnectionInfo() { return &this->m_conInfo; }
 
     void sendLoginRequest();

@@ -96,10 +96,7 @@ private:
     //    void startSendGamesListRequest(DataConRequest request);
     //    void startSendGamesInfoListRequest(DataConRequest request);
     //    void startSendSetGameTimeFixedRequest(DataConRequest request);
-    //    void startSendAddSeasonTicket(DataConRequest request);
     //    void startSendRemoveSeasonTicket(DataConRequest request);
-    //    void startSendSeasonTicketListRequest(DataConRequest request);
-    //    void startSendEditSeasonTicket(DataConRequest request);
     //    void startSendChangeTicketState(DataConRequest request);
     //    void startSendAvailableTicketListRequest(DataConRequest request);
     //    void startSendChangeGameRequest(DataConRequest request);

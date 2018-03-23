@@ -210,7 +210,7 @@ Page {
         }
     }
 
-    function notifyUserIntConnectionFinished(result) {}
+    function notifyUserIntConnectionFinished(result, msg) {}
 
     function notifyUserIntGamesListFinished(result) {
         if (result !== 1) {

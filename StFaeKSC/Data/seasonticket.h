@@ -67,8 +67,8 @@ public:
     ~SeasonTicket();
 
 
-    int addNewSeasonTicket(QString user, quint32 userIndex, QString ticketName, quint8 discount);
-    int changeSeasonTicketInfos(const quint32 index, const qint32 discount, const QString name, const QString place);
+    int addNewSeasonTicket(QString user, qint32 userIndex, QString ticketName, quint8 discount);
+    int changeSeasonTicketInfos(const qint32 index, const qint32 discount, const QString name, const QString place);
     int showAllSeasonTickets();
 
     virtual qint32 checkConsistency() { return -12; }

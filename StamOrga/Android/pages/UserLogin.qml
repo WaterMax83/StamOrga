@@ -156,7 +156,7 @@ Flickable {
                         var component = Qt.createComponent("../components/EditableTextDialog.qml");
                         if (component.status === Component.Ready) {
                             var dialog = component.createObject(flickableUser,{popupType: 1});
-                            if (globalUserData.readableName === "")
+                            if (gConUserSettings.getReadableName() === "")
                                 dialog.headerText = "Nutzername anlegen";
                             else
                                 dialog.headerText = "Nutzername ändern";
@@ -164,7 +164,7 @@ Flickable {
                             dialog.parentHeight = flickableUser.height
                             dialog.parentWidth = flickableUser.width
                             dialog.textMinSize = 4;
-                            dialog.editableText = globalUserData.readableName;
+                            dialog.editableText = gConUserSettings.getReadableName();
                             dialog.acceptedTextEdit.connect(acceptedEditReadableName);
                             dialog.open();
                         }
@@ -175,7 +175,8 @@ Flickable {
                         busyIndicatorUserlogin.loadingVisible = true;
                         busyIndicatorUserlogin.infoVisible = true;
                         busyIndicatorUserlogin.infoText = "Ändere Nutzernamen"
-                        userIntUser.startUpdateReadableName(text)
+                        gConUserSettings.startUpdateReadableName(text.trim());
+//                        userIntUser.startUpdateReadableName(text)
                     }
                 }
                 Text {
@@ -253,7 +254,7 @@ Flickable {
     }
 
 
-    function notifyUserIntConnectionFinished(result) {
+    function notifyUserIntConnectionFinished(result, msg) {
         btnSendData.enabled = true
         busyIndicatorUserlogin.loadingVisible = false;
         if (result === 1) {
@@ -312,7 +313,7 @@ Flickable {
         } else {
             columnLayoutUserLogin.visible = false;
             columnLayoutUserData.visible = true;
-            if (globalUserData.readableName === "")
+            if (gConUserSettings.getReadableName() === "")
                 btnChangeReadableName.text = "Nutzername anlegen"
             else
                 btnChangeReadableName.text = "Nutzername ändern"
@@ -337,7 +338,8 @@ Flickable {
                 labelPasswordTooShort.visible = true
                 changePassWordDialog.open()
             } else if (txtnewPassWord.text.trim() == txtnewPassWordReplay.text.trim()) {
-                userIntUser.startUpdateUserPassword(txtnewPassWord.text.trim())
+                gConUserSettings.startUpdatePassword(txtnewPassWord.text.trim());
+//                userIntUser.startUpdateUserPassword()
                 busyIndicatorUserlogin.loadingVisible = true;
                 busyIndicatorUserlogin.infoVisible = true;
                 busyIndicatorUserlogin.infoText = "Ändere Passwort"

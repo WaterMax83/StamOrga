@@ -318,6 +318,6 @@ Item {
         currentAwayTripInfo.notifyAcceptMeetingFinished(result);
     }
 
-    function notifyUserIntConnectionFinished(result) {}
+    function notifyUserIntConnectionFinished(result, msg) {}
 
 }

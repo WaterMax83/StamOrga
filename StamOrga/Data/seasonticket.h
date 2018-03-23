@@ -36,7 +36,7 @@ public:
     explicit SeasonTicketItem(QObject* parent = 0);
 
     QString name() { return this->m_name; }
-    void setName(const QString& name)
+    void    setName(const QString& name)
     {
         if (this->m_name != name) {
             this->m_name = name;
@@ -45,7 +45,7 @@ public:
     }
 
     QString place() { return this->m_place; }
-    void setPlace(const QString& place)
+    void    setPlace(const QString& place)
     {
         if (this->m_place != place) {
             this->m_place = place;
@@ -54,7 +54,7 @@ public:
     }
 
     quint8 discount() { return this->m_discount; }
-    void setDiscount(const quint8 discount)
+    void   setDiscount(const quint8 discount)
     {
         if (this->m_discount != discount) {
             this->m_discount = discount;
@@ -63,7 +63,7 @@ public:
     }
 
     qint32 index() { return this->m_index; }
-    void setIndex(const qint32 index)
+    void   setIndex(const qint32 index)
     {
         if (this->m_index != index) {
             this->m_index = index;
@@ -72,7 +72,7 @@ public:
     }
 
     qint32 userIndex() { return this->m_userIndex; }
-    void setUserIndex(const qint32 userIndex)
+    void   setUserIndex(const qint32 userIndex)
     {
         if (this->m_userIndex != userIndex) {
             this->m_userIndex = userIndex;
@@ -81,12 +81,13 @@ public:
     }
 
     Q_INVOKABLE bool isTicketYourOwn() { return this->m_ownTicket; }
-    void checkTicketOwn(qint32 userIndex)
+    void             checkTicketOwn(qint32 userIndex)
     {
-        if (this->m_userIndex == userIndex)
+        if (this->m_userIndex == userIndex) {
             this->m_ownTicket = true;
-        else
+        } else {
             this->m_ownTicket = false;
+        }
     }
 
     Q_INVOKABLE quint32 getTicketState()

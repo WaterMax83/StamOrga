@@ -34,8 +34,16 @@ public:
 
     qint32 getValue(const QString group, const QString key, QString& value);
     qint32 setValue(const QString group, const QString key, const QString value);
+    qint32 getValue(const QString group, const QString key, const qint32 index, QString& value);
+    qint32 setValue(const QString group, const QString key, const qint32 index, const QString value);
     qint32 getBoolValue(const QString group, const QString key, bool& value);
     qint32 setBoolValue(const QString group, const QString key, const bool value);
+    qint32 getInt64Value(const QString group, const QString key, qint64& value);
+    qint32 setInt64Value(const QString group, const QString key, const qint64 value);
+    qint32 getInt64Value(const QString group, const QString key, const qint32 index, qint64& value);
+    qint32 setInt64Value(const QString group, const QString key, const qint32 index, const qint64 value);
+
+    qint32 removeGroup(const QString group);
 
 signals:
 
@@ -44,7 +52,10 @@ public slots:
 private:
     QSettings* m_pMainUserSettings;
 
+    qint32 getValue(const QString group, const QString key, QVariant& value, const QVariant defaultValue = "");
     qint32 setValue(const QString group, const QString key, const QVariant value);
+    qint32 getValue(const QString group, const QString key, const qint32 index, QVariant& value, const QVariant defaultValue = "");
+    qint32 setValue(const QString group, const QString key, const qint32 index, const QVariant value);
 };
 
 extern cStaSettingsManager g_StaSettingsManager;

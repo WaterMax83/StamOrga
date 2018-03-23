@@ -23,13 +23,13 @@
 
 #include "../../Common/General/globalfunctions.h"
 #include "../Data/globaldata.h"
-#include "../connectionhandling.h"
+//#include "../connectionhandling.h"
 
 class UserInterface : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(GlobalData* globalData READ globalData WRITE setGlobalData)
+    //    Q_PROPERTY(GlobalData* globalData READ globalData WRITE setGlobalData)
 public:
     explicit UserInterface(QObject* parent = 0);
 
@@ -44,10 +44,6 @@ public:
     Q_INVOKABLE qint32 startListGettingGamesInfo();
 
     Q_INVOKABLE qint32 startSetFixedGameTime(const quint32 gameIndex, const quint32 fixed);
-
-    Q_INVOKABLE qint32 startUpdateUserPassword(QString newPassw);
-
-    Q_INVOKABLE qint32 startUpdateReadableName(QString name);
 
     Q_INVOKABLE qint32 startAddSeasonTicket(QString name, quint32 discount);
 
@@ -107,20 +103,20 @@ public:
         return getErrorCodeString(code);
     }
 
-    GlobalData* globalData()
-    {
-        return this->m_pConHandle->getGlobalData();
-    }
-    void setGlobalData(GlobalData* pData)
-    {
-        this->m_pConHandle->setGlobalData(pData);
-    }
+    //    GlobalData* globalData()
+    //    {
+    //        return this->m_pConHandle->getGlobalData();
+    //    }
+    //    void setGlobalData(GlobalData* pData)
+    //    {
+    //        this->m_pConHandle->setGlobalData(pData);
+    //    }
 
 signals:
-    void notifyConnectionFinished(qint32 result);
-    void notifyVersionRequestFinished(qint32 result, QString msg);
+    void notifyConnectionFinished(qint32 result, const QString msg);
+    void notifyVersionRequestFinished(qint32 result);
     void notifyUserPropertiesFinished(qint32 result);
-    void notifyUpdatePasswordRequestFinished(qint32 result, QString newPassWord);
+    void notifyUpdatePasswordRequestFinished(qint32 result);
     void notifyUpdateReadableNameRequest(qint32 result);
     void notifyGamesListFinished(qint32 result);
     void notifyGamesInfoListFinished(qint32 result);
@@ -146,16 +142,13 @@ signals:
     void notifyStatisticsCommandFinished(qint32 result);
 
 public slots:
-    void slConnectionRequestFinished(qint32 result);
-    void slVersionRequestFinished(qint32 result, QString msg);
-    void slUpdatePasswordRequestFinished(qint32 result, QString newPassWord);
+    void slotConnectionRequestFinished(qint32 result, const QString msg);
 
-    void slCommandFinished(quint32 command, qint32 result);
+    void slotCommandFinished(quint32 command, qint32 result);
 
 
 private:
-    ConnectionHandling* m_pConHandle;
-    QMutex              m_notifyMutex;
+    QMutex m_notifyMutex;
 };
 
 #endif // USERINTERFACE_H

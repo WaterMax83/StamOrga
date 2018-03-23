@@ -90,44 +90,44 @@ qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol* msg)
     QByteArray  data(msg->getPointerToData());
     QJsonObject rootObj = QJsonDocument::fromJson(data).object();
 
-    qint32  rValue       = rootObj.value("rvalue").toInt(ERROR_CODE_MISSING_PARAMETER);
-    qint32  index        = rootObj.value("index").toInt(-1);
-    qint32  properties   = rootObj.value("property").toInt(0);
-    QString readableName = rootObj.value("readableName").toString();
+    qint32 rValue = rootObj.value("rvalue").toInt(ERROR_CODE_MISSING_PARAMETER);
+    qint32 index  = rootObj.value("index").toInt(-1);
+    //    qint32 properties = rootObj.value("property").toInt(0);
+    //    QString readableName = rootObj.value("readableName").toString();
 
     //    qInfo().noquote() << rootObj.value("tickets");
 
     this->m_pGlobalData->setUserIndex(index);
 
-    SeasonTicketItem* seasonTicket;
-    int               i = 0;
-    while ((seasonTicket = this->m_pGlobalData->getSeasonTicketFromArrayIndex(i++)) != NULL)
-        seasonTicket->checkTicketOwn(index);
+    //    SeasonTicketItem* seasonTicket;
+    //    int               i = 0;
+    //    while ((seasonTicket = this->m_pGlobalData->getSeasonTicketFromArrayIndex(i++)) != NULL)
+    //        seasonTicket->checkTicketOwn(index);
 
-    if (rValue == ERROR_CODE_SUCCESS) {
-        if (this->m_pGlobalData->getUserProperties() != (quint32)properties) {
-            this->m_pGlobalData->SetUserProperties(properties);
-            qInfo().noquote() << QString("Setting user properties to 0x%1").arg(QString::number(properties, 16));
-        }
-    } else
-        this->m_pGlobalData->SetUserProperties(0x0);
+    //    if (rValue == ERROR_CODE_SUCCESS) {
+    //        if (this->m_pGlobalData->getUserProperties() != (quint32)properties) {
+    //            this->m_pGlobalData->SetUserProperties(properties);
+    //            qInfo().noquote() << QString("Setting user properties to 0x%1").arg(QString::number(properties, 16));
+    //        }
+    //    } else
+    //        this->m_pGlobalData->SetUserProperties(0x0);
 
-    this->m_pGlobalData->setReadableName(readableName);
+    //    this->m_pGlobalData->setReadableName(readableName);
 
-    if (rootObj.contains("tickets")) {
-        GameUserData* pGameUserData = this->m_pGlobalData->getGameUserDataHandler();
-        pGameUserData->clearTicketGameList();
+    //    if (rootObj.contains("tickets")) {
+    //        GameUserData* pGameUserData = this->m_pGlobalData->getGameUserDataHandler();
+    //        pGameUserData->clearTicketGameList();
 
-        QJsonArray arrTickets = rootObj.value("tickets").toArray();
-        for (int i = 0; i < arrTickets.count(); i++) {
-            QJsonObject ticket    = arrTickets.at(i).toObject();
-            qint32      gameIndex = ticket.value("gameIndex").toInt(-1);
-            if (ticket.value("type").toString("") == "reserved")
-                pGameUserData->setTicketGameIndex(gameIndex, TICKET_STATE_RESERVED);
-            else if (ticket.value("type").toString("") == "free")
-                pGameUserData->setTicketGameIndex(gameIndex, TICKET_STATE_FREE);
-        }
-    }
+    //        QJsonArray arrTickets = rootObj.value("tickets").toArray();
+    //        for (int i = 0; i < arrTickets.count(); i++) {
+    //            QJsonObject ticket    = arrTickets.at(i).toObject();
+    //            qint32      gameIndex = ticket.value("gameIndex").toInt(-1);
+    //            if (ticket.value("type").toString("") == "reserved")
+    //                pGameUserData->setTicketGameIndex(gameIndex, TICKET_STATE_RESERVED);
+    //            else if (ticket.value("type").toString("") == "free")
+    //                pGameUserData->setTicketGameIndex(gameIndex, TICKET_STATE_FREE);
+    //        }
+    //    }
 
     return rValue;
 }
@@ -364,64 +364,64 @@ qint32 DataHandling::getHandleGamesInfoListResponse(MessageProtocol* msg)
 
 qint32 DataHandling::getHandleSeasonTicketListResponse(MessageProtocol* msg)
 {
-    if (msg->getDataLength() < 6)
-        return ERROR_CODE_WRONG_SIZE;
+    //    if (msg->getDataLength() < 6)
+    //        return ERROR_CODE_WRONG_SIZE;
 
-    quint32     userIndex = this->m_pGlobalData->userIndex();
-    const char* pData     = msg->getPointerToData();
-    qint32      rValue;
-    memcpy(&rValue, pData, sizeof(qint32));
-    rValue = qFromLittleEndian(rValue);
+    //    quint32     userIndex = this->m_pGlobalData->userIndex();
+    //    const char* pData     = msg->getPointerToData();
+    qint32 rValue = 0;
+    //    memcpy(&rValue, pData, sizeof(qint32));
+    //    rValue = qFromLittleEndian(rValue);
 
-    if (rValue != ERROR_CODE_SUCCESS)
-        return rValue;
+    //    if (rValue != ERROR_CODE_SUCCESS)
+    //        return rValue;
 
-    quint32 totalSize = msg->getDataLength();
-    quint32 offset    = 4;
+    //    quint32 totalSize = msg->getDataLength();
+    //    quint32 offset    = 4;
 
-    quint16 updateIndex;
-    memcpy(&updateIndex, pData + offset, sizeof(quint16));
-    updateIndex = qFromLittleEndian(updateIndex);
-    offset += 2;
+    //    quint16 updateIndex;
+    //    memcpy(&updateIndex, pData + offset, sizeof(quint16));
+    //    updateIndex = qFromLittleEndian(updateIndex);
+    //    offset += 2;
 
-    this->m_pGlobalData->startUpdateSeasonTickets(updateIndex);
-    while (offset + TICKET_OFFSET < totalSize) {
-        SeasonTicketItem* sTicket = new SeasonTicketItem();
-        quint16           size    = qFromLittleEndian(*(qint16*)(pData + offset));
-        offset += 2;
+    //    this->m_pGlobalData->startUpdateSeasonTickets(updateIndex);
+    //    while (offset + TICKET_OFFSET < totalSize) {
+    //        SeasonTicketItem* sTicket = new SeasonTicketItem();
+    //        quint16           size    = qFromLittleEndian(*(qint16*)(pData + offset));
+    //        offset += 2;
 
-        if (size <= 8) {
-            qWarning().noquote() << QString("Size is to small %1").arg(size);
-            delete sTicket;
-            break;
-        }
+    //        if (size <= 8) {
+    //            qWarning().noquote() << QString("Size is to small %1").arg(size);
+    //            delete sTicket;
+    //            break;
+    //        }
 
-        sTicket->setDiscount(*(quint8*)(pData + offset));
-        offset += 1;
-        sTicket->setIndex(qFromLittleEndian(*(quint32*)(pData + offset)));
-        offset += 4;
-        sTicket->setUserIndex(qFromLittleEndian(*(quint32*)(pData + offset)));
-        offset += 4;
-        sTicket->checkTicketOwn(userIndex);
+    //        sTicket->setDiscount(*(quint8*)(pData + offset));
+    //        offset += 1;
+    //        sTicket->setIndex(qFromLittleEndian(*(quint32*)(pData + offset)));
+    //        offset += 4;
+    //        sTicket->setUserIndex(qFromLittleEndian(*(quint32*)(pData + offset)));
+    //        offset += 4;
+    //        sTicket->checkTicketOwn(userIndex);
 
-        QString ticketString(QByteArray(pData + offset, size - TICKET_OFFSET));
-        offset += (size - TICKET_OFFSET);
-        QStringList lsticketString = ticketString.split(";");
+    //        QString ticketString(QByteArray(pData + offset, size - TICKET_OFFSET));
+    //        offset += (size - TICKET_OFFSET);
+    //        QStringList lsticketString = ticketString.split(";");
 
-        if (lsticketString.size() > 0)
-            sTicket->setName(lsticketString.value(0));
-        if (lsticketString.size() > 1)
-            sTicket->setPlace(lsticketString.value(1));
+    //        if (lsticketString.size() > 0)
+    //            sTicket->setName(lsticketString.value(0));
+    //        if (lsticketString.size() > 1)
+    //            sTicket->setPlace(lsticketString.value(1));
 
-        QQmlEngine::setObjectOwnership(sTicket, QQmlEngine::CppOwnership);
-        this->m_pGlobalData->addNewSeasonTicket(sTicket, updateIndex);
-    }
+    //        QQmlEngine::setObjectOwnership(sTicket, QQmlEngine::CppOwnership);
+    //        this->m_pGlobalData->addNewSeasonTicket(sTicket, updateIndex);
+    //    }
 
-    qint64 serverTimeStamp;
-    memcpy(&serverTimeStamp, pData + offset, sizeof(qint64));
-    serverTimeStamp = qFromLittleEndian(serverTimeStamp);
+    //    qint64 serverTimeStamp;
+    //    memcpy(&serverTimeStamp, pData + offset, sizeof(qint64));
+    //    serverTimeStamp = qFromLittleEndian(serverTimeStamp);
 
-    this->m_pGlobalData->saveCurrentSeasonTickets(serverTimeStamp);
+    //    this->m_pGlobalData->saveCurrentSeasonTickets(serverTimeStamp);
 
     return rValue;
 }
@@ -458,73 +458,73 @@ qint32 DataHandling::getHandleChangeTicketStateResponse(MessageProtocol* msg)
 #define AVAILABLE_HEAD_OFFSET 2
 qint32 DataHandling::getHandleAvailableTicketListResponse(MessageProtocol* msg, const quint32 gameIndex)
 {
-    if (msg->getDataLength() < 4)
-        return ERROR_CODE_WRONG_SIZE;
+    //    if (msg->getDataLength() < 4)
+    //        return ERROR_CODE_WRONG_SIZE;
 
-    const char* pData = msg->getPointerToData();
-    qint32      result;
-    memcpy(&result, pData, sizeof(quint32));
-    result = qFromLittleEndian(result);
-    if (result != ERROR_CODE_SUCCESS)
-        return result;
+    //    const char* pData = msg->getPointerToData();
+    qint32 result;
+    //    memcpy(&result, pData, sizeof(quint32));
+    //    result = qFromLittleEndian(result);
+    //    if (result != ERROR_CODE_SUCCESS)
+    //        return result;
 
-    quint32 offset = 4;
-    if (msg->getDataLength() <= 4)
-        return ERROR_CODE_WRONG_SIZE;
+    //    quint32 offset = 4;
+    //    if (msg->getDataLength() <= 4)
+    //        return ERROR_CODE_WRONG_SIZE;
 
-    for (uint i = 0; i < this->m_pGlobalData->getSeasonTicketLength(); i++) {
-        SeasonTicketItem* item = this->m_pGlobalData->getSeasonTicketFromArrayIndex(i);
-        if (item != NULL)
-            item->setTicketState(TICKET_STATE_BLOCKED);
-    }
+    //    for (uint i = 0; i < this->m_pGlobalData->getSeasonTicketLength(); i++) {
+    //        SeasonTicketItem* item = this->m_pGlobalData->getSeasonTicketFromArrayIndex(i);
+    //        if (item != NULL)
+    //            item->setTicketState(TICKET_STATE_BLOCKED);
+    //    }
 
-    qint16 countOfFreeTickets = qFromLittleEndian(*((qint16*)(pData + offset)));
-    offset += sizeof(qint16);
-    qint16 countOfReservedTickets = qFromLittleEndian(*((qint16*)(pData + offset)));
-    offset += sizeof(qint16);
+    //    qint16 countOfFreeTickets = qFromLittleEndian(*((qint16*)(pData + offset)));
+    //    offset += sizeof(qint16);
+    //    qint16 countOfReservedTickets = qFromLittleEndian(*((qint16*)(pData + offset)));
+    //    offset += sizeof(qint16);
 
-    for (int i = 0; i < countOfFreeTickets; i++) {
-        if (offset + AVAILABLE_HEAD_OFFSET > msg->getDataLength()) {
-            qWarning() << "Error in message for get available ticket list";
-            return result;
-        }
-        quint32           ticketIndex = qFromLittleEndian(*((quint32*)(pData + offset)));
-        SeasonTicketItem* item        = this->m_pGlobalData->getSeasonTicket(ticketIndex);
-        if (item != NULL)
-            item->setTicketState(TICKET_STATE_FREE);
-        else {
-            qWarning().noquote() << QString("Ticket with number %1 is missing for availableTicket Free").arg(ticketIndex);
-            result = ERROR_CODE_MISSING_TICKET;
-        }
+    //    for (int i = 0; i < countOfFreeTickets; i++) {
+    //        if (offset + AVAILABLE_HEAD_OFFSET > msg->getDataLength()) {
+    //            qWarning() << "Error in message for get available ticket list";
+    //            return result;
+    //        }
+    //        quint32           ticketIndex = qFromLittleEndian(*((quint32*)(pData + offset)));
+    //        SeasonTicketItem* item        = this->m_pGlobalData->getSeasonTicket(ticketIndex);
+    //        if (item != NULL)
+    //            item->setTicketState(TICKET_STATE_FREE);
+    //        else {
+    //            qWarning().noquote() << QString("Ticket with number %1 is missing for availableTicket Free").arg(ticketIndex);
+    //            result = ERROR_CODE_MISSING_TICKET;
+    //        }
 
-        offset += 4;
-    }
-    for (int i = 0; i < countOfReservedTickets; i++) {
-        if (offset + AVAILABLE_HEAD_OFFSET > msg->getDataLength()) {
-            qWarning() << "Error in message for get available ticket list";
-            return result;
-        }
-        quint32           ticketIndex = qFromLittleEndian(*((quint32*)(pData + offset)));
-        SeasonTicketItem* item        = this->m_pGlobalData->getSeasonTicket(ticketIndex);
-        offset += 4;
-        if (item != NULL)
-            item->setTicketState(TICKET_STATE_RESERVED);
-        else {
-            qWarning().noquote() << QString("Ticket with number %1 is missing for availableTicket Reserved").arg(ticketIndex);
-            result = ERROR_CODE_MISSING_TICKET;
-            continue;
-        }
-        QString name(pData + offset);
-        item->setReserveName(name);
-        offset += name.size() + 1;
-    }
+    //        offset += 4;
+    //    }
+    //    for (int i = 0; i < countOfReservedTickets; i++) {
+    //        if (offset + AVAILABLE_HEAD_OFFSET > msg->getDataLength()) {
+    //            qWarning() << "Error in message for get available ticket list";
+    //            return result;
+    //        }
+    //        quint32           ticketIndex = qFromLittleEndian(*((quint32*)(pData + offset)));
+    //        SeasonTicketItem* item        = this->m_pGlobalData->getSeasonTicket(ticketIndex);
+    //        offset += 4;
+    //        if (item != NULL)
+    //            item->setTicketState(TICKET_STATE_RESERVED);
+    //        else {
+    //            qWarning().noquote() << QString("Ticket with number %1 is missing for availableTicket Reserved").arg(ticketIndex);
+    //            result = ERROR_CODE_MISSING_TICKET;
+    //            continue;
+    //        }
+    //        QString name(pData + offset);
+    //        item->setReserveName(name);
+    //        offset += name.size() + 1;
+    //    }
 
-    GamePlay* game = this->m_pGlobalData->getGamePlay(gameIndex);
-    if (game != NULL) {
-        game->setFreeTickets(countOfFreeTickets);
-        game->setReservedTickets(countOfReservedTickets);
-        game->setBlockedTickets(this->m_pGlobalData->getSeasonTicketLength() - countOfFreeTickets - countOfReservedTickets);
-    }
+    //    GamePlay* game = this->m_pGlobalData->getGamePlay(gameIndex);
+    //    if (game != NULL) {
+    //        game->setFreeTickets(countOfFreeTickets);
+    //        game->setReservedTickets(countOfReservedTickets);
+    //        game->setBlockedTickets(this->m_pGlobalData->getSeasonTicketLength() - countOfFreeTickets - countOfReservedTickets);
+    //    }
 
     return result;
 }

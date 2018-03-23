@@ -1,0 +1,21 @@
+SystemTest Cases:
+
+#001:	User Login
+No server running					-> Toast Message nicht möglich oder Timeout
+Wrong Login Name: 					-> Unkown user
+Wrong Password: 					-> Wrong Password
+Everythink correct:					-> Connection success
+Open without passw or Login			-> Login page opens
+
+#002:	Version request
+After every connection version check -> Popup if set in settings or Update in Listview
+
+#003:	User Profile
+Change Readable Name				-> changes the name (should be set in new ticket for example)
+Change Password						-> Connect in UserProfile works after that and after restart
+
+#004:	Season Tickets
+Load Ticket List					-> Own tickets should be marked
+After first connect					-> Own tickets should be marked
+DoNotSaveInfosOnApp					-> After open list should be empty
+Edit SeasonTicket Name or Place		-> List should be updated

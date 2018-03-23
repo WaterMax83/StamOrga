@@ -469,10 +469,10 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
         break;
 
     case OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME:
-        if (request.m_result == ERROR_CODE_SUCCESS) {
-            this->m_pGlobalData->setReadableName(request.m_returnData);
-            this->m_pGlobalData->saveGlobalUserSettings();
-        }
+        //        if (request.m_result == ERROR_CODE_SUCCESS) {
+        //            this->m_pGlobalData->setReadableName(request.m_returnData);
+        //            this->m_pGlobalData->saveGlobalUserSettings();
+        //        }
 
         emit this->sNotifyCommandFinished(request.m_request, request.m_result);
         break;
@@ -494,7 +494,7 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
     }
 
     case OP_CODE_CMD_REQ::REQ_REMOVE_TICKET:
-        this->m_pGlobalData->resetSeasonTicketLastServerUpdate();
+        //        this->m_pGlobalData->resetSeasonTicketLastServerUpdate();
         emit this->sNotifyCommandFinished(request.m_request, request.m_result);
         break;
 

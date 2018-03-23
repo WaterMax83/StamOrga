@@ -140,33 +140,6 @@ qint32 cConManager::startMainConnection(QString name, QString passw)
 //    return ERROR_CODE_SUCCESS;
 //}
 
-//qint32 cConManager::startEditSeasonTicket(quint32 index, QString name, QString place, quint32 discount)
-//{
-//    DataConRequest req(OP_CODE_CMD_REQ::REQ_CHANGE_TICKET);
-//    req.m_lData.append(QString::number(index));
-//    req.m_lData.append(name);
-//    req.m_lData.append(place);
-//    req.m_lData.append(QString::number(discount));
-//    this->sendNewRequest(req);
-//    return ERROR_CODE_SUCCESS;
-//}
-
-//qint32 cConManager::startAddSeasonTicket(QString name, quint32 discount)
-//{
-//    DataConRequest req(OP_CODE_CMD_REQ::REQ_ADD_TICKET);
-//    req.m_lData.append(QString::number(discount));
-//    req.m_lData.append(name);
-//    this->sendNewRequest(req);
-//    return ERROR_CODE_SUCCESS;
-//}
-
-//qint32 cConManager::startListSeasonTickets()
-//{
-//    DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST);
-//    this->sendNewRequest(req);
-//    return ERROR_CODE_SUCCESS;
-//}
-
 //qint32 cConManager::startChangeSeasonTicketState(quint32 tickedIndex, quint32 gameIndex, quint32 state, QString name)
 //{
 //    DataConRequest req(OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET);
@@ -445,15 +418,17 @@ void cConManager::slotDataConLastRequestFinished(TcpDataConRequest* request)
             g_ConUserSettings.setSalt("");
             g_ConUserSettings.setPassWord("");
             emit this->signalNotifyConnectionFinished(request->m_result, getErrorCodeString(request->m_result));
+            this->stopDataConnection();
         }
 
         this->m_bIsConnecting = false;
         break;
 
-        //    case OP_CODE_CMD_REQ::REQ_GET_VERSION:
+    case OP_CODE_CMD_REQ::REQ_GET_VERSION:
         //        g_GlobalSettings->updateConnectionStatus(true);
         //        emit this->sNotifyVersionRequest(request.m_result, request.m_returnData);
-        //        return;
+        emit this->signalNotifyCommandFinished(request->m_request, request->m_result);
+        return;
 
         //    case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
         //        if (request.m_result == ERROR_CODE_SUCCESS) {

@@ -32,7 +32,8 @@ cStaGlobalSettings g_StaGlobalSettings;
 
 #define SETTINGS_GROUP      "GLOBAL_SETTINGS"
 
-#define SETT_ALREADY_CONNECTED     "AlreadyConnected"
+#define SETT_ALREADY_CONNECTED      "AlreadyConnected"
+#define SETT_SAVE_INFO_ON_APP       "SaveInfosOnApp"
 //#define USER_USERNAME   "UserName"
 //#define USER_PASSWORD   "Password"
 //#define USER_SALT       "Salt"
@@ -55,6 +56,8 @@ qint32 cStaGlobalSettings::initialize()
 
     g_StaSettingsManager.getBoolValue(SETTINGS_GROUP, SETT_ALREADY_CONNECTED, bValue);
     this->m_bAlreadyConnected = bValue;
+    g_StaSettingsManager.getBoolValue(SETTINGS_GROUP, SETT_SAVE_INFO_ON_APP, bValue);
+    this->m_bSaveInfosOnApp = bValue;
     //    g_StaSettingsManager.getValue(SETTINGS_GROUP, USER_USERNAME, value);
     //    this->m_userName = value;
     //    g_StaSettingsManager.getValue(SETTINGS_GROUP, USER_PASSWORD, value);
@@ -111,6 +114,20 @@ qint32 cStaGlobalSettings::handleVersionResponse(MessageProtocol* msg)
     }
     //    version->append(remVersion);
     return result;
+}
+
+bool cStaGlobalSettings::getSaveInfosOnApp()
+{
+    return this->m_bSaveInfosOnApp;
+}
+
+void cStaGlobalSettings::setSaveInfosOnApp(const bool save)
+{
+    if (this->m_bSaveInfosOnApp != save) {
+        this->m_bSaveInfosOnApp = save;
+
+        g_StaSettingsManager.setBoolValue(SETTINGS_GROUP, SETT_SAVE_INFO_ON_APP, save);
+    }
 }
 
 
