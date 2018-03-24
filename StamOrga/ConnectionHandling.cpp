@@ -528,13 +528,13 @@ void ConnectionHandling::slDataConLastRequestFinished(DataConRequest request)
         if (request.m_result != ERROR_CODE_SUCCESS)
             emit this->sNotifyCommandFinished(request.m_request, request.m_result);
         else {
-            this->m_pGlobalData->createNewNewsDataItem(request.m_returnData.toInt(), request.m_lData[1], request.m_lData[2]);
+            //            this->m_pGlobalData->createNewNewsDataItem(request.m_returnData.toInt(), request.m_lData[1], request.m_lData[2]);
             emit this->sNotifyCommandFinished(request.m_request, request.m_returnData.toInt());
         }
         break;
     }
     case OP_CODE_CMD_REQ::REQ_DEL_NEWS_DATA_ITEM:
-        this->m_pGlobalData->resetNewsDataLastServerUpdate();
+        //        this->m_pGlobalData->resetNewsDataLastServerUpdate();
         emit this->sNotifyCommandFinished(request.m_request, request.m_result);
         break;
 

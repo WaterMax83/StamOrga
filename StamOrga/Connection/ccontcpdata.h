@@ -81,18 +81,12 @@ private:
     QHostAddress  m_hMasterReceiver;
     quint16       m_dataPort;
     MessageBuffer m_messageBuffer;
-    //    DataHandling* m_pDataHandle;
 
     QTimer*     m_pConTimeout;
     QTcpSocket* m_pDataTcpSocket = NULL;
 
-    //    void startSendLoginRequest(DataConRequest request);
-    //    void startSendVersionRequest(DataConRequest request);
-    //    void startSendUserPropsRequest(DataConRequest request);
     //    void startSendGetUserEventsRequest(DataConRequest request);
     //    void startSendSetUserEventsRequest(DataConRequest request);
-    //    void startSendUpdPassRequest(DataConRequest request);
-    //    void startSendReadableNameRequest(DataConRequest request);
     //    void startSendGamesListRequest(DataConRequest request);
     //    void startSendGamesInfoListRequest(DataConRequest request);
     //    void startSendSetGameTimeFixedRequest(DataConRequest request);
@@ -103,16 +97,12 @@ private:
     //    void startSendChangeMeetingInfo(DataConRequest request);
     //    void startSendGetMeetingInfo(DataConRequest request);
     //    void startSendAcceptMeeting(DataConRequest request);
-    //    void startSendChangeNewsData(DataConRequest request);
-    //    void startSendGetNewsDataList(DataConRequest request);
-    //    void startSendGetNewDataItem(DataConRequest request);
-    //    void startSendDeleteNewDataItem(DataConRequest request);
     //    void startSendStatisticsCommand(DataConRequest request);
 
 
-    void               checkNewOncomingData();
-    qint32             sendMessageRequest(MessageProtocol* msg, TcpDataConRequest* request);
-    void               removeActualRequest(TcpDataConRequest* request);
+    void   checkNewOncomingData();
+    qint32 sendMessageRequest(MessageProtocol* msg, TcpDataConRequest* request);
+    void removeActualRequest(TcpDataConRequest* request);
     TcpDataConRequest* getActualRequest(quint32 req);
 
     bool m_bRequestLoginAgain;

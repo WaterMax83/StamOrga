@@ -99,20 +99,16 @@ void cDataTicketManager::addNewSeasonTicket(SeasonTicketItem* sTicket, const qui
     if (pTicket == NULL) {
         QMutexLocker lock(&this->m_mutex);
         this->m_lTickets.append(sTicket);
-        //        this->m_bSeasonTicketLastUpdateDidChanges = true;
         return;
     } else if (updateIndex == UpdateIndex::UpdateDiff) {
         if (pTicket->name() != sTicket->name()) {
             pTicket->setName(sTicket->name());
-            //            this->m_bSeasonTicketLastUpdateDidChanges = true;
         }
         if (pTicket->place() != sTicket->place()) {
             pTicket->setPlace(sTicket->place());
-            //            this->m_bSeasonTicketLastUpdateDidChanges = true;
         }
         if (pTicket->discount() != sTicket->discount()) {
             pTicket->setDiscount(sTicket->discount());
-            //            this->m_bSeasonTicketLastUpdateDidChanges = true;
         }
     }
 }
@@ -190,8 +186,6 @@ qint32 cDataTicketManager::handleListSeasonTicketsResponse(MessageProtocol* msg)
     qint32     updateIndex = rootObj.value("index").toInt(UpdateAll);
     qint64     timestamp   = (qint64)rootObj.value("timestamp").toDouble(0);
     QJsonArray arrTickets  = rootObj.value("tickets").toArray();
-
-    qDebug() << rootObj;
 
     this->m_mutex.lock();
 

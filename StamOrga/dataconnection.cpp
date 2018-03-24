@@ -388,7 +388,7 @@ void DataConnection::startSendGamesListRequest(DataConRequest request)
         data[0] = qToLittleEndian(UpdateIndex::UpdateDiff);
     else
         data[0] = qToLittleEndian(UpdateIndex::UpdateAll);
-    timeStamp = qToLittleEndian(this->m_pGlobalData->getGamePlayLastServerUpdate());
+    timeStamp   = qToLittleEndian(this->m_pGlobalData->getGamePlayLastServerUpdate());
     memcpy(&data[1], &timeStamp, sizeof(qint64));
 
     MessageProtocol msg(request.m_request, (char*)(&data[0]), sizeof(quint32) * 3);
@@ -580,14 +580,14 @@ void DataConnection::startSendChangeNewsData(DataConRequest request)
 void DataConnection::startSendGetNewsDataList(DataConRequest request)
 {
     quint32 data[3];
-    qint64  timeStamp = this->m_pGlobalData->getNewsDataLastLocalUpdate();
-    if (timeStamp + TIMEOUT_UPDATE_NEWS > QDateTime::currentMSecsSinceEpoch() && this->m_pGlobalData->getNewsDataItemLength() > 0)
-        data[0] = qToLittleEndian(UpdateIndex::UpdateDiff);
-    else
-        data[0] = qToLittleEndian(UpdateIndex::UpdateAll);
+    //    qint64  timeStamp = this->m_pGlobalData->getNewsDataLastLocalUpdate();
+    //    if (timeStamp + TIMEOUT_UPDATE_NEWS > QDateTime::currentMSecsSinceEpoch() && this->m_pGlobalData->getNewsDataItemLength() > 0)
+    //        data[0] = qToLittleEndian(UpdateIndex::UpdateDiff);
+    //    else
+    //        data[0] = qToLittleEndian(UpdateIndex::UpdateAll);
 
-    timeStamp = qToLittleEndian(this->m_pGlobalData->getNewsDataLastServerUpdate());
-    memcpy(&data[1], &timeStamp, sizeof(qint64));
+    //    timeStamp = qToLittleEndian(this->m_pGlobalData->getNewsDataLastServerUpdate());
+    //    memcpy(&data[1], &timeStamp, sizeof(qint64));
 
     MessageProtocol msg(request.m_request, (char*)(&data[0]), sizeof(quint32) * 3);
     this->sendMessageRequest(&msg, request);

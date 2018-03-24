@@ -187,7 +187,8 @@ Item {
         var newsIndex = 0;
         if (newsDataItem !== undefined)
             newsIndex = newsDataItem.index
-        userIntCurrentNews.startChangeFanclubNews(newsIndex, textHeader.input, textAreaInfo.text);
+        gDataNewsDataManager.startChangeNewsDataItem(newsIndex, textHeader.input, textAreaInfo.text);
+//        userIntCurrentNews.startChangeFanclubNews(newsIndex, textHeader.input, textAreaInfo.text);
         busyIndicatorNews.loadingVisible = true;
         busyIndicatorNews.infoVisible = true;
         busyIndicatorNews.infoText = "Speichere News"
@@ -202,7 +203,7 @@ Item {
             isStartupDone = true;
         } else {
             if (newsItem !== undefined) {
-                userIntCurrentNews.startGetFanclubNewsItem(newsItem.index);
+                gDataNewsDataManager.startGetNewsDataItem(newsItem.index);
                 isStartupDone = false;
             }
             updateHeaderFromMain("Nachricht", "")
@@ -225,20 +226,15 @@ Item {
 
     function notifyChangeNewsDataFinished(result) {
 
-        if (result >= 1) {
+        if (result === 1) {
             toastManager.show("Nachricht erfolgreich gespeichert", 2000);
             busyIndicatorNews.loadingVisible = false;
             busyIndicatorNews.infoVisible = false;
             isEditMode = false;
             updateHeaderFromMain("Nachricht", "images/edit.png")
 
-            for (var i = 0; i < globalUserData.getNewsDataItemLength(); i++) {
-                var newsItem = globalUserData.getNewsDataItemFromArrayIndex(i)
-                if (i === result) {
-                    newsDataItem = newsItem;
-                    break;
-                }
-            }
+            newsDataItem = gDataNewsDataManager.getCurrentEditedItem();
+
         } else {
             toastManager.show(userIntCurrentNews.getErrorCodeToString(result), 4000);
             busyIndicatorNews.loadingVisible = false;
@@ -248,7 +244,7 @@ Item {
 
     function notifyGetFanclubNewsItemFinished(result){
 
-        if (result >= 1) {
+        if (result === 1) {
             if (globalUserData.userIsFanclubEditEnabled() ||  userIntCurrentNews.isDebuggingEnabled())
                 updateHeaderFromMain("Nachricht", "images/edit.png")
 

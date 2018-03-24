@@ -41,15 +41,9 @@ public:
     qint32 startMainConnection(QString name, QString passw);
     //    qint32 startGettingUserEvents();
     //    qint32 startSettingUserEvents(qint64 eventID, qint32 status);
-    //    bool startUpdatePassword(QString newPassWord);
-    //    qint32 startUpdateReadableName(QString name);
     //    qint32 startListGettingGames();
     //    qint32 startListGettingGamesInfo();
     //    qint32 startSetFixedGameTime(const quint32 gameIndex, const quint32 fixedTime);
-    //    qint32 startRemoveSeasonTicket(quint32 index);
-    //    qint32 startEditSeasonTicket(quint32 index, QString name, QString place, quint32 discount);
-    //    qint32 startAddSeasonTicket(QString name, quint32 discount);
-    //    qint32 startListSeasonTickets();
     //    qint32 startChangeSeasonTicketState(quint32 tickedIndex, quint32 gameIndex, quint32 state, QString name);
     //    qint32 startListAvailableTicket(quint32 gameIndex);
     //    qint32 startChangeGame(const quint32 index, const quint32 sIndex, const QString competition,
@@ -60,12 +54,6 @@ public:
     //    qint32 startAcceptMeetingInfo(const quint32 gameIndex, const quint32 accept,
     //                                  const QString name, const quint32 type,
     //                                  const quint32 acceptIndex = 0);
-
-    //    qint32 startChangeFanclubNews(const quint32 newsIndex, const QString header,
-    //                                  const QString info);
-    //    qint32 startListFanclubNews();
-    //    qint32 startGetFanclubNewsItem(const quint32 newsIndex);
-    //    qint32 startDeleteFanclubNewsItem(const quint32 newsIndex);
     //    qint32 startStatisticsCommand(const QByteArray& command);
 
     //    ConnectionInfo *GetConnectionInfo() { return &this->m_conInfo; }
@@ -75,16 +63,7 @@ public:
 
 signals:
     void signalNotifyConnectionFinished(const qint32 result, const QString msg);
-    //    void sNotifyVersionRequest(qint32 result, QString msg);
-    //    //    void sNotifyUserPropertiesRequest(qint32 result);
-    //    void sNotifyUpdatePasswordRequest(qint32 result, QString newPassWord);
-
     void signalNotifyCommandFinished(quint32 command, qint32 result);
-
-    //    void sStartSendMainConRequest(QString name);
-
-    //    void sSendNewBindingPortRequest();
-
     void signalStartSendNewRequest(TcpDataConRequest* request);
 
 public slots:
@@ -92,7 +71,6 @@ public slots:
 private slots:
     void slMainConReqFin(qint32 result, const QString msg, const QString salt, const QString random);
     void slotDataConnnectionFinished(qint32 result, const QString msg);
-
     void slotDataConLastRequestFinished(TcpDataConRequest* request);
 
 private:
@@ -104,12 +82,7 @@ private:
 
     bool m_bIsConnecting = false;
 
-    //    GlobalData* m_pGlobalData = NULL;
-
-    //    qint64 m_lastSuccessTimeStamp;
-
     QList<TcpDataConRequest*> m_lRequestConError;
-
 
     void checkTimeoutResult(qint32 result);
 

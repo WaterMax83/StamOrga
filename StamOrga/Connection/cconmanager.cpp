@@ -37,7 +37,6 @@ cConManager::cConManager(QObject* parent)
     : cGenDisposer(parent)
 {
     this->m_pMainCon = NULL;
-    //    this->m_lastSuccessTimeStamp = 0;
 }
 
 qint32 cConManager::initialize()
@@ -93,22 +92,6 @@ qint32 cConManager::startMainConnection(QString name, QString passw)
 //    return ERROR_CODE_SUCCESS;
 //}
 
-//bool cConManager::startUpdatePassword(QString newPassWord)
-//{
-//    DataConRequest req(OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN);
-//    req.m_lData.append(newPassWord);
-//    this->sendNewRequest(req);
-//    return true;
-//}
-
-//qint32 cConManager::startUpdateReadableName(QString name)
-//{
-//    DataConRequest req(OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME);
-//    req.m_lData.append(name);
-//    this->sendNewRequest(req);
-//    return ERROR_CODE_SUCCESS;
-//}
-
 //qint32 cConManager::startListGettingGames()
 //{
 //    DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST);
@@ -128,14 +111,6 @@ qint32 cConManager::startMainConnection(QString name, QString passw)
 //    DataConRequest req(OP_CODE_CMD_REQ::REQ_SET_FIXED_GAME_TIME);
 //    req.m_lData.append(QString::number(gameIndex));
 //    req.m_lData.append(QString::number(fixedTime));
-//    this->sendNewRequest(req);
-//    return ERROR_CODE_SUCCESS;
-//}
-
-//qint32 cConManager::startRemoveSeasonTicket(quint32 index)
-//{
-//    DataConRequest req(OP_CODE_CMD_REQ::REQ_REMOVE_TICKET);
-//    req.m_lData.append(QString::number(index));
 //    this->sendNewRequest(req);
 //    return ERROR_CODE_SUCCESS;
 //}
@@ -240,43 +215,6 @@ qint32 cConManager::startMainConnection(QString name, QString passw)
 //    req.m_lData.append(QString::number(acceptIndex));
 //    req.m_lData.append(name);
 //    req.m_lData.append(QString::number(type));
-//    this->sendNewRequest(req);
-
-//    return ERROR_CODE_SUCCESS;
-//}
-
-//qint32 cConManager::startChangeFanclubNews(const quint32 newsIndex, const QString header, const QString info)
-//{
-//    DataConRequest req(OP_CODE_CMD_REQ::REQ_CHANGE_NEWS_DATA);
-//    req.m_lData.append(QString::number(newsIndex));
-//    req.m_lData.append(header);
-//    req.m_lData.append(info);
-//    this->sendNewRequest(req);
-
-//    return ERROR_CODE_SUCCESS;
-//}
-
-//qint32 cConManager::startListFanclubNews()
-//{
-//    DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_NEWS_DATA_LIST);
-//    this->sendNewRequest(req);
-
-//    return ERROR_CODE_SUCCESS;
-//}
-
-//qint32 cConManager::startGetFanclubNewsItem(const quint32 newsIndex)
-//{
-//    DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_NEWS_DATA_ITEM);
-//    req.m_lData.append(QString::number(newsIndex));
-//    this->sendNewRequest(req);
-
-//    return ERROR_CODE_SUCCESS;
-//}
-
-//qint32 cConManager::startDeleteFanclubNewsItem(const quint32 newsIndex)
-//{
-//    DataConRequest req(OP_CODE_CMD_REQ::REQ_DEL_NEWS_DATA_ITEM);
-//    req.m_lData.append(QString::number(newsIndex));
 //    this->sendNewRequest(req);
 
 //    return ERROR_CODE_SUCCESS;
@@ -430,92 +368,78 @@ void cConManager::slotDataConLastRequestFinished(TcpDataConRequest* request)
         emit this->signalNotifyCommandFinished(request->m_request, request->m_result);
         return;
 
-        //    case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
-        //        if (request.m_result == ERROR_CODE_SUCCESS) {
-        //            this->startGettingUserEvents();
-        //        }
-        //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
+    //    case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
+    //        if (request.m_result == ERROR_CODE_SUCCESS) {
+    //            this->startGettingUserEvents();
+    //        }
+    //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
 
-        //        break;
+    //        break;
 
-        //    case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
-        //        if (request.m_result == ERROR_CODE_SUCCESS) {
-        //            this->m_pGlobalData->setPassWord(request.m_returnData);
-        //            this->m_pGlobalData->saveGlobalUserSettings();
-        //        }
+    //    case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
+    //        if (request.m_result == ERROR_CODE_SUCCESS) {
+    //            this->m_pGlobalData->setPassWord(request.m_returnData);
+    //            this->m_pGlobalData->saveGlobalUserSettings();
+    //        }
 
-        //        emit this->sNotifyUpdatePasswordRequest(request.m_result, request.m_returnData);
-        //        break;
+    //        emit this->sNotifyUpdatePasswordRequest(request.m_result, request.m_returnData);
+    //        break;
 
-        //    case OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME:
-        //        if (request.m_result == ERROR_CODE_SUCCESS) {
-        //            this->m_pGlobalData->setReadableName(request.m_returnData);
-        //            this->m_pGlobalData->saveGlobalUserSettings();
-        //        }
+    //    case OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME:
+    //        if (request.m_result == ERROR_CODE_SUCCESS) {
+    //            this->m_pGlobalData->setReadableName(request.m_returnData);
+    //            this->m_pGlobalData->saveGlobalUserSettings();
+    //        }
 
-        //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
-        //        break;
+    //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
+    //        break;
 
-        //    case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST: {
+    //    case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST: {
 
-        //        static quint32 retryGetGamesInfoCount = 0;
-        //        if (request.m_result == ERROR_CODE_UPDATE_LIST) {
-        //            if (retryGetGamesInfoCount < 3) {
-        //                this->startListGettingGames();
-        //                retryGetGamesInfoCount++;
-        //                return;
-        //            }
-        //        }
-        //        this->startGettingUserProps();
-        //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
-        //        retryGetGamesInfoCount = 0;
-        //        break;
-        //    }
+    //        static quint32 retryGetGamesInfoCount = 0;
+    //        if (request.m_result == ERROR_CODE_UPDATE_LIST) {
+    //            if (retryGetGamesInfoCount < 3) {
+    //                this->startListGettingGames();
+    //                retryGetGamesInfoCount++;
+    //                return;
+    //            }
+    //        }
+    //        this->startGettingUserProps();
+    //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
+    //        retryGetGamesInfoCount = 0;
+    //        break;
+    //    }
 
-        //    case OP_CODE_CMD_REQ::REQ_REMOVE_TICKET:
-        //        this->m_pGlobalData->resetSeasonTicketLastServerUpdate();
-        //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
-        //        break;
+    //    case OP_CODE_CMD_REQ::REQ_REMOVE_TICKET:
+    //        this->m_pGlobalData->resetSeasonTicketLastServerUpdate();
+    //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
+    //        break;
 
-        //    case OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET:
-        //        this->startGettingUserProps();
-        //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
-        //        break;
+    //    case OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET:
+    //        this->startGettingUserProps();
+    //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
+    //        break;
 
-        //    case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS: {
+    //    case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS: {
 
-        //        static quint32 retryGetTicketCount = 0;
-        //        if (request.m_result == ERROR_CODE_UPDATE_LIST || request.m_result == ERROR_CODE_MISSING_TICKET) {
-        //            if (retryGetTicketCount < 3) {
-        //                this->startListSeasonTickets();
-        //                retryGetTicketCount++;
-        //                return;
-        //            }
-        //        }
-        //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
-        //        retryGetTicketCount = 0;
-        //        break;
-        //    }
-        //    case OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO:
-        //    case OP_CODE_CMD_REQ::REQ_GET_AWAYTRIP_INFO:
-        //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
-        //        if (request.m_result == ERROR_CODE_NOT_FOUND)
-        //            return;
-        //        break;
-
-        //    case OP_CODE_CMD_REQ::REQ_CHANGE_NEWS_DATA: {
-        //        if (request.m_result != ERROR_CODE_SUCCESS)
-        //            emit this->sNotifyCommandFinished(request.m_request, request.m_result);
-        //        else {
-        //            this->m_pGlobalData->createNewNewsDataItem(request.m_returnData.toInt(), request.m_lData[1], request.m_lData[2]);
-        //            emit this->sNotifyCommandFinished(request.m_request, request.m_returnData.toInt());
-        //        }
-        //        break;
-        //    }
-        //    case OP_CODE_CMD_REQ::REQ_DEL_NEWS_DATA_ITEM:
-        //        this->m_pGlobalData->resetNewsDataLastServerUpdate();
-        //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
-        //        break;
+    //        static quint32 retryGetTicketCount = 0;
+    //        if (request.m_result == ERROR_CODE_UPDATE_LIST || request.m_result == ERROR_CODE_MISSING_TICKET) {
+    //            if (retryGetTicketCount < 3) {
+    //                this->startListSeasonTickets();
+    //                retryGetTicketCount++;
+    //                return;
+    //            }
+    //        }
+    //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
+    //        retryGetTicketCount = 0;
+    //        break;
+    //    }
+    //    case OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO:
+    //    case OP_CODE_CMD_REQ::REQ_GET_AWAYTRIP_INFO:
+    //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
+    //        if (request.m_result == ERROR_CODE_NOT_FOUND)
+    //            return;
+    //        break;
 
     default:
         emit this->signalNotifyCommandFinished(request->m_request, request->m_result);

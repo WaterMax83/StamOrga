@@ -27,7 +27,7 @@ class NewsDataItem : public QObject
     Q_OBJECT
     Q_PROPERTY(QString user READ user WRITE setUser NOTIFY userChanged)
     Q_PROPERTY(QString header READ header WRITE setHeader NOTIFY headerChanged)
-    Q_PROPERTY(quint32 index READ index WRITE setIndex NOTIFY indexChanged)
+    Q_PROPERTY(qint32 index READ index WRITE setIndex NOTIFY indexChanged)
     Q_PROPERTY(QString info READ info WRITE setInfo NOTIFY infoChanged)
     Q_PROPERTY(qint32 event READ event NOTIFY eventChanged)
 public:
@@ -60,8 +60,8 @@ public:
         }
     }
 
-    quint32 index() { return this->m_index; }
-    void setIndex(const quint32 index)
+    qint32 index() { return this->m_index; }
+    void setIndex(const qint32 index)
     {
         if (this->m_index != index) {
             this->m_index = index;
@@ -102,7 +102,7 @@ private:
     QString m_user;
     QString m_header;
     QString m_info;
-    quint32 m_index;
+    qint32  m_index;
     qint64  m_timestamp;
     qint32  m_eventCnt;
 };

@@ -23,6 +23,7 @@
 #include "../Common/General/globalfunctions.h"
 #include "../Common/General/globaltiming.h"
 #include "../Common/Network/messagecommand.h"
+#include "../Data/cdatanewsdatamanager.h"
 #include "../Data/cdataticketmanager.h"
 #include "../cstaglobalsettings.h"
 #include "cconmanager.h"
@@ -33,7 +34,6 @@ cConTcpData::cConTcpData()
     : BackgroundWorker()
 {
     this->SetWorkerName("cConTcpData");
-    //    this->m_pGlobalData        = pData;
     this->m_bRequestLoginAgain = false;
 }
 
@@ -162,13 +162,13 @@ void cConTcpData::checkNewOncomingData()
             request->m_result = g_ConUserSettings.handleUserPropsResponse(msg);
             break;
 
-            //        case OP_CODE_CMD_RES::ACK_GET_USER_EVENTS:
-            //            request.m_result = this->m_pDataHandle->getHandleUserEventsResponse(msg);
-            //            break;
+        //        case OP_CODE_CMD_RES::ACK_GET_USER_EVENTS:
+        //            request.m_result = this->m_pDataHandle->getHandleUserEventsResponse(msg);
+        //            break;
 
-            //        case OP_CODE_CMD_RES::ACK_SET_USER_EVENTS:
-            //            request.m_result = msg->getIntData();
-            //            break;
+        //        case OP_CODE_CMD_RES::ACK_SET_USER_EVENTS:
+        //            request.m_result = msg->getIntData();
+        //            break;
 
         case OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN:
             request->m_result = g_ConUserSettings.handleUpdatePasswordResponse(msg);
@@ -178,17 +178,17 @@ void cConTcpData::checkNewOncomingData()
             request->m_result = g_ConUserSettings.handleUpdateReadableNameResponse(msg);
             break;
 
-            //        case OP_CODE_CMD_RES::ACK_GET_GAMES_LIST:
-            //            request.m_result = this->m_pDataHandle->getHandleGamesListResponse(msg);
-            //            break;
+        //        case OP_CODE_CMD_RES::ACK_GET_GAMES_LIST:
+        //            request.m_result = this->m_pDataHandle->getHandleGamesListResponse(msg);
+        //            break;
 
-            //        case OP_CODE_CMD_RES::ACK_GET_GAMES_INFO_LIST:
-            //            request.m_result = this->m_pDataHandle->getHandleGamesInfoListResponse(msg);
-            //            break;
+        //        case OP_CODE_CMD_RES::ACK_GET_GAMES_INFO_LIST:
+        //            request.m_result = this->m_pDataHandle->getHandleGamesInfoListResponse(msg);
+        //            break;
 
-            //        case OP_CODE_CMD_RES::ACK_SET_FIXED_GAME_TIME:
-            //                    request.m_result = msg->getIntData();
-            //            break;
+        //        case OP_CODE_CMD_RES::ACK_SET_FIXED_GAME_TIME:
+        //                    request.m_result = msg->getIntData();
+        //            break;
 
         case OP_CODE_CMD_RES::ACK_ADD_TICKET:
             request->m_result = g_DataTicketManager.handleAddSeasonTicketResponse(msg);
@@ -202,55 +202,55 @@ void cConTcpData::checkNewOncomingData()
             request->m_result = g_DataTicketManager.handleListSeasonTicketsResponse(msg);
             break;
 
-            //        case OP_CODE_CMD_RES::ACK_STATE_CHANGE_SEASON_TICKET:
-            //            request.m_result = this->m_pDataHandle->getHandleChangeTicketStateResponse(msg);
-            //            break;
+        //        case OP_CODE_CMD_RES::ACK_STATE_CHANGE_SEASON_TICKET:
+        //            request.m_result = this->m_pDataHandle->getHandleChangeTicketStateResponse(msg);
+        //            break;
 
-            //        case OP_CODE_CMD_RES::ACK_GET_AVAILABLE_TICKETS:
-            //            request.m_result = this->m_pDataHandle->getHandleAvailableTicketListResponse(msg, request.m_lData.at(0).toUInt());
-            //            break;
+        //        case OP_CODE_CMD_RES::ACK_GET_AVAILABLE_TICKETS:
+        //            request.m_result = this->m_pDataHandle->getHandleAvailableTicketListResponse(msg, request.m_lData.at(0).toUInt());
+        //            break;
 
-            //        case OP_CODE_CMD_RES::ACK_CHANGE_GAME:
-            //            request.m_result = msg->getIntData();
-            //            break;
+        //        case OP_CODE_CMD_RES::ACK_CHANGE_GAME:
+        //            request.m_result = msg->getIntData();
+        //            break;
 
-            //        case OP_CODE_CMD_RES::ACK_CHANGE_MEETING_INFO:
-            //        case OP_CODE_CMD_RES::ACK_CHANGE_AWAYTRIP_INFO:
-            //            request.m_result = this->m_pDataHandle->getHandleChangeMeetingResponse(msg);
-            //            break;
+        //        case OP_CODE_CMD_RES::ACK_CHANGE_MEETING_INFO:
+        //        case OP_CODE_CMD_RES::ACK_CHANGE_AWAYTRIP_INFO:
+        //            request.m_result = this->m_pDataHandle->getHandleChangeMeetingResponse(msg);
+        //            break;
 
-            //        case OP_CODE_CMD_RES::ACK_GET_MEETING_INFO:
-            //            request.m_result = this->m_pDataHandle->getHandleLoadMeetingInfo(msg, MEETING_TYPE_MEETING);
-            //            break;
+        //        case OP_CODE_CMD_RES::ACK_GET_MEETING_INFO:
+        //            request.m_result = this->m_pDataHandle->getHandleLoadMeetingInfo(msg, MEETING_TYPE_MEETING);
+        //            break;
 
-            //        case OP_CODE_CMD_RES::ACK_GET_AWAYTRIP_INFO:
-            //            request.m_result = this->m_pDataHandle->getHandleLoadMeetingInfo(msg, MEETING_TYPE_AWAYTRIP);
-            //            break;
+        //        case OP_CODE_CMD_RES::ACK_GET_AWAYTRIP_INFO:
+        //            request.m_result = this->m_pDataHandle->getHandleLoadMeetingInfo(msg, MEETING_TYPE_AWAYTRIP);
+        //            break;
 
-            //        case OP_CODE_CMD_RES::ACK_ACCEPT_MEETING:
-            //        case OP_CODE_CMD_RES::ACK_ACCEPT_AWAYTRIP:
-            //            request.m_result = this->m_pDataHandle->getHandleAcceptMeetingResponse(msg);
-            //            break;
+        //        case OP_CODE_CMD_RES::ACK_ACCEPT_MEETING:
+        //        case OP_CODE_CMD_RES::ACK_ACCEPT_AWAYTRIP:
+        //            request.m_result = this->m_pDataHandle->getHandleAcceptMeetingResponse(msg);
+        //            break;
 
-            //        case OP_CODE_CMD_RES::ACK_CHANGE_NEWS_DATA:
-            //            request.m_result = this->m_pDataHandle->getHandleFanclubNewsChangeResponse(msg, request.m_returnData);
-            //            break;
+        case OP_CODE_CMD_RES::ACK_CHANGE_NEWS_DATA:
+            request->m_result = g_DataNewsDataManager.handleChangeNewsDataResponse(msg);
+            break;
 
-            //        case OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_LIST:
-            //            request.m_result = this->m_pDataHandle->getHandleFanclubNewsListResponse(msg);
-            //            break;
+        case OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_LIST:
+            request->m_result = g_DataNewsDataManager.handleListNewsDataResponse(msg);
+            break;
 
-            //        case OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_ITEM:
-            //            request.m_result = this->m_pDataHandle->getHandleFanclubNewsItemResponse(msg);
-            //            break;
+        case OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_ITEM:
+            request->m_result = g_DataNewsDataManager.handleGetNewsDataItem(msg);
+            break;
 
-            //        case OP_CODE_CMD_RES::ACK_DEL_NEWS_DATA_ITEM:
-            //            request.m_result = msg->getIntData();
-            //            break;
+        case OP_CODE_CMD_RES::ACK_DEL_NEWS_DATA_ITEM:
+            request->m_result = g_DataNewsDataManager.handleRemoveNewsDataItemResponse(msg);
+            break;
 
-            //        case OP_CODE_CMD_RES::ACK_CMD_STATISTIC:
-            //            request.m_result = this->m_pDataHandle->getHandleStatisticsCommandResponse(msg);
-            //            break;
+        //        case OP_CODE_CMD_RES::ACK_CMD_STATISTIC:
+        //            request.m_result = this->m_pDataHandle->getHandleStatisticsCommandResponse(msg);
+        //            break;
 
 
         default:
@@ -415,59 +415,6 @@ void cConTcpData::checkNewOncomingData()
 //    this->sendMessageRequest(&msg, request);
 //}
 
-//void cConTcpData::startSendChangeNewsData(DataConRequest request)
-//{
-//    QByteArray header = request.m_lData.at(1).toUtf8();
-//    QByteArray info   = qCompress(request.m_lData.at(2).toUtf8(), 9);
-
-//    qInfo().noquote() << QString("Compressed news info from %1 to %2 Bytes").arg(request.m_lData.at(2).size()).arg(info.size());
-
-//    int   totalSize = header.size() + info.size() + sizeof(quint32) * 2 + 2;
-//    char* data      = new char[totalSize];
-//    memset(data, 0x0, totalSize);
-//    quint32 newsIndex = qToLittleEndian(request.m_lData.at(0).toUInt());
-//    quint32 infoSize  = qToLittleEndian(info.size());
-//    memcpy(data, &newsIndex, sizeof(quint32));
-//    memcpy(&data[sizeof(quint32)], &infoSize, sizeof(quint32));
-//    memcpy(&data[sizeof(quint32) * 2], header.constData(), header.size());
-//    memcpy(&data[sizeof(quint32) * 2 + 1 + header.size()], info.constData(), info.size());
-
-//    MessageProtocol msg(request.m_request, data, totalSize);
-//    this->sendMessageRequest(&msg, request);
-//}
-
-//void cConTcpData::startSendGetNewsDataList(DataConRequest request)
-//{
-//    quint32 data[3];
-//    qint64  timeStamp = this->m_pGlobalData->getNewsDataLastLocalUpdate();
-//    if (timeStamp + TIMEOUT_UPDATE_NEWS > QDateTime::currentMSecsSinceEpoch() && this->m_pGlobalData->getNewsDataItemLength() > 0)
-//        data[0] = qToLittleEndian(UpdateIndex::UpdateDiff);
-//    else
-//        data[0] = qToLittleEndian(UpdateIndex::UpdateAll);
-
-//    timeStamp = qToLittleEndian(this->m_pGlobalData->getNewsDataLastServerUpdate());
-//    memcpy(&data[1], &timeStamp, sizeof(qint64));
-
-//    MessageProtocol msg(request.m_request, (char*)(&data[0]), sizeof(quint32) * 3);
-//    this->sendMessageRequest(&msg, request);
-//}
-
-//void cConTcpData::startSendGetNewDataItem(DataConRequest request)
-//{
-//    quint32 newsIndex = qToLittleEndian(request.m_lData.at(0).toUInt());
-
-//    MessageProtocol msg(request.m_request, newsIndex);
-//    this->sendMessageRequest(&msg, request);
-//}
-
-//void cConTcpData::startSendDeleteNewDataItem(DataConRequest request)
-//{
-//    quint32 newsIndex = qToLittleEndian(request.m_lData.at(0).toUInt());
-
-//    MessageProtocol msg(request.m_request, newsIndex);
-//    this->sendMessageRequest(&msg, request);
-//}
-
 //void cConTcpData::startSendStatisticsCommand(DataConRequest request)
 //{
 //    QByteArray data = request.m_lData.at(0).toUtf8();
@@ -609,22 +556,6 @@ void cConTcpData::startSendNewRequest(TcpDataConRequest* request)
     //    case OP_CODE_CMD_REQ::REQ_ACCEPT_MEETING:
     //    case OP_CODE_CMD_REQ::REQ_ACCEPT_AWAYTRIP:
     //        this->startSendAcceptMeeting(request);
-    //        break;
-
-    //    case OP_CODE_CMD_REQ::REQ_CHANGE_NEWS_DATA:
-    //        this->startSendChangeNewsData(request);
-    //        break;
-
-    //    case OP_CODE_CMD_REQ::REQ_GET_NEWS_DATA_LIST:
-    //        this->startSendGetNewsDataList(request);
-    //        break;
-
-    //    case OP_CODE_CMD_REQ::REQ_GET_NEWS_DATA_ITEM:
-    //        this->startSendGetNewDataItem(request);
-    //        break;
-
-    //    case OP_CODE_CMD_REQ::REQ_DEL_NEWS_DATA_ITEM:
-    //        this->startSendDeleteNewDataItem(request);
     //        break;
 
     //    case OP_CODE_CMD_REQ::REQ_CMD_STATISTIC:

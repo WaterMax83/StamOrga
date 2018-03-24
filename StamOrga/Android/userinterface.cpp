@@ -80,30 +80,6 @@ qint32 UserInterface::startSetFixedGameTime(const quint32 gameIndex, const quint
     return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
-qint32 UserInterface::startAddSeasonTicket(QString name, quint32 discount)
-{
-    //    return this->m_pConHandle->startAddSeasonTicket(name, discount);
-    return ERROR_CODE_NOT_IMPLEMENTED;
-}
-
-qint32 UserInterface::startRemoveSeasonTicket(quint32 index)
-{
-    //    return this->m_pConHandle->startRemoveSeasonTicket(index);
-    return ERROR_CODE_NOT_IMPLEMENTED;
-}
-
-qint32 UserInterface::startEditSeasonTicket(quint32 index, QString name, QString place, quint32 discount)
-{
-    //    return this->m_pConHandle->startEditSeasonTicket(index, name, place, discount);
-    return ERROR_CODE_NOT_IMPLEMENTED;
-}
-
-qint32 UserInterface::startListSeasonTickets()
-{
-    //    return this->m_pConHandle->startListSeasonTickets();
-    return ERROR_CODE_NOT_IMPLEMENTED;
-}
-
 qint32 UserInterface::startChangeAvailableTicketState(quint32 ticketIndex, quint32 gameIndex, quint32 state, QString name)
 {
     //    return this->m_pConHandle->startChangeSeasonTicketState(ticketIndex, gameIndex, state, name);
@@ -141,30 +117,6 @@ qint32 UserInterface::startAcceptMeetingInfo(const quint32 gameIndex, const quin
                                              const quint32 acceptIndex)
 {
     //    return this->m_pConHandle->startAcceptMeetingInfo(gameIndex, accept, name, type, acceptIndex);
-    return ERROR_CODE_NOT_IMPLEMENTED;
-}
-
-qint32 UserInterface::startChangeFanclubNews(const quint32 newsIndex, const QString header, const QString info)
-{
-    //    return this->m_pConHandle->startChangeFanclubNews(newsIndex, header, info);
-    return ERROR_CODE_NOT_IMPLEMENTED;
-}
-
-qint32 UserInterface::startGetFanclubNewsItem(const quint32 newsIndex)
-{
-    //    return this->m_pConHandle->startGetFanclubNewsItem(newsIndex);
-    return ERROR_CODE_NOT_IMPLEMENTED;
-}
-
-qint32 UserInterface::startDeleteFanclubNewsItem(const quint32 newsIndex)
-{
-    //    return this->m_pConHandle->startDeleteFanclubNewsItem(newsIndex);
-    return ERROR_CODE_NOT_IMPLEMENTED;
-}
-
-qint32 UserInterface::startListFanclubNews()
-{
-    //    return this->m_pConHandle->startListFanclubNews();
     return ERROR_CODE_NOT_IMPLEMENTED;
 }
 

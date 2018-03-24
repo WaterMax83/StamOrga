@@ -168,7 +168,7 @@ void GlobalData::loadGlobalSettings()
     //    this->m_pMainUserSettings->endGroup();
     //    this->m_bSeasonTicketLastUpdateDidChanges = false;
 
-    this->resetNewsDataLastServerUpdate();
+    //    this->resetNewsDataLastServerUpdate();
 
     this->m_gameUserData.initialize();
 }
@@ -579,138 +579,138 @@ bool GlobalData::setGamePlayItemHasEvent(quint32 gameIndex)
 //    this->m_stLastServerUpdateTimeStamp = 0;
 //}
 
-void GlobalData::saveCurrentNewsDataList(qint64 timestamp)
-{
-    QMutexLocker lock(&this->m_mutexNewsData);
+//void GlobalData::saveCurrentNewsDataList(qint64 timestamp)
+//{
+//    QMutexLocker lock(&this->m_mutexNewsData);
 
-    this->m_ndLastServerUpdateTimeStamp = timestamp;
+//    this->m_ndLastServerUpdateTimeStamp = timestamp;
 
-    std::sort(this->m_lNewsDataItems.begin(), this->m_lNewsDataItems.end(), NewsDataItem::compareTimeStampFunctionDescending);
+//    std::sort(this->m_lNewsDataItems.begin(), this->m_lNewsDataItems.end(), NewsDataItem::compareTimeStampFunctionDescending);
 
-    /* Data is not saved */
-}
+//    /* Data is not saved */
+//}
 
-void GlobalData::resetNewsDataLastServerUpdate()
-{
-    this->m_ndLastServerUpdateTimeStamp = 0;
-}
+//void GlobalData::resetNewsDataLastServerUpdate()
+//{
+//    this->m_ndLastServerUpdateTimeStamp = 0;
+//}
 
-void GlobalData::startUpdateNewsDataItem(const quint16 updateIndex)
-{
-    QMutexLocker lock(&this->m_mutexNewsData);
+//void GlobalData::startUpdateNewsDataItem(const quint16 updateIndex)
+//{
+//    QMutexLocker lock(&this->m_mutexNewsData);
 
-    if (updateIndex == UpdateIndex::UpdateAll) {
-        /* need to delete, because they are all pointers */
-        for (int i = 0; i < this->m_lNewsDataItems.size(); i++)
-            delete this->m_lNewsDataItems[i];
-        this->m_lNewsDataItems.clear();
-    }
+//    if (updateIndex == UpdateIndex::UpdateAll) {
+//        /* need to delete, because they are all pointers */
+//        for (int i = 0; i < this->m_lNewsDataItems.size(); i++)
+//            delete this->m_lNewsDataItems[i];
+//        this->m_lNewsDataItems.clear();
+//    }
 
-    this->m_ndLastLocalUpdateTimeStamp = QDateTime::currentMSecsSinceEpoch();
-}
+//    this->m_ndLastLocalUpdateTimeStamp = QDateTime::currentMSecsSinceEpoch();
+//}
 
-void GlobalData::addNewNewsDataItem(NewsDataItem* pItem, const quint16 updateIndex)
-{
-    NewsDataItem* Item = this->getNewsDataItem(pItem->index());
-    if (Item == NULL) {
-        QMutexLocker lock(&this->m_mutexNewsData);
-        this->m_lNewsDataItems.append(pItem);
-        return;
-    } else if (updateIndex == UpdateIndex::UpdateDiff) {
-        if (Item->user() != pItem->user())
-            Item->setUser(pItem->user());
+//void GlobalData::addNewNewsDataItem(NewsDataItem* pItem, const quint16 updateIndex)
+//{
+//    NewsDataItem* Item = this->getNewsDataItem(pItem->index());
+//    if (Item == NULL) {
+//        QMutexLocker lock(&this->m_mutexNewsData);
+//        this->m_lNewsDataItems.append(pItem);
+//        return;
+//    } else if (updateIndex == UpdateIndex::UpdateDiff) {
+//        if (Item->user() != pItem->user())
+//            Item->setUser(pItem->user());
 
-        if (Item->header() != pItem->header())
-            Item->setHeader(pItem->header());
+//        if (Item->header() != pItem->header())
+//            Item->setHeader(pItem->header());
 
-        if (Item->info() != pItem->info())
-            Item->setInfo(pItem->info());
-    }
-}
+//        if (Item->info() != pItem->info())
+//            Item->setInfo(pItem->info());
+//    }
+//}
 
-NewsDataItem* GlobalData::createNewNewsDataItem(quint32 newsIndex, QString header, QString info)
-{
-    NewsDataItem* pItem = this->getNewsDataItem(newsIndex);
-    if (pItem != NULL) {
-        pItem->setTimeStamp(QDateTime::currentMSecsSinceEpoch());
-        pItem->setHeader(header);
-        pItem->setInfo(info);
-        pItem->setUser(this->m_readableName);
+//NewsDataItem* GlobalData::createNewNewsDataItem(quint32 newsIndex, QString header, QString info)
+//{
+//    NewsDataItem* pItem = this->getNewsDataItem(newsIndex);
+//    if (pItem != NULL) {
+//        pItem->setTimeStamp(QDateTime::currentMSecsSinceEpoch());
+//        pItem->setHeader(header);
+//        pItem->setInfo(info);
+//        pItem->setUser(this->m_readableName);
 
-        std::sort(this->m_lNewsDataItems.begin(), this->m_lNewsDataItems.end(), NewsDataItem::compareTimeStampFunctionDescending);
-        return pItem;
-    }
+//        std::sort(this->m_lNewsDataItems.begin(), this->m_lNewsDataItems.end(), NewsDataItem::compareTimeStampFunctionDescending);
+//        return pItem;
+//    }
 
-    pItem = new NewsDataItem();
-    pItem->setIndex(newsIndex);
-    pItem->setTimeStamp(QDateTime::currentMSecsSinceEpoch());
-    pItem->setHeader(header);
-    pItem->setInfo(info);
-    pItem->setUser(this->m_readableName);
+//    pItem = new NewsDataItem();
+//    pItem->setIndex(newsIndex);
+//    pItem->setTimeStamp(QDateTime::currentMSecsSinceEpoch());
+//    pItem->setHeader(header);
+//    pItem->setInfo(info);
+//    pItem->setUser(this->m_readableName);
 
-    QQmlEngine::setObjectOwnership(pItem, QQmlEngine::CppOwnership);
-    this->addNewNewsDataItem(pItem, UpdateIndex::UpdateAll);
+//    QQmlEngine::setObjectOwnership(pItem, QQmlEngine::CppOwnership);
+//    this->addNewNewsDataItem(pItem, UpdateIndex::UpdateAll);
 
-    std::sort(this->m_lNewsDataItems.begin(), this->m_lNewsDataItems.end(), NewsDataItem::compareTimeStampFunctionDescending);
-    return pItem;
-}
+//    std::sort(this->m_lNewsDataItems.begin(), this->m_lNewsDataItems.end(), NewsDataItem::compareTimeStampFunctionDescending);
+//    return pItem;
+//}
 
-NewsDataItem* GlobalData::getNewsDataItemFromArrayIndex(int index)
-{
-    QMutexLocker lock(&this->m_mutexNewsData);
+//NewsDataItem* GlobalData::getNewsDataItemFromArrayIndex(int index)
+//{
+//    QMutexLocker lock(&this->m_mutexNewsData);
 
-    if (index < this->m_lNewsDataItems.size()) {
-        return this->m_lNewsDataItems.at(index);
-    }
-    return NULL;
-}
+//    if (index < this->m_lNewsDataItems.size()) {
+//        return this->m_lNewsDataItems.at(index);
+//    }
+//    return NULL;
+//}
 
-NewsDataItem* GlobalData::getNewsDataItem(quint32 newsIndex)
-{
-    QMutexLocker lock(&this->m_mutexNewsData);
+//NewsDataItem* GlobalData::getNewsDataItem(quint32 newsIndex)
+//{
+//    QMutexLocker lock(&this->m_mutexNewsData);
 
-    for (int i = 0; i < this->m_lNewsDataItems.size(); i++) {
-        if (this->m_lNewsDataItems[i]->index() == newsIndex)
-            return this->m_lNewsDataItems[i];
-    }
-    return NULL;
-}
+//    for (int i = 0; i < this->m_lNewsDataItems.size(); i++) {
+//        if (this->m_lNewsDataItems[i]->index() == newsIndex)
+//            return this->m_lNewsDataItems[i];
+//    }
+//    return NULL;
+//}
 
-QString GlobalData::getNewsDataLastLocalUpdateString()
-{
-    QMutexLocker lock(&this->m_mutexNewsData);
-    return QDateTime::fromMSecsSinceEpoch(this->m_ndLastLocalUpdateTimeStamp).toString("dd.MM.yy hh:mm:ss");
-}
+//QString GlobalData::getNewsDataLastLocalUpdateString()
+//{
+//    QMutexLocker lock(&this->m_mutexNewsData);
+//    return QDateTime::fromMSecsSinceEpoch(this->m_ndLastLocalUpdateTimeStamp).toString("dd.MM.yy hh:mm:ss");
+//}
 
-qint64 GlobalData::getNewsDataLastLocalUpdate()
-{
-    QMutexLocker lock(&this->m_mutexNewsData);
-    return this->m_ndLastLocalUpdateTimeStamp;
-}
+//qint64 GlobalData::getNewsDataLastLocalUpdate()
+//{
+//    QMutexLocker lock(&this->m_mutexNewsData);
+//    return this->m_ndLastLocalUpdateTimeStamp;
+//}
 
-qint64 GlobalData::getNewsDataLastServerUpdate()
-{
-    QMutexLocker lock(&this->m_mutexNewsData);
-    return this->m_ndLastServerUpdateTimeStamp;
-}
+//qint64 GlobalData::getNewsDataLastServerUpdate()
+//{
+//    QMutexLocker lock(&this->m_mutexNewsData);
+//    return this->m_ndLastServerUpdateTimeStamp;
+//}
 
-void GlobalData::resetAllNewsDataEvents()
-{
-    for (int i = 0; i < this->m_lNewsDataItems.count(); i++) {
-        this->m_lNewsDataItems[i]->setEvent(0);
-    }
-}
+//void GlobalData::resetAllNewsDataEvents()
+//{
+//    for (int i = 0; i < this->m_lNewsDataItems.count(); i++) {
+//        this->m_lNewsDataItems[i]->setEvent(0);
+//    }
+//}
 
-bool GlobalData::setNewsDataItemHasEvent(quint32 newsIndex)
-{
-    for (int i = 0; i < this->m_lNewsDataItems.count(); i++) {
-        if (this->m_lNewsDataItems[i]->index() == newsIndex) {
-            this->m_lNewsDataItems[i]->setEvent(this->m_lNewsDataItems[i]->event() + 1);
-            return true;
-        }
-    }
-    return false;
-}
+//bool GlobalData::setNewsDataItemHasEvent(quint32 newsIndex)
+//{
+//    for (int i = 0; i < this->m_lNewsDataItems.count(); i++) {
+//        if (this->m_lNewsDataItems[i]->index() == newsIndex) {
+//            this->m_lNewsDataItems[i]->setEvent(this->m_lNewsDataItems[i]->event() + 1);
+//            return true;
+//        }
+//    }
+//    return false;
+//}
 
 QString GlobalData::getCurrentLoggingList(int index)
 {

@@ -58,28 +58,28 @@ public:
     void loadGlobalSettings();
 
     QString userName();
-    void    setUserName(const QString& user);
+    void setUserName(const QString& user);
 
     QString getSalt() { return this->m_salt; }
-    void    setSalt(QString salt) { this->m_salt = salt; }
+    void setSalt(QString salt) { this->m_salt = salt; }
 
     //    QString readableName();
     //    void    setReadableName(const QString& name);
 
     QString passWord();
-    void    setPassWord(const QString& passw);
+    void setPassWord(const QString& passw);
 
     QString ipAddr();
-    void    setIpAddr(const QString& ip);
+    void setIpAddr(const QString& ip);
 
     quint32 conMasterPort();
-    void    setConMasterPort(quint32 port);
+    void setConMasterPort(quint32 port);
 
     quint32 conDataPort();
-    void    setConDataPort(quint32 port);
+    void setConDataPort(quint32 port);
 
     Q_INVOKABLE quint32 userIndex();
-    void                setUserIndex(quint32 userIndex);
+    void setUserIndex(quint32 userIndex);
 
     bool bIsConnected() { return this->m_bIsConnected; }
     void setbIsConnected(bool enable)
@@ -95,8 +95,8 @@ public:
     Q_INVOKABLE bool userIsGameFixedTimeEnabled();
     Q_INVOKABLE bool userIsFanclubEnabled();
     Q_INVOKABLE bool userIsFanclubEditEnabled();
-    void             SetUserProperties(quint32 value);
-    quint32          getUserProperties();
+    void SetUserProperties(quint32 value);
+    quint32 getUserProperties();
 
     void saveGlobalUserSettings();
 
@@ -110,20 +110,20 @@ public:
 
     void saveCurrentGamesList(qint64 timestamp);
 
-    void        startUpdateGamesPlay(const qint16 updateIndex);
-    void        addNewGamePlay(GamePlay* gPlay, const qint16 updateIndex = 0);
+    void startUpdateGamesPlay(const qint16 updateIndex);
+    void addNewGamePlay(GamePlay* gPlay, const qint16 updateIndex = 0);
     Q_INVOKABLE quint32 getGamePlayLength()
     {
         QMutexLocker lock(&this->m_mutexGame);
         return this->m_lGamePlay.size();
     }
-    GamePlay*   getGamePlay(const quint32 gameIndex);
+    GamePlay* getGamePlay(const quint32 gameIndex);
     Q_INVOKABLE GamePlay* getGamePlayFromArrayIndex(int index);
     Q_INVOKABLE QString getGamePlayLastUpdateString();
     qint64              getGamePlayLastLocalUpdate();
     qint64              getGamePlayLastServerUpdate();
     void                resetAllGamePlayEvents();
-    bool                setGamePlayItemHasEvent(quint32 gameIndex);
+    bool setGamePlayItemHasEvent(quint32 gameIndex);
 
 
     //    void saveCurrentSeasonTickets(qint64 timestamp);
@@ -151,23 +151,23 @@ public:
     }
 
 
-    void          saveCurrentNewsDataList(qint64 timestamp);
-    void          startUpdateNewsDataItem(const quint16 updateIndex);
-    void          addNewNewsDataItem(NewsDataItem* pItem, const quint16 updateIndex = 0);
-    NewsDataItem* createNewNewsDataItem(quint32 newsIndex, QString header, QString info);
-    Q_INVOKABLE quint32 getNewsDataItemLength()
-    {
-        QMutexLocker lock(&this->m_mutexNewsData);
-        return this->m_lNewsDataItems.size();
-    }
-    Q_INVOKABLE NewsDataItem* getNewsDataItemFromArrayIndex(int index);
-    NewsDataItem*             getNewsDataItem(quint32 newsIndex);
-    Q_INVOKABLE QString getNewsDataLastLocalUpdateString();
-    qint64              getNewsDataLastLocalUpdate();
-    qint64              getNewsDataLastServerUpdate();
-    void                resetNewsDataLastServerUpdate();
-    void                resetAllNewsDataEvents();
-    bool                setNewsDataItemHasEvent(quint32 newsIndex);
+    //    void          saveCurrentNewsDataList(qint64 timestamp);
+    //    void          startUpdateNewsDataItem(const quint16 updateIndex);
+    //    void          addNewNewsDataItem(NewsDataItem* pItem, const quint16 updateIndex = 0);
+    //    NewsDataItem* createNewNewsDataItem(quint32 newsIndex, QString header, QString info);
+    //    Q_INVOKABLE quint32 getNewsDataItemLength()
+    //    {
+    //        QMutexLocker lock(&this->m_mutexNewsData);
+    //        return this->m_lNewsDataItems.size();
+    //    }
+    //    Q_INVOKABLE NewsDataItem* getNewsDataItemFromArrayIndex(int index);
+    //    NewsDataItem*             getNewsDataItem(quint32 newsIndex);
+    //    Q_INVOKABLE QString getNewsDataLastLocalUpdateString();
+    //    qint64              getNewsDataLastLocalUpdate();
+    //    qint64              getNewsDataLastServerUpdate();
+    //    void                resetNewsDataLastServerUpdate();
+    //    void                resetAllNewsDataEvents();
+    //    bool                setNewsDataItemHasEvent(quint32 newsIndex);
 
     Q_INVOKABLE GameUserData* getGameUserDataHandler() { return &this->m_gameUserData; }
 

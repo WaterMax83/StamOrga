@@ -21,6 +21,7 @@
 #include "../Common/General/globaltiming.h"
 #include "../Common/Network/messagecommand.h"
 #include "../Manager/cticketmanager.h"
+#include "../Manager/cnewsdatamanager.h"
 #include "ccontcpmaindata.h"
 
 cConTcpDataServer::cConTcpDataServer()
@@ -203,6 +204,19 @@ MessageProtocol* cConTcpDataServer::checkNewMessage(MessageProtocol* msg)
             break;
         case OP_CODE_CMD_REQ::REQ_REMOVE_TICKET:
             ack = g_TicketManager.getSeasonTicketRemoveRequest(this->m_pUserConData, msg);
+            break;
+
+        case OP_CODE_CMD_REQ::REQ_GET_NEWS_DATA_LIST:
+            ack = g_NewsDataManager.getNewsDataList(this->m_pUserConData, msg);
+           break;
+        case OP_CODE_CMD_REQ::REQ_GET_NEWS_DATA_ITEM:
+            ack = g_NewsDataManager.getNewsDataItem(this->m_pUserConData, msg);
+            break;
+        case OP_CODE_CMD_REQ::REQ_CHANGE_NEWS_DATA:
+            ack = g_NewsDataManager.getNewsDataChangeRequest(this->m_pUserConData, msg);
+            break;
+        case OP_CODE_CMD_REQ::REQ_DEL_NEWS_DATA_ITEM:
+            ack = g_NewsDataManager.getNewsDataRemoveRequest(this->m_pUserConData, msg);
             break;
         }
     } else if (msg->getIndex() == OP_CODE_CMD_REQ::REQ_LOGIN_USER) {

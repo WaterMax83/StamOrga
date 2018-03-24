@@ -22,14 +22,10 @@
 #include <QtCore/QObject>
 
 #include "../../Common/General/globalfunctions.h"
-#include "../Data/globaldata.h"
-//#include "../connectionhandling.h"
 
 class UserInterface : public QObject
 {
     Q_OBJECT
-
-    //    Q_PROPERTY(GlobalData* globalData READ globalData WRITE setGlobalData)
 public:
     explicit UserInterface(QObject* parent = 0);
 
@@ -44,14 +40,6 @@ public:
     Q_INVOKABLE qint32 startListGettingGamesInfo();
 
     Q_INVOKABLE qint32 startSetFixedGameTime(const quint32 gameIndex, const quint32 fixed);
-
-    Q_INVOKABLE qint32 startAddSeasonTicket(QString name, quint32 discount);
-
-    Q_INVOKABLE qint32 startRemoveSeasonTicket(quint32 index);
-
-    Q_INVOKABLE qint32 startEditSeasonTicket(quint32 index, QString name, QString place, quint32 discount);
-
-    Q_INVOKABLE qint32 startListSeasonTickets();
 
     Q_INVOKABLE qint32 startRequestAvailableTickets(quint32 gameIndex);
 
@@ -68,15 +56,6 @@ public:
     Q_INVOKABLE qint32 startAcceptMeetingInfo(const quint32 gameIndex, const quint32 accept,
                                               const QString name, const quint32 type,
                                               const quint32 acceptIndex = 0);
-
-    Q_INVOKABLE qint32 startChangeFanclubNews(const quint32 newsIndex, const QString header,
-                                              const QString info);
-
-    Q_INVOKABLE qint32 startListFanclubNews();
-
-    Q_INVOKABLE qint32 startGetFanclubNewsItem(const quint32 newsIndex);
-
-    Q_INVOKABLE qint32 startDeleteFanclubNewsItem(const quint32 newsIndex);
 
     Q_INVOKABLE qint32 startStatisticsCommand(const QByteArray& command);
 
@@ -102,15 +81,6 @@ public:
     {
         return getErrorCodeString(code);
     }
-
-    //    GlobalData* globalData()
-    //    {
-    //        return this->m_pConHandle->getGlobalData();
-    //    }
-    //    void setGlobalData(GlobalData* pData)
-    //    {
-    //        this->m_pConHandle->setGlobalData(pData);
-    //    }
 
 signals:
     void notifyConnectionFinished(qint32 result, const QString msg);
@@ -143,7 +113,6 @@ signals:
 
 public slots:
     void slotConnectionRequestFinished(qint32 result, const QString msg);
-
     void slotCommandFinished(quint32 command, qint32 result);
 
 

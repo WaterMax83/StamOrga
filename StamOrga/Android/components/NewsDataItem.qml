@@ -124,7 +124,7 @@ Rectangle {
     }
 
     function showNewsDataInfo(index) {
-        var newsDataItem = globalUserData.getNewsDataItemFromArrayIndex(index)
+        var newsDataItem = gDataNewsDataManager.getNewsDataFromArrayIndex(index)
         if (newsDataItem !== null) {
             m_newsDataItem = newsDataItem
             labelHeaderItem.text = newsDataItem.header

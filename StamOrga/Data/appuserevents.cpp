@@ -52,7 +52,7 @@ void AppUserEvents::addNewUserEvents(QJsonObject& jsObj)
     } else if (pEvent->m_type == NOTIFY_TOPIC_NEW_FANCLUB_NEWS) {
 
         if (this->m_pGlobalData->userIsFanclubEnabled()) {
-            this->m_pGlobalData->setNewsDataItemHasEvent(pEvent->m_info.toUInt());
+            //            this->m_pGlobalData->setNewsDataItemHasEvent(pEvent->m_info.toUInt());
             this->m_eventNewFanclubNews++;
         } else {
             this->m_eventNewFanclubNews = 0;
@@ -77,7 +77,7 @@ void AppUserEvents::resetCurrentEvents()
     this->m_eventNewAppVersion  = false;
     this->m_eventNewFanclubNews = 0;
     this->m_pGlobalData->resetAllGamePlayEvents();
-    this->m_pGlobalData->resetAllNewsDataEvents();
+    //    this->m_pGlobalData->resetAllNewsDataEvents();
     for (int i = this->m_lEvents.count() - 1; i >= 0; i--) {
         delete this->m_lEvents[i];
         this->m_lEvents.removeAt(i);

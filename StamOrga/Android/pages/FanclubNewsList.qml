@@ -120,7 +120,8 @@ Flickable {
     }
 
     function updateFanclubNewsList() {
-        userInt.startListFanclubNews();
+        gDataNewsDataManager.startListNewsData();
+//        userInt.startListFanclubNews();
         busyIndicatorNewsList.loadingVisible = true;
         busyIndicatorNewsList.infoText = "Aktualisiere Liste"
     }
@@ -171,12 +172,12 @@ Flickable {
             columnLayoutFanClubList.children[j-1].destroy()
         }
 
-        if (globalUserData.getNewsDataItemLength() > 0) {
-            for (var i = 0; i < globalUserData.getNewsDataItemLength(); i++) {
+        if (gDataNewsDataManager.getNewsDataLength() > 0) {
+            for (var i = 0; i < gDataNewsDataManager.getNewsDataLength(); i++) {
                 var sprite = newsDataItem.createObject(columnLayoutFanClubList)
                 sprite.showNewsDataInfo(i);
             }
-            busyIndicatorNewsList.infoText = "Letztes Update am " + globalUserData.getNewsDataLastLocalUpdateString()
+            busyIndicatorNewsList.infoText = "Letztes Update am " + gDataNewsDataManager.getNewsDataLastLocalUpdateString()
         } else
             busyIndicatorNewsList.infoText = "Keine Daten gespeichert\nZiehen zum Aktualisieren"
 
@@ -239,7 +240,8 @@ Flickable {
     function acceptedDeletingNews() {
         busyIndicatorNewsList.loadingVisible = true;
         busyIndicatorNewsList.infoText = "Lösche Nachricht"
-        userInt.startDeleteFanclubNewsItem(m_newsItemEditIndex);
+        gDataNewsDataManager.startRemoveNewsDataItem(m_newsItemEditIndex);
+//        userInt.startDeleteFanclubNewsItem(m_newsItemEditIndex);
     }
 
     function notifyUserIntConnectionFinished(result, msg) {}
