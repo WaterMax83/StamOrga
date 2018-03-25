@@ -1320,7 +1320,7 @@ MessageProtocol* DataConnection::requestCommandStatistic(MessageProtocol* msg)
 //    return new MessageProtocol(OP_CODE_CMD_RES::ACK_CMD_STATISTIC, answer);
     MessageProtocol* ack = g_StatisticManager.handleStatisticCommand(this->m_pUserConData, msg);
 
-    QByteArray data = QByteArray(msg->getPointerToData());
+    QByteArray data = QByteArray(ack->getPointerToData());
     qint32 rCode = ERROR_CODE_SUCCESS;
     data.prepend(sizeof(qint32), 0x0);
     memcpy((void*)data.constData(), &rCode, sizeof(qint32));
