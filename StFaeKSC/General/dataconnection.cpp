@@ -1318,5 +1318,14 @@ MessageProtocol* DataConnection::requestCommandStatistic(MessageProtocol* msg)
 //    memcpy((void*)answer.constData(), &rCode, sizeof(qint32));
 
 //    return new MessageProtocol(OP_CODE_CMD_RES::ACK_CMD_STATISTIC, answer);
-    return g_StatisticManager.handleStatisticCommand(this->m_pUserConData, msg);
+    MessageProtocol* ack = g_StatisticManager.handleStatisticCommand(this->m_pUserConData, msg);
+
+    QByteArray data = QByteArray(msg->getPointerToData());
+    qint32 rCode = ERROR_CODE_SUCCESS;
+    data.prepend(sizeof(qint32), 0x0);
+    memcpy((void*)data.constData(), &rCode, sizeof(qint32));
+
+    MessageProtocol* ack2 = new MessageProtocol(ack->getIndex(), data);
+    delete ack;
+    return ack2;
 }
