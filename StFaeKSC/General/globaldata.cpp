@@ -109,8 +109,6 @@ void GlobalData::initialize()
             delete mEvent;
     }
 
-    this->m_statistic.initialize();
-
     this->m_initalized = true;
 }
 

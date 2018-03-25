@@ -53,13 +53,8 @@ public:
 
     qint32 initialize(QString host, qint32 port);
 
-    //    qint32 initialize() { return ERROR_CODE_SUCCESS; }
-
     int DoBackgroundWork() override;
 
-    //    QString m_workerName = "cConTcpData";
-
-    //    void setRandomLoginValue(QString val) { this->m_randomLoginValue = val; }
 
     qint32 terminate();
 
@@ -97,7 +92,6 @@ private:
     //    void startSendChangeMeetingInfo(DataConRequest request);
     //    void startSendGetMeetingInfo(DataConRequest request);
     //    void startSendAcceptMeeting(DataConRequest request);
-    //    void startSendStatisticsCommand(DataConRequest request);
 
 
     void   checkNewOncomingData();

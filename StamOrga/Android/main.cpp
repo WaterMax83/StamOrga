@@ -32,10 +32,10 @@
 #include "../../Common/General/config.h"
 #include "../../Common/General/globalfunctions.h"
 #include "../Data/appuserevents.h"
+#include "../Data/cdatastatisticmanager.h"
 #include "../Data/gameuserdata.h"
 #include "../Data/globaldata.h"
 #include "../Data/globalsettings.h"
-#include "../Data/statistic.h"
 #include "../cstaglobalmanager.h"
 #include "../dataconnection.h"
 #include "userinterface.h"
@@ -44,7 +44,6 @@
 GlobalSettings* g_GlobalSettings;
 AppUserEvents*  g_AppUserEvents;
 GlobalData*     g_GlobalData;
-Statistic*      g_Statistics;
 
 int main(int argc, char* argv[])
 {
@@ -78,10 +77,6 @@ int main(int argc, char* argv[])
     appUserEvents.initialize(&globalUserData);
     g_AppUserEvents = &appUserEvents;
 
-    Statistic statistics;
-    statistics.initialize();
-    g_Statistics = &statistics;
-
     QFontDatabase base;
     QStringList   fontFamilies = base.families();
     QString       chFontFam    = globalSettings.getChangeDefaultFont();
@@ -112,7 +107,6 @@ int main(int argc, char* argv[])
     engine.rootContext()->setContextProperty("globalSettings", &globalSettings);
     engine.rootContext()->setContextProperty("fontFamiliesModel", &fontFamiliesModel);
     engine.rootContext()->setContextProperty("appUserEvents", &appUserEvents);
-    engine.rootContext()->setContextProperty("statistics", &statistics);
     //    engine.rootContext()->setContextProperty("fontFamiliesModel", QVariant::fromValue(fontFamilies));
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));
 

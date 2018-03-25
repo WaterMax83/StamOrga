@@ -19,6 +19,7 @@
 #ifndef USERINTERFACE_H
 #define USERINTERFACE_H
 
+#include <QtCore/QMutex>
 #include <QtCore/QObject>
 
 #include "../../Common/General/globalfunctions.h"
@@ -56,8 +57,6 @@ public:
     Q_INVOKABLE qint32 startAcceptMeetingInfo(const quint32 gameIndex, const quint32 accept,
                                               const QString name, const quint32 type,
                                               const quint32 acceptIndex = 0);
-
-    Q_INVOKABLE qint32 startStatisticsCommand(const QByteArray& command);
 
     Q_INVOKABLE bool isDebuggingEnabled()
     {

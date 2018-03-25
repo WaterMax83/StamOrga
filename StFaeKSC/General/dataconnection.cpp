@@ -1303,17 +1303,20 @@ MessageProtocol* DataConnection::requestDeleteNewsDataItem(MessageProtocol* msg)
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_DEL_NEWS_DATA_ITEM, rCode);
 }
 
+#include "../Manager/cstatisticmanager.h"
+
 MessageProtocol* DataConnection::requestCommandStatistic(MessageProtocol* msg)
 {
-    const char* pData = msg->getPointerToData();
-    QByteArray  data(pData, (int)msg->getDataLength());
+//    const char* pData = msg->getPointerToData();
+//    QByteArray  data(pData, (int)msg->getDataLength());
 
-    QByteArray answer;
-    qint32     rCode = this->m_pGlobalData->m_statistic.handleStatisticCommand(data, answer);
-    qInfo().noquote() << QString("Handle statistics command from %1 with %2").arg(this->m_pUserConData->m_userName).arg(rCode);
-    rCode = qToLittleEndian(rCode);
-    answer.prepend(sizeof(qint32), 0x0);
-    memcpy((void*)answer.constData(), &rCode, sizeof(qint32));
+//    QByteArray answer;
+//    qint32     rCode = g_StatisticManager.handleStatisticCommand(data, answer);
+//    qInfo().noquote() << QString("Handle statistics command from %1 with %2").arg(this->m_pUserConData->m_userName).arg(rCode);
+//    rCode = qToLittleEndian(rCode);
+//    answer.prepend(sizeof(qint32), 0x0);
+//    memcpy((void*)answer.constData(), &rCode, sizeof(qint32));
 
-    return new MessageProtocol(OP_CODE_CMD_RES::ACK_CMD_STATISTIC, answer);
+//    return new MessageProtocol(OP_CODE_CMD_RES::ACK_CMD_STATISTIC, answer);
+    return g_StatisticManager.handleStatisticCommand(this->m_pUserConData, msg);
 }

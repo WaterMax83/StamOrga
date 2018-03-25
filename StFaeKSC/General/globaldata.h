@@ -32,7 +32,6 @@
 #include "../Data/meetinginfo.h"
 #include "../Data/seasonticket.h"
 #include "../Data/userevents.h"
-#include "../Data/statistic.h"
 
 class GlobalData
 {
@@ -68,7 +67,6 @@ public:
     Games                        m_GamesList;
     SeasonTicket                 m_SeasonTicket;
     FanclubNews                  m_fanclubNews;
-    Statistic                    m_statistic;
     QList<AvailableGameTickets*> m_availableTickets;
     QList<MeetingInfo*>          m_meetingInfos;
     QList<AwayTripInfo*>         m_awayTripInfos;

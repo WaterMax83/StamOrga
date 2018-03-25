@@ -23,6 +23,7 @@
 #include "../Manager/cticketmanager.h"
 #include "../Manager/cnewsdatamanager.h"
 #include "ccontcpmaindata.h"
+#include "../Manager/cstatisticmanager.h"
 
 cConTcpDataServer::cConTcpDataServer()
     : BackgroundWorker()
@@ -217,6 +218,10 @@ MessageProtocol* cConTcpDataServer::checkNewMessage(MessageProtocol* msg)
             break;
         case OP_CODE_CMD_REQ::REQ_DEL_NEWS_DATA_ITEM:
             ack = g_NewsDataManager.getNewsDataRemoveRequest(this->m_pUserConData, msg);
+            break;
+
+         case OP_CODE_CMD_REQ::REQ_CMD_STATISTIC:
+            ack = g_StatisticManager.handleStatisticCommand(this->m_pUserConData, msg);
             break;
         }
     } else if (msg->getIndex() == OP_CODE_CMD_REQ::REQ_LOGIN_USER) {

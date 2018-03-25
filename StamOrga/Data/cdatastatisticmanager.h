@@ -17,8 +17,8 @@
 */
 
 
-#ifndef STATISTIC_H
-#define STATISTIC_H
+#ifndef CDATASTATISTICMANAGER_H
+#define CDATASTATISTICMANAGER_H
 
 #include <QObject>
 #include <QtCharts/QBarCategoryAxis>
@@ -27,6 +27,8 @@
 #include <QtCharts/QChartView>
 #include <QtCharts/QLegend>
 
+#include "../Common/General/cgendisposer.h"
+#include "../Common/Network/messageprotocol.h"
 #include "userinterface.h"
 
 QT_CHARTS_USE_NAMESPACE
@@ -47,7 +49,7 @@ public:
     QString         m_color;
 };
 
-class Statistic : public QObject
+class cDataStatisticManager : public cGenDisposer
 {
     Q_OBJECT
     Q_PROPERTY(QStringList categories READ categories NOTIFY propertiesChanged)
@@ -55,17 +57,15 @@ class Statistic : public QObject
     Q_PROPERTY(qint32 maxX READ maxX NOTIFY propertiesChanged)
     Q_PROPERTY(qint32 height READ height NOTIFY propertiesChanged)
 public:
-    explicit Statistic(QObject* parent = nullptr);
+    explicit cDataStatisticManager(QObject* parent = nullptr);
 
-    void initialize();
+    qint32 initialize() override;
 
-    Q_INVOKABLE void setUserInterface(UserInterface* pInt);
+    Q_INVOKABLE qint32 startLoadStatisticOverview();
 
-    Q_INVOKABLE qint32 loadStatisticOverview();
+    Q_INVOKABLE qint32 startLoadStatisticContent(qint32 index);
 
-    Q_INVOKABLE qint32 loadStatisticContent(qint32 index);
-
-    Q_INVOKABLE qint32 handleStatisticResponse(QByteArray& data);
+    Q_INVOKABLE qint32 handleStatisticResponse(MessageProtocol* msg);
 
     Q_INVOKABLE QStringList getCurrentOverviewList();
 
@@ -83,8 +83,7 @@ signals:
 public slots:
 
 private:
-    UserInterface* m_userInterface;
-    QStringList    m_overView;
+    QStringList m_overView;
 
     QStringList      m_categories;
     QString          m_title;
@@ -94,4 +93,6 @@ private:
     qint32 startSendCommand(QJsonObject& rootObj);
 };
 
-#endif // STATISTIC_H
+extern cDataStatisticManager g_DataStatisticManager;
+
+#endif // CDATASTATISTICMANAGER_H

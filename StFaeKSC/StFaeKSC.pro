@@ -54,7 +54,6 @@ SOURCES += main.cpp \
     Data/userevents.cpp \
     Data/awaytripinfo.cpp \
     Data/checkconsistentdata.cpp \
-    Data/statistic.cpp \
     Network/ccontcpmainserver.cpp \
     Network/ccontcpmainsocket.cpp \
     Network/ccontcpmaindata.cpp \
@@ -62,6 +61,7 @@ SOURCES += main.cpp \
     Manager/cticketmanager.cpp \
     Manager/cglobalmanager.cpp \
     Manager/cnewsdatamanager.cpp \
+    Manager/cstatisticmanager.cpp
 
 
 HEADERS += \
@@ -95,7 +95,6 @@ HEADERS += \
     Data/userevents.h \
     Data/awaytripinfo.h \
     Data/checkconsistentdata.h \
-    Data/statistic.h \
     Network/ccontcpmainserver.h \
     Network/ccontcpmainsocket.h \
     Network/ccontcpmaindata.h \
@@ -103,6 +102,7 @@ HEADERS += \
     Manager/cticketmanager.h \
     Manager/cglobalmanager.h \
     Manager/cnewsdatamanager.h \
+    Manager/cstatisticmanager.h
 
 unix {
 #    QMAKE_POST_LINK = mkdir -p $$OUTPUT_FOLDER && cp $$TARGET $$OUTPUT_FOLDER

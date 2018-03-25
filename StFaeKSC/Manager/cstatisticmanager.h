@@ -16,8 +16,8 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CYCLECHECK_H
-#define CYCLECHECK_H
+#ifndef CSTATISTICMANAGER_H
+#define CSTATISTICMANAGER_H
 
 #include <QList>
 #include <QMutex>
@@ -26,6 +26,8 @@
 
 #include "../Common/General/backgroundcontroller.h"
 #include "../Common/General/backgroundworker.h"
+#include "../Common/Network/messageprotocol.h"
+#include "../Network/connectiondata.h"
 
 
 struct StatsTickets {
@@ -113,15 +115,15 @@ struct StatsMeeting {
     }
 };
 
-class Statistic : public BackgroundWorker
+class cStatisticManager : public BackgroundWorker
 {
     Q_OBJECT
 public:
-    explicit Statistic(QObject* parent = nullptr);
+    explicit cStatisticManager(QObject* parent = nullptr);
 
     int initialize();
 
-    qint32 handleStatisticCommand(QByteArray& cmd, QByteArray& answer);
+    MessageProtocol* handleStatisticCommand(UserConData* pUserCon, MessageProtocol* request);
 
 signals:
 
@@ -147,4 +149,6 @@ protected:
     qint32 handleAwayTripCommand(QJsonObject& rootObjAnswer);
 };
 
-#endif // CYCLECHECK_H
+extern cStatisticManager g_StatisticManager;
+
+#endif // CSTATISTICMANAGER_H

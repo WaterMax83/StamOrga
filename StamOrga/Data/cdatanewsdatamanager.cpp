@@ -40,35 +40,10 @@ cDataNewsDataManager::cDataNewsDataManager(QObject* parent)
 
 qint32 cDataNewsDataManager::initialize()
 {
-    //    if (!g_StaGlobalSettings.getSaveInfosOnApp())
-    //        g_StaSettingsManager.removeGroup(SEASONTICKET_GROUP);
-
-    //    qint64 iValue;
-    //    g_StaSettingsManager.getInt64Value(SEASONTICKET_GROUP, LOCAL_TICKET_UDPATE, iValue);
-    this->m_stLastLocalUpdateTimeStamp = 0;
-    //    g_StaSettingsManager.getInt64Value(SEASONTICKET_GROUP, SERVER_TICKET_UDPATE, iValue);
+    this->m_stLastLocalUpdateTimeStamp  = 0;
     this->m_stLastServerUpdateTimeStamp = 0;
 
     this->m_initialized = true;
-
-    //    QString value;
-    //    qint32  index = 0;
-    //    while (g_StaSettingsManager.getValue(SEASONTICKET_GROUP, TICKET_NAME, index, value) == ERROR_CODE_SUCCESS) {
-    //        SeasonTicketItem* pTicket = new SeasonTicketItem();
-    //        pTicket->setName(value);
-    //        g_StaSettingsManager.getValue(SEASONTICKET_GROUP, TICKET_PLACE, index, value);
-    //        pTicket->setPlace(value);
-    //        g_StaSettingsManager.getInt64Value(SEASONTICKET_GROUP, TICKET_DISCOUNT, index, iValue);
-    //        pTicket->setDiscount(iValue);
-    //        g_StaSettingsManager.getInt64Value(SEASONTICKET_GROUP, ITEM_INDEX, index, iValue);
-    //        pTicket->setIndex(iValue);
-    //        g_StaSettingsManager.getInt64Value(SEASONTICKET_GROUP, TICKET_USER_INDEX, index, iValue);
-    //        pTicket->setUserIndex(iValue);
-
-    //        QQmlEngine::setObjectOwnership(pTicket, QQmlEngine::CppOwnership);
-    //        this->addNewSeasonTicket(pTicket);
-    //        index++;
-    //    }
 
     return ERROR_CODE_SUCCESS;
 }

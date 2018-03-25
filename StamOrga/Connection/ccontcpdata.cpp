@@ -24,6 +24,7 @@
 #include "../Common/General/globaltiming.h"
 #include "../Common/Network/messagecommand.h"
 #include "../Data/cdatanewsdatamanager.h"
+#include "../Data/cdatastatisticmanager.h"
 #include "../Data/cdataticketmanager.h"
 #include "../cstaglobalsettings.h"
 #include "cconmanager.h"
@@ -248,9 +249,9 @@ void cConTcpData::checkNewOncomingData()
             request->m_result = g_DataNewsDataManager.handleRemoveNewsDataItemResponse(msg);
             break;
 
-        //        case OP_CODE_CMD_RES::ACK_CMD_STATISTIC:
-        //            request.m_result = this->m_pDataHandle->getHandleStatisticsCommandResponse(msg);
-        //            break;
+        case OP_CODE_CMD_RES::ACK_CMD_STATISTIC:
+            request->m_result = g_DataStatisticManager.handleStatisticResponse(msg);
+            break;
 
 
         default:
@@ -415,14 +416,6 @@ void cConTcpData::checkNewOncomingData()
 //    this->sendMessageRequest(&msg, request);
 //}
 
-//void cConTcpData::startSendStatisticsCommand(DataConRequest request)
-//{
-//    QByteArray data = request.m_lData.at(0).toUtf8();
-
-//    MessageProtocol msg(request.m_request, data);
-//    this->sendMessageRequest(&msg, request);
-//}
-
 qint32 cConTcpData::sendMessageRequest(MessageProtocol* msg, TcpDataConRequest* request)
 {
     if (this->m_pDataTcpSocket == NULL)
@@ -556,10 +549,6 @@ void cConTcpData::startSendNewRequest(TcpDataConRequest* request)
     //    case OP_CODE_CMD_REQ::REQ_ACCEPT_MEETING:
     //    case OP_CODE_CMD_REQ::REQ_ACCEPT_AWAYTRIP:
     //        this->startSendAcceptMeeting(request);
-    //        break;
-
-    //    case OP_CODE_CMD_REQ::REQ_CMD_STATISTIC:
-    //        this->startSendStatisticsCommand(request);
     //        break;
 
     //    default:

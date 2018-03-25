@@ -40,7 +40,7 @@ Item {
             Layout.rightMargin: 10
             Layout.topMargin: 10
             font.family: txtForFontFamily.font
-            model: statistics.getCurrentOverviewList()
+            model: gDataStatisticManager.getCurrentOverviewList()
             anchors.horizontalCenter: parent.horizontalCenter
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignTop
@@ -48,7 +48,7 @@ Item {
                 if (iLoadingIndex < 0 || bComboBoxIndexEnabled === false)
                     return;
 
-                statistics.loadStatisticContent(comboStatisticOverview.currentIndex);
+                gDataStatisticManager.startLoadStatisticContent(comboStatisticOverview.currentIndex);
                 busyIndicatorStatistic.loadingVisible = true;
                 chartView.visible = false;
                 iLoadingIndex = 1;
@@ -82,9 +82,9 @@ Item {
                 loadAgainButton.visible = false;
                 busyIndicatorStatistic.infoVisible = false;
                 if (iLoadingIndex === 0)
-                    statistics.loadStatisticOverview();
+                    gDataStatisticManager.startLoadStatisticOverview()
                 else
-                    statistics.loadStatisticContent(comboStatisticOverview.currentIndex);
+                    gDataStatisticManager.startLoadStatisticContent(comboStatisticOverview.currentIndex)
                 busyIndicatorStatistic.loadingVisible = true;
                 chartView.visible = false;
             }
@@ -101,20 +101,20 @@ Item {
 
             ChartView {
                 id: chartView
-                title: statistics.title
+                title: gDataStatisticManager.title
                 width: parent.width
                 height: Math.max(mainColumnLayoutStatistic.height - comboStatisticOverview.height,
-                                 statistics.height * txtForFontFamily.height * 3)
+                                 gDataStatisticManager.height * txtForFontFamily.height * 3)
                 antialiasing: true
 
                 HorizontalStackedBarSeries {
                     id: mySeries
                     axisY: BarCategoryAxis {
-                        categories: statistics.categories
+                        categories: gDataStatisticManager.categories
                     }
                     axisX: ValueAxis {
                         min: 0
-                        max: statistics.maxX
+                        max: gDataStatisticManager.maxX
                     }
                 }
             }
@@ -126,9 +126,7 @@ Item {
 
     function pageOpenedUpdateView() {
 
-        statistics.setUserInterface(userInt, chartView);
-
-        statistics.loadStatisticOverview();
+        gDataStatisticManager.startLoadStatisticOverview()
         busyIndicatorStatistic.loadingVisible = true;
         chartView.visible = false;
         iLoadingIndex = 0;
@@ -144,16 +142,16 @@ Item {
 
             if (iLoadingIndex === 0) {
 
-                comboStatisticOverview.model = statistics.getCurrentOverviewList();
-                statistics.loadStatisticContent(comboStatisticOverview.currentIndex);
+                comboStatisticOverview.model = gDataStatisticManager.getCurrentOverviewList();
+                gDataStatisticManager.startLoadStatisticContent(comboStatisticOverview.currentIndex)
                 iLoadingIndex = 1;
                 bComboBoxIndexEnabled = true;
             } else {
 
                 mySeries.clear();
 
-                for(var index = 0; index < statistics.getStatBarCount(); index++) {
-                    var barInfo = statistics.getNextStatBar(index);
+                for(var index = 0; index < gDataStatisticManager.getStatBarCount(); index++) {
+                    var barInfo = gDataStatisticManager.getNextStatBar(index);
                     var bar = mySeries.append(barInfo.title, barInfo.values);
                     bar.color = barInfo.color;
                 }

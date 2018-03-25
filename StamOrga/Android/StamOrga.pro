@@ -52,11 +52,11 @@ SOURCES += main.cpp \
     ../Data/meetinginfo.cpp \
     ../Data/globalsettings.cpp \
     ../Data/appuserevents.cpp \
-    ../Data/statistic.cpp \
     source/pushnotification.cpp \
     ../Data/gameuserdata.cpp \
     ../Data/cdataticketmanager.cpp  \
-    ../Data/cdatanewsdatamanager.cpp
+    ../Data/cdatanewsdatamanager.cpp \
+    ../Data/cdatastatisticmanager.cpp
 
 
 RESOURCES += qml.qrc
@@ -115,11 +115,11 @@ HEADERS += \
     ../Data/acceptmeetinginfo.h \
     ../Data/globalsettings.h \
     ../Data/appuserevents.h \
-    ../Data/statistic.h \
     source/pushnotification.h \
     ../Data/gameuserdata.h \
     ../Data/cdataticketmanager.h \
-    ../Data/cdatanewsdatamanager.h
+    ../Data/cdatanewsdatamanager.h \
+    ../Data/cdatastatisticmanager.h
 
 INCLUDEPATH += \
     ../ \

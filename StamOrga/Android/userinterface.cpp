@@ -120,12 +120,6 @@ qint32 UserInterface::startAcceptMeetingInfo(const quint32 gameIndex, const quin
     return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
-qint32 UserInterface::startStatisticsCommand(const QByteArray& command)
-{
-    //    return this->m_pConHandle->startStatisticsCommand(command);
-    return ERROR_CODE_NOT_IMPLEMENTED;
-}
-
 void UserInterface::slotConnectionRequestFinished(qint32 result, const QString msg)
 {
     emit this->notifyConnectionFinished(result, msg);

@@ -22,6 +22,7 @@
 #include "Connection/cconusersettings.h"
 #include "Data/cdatanewsdatamanager.h"
 #include "Data/cdatappinfomanager.h"
+#include "Data/cdatastatisticmanager.h"
 #include "Data/cdataticketmanager.h"
 #include "cstaglobalmanager.h"
 #include "cstaglobalsettings.h"
@@ -55,6 +56,9 @@ qint32 cStaGlobalManager::initialize()
         rCode = g_DataNewsDataManager.initialize();
 
     if (rCode == ERROR_CODE_SUCCESS)
+        rCode = g_DataStatisticManager.initialize();
+
+    if (rCode == ERROR_CODE_SUCCESS)
         rCode = g_ConUserSettings.initialize();
 
     if (rCode == ERROR_CODE_SUCCESS)
@@ -71,5 +75,6 @@ void cStaGlobalManager::setQmlInformationClasses(QQmlApplicationEngine* engine)
     engine->rootContext()->setContextProperty("gStaGlobalSettings", &g_StaGlobalSettings);
     engine->rootContext()->setContextProperty("gDataTicketManager", &g_DataTicketManager);
     engine->rootContext()->setContextProperty("gDataNewsDataManager", &g_DataNewsDataManager);
+    engine->rootContext()->setContextProperty("gDataStatisticManager", &g_DataStatisticManager);
     engine->rootContext()->setContextProperty("gConUserSettings", &g_ConUserSettings);
 }

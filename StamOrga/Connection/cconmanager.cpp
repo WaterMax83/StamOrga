@@ -362,36 +362,12 @@ void cConManager::slotDataConLastRequestFinished(TcpDataConRequest* request)
         this->m_bIsConnecting = false;
         break;
 
-    case OP_CODE_CMD_REQ::REQ_GET_VERSION:
-        //        g_GlobalSettings->updateConnectionStatus(true);
-        //        emit this->sNotifyVersionRequest(request.m_result, request.m_returnData);
-        emit this->signalNotifyCommandFinished(request->m_request, request->m_result);
-        return;
-
     //    case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
     //        if (request.m_result == ERROR_CODE_SUCCESS) {
     //            this->startGettingUserEvents();
     //        }
     //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
 
-    //        break;
-
-    //    case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
-    //        if (request.m_result == ERROR_CODE_SUCCESS) {
-    //            this->m_pGlobalData->setPassWord(request.m_returnData);
-    //            this->m_pGlobalData->saveGlobalUserSettings();
-    //        }
-
-    //        emit this->sNotifyUpdatePasswordRequest(request.m_result, request.m_returnData);
-    //        break;
-
-    //    case OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME:
-    //        if (request.m_result == ERROR_CODE_SUCCESS) {
-    //            this->m_pGlobalData->setReadableName(request.m_returnData);
-    //            this->m_pGlobalData->saveGlobalUserSettings();
-    //        }
-
-    //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
     //        break;
 
     //    case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST: {
@@ -458,17 +434,12 @@ void cConManager::checkTimeoutResult(qint32 result)
 {
     if (result == ERROR_CODE_TIMEOUT) {
         this->stopDataConnection();
-        //        this->m_lastSuccessTimeStamp = 0;
-        //        emit this->sSendNewBindingPortRequest();
-        //    } else if (this->m_pGlobalData->bIsConnected())
-        //        this->m_lastSuccessTimeStamp = QDateTime::currentMSecsSinceEpoch();
     }
 }
 
 void cConManager::startDataConnection()
 {
     if (this->isDataConnectionActive()) {
-        //        this->m_pDataCon->setRandomLoginValue(mainConRequestRandom);
         return;
     }
 
@@ -489,8 +460,6 @@ void cConManager::startDataConnection()
 
 void cConManager::stopDataConnection()
 {
-    //    this->m_pGlobalData->setbIsConnected(false);
-
     this->m_bIsConnecting = false;
 
     if (!this->isDataConnectionActive())
@@ -512,7 +481,4 @@ void cConManager::stopDataConnection()
 
 cConManager::~cConManager()
 {
-
-    //    if (this->isMainConnectionActive())
-    //        this->m_ctrlMainCon.Stop();
 }

@@ -19,29 +19,31 @@
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
+#include <QtQml/QQmlEngine>
 
-#include "statistic.h"
+#include "../Common/Network/messagecommand.h"
+#include "../Connection/cconmanager.h"
+#include "cdatastatisticmanager.h"
 
-Statistic::Statistic(QObject* parent)
-    : QObject(parent)
+cDataStatisticManager g_DataStatisticManager;
+
+cDataStatisticManager::cDataStatisticManager(QObject* parent)
+    : cGenDisposer(parent)
 {
 }
 
-void Statistic::initialize()
+qint32 cDataStatisticManager::initialize()
 {
-    this->m_userInterface = NULL;
+    this->m_initialized = true;
+
+    return ERROR_CODE_SUCCESS;
 }
 
 
-void Statistic::setUserInterface(UserInterface* pInt)
+qint32 cDataStatisticManager::startLoadStatisticOverview()
 {
-    this->m_userInterface = pInt;
-}
-
-qint32 Statistic::loadStatisticOverview()
-{
-    if (this->m_userInterface == NULL)
-        return ERROR_CODE_NOT_FOUND;
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
 
     QJsonObject rootObj;
     rootObj.insert("cmd", "overview");
@@ -49,9 +51,12 @@ qint32 Statistic::loadStatisticOverview()
     return this->startSendCommand(rootObj);
 }
 
-qint32 Statistic::handleStatisticResponse(QByteArray& data)
+qint32 cDataStatisticManager::handleStatisticResponse(MessageProtocol* msg)
 {
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
 
+    QByteArray      data(msg->getPointerToData());
     QJsonParseError jerror;
     QJsonObject     rootObj = QJsonDocument::fromJson(data, &jerror).object();
     if (jerror.error != QJsonParseError::NoError) {
@@ -111,10 +116,10 @@ qint32 Statistic::handleStatisticResponse(QByteArray& data)
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 Statistic::loadStatisticContent(qint32 index)
+qint32 cDataStatisticManager::startLoadStatisticContent(qint32 index)
 {
-    if (this->m_userInterface == NULL)
-        return ERROR_CODE_NOT_FOUND;
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
 
     if (index >= this->m_overView.count())
         return ERROR_CODE_WRONG_SIZE;
@@ -128,12 +133,12 @@ qint32 Statistic::loadStatisticContent(qint32 index)
     return ERROR_CODE_SUCCESS;
 }
 
-QStringList Statistic::getCurrentOverviewList()
+QStringList cDataStatisticManager::getCurrentOverviewList()
 {
     return this->m_overView;
 }
 
-StatBars* Statistic::getNextStatBar(const qint32 index)
+StatBars* cDataStatisticManager::getNextStatBar(const qint32 index)
 {
     if (this->m_statBars.count() <= index)
         return NULL;
@@ -141,10 +146,13 @@ StatBars* Statistic::getNextStatBar(const qint32 index)
     return this->m_statBars.at(index);
 }
 
-qint32 Statistic::startSendCommand(QJsonObject& rootObj)
+qint32 cDataStatisticManager::startSendCommand(QJsonObject& rootObj)
 {
-    rootObj.insert("type", "Statistic");
-    QByteArray data = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+    rootObj.insert("type", "cDataStatisticManager");
 
-    return this->m_userInterface->startStatisticsCommand(data);
+    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CMD_STATISTIC);
+    req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+
+    g_ConManager.sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
 }

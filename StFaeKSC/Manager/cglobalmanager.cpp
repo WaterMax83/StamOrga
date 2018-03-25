@@ -21,6 +21,7 @@
 
 #include "cticketmanager.h"
 #include "cnewsdatamanager.h"
+#include "cstatisticmanager.h"
 
 cGlobalManager::cGlobalManager(QObject* parent)
     : cGenDisposer(parent)
@@ -35,6 +36,9 @@ qint32 cGlobalManager::initialize()
 
     if (rValue == ERROR_CODE_SUCCESS)
         rValue = g_NewsDataManager.initialize();
+
+    if (rValue == ERROR_CODE_SUCCESS)
+        rValue = g_StatisticManager.initialize();
 
     this->m_initialized = true;
 

@@ -25,13 +25,13 @@
 #include "../Common/General/config.h"
 #include "../Common/General/globalfunctions.h"
 #include "../Data/appuserevents.h"
+#include "../Data/cdatastatisticmanager.h"
 #include "../Data/gameplay.h"
-#include "../Data/statistic.h"
 #include "datahandling.h"
 
 
-extern AppUserEvents* g_AppUserEvents;
-extern Statistic*     g_Statistics;
+extern AppUserEvents*         g_AppUserEvents;
+extern cDataStatisticManager* g_Statistics;
 
 DataHandling::DataHandling(GlobalData* pData)
 {
@@ -812,19 +812,19 @@ qint32 DataHandling::getHandleFanclubNewsItemResponse(MessageProtocol* msg)
 
 qint32 DataHandling::getHandleStatisticsCommandResponse(MessageProtocol* msg)
 {
-    if (msg->getDataLength() < 4)
-        return ERROR_CODE_WRONG_SIZE;
+    //    if (msg->getDataLength() < 4)
+    //        return ERROR_CODE_WRONG_SIZE;
 
-    const char* pData = msg->getPointerToData();
-    qint32      rValue;
-    memcpy(&rValue, pData, sizeof(qint32));
-    rValue = qFromLittleEndian(rValue);
+    //    const char* pData  = msg->getPointerToData();
+    qint32 rValue = ERROR_CODE_NOT_IMPLEMENTED;
+    //    memcpy(&rValue, pData, sizeof(qint32));
+    //    rValue = qFromLittleEndian(rValue);
 
-    if (msg->getDataLength() > 4 && rValue == ERROR_CODE_SUCCESS) {
+    //    if (msg->getDataLength() > 4 && rValue == ERROR_CODE_SUCCESS) {
 
-        QByteArray jsonByteArray(pData + sizeof(qint32));
-        rValue = g_Statistics->handleStatisticResponse(jsonByteArray);
-    }
+    //        QByteArray jsonByteArray(pData + sizeof(qint32));
+    //        rValue = = g_Statistics->handleStatisticResponse(jsonByteArray);
+    //    }
 
     return rValue;
 }

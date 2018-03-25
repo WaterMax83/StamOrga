@@ -24,17 +24,20 @@
 #include <QtCore/QJsonValue>
 
 #include "../General/globaldata.h"
-#include "statistic.h"
+#include "cstatisticmanager.h"
+#include "../Common/Network/messagecommand.h"
 
 extern GlobalData* g_GlobalData;
 
-Statistic::Statistic(QObject* parent)
+cStatisticManager g_StatisticManager;
+
+cStatisticManager::cStatisticManager(QObject* parent)
     : BackgroundWorker(parent)
 {
 }
 
 
-int Statistic::initialize()
+int cStatisticManager::initialize()
 {
     this->m_bckGrndCtrl = new BackgroundController();
     this->m_bckGrndCtrl->Start(this, false);
@@ -42,11 +45,11 @@ int Statistic::initialize()
     return 1;
 }
 
-int Statistic::DoBackgroundWork()
+int cStatisticManager::DoBackgroundWork()
 {
     this->m_cycleTimer = new QTimer();
     this->m_cycleTimer->setSingleShot(true);
-    connect(this->m_cycleTimer, &QTimer::timeout, this, &Statistic::slotCycleTimerFired);
+    connect(this->m_cycleTimer, &QTimer::timeout, this, &cStatisticManager::slotCycleTimerFired);
 #ifdef QT_DEBUG
     this->m_cycleTimer->start(1000);
 #else
@@ -56,7 +59,7 @@ int Statistic::DoBackgroundWork()
     return ERROR_CODE_SUCCESS;
 }
 
-void Statistic::slotCycleTimerFired()
+void cStatisticManager::slotCycleTimerFired()
 {
     QMutexLocker lock0(&g_GlobalData->m_globalDataMutex);
     QMutexLocker lock1(&this->m_statsMutex);
@@ -235,7 +238,7 @@ void Statistic::slotCycleTimerFired()
     this->m_cycleTimer->start(6 * 60 * 60 * 1000);
 }
 
-QString Statistic::cleanName(QString name)
+QString cStatisticManager::cleanName(QString name)
 {
     QString rValue = name.toLower();
     rValue.replace("'", "");
@@ -267,57 +270,62 @@ QString Statistic::cleanName(QString name)
  *      "parameter": [{"value":"SeasonTickets"},{"value":"Reservierungen"}]     -> these are the groups
  * }
  */
-qint32 Statistic::handleStatisticCommand(QByteArray& command, QByteArray& answer)
+MessageProtocol* cStatisticManager::handleStatisticCommand(UserConData* pUserCon, MessageProtocol* request)
 {
     QMutexLocker lock(&this->m_statsMutex);
 
+    qint32 rCode = ERROR_CODE_SUCCESS;
     QJsonParseError jerror;
-    QJsonObject     rootObj = QJsonDocument::fromJson(command, &jerror).object();
+    QByteArray  data    = QByteArray(request->getPointerToData());
+    QJsonObject     rootObj = QJsonDocument::fromJson(data, &jerror).object();
     if (jerror.error != QJsonParseError::NoError) {
         qWarning().noquote() << QString("Could not answer statistic command, json parse errror: %1 - %2").arg(jerror.errorString()).arg(jerror.offset);
-        return ERROR_CODE_WRONG_PARAMETER;
+        rCode = ERROR_CODE_WRONG_PARAMETER;
     }
 
     QString cmd = rootObj.value("cmd").toString("");
     if (cmd.isEmpty()) {
         qWarning().noquote() << QString("No cmd found in JSON Statistics command");
-        return ERROR_CODE_MISSING_PARAMETER;
+        rCode = ERROR_CODE_MISSING_PARAMETER;
     }
 
     QJsonObject rootObjAnswer;
-    qint32      rValue = ERROR_CODE_SUCCESS;
-    if (cmd == "overview") {
-        QJsonArray parameter;
-        parameter.append("Dauerkarten");
-        parameter.append("Reservierungen");
-        parameter.append("Treffen");
-        parameter.append("Auswärtsfahrt");
+    if (rCode == ERROR_CODE_SUCCESS) {
+        if (cmd == "overview") {
+            QJsonArray parameter;
+            parameter.append("Dauerkarten");
+            parameter.append("Reservierungen");
+            parameter.append("Treffen");
+            parameter.append("Auswärtsfahrt");
 
-        rootObjAnswer.insert("parameter", parameter);
+            rootObjAnswer.insert("parameter", parameter);
 
-    } else if (cmd == "content") {
+        } else if (cmd == "content") {
 
-        QString para = rootObj.value("parameter").toString("");
-        if (para == "Dauerkarten")
-            this->handleSeasonTicketCommand(rootObjAnswer);
-        else if (para == "Reservierungen")
-            this->handleReservesCommand(rootObjAnswer);
-        else if (para == "Treffen")
-            this->handleMeetingCommand(rootObjAnswer);
-        else if (para == "Auswärtsfahrt")
-            this->handleAwayTripCommand(rootObjAnswer);
-        else
-            return ERROR_CODE_NOT_POSSIBLE;
-    } else
-        return ERROR_CODE_NOT_POSSIBLE;
+            QString para = rootObj.value("parameter").toString("");
+            if (para == "Dauerkarten")
+                this->handleSeasonTicketCommand(rootObjAnswer);
+            else if (para == "Reservierungen")
+                this->handleReservesCommand(rootObjAnswer);
+            else if (para == "Treffen")
+                this->handleMeetingCommand(rootObjAnswer);
+            else if (para == "Auswärtsfahrt")
+                this->handleAwayTripCommand(rootObjAnswer);
+            else
+                rCode = ERROR_CODE_NOT_POSSIBLE;
+        } else
+            rCode = ERROR_CODE_NOT_POSSIBLE;
+    }
 
     rootObjAnswer.insert("type", "Statistic");
     rootObjAnswer.insert("cmd", cmd);
+    rootObjAnswer.insert("ack", rCode);
 
-    answer.clear();
-    answer.append(QJsonDocument(rootObjAnswer).toJson(QJsonDocument::Compact));
+    qInfo().noquote() << QString("Handle statistics command from %1 with %2").arg(pUserCon->m_userName).arg(rCode);
 
-    return rValue;
+    QByteArray answer = QJsonDocument(rootObjAnswer).toJson(QJsonDocument::Compact);
+
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_CMD_STATISTIC, answer);
 }
 
 /* Answer
@@ -334,7 +342,7 @@ qint32 Statistic::handleStatisticCommand(QByteArray& command, QByteArray& answer
  *              }]
  * }
  */
-qint32 Statistic::handleSeasonTicketCommand(QJsonObject& rootObjAnswer)
+qint32 cStatisticManager::handleSeasonTicketCommand(QJsonObject& rootObjAnswer)
 {
     QJsonArray categories, blocked, reserved, free;
     qint32     maxX = 0;
@@ -398,7 +406,7 @@ qint32 Statistic::handleSeasonTicketCommand(QJsonObject& rootObjAnswer)
  *              }]
  * }
  */
-qint32 Statistic::handleReservesCommand(QJsonObject& rootObjAnswer)
+qint32 cStatisticManager::handleReservesCommand(QJsonObject& rootObjAnswer)
 {
     QJsonArray categories, reserved;
     qint32     maxX = 0;
@@ -447,7 +455,7 @@ qint32 Statistic::handleReservesCommand(QJsonObject& rootObjAnswer)
  *              }]
  * }
  */
-qint32 Statistic::handleMeetingCommand(QJsonObject& rootObjAnswer)
+qint32 cStatisticManager::handleMeetingCommand(QJsonObject& rootObjAnswer)
 {
     QJsonArray categories, accepted, interested;
     qint32     maxX = 0;
@@ -501,7 +509,7 @@ qint32 Statistic::handleMeetingCommand(QJsonObject& rootObjAnswer)
  *              }]
  * }
  */
-qint32 Statistic::handleAwayTripCommand(QJsonObject& rootObjAnswer)
+qint32 cStatisticManager::handleAwayTripCommand(QJsonObject& rootObjAnswer)
 {
     QJsonArray categories, accepted, interested;
     qint32     maxX = 0;
