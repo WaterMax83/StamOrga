@@ -110,6 +110,8 @@ void cDataTicketManager::addNewSeasonTicket(SeasonTicketItem* sTicket, const qui
         if (pTicket->discount() != sTicket->discount()) {
             pTicket->setDiscount(sTicket->discount());
         }
+
+        delete sTicket;
     }
 }
 

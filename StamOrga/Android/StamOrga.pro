@@ -56,7 +56,8 @@ SOURCES += main.cpp \
     ../Data/gameuserdata.cpp \
     ../Data/cdataticketmanager.cpp  \
     ../Data/cdatanewsdatamanager.cpp \
-    ../Data/cdatastatisticmanager.cpp
+    ../Data/cdatastatisticmanager.cpp \
+    ../Data/cdatagamesmanager.cpp
 
 
 RESOURCES += qml.qrc
@@ -119,7 +120,8 @@ HEADERS += \
     ../Data/gameuserdata.h \
     ../Data/cdataticketmanager.h \
     ../Data/cdatanewsdatamanager.h \
-    ../Data/cdatastatisticmanager.h
+    ../Data/cdatastatisticmanager.h \
+    ../Data/cdatagamesmanager.h
 
 INCLUDEPATH += \
     ../ \

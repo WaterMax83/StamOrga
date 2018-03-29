@@ -19,3 +19,24 @@ Load Ticket List					-> Own tickets should be marked
 After first connect					-> Own tickets should be marked
 DoNotSaveInfosOnApp					-> After open list should be empty
 Edit SeasonTicket Name or Place		-> List should be updated
+Remove SeasonTicket					-> List should be updated without the item
+
+#005:	Games
+
+
+#006: Fanclub
+Open Fanclub						-> List should be automatically updated
+Click on Item						-> Item opens and can be edited
+Edit Item							-> Success and back to list, element should be on top with new timestamp
+Add Item							-> Success and back to list, element should be on top with new timestamp
+Delete Item							-> List should be updated
+
+
+#007 Statistic
+Open								-> List should be Updated and first Stats shown
+Change combobox						-> stats should be updated
+
+#008 Font
+Change Font in Settings				-> After restart font should be set
+
+

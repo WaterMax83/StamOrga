@@ -60,7 +60,7 @@ Flickable {
                     Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                     font.pixelSize: 12
                     color: "white"
-                    text: globalSettings.getVersionChangeInfo()
+                    text: gStaGlobalSettings.getVersionChangeInfo()
                 }
 
                 Text {
@@ -69,7 +69,7 @@ Flickable {
                     wrapMode: Text.Wrap
                     font.pixelSize: 12
                     color: "white"
-                    text: globalSettings.getCurrentVersionLink()
+                    text: gStaGlobalSettings.getCurrentVersionLink()
                     onLinkActivated: Qt.openUrlExternally(link)
                 }
             }

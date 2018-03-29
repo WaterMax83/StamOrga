@@ -16,6 +16,8 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QtCore/QDateTime>
+//#include <QtCore/QDebug>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 
@@ -24,6 +26,7 @@
 #include "../Common/Network/messagecommand.h"
 #include "../cstasettingsmanager.h"
 #include "Connection/cconmanager.h"
+#include "Connection/cconusersettings.h"
 #include "cstaglobalsettings.h"
 
 cStaGlobalSettings g_StaGlobalSettings;
@@ -34,9 +37,12 @@ cStaGlobalSettings g_StaGlobalSettings;
 
 #define SETT_ALREADY_CONNECTED      "AlreadyConnected"
 #define SETT_SAVE_INFO_ON_APP       "SaveInfosOnApp"
-//#define USER_USERNAME   "UserName"
-//#define USER_PASSWORD   "Password"
-//#define USER_SALT       "Salt"
+#define SETT_LOAD_GAME_INFO         "LoadGameInfo"
+#define SETT_LAST_SHOWN_VERSION     "LastShownVersion"
+#define SETT_USE_VERSION_POPUP      "UseVersionPopup"
+#define SETT_CHANGE_DEFAULT_FONT    "ChangeDefaultFont"
+#define SETT_DEBUG_IP               "DebugIP"
+#define SETT_DEBUG_IP_WIFI          "DebugIPWifi"
 //#define USER_READABLE   "ReadableName"
 
 // clang-format on
@@ -51,21 +57,30 @@ cStaGlobalSettings::cStaGlobalSettings(QObject* parent)
 
 qint32 cStaGlobalSettings::initialize()
 {
-    //    QString value;
-    bool bValue;
+    QString value;
+    bool    bValue;
 
     g_StaSettingsManager.getBoolValue(SETTINGS_GROUP, SETT_ALREADY_CONNECTED, bValue);
     this->m_bAlreadyConnected = bValue;
     g_StaSettingsManager.getBoolValue(SETTINGS_GROUP, SETT_SAVE_INFO_ON_APP, bValue);
     this->m_bSaveInfosOnApp = bValue;
-    //    g_StaSettingsManager.getValue(SETTINGS_GROUP, USER_USERNAME, value);
-    //    this->m_userName = value;
-    //    g_StaSettingsManager.getValue(SETTINGS_GROUP, USER_PASSWORD, value);
-    //    this->m_passWord = value;
-    //    g_StaSettingsManager.getValue(SETTINGS_GROUP, USER_SALT, value);
-    //    this->m_salt = value;
-    //    g_StaSettingsManager.getValue(SETTINGS_GROUP, USER_READABLE, value);
-    //    this->m_readableName = value;
+    g_StaSettingsManager.getBoolValue(SETTINGS_GROUP, SETT_LOAD_GAME_INFO, bValue);
+    this->m_bLoadGameInfo = bValue;
+    g_StaSettingsManager.getBoolValue(SETTINGS_GROUP, SETT_USE_VERSION_POPUP, bValue);
+    this->m_bUseVersionPopup = bValue;
+    g_StaSettingsManager.getValue(SETTINGS_GROUP, SETT_LAST_SHOWN_VERSION, value);
+    this->m_lastShownVersion = value;
+    g_StaSettingsManager.getValue(SETTINGS_GROUP, SETT_CHANGE_DEFAULT_FONT, value);
+    this->m_changeDefaultFont = value != "" ? value : "Default";
+    g_StaSettingsManager.getValue(SETTINGS_GROUP, SETT_DEBUG_IP, value);
+    this->m_debugIP = value;
+    g_StaSettingsManager.getValue(SETTINGS_GROUP, SETT_DEBUG_IP_WIFI, value);
+    this->m_debugIPWifi = value;
+
+    this->m_bIpAddressWasSet = false;
+    QHostInfo::lookupHost("watermax83.ddns.net", this, SLOT(slotCallBackLookUpHost(QHostInfo)));
+
+    connect(qGuiApp, &QGuiApplication::applicationStateChanged, this, &cStaGlobalSettings::slotStateFromAppChanged);
 
     this->m_initialized = true;
 
@@ -130,6 +145,160 @@ void cStaGlobalSettings::setSaveInfosOnApp(const bool save)
     }
 }
 
+bool cStaGlobalSettings::getLoadGameInfos()
+{
+    return this->m_bLoadGameInfo;
+}
+
+void cStaGlobalSettings::setLoadGameInfos(const bool load)
+{
+    if (this->m_bLoadGameInfo != load) {
+        this->m_bLoadGameInfo = load;
+
+        g_StaSettingsManager.setBoolValue(SETTINGS_GROUP, SETT_LOAD_GAME_INFO, load);
+    }
+}
+
+bool cStaGlobalSettings::getUseVersionPopup()
+{
+    return this->m_bUseVersionPopup;
+}
+
+void cStaGlobalSettings::setUseVersionPopup(const bool use)
+{
+    if (this->m_bUseVersionPopup != use) {
+        this->m_bUseVersionPopup = use;
+
+        g_StaSettingsManager.setBoolValue(SETTINGS_GROUP, SETT_USE_VERSION_POPUP, use);
+    }
+}
+
+/********************************************* IP *****************************************/
+QString cStaGlobalSettings::getDebugIP()
+{
+    return this->m_debugIP;
+}
+
+void cStaGlobalSettings::setDebugIP(const QString ip)
+{
+    if (this->m_debugIP != ip) {
+        this->m_debugIP = ip;
+
+        g_StaSettingsManager.setValue(SETTINGS_GROUP, SETT_DEBUG_IP, ip);
+    }
+}
+
+QString cStaGlobalSettings::getDebugIPWifi()
+{
+    return this->m_debugIPWifi;
+}
+
+void cStaGlobalSettings::setDebugIPWifi(const QString ip)
+{
+    if (this->m_debugIPWifi != ip) {
+        this->m_debugIPWifi = ip;
+
+        g_StaSettingsManager.setValue(SETTINGS_GROUP, SETT_DEBUG_IP_WIFI, ip);
+    }
+}
+
+/******************************** FONT ****************************************************/
+QString cStaGlobalSettings::getChangeDefaultFont()
+{
+    return this->m_changeDefaultFont;
+}
+
+void cStaGlobalSettings::setChangeDefaultFont(const QString font)
+{
+    if (this->m_changeDefaultFont != font) {
+        this->m_changeDefaultFont = font;
+
+        g_StaSettingsManager.setValue(SETTINGS_GROUP, SETT_CHANGE_DEFAULT_FONT, font);
+
+        if (this->m_fontList != NULL)
+            this->m_currentFontIndex = this->m_fontList->indexOf(font);
+    }
+}
+
+qint32 cStaGlobalSettings::getCurrentFontIndex()
+{
+    return this->m_currentFontIndex;
+}
+
+void cStaGlobalSettings::setCurrentFontList(QStringList* list)
+{
+    this->m_fontList = list;
+    if (this->m_fontList != NULL)
+        this->m_currentFontIndex = this->m_fontList->indexOf(this->m_changeDefaultFont);
+}
+
+bool cStaGlobalSettings::isVersionChangeAlreadyShown()
+{
+    if (this->m_lastShownVersion == STAM_ORGA_VERSION_S)
+        return true;
+
+    return false;
+}
+
+QString cStaGlobalSettings::getVersionChangeInfo()
+{
+    QString rValue;
+
+    rValue.append("<b>V1.0.7:</b>(03.03.2018)<br>");
+    rValue.append("- Statistic hinzugefügt<br>");
+    rValue.append("- Icons in Drawer und Übersicht überarbeitet<br>");
+    rValue.append("- Easteregg versteckt<br>");
+    rValue.append("- Infos über eigene Karte und Reservierung in der Übersicht<br>");
+
+    rValue.append("<br><b>V1.0.6:</b>(08.02.2018)<br>");
+    rValue.append("- Infos über Fahrt in der Übersicht<br>");
+    rValue.append("- Icons überarbeitet<br>");
+    rValue.append("- Spiel als Favorit markieren<br>");
+
+    rValue.append("<br><b>V1.0.5:</b>(16.12.2017)<br>");
+    rValue.append("- Infos über letzte Neuigkeiten markieren<br>");
+    rValue.append("- Framework Version aktualisiert<br>");
+    rValue.append("- Fahrt bei Auswärtsspiel hinzugefügt<br>");
+    rValue.append("- Versionsupdate über Liste<br>");
+
+    rValue.append("<br><b>V1.0.4:</b>(24.10.2017)<br>");
+    rValue.append("- Fanclub Nachrichten (Mitglieder)<br>");
+    rValue.append("- neue Benachrichtigung \"Erster Auswärtsfahrer\" & \"Fanclub Nachricht\"<br>");
+    rValue.append("- Schrift änderbar (Android)<br>");
+    rValue.append("- Verbindungsfehler beim Start behoben<br>");
+
+    rValue.append("<br><b>V1.0.3:</b>(25.08.2017)<br>");
+    rValue.append("- Push Notifications (Android)<br>");
+    rValue.append("- Schrift änderbar (Windows)<br>");
+    rValue.append("- Infos über Ort bei Spieltagstickets<br>");
+    rValue.append("- Optische Anpassungen<br>");
+
+    rValue.append("<br><b>V1.0.2:</b>(31.07.2017)<br>");
+    rValue.append("- Spielterminierung hinzugefügt<br>");
+    rValue.append("- Spielliste in Aktuell/Vergangenheit aufgeteilt<br>");
+    rValue.append("- Daten nur nach Bedarf vom Server laden<br>");
+    rValue.append("- Fehler beseitigt (Einstellungen/Tickets/etc..)<br>");
+
+    rValue.append("<br><b>V1.0.1:</b>(17.07.2017)<br>");
+    rValue.append("- Mehr Informationen in der Spielübersicht<br>");
+    rValue.append("- automatisches Laden der Spielinformationen<br>");
+    rValue.append("- Dauerkarten editierbar<br>");
+    rValue.append("- Passwörter vollständig gehasht<br>");
+    rValue.append("- Versionshistorie hinzugefügt<br>");
+    rValue.append("- Diverse Fehler beseitigt<br>");
+
+    rValue.append("<br><b>V1.0.0:</b>(30.06.2017)<br>");
+    rValue.append("Erste Version<br>");
+
+    if (this->m_lastShownVersion != STAM_ORGA_VERSION_S) {
+        this->m_lastShownVersion = STAM_ORGA_VERSION_S;
+
+        g_StaSettingsManager.setValue(SETTINGS_GROUP, SETT_LAST_SHOWN_VERSION, this->m_lastShownVersion);
+    }
+
+    return rValue;
+}
+
 
 void cStaGlobalSettings::setAlreadyConnected(const bool con)
 {
@@ -152,4 +321,85 @@ QString cStaGlobalSettings::getUpdateLink()
 QString cStaGlobalSettings::getVersionInfo()
 {
     return this->m_versionInfo;
+}
+
+
+QString cStaGlobalSettings::getCurrentVersion()
+{
+    return STAM_ORGA_VERSION_S;
+}
+
+QString cStaGlobalSettings::getCurrentVersionLink()
+{
+    return QString(STAM_ORGA_VERSION_LINK_WITH_TEXT).arg(QString(STAM_ORGA_VERSION_S).toLower(), STAM_ORGA_VERSION_S);
+}
+
+
+/* Under Android it takes too long to register for app changed at first start, so call it */
+void cStaGlobalSettings::checkNewStateChangedAtStart()
+{
+    this->slotStateFromAppChanged(QGuiApplication::applicationState());
+}
+
+void cStaGlobalSettings::slotStateFromAppChanged(Qt::ApplicationState state)
+{
+    //    qDebug() << "State Change";
+
+    if (state != Qt::ApplicationState::ApplicationActive)
+        return;
+
+    if (!this->getLoadGameInfos())
+        return;
+
+    if (g_ConUserSettings.getUserName() == "" || g_ConUserSettings.getPassWord() == "")
+        return;
+
+    /* Move this to later created GameManager */
+    //    qint64 now = QDateTime::currentMSecsSinceEpoch();
+    //    if ((now - this->m_lastGameInfoUpdate) < TIMEOUT_LOAD_GAMEINFO)
+    //        return;
+
+    //    if ((now - this->m_pGlobalData->m_gpLastLocalUpdateTimeStamp) < TIMEOUT_LOAD_GAMES)
+    //        emit this->sendAppStateChangedToActive(1);
+    //    else
+    //        emit this->sendAppStateChangedToActive(2);
+
+    //    this->m_lastGameInfoUpdate = now;
+}
+
+void cStaGlobalSettings::slotCallBackLookUpHost(const QHostInfo& host)
+{
+    QString newChangedIP;
+    if (host.addresses().size() > 0)
+        newChangedIP = host.addresses().value(0).toString();
+
+    if (this->getDebugIP() != "")
+        newChangedIP = this->getDebugIP();
+#ifdef QT_DEBUG
+#ifdef Q_OS_ANDROID
+//    if (g_GlobalSettings->debugIPWifi() != "") {
+//        QNetworkConfigurationManager ncm;
+//        QList<QNetworkConfiguration> nc = ncm.allConfigurations();
+//        foreach (QNetworkConfiguration item, nc) {
+//            if (item.bearerType() == QNetworkConfiguration::BearerWLAN) {
+//                if (item.state() == QNetworkConfiguration::StateFlag::Active) {
+//                    this->setIpAddr(g_GlobalSettings->debugIPWifi());
+//                    newChangedIP = g_GlobalSettings->debugIPWifi();
+//                }
+//                //                 qDebug() << "Wifi " << item.name();
+//                //                 qDebug() << "state " << item.state();
+//            }
+//        }
+//    }
+#endif // ANDROID
+#endif // DEBUG
+
+    if (newChangedIP.isEmpty())
+        newChangedIP = g_ConUserSettings.getIPAddr();
+
+    g_ConUserSettings.setIPAddr(newChangedIP);
+
+    qInfo().noquote() << QString("Setting IP Address: %1").arg(newChangedIP);
+
+    this->m_bIpAddressWasSet = true;
 }

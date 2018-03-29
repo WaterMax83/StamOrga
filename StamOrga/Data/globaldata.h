@@ -23,7 +23,7 @@
 #include <QtCore/QMutex>
 #include <QtCore/QObject>
 #include <QtCore/QSettings>
-#include <QtNetwork/QHostInfo>
+//#include <QtNetwork/QHostInfo>
 
 #include "../../Common/General/backgroundcontroller.h"
 #include "../../Common/General/globalfunctions.h"
@@ -41,12 +41,12 @@
 class GlobalData : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString userName READ userName WRITE setUserName NOTIFY userNameChanged)
-    Q_PROPERTY(QString passWord READ passWord WRITE setPassWord NOTIFY passWordChanged)
+    //    Q_PROPERTY(QString userName READ userName WRITE setUserName NOTIFY userNameChanged)
+    //    Q_PROPERTY(QString passWord READ passWord WRITE setPassWord NOTIFY passWordChanged)
     //    Q_PROPERTY(QString readableName READ readableName WRITE setReadableName NOTIFY readableNameChanged)
-    Q_PROPERTY(QString ipAddr READ ipAddr WRITE setIpAddr NOTIFY ipAddrChanged)
-    Q_PROPERTY(quint32 conMasterPort READ conMasterPort WRITE setConMasterPort NOTIFY conMasterPortChanged)
-    Q_PROPERTY(bool bIsConnected READ bIsConnected WRITE setbIsConnected NOTIFY bIsConnectedChanged)
+    //    Q_PROPERTY(QString ipAddr READ ipAddr WRITE setIpAddr NOTIFY ipAddrChanged)
+    //    Q_PROPERTY(quint32 conMasterPort READ conMasterPort WRITE setConMasterPort NOTIFY conMasterPortChanged)
+    //    Q_PROPERTY(bool bIsConnected READ bIsConnected WRITE setbIsConnected NOTIFY bIsConnectedChanged)
 
     friend class GlobalSettings;
 
@@ -57,48 +57,48 @@ public:
 
     void loadGlobalSettings();
 
-    QString userName();
-    void setUserName(const QString& user);
+    //    QString userName();
+    //    void    setUserName(const QString& user);
 
-    QString getSalt() { return this->m_salt; }
-    void setSalt(QString salt) { this->m_salt = salt; }
+    //    QString getSalt() { return this->m_salt; }
+    //    void    setSalt(QString salt) { this->m_salt = salt; }
 
     //    QString readableName();
     //    void    setReadableName(const QString& name);
 
-    QString passWord();
-    void setPassWord(const QString& passw);
+    //    QString passWord();
+    //    void    setPassWord(const QString& passw);
 
-    QString ipAddr();
-    void setIpAddr(const QString& ip);
+    //    QString ipAddr();
+    //    void    setIpAddr(const QString& ip);
 
-    quint32 conMasterPort();
-    void setConMasterPort(quint32 port);
+    //    quint32 conMasterPort();
+    //    void    setConMasterPort(quint32 port);
 
-    quint32 conDataPort();
-    void setConDataPort(quint32 port);
+    //    quint32 conDataPort();
+    //    void    setConDataPort(quint32 port);
 
-    Q_INVOKABLE quint32 userIndex();
-    void setUserIndex(quint32 userIndex);
+    //    Q_INVOKABLE quint32 userIndex();
+    //    void                setUserIndex(quint32 userIndex);
 
-    bool bIsConnected() { return this->m_bIsConnected; }
-    void setbIsConnected(bool enable)
-    {
-        if (this->m_bIsConnected != enable) {
-            this->m_bIsConnected = enable;
-            emit this->bIsConnectedChanged();
-        }
-    }
+    //    bool bIsConnected() { return this->m_bIsConnected; }
+    //    void setbIsConnected(bool enable)
+    //    {
+    //        if (this->m_bIsConnected != enable) {
+    //            this->m_bIsConnected = enable;
+    //            emit this->bIsConnectedChanged();
+    //        }
+    //    }
 
     Q_INVOKABLE bool userIsDebugEnabled();
     Q_INVOKABLE bool userIsGameAddingEnabled();
     Q_INVOKABLE bool userIsGameFixedTimeEnabled();
     Q_INVOKABLE bool userIsFanclubEnabled();
     Q_INVOKABLE bool userIsFanclubEditEnabled();
-    void SetUserProperties(quint32 value);
-    quint32 getUserProperties();
+    //    void             SetUserProperties(quint32 value);
+    //    quint32          getUserProperties();
 
-    void saveGlobalUserSettings();
+    //    void saveGlobalUserSettings();
 
     Q_INVOKABLE QString getCurrentLoggingList(int index);
 
@@ -110,20 +110,20 @@ public:
 
     void saveCurrentGamesList(qint64 timestamp);
 
-    void startUpdateGamesPlay(const qint16 updateIndex);
-    void addNewGamePlay(GamePlay* gPlay, const qint16 updateIndex = 0);
-    Q_INVOKABLE quint32 getGamePlayLength()
-    {
-        QMutexLocker lock(&this->m_mutexGame);
-        return this->m_lGamePlay.size();
-    }
-    GamePlay* getGamePlay(const quint32 gameIndex);
-    Q_INVOKABLE GamePlay* getGamePlayFromArrayIndex(int index);
-    Q_INVOKABLE QString getGamePlayLastUpdateString();
-    qint64              getGamePlayLastLocalUpdate();
-    qint64              getGamePlayLastServerUpdate();
-    void                resetAllGamePlayEvents();
-    bool setGamePlayItemHasEvent(quint32 gameIndex);
+    //    void        startUpdateGamesPlay(const qint16 updateIndex);
+    //    void        addNewGamePlay(GamePlay* gPlay, const qint16 updateIndex = 0);
+    //    Q_INVOKABLE quint32 getGamePlayLength()
+    //    {
+    //        QMutexLocker lock(&this->m_mutexGame);
+    //        return this->m_lGamePlay.size();
+    //    }
+    //    GamePlay*   getGamePlay(const quint32 gameIndex);
+    //    Q_INVOKABLE GamePlay* getGamePlayFromArrayIndex(int index);
+    //    Q_INVOKABLE QString getGamePlayLastUpdateString();
+    //    qint64              getGamePlayLastLocalUpdate();
+    //    qint64              getGamePlayLastServerUpdate();
+    //    void                resetAllGamePlayEvents();
+    //    bool                setGamePlayItemHasEvent(quint32 gameIndex);
 
 
     //    void saveCurrentSeasonTickets(qint64 timestamp);
@@ -171,12 +171,12 @@ public:
 
     Q_INVOKABLE GameUserData* getGameUserDataHandler() { return &this->m_gameUserData; }
 
-    QString getCurrentAppGUID() { return this->m_AppInstanceGUID; }
-    QString getCurrentAppToken() { return this->m_pushNotificationToken; }
+    //    QString getCurrentAppGUID() { return this->m_AppInstanceGUID; }
+    //    QString getCurrentAppToken() { return this->m_pushNotificationToken; }
 
-    bool isIPLookUpDone() { return this->m_bIpAdressWasSet; }
+    //    bool isIPLookUpDone() { return this->m_bIpAdressWasSet; }
 
-    void setUpdateLink(QString link) { this->m_updateLink = link; }
+    //    void setUpdateLink(QString link) { this->m_updateLink = link; }
     //    Q_INVOKABLE QString getUpdateLink() { return this->m_updateLink; }
 
 signals:
@@ -192,31 +192,31 @@ signals:
 public slots:
 
 private slots:
-    void callBackLookUpHost(const QHostInfo& host);
+//    void callBackLookUpHost(const QHostInfo& host);
 #ifdef Q_OS_ANDROID
     void slotNewFcmRegistrationToken(QString token);
 #endif
 
 private:
-    QString m_userName;
-    QString m_passWord;
-    QString m_salt;
-    QString m_readableName;
-    QString m_ipAddress;
-    quint32 m_uMasterPort;
-    quint16 m_uDataPort;
-    quint32 m_userIndex;
-    bool    m_bIpAdressWasSet;
+    //    QString m_userName;
+    //    QString m_passWord;
+    //    QString m_salt;
+    //    QString m_readableName;
+    //    QString m_ipAddress;
+    //    quint32 m_uMasterPort;
+    //    quint16 m_uDataPort;
+    //    quint32 m_userIndex;
+    //    bool    m_bIpAdressWasSet;
 
     quint32 m_UserProperties;
 
     QMutex m_mutexUser;
     QMutex m_mutexUserIni;
     QMutex m_mutexGame;
-    QMutex m_mutexTicket;
-    QMutex m_mutexNewsData;
+    //    QMutex m_mutexTicket;
+    //    QMutex m_mutexNewsData;
 
-    bool m_bIsConnected;
+    //    bool m_bIsConnected;
 
     QSettings* m_pMainUserSettings;
 
@@ -225,24 +225,24 @@ private:
     qint64           m_gpLastServerUpdateTimeStamp;
     bool             m_bGamePlayLastUpdateDidChanges;
 
-    QList<SeasonTicketItem*> m_lSeasonTicket;
-    qint64                   m_stLastLocalUpdateTimeStamp;
-    qint64                   m_stLastServerUpdateTimeStamp;
-    bool                     m_bSeasonTicketLastUpdateDidChanges;
+    //    QList<SeasonTicketItem*> m_lSeasonTicket;
+    //    qint64                   m_stLastLocalUpdateTimeStamp;
+    //    qint64                   m_stLastServerUpdateTimeStamp;
+    //    bool                     m_bSeasonTicketLastUpdateDidChanges;
 
     MeetingInfo m_meetingInfo;
     MeetingInfo m_awayTripInfo;
 
-    QList<NewsDataItem*> m_lNewsDataItems;
-    qint64               m_ndLastLocalUpdateTimeStamp;
-    qint64               m_ndLastServerUpdateTimeStamp;
+    //    QList<NewsDataItem*> m_lNewsDataItems;
+    //    qint64               m_ndLastLocalUpdateTimeStamp;
+    //    qint64               m_ndLastServerUpdateTimeStamp;
 
     PushNotificationInformationHandler* m_pushNotificationInfoHandler;
     QMutex                              m_pushNotificationMutex;
     QString                             m_pushNotificationToken;
     QString                             m_AppInstanceGUID;
 
-    QString m_updateLink;
+    //    QString m_updateLink;
 
     GameUserData m_gameUserData;
 

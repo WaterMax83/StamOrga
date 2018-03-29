@@ -279,8 +279,9 @@ Page {
         gamesListPagePresent.showListedGames()
         gamesListPagePast.showListedGames()
 
-        if (globalUserData.getGamePlayLength() > 0) {
-            showLoadingGameInfos("Letztes Update am " + globalUserData.getGamePlayLastUpdateString(), false);
+
+        if (gDataGamesManager.getGamePlayLength() > 0) {
+            showLoadingGameInfos("Letztes Update am " + gDataGamesManager.getGamePlayLastLocalUpdateString(), false);
         } else {
             showLoadingGameInfos("Keine Daten gespeichert\nZiehen zum Aktualisieren", false);
         }

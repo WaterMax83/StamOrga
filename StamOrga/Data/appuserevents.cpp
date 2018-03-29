@@ -59,13 +59,13 @@ void AppUserEvents::addNewUserEvents(QJsonObject& jsObj)
         }
     } else if (pEvent->m_type == NOTIFY_TOPIC_NEW_FREE_TICKET) {
 
-        this->m_pGlobalData->setGamePlayItemHasEvent(pEvent->m_info.toUInt());
+        //        this->m_pGlobalData->setGamePlayItemHasEvent(pEvent->m_info.toUInt());
     } else if (pEvent->m_type == NOTIFY_TOPIC_NEW_MEETING || pEvent->m_type == NOTIFY_TOPIC_CHANGE_MEETING) {
 
-        this->m_pGlobalData->setGamePlayItemHasEvent(pEvent->m_info.toUInt());
+        //        this->m_pGlobalData->setGamePlayItemHasEvent(pEvent->m_info.toUInt());
     } else if (pEvent->m_type == NOTIFY_TOPIC_NEW_AWAY_ACCEPT) {
 
-        this->m_pGlobalData->setGamePlayItemHasEvent(pEvent->m_info.toUInt());
+        //        this->m_pGlobalData->setGamePlayItemHasEvent(pEvent->m_info.toUInt());
     } else
         return;
 
@@ -76,7 +76,7 @@ void AppUserEvents::resetCurrentEvents()
 {
     this->m_eventNewAppVersion  = false;
     this->m_eventNewFanclubNews = 0;
-    this->m_pGlobalData->resetAllGamePlayEvents();
+    //    this->m_pGlobalData->resetAllGamePlayEvents();
     //    this->m_pGlobalData->resetAllNewsDataEvents();
     for (int i = this->m_lEvents.count() - 1; i >= 0; i--) {
         delete this->m_lEvents[i];

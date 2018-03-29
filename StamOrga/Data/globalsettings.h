@@ -29,11 +29,11 @@
 class GlobalSettings : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString debugIP READ debugIP WRITE setDebugIP NOTIFY debugIPChanged)
-    Q_PROPERTY(QString debugIPWifi READ debugIPWifi WRITE setDebugIPWifi NOTIFY debugIPWifiChanged)
+    //    Q_PROPERTY(QString debugIP READ debugIP WRITE setDebugIP NOTIFY debugIPChanged)
+    //    Q_PROPERTY(QString debugIPWifi READ debugIPWifi WRITE setDebugIPWifi NOTIFY debugIPWifiChanged)
     //    Q_PROPERTY(bool useReadableName READ useReadableName WRITE setUseReadableName NOTIFY useReadableNameChanged)
-    Q_PROPERTY(bool loadGameInfo READ loadGameInfo WRITE setLoadGameInfo NOTIFY loadGameInfoChanged)
-    Q_PROPERTY(bool useVersionPopup READ useVersionPopup WRITE setUseVersionPopup NOTIFY useVersionPopupChanged)
+    //    Q_PROPERTY(bool loadGameInfo READ loadGameInfo WRITE setLoadGameInfo NOTIFY loadGameInfoChanged)
+    //    Q_PROPERTY(bool useVersionPopup READ useVersionPopup WRITE setUseVersionPopup NOTIFY useVersionPopupChanged)
 public:
     explicit GlobalSettings(QObject* parent = 0);
 
@@ -41,40 +41,40 @@ public:
 
     Q_INVOKABLE void saveGlobalSettings();
 
-    bool updateConnectionStatus(bool connected);
+    //    bool updateConnectionStatus(bool connected);
     void updatePushNotification(void);
 
-    QString debugIP()
-    {
-        QMutexLocker lock(&this->m_mutex);
-        return this->m_debugIP;
-    }
-    void setDebugIP(QString ip)
-    {
-        if (this->m_debugIP != ip) {
-            {
-                QMutexLocker lock(&this->m_mutex);
-                this->m_debugIP = ip;
-            }
-            emit debugIPChanged();
-        }
-    }
+    //    QString debugIP()
+    //    {
+    //        QMutexLocker lock(&this->m_mutex);
+    //        return this->m_debugIP;
+    //    }
+    //    void setDebugIP(QString ip)
+    //    {
+    //        if (this->m_debugIP != ip) {
+    //            {
+    //                QMutexLocker lock(&this->m_mutex);
+    //                this->m_debugIP = ip;
+    //            }
+    //            emit debugIPChanged();
+    //        }
+    //    }
 
-    QString debugIPWifi()
-    {
-        QMutexLocker lock(&this->m_mutex);
-        return this->m_debugIPWifi;
-    }
-    void setDebugIPWifi(QString ip)
-    {
-        if (this->m_debugIPWifi != ip) {
-            {
-                QMutexLocker lock(&this->m_mutex);
-                this->m_debugIPWifi = ip;
-            }
-            emit debugIPWifiChanged();
-        }
-    }
+    //    QString debugIPWifi()
+    //    {
+    //        QMutexLocker lock(&this->m_mutex);
+    //        return this->m_debugIPWifi;
+    //    }
+    //    void setDebugIPWifi(QString ip)
+    //    {
+    //        if (this->m_debugIPWifi != ip) {
+    //            {
+    //                QMutexLocker lock(&this->m_mutex);
+    //                this->m_debugIPWifi = ip;
+    //            }
+    //            emit debugIPWifiChanged();
+    //        }
+    //    }
 
     //    bool useReadableName() { return this->m_useReadableName; }
     //    void setUseReadableName(bool enable)
@@ -83,35 +83,35 @@ public:
     //        emit this->useReadableNameChanged();
     //    }
 
-    bool loadGameInfo() { return this->m_loadGameInfo; }
-    void setLoadGameInfo(bool load)
-    {
-        this->m_loadGameInfo = load;
-        emit this->loadGameInfoChanged();
-    }
+    //    bool loadGameInfo() { return this->m_loadGameInfo; }
+    //    void setLoadGameInfo(bool load)
+    //    {
+    //        this->m_loadGameInfo = load;
+    //        emit this->loadGameInfoChanged();
+    //    }
 
-    bool useVersionPopup() { return this->m_useVersionPopup; }
-    void setUseVersionPopup(bool use)
-    {
-        this->m_useVersionPopup = use;
-        emit this->useVersionPopupChanged();
-    }
+    //    bool useVersionPopup() { return this->m_useVersionPopup; }
+    //    void setUseVersionPopup(bool use)
+    //    {
+    //        this->m_useVersionPopup = use;
+    //        emit this->useVersionPopupChanged();
+    //    }
 
-    Q_INVOKABLE QString getChangeDefaultFont() { return this->m_changeDefaultFont; }
-    Q_INVOKABLE void    setChangeDefaultFont(QString font);
+    //    Q_INVOKABLE QString getChangeDefaultFont() { return this->m_changeDefaultFont; }
+    //    Q_INVOKABLE void    setChangeDefaultFont(QString font);
 
-    Q_INVOKABLE qint64 getCurrentFontIndex() { return this->m_currentFontIndex; }
-    void               setCurrentFontList(QStringList* list);
+    //    Q_INVOKABLE qint64 getCurrentFontIndex() { return this->m_currentFontIndex; }
+    //    void               setCurrentFontList(QStringList* list);
 
-    Q_INVOKABLE QString getCurrentVersion();
+    //    Q_INVOKABLE QString getCurrentVersion();
 
-    Q_INVOKABLE QString getCurrentVersionLink();
+    //    Q_INVOKABLE QString getCurrentVersionLink();
 
-    Q_INVOKABLE QString getVersionChangeInfo();
+    //    Q_INVOKABLE QString getVersionChangeInfo();
 
-    Q_INVOKABLE bool isVersionChangeAlreadyShown();
+    //    Q_INVOKABLE bool isVersionChangeAlreadyShown();
 
-    Q_INVOKABLE void checkNewStateChangedAtStart();
+    //    Q_INVOKABLE void checkNewStateChangedAtStart();
 
     Q_INVOKABLE bool isNotificationNewAppVersionEnabled();
     Q_INVOKABLE bool isNotificationNewMeetingEnabled();
@@ -127,32 +127,32 @@ public:
     Q_INVOKABLE void setNotificationFanclubNewsEnabled(bool enable);
 
 signals:
-    void debugIPChanged();
-    void debugIPWifiChanged();
-    void useReadableNameChanged();
-    void loadGameInfoChanged();
-    void saveInfosOnAppChanged();
-    void useVersionPopupChanged();
-    void sendAppStateChangedToActive(quint32 value);
+    //    void debugIPChanged();
+    //    void debugIPWifiChanged();
+    //    void useReadableNameChanged();
+    //    void loadGameInfoChanged();
+    //    void saveInfosOnAppChanged();
+    //    void useVersionPopupChanged();
+    //    void sendAppStateChangedToActive(quint32 value);
 
 public slots:
-    void stateFromAppChanged(Qt::ApplicationState state);
+    //    void stateFromAppChanged(Qt::ApplicationState state);
 
 private:
     GlobalData* m_pGlobalData;
     bool        m_alreadyConnected;
     //    bool         m_useReadableName;
-    bool         m_loadGameInfo;
-    bool         m_useVersionPopup;
-    QString      m_debugIP;
-    QString      m_debugIPWifi;
-    QMutex       m_mutex;
-    qint64       m_lastGameInfoUpdate;
-    QString      m_changeDefaultFont;
-    qint64       m_currentFontIndex;
-    QStringList* m_fontList = NULL;
-    QString      m_lastShownVersion;
-    quint64      m_notificationEnabledValue;
+    //    bool         m_loadGameInfo;
+    //    bool         m_useVersionPopup;
+    //    QString      m_debugIP;
+    //    QString      m_debugIPWifi;
+    //    QMutex m_mutex;
+    //    qint64 m_lastGameInfoUpdate;
+    //    QString      m_changeDefaultFont;
+    //    qint64       m_currentFontIndex;
+    //    QStringList* m_fontList = NULL;
+    //    QString      m_lastShownVersion;
+    quint64 m_notificationEnabledValue;
 };
 
 

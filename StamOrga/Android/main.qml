@@ -334,7 +334,7 @@ ApplicationWindow {
         }
         onNotifyVersionRequestFinished: {
             if (result === 5) {
-                if (globalSettings.useVersionPopup) {
+                if (gStaGlobalSettings.getUseVersionPopup()) {
                     var component = Qt.createComponent("/components/VersionDialog.qml")
                     if (component.status === Component.Ready) {
                         var dialog = component.createObject(stackView, {
@@ -447,16 +447,16 @@ ApplicationWindow {
         onNotifyStatisticsCommandFinished: stackView.currentItem.notifyStatisticsCommandFinished(result);
     }
 
-    Connections {
-       target: globalSettings
-       onSendAppStateChangedToActive: {
-           viewMainGames.showLoadingGameInfos("Lade Spielinfos", true)
-           if (value === 1)
-               userInt.startListGettingGamesInfo();
-           else if (value === 2)
-               userInt.startListGettingGames();
-       }
-    }
+//    Connections {
+//       target: globalSettings
+//       onSendAppStateChangedToActive: {
+//           viewMainGames.showLoadingGameInfos("Lade Spielinfos", true)
+//           if (value === 1)
+//               userInt.startListGettingGamesInfo();
+//           else if (value === 2)
+//               userInt.startListGettingGames();
+//       }
+//    }
 
     function openUserLogin(open) {
 
@@ -465,9 +465,9 @@ ApplicationWindow {
             imageToolButton.visible = false
         } else {
             stackView.currentItem.showListedGames()
-            globalSettings.checkNewStateChangedAtStart();
+            gStaGlobalSettings.checkNewStateChangedAtStart();
 
-            if (!globalSettings.isVersionChangeAlreadyShown()) {
+            if (!gStaGlobalSettings.isVersionChangeAlreadyShown()) {
                 var component = Qt.createComponent("../pages/newVersionInfo.qml");
                 if (component.status === Component.Ready) {
                     stackView.push(component);

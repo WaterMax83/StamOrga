@@ -19,8 +19,10 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
+#include <QtCore/QThread>
 #include <QtCore/QtEndian>
 
+#include "../cstaglobalsettings.h"
 #include "General/globalfunctions.h"
 #include "General/globaltiming.h"
 #include "Network/messagecommand.h"
@@ -61,15 +63,14 @@ int cConTcpMain::DoBackgroundWork()
         return -1;
     }
 
-    //    /* Wait till IP address was set */
-    //    qint32 sleepCounter = 0;
-    //    while (!this->m_pGlobalData->isIPLookUpDone()) {
-    //        QThread::msleep(100);
-    //        sleepCounter++;
-    //        if (sleepCounter >= 10)
-    //            break;
-    //      TODO: enable this again for app
-    //    }
+    /* Wait till IP address was set */
+    qint32 sleepCounter = 0;
+    while (g_StaGlobalSettings.isIpAddressAlreadySet()) {
+        QThread::msleep(100);
+        sleepCounter++;
+        if (sleepCounter >= 10)
+            break;
+    }
 
     connect(this->m_pMasterTcpSocket, &QTcpSocket::connected, this, &cConTcpMain::slotMasterSocketConnected);
     typedef void (QAbstractSocket::*QAbstractSocketErrorSignal)(QAbstractSocket::SocketError);

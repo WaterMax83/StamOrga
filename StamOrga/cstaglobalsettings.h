@@ -20,6 +20,8 @@
 #define CSTAGLOBALSETTINGS_H
 
 #include <QObject>
+#include <QtGui/QGuiApplication>
+#include <QtNetwork/QHostInfo>
 
 #include "../Common/General/cgendisposer.h"
 #include "../Common/Network/messageprotocol.h"
@@ -35,6 +37,28 @@ public:
     Q_INVOKABLE bool getSaveInfosOnApp();
     Q_INVOKABLE void setSaveInfosOnApp(const bool save);
 
+    Q_INVOKABLE bool getLoadGameInfos();
+    Q_INVOKABLE void setLoadGameInfos(const bool load);
+    Q_INVOKABLE void checkNewStateChangedAtStart();
+
+    Q_INVOKABLE bool getUseVersionPopup();
+    Q_INVOKABLE void setUseVersionPopup(const bool use);
+
+    Q_INVOKABLE QString getDebugIP();
+    Q_INVOKABLE void    setDebugIP(const QString ip);
+
+    Q_INVOKABLE QString getDebugIPWifi();
+    Q_INVOKABLE void    setDebugIPWifi(const QString ip);
+
+    Q_INVOKABLE QString getChangeDefaultFont();
+    Q_INVOKABLE void    setChangeDefaultFont(const QString font);
+
+    Q_INVOKABLE qint32 getCurrentFontIndex();
+    void               setCurrentFontList(QStringList* list);
+
+    Q_INVOKABLE bool isVersionChangeAlreadyShown();
+    Q_INVOKABLE QString getVersionChangeInfo();
+
     qint32 startGettingVersionInfo();
     qint32 handleVersionResponse(MessageProtocol* msg);
 
@@ -44,15 +68,33 @@ public:
     Q_INVOKABLE QString getUpdateLink();
     Q_INVOKABLE QString getVersionInfo();
 
+    Q_INVOKABLE QString getCurrentVersion();
+    Q_INVOKABLE QString getCurrentVersionLink();
+
+
+    bool isIpAddressAlreadySet() { return this->m_bIpAddressWasSet; }
+
 signals:
 
 public slots:
+    void slotStateFromAppChanged(Qt::ApplicationState state);
+    void slotCallBackLookUpHost(const QHostInfo& host);
 
 private:
     QString m_versionInfo;
     QString m_remoteVersion;
     QString m_updateLink;
+    QString m_lastShownVersion;
+    QString m_debugIP;
+    QString m_debugIPWifi;
     bool    m_bSaveInfosOnApp;
+    bool    m_bLoadGameInfo;
+    bool    m_bUseVersionPopup;
+    bool    m_bIpAddressWasSet;
+
+    QString      m_changeDefaultFont;
+    qint64       m_currentFontIndex;
+    QStringList* m_fontList = NULL;
 
     bool m_bAlreadyConnected;
 };

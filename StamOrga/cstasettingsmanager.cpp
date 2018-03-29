@@ -90,6 +90,22 @@ qint32 cStaSettingsManager::setBoolValue(const QString group, const QString key,
     return this->setValue(group, key, QVariant(value));
 }
 
+qint32 cStaSettingsManager::getBoolValue(const QString group, const QString key, const qint32 index, bool& value)
+{
+    QVariant vValue;
+    qint32   rValue = this->getValue(group, key, index, vValue, QVariant(false));
+
+    if (rValue == ERROR_CODE_SUCCESS)
+        value = vValue.toBool();
+
+    return rValue;
+}
+
+qint32 cStaSettingsManager::setBoolValue(const QString group, const QString key, const qint32 index, const bool value)
+{
+    return this->setValue(group, key, index, QVariant(value));
+}
+
 /************************ qint64 values ******************************/
 qint32 cStaSettingsManager::getInt64Value(const QString group, const QString key, qint64& value)
 {

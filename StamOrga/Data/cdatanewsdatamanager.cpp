@@ -69,6 +69,7 @@ void cDataNewsDataManager::addNewNewsData(NewsDataItem* sNews, const quint16 upd
         if (pNews->info() != sNews->info()) {
             pNews->setInfo(sNews->info());
         }
+        delete sNews;
     }
 }
 

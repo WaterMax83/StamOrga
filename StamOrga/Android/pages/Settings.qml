@@ -75,7 +75,7 @@ Flickable {
                }
                CheckBox {
                     id: loadGameInfo
-                    checked: globalSettings.loadGameInfo
+                    checked: gStaGlobalSettings.getLoadGameInfos()
                     onCheckedChanged: valueWasEditedEnableSave()
                }
            }
@@ -113,7 +113,7 @@ Flickable {
                }
                CheckBox {
                     id: usePopupForVersionInfo
-                    checked: globalSettings.useVersionPopup
+                    checked: gStaGlobalSettings.getUseVersionPopup()
                     onCheckedChanged: valueWasEditedEnableSave()
                }
            }
@@ -206,7 +206,7 @@ Flickable {
 
                TextField {
                    id: txtOtherIPAddr
-                   text: globalSettings.debugIP
+                   text: gStaGlobalSettings.getDebugIP()
                    implicitWidth: parent.width
                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                    Layout.fillWidth: true
@@ -229,7 +229,7 @@ Flickable {
 
                TextField {
                    id: txtOtherIPAddrWifi
-                   text: globalSettings.debugIPWifi
+                   text: gStaGlobalSettings.getDebugIPWifi()
                    implicitWidth: parent.width
                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                    Layout.fillWidth: true
@@ -247,7 +247,7 @@ Flickable {
                Layout.bottomMargin: (saveInfosOnApp.height - height) / 2
                font.pixelSize: 14
                color: "white"
-               text: "Aktuelle Version: <a href=\"tmp\">" + globalSettings.getCurrentVersion() + "</a>"
+               text: "Aktuelle Version: <a href=\"tmp\">" + gStaGlobalSettings.getCurrentVersion() + "</a>"
                onLinkActivated: {
                    var component = Qt.createComponent("../pages/newVersionInfo.qml");
                    if (component.status === Component.Ready) {
@@ -269,35 +269,29 @@ Flickable {
 //           saveSettings = true;
 //        }
 
-        if (globalSettings.loadGameInfo !== loadGameInfo.checked) {
-           globalSettings.loadGameInfo = loadGameInfo.checked;
-           saveSettings = true;
+        if (gStaGlobalSettings.getLoadGameInfos() !== loadGameInfo.checked) {
+           gStaGlobalSettings.setLoadGameInfos(loadGameInfo.checked);
         }
 
         if (gStaGlobalSettings.getSaveInfosOnApp() !== saveInfosOnApp.checked) {
            gStaGlobalSettings.setSaveInfosOnApp(saveInfosOnApp.checked);
-           saveSettings = true;
         }
 
-        if (globalSettings.useVersionPopup !== usePopupForVersionInfo.checked) {
-           globalSettings.useVersionPopup = usePopupForVersionInfo.checked;
-           saveSettings = true;
+        if (gStaGlobalSettings.getUseVersionPopup() !== usePopupForVersionInfo.checked) {
+           gStaGlobalSettings.setUseVersionPopup(usePopupForVersionInfo.checked);
         }
 
-        if (globalSettings.getChangeDefaultFont() !== cbfontFamilies.currentText ) {
-            globalSettings.setChangeDefaultFont(cbfontFamilies.currentText);
-            saveSettings = true;
+        if (gStaGlobalSettings.getChangeDefaultFont() !== cbfontFamilies.currentText ) {
+            gStaGlobalSettings.setChangeDefaultFont(cbfontFamilies.currentText);
             saveFonts = true;
         }
 
-        if (globalSettings.debugIP !== txtOtherIPAddr.text) {
-           globalSettings.debugIP = txtOtherIPAddr.text;
-           saveSettings = true;
+        if (gStaGlobalSettings.getDebugIP() !== txtOtherIPAddr.text) {
+           gStaGlobalSettings.setDebugIP(txtOtherIPAddr.text);
         }
 
-        if (globalSettings.debugIPWifi !== txtOtherIPAddrWifi.text) {
-           globalSettings.debugIPWifi = txtOtherIPAddrWifi.text;
-           saveSettings = true;
+        if (gStaGlobalSettings.getDebugIPWifi() !== txtOtherIPAddrWifi.text) {
+           gStaGlobalSettings.setDebugIPWifi(txtOtherIPAddrWifi.text);
         }
 
         if (notifyNewAppVersion !== globalSettings.isNotificationNewAppVersionEnabled()) {
@@ -364,7 +358,7 @@ Flickable {
 
    function pageOpenedUpdateView() {
 
-        cbfontFamilies.currentIndex = globalSettings.getCurrentFontIndex();
+        cbfontFamilies.currentIndex = gStaGlobalSettings.getCurrentFontIndex()
 
         notifyNewAppVersion = globalSettings.isNotificationNewAppVersionEnabled();
         notifyNewMeetInfo = globalSettings.isNotificationNewMeetingEnabled();

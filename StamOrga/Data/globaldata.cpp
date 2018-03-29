@@ -40,15 +40,15 @@
 #define PLAY_COMPETITION    "competition"
 #define PLAY_TIME_FIXED     "timeFixed"
 
-#define SEASONTICKET_GROUP  "SEASONTICKET_LIST"
-#define TICKET_NAME         "name"
-#define TICKET_PLACE        "place"
-#define TICKET_DISCOUNT     "discount"
-#define TICKET_USER_INDEX   "userIndex"
+//#define SEASONTICKET_GROUP  "SEASONTICKET_LIST"
+//#define TICKET_NAME         "name"
+//#define TICKET_PLACE        "place"
+//#define TICKET_DISCOUNT     "discount"
+//#define TICKET_USER_INDEX   "userIndex"
 
-#define APP_INFO_GROUP      "AppInfo"
-#define APP_INFO_TOKEN      "FcmToken"
-#define APP_INFO_GUID       "AppGuid"
+//#define APP_INFO_GROUP      "AppInfo"
+//#define APP_INFO_TOKEN      "FcmToken"
+//#define APP_INFO_GUID       "AppGuid"
 // clang-format on
 
 
@@ -57,8 +57,8 @@ GlobalData::GlobalData(QObject* parent)
 {
     QGuiApplication::setOrganizationName("WaterMax");
     QGuiApplication::setApplicationName("StamOrga");
-    this->setbIsConnected(false);
-    this->SetUserProperties(0x0);
+    //    this->setbIsConnected(false);
+    //    this->SetUserProperties(0x0);
 
     this->m_logApp = new Logging();
     this->m_logApp->initialize();
@@ -72,7 +72,7 @@ GlobalData::GlobalData(QObject* parent)
     this->m_pMainUserSettings->setIniCodec(("UTF-8"));
 
     QMutexLocker lock(&this->m_pushNotificationMutex);
-    this->m_pMainUserSettings->beginGroup(APP_INFO_GROUP);
+//    this->m_pMainUserSettings->beginGroup(APP_INFO_GROUP);
 #ifdef Q_OS_ANDROID
     this->m_pushNotificationInfoHandler = new PushNotificationInformationHandler(this);
     connect(this->m_pushNotificationInfoHandler, &PushNotificationInformationHandler::fcmRegistrationTokenChanged,
@@ -80,33 +80,33 @@ GlobalData::GlobalData(QObject* parent)
 
     this->m_pushNotificationToken = this->m_pMainUserSettings->value(APP_INFO_TOKEN, "").toString();
 #endif
-    this->m_AppInstanceGUID = this->m_pMainUserSettings->value(APP_INFO_GUID, "").toString();
-    if (this->m_AppInstanceGUID == "") {
-        this->m_AppInstanceGUID = QUuid::createUuid().toString();
-        this->m_pMainUserSettings->setValue(APP_INFO_GUID, this->m_AppInstanceGUID);
-        qInfo().noquote() << QString("Create a new GUID for this instance %1").arg(this->m_AppInstanceGUID);
-    }
+    //    this->m_AppInstanceGUID = this->m_pMainUserSettings->value(APP_INFO_GUID, "").toString();
+    //    if (this->m_AppInstanceGUID == "") {
+    //        this->m_AppInstanceGUID = QUuid::createUuid().toString();
+    //        this->m_pMainUserSettings->setValue(APP_INFO_GUID, this->m_AppInstanceGUID);
+    //        qInfo().noquote() << QString("Create a new GUID for this instance %1").arg(this->m_AppInstanceGUID);
+    //    }
 
-    this->m_pMainUserSettings->endGroup();
+    //    this->m_pMainUserSettings->endGroup();
 }
 
 void GlobalData::loadGlobalSettings()
 {
-    this->m_bIpAdressWasSet = false;
-    QHostInfo::lookupHost("watermax83.ddns.net", this, SLOT(callBackLookUpHost(QHostInfo)));
+    //    this->m_bIpAdressWasSet = false;
+    //    QHostInfo::lookupHost("watermax83.ddns.net", this, SLOT(callBackLookUpHost(QHostInfo)));
 
     qInfo().noquote() << this->m_pMainUserSettings->fileName();
 
-    this->m_pMainUserSettings->beginGroup("USER_LOGIN");
+    //    this->m_pMainUserSettings->beginGroup("USER_LOGIN");
 
-    this->setUserName(this->m_pMainUserSettings->value("UserName", "").toString());
-    this->setPassWord(this->m_pMainUserSettings->value("Password", "").toString());
-    this->setSalt(this->m_pMainUserSettings->value("Salt", "").toString());
-    //    this->setReadableName(this->m_pMainUserSettings->value("ReadableName", "").toString());
-    this->setIpAddr(this->m_pMainUserSettings->value("IPAddress", "140.80.61.57").toString());
-    this->setConMasterPort(this->m_pMainUserSettings->value("ConMasterPort", 55000).toInt());
+    //    this->setUserName(this->m_pMainUserSettings->value("UserName", "").toString());
+    //    this->setPassWord(this->m_pMainUserSettings->value("Password", "").toString());
+    //    this->setSalt(this->m_pMainUserSettings->value("Salt", "").toString());
+    //    //    this->setReadableName(this->m_pMainUserSettings->value("ReadableName", "").toString());
+    //    this->setIpAddr(this->m_pMainUserSettings->value("IPAddress", "140.80.61.57").toString());
+    //    //    this->setConMasterPort(this->m_pMainUserSettings->value("ConMasterPort", 55000).toInt());
 
-    this->m_pMainUserSettings->endGroup();
+    //    this->m_pMainUserSettings->endGroup();
 
     //    if (!g_GlobalSettings->saveInfosOnApp()) {
     //        this->m_pMainUserSettings->beginGroup(GAMES_GROUP);
@@ -121,28 +121,28 @@ void GlobalData::loadGlobalSettings()
     //    }
 
     /* Getting data from last Games */
-    this->m_pMainUserSettings->beginGroup(GAMES_GROUP);
-    this->m_gpLastLocalUpdateTimeStamp  = this->m_pMainUserSettings->value("LocalGamesUpdateTime", 0).toLongLong();
-    this->m_gpLastServerUpdateTimeStamp = this->m_pMainUserSettings->value("ServerGamesUpdateTime", 0).toLongLong();
-    int count                           = this->m_pMainUserSettings->beginReadArray(GROUP_ARRAY_ITEM);
-    for (int i = 0; i < count; i++) {
-        this->m_pMainUserSettings->setArrayIndex(i);
-        GamePlay* play = new GamePlay();
-        play->setHome(this->m_pMainUserSettings->value(PLAY_HOME, "").toString());
-        play->setAway(this->m_pMainUserSettings->value(PLAY_AWAY, "").toString());
-        play->setTimeStamp(this->m_pMainUserSettings->value(PLAY_DATETIME, 0).toLongLong());
-        play->setSeasonIndex(quint8(this->m_pMainUserSettings->value(PLAY_SAISON_INDEX, 0).toUInt()));
-        play->setIndex(this->m_pMainUserSettings->value(ITEM_INDEX, 0).toUInt());
-        play->setScore(this->m_pMainUserSettings->value(PLAY_SCORE, "").toString());
-        play->setCompetition(CompetitionIndex(quint8(this->m_pMainUserSettings->value(PLAY_COMPETITION, 0).toUInt())));
-        play->setTimeFixed(this->m_pMainUserSettings->value(PLAY_TIME_FIXED, false).toBool());
+    //    this->m_pMainUserSettings->beginGroup(GAMES_GROUP);
+    //    this->m_gpLastLocalUpdateTimeStamp  = this->m_pMainUserSettings->value("LocalGamesUpdateTime", 0).toLongLong();
+    //    this->m_gpLastServerUpdateTimeStamp = this->m_pMainUserSettings->value("ServerGamesUpdateTime", 0).toLongLong();
+    //    int count                           = this->m_pMainUserSettings->beginReadArray(GROUP_ARRAY_ITEM);
+    //    for (int i = 0; i < count; i++) {
+    //        this->m_pMainUserSettings->setArrayIndex(i);
+    //        GamePlay* play = new GamePlay();
+    //        play->setHome(this->m_pMainUserSettings->value(PLAY_HOME, "").toString());
+    //        play->setAway(this->m_pMainUserSettings->value(PLAY_AWAY, "").toString());
+    //        play->setTimeStamp(this->m_pMainUserSettings->value(PLAY_DATETIME, 0).toLongLong());
+    //        play->setSeasonIndex(quint8(this->m_pMainUserSettings->value(PLAY_SAISON_INDEX, 0).toUInt()));
+    //        play->setIndex(this->m_pMainUserSettings->value(ITEM_INDEX, 0).toUInt());
+    //        play->setScore(this->m_pMainUserSettings->value(PLAY_SCORE, "").toString());
+    //        play->setCompetition(CompetitionIndex(quint8(this->m_pMainUserSettings->value(PLAY_COMPETITION, 0).toUInt())));
+    //        play->setTimeFixed(this->m_pMainUserSettings->value(PLAY_TIME_FIXED, false).toBool());
 
-        QQmlEngine::setObjectOwnership(play, QQmlEngine::CppOwnership);
-        this->addNewGamePlay(play);
-    }
-    this->m_pMainUserSettings->endArray();
-    this->m_pMainUserSettings->endGroup();
-    this->m_bGamePlayLastUpdateDidChanges = false;
+    //        QQmlEngine::setObjectOwnership(play, QQmlEngine::CppOwnership);
+    //        this->addNewGamePlay(play);
+    //    }
+    //    this->m_pMainUserSettings->endArray();
+    //    this->m_pMainUserSettings->endGroup();
+    //    this->m_bGamePlayLastUpdateDidChanges = false;
 
     /* Getting data from last SeasonTickets */
     //    this->m_pMainUserSettings->beginGroup(SEASONTICKET_GROUP);
@@ -173,23 +173,23 @@ void GlobalData::loadGlobalSettings()
     this->m_gameUserData.initialize();
 }
 
-void GlobalData::saveGlobalUserSettings()
-{
-    QMutexLocker lock(&this->m_mutexUser);
+//void GlobalData::saveGlobalUserSettings()
+//{
+//    QMutexLocker lock(&this->m_mutexUser);
 
-    this->m_pMainUserSettings->beginGroup("USER_LOGIN");
+//    this->m_pMainUserSettings->beginGroup("USER_LOGIN");
 
-    this->m_pMainUserSettings->setValue("UserName", this->m_userName);
-    this->m_pMainUserSettings->setValue("Password", this->m_passWord);
-    this->m_pMainUserSettings->setValue("Salt", this->m_salt);
-    //    this->m_pMainUserSettings->setValue("ReadableName", this->m_readableName);
-    this->m_pMainUserSettings->setValue("IPAddress", this->m_ipAddress);
-    this->m_pMainUserSettings->setValue("ConMasterPort", this->m_uMasterPort);
+//    this->m_pMainUserSettings->setValue("UserName", this->m_userName);
+//    this->m_pMainUserSettings->setValue("Password", this->m_passWord);
+//    this->m_pMainUserSettings->setValue("Salt", this->m_salt);
+//    //    this->m_pMainUserSettings->setValue("ReadableName", this->m_readableName);
+//    this->m_pMainUserSettings->setValue("IPAddress", this->m_ipAddress);
+//    //    this->m_pMainUserSettings->setValue("ConMasterPort", this->m_uMasterPort);
 
-    this->m_pMainUserSettings->endGroup();
+//    this->m_pMainUserSettings->endGroup();
 
-    this->m_pMainUserSettings->sync();
-}
+//    this->m_pMainUserSettings->sync();
+//}
 
 void GlobalData::saveCurrentGamesList(qint64 timestamp)
 {
@@ -233,21 +233,21 @@ void GlobalData::saveCurrentGamesList(qint64 timestamp)
     this->m_pMainUserSettings->endGroup();
 }
 
-QString GlobalData::userName()
-{
-    QMutexLocker lock(&this->m_mutexUser);
-    return this->m_userName;
-}
-void GlobalData::setUserName(const QString& user)
-{
-    if (this->m_userName != user) {
-        {
-            QMutexLocker lock(&this->m_mutexUser);
-            this->m_userName = user;
-        }
-        emit userNameChanged();
-    }
-}
+//QString GlobalData::userName()
+//{
+//    QMutexLocker lock(&this->m_mutexUser);
+//    return this->m_userName;
+//}
+//void GlobalData::setUserName(const QString& user)
+//{
+//    if (this->m_userName != user) {
+//        {
+//            QMutexLocker lock(&this->m_mutexUser);
+//            this->m_userName = user;
+//        }
+//        emit userNameChanged();
+//    }
+//}
 
 //QString GlobalData::readableName()
 //{
@@ -265,194 +265,194 @@ void GlobalData::setUserName(const QString& user)
 //    }
 //}
 
-QString GlobalData::passWord()
-{
-    QMutexLocker lock(&this->m_mutexUser);
-    return this->m_passWord;
-}
-void GlobalData::setPassWord(const QString& passw)
-{
-    if (this->m_passWord != passw) {
-        {
-            QMutexLocker lock(&this->m_mutexUser);
-            this->m_passWord = passw;
-        }
-        emit passWordChanged();
-    }
-}
+//QString GlobalData::passWord()
+//{
+//    QMutexLocker lock(&this->m_mutexUser);
+//    return this->m_passWord;
+//}
+//void GlobalData::setPassWord(const QString& passw)
+//{
+//    if (this->m_passWord != passw) {
+//        {
+//            QMutexLocker lock(&this->m_mutexUser);
+//            this->m_passWord = passw;
+//        }
+//        emit passWordChanged();
+//    }
+//}
 
-QString GlobalData::ipAddr()
-{
-    QMutexLocker lock(&this->m_mutexUser);
-    return this->m_ipAddress;
-}
-void GlobalData::setIpAddr(const QString& ip)
-{
-    if (this->m_ipAddress != ip) {
-        {
-            QMutexLocker lock(&this->m_mutexUser);
-            this->m_ipAddress = ip;
-        }
-        emit ipAddrChanged();
-    }
-}
+//QString GlobalData::ipAddr()
+//{
+//    QMutexLocker lock(&this->m_mutexUser);
+//    return this->m_ipAddress;
+//}
+//void GlobalData::setIpAddr(const QString& ip)
+//{
+//    if (this->m_ipAddress != ip) {
+//        {
+//            QMutexLocker lock(&this->m_mutexUser);
+//            this->m_ipAddress = ip;
+//        }
+//        emit ipAddrChanged();
+//    }
+//}
 
-quint32 GlobalData::conMasterPort()
-{
-    QMutexLocker lock(&this->m_mutexUser);
-    return this->m_uMasterPort;
-}
-void GlobalData::setConMasterPort(quint32 port)
-{
-    if (this->m_uMasterPort != port) {
-        {
-            QMutexLocker lock(&this->m_mutexUser);
-            this->m_uMasterPort = port;
-        }
-        emit conMasterPortChanged();
-    }
-}
+//quint32 GlobalData::conMasterPort()
+//{
+//    QMutexLocker lock(&this->m_mutexUser);
+//    return this->m_uMasterPort;
+//}
+//void GlobalData::setConMasterPort(quint32 port)
+//{
+//    if (this->m_uMasterPort != port) {
+//        {
+//            QMutexLocker lock(&this->m_mutexUser);
+//            this->m_uMasterPort = port;
+//        }
+//        emit conMasterPortChanged();
+//    }
+//}
 
-quint32 GlobalData::conDataPort()
-{
-    QMutexLocker lock(&this->m_mutexUser);
-    return this->m_uDataPort;
-}
-void GlobalData::setConDataPort(quint32 port)
-{
-    QMutexLocker lock(&this->m_mutexUser);
-    if (this->m_uDataPort != port) {
-        this->m_uDataPort = port;
-    }
-}
+//quint32 GlobalData::conDataPort()
+//{
+//    QMutexLocker lock(&this->m_mutexUser);
+//    return this->m_uDataPort;
+//}
+//void GlobalData::setConDataPort(quint32 port)
+//{
+//    QMutexLocker lock(&this->m_mutexUser);
+//    if (this->m_uDataPort != port) {
+//        this->m_uDataPort = port;
+//    }
+//}
 
-quint32 GlobalData::userIndex()
-{
-    QMutexLocker lock(&this->m_mutexUser);
-    return this->m_userIndex;
-}
-void GlobalData::setUserIndex(quint32 userIndex)
-{
-    QMutexLocker lock(&this->m_mutexUser);
-    if (this->m_userIndex != userIndex) {
-        this->m_userIndex = userIndex;
-        PushNotificationInformationHandler::setUserIndexForTopics(QString::number(userIndex));
-    }
-}
+//quint32 GlobalData::userIndex()
+//{
+//    QMutexLocker lock(&this->m_mutexUser);
+//    return this->m_userIndex;
+//}
+//void GlobalData::setUserIndex(quint32 userIndex)
+//{
+//    QMutexLocker lock(&this->m_mutexUser);
+//    if (this->m_userIndex != userIndex) {
+//        this->m_userIndex = userIndex;
+//        PushNotificationInformationHandler::setUserIndexForTopics(QString::number(userIndex));
+//    }
+//}
 
-void GlobalData::startUpdateGamesPlay(const qint16 updateIndex)
-{
-    QMutexLocker lock(&this->m_mutexGame);
+//void GlobalData::startUpdateGamesPlay(const qint16 updateIndex)
+//{
+//    QMutexLocker lock(&this->m_mutexGame);
 
-    /* need to delet, because they are all pointers */
-    if (updateIndex == UpdateIndex::UpdateAll) {
-        for (int i = 0; i < this->m_lGamePlay.size(); i++)
-            delete this->m_lGamePlay[i];
-        this->m_lGamePlay.clear();
-        this->m_bGamePlayLastUpdateDidChanges = true;
-    } else
-        this->m_bGamePlayLastUpdateDidChanges = false;
+//    /* need to delet, because they are all pointers */
+//    if (updateIndex == UpdateIndex::UpdateAll) {
+//        for (int i = 0; i < this->m_lGamePlay.size(); i++)
+//            delete this->m_lGamePlay[i];
+//        this->m_lGamePlay.clear();
+//        this->m_bGamePlayLastUpdateDidChanges = true;
+//    } else
+//        this->m_bGamePlayLastUpdateDidChanges = false;
 
-    this->m_gpLastLocalUpdateTimeStamp = QDateTime::currentMSecsSinceEpoch();
-}
+//    this->m_gpLastLocalUpdateTimeStamp = QDateTime::currentMSecsSinceEpoch();
+//}
 
-void GlobalData::addNewGamePlay(GamePlay* gPlay, const qint16 updateIndex)
-{
-    GamePlay* play = this->getGamePlay(gPlay->index());
-    if (play == NULL) {
-        QMutexLocker lock(&this->m_mutexGame);
+//void GlobalData::addNewGamePlay(GamePlay* gPlay, const qint16 updateIndex)
+//{
+//    GamePlay* play = this->getGamePlay(gPlay->index());
+//    if (play == NULL) {
+//        QMutexLocker lock(&this->m_mutexGame);
 
-        gPlay->setEnableAddGame(this->userIsGameAddingEnabled());
-        this->m_lGamePlay.append(gPlay);
-        this->m_bGamePlayLastUpdateDidChanges = true;
-        return;
-    } else if (updateIndex == UpdateIndex::UpdateDiff) {
-        if (play->home() != gPlay->home()) {
-            play->setHome(gPlay->home());
-            this->m_bGamePlayLastUpdateDidChanges = true;
-        }
-        if (play->away() != gPlay->away()) {
-            play->setAway(gPlay->away());
-            this->m_bGamePlayLastUpdateDidChanges = true;
-        }
-        if (play->score() != gPlay->score()) {
-            play->setScore(gPlay->score());
-            this->m_bGamePlayLastUpdateDidChanges = true;
-        }
-        if (play->timestamp64Bit() != gPlay->timestamp64Bit()) {
-            play->setTimeStamp(gPlay->timestamp64Bit());
-            this->m_bGamePlayLastUpdateDidChanges = true;
-        }
-        if (play->seasonIndex() != gPlay->seasonIndex()) {
-            play->setSeasonIndex(gPlay->seasonIndex());
-            this->m_bGamePlayLastUpdateDidChanges = true;
-        }
-        if (play->competitionValue() != gPlay->competitionValue()) {
-            play->setCompetition((CompetitionIndex)gPlay->competitionValue());
-            this->m_bGamePlayLastUpdateDidChanges = true;
-        }
-        if (play->timeFixed() != gPlay->timeFixed()) {
-            play->setTimeFixed(gPlay->timeFixed());
-            this->m_bGamePlayLastUpdateDidChanges = true;
-        }
-    }
+//        gPlay->setEnableAddGame(this->userIsGameAddingEnabled());
+//        this->m_lGamePlay.append(gPlay);
+//        this->m_bGamePlayLastUpdateDidChanges = true;
+//        return;
+//    } else if (updateIndex == UpdateIndex::UpdateDiff) {
+//        if (play->home() != gPlay->home()) {
+//            play->setHome(gPlay->home());
+//            this->m_bGamePlayLastUpdateDidChanges = true;
+//        }
+//        if (play->away() != gPlay->away()) {
+//            play->setAway(gPlay->away());
+//            this->m_bGamePlayLastUpdateDidChanges = true;
+//        }
+//        if (play->score() != gPlay->score()) {
+//            play->setScore(gPlay->score());
+//            this->m_bGamePlayLastUpdateDidChanges = true;
+//        }
+//        if (play->timestamp64Bit() != gPlay->timestamp64Bit()) {
+//            play->setTimeStamp(gPlay->timestamp64Bit());
+//            this->m_bGamePlayLastUpdateDidChanges = true;
+//        }
+//        if (play->seasonIndex() != gPlay->seasonIndex()) {
+//            play->setSeasonIndex(gPlay->seasonIndex());
+//            this->m_bGamePlayLastUpdateDidChanges = true;
+//        }
+//        if (play->competitionValue() != gPlay->competitionValue()) {
+//            play->setCompetition((CompetitionIndex)gPlay->competitionValue());
+//            this->m_bGamePlayLastUpdateDidChanges = true;
+//        }
+//        if (play->timeFixed() != gPlay->timeFixed()) {
+//            play->setTimeFixed(gPlay->timeFixed());
+//            this->m_bGamePlayLastUpdateDidChanges = true;
+//        }
+//    }
 
-    delete gPlay;
-}
+//    delete gPlay;
+//}
 
-GamePlay* GlobalData::getGamePlay(const quint32 gameIndex)
-{
-    QMutexLocker lock(&this->m_mutexGame);
+//GamePlay* GlobalData::getGamePlay(const quint32 gameIndex)
+//{
+//    QMutexLocker lock(&this->m_mutexGame);
 
-    for (int i = 0; i < this->m_lGamePlay.size(); i++) {
-        if (this->m_lGamePlay[i]->index() == gameIndex)
-            return this->m_lGamePlay[i];
-    }
-    return NULL;
-}
+//    for (int i = 0; i < this->m_lGamePlay.size(); i++) {
+//        if (this->m_lGamePlay[i]->index() == gameIndex)
+//            return this->m_lGamePlay[i];
+//    }
+//    return NULL;
+//}
 
-GamePlay* GlobalData::getGamePlayFromArrayIndex(int index)
-{
-    QMutexLocker lock(&this->m_mutexGame);
+//GamePlay* GlobalData::getGamePlayFromArrayIndex(int index)
+//{
+//    QMutexLocker lock(&this->m_mutexGame);
 
-    if (index < this->m_lGamePlay.size())
-        return this->m_lGamePlay.at(index);
-    return NULL;
-}
+//    if (index < this->m_lGamePlay.size())
+//        return this->m_lGamePlay.at(index);
+//    return NULL;
+//}
 
-QString GlobalData::getGamePlayLastUpdateString()
-{
-    QMutexLocker lock(&this->m_mutexGame);
-    return QDateTime::fromMSecsSinceEpoch(this->m_gpLastLocalUpdateTimeStamp).toString("dd.MM.yy hh:mm:ss");
-}
+//QString GlobalData::getGamePlayLastUpdateString()
+//{
+//    QMutexLocker lock(&this->m_mutexGame);
+//    return QDateTime::fromMSecsSinceEpoch(this->m_gpLastLocalUpdateTimeStamp).toString("dd.MM.yy hh:mm:ss");
+//}
 
-qint64 GlobalData::getGamePlayLastLocalUpdate()
-{
-    return this->m_gpLastLocalUpdateTimeStamp;
-}
+//qint64 GlobalData::getGamePlayLastLocalUpdate()
+//{
+//    return this->m_gpLastLocalUpdateTimeStamp;
+//}
 
-qint64 GlobalData::getGamePlayLastServerUpdate()
-{
-    return this->m_gpLastServerUpdateTimeStamp;
-}
+//qint64 GlobalData::getGamePlayLastServerUpdate()
+//{
+//    return this->m_gpLastServerUpdateTimeStamp;
+//}
 
-void GlobalData::resetAllGamePlayEvents()
-{
-    for (int i = 0; i < this->m_lGamePlay.count(); i++) {
-        this->m_lGamePlay[i]->setEvent(0);
-    }
-}
+//void GlobalData::resetAllGamePlayEvents()
+//{
+//    for (int i = 0; i < this->m_lGamePlay.count(); i++) {
+//        this->m_lGamePlay[i]->setEvent(0);
+//    }
+//}
 
-bool GlobalData::setGamePlayItemHasEvent(quint32 gameIndex)
-{
-    for (int i = 0; i < this->m_lGamePlay.count(); i++) {
-        if (this->m_lGamePlay[i]->index() == gameIndex) {
-            this->m_lGamePlay[i]->setEvent(this->m_lGamePlay[i]->getEvent() + 1);
-            return true;
-        }
-    }
-    return false;
-}
+//bool GlobalData::setGamePlayItemHasEvent(quint32 gameIndex)
+//{
+//    for (int i = 0; i < this->m_lGamePlay.count(); i++) {
+//        if (this->m_lGamePlay[i]->index() == gameIndex) {
+//            this->m_lGamePlay[i]->setEvent(this->m_lGamePlay[i]->getEvent() + 1);
+//            return true;
+//        }
+//    }
+//    return false;
+//}
 
 //void GlobalData::saveCurrentSeasonTickets(qint64 timestamp)
 //{
@@ -732,53 +732,53 @@ void GlobalData::copyTextToClipBoard(QString text)
     clip->setText(text);
 }
 
-void GlobalData::callBackLookUpHost(const QHostInfo& host)
-{
-    QString newChangedIP;
-    QString currentIP = this->ipAddr();
-    if (host.addresses().size() > 0) {
-        this->setIpAddr(host.addresses().value(0).toString());
-        newChangedIP = host.addresses().value(0).toString();
-    }
-
-    if (g_GlobalSettings->debugIP() != "") {
-        this->setIpAddr(g_GlobalSettings->debugIP());
-        newChangedIP = g_GlobalSettings->debugIP();
-    }
-#ifdef QT_DEBUG
-//    if (this->m_debugIP != "") {
-//        this->setIpAddr(this->m_debugIP);
-//        newChangedIP = this->m_debugIP;
+//void GlobalData::callBackLookUpHost(const QHostInfo& host)
+//{
+//    QString newChangedIP;
+//    QString currentIP = this->ipAddr();
+//    if (host.addresses().size() > 0) {
+//        this->setIpAddr(host.addresses().value(0).toString());
+//        newChangedIP = host.addresses().value(0).toString();
 //    }
-#ifdef Q_OS_ANDROID
 
-    if (g_GlobalSettings->debugIPWifi() != "") {
-        QNetworkConfigurationManager ncm;
-        QList<QNetworkConfiguration> nc = ncm.allConfigurations();
-        foreach (QNetworkConfiguration item, nc) {
-            if (item.bearerType() == QNetworkConfiguration::BearerWLAN) {
-                if (item.state() == QNetworkConfiguration::StateFlag::Active) {
-                    this->setIpAddr(g_GlobalSettings->debugIPWifi());
-                    newChangedIP = g_GlobalSettings->debugIPWifi();
-                }
-                //                 qDebug() << "Wifi " << item.name();
-                //                 qDebug() << "state " << item.state();
-            }
-        }
-    }
-#endif // ANDROID
-#endif // DEBUG
+//    if (g_GlobalSettings->debugIP() != "") {
+//        this->setIpAddr(g_GlobalSettings->debugIP());
+//        newChangedIP = g_GlobalSettings->debugIP();
+//    }
+//#ifdef QT_DEBUG
+////    if (this->m_debugIP != "") {
+////        this->setIpAddr(this->m_debugIP);
+////        newChangedIP = this->m_debugIP;
+////    }
+//#ifdef Q_OS_ANDROID
 
-    if (newChangedIP.isEmpty())
-        newChangedIP = this->ipAddr();
+//    if (g_GlobalSettings->debugIPWifi() != "") {
+//        QNetworkConfigurationManager ncm;
+//        QList<QNetworkConfiguration> nc = ncm.allConfigurations();
+//        foreach (QNetworkConfiguration item, nc) {
+//            if (item.bearerType() == QNetworkConfiguration::BearerWLAN) {
+//                if (item.state() == QNetworkConfiguration::StateFlag::Active) {
+//                    this->setIpAddr(g_GlobalSettings->debugIPWifi());
+//                    newChangedIP = g_GlobalSettings->debugIPWifi();
+//                }
+//                //                 qDebug() << "Wifi " << item.name();
+//                //                 qDebug() << "state " << item.state();
+//            }
+//        }
+//    }
+//#endif // ANDROID
+//#endif // DEBUG
 
-    //    if (host.addresses().size() > 0)
-    qInfo().noquote() << QString("Setting IP Address: %1").arg(newChangedIP) << QThread::currentThreadId();
+//    if (newChangedIP.isEmpty())
+//        newChangedIP = this->ipAddr();
 
-    if (currentIP != newChangedIP)
-        this->saveGlobalUserSettings();
-    this->m_bIpAdressWasSet = true;
-}
+//    //    if (host.addresses().size() > 0)
+//    qInfo().noquote() << QString("Setting IP Address: %1").arg(newChangedIP) << QThread::currentThreadId();
+
+//    if (currentIP != newChangedIP)
+//        this->saveGlobalUserSettings();
+//    this->m_bIpAdressWasSet = true;
+//}
 
 #ifdef Q_OS_ANDROID
 void GlobalData::slotNewFcmRegistrationToken(QString token)
@@ -816,12 +816,12 @@ bool GlobalData::userIsFanclubEditEnabled()
     return USER_IS_ENABLED(USER_ENABLE_FANCLUB_EDIT);
 }
 
-void GlobalData::SetUserProperties(quint32 value)
-{
-    this->m_UserProperties = value;
-}
+//void GlobalData::SetUserProperties(quint32 value)
+//{
+//    this->m_UserProperties = value;
+//}
 
-quint32 GlobalData::getUserProperties()
-{
-    return this->m_UserProperties;
-}
+//quint32 GlobalData::getUserProperties()
+//{
+//    return this->m_UserProperties;
+//}

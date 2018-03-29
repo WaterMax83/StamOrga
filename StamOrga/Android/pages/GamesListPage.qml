@@ -99,18 +99,18 @@ Flickable {
 
         cleanGameLayout();
 
-        if (globalUserData.getGamePlayLength() > 0) {
+        if (gDataGamesManager.getGamePlayLength() > 0) {
             if (showOnlyPastGames) {
-                for (var i = globalUserData.getGamePlayLength() - 1; i >= 0; i--) {
-                    var gameInfo = globalUserData.getGamePlayFromArrayIndex(i);
+                for (var i = gDataGamesManager.getGamePlayLength() - 1; i >= 0; i--) {
+                    var gameInfo = gDataGamesManager.getGamePlayFromArrayIndex(i);
                     if (gameInfo.isGameInPast()) {
                         var sprite = gameView.createObject(columnLayoutGames)
                         sprite.showGamesInfo(gameInfo)
                     }
                 }
             } else {
-                for (var j = 0; j < globalUserData.getGamePlayLength(); j++) {
-                    var gameInfo2 = globalUserData.getGamePlayFromArrayIndex(j);
+                for (var j = 0; j < gDataGamesManager.getGamePlayLength(); j++) {
+                    var gameInfo2 = gDataGamesManager.getGamePlayFromArrayIndex(j);
                     if (!gameInfo2.isGameInPast()) {
                         var sprite2 = gameView.createObject(columnLayoutGames)
                         sprite2.showGamesInfo(gameInfo2)

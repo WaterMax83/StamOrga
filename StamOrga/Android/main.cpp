@@ -31,12 +31,14 @@
 #include "../../Common/General/backgroundcontroller.h"
 #include "../../Common/General/config.h"
 #include "../../Common/General/globalfunctions.h"
+#include "../Connection/cconusersettings.h"
 #include "../Data/appuserevents.h"
 #include "../Data/cdatastatisticmanager.h"
 #include "../Data/gameuserdata.h"
 #include "../Data/globaldata.h"
 #include "../Data/globalsettings.h"
 #include "../cstaglobalmanager.h"
+#include "../cstaglobalsettings.h"
 #include "../dataconnection.h"
 #include "userinterface.h"
 
@@ -79,7 +81,7 @@ int main(int argc, char* argv[])
 
     QFontDatabase base;
     QStringList   fontFamilies = base.families();
-    QString       chFontFam    = globalSettings.getChangeDefaultFont();
+    QString       chFontFam    = g_StaGlobalSettings.getChangeDefaultFont();
     if (chFontFam != "Default") {
 
         if (fontFamilies.contains(chFontFam)) {
@@ -96,7 +98,7 @@ int main(int argc, char* argv[])
     }
 
     fontFamilies.insert(0, "Default");
-    globalSettings.setCurrentFontList(&fontFamilies);
+    g_StaGlobalSettings.setCurrentFontList(&fontFamilies);
     QStringListModel fontFamiliesModel;
     fontFamiliesModel.setStringList(fontFamilies);
 
@@ -124,9 +126,8 @@ int main(int argc, char* argv[])
 
 #endif
 
-    QObject* pRootObject
-        = engine.rootObjects().first();
-    if (globalUserData.userName().size() == 0 || globalUserData.passWord().size() == 0)
+    QObject* pRootObject = engine.rootObjects().first();
+    if (g_ConUserSettings.getUserName().size() == 0 || g_ConUserSettings.getPassWord() == 0)
         QMetaObject::invokeMethod(pRootObject, "openUserLogin", Q_ARG(QVariant, true));
     else
         QMetaObject::invokeMethod(pRootObject, "openUserLogin", Q_ARG(QVariant, false));

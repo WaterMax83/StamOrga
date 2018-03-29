@@ -24,13 +24,13 @@
 #include "source/pushnotification.h"
 
 // clang-format off
-#define SETT_USE_READABLE_NAME      "UseReadableName"
-#define SETT_DEBUG_IP               "DebugIP"
-#define SETT_DEBUG_IP_WIFI          "DebugIPWifi"
-#define SETT_LAST_SHOWN_VERSION     "LastShownVersion"
-#define SETT_LOAD_GAME_INFO         "LoadGameInfo"
-#define SETT_USE_VERSION_POPUP      "UseVersionPopup"
-#define SETT_CHANGE_DEFAULT_FONT    "ChangeDefaultFont"
+//#define SETT_USE_READABLE_NAME      "UseReadableName"
+//#define SETT_DEBUG_IP               "DebugIP"
+//#define SETT_DEBUG_IP_WIFI          "DebugIPWifi"
+//#define SETT_LAST_SHOWN_VERSION     "LastShownVersion"
+//#define SETT_LOAD_GAME_INFO         "LoadGameInfo"
+//#define SETT_USE_VERSION_POPUP      "UseVersionPopup"
+//#define SETT_CHANGE_DEFAULT_FONT    "ChangeDefaultFont"
 #define SETT_ENABLE_NOTIFICATION    "EnableNotification"
 
 #define SETT_ALREADY_CONNECTED      "AlreadyConnected"
@@ -39,7 +39,7 @@
 GlobalSettings::GlobalSettings(QObject* parent)
     : QObject(parent)
 {
-    this->m_lastGameInfoUpdate = 0;
+    //    this->m_lastGameInfoUpdate = 0;
 }
 
 void GlobalSettings::initialize(GlobalData* pGlobalData, QGuiApplication* app)
@@ -49,19 +49,19 @@ void GlobalSettings::initialize(GlobalData* pGlobalData, QGuiApplication* app)
     this->m_pGlobalData->m_pMainUserSettings->beginGroup("GLOBAL_SETTINGS");
 
     //    this->setUseReadableName(this->m_pGlobalData->m_pMainUserSettings->value(SETT_USE_READABLE_NAME, true).toBool());
-    this->setLoadGameInfo(this->m_pGlobalData->m_pMainUserSettings->value(SETT_LOAD_GAME_INFO, true).toBool());
-    this->setUseVersionPopup(this->m_pGlobalData->m_pMainUserSettings->value(SETT_USE_VERSION_POPUP, true).toBool());
-    this->setDebugIP(this->m_pGlobalData->m_pMainUserSettings->value(SETT_DEBUG_IP, "").toString());
-    this->setDebugIPWifi(this->m_pGlobalData->m_pMainUserSettings->value(SETT_DEBUG_IP_WIFI, "").toString());
-    this->m_lastShownVersion = this->m_pGlobalData->m_pMainUserSettings->value(SETT_LAST_SHOWN_VERSION, "").toString();
-    this->setChangeDefaultFont(this->m_pGlobalData->m_pMainUserSettings->value(SETT_CHANGE_DEFAULT_FONT, "Default").toString());
+    //    this->setLoadGameInfo(this->m_pGlobalData->m_pMainUserSettings->value(SETT_LOAD_GAME_INFO, true).toBool());
+    //    this->setUseVersionPopup(this->m_pGlobalData->m_pMainUserSettings->value(SETT_USE_VERSION_POPUP, true).toBool());
+    //    this->setDebugIP(this->m_pGlobalData->m_pMainUserSettings->value(SETT_DEBUG_IP, "").toString());
+    //    this->setDebugIPWifi(this->m_pGlobalData->m_pMainUserSettings->value(SETT_DEBUG_IP_WIFI, "").toString());
+    //    this->m_lastShownVersion = this->m_pGlobalData->m_pMainUserSettings->value(SETT_LAST_SHOWN_VERSION, "").toString();
+    //    this->setChangeDefaultFont(this->m_pGlobalData->m_pMainUserSettings->value(SETT_CHANGE_DEFAULT_FONT, "Default").toString());
     this->m_notificationEnabledValue = this->m_pGlobalData->m_pMainUserSettings->value(SETT_ENABLE_NOTIFICATION, 0x00000000FFFFFFFF).toULongLong();
 
     this->m_alreadyConnected = this->m_pGlobalData->m_pMainUserSettings->value(SETT_ALREADY_CONNECTED, false).toBool();
 
     this->m_pGlobalData->m_pMainUserSettings->endGroup();
 
-    connect(app, &QGuiApplication::applicationStateChanged, this, &GlobalSettings::stateFromAppChanged);
+    //    connect(qGuiApp, &QGuiApplication::applicationStateChanged, this, &GlobalSettings::stateFromAppChanged);
 }
 
 
@@ -72,12 +72,12 @@ void GlobalSettings::saveGlobalSettings()
     this->m_pGlobalData->m_pMainUserSettings->beginGroup("GLOBAL_SETTINGS");
 
     //    this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_USE_READABLE_NAME, this->m_useReadableName);
-    this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_LOAD_GAME_INFO, this->m_loadGameInfo);
-    this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_USE_VERSION_POPUP, this->m_useVersionPopup);
-    this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_DEBUG_IP, this->m_debugIP);
-    this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_DEBUG_IP_WIFI, this->m_debugIPWifi);
-    this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_LAST_SHOWN_VERSION, this->m_lastShownVersion);
-    this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_CHANGE_DEFAULT_FONT, this->m_changeDefaultFont);
+    //    this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_LOAD_GAME_INFO, this->m_loadGameInfo);
+    //    this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_USE_VERSION_POPUP, this->m_useVersionPopup);
+    //    this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_DEBUG_IP, this->m_debugIP);
+    //    this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_DEBUG_IP_WIFI, this->m_debugIPWifi);
+    //    this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_LAST_SHOWN_VERSION, this->m_lastShownVersion);
+    //    this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_CHANGE_DEFAULT_FONT, this->m_changeDefaultFont);
     this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
 
     this->m_pGlobalData->m_pMainUserSettings->endGroup();
@@ -87,22 +87,22 @@ void GlobalSettings::saveGlobalSettings()
     this->updatePushNotification();
 }
 
-bool GlobalSettings::updateConnectionStatus(bool connected)
-{
-    if (connected != this->m_alreadyConnected) {
-        this->m_alreadyConnected = connected;
-        this->updatePushNotification();
-        QMutexLocker lock(&this->m_pGlobalData->m_mutexUser);
+//bool GlobalSettings::updateConnectionStatus(bool connected)
+//{
+//    if (connected != this->m_alreadyConnected) {
+//        this->m_alreadyConnected = connected;
+//        this->updatePushNotification();
+//        QMutexLocker lock(&this->m_pGlobalData->m_mutexUser);
 
-        this->m_pGlobalData->m_pMainUserSettings->beginGroup("GLOBAL_SETTINGS");
+//        this->m_pGlobalData->m_pMainUserSettings->beginGroup("GLOBAL_SETTINGS");
 
-        this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_ALREADY_CONNECTED, this->m_alreadyConnected);
+//        this->m_pGlobalData->m_pMainUserSettings->setValue(SETT_ALREADY_CONNECTED, this->m_alreadyConnected);
 
-        this->m_pGlobalData->m_pMainUserSettings->endGroup();
-        return true;
-    }
-    return false;
-}
+//        this->m_pGlobalData->m_pMainUserSettings->endGroup();
+//        return true;
+//    }
+//    return false;
+//}
 
 void GlobalSettings::updatePushNotification()
 {
@@ -146,133 +146,136 @@ void GlobalSettings::updatePushNotification()
     }
 }
 
-void GlobalSettings::setChangeDefaultFont(QString font)
-{
-    this->m_changeDefaultFont = font;
-    if (this->m_fontList == NULL)
-        return;
+//void GlobalSettings::setChangeDefaultFont(QString font)
+//{
+//    this->m_changeDefaultFont = font;
+//    if (this->m_fontList == NULL)
+//        return;
 
-    this->m_currentFontIndex = this->m_fontList->indexOf(font);
-}
+//    this->m_currentFontIndex = this->m_fontList->indexOf(font);
+//}
 
-void GlobalSettings::setCurrentFontList(QStringList* list)
-{
-    this->m_fontList = list;
-    if (this->m_fontList == NULL)
-        return;
+//void GlobalSettings::setCurrentFontList(QStringList* list)
+//{
+//    this->m_fontList = list;
+//    if (this->m_fontList == NULL)
+//        return;
 
-    this->m_currentFontIndex = this->m_fontList->indexOf(this->m_changeDefaultFont);
-}
+//    this->m_currentFontIndex = this->m_fontList->indexOf(this->m_changeDefaultFont);
+//}
 
-QString GlobalSettings::getCurrentVersion()
-{
-    return STAM_ORGA_VERSION_S;
-}
+//QString GlobalSettings::getCurrentVersion()
+//{
+//    return STAM_ORGA_VERSION_S;
+//}
 
-QString GlobalSettings::getCurrentVersionLink()
-{
-    return QString(STAM_ORGA_VERSION_LINK_WITH_TEXT).arg(QString(STAM_ORGA_VERSION_S).toLower(), STAM_ORGA_VERSION_S);
-}
+//QString GlobalSettings::getCurrentVersionLink()
+//{
+//    return QString(STAM_ORGA_VERSION_LINK_WITH_TEXT).arg(QString(STAM_ORGA_VERSION_S).toLower(), STAM_ORGA_VERSION_S);
+//}
 
-QString GlobalSettings::getVersionChangeInfo()
-{
-    QString rValue;
+//QString GlobalSettings::getVersionChangeInfo()
+//{
+//    QString rValue;
 
-    rValue.append("<b>V1.0.7:</b>(03.03.2018)<br>");
-    rValue.append("- Statistic hinzugefügt<br>");
-    rValue.append("- Icons in Drawer und Übersicht überarbeitet<br>");
-    rValue.append("- Easteregg versteckt<br>");
-    rValue.append("- Infos über eigene Karte und Reservierung in der Übersicht<br>");
+//    rValue.append("<b>V1.0.7:</b>(03.03.2018)<br>");
+//    rValue.append("- Statistic hinzugefügt<br>");
+//    rValue.append("- Icons in Drawer und Übersicht überarbeitet<br>");
+//    rValue.append("- Easteregg versteckt<br>");
+//    rValue.append("- Infos über eigene Karte und Reservierung in der Übersicht<br>");
 
-    rValue.append("<br><b>V1.0.6:</b>(08.02.2018)<br>");
-    rValue.append("- Infos über Fahrt in der Übersicht<br>");
-    rValue.append("- Icons überarbeitet<br>");
-    rValue.append("- Spiel als Favorit markieren<br>");
+//    rValue.append("<br><b>V1.0.6:</b>(08.02.2018)<br>");
+//    rValue.append("- Infos über Fahrt in der Übersicht<br>");
+//    rValue.append("- Icons überarbeitet<br>");
+//    rValue.append("- Spiel als Favorit markieren<br>");
 
-    rValue.append("<br><b>V1.0.5:</b>(16.12.2017)<br>");
-    rValue.append("- Infos über letzte Neuigkeiten markieren<br>");
-    rValue.append("- Framework Version aktualisiert<br>");
-    rValue.append("- Fahrt bei Auswärtsspiel hinzugefügt<br>");
-    rValue.append("- Versionsupdate über Liste<br>");
+//    rValue.append("<br><b>V1.0.5:</b>(16.12.2017)<br>");
+//    rValue.append("- Infos über letzte Neuigkeiten markieren<br>");
+//    rValue.append("- Framework Version aktualisiert<br>");
+//    rValue.append("- Fahrt bei Auswärtsspiel hinzugefügt<br>");
+//    rValue.append("- Versionsupdate über Liste<br>");
 
-    rValue.append("<br><b>V1.0.4:</b>(24.10.2017)<br>");
-    rValue.append("- Fanclub Nachrichten (Mitglieder)<br>");
-    rValue.append("- neue Benachrichtigung \"Erster Auswärtsfahrer\" & \"Fanclub Nachricht\"<br>");
-    rValue.append("- Schrift änderbar (Android)<br>");
-    rValue.append("- Verbindungsfehler beim Start behoben<br>");
+//    rValue.append("<br><b>V1.0.4:</b>(24.10.2017)<br>");
+//    rValue.append("- Fanclub Nachrichten (Mitglieder)<br>");
+//    rValue.append("- neue Benachrichtigung \"Erster Auswärtsfahrer\" & \"Fanclub Nachricht\"<br>");
+//    rValue.append("- Schrift änderbar (Android)<br>");
+//    rValue.append("- Verbindungsfehler beim Start behoben<br>");
 
-    rValue.append("<br><b>V1.0.3:</b>(25.08.2017)<br>");
-    rValue.append("- Push Notifications (Android)<br>");
-    rValue.append("- Schrift änderbar (Windows)<br>");
-    rValue.append("- Infos über Ort bei Spieltagstickets<br>");
-    rValue.append("- Optische Anpassungen<br>");
+//    rValue.append("<br><b>V1.0.3:</b>(25.08.2017)<br>");
+//    rValue.append("- Push Notifications (Android)<br>");
+//    rValue.append("- Schrift änderbar (Windows)<br>");
+//    rValue.append("- Infos über Ort bei Spieltagstickets<br>");
+//    rValue.append("- Optische Anpassungen<br>");
 
-    rValue.append("<br><b>V1.0.2:</b>(31.07.2017)<br>");
-    rValue.append("- Spielterminierung hinzugefügt<br>");
-    rValue.append("- Spielliste in Aktuell/Vergangenheit aufgeteilt<br>");
-    rValue.append("- Daten nur nach Bedarf vom Server laden<br>");
-    rValue.append("- Fehler beseitigt (Einstellungen/Tickets/etc..)<br>");
+//    rValue.append("<br><b>V1.0.2:</b>(31.07.2017)<br>");
+//    rValue.append("- Spielterminierung hinzugefügt<br>");
+//    rValue.append("- Spielliste in Aktuell/Vergangenheit aufgeteilt<br>");
+//    rValue.append("- Daten nur nach Bedarf vom Server laden<br>");
+//    rValue.append("- Fehler beseitigt (Einstellungen/Tickets/etc..)<br>");
 
-    rValue.append("<br><b>V1.0.1:</b>(17.07.2017)<br>");
-    rValue.append("- Mehr Informationen in der Spielübersicht<br>");
-    rValue.append("- automatisches Laden der Spielinformationen<br>");
-    rValue.append("- Dauerkarten editierbar<br>");
-    rValue.append("- Passwörter vollständig gehasht<br>");
-    rValue.append("- Versionshistorie hinzugefügt<br>");
-    rValue.append("- Diverse Fehler beseitigt<br>");
+//    rValue.append("<br><b>V1.0.1:</b>(17.07.2017)<br>");
+//    rValue.append("- Mehr Informationen in der Spielübersicht<br>");
+//    rValue.append("- automatisches Laden der Spielinformationen<br>");
+//    rValue.append("- Dauerkarten editierbar<br>");
+//    rValue.append("- Passwörter vollständig gehasht<br>");
+//    rValue.append("- Versionshistorie hinzugefügt<br>");
+//    rValue.append("- Diverse Fehler beseitigt<br>");
 
-    rValue.append("<br><b>V1.0.0:</b>(30.06.2017)<br>");
-    rValue.append("Erste Version<br>");
+//    rValue.append("<br><b>V1.0.0:</b>(30.06.2017)<br>");
+//    rValue.append("Erste Version<br>");
 
-    if (this->m_lastShownVersion != STAM_ORGA_VERSION_S) {
-        this->m_lastShownVersion = STAM_ORGA_VERSION_S;
+//    if (this->m_lastShownVersion != STAM_ORGA_VERSION_S) {
+//        this->m_lastShownVersion = STAM_ORGA_VERSION_S;
 
-        QMutexLocker lock(&this->m_pGlobalData->m_mutexUser);
+//        QMutexLocker lock(&this->m_pGlobalData->m_mutexUser);
 
-        this->m_pGlobalData->m_pMainUserSettings->beginGroup("GLOBAL_SETTINGS");
-        this->m_pGlobalData->m_pMainUserSettings->setValue("LastShownVersion", this->m_lastShownVersion);
-        this->m_pGlobalData->m_pMainUserSettings->endGroup();
-    }
+//        this->m_pGlobalData->m_pMainUserSettings->beginGroup("GLOBAL_SETTINGS");
+//        this->m_pGlobalData->m_pMainUserSettings->setValue("LastShownVersion", this->m_lastShownVersion);
+//        this->m_pGlobalData->m_pMainUserSettings->endGroup();
+//    }
 
-    return rValue;
-}
+//    return rValue;
+//}
 
-bool GlobalSettings::isVersionChangeAlreadyShown()
-{
-    if (this->m_lastShownVersion == STAM_ORGA_VERSION_S)
-        return true;
+//bool GlobalSettings::isVersionChangeAlreadyShown()
+//{
+//    if (this->m_lastShownVersion == STAM_ORGA_VERSION_S)
+//        return true;
 
-    return false;
-}
+//    return false;
+//}
 
 /* Under Android it takes too long to register for app changed at first start, so call it */
-void GlobalSettings::checkNewStateChangedAtStart()
-{
-    this->stateFromAppChanged(QGuiApplication::applicationState());
-}
+//void GlobalSettings::checkNewStateChangedAtStart()
+//{
+//    this->stateFromAppChanged(QGuiApplication::applicationState());
+//}
 
-void GlobalSettings::stateFromAppChanged(Qt::ApplicationState state)
-{
-    if (state != Qt::ApplicationState::ApplicationActive)
-        return;
+//void GlobalSettings::stateFromAppChanged(Qt::ApplicationState state)
+//{
 
-    if (!this->loadGameInfo())
-        return;
+//    qDebug() << "State Change";
 
-    if (this->m_pGlobalData->userName() == "" || this->m_pGlobalData->passWord() == "")
-        return;
+//    if (state != Qt::ApplicationState::ApplicationActive)
+//        return;
 
-    qint64 now = QDateTime::currentMSecsSinceEpoch();
-    if ((now - this->m_lastGameInfoUpdate) < TIMEOUT_LOAD_GAMEINFO)
-        return;
+//    if (!this->loadGameInfo())
+//        return;
 
-    if ((now - this->m_pGlobalData->m_gpLastLocalUpdateTimeStamp) < TIMEOUT_LOAD_GAMES)
-        emit this->sendAppStateChangedToActive(1);
-    else
-        emit this->sendAppStateChangedToActive(2);
+//    if (this->m_pGlobalData->userName() == "" || this->m_pGlobalData->passWord() == "")
+//        return;
 
-    this->m_lastGameInfoUpdate = now;
-}
+//    qint64 now = QDateTime::currentMSecsSinceEpoch();
+//    if ((now - this->m_lastGameInfoUpdate) < TIMEOUT_LOAD_GAMEINFO)
+//        return;
+
+//    if ((now - this->m_pGlobalData->m_gpLastLocalUpdateTimeStamp) < TIMEOUT_LOAD_GAMES)
+//        emit this->sendAppStateChangedToActive(1);
+//    else
+//        emit this->sendAppStateChangedToActive(2);
+
+//    this->m_lastGameInfoUpdate = now;
+//}
 
 #define NOT_OFFSET_NEWAPPV 0
 #define NOT_OFFSET_NEWMEET 1
