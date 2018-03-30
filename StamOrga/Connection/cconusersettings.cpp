@@ -37,6 +37,8 @@
 #define USER_SALT       "Salt"
 #define USER_READABLE   "ReadableName"
 
+#define USER_IS_ENABLED(val) ((this->m_userProperties & val) > 0 ? true : false)
+
 // clang-format on
 
 
@@ -168,7 +170,7 @@ void cConUserSettings::setUserProperties(const quint32 userProperties)
     //    }
 }
 
-qint32 cConUserSettings::startGettingUserProps()
+qint32 cConUserSettings::startGettingUserProps(const bool loadEverything)
 {
     QJsonObject rootObj;
     rootObj.insert("guid", g_DatAppInfoManager.getCurrentAppGUID());
@@ -180,6 +182,7 @@ qint32 cConUserSettings::startGettingUserProps()
 #elif defined(Q_OS_IOS)
     rootObj.insert("os", 3);
 #endif
+    rootObj.insert("loadAll", loadEverything);
 
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_GET_USER_PROPS);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
@@ -197,8 +200,6 @@ qint32 cConUserSettings::handleUserPropsResponse(MessageProtocol* msg)
     qint32  index        = rootObj.value("index").toInt(-1);
     quint32 properties   = (quint32)rootObj.value("property").toDouble(0);
     QString readableName = rootObj.value("readableName").toString();
-
-    //    qInfo().noquote() << rootObj.value("tickets");
 
     this->setUserIndex(index);
     this->setReadableName(readableName);
@@ -267,7 +268,7 @@ qint32 cConUserSettings::startUpdatePassword(QString password)
     if (password.length() > 0)
         newPassWord = this->createHashValue(password, this->getSalt());
     else
-        newPassWord = this->m_newPassWord;
+        newPassWord             = this->m_newPassWord;
     QString     currentPassWord = this->createHashValue(this->getPassWord(), this->m_currentRandomValue);
     QJsonObject rootObj;
     rootObj.insert("new", newPassWord);
@@ -302,6 +303,27 @@ QString cConUserSettings::createHashValue(const QString first, const QString sec
     this->m_hash->addData(tmp.constData(), tmp.length());
 
     return QString(this->m_hash->result());
+}
+
+bool cConUserSettings::userIsDebugEnabled()
+{
+    return USER_IS_ENABLED(USER_ENABLE_LOG);
+}
+bool cConUserSettings::userIsGameAddingEnabled()
+{
+    return USER_IS_ENABLED(USER_ENABLE_ADD_GAME);
+}
+bool cConUserSettings::userIsGameFixedTimeEnabled()
+{
+    return USER_IS_ENABLED(USER_ENABLE_FIXED_GAME_TIME);
+}
+bool cConUserSettings::userIsFanclubEnabled()
+{
+    return USER_IS_ENABLED(USER_ENABLE_FANCLUB);
+}
+bool cConUserSettings::userIsFanclubEditEnabled()
+{
+    return USER_IS_ENABLED(USER_ENABLE_FANCLUB_EDIT);
 }
 
 cConUserSettings::~cConUserSettings()

@@ -148,6 +148,7 @@ ApplicationWindow {
                                    title: "Benutzerprofil",
                                    element: viewUserLogin,
                                    link: "",
+                                   event: 0,
                                    toolButtonImgSource: "images/menu.png",
                                    listImgSource : "images/account.png"
                                })
@@ -367,7 +368,7 @@ ApplicationWindow {
             if (result > 0 && !userInt.isDebuggingEnabled()) {
                 if (!isLoggingWindowShown) {
                     isLoggingWindowShown = true;
-                    if (globalUserData.userIsDebugEnabled()) {
+                    if (gConUserSettings.userIsDebugEnabled()) {
                         listViewListModel.append({
                                                 title: "Logging",
                                                 element: viewLoggingPage,
@@ -378,7 +379,7 @@ ApplicationWindow {
                 }
                 if (!isFanclubNewsWindowShown) {
                     isFanclubNewsWindowShown = true;
-                    if (globalUserData.userIsFanclubEnabled()) {
+                    if (gConUserSettings.userIsFanclubEnabled()) {
                         listViewListModel.insert(2, {
                                                 title: "Fanclub",
                                                 element: viewFanclubNewList,
@@ -390,7 +391,7 @@ ApplicationWindow {
                 }
             }
             if (stackView.currentItem === viewMainGames) {
-                if (globalUserData.userIsGameAddingEnabled() || userInt.isDebuggingEnabled())
+                if (gConUserSettings.userIsGameAddingEnabled() || userInt.isDebuggingEnabled())
                     updateHeaderFromMain("StamOrga", "images/add.png")
                 else
                     updateHeaderFromMain("StamOrga", "")
@@ -421,7 +422,7 @@ ApplicationWindow {
         }
         onNotifyGamesListFinished: viewMainGames.notifyUserIntGamesListFinished(result)
         onNotifyGamesInfoListFinished: viewMainGames.notifyUserIntGamesInfoListFinished(result);
-        onNotifySetGamesFixedTimeFinished: viewMainGames.notifySetGamesFixedTimeFinished(result);
+//        onNotifySetGamesFixedTimeFinished: viewMainGames.notifySetGamesFixedTimeFinished(result);
         onNotifyChangedGameFinished: stackView.currentItem.notifyGameChangedFinished(result);
 
         onNotifySeasonTicketAddFinished: stackView.currentItem.notifyUserIntSeasonTicketAdd(result)
@@ -452,9 +453,9 @@ ApplicationWindow {
 //       onSendAppStateChangedToActive: {
 //           viewMainGames.showLoadingGameInfos("Lade Spielinfos", true)
 //           if (value === 1)
-//               userInt.startListGettingGamesInfo();
+//                gDataGamesManager.startListGamesInfo();
 //           else if (value === 2)
-//               userInt.startListGettingGames();
+//                gDataGamesManager.startListGames();
 //       }
 //    }
 

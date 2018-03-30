@@ -96,7 +96,7 @@ Flickable {
     property bool isViewAlreadyOpened: false
     function pageOpenedUpdateView() {
 
-        if (globalUserData.userIsFanclubEditEnabled() ||  userInt.isDebuggingEnabled())
+        if (gConUserSettings.userIsFanclubEditEnabled() ||  userInt.isDebuggingEnabled())
             updateHeaderFromMain("Fanclub", "images/add.png")
         else
             updateHeaderFromMain("Fanclub", "")
@@ -108,7 +108,7 @@ Flickable {
     }
 
     function toolButtonClicked() {
-        if (!globalUserData.userIsFanclubEditEnabled() &&  !userInt.isDebuggingEnabled())
+        if (!gConUserSettings.userIsFanclubEditEnabled() &&  !userInt.isDebuggingEnabled())
             return;
 
         var component = Qt.createComponent("../pages/FanclubNewsItem.qml")
@@ -198,7 +198,7 @@ Flickable {
                 }
             }
             onPressAndHold: {
-                if (!globalUserData.userIsFanclubEditEnabled() &&  !userInt.isDebuggingEnabled())
+                if (!gConUserSettings.userIsFanclubEditEnabled() &&  !userInt.isDebuggingEnabled())
                     return;
 
                 m_newsItemEditIndex = sender.index;

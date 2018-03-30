@@ -78,13 +78,13 @@ Flickable {
                 TextField {
                     id: txtUserName
                     font.family: txtForFontFamily.font
-                    text: globalUserData.userName
+                    text: gConUserSettings.userName
                     padding: 10
                     implicitWidth: parent.width / 3 * 2
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     onTextChanged: {
                         globalUserData.bIsConnected = false;
-                        if (text != globalUserData.userName) {
+                        if (text != gConUserSettings.userName) {
                             txtPassWord.text = "";
                         }
                     }
@@ -300,7 +300,7 @@ Flickable {
     }
 
     function pageOpenedUpdateView() {
-        if (globalUserData.userName === "" || globalUserData.passWord === "")
+        if (gConUserSettings.userName === "" || globalUserData.passWord === "")
             updateUserColumnView(true);
         else
             updateUserColumnView(false);

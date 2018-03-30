@@ -245,7 +245,7 @@ Item {
     function notifyGetFanclubNewsItemFinished(result){
 
         if (result === 1) {
-            if (globalUserData.userIsFanclubEditEnabled() ||  userIntCurrentNews.isDebuggingEnabled())
+            if (gConUserSettings.userIsFanclubEditEnabled() ||  userIntCurrentNews.isDebuggingEnabled())
                 updateHeaderFromMain("Nachricht", "images/edit.png")
 
             toastManager.show("Nachricht erfolgreich geladen", 2000);

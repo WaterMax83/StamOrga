@@ -36,18 +36,9 @@ public:
 
     Q_INVOKABLE qint32 startSetUserEvents(qint64 eventID, qint32 status);
 
-    Q_INVOKABLE qint32 startListGettingGames();
-
-    Q_INVOKABLE qint32 startListGettingGamesInfo();
-
-    Q_INVOKABLE qint32 startSetFixedGameTime(const quint32 gameIndex, const quint32 fixed);
-
     Q_INVOKABLE qint32 startRequestAvailableTickets(quint32 gameIndex);
 
     Q_INVOKABLE qint32 startChangeAvailableTicketState(quint32 ticketIndex, quint32 gameIndex, quint32 state, QString name = "");
-
-    Q_INVOKABLE qint32 startChangeGame(const quint32 index, const quint32 sIndex, const QString competition,
-                                       const QString home, const QString away, const QString date, const QString score);
 
     Q_INVOKABLE qint32 startSaveMeetingInfo(const quint32 gameIndex, const QString when, const QString where, const QString info,
                                             const quint32 type);
@@ -89,7 +80,7 @@ signals:
     void notifyUpdateReadableNameRequest(qint32 result);
     void notifyGamesListFinished(qint32 result);
     void notifyGamesInfoListFinished(qint32 result);
-    void notifySetGamesFixedTimeFinished(qint32 result);
+    //    void notifySetGamesFixedTimeFinished(qint32 result);
     void notifySeasonTicketAddFinished(qint32 result);
     void notifySeasonTicketRemoveFinished(qint32 result);
     void notifySeasonTicketEditFinished(qint32 result);

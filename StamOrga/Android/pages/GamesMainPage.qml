@@ -165,7 +165,7 @@ Page {
 
     function toolButtonClicked() {
 
-        if (globalUserData.userIsGameAddingEnabled() || userIntGames.isDebuggingEnabled()) {
+        if (gConUserSettings.userIsGameAddingEnabled() || userIntGames.isDebuggingEnabled()) {
             var component = Qt.createComponent("../components/ChangeGameDialog.qml");
             if (component.status === Component.Ready) {
                 var dialog = component.createObject(mainItemGamesMainPage,{popupType: 1});
@@ -179,6 +179,7 @@ Page {
                 dialog.competitionIndex = 2;
                 dialog.date = "";
                 dialog.index = 0;
+                dialog.fixedTime = false;
                 dialog.font.family= txtForFontFamily.font
                 dialog.acceptedDialog.connect(acceptedAddGameDialog);
                 addGameDialog = dialog
@@ -192,19 +193,16 @@ Page {
     }
 
     function startEditGame(dialog) {
-        var result = userIntGames.startChangeGame(dialog.index, dialog.seasonIndex,
+        var result = gDataGamesManager.startChangeGame(dialog.index, dialog.seasonIndex,
                                                   dialog.competition, dialog.homeTeam.trim(),
                                                   dialog.awayTeam.trim(), dialog.date.trim(),
-                                                  dialog.score.trim());
+                                                  dialog.score.trim(), dialog.fixedTime);
         if (result !== 1) {
             toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
-//            busyIndicatorGames.loadingVisible = true
             if (changeGameDialog.index === 0) {
-//                busyIndicatorGames.infoText = "Füge Spiel hinzu"
                 showLoadingGameInfos("Füge Spiel hinzu", true);
             }
             else {
-//                busyIndicatorGames.infoText = "Ändere Spiel"
                 showLoadingGameInfos("Ändere Spiel", true);
             }
         }
@@ -217,13 +215,17 @@ Page {
             toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
             showLoadingGameInfos("", false);
             showListedGames()
+        } else {
+            gDataGamesManager.startListGamesInfo();
         }
+
     }
 
     function notifyUserIntGamesInfoListFinished(result) {
         showLoadingGameInfos("", false);
         if (result === 1) {
             toastManager.show("Spiele geladen", 2000)
+            showListedGames()
         }
         else{
             toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
@@ -246,7 +248,7 @@ Page {
     function notifyGameChangedFinished(result) {
         if (result === 1) {
             showLoadingGameInfos("Lade Spielinfos", true)
-            userIntGames.startListGettingGames()
+            gDataGamesManager.startListGames();
             gamesListPagePresent.cleanGameLayout();
             gamesListPagePast.cleanGameLayout();
         }
@@ -254,20 +256,20 @@ Page {
             toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
     }
 
-    function notifySetGamesFixedTimeFinished(result) {
-        if (result === 1) {
-            showLoadingGameInfos("Lade Spielinfos", true)
-            userIntGames.startListGettingGames()
-            gamesListPagePresent.cleanGameLayout();
-            gamesListPagePast.cleanGameLayout();
-        }
-        else
-            toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
-    }
+//    function notifySetGamesFixedTimeFinished(result) {
+//        if (result === 1) {
+//            showLoadingGameInfos("Lade Spielinfos", true)
+//            gDataGamesManager.startListGames();
+//            gamesListPagePresent.cleanGameLayout();
+//            gamesListPagePast.cleanGameLayout();
+//        }
+//        else
+//            toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
+//    }
 
     function pageOpenedUpdateView() {
 
-        if (globalUserData.userIsGameAddingEnabled() || userIntGames.isDebuggingEnabled())
+        if (gConUserSettings.userIsGameAddingEnabled() || userIntGames.isDebuggingEnabled())
             updateHeaderFromMain("StamOrga", "images/add.png")
         else
             updateHeaderFromMain("StamOrga", "")

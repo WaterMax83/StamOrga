@@ -132,8 +132,8 @@ void GlobalSettings::updatePushNotification()
         PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_AWAY_ACCEPT);
 
     if (this->m_alreadyConnected && this->isNotificationFanclubNewsEnabled()) {
-        if (this->m_pGlobalData->userIsFanclubEnabled())
-            PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_FANCLUB_NEWS);
+        //        if (this->m_pGlobalData->userIsFanclubEnabled())
+        //            PushNotificationInformationHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_FANCLUB_NEWS);
     } else
         PushNotificationInformationHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_FANCLUB_NEWS);
 

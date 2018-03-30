@@ -24,6 +24,7 @@
 #include "../Manager/cnewsdatamanager.h"
 #include "ccontcpmaindata.h"
 #include "../Manager/cstatisticmanager.h"
+#include "../Manager/cgamesmanager.h"
 
 cConTcpDataServer::cConTcpDataServer()
     : BackgroundWorker()
@@ -205,6 +206,16 @@ MessageProtocol* cConTcpDataServer::checkNewMessage(MessageProtocol* msg)
             break;
         case OP_CODE_CMD_REQ::REQ_REMOVE_TICKET:
             ack = g_TicketManager.getSeasonTicketRemoveRequest(this->m_pUserConData, msg);
+            break;
+
+        case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
+            ack = g_GamesManager.getGamesList(this->m_pUserConData, msg);
+            break;
+        case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST:
+            ack = g_GamesManager.getGamesInfoList(this->m_pUserConData, msg);
+            break;
+        case OP_CODE_CMD_REQ::REQ_CHANGE_GAME:
+            ack = g_GamesManager.getChangeGameRequest(this->m_pUserConData, msg);
             break;
 
         case OP_CODE_CMD_REQ::REQ_GET_NEWS_DATA_LIST:

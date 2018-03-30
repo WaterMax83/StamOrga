@@ -39,7 +39,7 @@ Flickable {
     onDragEnded: {
         if (flickableGames.contentY < -100) {
             showInfoHeader("Lade Spielinfos")
-            userIntGames.startListGettingGames()
+            gDataGamesManager.startListGames();
             cleanGameLayout();
         }
     }
@@ -150,12 +150,12 @@ Flickable {
                 menuItemEditGame.visible = false;
                 menuItemFixedGameTime.visible = false;
                 menuItemNotFixedGameTime.visible = false;
-                if (globalUserData.userIsGameAddingEnabled() || userIntGames.isDebuggingEnabled()) {
+                if (gConUserSettings.userIsGameAddingEnabled() || userIntGames.isDebuggingEnabled()) {
                     menuItemEditGame.visible = true;
                     openCounter++;
                 }
 
-                if (globalUserData.userIsGameFixedTimeEnabled() && !sender.isGameInPast()) {
+                if ((gConUserSettings.userIsGameFixedTimeEnabled() || userIntGames.isDebuggingEnabled()) && !sender.isGameInPast()) {
                     if(sender.timeFixed)
                         menuItemNotFixedGameTime.visible = true;
                     else
@@ -206,6 +206,7 @@ Flickable {
                     dialog.seasonIndex = menuSender.seasonIndex;
                     dialog.date = menuSender.timestamp;
                     dialog.index = menuSender.index;
+                    dialog.fixedTime = menuSender.timeFixed;
                     dialog.font.family= txtForFontFamily.font
                     dialog.acceptedDialog.connect(acceptedChangeGameDialog);
                     changeGameDialog = dialog
@@ -219,7 +220,10 @@ Flickable {
             font.family: txtForFontFamily.font
             height: visible ? implicitHeight : 0
             text: "Spiel fest terminieren"
-            onClicked: userIntGames.startSetFixedGameTime(menuSender.index, 1)
+            onClicked: gDataGamesManager.startChangeGame(menuSender.index, menuSender.seasonIndex,
+                                                         menuSender.competition, menuSender.home,
+                                                         menuSender.away, menuSender.timestamp,
+                                                         menuSender.score, true);
         }
 
         MenuItem {
@@ -227,7 +231,10 @@ Flickable {
             font.family: txtForFontFamily.font
             height: visible ? implicitHeight : 0
             text: "Spiel nicht fest terminieren"
-            onClicked: userIntGames.startSetFixedGameTime(menuSender.index, 0)
+            onClicked: gDataGamesManager.startChangeGame(menuSender.index, menuSender.seasonIndex,
+                                                         menuSender.competition, menuSender.home,
+                                                         menuSender.away, menuSender.timestamp,
+                                                         menuSender.score, false);
         }
     }
 

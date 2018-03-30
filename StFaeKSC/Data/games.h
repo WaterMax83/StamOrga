@@ -36,12 +36,12 @@ public:
     quint16          m_saison;
     QString          m_score;
     qint64           m_lastUpdate;
-    quint32          m_scheduled;
+    qint32             m_scheduled;
 
     GamesPlay(QString home, QString away, qint64 timestamp,
               quint8 sIndex, QString score, CompetitionIndex comp,
               quint16 saison, quint32 index, qint64 lastUpdate,
-              quint32 scheduled)
+              qint32 scheduled)
     {
         this->m_itemName  = home;
         this->m_index     = index;
@@ -78,7 +78,7 @@ public:
                    quint16 season = 0, qint64 lastUpdate = 0);
     int showAllGames(const bool showUpdate);
 
-    int changeScheduledValue(const quint32 gameIndex, const quint32 fixedTime);
+    int changeScheduledValue(const quint32 gameIndex, const qint32 fixedTime);
 
 
     GamesPlay* gameExists(quint8 sIndex, CompetitionIndex comp, quint16 saison, qint64 timestamp);

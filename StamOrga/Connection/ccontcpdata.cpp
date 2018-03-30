@@ -23,6 +23,7 @@
 #include "../Common/General/globalfunctions.h"
 #include "../Common/General/globaltiming.h"
 #include "../Common/Network/messagecommand.h"
+#include "../Data/cdatagamesmanager.h"
 #include "../Data/cdatanewsdatamanager.h"
 #include "../Data/cdatastatisticmanager.h"
 #include "../Data/cdataticketmanager.h"
@@ -179,13 +180,17 @@ void cConTcpData::checkNewOncomingData()
             request->m_result = g_ConUserSettings.handleUpdateReadableNameResponse(msg);
             break;
 
-        //        case OP_CODE_CMD_RES::ACK_GET_GAMES_LIST:
-        //            request.m_result = this->m_pDataHandle->getHandleGamesListResponse(msg);
-        //            break;
+        case OP_CODE_CMD_RES::ACK_GET_GAMES_LIST:
+            request->m_result = g_DataGamesManager.handleListGamesResponse(msg);
+            break;
 
-        //        case OP_CODE_CMD_RES::ACK_GET_GAMES_INFO_LIST:
-        //            request.m_result = this->m_pDataHandle->getHandleGamesInfoListResponse(msg);
-        //            break;
+        case OP_CODE_CMD_RES::ACK_GET_GAMES_INFO_LIST:
+            request->m_result = g_DataGamesManager.handleListGamesInfoResponse(msg);
+            break;
+
+        case OP_CODE_CMD_RES::ACK_CHANGE_GAME:
+            request->m_result = g_DataGamesManager.handleChangeGameResponse(msg);
+            break;
 
         //        case OP_CODE_CMD_RES::ACK_SET_FIXED_GAME_TIME:
         //                    request.m_result = msg->getIntData();
@@ -209,10 +214,6 @@ void cConTcpData::checkNewOncomingData()
 
         //        case OP_CODE_CMD_RES::ACK_GET_AVAILABLE_TICKETS:
         //            request.m_result = this->m_pDataHandle->getHandleAvailableTicketListResponse(msg, request.m_lData.at(0).toUInt());
-        //            break;
-
-        //        case OP_CODE_CMD_RES::ACK_CHANGE_GAME:
-        //            request.m_result = msg->getIntData();
         //            break;
 
         //        case OP_CODE_CMD_RES::ACK_CHANGE_MEETING_INFO:
@@ -287,48 +288,6 @@ void cConTcpData::checkNewOncomingData()
 //    this->sendMessageRequest(&msg, request);
 //}
 
-
-//void cConTcpData::startSendGamesListRequest(DataConRequest request)
-//{
-//    quint32 data[3];
-//    qint64  timeStamp = this->m_pGlobalData->getGamePlayLastLocalUpdate();
-
-//    if (timeStamp + TIMEOUT_UPDATE_GAMES > QDateTime::currentMSecsSinceEpoch() && this->m_pGlobalData->getGamePlayLength() > 0)
-//        data[0] = qToLittleEndian(UpdateIndex::UpdateDiff);
-//    else
-//        data[0] = qToLittleEndian(UpdateIndex::UpdateAll);
-//    timeStamp = qToLittleEndian(this->m_pGlobalData->getGamePlayLastServerUpdate());
-//    memcpy(&data[1], &timeStamp, sizeof(qint64));
-
-//    MessageProtocol msg(request.m_request, (char*)(&data[0]), sizeof(quint32) * 3);
-//    this->sendMessageRequest(&msg, request);
-//}
-
-//void cConTcpData::startSendGamesInfoListRequest(DataConRequest request)
-//{
-//    quint32 data[2];
-//    qint64  timeStamp = qToLittleEndian(this->m_pGlobalData->getGamePlayLastServerUpdate());
-//    memcpy(&data[0], &timeStamp, sizeof(qint64));
-//    MessageProtocol msg(request.m_request, (char*)&data[0], 8);
-//    this->sendMessageRequest(&msg, request);
-//}
-
-//void cConTcpData::startSendSetGameTimeFixedRequest(DataConRequest request)
-//{
-//    quint32 data[2];
-//    data[0] = request.m_lData.at(0).toUInt();
-//    data[1] = request.m_lData.at(1).toUInt();
-//    MessageProtocol msg(request.m_request, (char*)&data[0], 8);
-//    this->sendMessageRequest(&msg, request);
-//}
-
-//void cConTcpData::startSendRemoveSeasonTicket(DataConRequest request)
-//{
-//    quint32         index = request.m_lData.at(0).toUInt();
-//    MessageProtocol msg(request.m_request, index);
-//    this->sendMessageRequest(&msg, request);
-//}
-
 //void cConTcpData::startSendChangeTicketState(DataConRequest request)
 //{
 //    QByteArray  seasonTicket;
@@ -354,16 +313,6 @@ void cConTcpData::checkNewOncomingData()
 //    memcpy(&data[1], &timeStamp, sizeof(qint64));
 
 //    MessageProtocol msg(request.m_request, (char*)(&data[0]), sizeof(quint32) * 3);
-//    this->sendMessageRequest(&msg, request);
-//}
-
-//void cConTcpData::startSendChangeGameRequest(DataConRequest request)
-//{
-//    QByteArray data;
-//    data.append(request.m_lData.at(0));
-//    data.append(char(0x00));
-
-//    MessageProtocol msg(request.m_request, data);
 //    this->sendMessageRequest(&msg, request);
 //}
 
@@ -507,18 +456,6 @@ void cConTcpData::startSendNewRequest(TcpDataConRequest* request)
     //        this->startSendSetUserEventsRequest(request);
     //        break;
 
-    //    case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
-    //        this->startSendGamesListRequest(request);
-    //        break;
-
-    //    case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST:
-    //        this->startSendGamesInfoListRequest(request);
-    //        break;
-
-    //    case OP_CODE_CMD_REQ::REQ_SET_FIXED_GAME_TIME:
-    //        this->startSendSetGameTimeFixedRequest(request);
-    //        break;
-
     //    case OP_CODE_CMD_REQ::REQ_REMOVE_TICKET:
     //        if (request.m_lData.size() > 0)
     //            this->startSendRemoveSeasonTicket(request);
@@ -530,10 +467,6 @@ void cConTcpData::startSendNewRequest(TcpDataConRequest* request)
 
     //    case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS:
     //        this->startSendAvailableTicketListRequest(request);
-    //        break;
-
-    //    case OP_CODE_CMD_REQ::REQ_CHANGE_GAME:
-    //        this->startSendChangeGameRequest(request);
     //        break;
 
     //    case OP_CODE_CMD_REQ::REQ_CHANGE_MEETING_INFO:

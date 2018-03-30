@@ -177,122 +177,176 @@ QString cDataGamesManager::getGamePlayLastLocalUpdateString()
     return QDateTime::fromMSecsSinceEpoch(this->m_stLastLocalUpdateTimeStamp).toString("dd.MM.yy hh:mm:ss");
 }
 
-//qint32 cDataGamesManager::startListSeasonTickets()
-//{
-//    if (!this->m_initialized)
-//        return ERROR_CODE_NOT_INITIALIZED;
+qint32 cDataGamesManager::startListGames()
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
 
-//    QMutexLocker lock(&this->m_mutex);
+    QMutexLocker lock(&this->m_mutex);
 
-//    QJsonObject rootObj;
-//    if (this->m_stLastLocalUpdateTimeStamp + TIMEOUT_UPDATE_TICKETS > QDateTime::currentMSecsSinceEpoch() && this->m_lTickets.count() > 0)
-//        rootObj.insert("index", UpdateIndex::UpdateDiff);
-//    else
-//        rootObj.insert("index", UpdateIndex::UpdateAll);
+    QJsonObject rootObj;
+    if (this->m_stLastLocalUpdateTimeStamp + TIMEOUT_UPDATE_GAMES > QDateTime::currentMSecsSinceEpoch() && this->m_lGames.count() > 0)
+        rootObj.insert("index", UpdateIndex::UpdateDiff);
+    else
+        rootObj.insert("index", UpdateIndex::UpdateAll);
 
-//    rootObj.insert("timestamp", this->m_stLastServerUpdateTimeStamp);
+    rootObj.insert("timestamp", this->m_stLastServerUpdateTimeStamp);
 
-//    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST);
-//    req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST);
+    req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
-//    g_ConManager.sendNewRequest(req);
-//    return ERROR_CODE_SUCCESS;
-//}
+    g_ConManager.sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
+}
 
-//qint32 cDataGamesManager::handleListSeasonTicketsResponse(MessageProtocol* msg)
-//{
-//    if (!this->m_initialized)
-//        return ERROR_CODE_NOT_INITIALIZED;
+qint32 cDataGamesManager::handleListGamesResponse(MessageProtocol* msg)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
 
-//    QByteArray  data(msg->getPointerToData());
-//    QJsonObject rootObj = QJsonDocument::fromJson(data).object();
+    QByteArray  data(msg->getPointerToData());
+    QJsonObject rootObj = QJsonDocument::fromJson(data).object();
 
-//    qint32     result      = rootObj.value("ack").toInt(ERROR_CODE_NOT_FOUND);
-//    qint32     updateIndex = rootObj.value("index").toInt(UpdateAll);
-//    qint64     timestamp   = (qint64)rootObj.value("timestamp").toDouble(0);
-//    QJsonArray arrTickets  = rootObj.value("tickets").toArray();
+    qint32     result      = rootObj.value("ack").toInt(ERROR_CODE_NOT_FOUND);
+    qint32     updateIndex = rootObj.value("index").toInt(UpdateAll);
+    qint64     timestamp   = (qint64)rootObj.value("timestamp").toDouble(0);
+    QJsonArray arrGames    = rootObj.value("games").toArray();
 
-//    this->m_mutex.lock();
+    this->m_mutex.lock();
 
-//    if (updateIndex == UpdateIndex::UpdateAll) {
-//        for (int i = 0; i < this->m_lTickets.size(); i++)
-//            delete this->m_lTickets[i];
-//        this->m_lTickets.clear();
-//    }
-//    this->m_stLastLocalUpdateTimeStamp = QDateTime::currentMSecsSinceEpoch();
+    if (updateIndex == UpdateIndex::UpdateAll) {
+        for (int i = 0; i < this->m_lGames.size(); i++)
+            delete this->m_lGames[i];
+        this->m_lGames.clear();
+    }
+    this->m_stLastLocalUpdateTimeStamp = QDateTime::currentMSecsSinceEpoch();
 
-//    this->m_mutex.unlock();
+    this->m_mutex.unlock();
 
-//    for (int i = 0; i < arrTickets.count(); i++) {
-//        QJsonObject       ticketObj = arrTickets.at(i).toObject();
-//        SeasonTicketItem* pTicket   = new SeasonTicketItem();
+    for (int i = 0; i < arrGames.count(); i++) {
+        QJsonObject gameObj = arrGames.at(i).toObject();
+        GamePlay*   pGame   = new GamePlay();
 
-//        pTicket->setDiscount(ticketObj.value("discount").toInt());
-//        pTicket->setIndex(ticketObj.value("index").toInt());
-//        pTicket->setUserIndex(ticketObj.value("userIndex").toInt());
-//        pTicket->setName(ticketObj.value("name").toString());
-//        pTicket->setPlace(ticketObj.value("place").toString());
-//        pTicket->checkTicketOwn(g_ConUserSettings.getUserIndex());
+        pGame->setHome(gameObj.value("home").toString());
+        pGame->setAway(gameObj.value("away").toString());
+        pGame->setScore(gameObj.value("score").toString());
+        pGame->setIndex(gameObj.value("index").toInt());
+        pGame->setCompetition((CompetitionIndex)gameObj.value("competition").toInt());
+        pGame->setTimeStamp((qint64)gameObj.value("timestamp").toDouble());
+        pGame->setTimeFixed(gameObj.value("fixed").toBool());
+        pGame->setSeasonIndex(gameObj.value("seasonIndex").toInt());
 
-//        QQmlEngine::setObjectOwnership(pTicket, QQmlEngine::CppOwnership);
-//        this->addNewSeasonTicket(pTicket, updateIndex);
-//    }
+        QQmlEngine::setObjectOwnership(pGame, QQmlEngine::CppOwnership);
+        this->addNewGamesPlay(pGame, updateIndex);
+    }
 
-//    QMutexLocker lock(&this->m_mutex);
+    QMutexLocker lock(&this->m_mutex);
 
-//    if (timestamp == this->m_stLastServerUpdateTimeStamp && arrTickets.count() == 0 && updateIndex != UpdateAll) {
-//        if (!g_StaGlobalSettings.getSaveInfosOnApp())
-//            return result;
+    std::sort(this->m_lGames.begin(), this->m_lGames.end(), GamePlay::compareTimeStampFunctionAscending);
 
-//        g_StaSettingsManager.setInt64Value(GAMES_GROUP, LOCAL_GAMES_UDPATE, this->m_stLastLocalUpdateTimeStamp);
-//        return result;
-//    }
+    if (timestamp == this->m_stLastServerUpdateTimeStamp && arrGames.count() == 0 && updateIndex != UpdateAll) {
+        if (!g_StaGlobalSettings.getSaveInfosOnApp())
+            return result;
 
-//    this->m_stLastServerUpdateTimeStamp = timestamp;
+        g_StaSettingsManager.setInt64Value(GAMES_GROUP, LOCAL_GAMES_UDPATE, this->m_stLastLocalUpdateTimeStamp);
+        return result;
+    }
 
-//    if (!g_StaGlobalSettings.getSaveInfosOnApp())
-//        return result;
+    this->m_stLastServerUpdateTimeStamp = timestamp;
 
-//    g_StaSettingsManager.setInt64Value(GAMES_GROUP, LOCAL_GAMES_UDPATE, this->m_stLastLocalUpdateTimeStamp);
-//    g_StaSettingsManager.setInt64Value(GAMES_GROUP, SERVER_GAMES_UDPATE, this->m_stLastServerUpdateTimeStamp);
+    if (!g_StaGlobalSettings.getSaveInfosOnApp())
+        return result;
 
-//    for (int i = 0; i < this->m_lTickets.size(); i++) {
-//        g_StaSettingsManager.setValue(GAMES_GROUP, TICKET_NAME, i, this->m_lTickets[i]->name());
-//        g_StaSettingsManager.setValue(GAMES_GROUP, TICKET_PLACE, i, this->m_lTickets[i]->place());
-//        g_StaSettingsManager.setInt64Value(GAMES_GROUP, TICKET_DISCOUNT, i, this->m_lTickets[i]->discount());
-//        g_StaSettingsManager.setInt64Value(GAMES_GROUP, TICKET_USER_INDEX, i, this->m_lTickets[i]->userIndex());
-//        g_StaSettingsManager.setInt64Value(GAMES_GROUP, ITEM_INDEX, i, this->m_lTickets[i]->index());
-//    }
+    g_StaSettingsManager.setInt64Value(GAMES_GROUP, LOCAL_GAMES_UDPATE, this->m_stLastLocalUpdateTimeStamp);
+    g_StaSettingsManager.setInt64Value(GAMES_GROUP, SERVER_GAMES_UDPATE, this->m_stLastServerUpdateTimeStamp);
 
-//    return result;
-//}
+    for (int i = 0; i < this->m_lGames.size(); i++) {
+        g_StaSettingsManager.setValue(GAMES_GROUP, PLAY_HOME, i, this->m_lGames[i]->home());
+        g_StaSettingsManager.setValue(GAMES_GROUP, PLAY_AWAY, i, this->m_lGames[i]->away());
+        g_StaSettingsManager.setValue(GAMES_GROUP, PLAY_SCORE, i, this->m_lGames[i]->score());
+        g_StaSettingsManager.setInt64Value(GAMES_GROUP, PLAY_DATETIME, i, this->m_lGames[i]->timestamp64Bit());
+        g_StaSettingsManager.setInt64Value(GAMES_GROUP, PLAY_SAISON_INDEX, i, this->m_lGames[i]->seasonIndex());
+        g_StaSettingsManager.setInt64Value(GAMES_GROUP, PLAY_COMPETITION, i, this->m_lGames[i]->competitionValue());
+        g_StaSettingsManager.setBoolValue(GAMES_GROUP, PLAY_TIME_FIXED, i, this->m_lGames[i]->timeFixed());
+        g_StaSettingsManager.setInt64Value(GAMES_GROUP, ITEM_INDEX, i, this->m_lGames[i]->index());
+    }
 
+    return result;
+}
 
-//qint32 cDataGamesManager::startAddSeasonTicket(const qint32 index, const QString name, const QString place, const qint32 discount)
-//{
-//    if (!this->m_initialized)
-//        return ERROR_CODE_NOT_INITIALIZED;
+qint32 cDataGamesManager::startListGamesInfo()
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
 
-//    QJsonObject rootObj;
-//    rootObj.insert("index", index);
-//    rootObj.insert("name", name);
-//    rootObj.insert("place", place);
-//    rootObj.insert("discount", discount);
+    QMutexLocker lock(&this->m_mutex);
 
-//    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_ADD_TICKET);
-//    req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+    QJsonObject rootObj;
+    rootObj.insert("timestamp", this->m_stLastServerUpdateTimeStamp);
 
-//    g_ConManager.sendNewRequest(req);
-//    return ERROR_CODE_SUCCESS;
-//}
+    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST);
+    req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
-//qint32 cDataGamesManager::handleAddSeasonTicketResponse(MessageProtocol* msg)
-//{
-//    if (!this->m_initialized)
-//        return ERROR_CODE_NOT_INITIALIZED;
+    g_ConManager.sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
+}
 
-//    return msg->getIntData();
-//}
+qint32 cDataGamesManager::handleListGamesInfoResponse(MessageProtocol* msg)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QByteArray  data(msg->getPointerToData());
+    QJsonObject rootObj = QJsonDocument::fromJson(data).object();
+
+    qint32 result = rootObj.value("ack").toInt(ERROR_CODE_NOT_FOUND);
+
+    return result;
+}
+
+qint32 cDataGamesManager::startChangeGame(const qint32 index, const qint32 sIndex,
+                                          const QString competition, const QString home,
+                                          const QString away, const QString date,
+                                          const QString score, const bool fixedTime)
+
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    if (sIndex > 38 || competition == "" || home == "" || away == "" || date == "") {
+        qWarning().noquote() << "Standart parameter for changing game are wrong";
+        return ERROR_CODE_WRONG_PARAMETER;
+    }
+    CompetitionIndex compIndex = getCompetitionIndex(competition);
+    if (compIndex == NO_COMPETITION)
+        return ERROR_CODE_WRONG_PARAMETER;
+
+    qint64 timestamp = QDateTime::fromString(date, "dd.MM.yyyy hh:mm").toMSecsSinceEpoch();
+
+    QJsonObject rootObj;
+    rootObj.insert("index", index);
+    rootObj.insert("home", home);
+    rootObj.insert("away", away);
+    rootObj.insert("score", score);
+    rootObj.insert("seasonIndex", sIndex);
+    rootObj.insert("competition", compIndex);
+    rootObj.insert("timestamp", timestamp);
+    rootObj.insert("fixed", fixedTime);
+
+    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CHANGE_GAME);
+    req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+
+    g_ConManager.sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 cDataGamesManager::handleChangeGameResponse(MessageProtocol* msg)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    return msg->getIntData();
+}
 
 //qint32 cDataGamesManager::startRemoveSeasonTicket(const qint32 index)
 //{

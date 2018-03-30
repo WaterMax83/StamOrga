@@ -62,24 +62,6 @@ qint32 UserInterface::startSetUserEvents(qint64 eventID, qint32 status)
     return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
-qint32 UserInterface::startListGettingGames()
-{
-    //    return this->m_pConHandle->startListGettingGames();
-    return ERROR_CODE_NOT_IMPLEMENTED;
-}
-
-qint32 UserInterface::startListGettingGamesInfo()
-{
-    //    return this->m_pConHandle->startListGettingGamesInfo();
-    return ERROR_CODE_NOT_IMPLEMENTED;
-}
-
-qint32 UserInterface::startSetFixedGameTime(const quint32 gameIndex, const quint32 fixed)
-{
-    //    return this->m_pConHandle->startSetFixedGameTime(gameIndex, fixed);
-    return ERROR_CODE_NOT_IMPLEMENTED;
-}
-
 qint32 UserInterface::startChangeAvailableTicketState(quint32 ticketIndex, quint32 gameIndex, quint32 state, QString name)
 {
     //    return this->m_pConHandle->startChangeSeasonTicketState(ticketIndex, gameIndex, state, name);
@@ -89,13 +71,6 @@ qint32 UserInterface::startChangeAvailableTicketState(quint32 ticketIndex, quint
 qint32 UserInterface::startRequestAvailableTickets(quint32 gameIndex)
 {
     //    return this->m_pConHandle->startListAvailableTicket(gameIndex);
-    return ERROR_CODE_NOT_IMPLEMENTED;
-}
-
-qint32 UserInterface::startChangeGame(const quint32 index, const quint32 sIndex, const QString competition,
-                                      const QString home, const QString away, const QString date, const QString score)
-{
-    //    return this->m_pConHandle->startChangeGame(index, sIndex, competition, home, away, date, score);
     return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
@@ -161,9 +136,9 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
         emit this->notifyGamesInfoListFinished(result);
         break;
 
-    case OP_CODE_CMD_REQ::REQ_SET_FIXED_GAME_TIME:
-        emit this->notifySetGamesFixedTimeFinished(result);
-        break;
+    //    case OP_CODE_CMD_REQ::REQ_SET_FIXED_GAME_TIME:
+    //        emit this->notifySetGamesFixedTimeFinished(result);
+    //        break;
 
     case OP_CODE_CMD_REQ::REQ_ADD_TICKET:
         emit this->notifySeasonTicketAddFinished(result);

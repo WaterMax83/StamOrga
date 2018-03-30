@@ -38,6 +38,7 @@ MyComponents.CustomDialog {
     property alias competition : comboBoxCompetition.currentText
     property alias date : inputDate.text
     property var index
+    property var fixedTime
 
 
     signal acceptedDialog()

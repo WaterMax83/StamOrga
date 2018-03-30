@@ -41,13 +41,8 @@ public:
     qint32 startMainConnection(QString name, QString passw);
     //    qint32 startGettingUserEvents();
     //    qint32 startSettingUserEvents(qint64 eventID, qint32 status);
-    //    qint32 startListGettingGames();
-    //    qint32 startListGettingGamesInfo();
-    //    qint32 startSetFixedGameTime(const quint32 gameIndex, const quint32 fixedTime);
     //    qint32 startChangeSeasonTicketState(quint32 tickedIndex, quint32 gameIndex, quint32 state, QString name);
     //    qint32 startListAvailableTicket(quint32 gameIndex);
-    //    qint32 startChangeGame(const quint32 index, const quint32 sIndex, const QString competition,
-    //                           const QString home, const QString away, const QString date, const QString score);
     //    qint32 startSaveMeetingInfo(const quint32 gameIndex, const QString when, const QString where, const QString info,
     //                                const quint32 type);
     //    qint32 startLoadMeetingInfo(const quint32 gameIndex, const quint32 type);

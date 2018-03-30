@@ -233,7 +233,7 @@ int Games::showAllGames(const bool showUpdate)
     return 0;
 }
 
-int Games::changeScheduledValue(const quint32 gameIndex, const quint32 fixedTime)
+int Games::changeScheduledValue(const quint32 gameIndex, const qint32 fixedTime)
 {
     GamesPlay* gPlay = (GamesPlay*)this->getItem(gameIndex);
     if (gPlay == NULL)

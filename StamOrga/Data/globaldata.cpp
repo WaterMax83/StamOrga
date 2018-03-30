@@ -31,14 +31,14 @@
 #define GROUP_ARRAY_ITEM    "item"
 #define ITEM_INDEX          "index"
 
-#define GAMES_GROUP         "GAMES_LIST"
-#define PLAY_HOME           "home"
-#define PLAY_AWAY           "away"
-#define PLAY_DATETIME       "datetime"
-#define PLAY_SAISON_INDEX   "sIndex"
-#define PLAY_SCORE          "score"
-#define PLAY_COMPETITION    "competition"
-#define PLAY_TIME_FIXED     "timeFixed"
+//#define GAMES_GROUP         "GAMES_LIST"
+//#define PLAY_HOME           "home"
+//#define PLAY_AWAY           "away"
+//#define PLAY_DATETIME       "datetime"
+//#define PLAY_SAISON_INDEX   "sIndex"
+//#define PLAY_SCORE          "score"
+//#define PLAY_COMPETITION    "competition"
+//#define PLAY_TIME_FIXED     "timeFixed"
 
 //#define SEASONTICKET_GROUP  "SEASONTICKET_LIST"
 //#define TICKET_NAME         "name"
@@ -203,34 +203,34 @@ void GlobalData::saveCurrentGamesList(qint64 timestamp)
     //        this->m_pMainUserSettings->endGroup();
     //        return;
     //    }
-    this->m_gpLastServerUpdateTimeStamp = timestamp;
+    //    this->m_gpLastServerUpdateTimeStamp = timestamp;
 
-    std::sort(this->m_lGamePlay.begin(), this->m_lGamePlay.end(), GamePlay::compareTimeStampFunctionAscending);
+    //    std::sort(this->m_lGamePlay.begin(), this->m_lGamePlay.end(), GamePlay::compareTimeStampFunctionAscending);
 
     //    if (!g_GlobalSettings->saveInfosOnApp())
     //        return;
 
-    this->m_pMainUserSettings->beginGroup(GAMES_GROUP);
-    this->m_pMainUserSettings->remove(""); // clear all elements
+    //    this->m_pMainUserSettings->beginGroup(GAMES_GROUP);
+    //    this->m_pMainUserSettings->remove(""); // clear all elements
 
-    this->m_pMainUserSettings->setValue("LocalGamesUpdateTime", this->m_gpLastLocalUpdateTimeStamp);
-    this->m_pMainUserSettings->setValue("ServerGamesUpdateTime", this->m_gpLastServerUpdateTimeStamp);
+    //    this->m_pMainUserSettings->setValue("LocalGamesUpdateTime", this->m_gpLastLocalUpdateTimeStamp);
+    //    this->m_pMainUserSettings->setValue("ServerGamesUpdateTime", this->m_gpLastServerUpdateTimeStamp);
 
-    this->m_pMainUserSettings->beginWriteArray(GROUP_ARRAY_ITEM);
-    for (int i = 0; i < this->m_lGamePlay.size(); i++) {
-        this->m_pMainUserSettings->setArrayIndex(i);
-        this->m_pMainUserSettings->setValue(PLAY_HOME, this->m_lGamePlay[i]->home());
-        this->m_pMainUserSettings->setValue(PLAY_AWAY, this->m_lGamePlay[i]->away());
-        this->m_pMainUserSettings->setValue(PLAY_DATETIME, this->m_lGamePlay[i]->timestamp64Bit());
-        this->m_pMainUserSettings->setValue(PLAY_SAISON_INDEX, this->m_lGamePlay[i]->seasonIndex());
-        this->m_pMainUserSettings->setValue(ITEM_INDEX, this->m_lGamePlay[i]->index());
-        this->m_pMainUserSettings->setValue(PLAY_SCORE, this->m_lGamePlay[i]->score());
-        this->m_pMainUserSettings->setValue(PLAY_COMPETITION, this->m_lGamePlay[i]->competitionValue());
-        this->m_pMainUserSettings->setValue(PLAY_TIME_FIXED, this->m_lGamePlay[i]->timeFixed());
-    }
+    //    this->m_pMainUserSettings->beginWriteArray(GROUP_ARRAY_ITEM);
+    //    for (int i = 0; i < this->m_lGamePlay.size(); i++) {
+    //        this->m_pMainUserSettings->setArrayIndex(i);
+    //        this->m_pMainUserSettings->setValue(PLAY_HOME, this->m_lGamePlay[i]->home());
+    //        this->m_pMainUserSettings->setValue(PLAY_AWAY, this->m_lGamePlay[i]->away());
+    //        this->m_pMainUserSettings->setValue(PLAY_DATETIME, this->m_lGamePlay[i]->timestamp64Bit());
+    //        this->m_pMainUserSettings->setValue(PLAY_SAISON_INDEX, this->m_lGamePlay[i]->seasonIndex());
+    //        this->m_pMainUserSettings->setValue(ITEM_INDEX, this->m_lGamePlay[i]->index());
+    //        this->m_pMainUserSettings->setValue(PLAY_SCORE, this->m_lGamePlay[i]->score());
+    //        this->m_pMainUserSettings->setValue(PLAY_COMPETITION, this->m_lGamePlay[i]->competitionValue());
+    //        this->m_pMainUserSettings->setValue(PLAY_TIME_FIXED, this->m_lGamePlay[i]->timeFixed());
+    //    }
 
-    this->m_pMainUserSettings->endArray();
-    this->m_pMainUserSettings->endGroup();
+    //    this->m_pMainUserSettings->endArray();
+    //    this->m_pMainUserSettings->endGroup();
 }
 
 //QString GlobalData::userName()
@@ -795,26 +795,26 @@ void GlobalData::slotNewFcmRegistrationToken(QString token)
 }
 #endif
 
-bool GlobalData::userIsDebugEnabled()
-{
-    return USER_IS_ENABLED(USER_ENABLE_LOG);
-}
-bool GlobalData::userIsGameAddingEnabled()
-{
-    return USER_IS_ENABLED(USER_ENABLE_ADD_GAME);
-}
-bool GlobalData::userIsGameFixedTimeEnabled()
-{
-    return USER_IS_ENABLED(USER_ENABLE_FIXED_GAME_TIME);
-}
-bool GlobalData::userIsFanclubEnabled()
-{
-    return USER_IS_ENABLED(USER_ENABLE_FANCLUB);
-}
-bool GlobalData::userIsFanclubEditEnabled()
-{
-    return USER_IS_ENABLED(USER_ENABLE_FANCLUB_EDIT);
-}
+//bool GlobalData::userIsDebugEnabled()
+//{
+//    return USER_IS_ENABLED(USER_ENABLE_LOG);
+//}
+//bool GlobalData::userIsGameAddingEnabled()
+//{
+//    return USER_IS_ENABLED(USER_ENABLE_ADD_GAME);
+//}
+//bool GlobalData::userIsGameFixedTimeEnabled()
+//{
+//    return USER_IS_ENABLED(USER_ENABLE_FIXED_GAME_TIME);
+//}
+//bool GlobalData::userIsFanclubEnabled()
+//{
+//    return USER_IS_ENABLED(USER_ENABLE_FANCLUB);
+//}
+//bool GlobalData::userIsFanclubEditEnabled()
+//{
+//    return USER_IS_ENABLED(USER_ENABLE_FANCLUB_EDIT);
+//}
 
 //void GlobalData::SetUserProperties(quint32 value)
 //{

@@ -146,7 +146,7 @@ Flickable {
                            dialog.enableNewFreeTicket = notifyFreeTicket;
                            dialog.enableNewAwayAccept = notifyAwayAccept;
                            dialog.enableFanclubNews = notifyFanclubNews;
-                           dialog.visibleFanclubNews = globalUserData.userIsFanclubEnabled();
+                           dialog.visibleFanclubNews = gConUserSettings.userIsFanclubEnabled();
                            dialog.acceptedDialog.connect(acceptedNotificationDialog);
                            dialog.font.family= txtForFontFamily.font
                            notifyDialog = dialog;

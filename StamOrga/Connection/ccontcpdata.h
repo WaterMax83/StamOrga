@@ -82,13 +82,8 @@ private:
 
     //    void startSendGetUserEventsRequest(DataConRequest request);
     //    void startSendSetUserEventsRequest(DataConRequest request);
-    //    void startSendGamesListRequest(DataConRequest request);
-    //    void startSendGamesInfoListRequest(DataConRequest request);
-    //    void startSendSetGameTimeFixedRequest(DataConRequest request);
-    //    void startSendRemoveSeasonTicket(DataConRequest request);
     //    void startSendChangeTicketState(DataConRequest request);
     //    void startSendAvailableTicketListRequest(DataConRequest request);
-    //    void startSendChangeGameRequest(DataConRequest request);
     //    void startSendChangeMeetingInfo(DataConRequest request);
     //    void startSendGetMeetingInfo(DataConRequest request);
     //    void startSendAcceptMeeting(DataConRequest request);

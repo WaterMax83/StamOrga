@@ -25,6 +25,7 @@
 #include "../Common/General/globaltiming.h"
 #include "../Common/Network/messagecommand.h"
 #include "../Common/Network/messageprotocol.h"
+#include "../Data/cdatagamesmanager.h"
 #include "../cstaglobalsettings.h"
 #include "cconmanager.h"
 #include "cconusersettings.h"
@@ -92,29 +93,6 @@ qint32 cConManager::startMainConnection(QString name, QString passw)
 //    return ERROR_CODE_SUCCESS;
 //}
 
-//qint32 cConManager::startListGettingGames()
-//{
-//    DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST);
-//    this->sendNewRequest(req);
-//    return ERROR_CODE_SUCCESS;
-//}
-
-//qint32 cConManager::startListGettingGamesInfo()
-//{
-//    DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST);
-//    this->sendNewRequest(req);
-//    return ERROR_CODE_SUCCESS;
-//}
-
-//qint32 cConManager::startSetFixedGameTime(const quint32 gameIndex, const quint32 fixedTime)
-//{
-//    DataConRequest req(OP_CODE_CMD_REQ::REQ_SET_FIXED_GAME_TIME);
-//    req.m_lData.append(QString::number(gameIndex));
-//    req.m_lData.append(QString::number(fixedTime));
-//    this->sendNewRequest(req);
-//    return ERROR_CODE_SUCCESS;
-//}
-
 //qint32 cConManager::startChangeSeasonTicketState(quint32 tickedIndex, quint32 gameIndex, quint32 state, QString name)
 //{
 //    DataConRequest req(OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET);
@@ -135,31 +113,6 @@ qint32 cConManager::startMainConnection(QString name, QString passw)
 
 //    DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS);
 //    req.m_lData.append(QString::number(gameIndex));
-//    this->sendNewRequest(req);
-//    return ERROR_CODE_SUCCESS;
-//}
-
-//qint32 cConManager::startChangeGame(const quint32 index, const quint32 sIndex,
-//                                           const QString competition, const QString home,
-//                                           const QString away, const QString date,
-//                                           const QString score)
-//{
-//    if (sIndex > 34 || competition == "" || home == "" || away == "" || date == "") {
-//        qWarning().noquote() << "Standart parameter for changing game are wrong";
-//        return ERROR_CODE_WRONG_PARAMETER;
-//    }
-//    if (home.contains(";") || away.contains(";") || date.contains(";")) {
-//        qWarning().noquote() << "String parameter for changing game contain semicolons";
-//        return ERROR_CODE_WRONG_PARAMETER;
-//    }
-
-//    CompetitionIndex compIndex = getCompetitionIndex(competition);
-//    if (compIndex == NO_COMPETITION)
-//        return ERROR_CODE_WRONG_PARAMETER;
-
-//    QString        val = QString("%1;%2;%3;%4;%5;%6;%7").arg(home, away, date, score).arg(index).arg(sIndex).arg(compIndex);
-//    DataConRequest req(OP_CODE_CMD_REQ::REQ_CHANGE_GAME);
-//    req.m_lData.append(val);
 //    this->sendNewRequest(req);
 //    return ERROR_CODE_SUCCESS;
 //}
@@ -215,15 +168,6 @@ qint32 cConManager::startMainConnection(QString name, QString passw)
 //    req.m_lData.append(QString::number(acceptIndex));
 //    req.m_lData.append(name);
 //    req.m_lData.append(QString::number(type));
-//    this->sendNewRequest(req);
-
-//    return ERROR_CODE_SUCCESS;
-//}
-
-//qint32 cConManager::startStatisticsCommand(const QByteArray& command)
-//{
-//    DataConRequest req(OP_CODE_CMD_REQ::REQ_CMD_STATISTIC);
-//    req.m_lData.append(QString(command));
 //    this->sendNewRequest(req);
 
 //    return ERROR_CODE_SUCCESS;
@@ -324,7 +268,7 @@ void cConManager::slotDataConLastRequestFinished(TcpDataConRequest* request)
     case OP_CODE_CMD_REQ::REQ_LOGIN_USER:
         if (request->m_result == ERROR_CODE_SUCCESS) {
             g_StaGlobalSettings.startGettingVersionInfo();
-            g_ConUserSettings.startGettingUserProps();
+            g_ConUserSettings.startGettingUserProps(false);
 
             while (this->m_lRequestConError.size() > 0) {
                 TcpDataConRequest* request = this->m_lRequestConError.last();
@@ -370,26 +314,21 @@ void cConManager::slotDataConLastRequestFinished(TcpDataConRequest* request)
 
     //        break;
 
-    //    case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST: {
+    case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST: {
 
-    //        static quint32 retryGetGamesInfoCount = 0;
-    //        if (request.m_result == ERROR_CODE_UPDATE_LIST) {
-    //            if (retryGetGamesInfoCount < 3) {
-    //                this->startListGettingGames();
-    //                retryGetGamesInfoCount++;
-    //                return;
-    //            }
-    //        }
-    //        this->startGettingUserProps();
-    //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
-    //        retryGetGamesInfoCount = 0;
-    //        break;
-    //    }
-
-    //    case OP_CODE_CMD_REQ::REQ_REMOVE_TICKET:
-    //        this->m_pGlobalData->resetSeasonTicketLastServerUpdate();
-    //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
-    //        break;
+        static quint32 retryGetGamesInfoCount = 0;
+        if (request->m_result == ERROR_CODE_UPDATE_LIST) {
+            if (retryGetGamesInfoCount < 3) {
+                g_DataGamesManager.startListGamesInfo();
+                retryGetGamesInfoCount++;
+                return;
+            }
+        }
+        g_ConUserSettings.startGettingUserProps(true);
+        emit this->signalNotifyCommandFinished(request->m_request, request->m_result);
+        retryGetGamesInfoCount = 0;
+        break;
+    }
 
     //    case OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET:
     //        this->startGettingUserProps();

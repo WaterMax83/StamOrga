@@ -36,7 +36,7 @@
 #include "source/pushnotification.h"
 
 
-#define USER_IS_ENABLED(val) ((this->m_UserProperties & val) > 0 ? true : false)
+//#define USER_IS_ENABLED(val) ((this->m_UserProperties & val) > 0 ? true : false)
 
 class GlobalData : public QObject
 {
@@ -90,11 +90,11 @@ public:
     //        }
     //    }
 
-    Q_INVOKABLE bool userIsDebugEnabled();
-    Q_INVOKABLE bool userIsGameAddingEnabled();
-    Q_INVOKABLE bool userIsGameFixedTimeEnabled();
-    Q_INVOKABLE bool userIsFanclubEnabled();
-    Q_INVOKABLE bool userIsFanclubEditEnabled();
+    //    Q_INVOKABLE bool userIsDebugEnabled();
+    //    Q_INVOKABLE bool userIsGameAddingEnabled();
+    //    Q_INVOKABLE bool userIsGameFixedTimeEnabled();
+    //    Q_INVOKABLE bool userIsFanclubEnabled();
+    //    Q_INVOKABLE bool userIsFanclubEditEnabled();
     //    void             SetUserProperties(quint32 value);
     //    quint32          getUserProperties();
 
@@ -208,7 +208,7 @@ private:
     //    quint32 m_userIndex;
     //    bool    m_bIpAdressWasSet;
 
-    quint32 m_UserProperties;
+    //    quint32 m_UserProperties;
 
     QMutex m_mutexUser;
     QMutex m_mutexUserIni;
@@ -220,10 +220,10 @@ private:
 
     QSettings* m_pMainUserSettings;
 
-    QList<GamePlay*> m_lGamePlay;
-    qint64           m_gpLastLocalUpdateTimeStamp;
-    qint64           m_gpLastServerUpdateTimeStamp;
-    bool             m_bGamePlayLastUpdateDidChanges;
+    //    QList<GamePlay*> m_lGamePlay;
+    //    qint64           m_gpLastLocalUpdateTimeStamp;
+    //    qint64           m_gpLastServerUpdateTimeStamp;
+    //    bool             m_bGamePlayLastUpdateDidChanges;
 
     //    QList<SeasonTicketItem*> m_lSeasonTicket;
     //    qint64                   m_stLastLocalUpdateTimeStamp;

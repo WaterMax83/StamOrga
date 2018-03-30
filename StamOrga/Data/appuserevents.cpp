@@ -51,12 +51,12 @@ void AppUserEvents::addNewUserEvents(QJsonObject& jsObj)
             this->m_eventNewAppVersion = true;
     } else if (pEvent->m_type == NOTIFY_TOPIC_NEW_FANCLUB_NEWS) {
 
-        if (this->m_pGlobalData->userIsFanclubEnabled()) {
-            //            this->m_pGlobalData->setNewsDataItemHasEvent(pEvent->m_info.toUInt());
-            this->m_eventNewFanclubNews++;
-        } else {
-            this->m_eventNewFanclubNews = 0;
-        }
+        //        if (this->m_pGlobalData->userIsFanclubEnabled()) {
+        //            this->m_pGlobalData->setNewsDataItemHasEvent(pEvent->m_info.toUInt());
+        //            this->m_eventNewFanclubNews++;
+        //        } else {
+        //            this->m_eventNewFanclubNews = 0;
+        //        }
     } else if (pEvent->m_type == NOTIFY_TOPIC_NEW_FREE_TICKET) {
 
         //        this->m_pGlobalData->setGamePlayItemHasEvent(pEvent->m_info.toUInt());
