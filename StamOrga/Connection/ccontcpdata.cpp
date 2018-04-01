@@ -304,18 +304,6 @@ void cConTcpData::checkNewOncomingData()
 //    this->sendMessageRequest(&msg, request);
 //}
 
-//void cConTcpData::startSendAvailableTicketListRequest(DataConRequest request)
-//{
-//    quint32 data[3];
-//    qint64  timeStamp = qToLittleEndian(this->m_pGlobalData->getSeasonTicketLastServerUpdate());
-
-//    data[0] = request.m_lData.at(0).toUInt();
-//    memcpy(&data[1], &timeStamp, sizeof(qint64));
-
-//    MessageProtocol msg(request.m_request, (char*)(&data[0]), sizeof(quint32) * 3);
-//    this->sendMessageRequest(&msg, request);
-//}
-
 //void cConTcpData::startSendChangeMeetingInfo(DataConRequest request)
 //{
 //    QByteArray  data;
@@ -463,10 +451,6 @@ void cConTcpData::startSendNewRequest(TcpDataConRequest* request)
 
     //    case OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET:
     //        this->startSendChangeTicketState(request);
-    //        break;
-
-    //    case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS:
-    //        this->startSendAvailableTicketListRequest(request);
     //        break;
 
     //    case OP_CODE_CMD_REQ::REQ_CHANGE_MEETING_INFO:

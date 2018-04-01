@@ -341,7 +341,7 @@ Flickable {
         listViewReservedTickets.implicitHeight = 0;
         listViewFreeTickets.implicitHeight = 0;
         showInfoHeader("Aktualisiere Daten", true);
-        userIntCurrentGame.startRequestAvailableTickets(m_gamePlayCurrentItem.index);
+        gDataTicketManager.startListAvailableTickets(m_gamePlayCurrentItem.index);
     }
 
     function notifyAvailableTicketListFinished(result) {

@@ -41,7 +41,7 @@ public:
     explicit GamePlay(QObject* parent = 0);
 
     QString home() { return this->m_home; }
-    void    setHome(const QString& home)
+    void setHome(const QString& home)
     {
         if (this->m_home != home) {
             this->m_home = home;
@@ -50,7 +50,7 @@ public:
     }
 
     QString away() { return this->m_away; }
-    void    setAway(const QString& away)
+    void setAway(const QString& away)
     {
         if (this->m_away != away) {
             this->m_away = away;
@@ -59,7 +59,7 @@ public:
     }
 
     QString score() { return this->m_score; }
-    void    setScore(const QString& score)
+    void setScore(const QString& score)
     {
         if (this->m_score != score) {
             this->m_score = score;
@@ -103,7 +103,7 @@ public:
     }
 
     quint8 index() { return this->m_index; }
-    void   setIndex(const quint8 index)
+    void setIndex(const quint8 index)
     {
         if (this->m_index != index) {
             this->m_index = index;
@@ -125,7 +125,7 @@ public:
 
 
     quint8 seasonIndex() { return this->m_seasonIndex; }
-    void   setSeasonIndex(const quint8 seasonIndex)
+    void setSeasonIndex(const quint8 seasonIndex)
     {
         if (this->m_seasonIndex != seasonIndex) {
             this->m_seasonIndex = seasonIndex;
@@ -134,7 +134,7 @@ public:
     }
 
     quint32 getEvent() { return this->m_eventCount; }
-    void    setEvent(quint32 event)
+    void setEvent(quint32 event)
     {
         if (this->m_eventCount != event) {
             this->m_eventCount = event;
@@ -144,66 +144,66 @@ public:
 
     Q_INVOKABLE QString getCompetitionLine();
 
-    Q_INVOKABLE quint16 getFreeTickets() { return this->m_freeTickets; }
-    void                setFreeTickets(quint16 number)
+    Q_INVOKABLE qint16 getFreeTickets() { return this->m_freeTickets; }
+    void setFreeTickets(qint16 number)
     {
         this->m_freeTickets = number;
     }
 
-    void setBlockedTickets(quint16 number)
+    void setBlockedTickets(qint16 number)
     {
         this->m_blockedTickets = number;
     }
 
-    void setReservedTickets(quint16 number)
+    void setReservedTickets(qint16 number)
     {
         this->m_reservedTickets = number;
     }
 
-    Q_INVOKABLE quint16 getAcceptedMeetingCount() { return this->m_acceptedMeeting; }
-    void                setAcceptedMeetingCount(quint16 number)
+    Q_INVOKABLE qint16 getAcceptedMeetingCount() { return this->m_acceptedMeeting; }
+    void setAcceptedMeetingCount(qint16 number)
     {
         this->m_acceptedMeeting = number;
     }
 
-    Q_INVOKABLE quint16 getInterestedMeetingCount() { return this->m_interestedMeeting; }
-    void                setInterestedMeetingCount(quint16 number)
+    Q_INVOKABLE qint16 getInterestedMeetingCount() { return this->m_interestedMeeting; }
+    void setInterestedMeetingCount(qint16 number)
     {
         this->m_interestedMeeting = number;
     }
 
-    Q_INVOKABLE quint16 getDeclinedMeetingCount() { return this->m_declinedMeeting; }
-    void                setDeclinedMeetingCount(quint16 number)
+    Q_INVOKABLE qint16 getDeclinedMeetingCount() { return this->m_declinedMeeting; }
+    void setDeclinedMeetingCount(qint16 number)
     {
         this->m_declinedMeeting = number;
     }
 
-    Q_INVOKABLE quint16 getMeetingInfo() { return this->m_meetingInfo; }
-    void                setMeetingInfo(quint16 number)
+    Q_INVOKABLE qint16 getMeetingInfo() { return this->m_meetingInfo; }
+    void setMeetingInfo(qint16 number)
     {
         this->m_meetingInfo = number;
     }
 
-    Q_INVOKABLE quint16 getAcceptedTripCount() { return this->m_acceptedTrip; }
-    void                setAcceptedTripCount(quint16 number)
+    Q_INVOKABLE qint16 getAcceptedTripCount() { return this->m_acceptedTrip; }
+    void setAcceptedTripCount(qint16 number)
     {
         this->m_acceptedTrip = number;
     }
 
-    Q_INVOKABLE quint16 getInterestedTripCount() { return this->m_interestedTrip; }
-    void                setInterestedTripCount(quint16 number)
+    Q_INVOKABLE qint16 getInterestedTripCount() { return this->m_interestedTrip; }
+    void setInterestedTripCount(qint16 number)
     {
         this->m_interestedTrip = number;
     }
 
-    Q_INVOKABLE quint16 getDeclinedTripCount() { return this->m_declinedTrip; }
-    void                setDeclinedTripCount(quint16 number)
+    Q_INVOKABLE qint16 getDeclinedTripCount() { return this->m_declinedTrip; }
+    void setDeclinedTripCount(qint16 number)
     {
         this->m_declinedTrip = number;
     }
 
-    Q_INVOKABLE quint16 getTripInfo() { return this->m_driveInfo; }
-    void                setTripInfo(quint16 number)
+    Q_INVOKABLE qint16 getTripInfo() { return this->m_driveInfo; }
+    void setTripInfo(qint16 number)
     {
         this->m_driveInfo = number;
     }
@@ -240,17 +240,17 @@ private:
     quint8           m_seasonIndex;
     qint64           m_timestamp;
     bool             m_timeFixed;
-    quint16          m_freeTickets;
-    quint16          m_blockedTickets;
-    quint16          m_reservedTickets;
-    quint16          m_acceptedMeeting;
-    quint16          m_interestedMeeting;
-    quint16          m_declinedMeeting;
-    quint16          m_meetingInfo;
-    quint16          m_acceptedTrip;
-    quint16          m_interestedTrip;
-    quint16          m_declinedTrip;
-    quint16          m_driveInfo;
+    qint16           m_freeTickets;
+    qint16           m_blockedTickets;
+    qint16           m_reservedTickets;
+    qint16           m_acceptedMeeting;
+    qint16           m_interestedMeeting;
+    qint16           m_declinedMeeting;
+    qint16           m_meetingInfo;
+    qint16           m_acceptedTrip;
+    qint16           m_interestedTrip;
+    qint16           m_declinedTrip;
+    qint16           m_driveInfo;
     bool             m_bIsUserGameAddingEnabled;
     quint32          m_eventCount;
 };

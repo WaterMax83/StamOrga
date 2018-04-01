@@ -40,11 +40,11 @@ public:
 
     void initialize();
 
-    qint32 requestChangeStateSeasonTicket(const quint32 ticketIndex, const quint32 gameIndex,
+    qint32 requestChangeStateSeasonTicket(const quint32 ticketIndex, const qint32 gameIndex,
                                           const quint32 state, const QString reserveName,
                                           const qint32 userID, qint64& messageID);
-    qint32 requestBlockSeasonTicket(quint32 ticketIndex, quint32 gameIndex, const QString userName);
-    qint32 requestGetAvailableSeasonTicket(const quint32 gameIndex, const QString userName, QByteArray& data);
+    qint32 requestBlockSeasonTicket(quint32 ticketIndex, qint32 gameIndex, const QString userName);
+    qint32 requestGetAvailableSeasonTicket(const qint32 gameIndex, const QString userName, QByteArray& data);
     qint32 requestGetAvailableTicketFromUser(const qint32 userID, QJsonArray& arrTickets);
 
     qint32 requestChangeMeetingInfo(const quint32 gameIndex, const quint32 version,
@@ -55,7 +55,7 @@ public:
                                     const quint32 acceptIndex, const QString name,
                                     const qint32 userID, const quint32 type, qint64& messageID);
 
-    quint16 getTicketNumber(const quint32 gamesIndex, const quint32 state);
+    quint16 getTicketNumber(const qint32 gamesIndex, const quint32 state);
     quint16 getAcceptedNumber(const quint32 type, const quint32 gamesIndex, const quint32 state);
     quint16 getMeetingInfoValue(const quint32 type, const quint32 gamesIndex);
 

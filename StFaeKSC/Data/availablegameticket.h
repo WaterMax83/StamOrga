@@ -57,7 +57,7 @@ public:
     qint32 addNewTicket(quint32 ticketID, quint32 userID, quint32 state, QString name = "");
     qint32 changeTicketState(qint32 ticketID, qint32 userID, quint32 state, QString name = "");
 
-    quint32 getGameIndex() { return this->m_gameIndex; }
+    qint32 getGameIndex() { return this->m_gameIndex; }
 
     quint16 getTicketNumber(const quint32 state);
 
@@ -71,7 +71,7 @@ private:
     quint32 m_year;
     quint32 m_competition;
     quint32 m_seasonIndex;
-    quint32 m_gameIndex;
+    qint32 m_gameIndex;
 
     void saveCurrentInteralList() override;
 

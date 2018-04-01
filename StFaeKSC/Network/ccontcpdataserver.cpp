@@ -208,6 +208,10 @@ MessageProtocol* cConTcpDataServer::checkNewMessage(MessageProtocol* msg)
             ack = g_TicketManager.getSeasonTicketRemoveRequest(this->m_pUserConData, msg);
             break;
 
+        case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS:
+            ack = g_TicketManager.getAvailableSeasonTicketList(this->m_pUserConData, msg);
+            break;
+
         case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
             ack = g_GamesManager.getGamesList(this->m_pUserConData, msg);
             break;

@@ -39,6 +39,8 @@ public:
 
     MessageProtocol* getSeasonTicketRemoveRequest(UserConData* pUserCon, MessageProtocol* request);
 
+    MessageProtocol* getAvailableSeasonTicketList(UserConData* pUserCon, MessageProtocol* request);
+
 signals:
 
 public slots:

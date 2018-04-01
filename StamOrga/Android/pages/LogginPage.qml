@@ -38,10 +38,10 @@ Flickable {
            ComboBox {
                id: logFilesCombo
                font.family: txtForFontFamily.font
-               model: globalUserData.getCurrentLogFileList()
+               model: gDataAppInfoManager.getCurrentLogFileList()
                anchors.horizontalCenter: parent.horizontalCenter
                onCurrentIndexChanged: {
-                   txtLogging.text = globalUserData.getCurrentLoggingList(logFilesCombo.currentIndex);
+                   txtLogging.text = gDataAppInfoManager.getCurrentLoggingList(logFilesCombo.currentIndex);
                }
            }
 
@@ -67,7 +67,7 @@ Flickable {
                implicitWidth: parent.width / 3 * 2
                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                onClicked: {
-                    globalUserData.copyTextToClipBoard(txtLogging.text);
+                    gDataAppInfoManager.copyTextToClipBoard(txtLogging.text);
                     toastManager.show("Daten wurden in die Zwischenablage kopiert", 2000);
                }
            }
@@ -78,11 +78,11 @@ Flickable {
                implicitWidth: parent.width / 3 * 2
                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                onClicked: {
-                   globalUserData.deleteCurrentLoggingFile(logFilesCombo.currentIndex);
+                   gDataAppInfoManager.deleteCurrentLoggingFile(logFilesCombo.currentIndex);
                    if (logFilesCombo.count > 0)
-                       txtLogging.text = globalUserData.getCurrentLoggingList(logFilesCombo.currentIndex);
+                       txtLogging.text = gDataAppInfoManager.getCurrentLoggingList(logFilesCombo.currentIndex);
                    else
-                       txtLogging.text = globalUserData.getCurrentLoggingList(0);
+                       txtLogging.text = gDataAppInfoManager.getCurrentLoggingList(0);
 //                   pageOpenedUpdateView();
                }
            }
@@ -95,7 +95,7 @@ Flickable {
             logFilesCombo.currentIndex = logFilesCombo.count - 1
        else {
            logFilesCombo.visible = false;
-           txtLogging.text = globalUserData.getCurrentLoggingList(0);
+           txtLogging.text = gDataAppInfoManager.getCurrentLoggingList(0);
        }
    }
 

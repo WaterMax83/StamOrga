@@ -17,7 +17,8 @@
 */
 
 #include <QtCore/QUuid>
-
+#include <QtGui/QClipboard>
+#include <QtGui/QGuiApplication>
 
 #include "cdatappinfomanager.h"
 
@@ -42,6 +43,10 @@ cDatAppInfoManager::cDatAppInfoManager(QObject* parent)
 qint32 cDatAppInfoManager::initialize()
 {
     QString value;
+
+    this->m_logApp = new Logging();
+    this->m_logApp->initialize();
+    this->m_ctrlLog.Start(this->m_logApp, false);
 
 #ifdef Q_OS_ANDROID
     this->m_pushNotificationInfoHandler = new PushNotificationInformationHandler(this);
@@ -74,4 +79,24 @@ QString cDatAppInfoManager::getCurrentAppGUID()
 QString cDatAppInfoManager::getCurrentAppToken()
 {
     return this->m_pushNotificationToken;
+}
+
+QString cDatAppInfoManager::getCurrentLoggingList(int index)
+{
+    return this->m_logApp->getCurrentLoggingList(index);
+}
+
+QStringList cDatAppInfoManager::getCurrentLogFileList()
+{
+    return this->m_logApp->getLogFileDates();
+}
+
+void cDatAppInfoManager::deleteCurrentLoggingFile(int index)
+{
+    this->m_logApp->clearCurrentLoggingList(index);
+}
+void cDatAppInfoManager::copyTextToClipBoard(QString text)
+{
+    QClipboard* clip = QGuiApplication::clipboard();
+    clip->setText(text);
 }

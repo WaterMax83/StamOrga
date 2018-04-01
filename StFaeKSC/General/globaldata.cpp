@@ -112,7 +112,7 @@ void GlobalData::initialize()
     this->m_initalized = true;
 }
 
-qint32 GlobalData::requestChangeStateSeasonTicket(const quint32 ticketIndex, const quint32 gameIndex,
+qint32 GlobalData::requestChangeStateSeasonTicket(const quint32 ticketIndex, const qint32 gameIndex,
                                                   const quint32 newState, const QString reserveName,
                                                   const qint32 userID, qint64& messageID)
 {
@@ -206,7 +206,7 @@ qint32 GlobalData::requestChangeStateSeasonTicket(const quint32 ticketIndex, con
  * X+4  quint32     rTicketName     Y
  * x+4+Yquint8      0x0             1
  */
-qint32 GlobalData::requestGetAvailableSeasonTicket(const quint32 gameIndex, const QString userName, QByteArray& data)
+qint32 GlobalData::requestGetAvailableSeasonTicket(const qint32 gameIndex, const QString userName, QByteArray& data)
 {
     if (!this->m_initalized)
         return ERROR_CODE_NOT_READY;
@@ -326,7 +326,7 @@ qint32 GlobalData::requestGetAvailableTicketFromUser(const qint32 userID, QJsonA
     return ERROR_CODE_SUCCESS;
 }
 
-quint16 GlobalData::getTicketNumber(const quint32 gamesIndex, const quint32 state)
+quint16 GlobalData::getTicketNumber(const qint32 gamesIndex, const quint32 state)
 {
     if (!this->m_initalized)
         return ERROR_CODE_NOT_READY;

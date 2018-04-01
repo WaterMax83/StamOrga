@@ -45,10 +45,10 @@ qint32 cStaGlobalManager::initialize()
     rCode = g_StaSettingsManager.initialize();
 
     if (rCode == ERROR_CODE_SUCCESS)
-        rCode = g_StaGlobalSettings.initialize();
+        rCode = g_DatAppInfoManager.initialize();
 
     if (rCode == ERROR_CODE_SUCCESS)
-        rCode = g_DatAppInfoManager.initialize();
+        rCode = g_StaGlobalSettings.initialize();
 
     if (rCode == ERROR_CODE_SUCCESS)
         rCode = g_DataGamesManager.initialize();
@@ -76,6 +76,7 @@ qint32 cStaGlobalManager::initialize()
 
 void cStaGlobalManager::setQmlInformationClasses(QQmlApplicationEngine* engine)
 {
+    engine->rootContext()->setContextProperty("gDataAppInfoManager", &g_DatAppInfoManager);
     engine->rootContext()->setContextProperty("gStaGlobalSettings", &g_StaGlobalSettings);
     engine->rootContext()->setContextProperty("gDataGamesManager", &g_DataGamesManager);
     engine->rootContext()->setContextProperty("gDataTicketManager", &g_DataTicketManager);

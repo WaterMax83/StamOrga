@@ -297,3 +297,21 @@ qint32 cDataTicketManager::handleRemoveSeasonTicketResponse(MessageProtocol* msg
 
     return msg->getIntData();
 }
+
+qint32 cDataTicketManager::startListAvailableTickets(const qint32 gameIndex)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QMutexLocker lock(&this->m_mutex);
+
+    QJsonObject rootObj;
+    rootObj.insert("index", gameIndex);
+    rootObj.insert("timestamp", this->m_stLastServerUpdateTimeStamp);
+
+    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS);
+    req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+
+    g_ConManager.sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
+}

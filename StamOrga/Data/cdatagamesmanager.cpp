@@ -300,6 +300,50 @@ qint32 cDataGamesManager::handleListGamesInfoResponse(MessageProtocol* msg)
     QJsonObject rootObj = QJsonDocument::fromJson(data).object();
 
     qint32 result = rootObj.value("ack").toInt(ERROR_CODE_NOT_FOUND);
+    if (result != ERROR_CODE_SUCCESS)
+        return result;
+
+    for (int i = 0; i < this->m_lGames.size(); i++) {
+        GamePlay* play = this->m_lGames[i];
+        play->setFreeTickets(0);
+        play->setBlockedTickets(0);
+        play->setReservedTickets(0);
+        play->setAcceptedMeetingCount(0);
+        play->setInterestedMeetingCount(0);
+        play->setDeclinedMeetingCount(0);
+        play->setMeetingInfo(0);
+        play->setAcceptedTripCount(0);
+        play->setInterestedTripCount(0);
+        play->setDeclinedTripCount(0);
+        play->setTripInfo(0);
+    }
+
+    qInfo() << rootObj;
+
+    QJsonArray infoArr = rootObj.value("infos").toArray();
+    for (int i = 0; i < infoArr.size(); i++) {
+        QJsonObject gameObj = infoArr.at(i).toObject();
+
+        GamePlay* play = this->getGamePlay(gameObj.value("index").toInt());
+        if (play == NULL)
+            continue;
+
+        play->setFreeTickets(gameObj.value("free").toInt());
+        play->setBlockedTickets(gameObj.value("blocked").toInt());
+        play->setReservedTickets(gameObj.value("reserved").toInt());
+
+        QJsonObject meetObj = gameObj.value("meet").toObject();
+        play->setAcceptedMeetingCount(meetObj.value("accepted").toInt());
+        play->setInterestedMeetingCount(meetObj.value("interest").toInt());
+        play->setDeclinedMeetingCount(meetObj.value("declined").toInt());
+        play->setMeetingInfo(meetObj.value("info").toInt());
+
+        QJsonObject tripObj = gameObj.value("trip").toObject();
+        play->setAcceptedTripCount(tripObj.value("accepted").toInt());
+        play->setInterestedTripCount(tripObj.value("interest").toInt());
+        play->setDeclinedTripCount(tripObj.value("declined").toInt());
+        play->setTripInfo(tripObj.value("info").toInt());
+    }
 
     return result;
 }

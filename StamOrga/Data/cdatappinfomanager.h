@@ -22,6 +22,9 @@
 
 #include <QObject>
 
+#include "../../Common/General/backgroundcontroller.h"
+#include "../../Common/General/globalfunctions.h"
+#include "../../Common/General/logging.h"
 #include "../Common/General/cgendisposer.h"
 
 class cDatAppInfoManager : public cGenDisposer
@@ -35,6 +38,14 @@ public:
     QString getCurrentAppGUID();
     QString getCurrentAppToken();
 
+    Q_INVOKABLE QString getCurrentLoggingList(int index);
+
+    Q_INVOKABLE QStringList getCurrentLogFileList();
+
+    Q_INVOKABLE void deleteCurrentLoggingFile(int index);
+
+    Q_INVOKABLE void copyTextToClipBoard(QString text);
+
 signals:
 
 public slots:
@@ -42,6 +53,9 @@ public slots:
 private:
     QString m_pushNotificationToken;
     QString m_AppInstanceGUID;
+
+    Logging*             m_logApp;
+    BackgroundController m_ctrlLog;
 };
 
 extern cDatAppInfoManager g_DatAppInfoManager;

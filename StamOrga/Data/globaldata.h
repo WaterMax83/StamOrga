@@ -100,15 +100,15 @@ public:
 
     //    void saveGlobalUserSettings();
 
-    Q_INVOKABLE QString getCurrentLoggingList(int index);
+    //    Q_INVOKABLE QString getCurrentLoggingList(int index);
 
-    Q_INVOKABLE QStringList getCurrentLogFileList();
+    //    Q_INVOKABLE QStringList getCurrentLogFileList();
 
-    Q_INVOKABLE void deleteCurrentLoggingFile(int index);
+    //    Q_INVOKABLE void deleteCurrentLoggingFile(int index);
 
-    Q_INVOKABLE void copyTextToClipBoard(QString text);
+    //    Q_INVOKABLE void copyTextToClipBoard(QString text);
 
-    void saveCurrentGamesList(qint64 timestamp);
+    //    void saveCurrentGamesList(qint64 timestamp);
 
     //    void        startUpdateGamesPlay(const qint16 updateIndex);
     //    void        addNewGamePlay(GamePlay* gPlay, const qint16 updateIndex = 0);
@@ -246,8 +246,8 @@ private:
 
     GameUserData m_gameUserData;
 
-    Logging*             m_logApp;
-    BackgroundController m_ctrlLog;
+    //    Logging*             m_logApp;
+    //    BackgroundController m_ctrlLog;
 };
 
 #endif // GLOBALDATA_H

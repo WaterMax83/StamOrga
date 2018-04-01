@@ -18,11 +18,11 @@
 
 #include <QtCore/QDebug>
 #include <QtCore/QStandardPaths>
-#include <QtCore/QUuid>
-#include <QtGui/QClipboard>
-#include <QtGui/QGuiApplication>
-#include <QtNetwork/QNetworkConfigurationManager>
-#include <QtQml/QQmlEngine>
+//#include <QtCore/QUuid>
+//#include <QtGui/QClipboard>
+//#include <QtGui/QGuiApplication>
+//#include <QtNetwork/QNetworkConfigurationManager>
+//#include <QtQml/QQmlEngine>
 
 #include "globaldata.h"
 #include "globalsettings.h"
@@ -60,9 +60,9 @@ GlobalData::GlobalData(QObject* parent)
     //    this->setbIsConnected(false);
     //    this->SetUserProperties(0x0);
 
-    this->m_logApp = new Logging();
-    this->m_logApp->initialize();
-    this->m_ctrlLog.Start(this->m_logApp, false);
+    //    this->m_logApp = new Logging();
+    //    this->m_logApp->initialize();
+    //    this->m_ctrlLog.Start(this->m_logApp, false);
 
     QQmlEngine::setObjectOwnership(&this->m_meetingInfo, QQmlEngine::CppOwnership);
     QQmlEngine::setObjectOwnership(&this->m_awayTripInfo, QQmlEngine::CppOwnership);
@@ -191,47 +191,47 @@ void GlobalData::loadGlobalSettings()
 //    this->m_pMainUserSettings->sync();
 //}
 
-void GlobalData::saveCurrentGamesList(qint64 timestamp)
-{
-    QMutexLocker lock(&this->m_mutexGame);
+//void GlobalData::saveCurrentGamesList(qint64 timestamp)
+//{
+//    QMutexLocker lock(&this->m_mutexGame);
 
-    //    if (this->m_gpLastServerUpdateTimeStamp == timestamp && !this->m_bGamePlayLastUpdateDidChanges) {
-    //        if (!g_GlobalSettings->saveInfosOnApp())
-    //            return;
-    //        this->m_pMainUserSettings->beginGroup(GAMES_GROUP);
-    //        this->m_pMainUserSettings->setValue("LocalGamesUpdateTime", this->m_gpLastLocalUpdateTimeStamp);
-    //        this->m_pMainUserSettings->endGroup();
-    //        return;
-    //    }
-    //    this->m_gpLastServerUpdateTimeStamp = timestamp;
+//    if (this->m_gpLastServerUpdateTimeStamp == timestamp && !this->m_bGamePlayLastUpdateDidChanges) {
+//        if (!g_GlobalSettings->saveInfosOnApp())
+//            return;
+//        this->m_pMainUserSettings->beginGroup(GAMES_GROUP);
+//        this->m_pMainUserSettings->setValue("LocalGamesUpdateTime", this->m_gpLastLocalUpdateTimeStamp);
+//        this->m_pMainUserSettings->endGroup();
+//        return;
+//    }
+//    this->m_gpLastServerUpdateTimeStamp = timestamp;
 
-    //    std::sort(this->m_lGamePlay.begin(), this->m_lGamePlay.end(), GamePlay::compareTimeStampFunctionAscending);
+//    std::sort(this->m_lGamePlay.begin(), this->m_lGamePlay.end(), GamePlay::compareTimeStampFunctionAscending);
 
-    //    if (!g_GlobalSettings->saveInfosOnApp())
-    //        return;
+//    if (!g_GlobalSettings->saveInfosOnApp())
+//        return;
 
-    //    this->m_pMainUserSettings->beginGroup(GAMES_GROUP);
-    //    this->m_pMainUserSettings->remove(""); // clear all elements
+//    this->m_pMainUserSettings->beginGroup(GAMES_GROUP);
+//    this->m_pMainUserSettings->remove(""); // clear all elements
 
-    //    this->m_pMainUserSettings->setValue("LocalGamesUpdateTime", this->m_gpLastLocalUpdateTimeStamp);
-    //    this->m_pMainUserSettings->setValue("ServerGamesUpdateTime", this->m_gpLastServerUpdateTimeStamp);
+//    this->m_pMainUserSettings->setValue("LocalGamesUpdateTime", this->m_gpLastLocalUpdateTimeStamp);
+//    this->m_pMainUserSettings->setValue("ServerGamesUpdateTime", this->m_gpLastServerUpdateTimeStamp);
 
-    //    this->m_pMainUserSettings->beginWriteArray(GROUP_ARRAY_ITEM);
-    //    for (int i = 0; i < this->m_lGamePlay.size(); i++) {
-    //        this->m_pMainUserSettings->setArrayIndex(i);
-    //        this->m_pMainUserSettings->setValue(PLAY_HOME, this->m_lGamePlay[i]->home());
-    //        this->m_pMainUserSettings->setValue(PLAY_AWAY, this->m_lGamePlay[i]->away());
-    //        this->m_pMainUserSettings->setValue(PLAY_DATETIME, this->m_lGamePlay[i]->timestamp64Bit());
-    //        this->m_pMainUserSettings->setValue(PLAY_SAISON_INDEX, this->m_lGamePlay[i]->seasonIndex());
-    //        this->m_pMainUserSettings->setValue(ITEM_INDEX, this->m_lGamePlay[i]->index());
-    //        this->m_pMainUserSettings->setValue(PLAY_SCORE, this->m_lGamePlay[i]->score());
-    //        this->m_pMainUserSettings->setValue(PLAY_COMPETITION, this->m_lGamePlay[i]->competitionValue());
-    //        this->m_pMainUserSettings->setValue(PLAY_TIME_FIXED, this->m_lGamePlay[i]->timeFixed());
-    //    }
+//    this->m_pMainUserSettings->beginWriteArray(GROUP_ARRAY_ITEM);
+//    for (int i = 0; i < this->m_lGamePlay.size(); i++) {
+//        this->m_pMainUserSettings->setArrayIndex(i);
+//        this->m_pMainUserSettings->setValue(PLAY_HOME, this->m_lGamePlay[i]->home());
+//        this->m_pMainUserSettings->setValue(PLAY_AWAY, this->m_lGamePlay[i]->away());
+//        this->m_pMainUserSettings->setValue(PLAY_DATETIME, this->m_lGamePlay[i]->timestamp64Bit());
+//        this->m_pMainUserSettings->setValue(PLAY_SAISON_INDEX, this->m_lGamePlay[i]->seasonIndex());
+//        this->m_pMainUserSettings->setValue(ITEM_INDEX, this->m_lGamePlay[i]->index());
+//        this->m_pMainUserSettings->setValue(PLAY_SCORE, this->m_lGamePlay[i]->score());
+//        this->m_pMainUserSettings->setValue(PLAY_COMPETITION, this->m_lGamePlay[i]->competitionValue());
+//        this->m_pMainUserSettings->setValue(PLAY_TIME_FIXED, this->m_lGamePlay[i]->timeFixed());
+//    }
 
-    //    this->m_pMainUserSettings->endArray();
-    //    this->m_pMainUserSettings->endGroup();
-}
+//    this->m_pMainUserSettings->endArray();
+//    this->m_pMainUserSettings->endGroup();
+//}
 
 //QString GlobalData::userName()
 //{
@@ -712,25 +712,25 @@ void GlobalData::saveCurrentGamesList(qint64 timestamp)
 //    return false;
 //}
 
-QString GlobalData::getCurrentLoggingList(int index)
-{
-    return this->m_logApp->getCurrentLoggingList(index);
-}
+//QString GlobalData::getCurrentLoggingList(int index)
+//{
+//    return this->m_logApp->getCurrentLoggingList(index);
+//}
 
-QStringList GlobalData::getCurrentLogFileList()
-{
-    return this->m_logApp->getLogFileDates();
-}
+//QStringList GlobalData::getCurrentLogFileList()
+//{
+//    return this->m_logApp->getLogFileDates();
+//}
 
-void GlobalData::deleteCurrentLoggingFile(int index)
-{
-    this->m_logApp->clearCurrentLoggingList(index);
-}
-void GlobalData::copyTextToClipBoard(QString text)
-{
-    QClipboard* clip = QGuiApplication::clipboard();
-    clip->setText(text);
-}
+//void GlobalData::deleteCurrentLoggingFile(int index)
+//{
+//    this->m_logApp->clearCurrentLoggingList(index);
+//}
+//void GlobalData::copyTextToClipBoard(QString text)
+//{
+//    QClipboard* clip = QGuiApplication::clipboard();
+//    clip->setText(text);
+//}
 
 //void GlobalData::callBackLookUpHost(const QHostInfo& host)
 //{

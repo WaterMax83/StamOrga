@@ -24,6 +24,7 @@
 #include "../Common/Network/messagecommand.h"
 #include "../General/globaldata.h"
 #include "cgamesmanager.h"
+#include "../Common/General/globaltiming.h"
 
 extern GlobalData* g_GlobalData;
 
@@ -106,17 +107,64 @@ MessageProtocol* cGamesManager::getGamesInfoList(UserConData* pUserCon, MessageP
     qint64 lastUpdateGamesFromApp = (qint64)rootObj.value("timestamp").toDouble(0);
 
     QJsonObject rootAns;
-
-
     if (g_GlobalData->m_GamesList.getLastUpdateTime() > lastUpdateGamesFromApp) {
         rootAns.insert("ack", ERROR_CODE_UPDATE_LIST);
     } else {
         rootAns.insert("ack", ERROR_CODE_SUCCESS);
+
+        qint32 numbOfGames = g_GlobalData->m_GamesList.getNumberOfInternalList();
+//    #ifndef QT_DEBUG
+        qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+//    #endif
+        QJsonArray gameInfoArr;
+        for (qint32 i = 0; i < numbOfGames; i++) {
+            GamesPlay* pGame = (GamesPlay*)(g_GlobalData->m_GamesList.getRequestConfigItemFromListIndex(i));
+            if (pGame == NULL)
+                continue;
+//    #ifndef QT_DEBUG
+            if (pGame->m_timestamp + 2 * MSEC_PER_HOUR < currentTime)
+                continue;
+//    #endif
+            qint16 freeTickets     = g_GlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_FREE);
+            qint16 blockTickets    = g_GlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_BLOCKED);
+            qint16 reservedTickets = g_GlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_RESERVED);
+            qint16 acceptedMeeting = g_GlobalData->getAcceptedNumber(MEETING_TYPE_MEETING, pGame->m_index, ACCEPT_STATE_ACCEPT);
+            qint16 interestMeeting = g_GlobalData->getAcceptedNumber(MEETING_TYPE_MEETING, pGame->m_index, ACCEPT_STATE_MAYBE);
+            qint16 declinedMeeting = g_GlobalData->getAcceptedNumber(MEETING_TYPE_MEETING, pGame->m_index, ACCEPT_STATE_DECLINE);
+            qint16 meetInfo        = g_GlobalData->getMeetingInfoValue(MEETING_TYPE_MEETING, pGame->m_index);
+            qint16 acceptedTrip    = g_GlobalData->getAcceptedNumber(MEETING_TYPE_AWAYTRIP, pGame->m_index, ACCEPT_STATE_ACCEPT);
+            qint16 interestTrip    = g_GlobalData->getAcceptedNumber(MEETING_TYPE_AWAYTRIP, pGame->m_index, ACCEPT_STATE_MAYBE);
+            qint16 declinedTrip    = g_GlobalData->getAcceptedNumber(MEETING_TYPE_AWAYTRIP, pGame->m_index, ACCEPT_STATE_DECLINE);
+            qint16 tripInfo        = g_GlobalData->getMeetingInfoValue(MEETING_TYPE_AWAYTRIP, pGame->m_index);
+
+            if (freeTickets == 0 && reservedTickets == 0 && acceptedMeeting == 0 && interestMeeting == 0 && declinedMeeting == 0 && meetInfo == 0 && acceptedTrip == 0 && interestTrip == 0 && declinedTrip == 0 && tripInfo == 0)
+                continue;
+
+            QJsonObject infoObj;
+            infoObj.insert("index", pGame->m_index);
+            infoObj.insert("free", freeTickets);
+            infoObj.insert("blocked", blockTickets);
+            infoObj.insert("reserved", reservedTickets);
+            QJsonObject meet;
+            meet.insert("accepted", acceptedMeeting);
+            meet.insert("interest", interestMeeting);
+            meet.insert("declined", declinedMeeting);
+            meet.insert("info", meetInfo);
+            QJsonObject trip;
+            trip.insert("accepted", acceptedTrip);
+            trip.insert("interest", interestTrip);
+            trip.insert("declined", declinedTrip);
+            trip.insert("info", tripInfo);
+            infoObj.insert("meet", meet);
+            infoObj.insert("trip", trip);
+
+            gameInfoArr.append(infoObj);
+        }
+        rootAns.insert("infos", gameInfoArr);
+
+        qInfo().noquote() << QString("User %1 request Games Info List").arg(pUserCon->m_userName);
     }
-
     QByteArray answer = QJsonDocument(rootAns).toJson(QJsonDocument::Compact);
-
-//    qInfo().noquote() << QString("User %1 request Games List with %2 entries").arg(pUserCon->m_userName).arg(numbOfGames);
 
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_GAMES_INFO_LIST, answer);
 }
@@ -164,21 +212,4 @@ MessageProtocol* cGamesManager::getChangeGameRequest(UserConData* pUserCon, Mess
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME, result);
 }
 
-//MessageProtocol* cGamesManager::getSeasonTicketRemoveRequest(UserConData* pUserCon, MessageProtocol* request)
-//{
-//    if (!this->m_initialized)
-//        return NULL;
 
-//    QByteArray  data    = QByteArray(request->getPointerToData());
-//    QJsonObject rootObj = QJsonDocument::fromJson(data).object();
-
-//    qint32 index = rootObj.value("index").toInt(0);
-//    qint32 rCode;
-//    if ((rCode = g_GlobalData->m_SeasonTicket.removeItem(index)) == ERROR_CODE_SUCCESS) {
-//        qInfo().noquote() << QString("User %1 removed SeasonTicket %2")
-//                                 .arg(pUserCon->m_userName)
-//                                 .arg(index);
-//        return new MessageProtocol(OP_CODE_CMD_RES::ACK_REMOVE_TICKET, ERROR_CODE_SUCCESS);
-//    }
-//    return new MessageProtocol(OP_CODE_CMD_RES::ACK_REMOVE_TICKET, rCode);
-//}

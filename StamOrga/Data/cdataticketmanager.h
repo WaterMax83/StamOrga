@@ -44,13 +44,15 @@ public:
     Q_INVOKABLE QString getSeasonTicketLastLocalUpdateString();
 
     Q_INVOKABLE qint32 startListSeasonTickets();
-    qint32             handleListSeasonTicketsResponse(MessageProtocol* msg);
+    qint32 handleListSeasonTicketsResponse(MessageProtocol* msg);
 
     Q_INVOKABLE qint32 startAddSeasonTicket(const qint32 index, const QString name, const QString place, const qint32 discount);
-    qint32             handleAddSeasonTicketResponse(MessageProtocol* msg);
+    qint32 handleAddSeasonTicketResponse(MessageProtocol* msg);
 
     Q_INVOKABLE qint32 startRemoveSeasonTicket(const qint32 index);
-    qint32             handleRemoveSeasonTicketResponse(MessageProtocol* msg);
+    qint32 handleRemoveSeasonTicketResponse(MessageProtocol* msg);
+
+    Q_INVOKABLE qint32 startListAvailableTickets(const qint32 gameIndex);
 
 signals:
 
