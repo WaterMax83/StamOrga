@@ -145,7 +145,7 @@ MessageProtocol* cTicketManager::getAvailableSeasonTicketList(UserConData* pUser
     QByteArray  data    = QByteArray(request->getPointerToData());
     QJsonObject rootObj = QJsonDocument::fromJson(data).object();
 
-    qint32 index              = rootObj.value("index").toInt(0);
+    qint32 index                    = rootObj.value("index").toInt(0);
     qint64 lastUpdateTicketsFromApp = (qint64)rootObj.value("timestamp").toDouble(0);
 
     QJsonObject rootAns;
@@ -161,10 +161,11 @@ MessageProtocol* cTicketManager::getAvailableSeasonTicketList(UserConData* pUser
             rootAns.insert("ack", ERROR_CODE_NOT_FOUND);
         else {
 
-            bool  bFoundTicket = false;
+            rootAns.insert("game", index);
+            bool bFoundTicket = false;
             foreach (AvailableGameTickets* ticket, g_GlobalData->m_availableTickets) {
                 if (ticket->getGameIndex() == index) {
-                    qint32 totalCount = ticket->getNumberOfInternalList();
+                    qint32     totalCount = ticket->getNumberOfInternalList();
                     QJsonArray freeTickets;
                     QJsonArray reservedTickets;
                     for (qint32 i = 0; i < totalCount; i++) {
@@ -183,33 +184,65 @@ MessageProtocol* cTicketManager::getAvailableSeasonTicketList(UserConData* pUser
                             QJsonObject resObj;
                             resObj.insert("index", info->m_ticketID);
                             resObj.insert("name", info->m_itemName);
+                            reservedTickets.append(resObj);
                         }
                     }
                     rootAns.insert("free", freeTickets);
                     rootAns.insert("reserved", reservedTickets);
                     bFoundTicket = true;
 
-
                     break;
-                    }
                 }
+            }
 
-                if (bFoundTicket)
-                    qInfo().noquote() << QString("User %1 got available SeasonTicket List for game %2:%3:%4")
-                                             .arg(pUserCon->m_userName)
-                                             .arg(index)
-                                             .arg(pGame->m_competition)
-                                             .arg(pGame->m_saisonIndex);
-                else
-                    qInfo().noquote() << QString("User %1 got available SeasonTicket List for game %2:%3:%4 with no entries")
-                                             .arg(pUserCon->m_userName)
-                                             .arg(index)
-                                             .arg(pGame->m_competition)
-                                             .arg(pGame->m_saisonIndex);
+            if (bFoundTicket)
+                qInfo().noquote() << QString("User %1 got available SeasonTicket List for game %2:%3:%4")
+                                         .arg(pUserCon->m_userName)
+                                         .arg(index)
+                                         .arg(pGame->m_competition)
+                                         .arg(pGame->m_saisonIndex);
+            else
+                qInfo().noquote() << QString("User %1 got available SeasonTicket List for game %2:%3:%4 with no entries")
+                                         .arg(pUserCon->m_userName)
+                                         .arg(index)
+                                         .arg(pGame->m_competition)
+                                         .arg(pGame->m_saisonIndex);
         }
     }
 
     QByteArray answer = QJsonDocument(rootAns).toJson(QJsonDocument::Compact);
 
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_AVAILABLE_TICKETS, answer);
+}
+
+MessageProtocol* cTicketManager::getChangeAvailableTicketState(UserConData* pUserCon, MessageProtocol* request)
+{
+    if (!this->m_initialized)
+        return NULL;
+
+    QByteArray  data    = QByteArray(request->getPointerToData());
+    QJsonObject rootObj = QJsonDocument::fromJson(data).object();
+
+    qint32  ticketIndex = rootObj.value("ticketIndex").toInt(0);
+    qint32  gameIndex   = rootObj.value("gameIndex").toInt(0);
+    qint32  state       = rootObj.value("state").toInt(0);
+    QString name        = rootObj.value("name").toString();
+
+    qint64 messageID;
+    qint32 rCode = g_GlobalData->requestChangeStateSeasonTicket(ticketIndex, gameIndex, state,
+                                                                name, pUserCon->m_userID,
+                                                                messageID);
+    if (rCode == ERROR_CODE_SUCCESS)
+        qInfo().noquote() << QString("User %1 set SeasonTicket %2 state to %3")
+                                 .arg(pUserCon->m_userName)
+                                 .arg(g_GlobalData->m_SeasonTicket.getItemName(ticketIndex))
+                                 .arg(state);
+
+    QJsonObject rootAns;
+    rootAns.insert("ack", rCode);
+    rootAns.insert("messageID", messageID);
+
+    QByteArray answer = QJsonDocument(rootAns).toJson(QJsonDocument::Compact);
+
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_STATE_CHANGE_SEASON_TICKET, answer);
 }

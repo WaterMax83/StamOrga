@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
     qmlRegisterType<UserInterface>("com.watermax.demo", 1, 0, "UserInterface");
     qRegisterMetaType<GamePlay*>("GamePlay*");
     qRegisterMetaType<SeasonTicketItem*>("SeasonTicketItem*");
-    qRegisterMetaType<MeetingInfo*>("MeetingInfo*");
+    qRegisterMetaType<cDataMeetingInfo*>("cDataMeetingInfo*");
     qRegisterMetaType<NewsDataItem*>("NewsDataItem*");
     qRegisterMetaType<AcceptMeetingInfo*>("AcceptMeetingInfo*");
     qRegisterMetaType<DataConRequest>("DataConRequest");

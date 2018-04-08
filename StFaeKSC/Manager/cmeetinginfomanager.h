@@ -16,8 +16,8 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CTICKETMANAGER_H
-#define CTICKETMANAGER_H
+#ifndef CMEETINGINFOMANAGER_H
+#define CMEETINGINFOMANAGER_H
 
 #include <QObject>
 
@@ -25,29 +25,27 @@
 #include "../Common/Network/messageprotocol.h"
 #include "../Network/connectiondata.h"
 
-class cTicketManager : public cGenDisposer
+class cMeetingInfoManager : public cGenDisposer
 {
     Q_OBJECT
 public:
-    explicit cTicketManager(QObject* parent = nullptr);
+    explicit cMeetingInfoManager(QObject* parent = nullptr);
 
     qint32 initialize();
 
-    MessageProtocol* getSeasonTicketList(UserConData* pUserCon, MessageProtocol* request);
+    MessageProtocol* getMeetingInfo(UserConData* pUserCon, MessageProtocol* request);
 
-    MessageProtocol* getSeasonTicketAddRequest(UserConData* pUserCon, MessageProtocol* request);
+    MessageProtocol* getChangeMeetingInfo(UserConData* pUserCon, MessageProtocol* request);
 
-    MessageProtocol* getSeasonTicketRemoveRequest(UserConData* pUserCon, MessageProtocol* request);
+    //    MessageProtocol* getNewsDataChangeRequest(UserConData* pUserCon, MessageProtocol* request);
 
-    MessageProtocol* getAvailableSeasonTicketList(UserConData* pUserCon, MessageProtocol* request);
-
-    MessageProtocol* getChangeAvailableTicketState(UserConData* pUserCon, MessageProtocol* request);
+    //    MessageProtocol* getNewsDataRemoveRequest(UserConData* pUserCon, MessageProtocol* request);
 
 signals:
 
 public slots:
 };
 
-extern cTicketManager g_TicketManager;
+extern cMeetingInfoManager g_MeetingInfoManager;
 
-#endif // CTICKETMANAGER_H
+#endif // CMEETINGINFOMANAGER_H

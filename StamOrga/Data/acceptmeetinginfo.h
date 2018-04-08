@@ -30,28 +30,28 @@ public:
     {
     }
 
-    Q_INVOKABLE quint32 index() { return this->m_index; }
-    void setIndex(const quint32 index)
+    Q_INVOKABLE qint32 index() { return this->m_index; }
+    void               setIndex(const qint32 index)
     {
         if (this->m_index != index)
             this->m_index = index;
     }
 
-    Q_INVOKABLE quint32 value() { return this->m_value; }
-    void setValue(const quint32 value)
+    Q_INVOKABLE qint32 value() { return this->m_value; }
+    void               setValue(const qint32 value)
     {
         if (this->m_value != value)
             this->m_value = value;
     }
 
     Q_INVOKABLE QString name() { return this->m_name; }
-    void setName(const QString& name)
+    void                setName(const QString& name)
     {
         if (this->m_name != name)
             this->m_name = name;
     }
 
-    void setUserIndex(const quint32 userID)
+    void setUserIndex(const qint32 userID)
     {
         Q_UNUSED(userID);
     }
@@ -62,8 +62,8 @@ signals:
 public slots:
 
 private:
-    quint32 m_index;
-    quint32 m_value;
+    qint32  m_index;
+    qint32  m_value;
     QString m_name;
 };
 

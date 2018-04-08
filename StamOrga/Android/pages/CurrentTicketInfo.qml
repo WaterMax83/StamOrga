@@ -190,12 +190,12 @@ Flickable {
     property string menuTicketReserveName
 
     function freeTicketItem() {
-        userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 2);
+        gDataTicketManager.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 2);
         showInfoHeader("Gebe Karte frei", true)
     }
 
     function blockTicketItem() {
-        userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 1);
+        gDataTicketManager.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 1);
         showInfoHeader("Sperre Karte", true)
     }
 
@@ -216,7 +216,7 @@ Flickable {
 
     function acceptedEditReserveNameDialog(text)
     {
-        userIntCurrentGame.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 3, text);
+        gDataTicketManager.startChangeAvailableTicketState(menuTicketIndex, m_gamePlayCurrentItem.index, 3, text);
         showInfoHeader("Reserviere Karte", true)
     }
 

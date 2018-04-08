@@ -30,6 +30,7 @@
 #include "../Connection/cconusersettings.h"
 #include "../cstaglobalsettings.h"
 #include "../cstasettingsmanager.h"
+#include "cdatagamesmanager.h"
 
 
 // clang-format off
@@ -303,6 +304,9 @@ qint32 cDataTicketManager::startListAvailableTickets(const qint32 gameIndex)
     if (!this->m_initialized)
         return ERROR_CODE_NOT_INITIALIZED;
 
+    if (this->m_stLastServerUpdateTimeStamp == 0)
+        return this->startListSeasonTickets();
+
     QMutexLocker lock(&this->m_mutex);
 
     QJsonObject rootObj;
@@ -314,4 +318,95 @@ qint32 cDataTicketManager::startListAvailableTickets(const qint32 gameIndex)
 
     g_ConManager.sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
+}
+
+qint32 cDataTicketManager::handleListAvailableSeasonTicketResponse(MessageProtocol* msg)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QByteArray  data(msg->getPointerToData());
+    QJsonObject rootObj = QJsonDocument::fromJson(data).object();
+
+    qint32 result = rootObj.value("ack").toInt(ERROR_CODE_NOT_FOUND);
+    if (result != ERROR_CODE_SUCCESS)
+        return result;
+
+    for (int i = 0; i < this->getSeasonTicketLength(); i++) {
+        SeasonTicketItem* pItem = this->getSeasonTicketFromArrayIndex(i);
+        if (pItem != NULL)
+            pItem->setTicketState(TICKET_STATE_BLOCKED);
+    }
+
+    QJsonArray freeArr   = rootObj.value("free").toArray();
+    QJsonArray resArr    = rootObj.value("reserved").toArray();
+    qint32     gameIndex = rootObj.value("game").toInt();
+
+    for (int i = 0; i < freeArr.count(); i++) {
+        qint32            ticketIndex = freeArr.at(i).toInt();
+        SeasonTicketItem* pItem       = this->getSeasonTicket(ticketIndex);
+        if (pItem != NULL)
+            pItem->setTicketState(TICKET_STATE_FREE);
+        else {
+            qWarning().noquote() << QString("Ticket with number %1 is missing for availableTicket Free").arg(ticketIndex);
+            result = ERROR_CODE_MISSING_TICKET;
+        }
+    }
+    for (int i = 0; i < resArr.count(); i++) {
+        qint32            ticketIndex = resArr.at(i).toObject().value("index").toInt(0);
+        SeasonTicketItem* pItem       = this->getSeasonTicket(ticketIndex);
+        if (pItem != NULL)
+            pItem->setTicketState(TICKET_STATE_RESERVED);
+        else {
+            qWarning().noquote() << QString("Ticket with number %1 is missing for availableTicket Reserved").arg(ticketIndex);
+            result = ERROR_CODE_MISSING_TICKET;
+            continue;
+        }
+        QString name = resArr.at(i).toObject().value("name").toString();
+        pItem->setReserveName(name);
+    }
+
+    GamePlay* pGame = g_DataGamesManager.getGamePlay(gameIndex);
+    if (pGame != NULL) {
+        pGame->setFreeTickets(freeArr.count());
+        pGame->setReservedTickets(resArr.count());
+        pGame->setBlockedTickets(this->getSeasonTicketLength() - freeArr.count() - resArr.count());
+    }
+
+
+    return result;
+}
+
+qint32 cDataTicketManager::startChangeAvailableTicketState(const qint32 ticketIndex, const qint32 gameIndex,
+                                                           const qint32 state, QString name)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QMutexLocker lock(&this->m_mutex);
+
+    QJsonObject rootObj;
+    rootObj.insert("ticketIndex", ticketIndex);
+    rootObj.insert("gameIndex", gameIndex);
+    rootObj.insert("state", state);
+    rootObj.insert("name", name);
+
+    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET);
+    req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+
+    g_ConManager.sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 cDataTicketManager::handleChangeAvailableTicketResponse(MessageProtocol* msg)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QByteArray  data(msg->getPointerToData());
+    QJsonObject rootObj = QJsonDocument::fromJson(data).object();
+
+    qint32 result = rootObj.value("ack").toInt(ERROR_CODE_NOT_FOUND);
+
+    return result;
 }

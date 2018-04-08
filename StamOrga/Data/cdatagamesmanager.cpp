@@ -318,8 +318,6 @@ qint32 cDataGamesManager::handleListGamesInfoResponse(MessageProtocol* msg)
         play->setTripInfo(0);
     }
 
-    qInfo() << rootObj;
-
     QJsonArray infoArr = rootObj.value("infos").toArray();
     for (int i = 0; i < infoArr.size(); i++) {
         QJsonObject gameObj = infoArr.at(i).toObject();

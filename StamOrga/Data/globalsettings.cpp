@@ -67,7 +67,7 @@ void GlobalSettings::initialize(GlobalData* pGlobalData, QGuiApplication* app)
 
 void GlobalSettings::saveGlobalSettings()
 {
-    QMutexLocker lock(&this->m_pGlobalData->m_mutexUser);
+    //    QMutexLocker lock(&this->m_pGlobalData->m_mutexUser);
 
     this->m_pGlobalData->m_pMainUserSettings->beginGroup("GLOBAL_SETTINGS");
 

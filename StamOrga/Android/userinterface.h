@@ -36,15 +36,6 @@ public:
 
     Q_INVOKABLE qint32 startSetUserEvents(qint64 eventID, qint32 status);
 
-    Q_INVOKABLE qint32 startRequestAvailableTickets(quint32 gameIndex);
-
-    Q_INVOKABLE qint32 startChangeAvailableTicketState(quint32 ticketIndex, quint32 gameIndex, quint32 state, QString name = "");
-
-    Q_INVOKABLE qint32 startSaveMeetingInfo(const quint32 gameIndex, const QString when, const QString where, const QString info,
-                                            const quint32 type);
-
-    Q_INVOKABLE qint32 startLoadMeetingInfo(const quint32 gameIndex, const quint32 type);
-
     Q_INVOKABLE qint32 startAcceptMeetingInfo(const quint32 gameIndex, const quint32 accept,
                                               const QString name, const quint32 type,
                                               const quint32 acceptIndex = 0);

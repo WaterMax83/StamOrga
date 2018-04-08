@@ -19,10 +19,11 @@
 #include "cglobalmanager.h"
 #include "../Common/General/globalfunctions.h"
 
-#include "cticketmanager.h"
+#include "cgamesmanager.h"
+#include "cmeetinginfomanager.h"
 #include "cnewsdatamanager.h"
 #include "cstatisticmanager.h"
-#include "cgamesmanager.h"
+#include "cticketmanager.h"
 
 cGlobalManager::cGlobalManager(QObject* parent)
     : cGenDisposer(parent)
@@ -43,6 +44,9 @@ qint32 cGlobalManager::initialize()
 
     if (rValue == ERROR_CODE_SUCCESS)
         rValue = g_StatisticManager.initialize();
+
+    if (rValue == ERROR_CODE_SUCCESS)
+        rValue = g_MeetingInfoManager.initialize();
 
     this->m_initialized = true;
 

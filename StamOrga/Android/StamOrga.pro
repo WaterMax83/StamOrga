@@ -49,7 +49,6 @@ SOURCES += main.cpp \
     ../Data/gameplay.cpp \
     ../Data/newsdataitem.cpp \
     ../Data/seasonticket.cpp \
-    ../Data/meetinginfo.cpp \
     ../Data/globalsettings.cpp \
     ../Data/appuserevents.cpp \
     source/pushnotification.cpp \
@@ -57,7 +56,8 @@ SOURCES += main.cpp \
     ../Data/cdataticketmanager.cpp  \
     ../Data/cdatanewsdatamanager.cpp \
     ../Data/cdatastatisticmanager.cpp \
-    ../Data/cdatagamesmanager.cpp
+    ../Data/cdatagamesmanager.cpp \
+    ../Data/cdatameetinginfo.cpp
 
 
 RESOURCES += qml.qrc
@@ -111,7 +111,6 @@ HEADERS += \
     ../Data/globaldata.h \
     ../Data/gameplay.h \
     ../Data/seasonticket.h \
-    ../Data/meetinginfo.h \
     ../Data/newsdataitem.h \
     ../Data/acceptmeetinginfo.h \
     ../Data/globalsettings.h \
@@ -121,7 +120,8 @@ HEADERS += \
     ../Data/cdataticketmanager.h \
     ../Data/cdatanewsdatamanager.h \
     ../Data/cdatastatisticmanager.h \
-    ../Data/cdatagamesmanager.h
+    ../Data/cdatagamesmanager.h \
+    ../Data/cdatameetinginfo.h
 
 INCLUDEPATH += \
     ../ \

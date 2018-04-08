@@ -1018,8 +1018,8 @@ MessageProtocol* DataConnection::requestGetMeetingInfo(MessageProtocol* msg, con
         memcpy(&type, pData + sizeof(quint32), sizeof(quint32));
     type = qFromLittleEndian(type);
 
-    quint32 size = 10000;
-    char    buffer[10000];
+    qint32 size = 10000;
+    char   buffer[10000];
 
     if ((rCode = this->m_pGlobalData->requestGetMeetingInfo(gameIndex, 0, &buffer[0], type, size)) == ERROR_CODE_SUCCESS) {
         GamesPlay* pGame = (GamesPlay*)this->m_pGlobalData->m_GamesList.getItem(gameIndex);
@@ -1307,21 +1307,21 @@ MessageProtocol* DataConnection::requestDeleteNewsDataItem(MessageProtocol* msg)
 
 MessageProtocol* DataConnection::requestCommandStatistic(MessageProtocol* msg)
 {
-//    const char* pData = msg->getPointerToData();
-//    QByteArray  data(pData, (int)msg->getDataLength());
+    //    const char* pData = msg->getPointerToData();
+    //    QByteArray  data(pData, (int)msg->getDataLength());
 
-//    QByteArray answer;
-//    qint32     rCode = g_StatisticManager.handleStatisticCommand(data, answer);
-//    qInfo().noquote() << QString("Handle statistics command from %1 with %2").arg(this->m_pUserConData->m_userName).arg(rCode);
-//    rCode = qToLittleEndian(rCode);
-//    answer.prepend(sizeof(qint32), 0x0);
-//    memcpy((void*)answer.constData(), &rCode, sizeof(qint32));
+    //    QByteArray answer;
+    //    qint32     rCode = g_StatisticManager.handleStatisticCommand(data, answer);
+    //    qInfo().noquote() << QString("Handle statistics command from %1 with %2").arg(this->m_pUserConData->m_userName).arg(rCode);
+    //    rCode = qToLittleEndian(rCode);
+    //    answer.prepend(sizeof(qint32), 0x0);
+    //    memcpy((void*)answer.constData(), &rCode, sizeof(qint32));
 
-//    return new MessageProtocol(OP_CODE_CMD_RES::ACK_CMD_STATISTIC, answer);
+    //    return new MessageProtocol(OP_CODE_CMD_RES::ACK_CMD_STATISTIC, answer);
     MessageProtocol* ack = g_StatisticManager.handleStatisticCommand(this->m_pUserConData, msg);
 
-    QByteArray data = QByteArray(ack->getPointerToData());
-    qint32 rCode = ERROR_CODE_SUCCESS;
+    QByteArray data  = QByteArray(ack->getPointerToData());
+    qint32     rCode = ERROR_CODE_SUCCESS;
     data.prepend(sizeof(qint32), 0x0);
     memcpy((void*)data.constData(), &rCode, sizeof(qint32));
 

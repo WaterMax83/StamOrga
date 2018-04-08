@@ -28,9 +28,9 @@
 #include "../../Common/General/backgroundcontroller.h"
 #include "../../Common/General/globalfunctions.h"
 #include "../../Common/General/logging.h"
+#include "cdatameetinginfo.h"
 #include "gameplay.h"
 #include "gameuserdata.h"
-#include "meetinginfo.h"
 #include "newsdataitem.h"
 #include "seasonticket.h"
 #include "source/pushnotification.h"
@@ -142,13 +142,13 @@ public:
     //    qint64              getSeasonTicketLastServerUpdate();
     //    void                resetSeasonTicketLastServerUpdate();
 
-    Q_INVOKABLE MeetingInfo* getMeetingInfo(quint32 type)
-    {
-        if (type == MEETING_TYPE_MEETING)
-            return &this->m_meetingInfo;
-        else
-            return &this->m_awayTripInfo;
-    }
+    //    Q_INVOKABLE cDataMeetingInfo* getMeetingInfo(quint32 type)
+    //    {
+    //        if (type == MEETING_TYPE_MEETING)
+    //            return &this->m_meetingInfo;
+    //        else
+    //            return &this->m_awayTripInfo;
+    //    }
 
 
     //    void          saveCurrentNewsDataList(qint64 timestamp);
@@ -210,9 +210,9 @@ private:
 
     //    quint32 m_UserProperties;
 
-    QMutex m_mutexUser;
-    QMutex m_mutexUserIni;
-    QMutex m_mutexGame;
+    //    QMutex m_mutexUser;
+    //    QMutex m_mutexUserIni;
+    //    QMutex m_mutexGame;
     //    QMutex m_mutexTicket;
     //    QMutex m_mutexNewsData;
 
@@ -230,8 +230,8 @@ private:
     //    qint64                   m_stLastServerUpdateTimeStamp;
     //    bool                     m_bSeasonTicketLastUpdateDidChanges;
 
-    MeetingInfo m_meetingInfo;
-    MeetingInfo m_awayTripInfo;
+    //    cDataMeetingInfo m_meetingInfo;
+    //    cDataMeetingInfo m_awayTripInfo;
 
     //    QList<NewsDataItem*> m_lNewsDataItems;
     //    qint64               m_ndLastLocalUpdateTimeStamp;

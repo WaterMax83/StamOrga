@@ -55,8 +55,8 @@
 GlobalData::GlobalData(QObject* parent)
     : QObject(parent)
 {
-    QGuiApplication::setOrganizationName("WaterMax");
-    QGuiApplication::setApplicationName("StamOrga");
+    //    QGuiApplication::setOrganizationName("WaterMax");
+    //    QGuiApplication::setApplicationName("StamOrga");
     //    this->setbIsConnected(false);
     //    this->SetUserProperties(0x0);
 
@@ -64,8 +64,8 @@ GlobalData::GlobalData(QObject* parent)
     //    this->m_logApp->initialize();
     //    this->m_ctrlLog.Start(this->m_logApp, false);
 
-    QQmlEngine::setObjectOwnership(&this->m_meetingInfo, QQmlEngine::CppOwnership);
-    QQmlEngine::setObjectOwnership(&this->m_awayTripInfo, QQmlEngine::CppOwnership);
+    //    QQmlEngine::setObjectOwnership(&this->m_meetingInfo, QQmlEngine::CppOwnership);
+    //    QQmlEngine::setObjectOwnership(&this->m_awayTripInfo, QQmlEngine::CppOwnership);
     QQmlEngine::setObjectOwnership(&this->m_gameUserData, QQmlEngine::CppOwnership);
 
     this->m_pMainUserSettings = new QSettings();
@@ -95,7 +95,7 @@ void GlobalData::loadGlobalSettings()
     //    this->m_bIpAdressWasSet = false;
     //    QHostInfo::lookupHost("watermax83.ddns.net", this, SLOT(callBackLookUpHost(QHostInfo)));
 
-    qInfo().noquote() << this->m_pMainUserSettings->fileName();
+    //    qInfo().noquote() << this->m_pMainUserSettings->fileName();
 
     //    this->m_pMainUserSettings->beginGroup("USER_LOGIN");
 

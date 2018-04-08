@@ -62,31 +62,6 @@ qint32 UserInterface::startSetUserEvents(qint64 eventID, qint32 status)
     return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
-qint32 UserInterface::startChangeAvailableTicketState(quint32 ticketIndex, quint32 gameIndex, quint32 state, QString name)
-{
-    //    return this->m_pConHandle->startChangeSeasonTicketState(ticketIndex, gameIndex, state, name);
-    return ERROR_CODE_NOT_IMPLEMENTED;
-}
-
-qint32 UserInterface::startRequestAvailableTickets(quint32 gameIndex)
-{
-    //    return this->m_pConHandle->startListAvailableTicket(gameIndex);
-    return ERROR_CODE_NOT_IMPLEMENTED;
-}
-
-qint32 UserInterface::startSaveMeetingInfo(const quint32 gameIndex, const QString when, const QString where, const QString info,
-                                           const quint32 type)
-{
-    //    return this->m_pConHandle->startSaveMeetingInfo(gameIndex, when, where, info, type);
-    return ERROR_CODE_NOT_IMPLEMENTED;
-}
-
-qint32 UserInterface::startLoadMeetingInfo(const quint32 gameIndex, const quint32 type)
-{
-    //    return this->m_pConHandle->startLoadMeetingInfo(gameIndex, type);
-    return ERROR_CODE_NOT_IMPLEMENTED;
-}
-
 qint32 UserInterface::startAcceptMeetingInfo(const quint32 gameIndex, const quint32 accept,
                                              const QString name, const quint32 type,
                                              const quint32 acceptIndex)
@@ -136,9 +111,9 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
         emit this->notifyGamesInfoListFinished(result);
         break;
 
-    //    case OP_CODE_CMD_REQ::REQ_SET_FIXED_GAME_TIME:
-    //        emit this->notifySetGamesFixedTimeFinished(result);
-    //        break;
+        //    case OP_CODE_CMD_REQ::REQ_SET_FIXED_GAME_TIME:
+        //        emit this->notifySetGamesFixedTimeFinished(result);
+        //        break;
 
     case OP_CODE_CMD_REQ::REQ_ADD_TICKET:
         emit this->notifySeasonTicketAddFinished(result);

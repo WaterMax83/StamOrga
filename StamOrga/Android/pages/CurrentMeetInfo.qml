@@ -46,7 +46,11 @@ Flickable {
     onDragEnded: {
         if (flickableCurrentMeetInfo.contentY < -100) {
             showInfoHeader("Aktualisiere Daten", true)
-            userIntCurrentGame.startLoadMeetingInfo(m_gamePlayCurrentItem.index, meetingType);
+            lDataMeetingInfo.startLoadMeetingInfo(m_gamePlayCurrentItem.index, meetingType);
+//            if (meetingType === 0)
+//                gDataMeetingInfo.startLoadMeetingInfo(m_gamePlayCurrentItem.index, meetingType);
+//            else
+//                gDataTripInfo.startLoadMeetingInfo(m_gamePlayCurrentItem.index, meetingType);
         }
     }
 
@@ -100,7 +104,7 @@ Flickable {
                     enabled: isEditMode ? true : false
                     onClickedButton: {
                         isEditMode = false;
-                        var result = userIntCurrentGame.startSaveMeetingInfo(m_gamePlayCurrentItem.index, textWhen.input, textWhere.input,
+                        var result = lDataMeetingInfo.startSaveMeetingInfo(m_gamePlayCurrentItem.index, textWhen.input, textWhere.input,
                                                                              textInfo.text, meetingType);
                         if (result === 0)
                             toastManager.show("Keine Änderung, nichts gespeichert", 2000);
@@ -425,7 +429,7 @@ Flickable {
 
     }
 
-    property var  meetingInfo;
+    property var  lDataMeetingInfo;
     property bool isEditMode: false
     property bool isInputAlreadyChanged: false
     property bool isInfoVisible: false
@@ -434,7 +438,11 @@ Flickable {
     property bool userClosedAccept: false
 
     function showAllInfoAboutGame() {
-        meetingInfo = globalUserData.getMeetingInfo(meetingType);
+
+        if (meetingType === 0)
+            lDataMeetingInfo = gDataMeetingInfo;
+        else
+            lDataMeetingInfo = gDataTripInfo;
         loadMeetingInfo();
     }
 
@@ -455,14 +463,15 @@ Flickable {
     }
 
     function notifyLoadMeetingInfoFinished(result) {
+        console.log("Notify Info " + result + " " + meetingType)
         if (result === 1) {
             if (meetingType === 0)
                 toastManager.show("Info übers Treffen geladen", 2000);
             else
                 toastManager.show("Info über die Fahrt geladen", 2000);
-            textInfo.text = meetingInfo.info();
-            textWhen.init(meetingInfo.when())
-            textWhere.init(meetingInfo.where())
+            textInfo.text = lDataMeetingInfo.info();
+            textWhen.init(lDataMeetingInfo.when())
+            textWhere.init(lDataMeetingInfo.where())
             if (textInfo.text.length > 0 && !userClosedInfo)
                 isInfoVisible = true;
             showInfoHeader("", false)
@@ -481,11 +490,11 @@ Flickable {
 
         listViewModelAcceptedUsers.clear();
 
-        if (result === 1 && meetingInfo.getAcceptedListCount() > 0) {
+        if (result === 1 && lDataMeetingInfo.getAcceptedListCount() > 0) {
             if (!userClosedAccept)
                 isAcceptVisible = true;
-            for (var i = 0; i < meetingInfo.getAcceptedListCount(); i++) {
-                var acceptInfo = meetingInfo.getAcceptInfoFromIndex(i)
+            for (var i = 0; i < lDataMeetingInfo.getAcceptedListCount(); i++) {
+                var acceptInfo = lDataMeetingInfo.getAcceptInfoFromIndex(i)
                 var btnColor;
                 var imgSource;
                 if (acceptInfo.value() === 1) {
@@ -546,9 +555,14 @@ Flickable {
     function loadMeetingInfo()
     {
         listViewModelAcceptedUsers.clear();
-        meetingInfo.clearAcceptInfoList();
+        lDataMeetingInfo.clearAcceptInfoList();
         showInfoHeader("Aktualisiere Daten", true)
-        userIntCurrentGame.startLoadMeetingInfo(m_gamePlayCurrentItem.index, meetingType);
+//        if (meetingType === 0)
+//            gDataMeetingInfo.startLoadMeetingInfo(m_gamePlayCurrentItem.index, meetingType);
+//        else
+//            gDataTripInfo.startLoadMeetingInfo(m_gamePlayCurrentItem.index, meetingType);
+        lDataMeetingInfo.startLoadMeetingInfo(m_gamePlayCurrentItem.index, meetingType);
+
     }
 
 }

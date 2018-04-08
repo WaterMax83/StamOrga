@@ -82,15 +82,13 @@ private:
 
     //    void startSendGetUserEventsRequest(DataConRequest request);
     //    void startSendSetUserEventsRequest(DataConRequest request);
-    //    void startSendChangeTicketState(DataConRequest request);
     //    void startSendChangeMeetingInfo(DataConRequest request);
-    //    void startSendGetMeetingInfo(DataConRequest request);
     //    void startSendAcceptMeeting(DataConRequest request);
 
 
-    void   checkNewOncomingData();
-    qint32 sendMessageRequest(MessageProtocol* msg, TcpDataConRequest* request);
-    void removeActualRequest(TcpDataConRequest* request);
+    void               checkNewOncomingData();
+    qint32             sendMessageRequest(MessageProtocol* msg, TcpDataConRequest* request);
+    void               removeActualRequest(TcpDataConRequest* request);
     TcpDataConRequest* getActualRequest(quint32 req);
 
     bool m_bRequestLoginAgain;

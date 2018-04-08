@@ -122,11 +122,11 @@ qint32 MeetingInfo::initialize(QString filePath)
         for (int i = 0; i < sizeOfArray; i++) {
             this->m_pConfigSettings->setArrayIndex(i);
             QString name      = this->m_pConfigSettings->value(ITEM_NAME, "").toString();
-            quint32 index     = this->m_pConfigSettings->value(ITEM_INDEX, 0).toUInt();
+            qint32  index     = this->m_pConfigSettings->value(ITEM_INDEX, 0).toUInt();
             qint64  timestamp = this->m_pConfigSettings->value(ITEM_TIMESTAMP, 0x0).toULongLong();
 
-            quint32 state  = this->m_pConfigSettings->value(MEET_INFO_STATE, 0x0).toUInt();
-            quint32 userID = this->m_pConfigSettings->value(MEET_INFO_USER_ID, 0x0).toUInt();
+            qint32 state  = this->m_pConfigSettings->value(MEET_INFO_STATE, 0x0).toUInt();
+            qint32 userID = this->m_pConfigSettings->value(MEET_INFO_USER_ID, 0x0).toUInt();
 
             if (userID == 0 || state == 0)
                 continue;
@@ -186,7 +186,7 @@ qint32 MeetingInfo::getMeetingInfo(QString& when, QString& where, QString& info)
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 MeetingInfo::addNewAcceptation(const quint32 acceptState, const quint32 userID, QString name)
+qint32 MeetingInfo::addNewAcceptation(const qint32 acceptState, const qint32 userID, QString name)
 {
     if (acceptState == ACCEPT_STATE_NOT_POSSIBLE) {
         qWarning().noquote() << QString("Could not add acceptation \"%1\", state 0 is not allowed").arg(name);
@@ -229,7 +229,7 @@ qint32 MeetingInfo::addNewAcceptation(const quint32 acceptState, const quint32 u
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 MeetingInfo::changeAcceptation(const quint32 acceptIndex, const quint32 acceptState, const quint32 userID, QString name)
+qint32 MeetingInfo::changeAcceptation(const qint32 acceptIndex, const qint32 acceptState, const qint32 userID, QString name)
 {
     AcceptMeetingInfo* aInfo = (AcceptMeetingInfo*)this->getItem(acceptIndex);
     if (aInfo == NULL) {
@@ -278,7 +278,7 @@ bool MeetingInfo::updateHeaderValue(QString key, QVariant value)
     return rValue;
 }
 
-quint16 MeetingInfo::getAcceptedNumber(const quint32 state)
+quint16 MeetingInfo::getAcceptedNumber(const qint32 state)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 

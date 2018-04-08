@@ -20,11 +20,12 @@
 #include "../Common/General/globalfunctions.h"
 #include "../Common/General/globaltiming.h"
 #include "../Common/Network/messagecommand.h"
-#include "../Manager/cticketmanager.h"
-#include "../Manager/cnewsdatamanager.h"
-#include "ccontcpmaindata.h"
-#include "../Manager/cstatisticmanager.h"
 #include "../Manager/cgamesmanager.h"
+#include "../Manager/cmeetinginfomanager.h"
+#include "../Manager/cnewsdatamanager.h"
+#include "../Manager/cstatisticmanager.h"
+#include "../Manager/cticketmanager.h"
+#include "ccontcpmaindata.h"
 
 cConTcpDataServer::cConTcpDataServer()
     : BackgroundWorker()
@@ -211,6 +212,9 @@ MessageProtocol* cConTcpDataServer::checkNewMessage(MessageProtocol* msg)
         case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS:
             ack = g_TicketManager.getAvailableSeasonTicketList(this->m_pUserConData, msg);
             break;
+        case OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET:
+            ack = g_TicketManager.getChangeAvailableTicketState(this->m_pUserConData, msg);
+            break;
 
         case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
             ack = g_GamesManager.getGamesList(this->m_pUserConData, msg);
@@ -224,7 +228,7 @@ MessageProtocol* cConTcpDataServer::checkNewMessage(MessageProtocol* msg)
 
         case OP_CODE_CMD_REQ::REQ_GET_NEWS_DATA_LIST:
             ack = g_NewsDataManager.getNewsDataList(this->m_pUserConData, msg);
-           break;
+            break;
         case OP_CODE_CMD_REQ::REQ_GET_NEWS_DATA_ITEM:
             ack = g_NewsDataManager.getNewsDataItem(this->m_pUserConData, msg);
             break;
@@ -235,7 +239,16 @@ MessageProtocol* cConTcpDataServer::checkNewMessage(MessageProtocol* msg)
             ack = g_NewsDataManager.getNewsDataRemoveRequest(this->m_pUserConData, msg);
             break;
 
-         case OP_CODE_CMD_REQ::REQ_CMD_STATISTIC:
+        case OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO:
+        case OP_CODE_CMD_REQ::REQ_GET_AWAYTRIP_INFO:
+            ack = g_MeetingInfoManager.getMeetingInfo(this->m_pUserConData, msg);
+            break;
+        case OP_CODE_CMD_REQ::REQ_CHANGE_MEETING_INFO:
+        case OP_CODE_CMD_REQ::REQ_CHANGE_AWAYTRIP_INFO:
+            ack = g_MeetingInfoManager.getChangeMeetingInfo(this->m_pUserConData, msg);
+            break;
+
+        case OP_CODE_CMD_REQ::REQ_CMD_STATISTIC:
             ack = g_StatisticManager.handleStatisticCommand(this->m_pUserConData, msg);
             break;
         }

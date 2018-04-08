@@ -21,6 +21,7 @@
 #include "Connection/cconmanager.h"
 #include "Connection/cconusersettings.h"
 #include "Data/cdatagamesmanager.h"
+#include "Data/cdatameetinginfo.h"
 #include "Data/cdatanewsdatamanager.h"
 #include "Data/cdatappinfomanager.h"
 #include "Data/cdatastatisticmanager.h"
@@ -28,6 +29,9 @@
 #include "cstaglobalmanager.h"
 #include "cstaglobalsettings.h"
 #include "cstasettingsmanager.h"
+
+cDataMeetingInfo g_DataMeetingInfo;
+cDataMeetingInfo g_DataTripInfo;
 
 
 cStaGlobalManager::cStaGlobalManager(QObject* parent)
@@ -63,6 +67,12 @@ qint32 cStaGlobalManager::initialize()
         rCode = g_DataStatisticManager.initialize();
 
     if (rCode == ERROR_CODE_SUCCESS)
+        rCode = g_DataMeetingInfo.initialize();
+
+    if (rCode == ERROR_CODE_SUCCESS)
+        rCode = g_DataTripInfo.initialize();
+
+    if (rCode == ERROR_CODE_SUCCESS)
         rCode = g_ConUserSettings.initialize();
 
     if (rCode == ERROR_CODE_SUCCESS)
@@ -82,5 +92,7 @@ void cStaGlobalManager::setQmlInformationClasses(QQmlApplicationEngine* engine)
     engine->rootContext()->setContextProperty("gDataTicketManager", &g_DataTicketManager);
     engine->rootContext()->setContextProperty("gDataNewsDataManager", &g_DataNewsDataManager);
     engine->rootContext()->setContextProperty("gDataStatisticManager", &g_DataStatisticManager);
+    engine->rootContext()->setContextProperty("gDataMeetingInfo", &g_DataMeetingInfo);
+    engine->rootContext()->setContextProperty("gDataTripInfo", &g_DataTripInfo);
     engine->rootContext()->setContextProperty("gConUserSettings", &g_ConUserSettings);
 }

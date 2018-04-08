@@ -27,12 +27,12 @@
 #include "configlist.h"
 
 struct AcceptMeetingInfo : public ConfigItem {
-    quint32 m_state;
-    quint32 m_userID;
+    qint32 m_state;
+    qint32 m_userID;
 
     AcceptMeetingInfo(QString name, qint64 timestamp,
-                      quint32 index, quint32 state,
-                      quint32 userID)
+                      qint32 index, qint32 state,
+                      qint32 userID)
     {
         this->m_itemName  = name;
         this->m_timestamp = timestamp;
@@ -65,15 +65,15 @@ public:
     qint32 initialize(quint32 year, quint32 competition, quint32 seasonIndex, quint32 index);
     qint32 initialize(QString filePath);
 
-    qint32 addNewAcceptation(const quint32 acceptState, const quint32 userID, QString name = "");
-    qint32 changeAcceptation(const quint32 acceptIndex, const quint32 acceptState, const quint32 userID, QString name = "");
+    qint32 addNewAcceptation(const qint32 acceptState, const qint32 userID, QString name = "");
+    qint32 changeAcceptation(const qint32 acceptIndex, const qint32 acceptState, const qint32 userID, QString name = "");
 
     qint32 changeMeetingInfo(const QString when, const QString where, const QString info);
     qint32 getMeetingInfo(QString& when, QString& where, QString& info);
 
-    quint32 getGameIndex() { return this->m_gameIndex; }
+    qint32 getGameIndex() { return this->m_gameIndex; }
 
-    quint16 getAcceptedNumber(const quint32 state);
+    quint16 getAcceptedNumber(const qint32 state);
 
     virtual qint32 checkConsistency() { return -12; }
 
@@ -88,8 +88,8 @@ protected:
 private:
     quint32 m_year;
     quint32 m_competition;
-    quint32 m_seasonIndex;
-    quint32 m_gameIndex;
+    qint32  m_seasonIndex;
+    qint32  m_gameIndex;
 
     QString m_when;
     QString m_where;

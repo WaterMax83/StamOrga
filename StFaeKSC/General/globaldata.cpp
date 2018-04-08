@@ -112,8 +112,8 @@ void GlobalData::initialize()
     this->m_initalized = true;
 }
 
-qint32 GlobalData::requestChangeStateSeasonTicket(const quint32 ticketIndex, const qint32 gameIndex,
-                                                  const quint32 newState, const QString reserveName,
+qint32 GlobalData::requestChangeStateSeasonTicket(const qint32 ticketIndex, const qint32 gameIndex,
+                                                  const qint32 newState, const QString reserveName,
                                                   const qint32 userID, qint64& messageID)
 {
     if (!this->m_initalized)
@@ -141,7 +141,7 @@ qint32 GlobalData::requestChangeStateSeasonTicket(const quint32 ticketIndex, con
     qint32 result = ERROR_CODE_SUCCESS;
     foreach (AvailableGameTickets* ticket, this->m_availableTickets) {
         if (ticket->getGameIndex() == gameIndex) {
-            quint32 currentState = ticket->getTicketState(ticketIndex);
+            qint32  currentState = ticket->getTicketState(ticketIndex);
             QString currentName  = ticket->getTicketName(ticketIndex);
             if (currentState == newState && currentName == reserveName)
                 qInfo().noquote() << QString("Ticket %1 at game %3 already has state %4 and name %2").arg(pTicket->m_itemName, currentName).arg(pGame->m_index).arg(currentState);
@@ -287,7 +287,7 @@ qint32 GlobalData::requestGetAvailableSeasonTicket(const qint32 gameIndex, const
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 GlobalData::requestGetAvailableTicketFromUser(const qint32 userID, QJsonArray &arrTickets)
+qint32 GlobalData::requestGetAvailableTicketFromUser(const qint32 userID, QJsonArray& arrTickets)
 {
     if (!this->m_initalized)
         return ERROR_CODE_NOT_READY;
@@ -310,8 +310,8 @@ qint32 GlobalData::requestGetAvailableTicketFromUser(const qint32 userID, QJsonA
             if (pTicketInfo->m_userID == userID && pTicketInfo->m_state == TICKET_STATE_RESERVED) {
                 gameObj.insert("type", "reserved");
             } else { /* Then check if this users card is not blocked */
-                TicketInfo* pTicket = (TicketInfo*) this->m_SeasonTicket.getItem(pTicketInfo->m_ticketID);
-                if (pTicket == NULL || pTicket->m_userIndex != userID)  // only tickets from this user
+                TicketInfo* pTicket = (TicketInfo*)this->m_SeasonTicket.getItem(pTicketInfo->m_ticketID);
+                if (pTicket == NULL || pTicket->m_userIndex != userID) // only tickets from this user
                     continue;
                 gameObj.insert("type", "free");
             }
@@ -320,13 +320,12 @@ qint32 GlobalData::requestGetAvailableTicketFromUser(const qint32 userID, QJsonA
             arrTickets.append(gameObj);
             break;
         }
-
     }
 
     return ERROR_CODE_SUCCESS;
 }
 
-quint16 GlobalData::getTicketNumber(const qint32 gamesIndex, const quint32 state)
+quint16 GlobalData::getTicketNumber(const qint32 gamesIndex, const qint32 state)
 {
     if (!this->m_initalized)
         return ERROR_CODE_NOT_READY;
@@ -344,7 +343,7 @@ quint16 GlobalData::getTicketNumber(const qint32 gamesIndex, const quint32 state
     return 0;
 }
 
-quint16 GlobalData::getAcceptedNumber(const quint32 type, const quint32 gamesIndex, const quint32 state)
+quint16 GlobalData::getAcceptedNumber(const qint32 type, const qint32 gamesIndex, const qint32 state)
 {
     if (!this->m_initalized)
         return ERROR_CODE_NOT_READY;
@@ -374,7 +373,7 @@ quint16 GlobalData::getAcceptedNumber(const quint32 type, const quint32 gamesInd
     return rValue;
 }
 
-quint16 GlobalData::getMeetingInfoValue(const quint32 type, const quint32 gamesIndex)
+quint16 GlobalData::getMeetingInfoValue(const qint32 type, const qint32 gamesIndex)
 {
     if (!this->m_initalized)
         return ERROR_CODE_NOT_READY;
@@ -420,9 +419,9 @@ quint16 GlobalData::getMeetingInfoValue(const quint32 type, const quint32 gamesI
 #define BODY_CHANGE_MEET "Beim Spiel %1 : %2 wurde das Treffen geändert"
 #define BODY_ADD_MEETING "Kommst du zu %1 : %2 ?"
 
-qint32 GlobalData::requestChangeMeetingInfo(const quint32 gameIndex, const quint32 version,
+qint32 GlobalData::requestChangeMeetingInfo(const qint32 gameIndex, const qint32 version,
                                             const QString when, const QString where, const QString info,
-                                            const qint32 userID, const quint32 type, qint64& messageID)
+                                            const qint32 userID, const qint32 type, qint64& messageID)
 {
     if (!this->m_initalized)
         return ERROR_CODE_NOT_READY;
@@ -502,7 +501,7 @@ qint32 GlobalData::requestChangeMeetingInfo(const quint32 gameIndex, const quint
  *      quint32     acceptValue     4
  *      QString     name            Z
  */
-qint32 GlobalData::requestGetMeetingInfo(const quint32 gameIndex, const quint32 version, char* pData, const quint32 type, quint32& size)
+qint32 GlobalData::requestGetMeetingInfo(const qint32 gameIndex, const qint32 version, char* pData, const qint32 type, qint32& size)
 {
     if (!this->m_initalized)
         return ERROR_CODE_NOT_READY;
@@ -594,9 +593,9 @@ qint32 GlobalData::requestGetMeetingInfo(const quint32 gameIndex, const quint32 
  * 0                Header          12
  * 12   quint32     result          4
  */
-qint32 GlobalData::requestAcceptMeetingInfo(const quint32 gameIndex, const quint32 version,
-                                            const quint32 acceptValue, const quint32 acceptIndex,
-                                            const QString name, const qint32 userID, const quint32 type,
+qint32 GlobalData::requestAcceptMeetingInfo(const qint32 gameIndex, const qint32 version,
+                                            const qint32 acceptValue, const qint32 acceptIndex,
+                                            const QString name, const qint32 userID, const qint32 type,
                                             qint64& messageID)
 {
     if (!this->m_initalized)

@@ -580,7 +580,7 @@ qint32 DataHandling::getHandleLoadMeetingInfo(MessageProtocol* msg, const quint3
     return ERROR_CODE_WRONG_SIZE;
 
     //    const char*  pData = msg->getPointerToData();
-    //    MeetingInfo* pInfo = this->m_pGlobalData->getMeetingInfo(type);
+    //    cDataMeetingInfo* pInfo = this->m_pGlobalData->getMeetingInfo(type);
     //    quint32      gameIndex;
     //    qint32       result;
     //    memcpy(&result, pData, sizeof(quint32));

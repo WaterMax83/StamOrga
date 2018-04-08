@@ -16,15 +16,15 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QtCore/QDate>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
-#include <QtCore/QDate>
 
 #include "../Common/General/globalfunctions.h"
+#include "../Common/General/globaltiming.h"
 #include "../Common/Network/messagecommand.h"
 #include "../General/globaldata.h"
 #include "cgamesmanager.h"
-#include "../Common/General/globaltiming.h"
 
 extern GlobalData* g_GlobalData;
 
@@ -51,7 +51,7 @@ MessageProtocol* cGamesManager::getGamesList(UserConData* pUserCon, MessageProto
     QByteArray  data    = QByteArray(request->getPointerToData());
     QJsonObject rootObj = QJsonDocument::fromJson(data).object();
 
-    qint32 updateIndex              = rootObj.value("index").toInt(UpdateIndex::UpdateAll);
+    qint32 updateIndex            = rootObj.value("index").toInt(UpdateIndex::UpdateAll);
     qint64 lastUpdateGamesFromApp = (qint64)rootObj.value("timestamp").toDouble(0);
 
     if (lastUpdateGamesFromApp == 0)
@@ -65,7 +65,7 @@ MessageProtocol* cGamesManager::getGamesList(UserConData* pUserCon, MessageProto
 
     QJsonArray arrGames;
     for (quint32 i = 0; i < numbOfGames; i++) {
-        GamesPlay * pGame = (GamesPlay*)(g_GlobalData->m_GamesList.getRequestConfigItemFromListIndex(i));
+        GamesPlay* pGame = (GamesPlay*)(g_GlobalData->m_GamesList.getRequestConfigItemFromListIndex(i));
         if (pGame == NULL)
             continue;
         QJsonObject gameObj;
@@ -113,18 +113,18 @@ MessageProtocol* cGamesManager::getGamesInfoList(UserConData* pUserCon, MessageP
         rootAns.insert("ack", ERROR_CODE_SUCCESS);
 
         qint32 numbOfGames = g_GlobalData->m_GamesList.getNumberOfInternalList();
-//    #ifndef QT_DEBUG
+        //    #ifndef QT_DEBUG
         qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
-//    #endif
+        //    #endif
         QJsonArray gameInfoArr;
         for (qint32 i = 0; i < numbOfGames; i++) {
             GamesPlay* pGame = (GamesPlay*)(g_GlobalData->m_GamesList.getRequestConfigItemFromListIndex(i));
             if (pGame == NULL)
                 continue;
-//    #ifndef QT_DEBUG
+            //    #ifndef QT_DEBUG
             if (pGame->m_timestamp + 2 * MSEC_PER_HOUR < currentTime)
                 continue;
-//    #endif
+            //    #endif
             qint16 freeTickets     = g_GlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_FREE);
             qint16 blockTickets    = g_GlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_BLOCKED);
             qint16 reservedTickets = g_GlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_RESERVED);
@@ -177,14 +177,14 @@ MessageProtocol* cGamesManager::getChangeGameRequest(UserConData* pUserCon, Mess
     QByteArray  data    = QByteArray(request->getPointerToData());
     QJsonObject rootObj = QJsonDocument::fromJson(data).object();
 
-    qint32  index    = rootObj.value("index").toInt(-1);
-    QString home     = rootObj.value("home").toString();
-    QString away    = rootObj.value("away").toString();
-    QString  score = rootObj.value("score").toString();
-    CompetitionIndex  comp = (CompetitionIndex)rootObj.value("competition").toInt();
-    qint32  sIndex = rootObj.value("seasonIndex").toInt();
-    qint64  timestamp = (qint64)rootObj.value("timestamp").toDouble();
-    bool  fixed = rootObj.value("fixed").toBool();
+    qint32           index     = rootObj.value("index").toInt(-1);
+    QString          home      = rootObj.value("home").toString();
+    QString          away      = rootObj.value("away").toString();
+    QString          score     = rootObj.value("score").toString();
+    CompetitionIndex comp      = (CompetitionIndex)rootObj.value("competition").toInt();
+    qint32           sIndex    = rootObj.value("seasonIndex").toInt();
+    qint64           timestamp = (qint64)rootObj.value("timestamp").toDouble();
+    bool             fixed     = rootObj.value("fixed").toBool();
 
     /* game already exists, should only be changed */
     if (index > 0) {
@@ -211,5 +211,3 @@ MessageProtocol* cGamesManager::getChangeGameRequest(UserConData* pUserCon, Mess
 
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME, result);
 }
-
-

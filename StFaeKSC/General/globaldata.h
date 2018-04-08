@@ -19,10 +19,10 @@
 #ifndef GLOBALDATA_H
 #define GLOBALDATA_H
 
-#include <QtCore/QList>
-#include <QtCore/QMutex>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
+#include <QtCore/QList>
+#include <QtCore/QMutex>
 
 #include "../Data/availablegameticket.h"
 #include "../Data/awaytripinfo.h"
@@ -40,24 +40,24 @@ public:
 
     void initialize();
 
-    qint32 requestChangeStateSeasonTicket(const quint32 ticketIndex, const qint32 gameIndex,
-                                          const quint32 state, const QString reserveName,
+    qint32 requestChangeStateSeasonTicket(const qint32 ticketIndex, const qint32 gameIndex,
+                                          const qint32 state, const QString reserveName,
                                           const qint32 userID, qint64& messageID);
-    qint32 requestBlockSeasonTicket(quint32 ticketIndex, qint32 gameIndex, const QString userName);
+    qint32 requestBlockSeasonTicket(qint32 ticketIndex, qint32 gameIndex, const QString userName);
     qint32 requestGetAvailableSeasonTicket(const qint32 gameIndex, const QString userName, QByteArray& data);
     qint32 requestGetAvailableTicketFromUser(const qint32 userID, QJsonArray& arrTickets);
 
-    qint32 requestChangeMeetingInfo(const quint32 gameIndex, const quint32 version,
+    qint32 requestChangeMeetingInfo(const qint32 gameIndex, const qint32 version,
                                     const QString when, const QString where, const QString info,
-                                    const qint32 userID, const quint32 type, qint64& messageID);
-    qint32 requestGetMeetingInfo(const quint32 gameIndex, const quint32 version, char* pData, const quint32 type, quint32& size);
-    qint32 requestAcceptMeetingInfo(const quint32 gameIndex, const quint32 version, const quint32 acceptValue,
-                                    const quint32 acceptIndex, const QString name,
-                                    const qint32 userID, const quint32 type, qint64& messageID);
+                                    const qint32 userID, const qint32 type, qint64& messageID);
+    qint32 requestGetMeetingInfo(const qint32 gameIndex, const qint32 version, char* pData, const qint32 type, qint32& size);
+    qint32 requestAcceptMeetingInfo(const qint32 gameIndex, const qint32 version, const qint32 acceptValue,
+                                    const qint32 acceptIndex, const QString name,
+                                    const qint32 userID, const qint32 type, qint64& messageID);
 
-    quint16 getTicketNumber(const qint32 gamesIndex, const quint32 state);
-    quint16 getAcceptedNumber(const quint32 type, const quint32 gamesIndex, const quint32 state);
-    quint16 getMeetingInfoValue(const quint32 type, const quint32 gamesIndex);
+    quint16 getTicketNumber(const qint32 gamesIndex, const qint32 state);
+    quint16 getAcceptedNumber(const qint32 type, const qint32 gamesIndex, const qint32 state);
+    quint16 getMeetingInfoValue(const qint32 type, const qint32 gamesIndex);
 
     qint32 addNewUserEvent(const QString type, const QString info, const qint32 userID);
     qint32 getCurrentUserEvents(QByteArray& destArray, const qint32 userID);
