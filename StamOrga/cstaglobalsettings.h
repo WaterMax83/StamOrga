@@ -71,6 +71,19 @@ public:
     Q_INVOKABLE QString getCurrentVersion();
     Q_INVOKABLE QString getCurrentVersionLink();
 
+    Q_INVOKABLE bool isNotificationNewAppVersionEnabled();
+    Q_INVOKABLE bool isNotificationNewMeetingEnabled();
+    Q_INVOKABLE bool isNotificationChangedMeetingEnabled();
+    Q_INVOKABLE bool isNotificationNewFreeTicketEnabled();
+    Q_INVOKABLE bool isNotificationNewAwayAcceptEnabled();
+    Q_INVOKABLE bool isNotificationFanclubNewsEnabled();
+    Q_INVOKABLE void setNotificationNewAppVersionEnabled(bool enable);
+    Q_INVOKABLE void setNotificationNewMeetingEnabled(bool enable);
+    Q_INVOKABLE void setNotificationChangedMeetingEnabled(bool enable);
+    Q_INVOKABLE void setNotificationNewFreeTicketEnabled(bool enabled);
+    Q_INVOKABLE void setNotificationNewAwayAcceptEnabled(bool enable);
+    Q_INVOKABLE void setNotificationFanclubNewsEnabled(bool enable);
+
 
     bool isIpAddressAlreadySet() { return this->m_bIpAddressWasSet; }
 
@@ -91,12 +104,15 @@ private:
     bool    m_bLoadGameInfo;
     bool    m_bUseVersionPopup;
     bool    m_bIpAddressWasSet;
+    quint64 m_notificationEnabledValue;
 
     QString      m_changeDefaultFont;
     qint64       m_currentFontIndex;
     QStringList* m_fontList = NULL;
 
     bool m_bAlreadyConnected;
+
+    void updatePushNotification(void);
 };
 
 extern cStaGlobalSettings g_StaGlobalSettings;

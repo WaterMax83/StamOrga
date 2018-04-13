@@ -288,7 +288,7 @@ ApplicationWindow {
                     } else if (model.link && model.link !== "") {
                         Qt.openUrlExternally(model.link);
                         if (model.title === "Update")
-                            appUserEvents.clearUserEventUpdate(userInt);
+                            gDataAppUserEvents.clearUserEventUpdate();
                     }
 
                     drawer.close()
@@ -328,7 +328,6 @@ ApplicationWindow {
 
     UserInterface {
         id: userInt
-//        globalData: globalUserData
         onNotifyConnectionFinished: {
             if (stackView.currentItem.notifyUserIntConnectionFinished)
                 stackView.currentItem.notifyUserIntConnectionFinished(result, msg)
@@ -396,22 +395,20 @@ ApplicationWindow {
                 else
                     updateHeaderFromMain("StamOrga", "")
             }
-            if (stackView.currentItem.notifyGetUserProperties)
-                stackView.currentItem.notifyGetUserProperties(result);
-        }
-        onNotifyGetUserEvents: {
-            iMainToolButtonEventCount = appUserEvents.getCurrentMainEventCounter();
+
+            /* User Events are also transported with UserProperties */
+            iMainToolButtonEventCount = gDataAppUserEvents.getCurrentMainEventCounter();
 
             for(var i=0; i< listViewListModel.count; i++) {
                 if (listViewListModel.get(i).title === "Update")
-                    listViewListModel.get(i).event = appUserEvents.getCurrentUpdateEventCounter();
+                    listViewListModel.get(i).event = gDataAppUserEvents.getCurrentUpdateEventCounter();
                 else if (listViewListModel.get(i).title === "Fanclub") {
-                    listViewListModel.get(i).event = appUserEvents.getCurrentFanclubEventCounter();
+                    listViewListModel.get(i).event = gDataAppUserEvents.getCurrentFanclubEventCounter();
                 }
             }
 
-            if (stackView.currentItem.notifyGetUserEvents)
-                stackView.currentItem.notifyGetUserEvents(result);
+            if (stackView.currentItem.notifyGetUserProperties)
+                stackView.currentItem.notifyGetUserProperties(result);
         }
 
         onNotifyUpdatePasswordRequestFinished: {

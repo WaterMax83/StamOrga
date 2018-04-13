@@ -49,6 +49,9 @@ public:
 signals:
 
 public slots:
+#ifdef Q_OS_ANDROID
+    void slotNewFcmRegistrationToken(QString token);
+#endif
 
 private:
     QString m_pushNotificationToken;

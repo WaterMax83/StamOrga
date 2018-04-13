@@ -39,20 +39,23 @@ public:
 
     GamePlay* getGamePlay(qint32 gameIndex);
 
+    bool setGamePlayItemHasEvent(qint32 gameIndex);
+    void resetAllGamePlayEvents();
+
     Q_INVOKABLE qint32 getGamePlayLength();
     Q_INVOKABLE GamePlay* getGamePlayFromArrayIndex(int index);
     Q_INVOKABLE QString getGamePlayLastLocalUpdateString();
 
     Q_INVOKABLE qint32 startListGames();
-    qint32 handleListGamesResponse(MessageProtocol* msg);
+    qint32             handleListGamesResponse(MessageProtocol* msg);
 
     Q_INVOKABLE qint32 startListGamesInfo();
-    qint32 handleListGamesInfoResponse(MessageProtocol* msg);
+    qint32             handleListGamesInfoResponse(MessageProtocol* msg);
 
     Q_INVOKABLE qint32 startChangeGame(const qint32 index, const qint32 sIndex, const QString competition,
                                        const QString home, const QString away, const QString date,
                                        const QString score, const bool fixedTime);
-    qint32 handleChangeGameResponse(MessageProtocol* msg);
+    qint32             handleChangeGameResponse(MessageProtocol* msg);
 
     //    Q_INVOKABLE qint32 startRemoveSeasonTicket(const qint32 index);
     //    qint32             handleRemoveSeasonTicketResponse(MessageProtocol* msg);

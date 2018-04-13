@@ -32,20 +32,16 @@
 #include "../../Common/General/config.h"
 #include "../../Common/General/globalfunctions.h"
 #include "../Connection/cconusersettings.h"
-#include "../Data/appuserevents.h"
+#include "../Data/cdataappuserevents.h"
+#include "../Data/cdatagameuserdata.h"
 #include "../Data/cdatastatisticmanager.h"
-#include "../Data/gameuserdata.h"
 #include "../Data/globaldata.h"
-#include "../Data/globalsettings.h"
 #include "../cstaglobalmanager.h"
 #include "../cstaglobalsettings.h"
 #include "../dataconnection.h"
 #include "userinterface.h"
 
-
-GlobalSettings* g_GlobalSettings;
-AppUserEvents*  g_AppUserEvents;
-GlobalData*     g_GlobalData;
+GlobalData* g_GlobalData;
 
 int main(int argc, char* argv[])
 {
@@ -53,31 +49,22 @@ int main(int argc, char* argv[])
     QCoreApplication::setAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles, true);
     QApplication app(argc, argv);
 
-    // Register our component type with QML.
-    qmlRegisterType<UserInterface>("com.watermax.demo", 1, 0, "UserInterface");
-    qRegisterMetaType<GamePlay*>("GamePlay*");
-    qRegisterMetaType<SeasonTicketItem*>("SeasonTicketItem*");
-    qRegisterMetaType<cDataMeetingInfo*>("cDataMeetingInfo*");
-    qRegisterMetaType<NewsDataItem*>("NewsDataItem*");
-    qRegisterMetaType<AcceptMeetingInfo*>("AcceptMeetingInfo*");
-    qRegisterMetaType<DataConRequest>("DataConRequest");
-    qRegisterMetaType<GameUserData*>("GameUserData*");
-    qRegisterMetaType<StatBars*>("StatBars*");
+    //    // Register our component type with QML.
+    //    qmlRegisterType<UserInterface>("com.watermax.demo", 1, 0, "UserInterface");
+    //    qRegisterMetaType<GamePlay*>("GamePlay*");
+    //    qRegisterMetaType<SeasonTicketItem*>("SeasonTicketItem*");
+    //    qRegisterMetaType<cDataMeetingInfo*>("cDataMeetingInfo*");
+    //    qRegisterMetaType<NewsDataItem*>("NewsDataItem*");
+    //    qRegisterMetaType<AcceptMeetingInfo*>("AcceptMeetingInfo*");
+    //    qRegisterMetaType<DataConRequest>("DataConRequest");
+    //    //    qRegisterMetaType<GameUserData*>("GameUserData*");
+    //    qRegisterMetaType<StatBars*>("StatBars*");
 
     cStaGlobalManager staGlobalManager;
     staGlobalManager.initialize();
 
-    GlobalSettings globalSettings;
-    g_GlobalSettings = &globalSettings;
-
     GlobalData globalUserData;
-    globalUserData.initialize();
     g_GlobalData = &globalUserData;
-    globalSettings.initialize(&globalUserData, &app);
-
-    AppUserEvents appUserEvents;
-    appUserEvents.initialize(&globalUserData);
-    g_AppUserEvents = &appUserEvents;
 
     QFontDatabase base;
     QStringList   fontFamilies = base.families();
@@ -106,14 +93,12 @@ int main(int argc, char* argv[])
     QQmlApplicationEngine engine;
     staGlobalManager.setQmlInformationClasses(&engine);
     engine.rootContext()->setContextProperty("globalUserData", &globalUserData);
-    engine.rootContext()->setContextProperty("globalSettings", &globalSettings);
     engine.rootContext()->setContextProperty("fontFamiliesModel", &fontFamiliesModel);
-    engine.rootContext()->setContextProperty("appUserEvents", &appUserEvents);
     //    engine.rootContext()->setContextProperty("fontFamiliesModel", QVariant::fromValue(fontFamilies));
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));
 
     // load settings to update data
-    globalUserData.loadGlobalSettings();
+    //    globalUserData.loadGlobalSettings();
 
     if (engine.rootObjects().size() == 0) {
         qCritical() << "Warning no root qml object loaded, end programm";

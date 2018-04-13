@@ -57,6 +57,8 @@ cDataTicketManager::cDataTicketManager(QObject* parent)
 
 qint32 cDataTicketManager::initialize()
 {
+    qRegisterMetaType<SeasonTicketItem*>("SeasonTicketItem*");
+
     if (!g_StaGlobalSettings.getSaveInfosOnApp())
         g_StaSettingsManager.removeGroup(SEASONTICKET_GROUP);
 

@@ -139,7 +139,7 @@ Flickable {
                     sprite.showAllInfoAboutGame(sender)
 
                     if (sender.event > 0)
-                        appUserEvents.clearUserEventGamPlay(userIntGames, sender.index);
+                        gDataAppUserEvents.clearUserEventGamPlay(sender.index);
 
                 } else
                     console.error("Fehler beim laden von der Spielseite " + component.errorString())

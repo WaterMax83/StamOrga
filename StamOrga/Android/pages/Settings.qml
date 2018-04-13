@@ -261,7 +261,6 @@ Flickable {
    ScrollIndicator.vertical: ScrollIndicator { }
 
     function toolButtonClicked() {
-        var saveSettings = false;
         var saveFonts = false;
 
 //        if (globalSettings.useReadableName !== useReadableName.checked) {
@@ -294,33 +293,24 @@ Flickable {
            gStaGlobalSettings.setDebugIPWifi(txtOtherIPAddrWifi.text);
         }
 
-        if (notifyNewAppVersion !== globalSettings.isNotificationNewAppVersionEnabled()) {
-            globalSettings.setNotificationNewAppVersionEnabled(notifyNewAppVersion);
-            saveSettings = true;
+        if (notifyNewAppVersion !== gStaGlobalSettings.isNotificationNewAppVersionEnabled()) {
+            gStaGlobalSettings.setNotificationNewAppVersionEnabled(notifyNewAppVersion);
         }
-        if (notifyNewMeetInfo !== globalSettings.isNotificationNewMeetingEnabled()){
-            globalSettings.setNotificationNewMeetingEnabled(notifyNewMeetInfo);
-            saveSettings = true;
+        if (notifyNewMeetInfo !== gStaGlobalSettings.isNotificationNewMeetingEnabled()){
+            gStaGlobalSettings.setNotificationNewMeetingEnabled(notifyNewMeetInfo);
         }
-        if (notifyChangeMeetInfo !== globalSettings.isNotificationChangedMeetingEnabled()){
-            globalSettings.setNotificationChangedMeetingEnabled(notifyChangeMeetInfo);
-            saveSettings = true;
+        if (notifyChangeMeetInfo !== gStaGlobalSettings.isNotificationChangedMeetingEnabled()){
+            gStaGlobalSettings.setNotificationChangedMeetingEnabled(notifyChangeMeetInfo);
         }
-        if (notifyFreeTicket !== globalSettings.isNotificationNewFreeTicketEnabled()){
-            globalSettings.setNotificationNewFreeTicketEnabled(notifyFreeTicket);
-            saveSettings = true;
+        if (notifyFreeTicket !== gStaGlobalSettings.isNotificationNewFreeTicketEnabled()){
+            gStaGlobalSettings.setNotificationNewFreeTicketEnabled(notifyFreeTicket);
         }
-        if (notifyAwayAccept !== globalSettings.isNotificationNewAwayAcceptEnabled()){
-            globalSettings.setNotificationNewAwayAcceptEnabled(notifyAwayAccept);
-            saveSettings = true;
+        if (notifyAwayAccept !== gStaGlobalSettings.isNotificationNewAwayAcceptEnabled()){
+            gStaGlobalSettings.setNotificationNewAwayAcceptEnabled(notifyAwayAccept);
         }
-        if (notifyFanclubNews !== globalSettings.isNotificationFanclubNewsEnabled()) {
-            globalSettings.setNotificationFanclubNewsEnabled(notifyFanclubNews);
-            saveSettings = true;
+        if (notifyFanclubNews !== gStaGlobalSettings.isNotificationFanclubNewsEnabled()) {
+            gStaGlobalSettings.setNotificationFanclubNewsEnabled(notifyFanclubNews);
         }
-
-        if (saveSettings)
-          globalSettings.saveGlobalSettings();
 
         updateHeaderFromMain("", "");
 
@@ -360,12 +350,12 @@ Flickable {
 
         cbfontFamilies.currentIndex = gStaGlobalSettings.getCurrentFontIndex()
 
-        notifyNewAppVersion = globalSettings.isNotificationNewAppVersionEnabled();
-        notifyNewMeetInfo = globalSettings.isNotificationNewMeetingEnabled();
-        notifyChangeMeetInfo = globalSettings.isNotificationChangedMeetingEnabled()
-        notifyFreeTicket = globalSettings.isNotificationNewFreeTicketEnabled();
-        notifyAwayAccept = globalSettings.isNotificationNewAwayAcceptEnabled();
-        notifyFanclubNews = globalSettings.isNotificationFanclubNewsEnabled();
+        notifyNewAppVersion = gStaGlobalSettings.isNotificationNewAppVersionEnabled();
+        notifyNewMeetInfo = gStaGlobalSettings.isNotificationNewMeetingEnabled();
+        notifyChangeMeetInfo = gStaGlobalSettings.isNotificationChangedMeetingEnabled()
+        notifyFreeTicket = gStaGlobalSettings.isNotificationNewFreeTicketEnabled();
+        notifyAwayAccept = gStaGlobalSettings.isNotificationNewAwayAcceptEnabled();
+        notifyFanclubNews = gStaGlobalSettings.isNotificationFanclubNewsEnabled();
 
        isStartupDone = true;
    }

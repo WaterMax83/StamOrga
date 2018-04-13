@@ -76,61 +76,12 @@ qint32 cConManager::startMainConnection(QString name, QString passw)
     return ERROR_CODE_SUCCESS;
 }
 
-//qint32 cConManager::startGettingUserEvents()
-//{
-//    DataConRequest req(OP_CODE_CMD_REQ::REQ_GET_USER_EVENTS);
-//    this->sendNewRequest(req);
-//    return ERROR_CODE_SUCCESS;
-//}
-
 //qint32 cConManager::startSettingUserEvents(qint64 eventID, qint32 status)
 //{
 //    DataConRequest req(OP_CODE_CMD_REQ::REQ_SET_USER_EVENTS);
 //    req.m_lData.append(QString::number(eventID));
 //    req.m_lData.append(QString::number(status));
 //    this->sendNewRequest(req);
-//    return ERROR_CODE_SUCCESS;
-//}
-
-//qint32 cConManager::startSaveMeetingInfo(const quint32 gameIndex, const QString when, const QString where, const QString info,
-//                                                const quint32 type)
-//{
-//    cDataMeetingInfo* pInfo = this->m_pGlobalData->getMeetingInfo(type);
-
-//    if (pInfo->when() != when || pInfo->where() != where || pInfo->info() != info) {
-//        DataConRequest req;
-//        if (type == MEETING_TYPE_MEETING)
-//            req.m_request = OP_CODE_CMD_REQ::REQ_CHANGE_MEETING_INFO;
-//        else
-//            req.m_request = OP_CODE_CMD_REQ::REQ_CHANGE_AWAYTRIP_INFO;
-//        req.m_lData.append(QString::number(gameIndex));
-//        req.m_lData.append(when);
-//        req.m_lData.append(where);
-//        req.m_lData.append(info);
-//        req.m_lData.append(QString::number(type));
-//        this->sendNewRequest(req);
-
-//        return ERROR_CODE_SUCCESS;
-//    }
-//    return ERROR_CODE_NO_ERROR;
-//}
-
-//qint32 cConManager::startAcceptMeetingInfo(const quint32 gameIndex, const quint32 accept,
-//                                                  const QString name, const quint32 type,
-//                                                  const quint32 acceptIndex)
-//{
-//    DataConRequest req;
-//    if (type == MEETING_TYPE_MEETING)
-//        req.m_request = OP_CODE_CMD_REQ::REQ_ACCEPT_MEETING;
-//    else
-//        req.m_request = OP_CODE_CMD_REQ::REQ_ACCEPT_AWAYTRIP;
-//    req.m_lData.append(QString::number(gameIndex));
-//    req.m_lData.append(QString::number(accept));
-//    req.m_lData.append(QString::number(acceptIndex));
-//    req.m_lData.append(name);
-//    req.m_lData.append(QString::number(type));
-//    this->sendNewRequest(req);
-
 //    return ERROR_CODE_SUCCESS;
 //}
 
@@ -267,35 +218,21 @@ void cConManager::slotDataConLastRequestFinished(TcpDataConRequest* request)
         this->m_bIsConnecting = false;
         break;
 
-        //    case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
-        //        if (request.m_result == ERROR_CODE_SUCCESS) {
-        //            this->startGettingUserEvents();
-        //        }
-        //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
-
-        //        break;
-
     case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST: {
 
         static quint32 retryGetGamesInfoCount = 0;
         if (request->m_result == ERROR_CODE_UPDATE_LIST) {
             if (retryGetGamesInfoCount < 3) {
-                g_DataGamesManager.startListGamesInfo();
+                g_DataGamesManager.startListGames();
                 retryGetGamesInfoCount++;
                 delete request;
                 return;
             }
         }
-        g_ConUserSettings.startGettingUserProps(true);
         emit this->signalNotifyCommandFinished(request->m_request, request->m_result);
         retryGetGamesInfoCount = 0;
         break;
     }
-
-        //    case OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET:
-        //        this->startGettingUserProps();
-        //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
-        //        break;
 
     case OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS: {
 
@@ -312,12 +249,12 @@ void cConManager::slotDataConLastRequestFinished(TcpDataConRequest* request)
         retryGetTicketCount = 0;
         break;
     }
-        //    case OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO:
-        //    case OP_CODE_CMD_REQ::REQ_GET_AWAYTRIP_INFO:
-        //        emit this->sNotifyCommandFinished(request.m_request, request.m_result);
-        //        if (request.m_result == ERROR_CODE_NOT_FOUND)
-        //            return;
-        //        break;
+    case OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO:
+    case OP_CODE_CMD_REQ::REQ_GET_AWAYTRIP_INFO:
+        emit this->signalNotifyCommandFinished(request->m_request, request->m_result);
+        if (request->m_result == ERROR_CODE_NOT_FOUND)
+            return;
+        break;
 
     default:
         emit this->signalNotifyCommandFinished(request->m_request, request->m_result);

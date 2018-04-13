@@ -155,9 +155,16 @@ MessageProtocol* DataConnection::requestGetUserEvents(MessageProtocol* msg)
     //    memcpy(&timestamp, msg->getPointerToData(), sizeof(qint64));
     //    timestamp = qFromLittleEndian(timestamp);
 
-    QByteArray userEvents;
-    qint32     rCode = this->m_pGlobalData->getCurrentUserEvents(userEvents, this->m_pUserConData->m_userID);
-    rCode            = qToLittleEndian(rCode);
+    QJsonArray jsArr;
+    qint32     rCode = this->m_pGlobalData->getCurrentUserEvents(jsArr, this->m_pUserConData->m_userID);
+
+    QJsonObject jsRootObj;
+    jsRootObj.insert("version", "1.0.0");
+    jsRootObj.insert("events", jsArr);
+
+    QJsonDocument jsDoc(jsRootObj);
+    QByteArray    userEvents = jsDoc.toJson(QJsonDocument::Compact);
+    rCode                    = qToLittleEndian(rCode);
     userEvents.prepend(sizeof(qint32), 0x0);
     memcpy((void*)userEvents.constData(), &rCode, sizeof(qint32));
 

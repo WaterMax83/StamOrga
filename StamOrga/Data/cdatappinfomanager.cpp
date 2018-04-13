@@ -24,6 +24,7 @@
 
 #include "../Common/General/globalfunctions.h"
 #include "../cstasettingsmanager.h"
+#include "source/cadrpushnotifyinfohandler.h"
 
 cDatAppInfoManager g_DatAppInfoManager;
 
@@ -49,8 +50,8 @@ qint32 cDatAppInfoManager::initialize()
     this->m_ctrlLog.Start(this->m_logApp, false);
 
 #ifdef Q_OS_ANDROID
-    this->m_pushNotificationInfoHandler = new PushNotificationInformationHandler(this);
-    connect(this->m_pushNotificationInfoHandler, &PushNotificationInformationHandler::fcmRegistrationTokenChanged,
+    this->m_pushNotificationInfoHandler = new AdrPushNotifyInfoHandler(this);
+    connect(this->m_pushNotificationInfoHandler, &AdrPushNotifyInfoHandler::fcmRegistrationTokenChanged,
             this, &GlobalData::slotNewFcmRegistrationToken);
 
     g_StaSettingsManager.getValue(APP_INFO_GROUP, APP_INFO_TOKEN, value);
@@ -70,6 +71,19 @@ qint32 cDatAppInfoManager::initialize()
 
     return ERROR_CODE_SUCCESS;
 }
+
+#ifdef Q_OS_ANDROID
+void cDatAppInfoManager::slotNewFcmRegistrationToken(QString token)
+{
+    QMutexLocker lock(&this->m_pushNotificationMutex);
+
+    this->m_pushNotificationToken = token;
+
+    g_StaSettingsManager.setValue(APP_INFO_GROUP, APP_INFO_TOKEN, token);
+
+    qInfo().noquote() << QString("Global Data got a new token %1").arg(token);
+}
+#endif
 
 QString cDatAppInfoManager::getCurrentAppGUID()
 {

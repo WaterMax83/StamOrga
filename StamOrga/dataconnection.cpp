@@ -25,7 +25,6 @@
 #include "../Common/General/globaltiming.h"
 #include "../Common/Network/messagecommand.h"
 #include "../Common/Network/messageprotocol.h"
-#include "../Data/globalsettings.h"
 #include "dataconnection.h"
 
 DataConnection::DataConnection(GlobalData* pData)

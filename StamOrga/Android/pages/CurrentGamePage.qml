@@ -208,15 +208,14 @@ Item {
     property int movedInfoHeigth : gameHeader.height + 20
 
     function toolButtonClicked() {
-        var favGame = globalUserData.getGameUserDataHandler();
-        var favIndex = favGame.getFavoriteGameIndex(m_gamePlayCurrentItem.index);
+        var favIndex = gDataGameUserData.getFavoriteGameIndex(m_gamePlayCurrentItem.index);
 
         if (favIndex <= 0) {
-            favGame.setFavoriteGameIndex(m_gamePlayCurrentItem.index, 1);
+            gDataGameUserData.setFavoriteGameIndex(m_gamePlayCurrentItem.index, 1);
             updateHeaderFromMain("", "images/star.png")
             toastManager.show("Spiel als Favorit markiert", 2000);
         }else {
-            favGame.setFavoriteGameIndex(m_gamePlayCurrentItem.index, 0);
+            gDataGameUserData.setFavoriteGameIndex(m_gamePlayCurrentItem.index, 0);
             updateHeaderFromMain("", "images/star_border.png")
             toastManager.show("Spiel als Favorit entfernt", 2000);
         }
@@ -251,9 +250,8 @@ Item {
             currentAwayTripInfo.showAllInfoAboutGame();
         }
 
-        var favGame = globalUserData.getGameUserDataHandler();
         var icon = "";
-        var favIndex = favGame.getFavoriteGameIndex(sender.index);
+        var favIndex = gDataGameUserData.getFavoriteGameIndex(sender.index);
         if (favIndex <= 0)
             icon = "images/star_border.png"
         else
@@ -266,10 +264,6 @@ Item {
     }
 
     function pageOpenedUpdateView() { }
-
-    function notifyGetUserEvents(result) {
-        gameHeader.showGamesInfo(m_gamePlayCurrentItem)
-    }
 
     function notifyGetUserProperties(result) {
         gameHeader.showGamesInfo(m_gamePlayCurrentItem)

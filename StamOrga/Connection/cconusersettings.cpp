@@ -16,13 +16,18 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 
 #include "../Common/General/globalfunctions.h"
 #include "../Common/Network/messagecommand.h"
+#include "../Data/cdataappuserevents.h"
+#include "../Data/cdatagamesmanager.h"
+#include "../Data/cdatagameuserdata.h"
 #include "../Data/cdatappinfomanager.h"
 #include "../Data/cdataticketmanager.h"
+#include "../cstaglobalsettings.h"
 #include "../cstasettingsmanager.h"
 #include "cconmanager.h"
 #include "cconusersettings.h"
@@ -208,6 +213,7 @@ qint32 cConUserSettings::handleUserPropsResponse(MessageProtocol* msg)
             this->setUserProperties(properties);
             qInfo().noquote() << QString("Setting user properties to 0x%1").arg(QString::number(properties, 16));
         }
+        g_StaGlobalSettings.setAlreadyConnected(true);
     } else
         this->setUserProperties(0);
 
@@ -218,22 +224,15 @@ qint32 cConUserSettings::handleUserPropsResponse(MessageProtocol* msg)
         seasonTicket->checkTicketOwn(index);
     }
 
-#ifdef Q_OS_ANDROID
     if (rootObj.contains("tickets")) {
-        GameUserData* pGameUserData = this->m_pGlobalData->getGameUserDataHandler();
-        pGameUserData->clearTicketGameList();
-
         QJsonArray arrTickets = rootObj.value("tickets").toArray();
-        for (int i = 0; i < arrTickets.count(); i++) {
-            QJsonObject ticket    = arrTickets.at(i).toObject();
-            qint32      gameIndex = ticket.value("gameIndex").toInt(-1);
-            if (ticket.value("type").toString("") == "reserved")
-                pGameUserData->setTicketGameIndex(gameIndex, TICKET_STATE_RESERVED);
-            else if (ticket.value("type").toString("") == "free")
-                pGameUserData->setTicketGameIndex(gameIndex, TICKET_STATE_FREE);
-        }
+        g_DataGameUserData.handleUserPropTickets(arrTickets);
     }
-#endif
+
+    if (rootObj.contains("events")) {
+        QJsonArray arrEvents = rootObj.value("events").toArray();
+        g_DataAppUserEvents.addNewUserEvents(arrEvents);
+    }
 
     return rValue;
 }
@@ -268,7 +267,7 @@ qint32 cConUserSettings::startUpdatePassword(QString password)
     if (password.length() > 0)
         newPassWord = this->createHashValue(password, this->getSalt());
     else
-        newPassWord             = this->m_newPassWord;
+        newPassWord = this->m_newPassWord;
     QString     currentPassWord = this->createHashValue(this->getPassWord(), this->m_currentRandomValue);
     QJsonObject rootObj;
     rootObj.insert("new", newPassWord);

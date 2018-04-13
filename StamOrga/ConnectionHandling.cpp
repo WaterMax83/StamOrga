@@ -22,7 +22,6 @@
 #include "../Common/General/globaltiming.h"
 #include "../Common/Network/messagecommand.h"
 #include "../Common/Network/messageprotocol.h"
-#include "../Data/globalsettings.h"
 #include "connectionhandling.h"
 
 #define TIMER_DIFF_MSEC 10 * 1000

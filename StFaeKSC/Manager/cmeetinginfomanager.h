@@ -37,7 +37,7 @@ public:
 
     MessageProtocol* getChangeMeetingInfo(UserConData* pUserCon, MessageProtocol* request);
 
-    //    MessageProtocol* getNewsDataChangeRequest(UserConData* pUserCon, MessageProtocol* request);
+    MessageProtocol* getAcceptMeetingInfo(UserConData* pUserCon, MessageProtocol* request);
 
     //    MessageProtocol* getNewsDataRemoveRequest(UserConData* pUserCon, MessageProtocol* request);
 

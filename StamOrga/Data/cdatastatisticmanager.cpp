@@ -34,6 +34,8 @@ cDataStatisticManager::cDataStatisticManager(QObject* parent)
 
 qint32 cDataStatisticManager::initialize()
 {
+    qRegisterMetaType<StatBars*>("StatBars*");
+
     this->m_initialized = true;
 
     return ERROR_CODE_SUCCESS;

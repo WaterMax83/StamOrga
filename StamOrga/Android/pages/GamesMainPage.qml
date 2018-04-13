@@ -215,33 +215,23 @@ Page {
             toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
             showLoadingGameInfos("", false);
             showListedGames()
-        } else {
-            gDataGamesManager.startListGamesInfo();
         }
-
     }
 
     function notifyUserIntGamesInfoListFinished(result) {
         showLoadingGameInfos("", false);
         if (result === 1) {
             toastManager.show("Spiele geladen", 2000)
-            showListedGames()
+//            showListedGames()
         }
         else{
             toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
             /* If success then user properties will be called */
             showListedGames()
         }
-
-
-    }
-
-    function notifyGetUserEvents(result) {
-        showListedGames();
     }
 
     function notifyGetUserProperties(result) {
-        if (result !== 1) /* If success then user events will be called */
             showListedGames();
     }
 
@@ -255,17 +245,6 @@ Page {
         else
             toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
     }
-
-//    function notifySetGamesFixedTimeFinished(result) {
-//        if (result === 1) {
-//            showLoadingGameInfos("Lade Spielinfos", true)
-//            gDataGamesManager.startListGames();
-//            gamesListPagePresent.cleanGameLayout();
-//            gamesListPagePast.cleanGameLayout();
-//        }
-//        else
-//            toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
-//    }
 
     function pageOpenedUpdateView() {
 

@@ -44,6 +44,11 @@ public:
                                             const qint32 type);
     qint32             handleSaveMeetingInfoResponse(MessageProtocol* msg);
 
+    Q_INVOKABLE qint32 startAcceptMeetingInfo(const qint32 gameIndex, const qint32 accept,
+                                              const QString name, const qint32 type,
+                                              const qint32 acceptIndex = 0);
+    qint32             handAcceptMeetingInfo(MessageProtocol* msg);
+
     Q_INVOKABLE QString when() { return this->m_when; }
     Q_INVOKABLE QString where() { return this->m_where; }
     Q_INVOKABLE QString info() { return this->m_info; }

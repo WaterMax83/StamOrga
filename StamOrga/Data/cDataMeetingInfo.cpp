@@ -37,6 +37,8 @@ cDataMeetingInfo::cDataMeetingInfo(QObject* parent)
 
 qint32 cDataMeetingInfo::initialize()
 {
+    qRegisterMetaType<AcceptMeetingInfo*>("AcceptMeetingInfo*");
+
     this->m_initialized = true;
 
     return ERROR_CODE_SUCCESS;
@@ -168,6 +170,47 @@ qint32 cDataMeetingInfo::startSaveMeetingInfo(const qint32 gameIndex, const QStr
 }
 
 qint32 cDataMeetingInfo::handleSaveMeetingInfoResponse(MessageProtocol* msg)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QByteArray  data(msg->getPointerToData());
+    QJsonObject rootObj = QJsonDocument::fromJson(data).object();
+    qint32      result  = rootObj.value("ack").toInt(ERROR_CODE_NOT_FOUND);
+
+    /* rest is not handled */
+
+    return result;
+}
+
+qint32 cDataMeetingInfo::startAcceptMeetingInfo(const qint32 gameIndex, const qint32 accept,
+                                                const QString name, const qint32 type,
+                                                const qint32 acceptIndex)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QMutexLocker lock(&this->m_mutex);
+
+    QJsonObject rootObj;
+    rootObj.insert("index", gameIndex);
+    rootObj.insert("type", type);
+    rootObj.insert("accept", accept);
+    rootObj.insert("acceptIndex", acceptIndex);
+    rootObj.insert("name", name);
+
+    TcpDataConRequest* req;
+    if (type == MEETING_TYPE_MEETING)
+        req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_ACCEPT_MEETING);
+    else
+        req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_ACCEPT_AWAYTRIP);
+    req->m_lData = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+
+    g_ConManager.sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 cDataMeetingInfo::handAcceptMeetingInfo(MessageProtocol* msg)
 {
     if (!this->m_initialized)
         return ERROR_CODE_NOT_INITIALIZED;

@@ -157,3 +157,45 @@ MessageProtocol* cMeetingInfoManager::getChangeMeetingInfo(UserConData* pUserCon
 
     return new MessageProtocol(ack, answer);
 }
+
+MessageProtocol* cMeetingInfoManager::getAcceptMeetingInfo(UserConData* pUserCon, MessageProtocol* request)
+{
+    if (!this->m_initialized)
+        return NULL;
+
+    QByteArray  data    = QByteArray(request->getPointerToData());
+    QJsonObject rootObj = QJsonDocument::fromJson(data).object();
+
+    qint32  gameIndex   = rootObj.value("index").toInt(0);
+    qint32  type        = rootObj.value("type").toInt(-1);
+    qint32  accept      = rootObj.value("accept").toInt(-1);
+    qint32  acceptIndex = rootObj.value("acceptIndex").toInt(-1);
+    QString name        = rootObj.value("name").toString();
+
+    quint32 ack;
+    if (type == MEETING_TYPE_MEETING) {
+        ack = OP_CODE_CMD_RES::ACK_ACCEPT_MEETING;
+    } else if (type == MEETING_TYPE_AWAYTRIP) {
+        ack = OP_CODE_CMD_RES::ACK_ACCEPT_AWAYTRIP;
+    } else
+        return NULL;
+
+    qint64 messageID = -1;
+    qint32 rCode     = g_GlobalData->requestAcceptMeetingInfo(gameIndex, 0, accept, acceptIndex, name, pUserCon->m_userID, type, messageID);
+    if (rCode == ERROR_CODE_SUCCESS) {
+        qInfo().noquote() << QString("User %1 accepted MeetingInfo of game %2 with value %3")
+                                 .arg(pUserCon->m_userName)
+                                 .arg(g_GlobalData->m_GamesList.getItemName(gameIndex))
+                                 .arg(accept);
+    }
+
+    QJsonObject rootAns;
+    rootAns.insert("ack", rCode);
+    rootAns.insert("index", gameIndex);
+    rootAns.insert("type", type);
+    rootAns.insert("messageID", messageID);
+
+    QByteArray answer = QJsonDocument(rootAns).toJson(QJsonDocument::Compact);
+
+    return new MessageProtocol(ack, answer);
+}

@@ -32,13 +32,7 @@ public:
 
     Q_INVOKABLE qint32 startMainConnection(QString name, QString passw);
 
-    Q_INVOKABLE qint32 startGetUserEvents();
-
     Q_INVOKABLE qint32 startSetUserEvents(qint64 eventID, qint32 status);
-
-    Q_INVOKABLE qint32 startAcceptMeetingInfo(const quint32 gameIndex, const quint32 accept,
-                                              const QString name, const quint32 type,
-                                              const quint32 acceptIndex = 0);
 
     Q_INVOKABLE bool isDebuggingEnabled()
     {
@@ -89,7 +83,6 @@ signals:
     void notifyFanclubNewsListFinished(qint32 result);
     void notifyGetFanclubNewsItemFinished(qint32 result);
     void notifyDeleteFanclubNewsItemFinished(qint32 result);
-    void notifyGetUserEvents(qint32 result);
     void notifyStatisticsCommandFinished(qint32 result);
 
 public slots:

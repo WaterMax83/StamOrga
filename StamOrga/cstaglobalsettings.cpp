@@ -28,6 +28,7 @@
 #include "Connection/cconmanager.h"
 #include "Connection/cconusersettings.h"
 #include "cstaglobalsettings.h"
+#include "source/cadrpushnotifyinfohandler.h"
 
 cStaGlobalSettings g_StaGlobalSettings;
 
@@ -43,6 +44,7 @@ cStaGlobalSettings g_StaGlobalSettings;
 #define SETT_CHANGE_DEFAULT_FONT    "ChangeDefaultFont"
 #define SETT_DEBUG_IP               "DebugIP"
 #define SETT_DEBUG_IP_WIFI          "DebugIPWifi"
+#define SETT_ENABLE_NOTIFICATION    "EnableNotification"
 //#define USER_READABLE   "ReadableName"
 
 // clang-format on
@@ -59,23 +61,26 @@ qint32 cStaGlobalSettings::initialize()
 {
     QString value;
     bool    bValue;
+    qint64  iValue;
 
     g_StaSettingsManager.getBoolValue(SETTINGS_GROUP, SETT_ALREADY_CONNECTED, bValue);
     this->m_bAlreadyConnected = bValue;
-    g_StaSettingsManager.getBoolValue(SETTINGS_GROUP, SETT_SAVE_INFO_ON_APP, bValue);
+    g_StaSettingsManager.getBoolValue(SETTINGS_GROUP, SETT_SAVE_INFO_ON_APP, bValue, true);
     this->m_bSaveInfosOnApp = bValue;
-    g_StaSettingsManager.getBoolValue(SETTINGS_GROUP, SETT_LOAD_GAME_INFO, bValue);
+    g_StaSettingsManager.getBoolValue(SETTINGS_GROUP, SETT_LOAD_GAME_INFO, bValue, true);
     this->m_bLoadGameInfo = bValue;
-    g_StaSettingsManager.getBoolValue(SETTINGS_GROUP, SETT_USE_VERSION_POPUP, bValue);
+    g_StaSettingsManager.getBoolValue(SETTINGS_GROUP, SETT_USE_VERSION_POPUP, bValue, true);
     this->m_bUseVersionPopup = bValue;
     g_StaSettingsManager.getValue(SETTINGS_GROUP, SETT_LAST_SHOWN_VERSION, value);
     this->m_lastShownVersion = value;
-    g_StaSettingsManager.getValue(SETTINGS_GROUP, SETT_CHANGE_DEFAULT_FONT, value);
+    g_StaSettingsManager.getValue(SETTINGS_GROUP, SETT_CHANGE_DEFAULT_FONT, value, "Default");
     this->m_changeDefaultFont = value != "" ? value : "Default";
     g_StaSettingsManager.getValue(SETTINGS_GROUP, SETT_DEBUG_IP, value);
     this->m_debugIP = value;
     g_StaSettingsManager.getValue(SETTINGS_GROUP, SETT_DEBUG_IP_WIFI, value);
     this->m_debugIPWifi = value;
+    g_StaSettingsManager.getInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, iValue, 0xFFFFFFFF);
+    this->m_notificationEnabledValue = iValue;
 
     this->m_bIpAddressWasSet = false;
     QHostInfo::lookupHost("watermax83.ddns.net", this, SLOT(slotCallBackLookUpHost(QHostInfo)));
@@ -119,7 +124,6 @@ qint32 cStaGlobalSettings::handleVersionResponse(MessageProtocol* msg)
 
     qInfo().noquote() << QString("Version from server %1:0x%2").arg(this->m_remoteVersion, QString::number(uVersion, 16));
 
-    this->setAlreadyConnected(true);
     if ((uVersion & 0xFFFFFF00) > (STAM_ORGA_VERSION_I & 0xFFFFFF00)) {
         this->m_versionInfo = QString("Deine Version: %2<br>Aktuelle Version: %1<br><br>").arg(this->m_remoteVersion, STAM_ORGA_VERSION_S);
         this->m_versionInfo.append(QString(STAM_ORGA_VERSION_LINK_WITH_TEXT).arg(this->m_remoteVersion.toLower(), this->m_remoteVersion));
@@ -304,7 +308,7 @@ void cStaGlobalSettings::setAlreadyConnected(const bool con)
 {
     if (con != this->m_bAlreadyConnected) {
         this->m_bAlreadyConnected = con;
-        //        this->updatePushNotification();
+        this->updatePushNotification();
 
         g_StaSettingsManager.setBoolValue(SETTINGS_GROUP, SETT_ALREADY_CONNECTED, con);
     }
@@ -334,6 +338,123 @@ QString cStaGlobalSettings::getCurrentVersionLink()
     return QString(STAM_ORGA_VERSION_LINK_WITH_TEXT).arg(QString(STAM_ORGA_VERSION_S).toLower(), STAM_ORGA_VERSION_S);
 }
 
+#define NOT_OFFSET_NEWAPPV 0
+#define NOT_OFFSET_NEWMEET 1
+#define NOT_OFFSET_CHGGAME 2
+#define NOT_OFFSET_NEWTICK 3
+#define NOT_OFFSET_NEWAWAY 4
+#define NOT_OFFSET_FANCLUB 5
+
+bool cStaGlobalSettings::isNotificationNewAppVersionEnabled()
+{
+    return (this->m_notificationEnabledValue & (1 << NOT_OFFSET_NEWAPPV)) ? true : false;
+}
+bool cStaGlobalSettings::isNotificationNewMeetingEnabled()
+{
+    return (this->m_notificationEnabledValue & (1 << NOT_OFFSET_NEWMEET)) ? true : false;
+}
+bool cStaGlobalSettings::isNotificationChangedMeetingEnabled()
+{
+    return (this->m_notificationEnabledValue & (1 << NOT_OFFSET_CHGGAME)) ? true : false;
+}
+bool cStaGlobalSettings::isNotificationNewFreeTicketEnabled()
+{
+    return (this->m_notificationEnabledValue & (1 << NOT_OFFSET_NEWTICK)) ? true : false;
+}
+bool cStaGlobalSettings::isNotificationNewAwayAcceptEnabled()
+{
+    return (this->m_notificationEnabledValue & (1 << NOT_OFFSET_NEWAWAY)) ? true : false;
+}
+bool cStaGlobalSettings::isNotificationFanclubNewsEnabled()
+{
+    return (this->m_notificationEnabledValue & (1 << NOT_OFFSET_FANCLUB)) ? true : false;
+}
+
+void cStaGlobalSettings::setNotificationNewAppVersionEnabled(bool enable)
+{
+    this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_NEWAPPV);
+    this->m_notificationEnabledValue |= (enable ? 1 : 0) << NOT_OFFSET_NEWAPPV;
+    g_StaSettingsManager.setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
+    this->updatePushNotification();
+}
+void cStaGlobalSettings::setNotificationNewMeetingEnabled(bool enable)
+{
+    this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_NEWMEET);
+    this->m_notificationEnabledValue |= (enable ? 1 : 0) << NOT_OFFSET_NEWMEET;
+    g_StaSettingsManager.setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
+    this->updatePushNotification();
+}
+void cStaGlobalSettings::setNotificationChangedMeetingEnabled(bool enable)
+{
+    this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_CHGGAME);
+    this->m_notificationEnabledValue |= (enable ? 1 : 0) << NOT_OFFSET_CHGGAME;
+    g_StaSettingsManager.setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
+    this->updatePushNotification();
+}
+void cStaGlobalSettings::setNotificationNewFreeTicketEnabled(bool enable)
+{
+    this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_NEWTICK);
+    this->m_notificationEnabledValue |= (enable ? 1 : 0) << NOT_OFFSET_NEWTICK;
+    g_StaSettingsManager.setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
+    this->updatePushNotification();
+}
+void cStaGlobalSettings::setNotificationNewAwayAcceptEnabled(bool enable)
+{
+    this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_NEWAWAY);
+    this->m_notificationEnabledValue |= (enable ? 1 : 0) << NOT_OFFSET_NEWAWAY;
+    g_StaSettingsManager.setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
+    this->updatePushNotification();
+}
+void cStaGlobalSettings::setNotificationFanclubNewsEnabled(bool enable)
+{
+    this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_FANCLUB);
+    this->m_notificationEnabledValue |= (enable ? 1 : 0) << NOT_OFFSET_FANCLUB;
+    g_StaSettingsManager.setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
+    this->updatePushNotification();
+}
+
+
+void cStaGlobalSettings::updatePushNotification()
+{
+    if (this->m_bAlreadyConnected && this->isNotificationNewAppVersionEnabled())
+        AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_APP_VERSION);
+    else
+        AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_APP_VERSION);
+
+    if (this->m_bAlreadyConnected && this->isNotificationNewMeetingEnabled())
+        AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_MEETING);
+    else
+        AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_MEETING);
+
+    if (this->m_bAlreadyConnected && this->isNotificationChangedMeetingEnabled())
+        AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_CHANGE_MEETING);
+    else
+        AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_CHANGE_MEETING);
+
+    if (this->m_bAlreadyConnected && this->isNotificationNewFreeTicketEnabled())
+        AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_FREE_TICKET);
+    else
+        AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_FREE_TICKET);
+
+    if (this->m_bAlreadyConnected && this->isNotificationNewAwayAcceptEnabled())
+        AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_AWAY_ACCEPT);
+    else
+        AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_AWAY_ACCEPT);
+
+    if (this->m_bAlreadyConnected && this->isNotificationFanclubNewsEnabled()) {
+        if (g_ConUserSettings.userIsFanclubEnabled())
+            AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_FANCLUB_NEWS);
+    } else
+        AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_FANCLUB_NEWS);
+
+    if (this->m_bAlreadyConnected) {
+        AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_GENERAL);
+        AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_GENERAL_BACKUP);
+    } else {
+        AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_GENERAL);
+        AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_GENERAL_BACKUP);
+    }
+}
 
 /* Under Android it takes too long to register for app changed at first start, so call it */
 void cStaGlobalSettings::checkNewStateChangedAtStart()

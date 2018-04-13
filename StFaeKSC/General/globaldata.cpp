@@ -685,11 +685,10 @@ qint32 GlobalData::addNewUserEvent(const QString type, const QString info, const
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 GlobalData::getCurrentUserEvents(QByteArray& destArray, const qint32 userID)
+qint32 GlobalData::getCurrentUserEvents(QJsonArray& destArray, const qint32 userID)
 {
     QMutexLocker lock(&this->m_globalDataMutex);
 
-    QJsonArray jsArr;
     for (int i = 0; i < this->m_userEvents.size(); i++) {
         if (this->m_userEvents[i]->getHasUserGotEvent(userID))
             continue;
@@ -702,15 +701,15 @@ qint32 GlobalData::getCurrentUserEvents(QByteArray& destArray, const qint32 user
         json.insert("info", this->m_userEvents[i]->getInfo());
         json.insert("id", this->m_userEvents[i]->getEventID());
 
-        jsArr.append(json);
+        destArray.append(json);
     }
 
-    QJsonObject jsRootObj;
-    jsRootObj.insert("version", "1.0.0");
-    jsRootObj.insert("events", jsArr);
+    //    QJsonObject jsRootObj;
+    //    jsRootObj.insert("version", "1.0.0");
+    //    jsRootObj.insert("events", jsArr);
 
-    QJsonDocument jsDoc(jsRootObj);
-    destArray = jsDoc.toJson(QJsonDocument::Compact);
+    //    QJsonDocument jsDoc(jsRootObj);
+    //    destArray = jsDoc.toJson(QJsonDocument::Compact);
 
     return ERROR_CODE_SUCCESS;
 }

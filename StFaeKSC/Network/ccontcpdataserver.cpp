@@ -91,8 +91,8 @@ void cConTcpDataServer::slotSocketConnected()
             continue;
         }
 
-        QString tmp = QString("Connected %1").arg(this->m_pUserConData->m_dstDataPort);
-        CONSOLE_INFO(tmp);
+        //        QString tmp = QString("Connected %1").arg(this->m_pUserConData->m_dstDataPort);
+        //        CONSOLE_INFO(tmp);
 
         this->m_pTcpDataSocket = socket;
         typedef void (QAbstractSocket::*QAbstractSocketErrorSignal)(QAbstractSocket::SocketError);
@@ -111,8 +111,8 @@ void cConTcpDataServer::slotConnectionTimeoutFired()
         delete this->m_pTcpDataSocket;
     this->m_pTcpDataSocket = NULL;
 
-    QString tmp = QString("Timeout %1").arg(this->m_pUserConData->m_dstDataPort);
-    CONSOLE_INFO(tmp);
+    //    QString tmp = QString("Timeout %1").arg(this->m_pUserConData->m_dstDataPort);
+    //    CONSOLE_INFO(tmp);
 
     emit this->signalServerClosed(this->m_pUserConData->m_dstDataPort);
 }
@@ -123,8 +123,8 @@ void cConTcpDataServer::slotDataSocketError(QAbstractSocket::SocketError socketE
 
     Q_UNUSED(socketError);
 
-    QString tmp = QString("Error %1").arg(this->m_pUserConData->m_dstDataPort);
-    CONSOLE_INFO(tmp);
+    //    QString tmp = QString("Error %1").arg(this->m_pUserConData->m_dstDataPort);
+    //    CONSOLE_INFO(tmp);
 
     emit this->signalServerClosed(this->m_pUserConData->m_dstDataPort);
 }
@@ -136,8 +136,8 @@ void cConTcpDataServer::readyReadDataPort()
     if (this->m_pTcpDataSocket == NULL)
         return;
 
-    QString tmp = QString("Data %1").arg(this->m_pUserConData->m_dstDataPort);
-    CONSOLE_INFO(tmp);
+    //    QString tmp = QString("Data %1").arg(this->m_pUserConData->m_dstDataPort);
+    //    CONSOLE_INFO(tmp);
 
     QByteArray datagram = this->m_pTcpDataSocket->readAll();
     this->m_msgBuffer.StoreNewData(datagram);
@@ -246,6 +246,10 @@ MessageProtocol* cConTcpDataServer::checkNewMessage(MessageProtocol* msg)
         case OP_CODE_CMD_REQ::REQ_CHANGE_MEETING_INFO:
         case OP_CODE_CMD_REQ::REQ_CHANGE_AWAYTRIP_INFO:
             ack = g_MeetingInfoManager.getChangeMeetingInfo(this->m_pUserConData, msg);
+            break;
+        case OP_CODE_CMD_REQ::REQ_ACCEPT_MEETING:
+        case OP_CODE_CMD_REQ::REQ_ACCEPT_AWAYTRIP:
+            ack = g_MeetingInfoManager.getAcceptMeetingInfo(this->m_pUserConData, msg);
             break;
 
         case OP_CODE_CMD_REQ::REQ_CMD_STATISTIC:

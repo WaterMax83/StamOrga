@@ -40,6 +40,8 @@ cDataNewsDataManager::cDataNewsDataManager(QObject* parent)
 
 qint32 cDataNewsDataManager::initialize()
 {
+    qRegisterMetaType<NewsDataItem*>("NewsDataItem*");
+
     this->m_stLastLocalUpdateTimeStamp  = 0;
     this->m_stLastServerUpdateTimeStamp = 0;
 
@@ -72,6 +74,35 @@ void cDataNewsDataManager::addNewNewsData(NewsDataItem* sNews, const quint16 upd
         delete sNews;
     }
 }
+
+bool cDataNewsDataManager::setNewsDataItemHasEvent(qint32 newsIndex)
+{
+    if (!this->m_initialized)
+        return false;
+
+    QMutexLocker lock(&this->m_mutex);
+
+    for (int i = 0; i < this->m_lNews.count(); i++) {
+        if (this->m_lNews[i]->index() == newsIndex) {
+            this->m_lNews[i]->setEvent(this->m_lNews[i]->event() + 1);
+            return true;
+        }
+    }
+    return false;
+}
+
+void cDataNewsDataManager::resetAllNewsDataEvents()
+{
+    if (!this->m_initialized)
+        return;
+
+    QMutexLocker lock(&this->m_mutex);
+
+    for (int i = 0; i < this->m_lNews.count(); i++) {
+        this->m_lNews[i]->setEvent(0);
+    }
+}
+
 
 NewsDataItem* cDataNewsDataManager::getNewsDataItem(qint32 newsIndex)
 {

@@ -104,6 +104,7 @@ Flickable {
         if (!isViewAlreadyOpened)
             updateFanclubNewsList();
         isViewAlreadyOpened = true;
+        console.log("Show from open")
         showNewsDataList();
     }
 
@@ -121,15 +122,14 @@ Flickable {
 
     function updateFanclubNewsList() {
         gDataNewsDataManager.startListNewsData();
-//        userInt.startListFanclubNews();
         busyIndicatorNewsList.loadingVisible = true;
         busyIndicatorNewsList.infoText = "Aktualisiere Liste"
     }
 
     function notifyFanclubNewsListFinished(result){
         if (result === 1) {
-            if (appUserEvents.getCurrentFanclubEventCounter() > 0) {
-                userInt.startGetUserEvents();
+            if (gDataAppUserEvents.getCurrentFanclubEventCounter() > 0) {
+                gConUserSettings.startGettingUserProps(true);
                 return;
             }
             toastManager.show("Liste erfolgreich geladen", 2000);
@@ -153,7 +153,7 @@ Flickable {
         }
     }
 
-    function notifyGetUserEvents(result) {
+    function notifyGetUserProperties(result) {
         if (result === 1) {
             toastManager.show("Liste erfolgreich geladen", 2000);
             busyIndicatorNewsList.loadingVisible = false;
@@ -163,6 +163,7 @@ Flickable {
             busyIndicatorNewsList.infoText = "Fehler beim Laden der Events"
         }
 
+        console.log("Show from user properties")
         showNewsDataList();
     }
 
@@ -194,7 +195,7 @@ Flickable {
                     sprite.startShowElements(sender, false);
 
                     if (sender.event)
-                        appUserEvents.clearUserEventFanclub(userInt, sender.index);
+                        gDataAppUserEvents.clearUserEventFanclub(sender.index);
                 }
             }
             onPressAndHold: {

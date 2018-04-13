@@ -82,8 +82,6 @@ private:
 
     //    void startSendGetUserEventsRequest(DataConRequest request);
     //    void startSendSetUserEventsRequest(DataConRequest request);
-    //    void startSendChangeMeetingInfo(DataConRequest request);
-    //    void startSendAcceptMeeting(DataConRequest request);
 
 
     void               checkNewOncomingData();

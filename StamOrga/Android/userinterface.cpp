@@ -19,6 +19,7 @@
 #include <QtCore/QDebug>
 
 #include "../../Common/Network/messagecommand.h"
+#include "../Data/cdatagamesmanager.h"
 #include "Connection/cconmanager.h"
 #include "Connection/cconusersettings.h"
 #include "userinterface.h"
@@ -50,23 +51,9 @@ qint32 UserInterface::startMainConnection(QString name, QString passw)
     return g_ConManager.startMainConnection(name, passw);
 }
 
-qint32 UserInterface::startGetUserEvents()
-{
-    //    return this->m_pConHandle->startGettingUserEvents();
-    return ERROR_CODE_NOT_IMPLEMENTED;
-}
-
 qint32 UserInterface::startSetUserEvents(qint64 eventID, qint32 status)
 {
     //    return this->m_pConHandle->startSettingUserEvents(eventID, status);
-    return ERROR_CODE_NOT_IMPLEMENTED;
-}
-
-qint32 UserInterface::startAcceptMeetingInfo(const quint32 gameIndex, const quint32 accept,
-                                             const QString name, const quint32 type,
-                                             const quint32 acceptIndex)
-{
-    //    return this->m_pConHandle->startAcceptMeetingInfo(gameIndex, accept, name, type, acceptIndex);
     return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
@@ -101,6 +88,8 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
 
     case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
         emit this->notifyGamesListFinished(result);
+        if (result == ERROR_CODE_SUCCESS)
+            g_DataGamesManager.startListGamesInfo();
         //        if (result == ERROR_CODE_SUCCESS) {
         //            this->m_pConHandle->startGettingUserEvents();
         //            this->m_pConHandle->startListGettingGamesInfo();
@@ -109,11 +98,9 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
 
     case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST:
         emit this->notifyGamesInfoListFinished(result);
+        if (result == ERROR_CODE_SUCCESS)
+            g_ConUserSettings.startGettingUserProps(true);
         break;
-
-        //    case OP_CODE_CMD_REQ::REQ_SET_FIXED_GAME_TIME:
-        //        emit this->notifySetGamesFixedTimeFinished(result);
-        //        break;
 
     case OP_CODE_CMD_REQ::REQ_ADD_TICKET:
         emit this->notifySeasonTicketAddFinished(result);
@@ -132,6 +119,8 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
         break;
 
     case OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET:
+        if (result == ERROR_CODE_SUCCESS)
+            g_ConUserSettings.startGettingUserProps(true);
         emit this->notifyAvailableTicketStateChangedFinished(result);
         break;
 
@@ -183,13 +172,13 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
         emit this->notifyDeleteFanclubNewsItemFinished(result);
         break;
 
-    case OP_CODE_CMD_REQ::REQ_GET_USER_EVENTS:
-        emit this->notifyGetUserEvents(result);
-        break;
+        //    case OP_CODE_CMD_REQ::REQ_GET_USER_EVENTS:
+        //        emit this->notifyGetUserEvents(result);
+        //        break;
 
     case OP_CODE_CMD_REQ::REQ_SET_USER_EVENTS:
         if (result == ERROR_CODE_SUCCESS)
-            this->startGetUserEvents();
+            g_ConUserSettings.startGettingUserProps(true);
         break;
 
     case OP_CODE_CMD_REQ::REQ_CMD_STATISTIC:

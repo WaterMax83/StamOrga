@@ -160,7 +160,6 @@ void cConTcpData::checkNewOncomingData()
         case OP_CODE_CMD_RES::ACK_GET_VERSION:
             request->m_result = g_StaGlobalSettings.handleVersionResponse(msg);
             break;
-
         case OP_CODE_CMD_RES::ACK_GET_USER_PROPS:
             request->m_result = g_ConUserSettings.handleUserPropsResponse(msg);
             break;
@@ -176,7 +175,6 @@ void cConTcpData::checkNewOncomingData()
         case OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN:
             request->m_result = g_ConUserSettings.handleUpdatePasswordResponse(msg);
             break;
-
         case OP_CODE_CMD_RES::ACK_USER_CHANGE_READNAME:
             request->m_result = g_ConUserSettings.handleUpdateReadableNameResponse(msg);
             break;
@@ -184,11 +182,9 @@ void cConTcpData::checkNewOncomingData()
         case OP_CODE_CMD_RES::ACK_GET_GAMES_LIST:
             request->m_result = g_DataGamesManager.handleListGamesResponse(msg);
             break;
-
         case OP_CODE_CMD_RES::ACK_GET_GAMES_INFO_LIST:
             request->m_result = g_DataGamesManager.handleListGamesInfoResponse(msg);
             break;
-
         case OP_CODE_CMD_RES::ACK_CHANGE_GAME:
             request->m_result = g_DataGamesManager.handleChangeGameResponse(msg);
             break;
@@ -200,11 +196,9 @@ void cConTcpData::checkNewOncomingData()
         case OP_CODE_CMD_RES::ACK_ADD_TICKET:
             request->m_result = g_DataTicketManager.handleAddSeasonTicketResponse(msg);
             break;
-
         case OP_CODE_CMD_RES::ACK_REMOVE_TICKET:
             request->m_result = g_DataTicketManager.handleRemoveSeasonTicketResponse(msg);
             break;
-
         case OP_CODE_CMD_RES::ACK_GET_TICKETS_LIST:
             request->m_result = g_DataTicketManager.handleListSeasonTicketsResponse(msg);
             break;
@@ -212,7 +206,6 @@ void cConTcpData::checkNewOncomingData()
         case OP_CODE_CMD_RES::ACK_STATE_CHANGE_SEASON_TICKET:
             request->m_result = g_DataTicketManager.handleChangeAvailableTicketResponse(msg);
             break;
-
         case OP_CODE_CMD_RES::ACK_GET_AVAILABLE_TICKETS:
             request->m_result = g_DataTicketManager.handleListAvailableSeasonTicketResponse(msg);
             break;
@@ -223,32 +216,28 @@ void cConTcpData::checkNewOncomingData()
         case OP_CODE_CMD_RES::ACK_CHANGE_AWAYTRIP_INFO:
             request->m_result = g_DataTripInfo.handleSaveMeetingInfoResponse(msg);
             break;
-
         case OP_CODE_CMD_RES::ACK_GET_MEETING_INFO:
             request->m_result = g_DataMeetingInfo.handleLoadMeetingInfoResponse(msg);
             break;
-
         case OP_CODE_CMD_RES::ACK_GET_AWAYTRIP_INFO:
             request->m_result = g_DataTripInfo.handleLoadMeetingInfoResponse(msg);
             break;
-
-            //        case OP_CODE_CMD_RES::ACK_ACCEPT_MEETING:
-            //        case OP_CODE_CMD_RES::ACK_ACCEPT_AWAYTRIP:
-            //            request.m_result = this->m_pDataHandle->getHandleAcceptMeetingResponse(msg);
-            //            break;
+        case OP_CODE_CMD_RES::ACK_ACCEPT_MEETING:
+            request->m_result = g_DataMeetingInfo.handAcceptMeetingInfo(msg);
+            break;
+        case OP_CODE_CMD_RES::ACK_ACCEPT_AWAYTRIP:
+            request->m_result = g_DataTripInfo.handAcceptMeetingInfo(msg);
+            break;
 
         case OP_CODE_CMD_RES::ACK_CHANGE_NEWS_DATA:
             request->m_result = g_DataNewsDataManager.handleChangeNewsDataResponse(msg);
             break;
-
         case OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_LIST:
             request->m_result = g_DataNewsDataManager.handleListNewsDataResponse(msg);
             break;
-
         case OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_ITEM:
             request->m_result = g_DataNewsDataManager.handleGetNewsDataItem(msg);
             break;
-
         case OP_CODE_CMD_RES::ACK_DEL_NEWS_DATA_ITEM:
             request->m_result = g_DataNewsDataManager.handleRemoveNewsDataItemResponse(msg);
             break;
@@ -288,44 +277,6 @@ void cConTcpData::checkNewOncomingData()
 //    data[2] = qToLittleEndian(request.m_lData.at(1).toInt()); // Status
 
 //    MessageProtocol msg(request.m_request, (char*)&data[0], 12);
-//    this->sendMessageRequest(&msg, request);
-//}
-
-//void cConTcpData::startSendChangeMeetingInfo(DataConRequest request)
-//{
-//    QByteArray  data;
-//    QDataStream wData(&data, QIODevice::WriteOnly);
-//    wData.setByteOrder(QDataStream::LittleEndian);
-//    wData << request.m_lData.at(0).toUInt(); /* game Index */
-//    data.append(request.m_lData.at(1));      /* when */
-//    data.append(char(0x00));
-//    data.append(request.m_lData.at(2)); /* where */
-//    data.append(char(0x00));
-//    data.append(request.m_lData.at(3)); /* info */
-//    data.append(char(0x00));
-//    wData.device()->seek(data.length());
-//    wData << request.m_lData.at(4).toUInt();
-
-//    MessageProtocol msg(request.m_request, data);
-//    this->sendMessageRequest(&msg, request);
-//}
-
-//#define BUFFER_SIZE 1000
-//void cConTcpData::startSendAcceptMeeting(DataConRequest request)
-//{
-//    quint32 data[BUFFER_SIZE / sizeof(quint32)];
-//    data[0] = qToLittleEndian(request.m_lData.at(0).toUInt()); /* game Index */
-//    data[1] = qToLittleEndian(request.m_lData.at(1).toUInt()); /* accept */
-//    data[2] = qToLittleEndian(request.m_lData.at(2).toUInt()); /* acceptIndex */
-
-//    QByteArray tmp = request.m_lData.at(3).toUtf8();
-//    if (tmp.size() > (BUFFER_SIZE - 12))
-//        tmp.resize(BUFFER_SIZE - 12);
-//    char* pName = (char*)&data[3];
-//    memcpy(pName, tmp.constData(), tmp.size());
-//    pName[tmp.size()] = 0x00;
-
-//    MessageProtocol msg(request.m_request, (char*)(&data[0]), 16 + tmp.size());
 //    this->sendMessageRequest(&msg, request);
 //}
 
@@ -418,21 +369,6 @@ void cConTcpData::startSendNewRequest(TcpDataConRequest* request)
 
     //    case OP_CODE_CMD_REQ::REQ_SET_USER_EVENTS:
     //        this->startSendSetUserEventsRequest(request);
-    //        break;
-
-    //    case OP_CODE_CMD_REQ::REQ_REMOVE_TICKET:
-    //        if (request.m_lData.size() > 0)
-    //            this->startSendRemoveSeasonTicket(request);
-    //        break;
-
-    //    case OP_CODE_CMD_REQ::REQ_CHANGE_MEETING_INFO:
-    //    case OP_CODE_CMD_REQ::REQ_CHANGE_AWAYTRIP_INFO:
-    //        this->startSendChangeMeetingInfo(request);
-    //        break;
-
-    //    case OP_CODE_CMD_REQ::REQ_ACCEPT_MEETING:
-    //    case OP_CODE_CMD_REQ::REQ_ACCEPT_AWAYTRIP:
-    //        this->startSendAcceptMeeting(request);
     //        break;
 
     //    default:

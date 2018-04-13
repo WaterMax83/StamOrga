@@ -47,10 +47,6 @@ Flickable {
         if (flickableCurrentMeetInfo.contentY < -100) {
             showInfoHeader("Aktualisiere Daten", true)
             lDataMeetingInfo.startLoadMeetingInfo(m_gamePlayCurrentItem.index, meetingType);
-//            if (meetingType === 0)
-//                gDataMeetingInfo.startLoadMeetingInfo(m_gamePlayCurrentItem.index, meetingType);
-//            else
-//                gDataTripInfo.startLoadMeetingInfo(m_gamePlayCurrentItem.index, meetingType);
         }
     }
 
@@ -362,7 +358,7 @@ Flickable {
                 height: visible ? implicitHeight : 0
                 text: "Zusagen"
                 onClicked: {
-                    userIntCurrentGame.startAcceptMeetingInfo(m_gamePlayCurrentItem.index, 1, menuAcceptText, meetingType, menuAcceptIndex);
+                    lDataMeetingInfo.startAcceptMeetingInfo(m_gamePlayCurrentItem.index, 1, menuAcceptText, meetingType, menuAcceptIndex);
                     showInfoHeader("Ändere Teilnahme", true)
                 }
             }
@@ -374,7 +370,7 @@ Flickable {
                 visible: menuAcceptValue !== 2 ? true : false
                 height: visible ? implicitHeight : 0
                 onClicked: {
-                    userIntCurrentGame.startAcceptMeetingInfo(m_gamePlayCurrentItem.index, 2, menuAcceptText, meetingType, menuAcceptIndex);
+                    lDataMeetingInfo.startAcceptMeetingInfo(m_gamePlayCurrentItem.index, 2, menuAcceptText, meetingType, menuAcceptIndex);
                     showInfoHeader("Ändere Teilnahme", true)
                 }
             }
@@ -386,7 +382,7 @@ Flickable {
                 visible: menuAcceptValue !== 3 ? true : false
                 height: visible ? implicitHeight : 0
                 onClicked: {
-                    userIntCurrentGame.startAcceptMeetingInfo(m_gamePlayCurrentItem.index, 3, menuAcceptText, meetingType, menuAcceptIndex);
+                    lDataMeetingInfo.startAcceptMeetingInfo(m_gamePlayCurrentItem.index, 3, menuAcceptText, meetingType, menuAcceptIndex);
                     showInfoHeader("Ändere Teilnahme", true)
                 }
             }
@@ -421,7 +417,7 @@ Flickable {
     }
 
     function acceptedEditTextDialogAccept(text) {
-        userIntCurrentGame.startAcceptMeetingInfo(m_gamePlayCurrentItem.index, menuAcceptValue, text, meetingType, menuAcceptIndex);
+        lDataMeetingInfo.startAcceptMeetingInfo(m_gamePlayCurrentItem.index, menuAcceptValue, text, meetingType, menuAcceptIndex);
         showInfoHeader("Ändere Teilnahme", true)
     }
 
@@ -463,7 +459,6 @@ Flickable {
     }
 
     function notifyLoadMeetingInfoFinished(result) {
-        console.log("Notify Info " + result + " " + meetingType)
         if (result === 1) {
             if (meetingType === 0)
                 toastManager.show("Info übers Treffen geladen", 2000);

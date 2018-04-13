@@ -18,6 +18,8 @@
 #include <QtGui/QGuiApplication>
 
 #include "../Common/General/globalfunctions.h"
+#include "../Data/cdataappuserevents.h"
+#include "../Data/cdatagameuserdata.h"
 #include "Connection/cconmanager.h"
 #include "Connection/cconusersettings.h"
 #include "Data/cdatagamesmanager.h"
@@ -46,6 +48,9 @@ qint32 cStaGlobalManager::initialize()
     QGuiApplication::setOrganizationName("WaterMax");
     QGuiApplication::setApplicationName("StamOrga");
 
+    // Register our component type with QML.
+    qmlRegisterType<UserInterface>("com.watermax.demo", 1, 0, "UserInterface");
+
     rCode = g_StaSettingsManager.initialize();
 
     if (rCode == ERROR_CODE_SUCCESS)
@@ -53,6 +58,9 @@ qint32 cStaGlobalManager::initialize()
 
     if (rCode == ERROR_CODE_SUCCESS)
         rCode = g_StaGlobalSettings.initialize();
+
+    if (rCode == ERROR_CODE_SUCCESS)
+        rCode = g_ConUserSettings.initialize();
 
     if (rCode == ERROR_CODE_SUCCESS)
         rCode = g_DataGamesManager.initialize();
@@ -73,7 +81,10 @@ qint32 cStaGlobalManager::initialize()
         rCode = g_DataTripInfo.initialize();
 
     if (rCode == ERROR_CODE_SUCCESS)
-        rCode = g_ConUserSettings.initialize();
+        rCode = g_DataGameUserData.initialize();
+
+    if (rCode == ERROR_CODE_SUCCESS)
+        rCode = g_DataAppUserEvents.initialize();
 
     if (rCode == ERROR_CODE_SUCCESS)
         rCode = g_ConManager.initialize();
@@ -93,6 +104,8 @@ void cStaGlobalManager::setQmlInformationClasses(QQmlApplicationEngine* engine)
     engine->rootContext()->setContextProperty("gDataNewsDataManager", &g_DataNewsDataManager);
     engine->rootContext()->setContextProperty("gDataStatisticManager", &g_DataStatisticManager);
     engine->rootContext()->setContextProperty("gDataMeetingInfo", &g_DataMeetingInfo);
+    engine->rootContext()->setContextProperty("gDataGameUserData", &g_DataGameUserData);
+    engine->rootContext()->setContextProperty("gDataAppUserEvents", &g_DataAppUserEvents);
     engine->rootContext()->setContextProperty("gDataTripInfo", &g_DataTripInfo);
     engine->rootContext()->setContextProperty("gConUserSettings", &g_ConUserSettings);
 }

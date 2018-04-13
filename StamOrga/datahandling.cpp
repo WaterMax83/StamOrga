@@ -24,13 +24,13 @@
 
 #include "../Common/General/config.h"
 #include "../Common/General/globalfunctions.h"
-#include "../Data/appuserevents.h"
+#include "../Data/cdataappuserevents.h"
 #include "../Data/cdatastatisticmanager.h"
 #include "../Data/gameplay.h"
 #include "datahandling.h"
 
 
-extern AppUserEvents*         g_AppUserEvents;
+extern cDataAppUserEvents*    g_AppUserEvents;
 extern cDataStatisticManager* g_Statistics;
 
 DataHandling::DataHandling(GlobalData* pData)
@@ -135,29 +135,29 @@ qint32 DataHandling::getHandleUserPropsResponse(MessageProtocol* msg)
 
 qint32 DataHandling::getHandleUserEventsResponse(MessageProtocol* msg)
 {
-    if (msg->getDataLength() < 4)
-        return ERROR_CODE_WRONG_SIZE;
+    //    if (msg->getDataLength() < 4)
+    //        return ERROR_CODE_WRONG_SIZE;
 
-    const char* pData = msg->getPointerToData();
-    qint32      rValue;
-    memcpy(&rValue, pData, sizeof(qint32));
-    rValue = qFromLittleEndian(rValue);
+    //    const char* pData = msg->getPointerToData();
+    //    qint32      rValue;
+    //    memcpy(&rValue, pData, sizeof(qint32));
+    //    rValue = qFromLittleEndian(rValue);
 
-    if (msg->getDataLength() > 4) {
-        g_AppUserEvents->resetCurrentEvents();
+    //    if (msg->getDataLength() > 4) {
+    //        g_AppUserEvents->resetCurrentEvents();
 
-        QByteArray  jsonByteArray(pData + sizeof(qint32));
-        QJsonObject jsRoot = QJsonDocument::fromJson(jsonByteArray).object();
-        if (!jsRoot.contains("events") || !jsRoot.value("events").isArray())
-            return ERROR_CODE_WRONG_PARAMETER;
+    //        QByteArray  jsonByteArray(pData + sizeof(qint32));
+    //        QJsonObject jsRoot = QJsonDocument::fromJson(jsonByteArray).object();
+    //        if (!jsRoot.contains("events") || !jsRoot.value("events").isArray())
+    //            return ERROR_CODE_WRONG_PARAMETER;
 
-        QJsonArray jsArr = jsRoot.value("events").toArray();
-        for (int i = 0; i < jsArr.size(); i++) {
-            QJsonObject jsObj = jsArr.at(i).toObject();
-            g_AppUserEvents->addNewUserEvents(jsObj);
-        }
-    }
-    return rValue;
+    //        QJsonArray jsArr = jsRoot.value("events").toArray();
+    //        for (int i = 0; i < jsArr.size(); i++) {
+    //            QJsonObject jsObj = jsArr.at(i).toObject();
+    //            g_AppUserEvents->addNewUserEvents(jsObj);
+    //        }
+    //    }
+    return ERROR_CODE_SUCCESS;
 }
 
 #define GAMES_OFFSET (1 + 1 + 8 + 4)

@@ -60,7 +60,7 @@ Flickable {
                 TextField {
                     id: txtIPAddress
                     font.family: txtForFontFamily.font
-                    text: globalUserData.ipAddr
+                    text: gConUserSettings.getIPAddr()
                     padding: 10
                     implicitWidth: parent.width / 3 * 2
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
@@ -78,13 +78,13 @@ Flickable {
                 TextField {
                     id: txtUserName
                     font.family: txtForFontFamily.font
-                    text: gConUserSettings.userName
+                    text: gConUserSettings.getUserName()
                     padding: 10
                     implicitWidth: parent.width / 3 * 2
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     onTextChanged: {
-                        globalUserData.bIsConnected = false;
-                        if (text != gConUserSettings.userName) {
+//                        globalUserData.bIsConnected = false;
+                        if (text !== gConUserSettings.getUserName()) {
                             txtPassWord.text = "";
                         }
                     }
@@ -103,12 +103,12 @@ Flickable {
                 TextField {
                     id: txtPassWord
                     font.family: txtForFontFamily.font
-                    text: globalUserData.passWord.length === 0 ? "" : "dEf1AuLt"
+                    text: gConUserSettings.getPassWord().length === 0 ? "" : "dEf1AuLt"
                     padding: 10
                     implicitWidth: parent.width / 3 * 2
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     onTextChanged: {
-                        globalUserData.bIsConnected = false;
+//                        globalUserData.bIsConnected = false;
                     }
                     echoMode: TextInput.Password
                     Layout.bottomMargin: 35
@@ -122,9 +122,9 @@ Flickable {
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     transformOrigin: Item.Center
                     onClicked: {
-                        if (userIntUser.isDebuggingEnabled()) {
-                            globalUserData.ipAddr = txtIPAddress.text
-                        }
+//                        if (userIntUser.isDebuggingEnabled()) {
+//                            globalUserData.ipAddr = txtIPAddress.text
+//                        }
 
                         if (txtUserName.text.trim() === "" || txtPassWord.text.trim() === "") {
                             toastManager.show("Bitte Verbindungsdaten ausfüllen", 4000)
@@ -300,7 +300,7 @@ Flickable {
     }
 
     function pageOpenedUpdateView() {
-        if (gConUserSettings.userName === "" || globalUserData.passWord === "")
+        if (gConUserSettings.getUserName() === "" || gConUserSettings.getPassWord() === "")
             updateUserColumnView(true);
         else
             updateUserColumnView(false);
@@ -375,7 +375,7 @@ Flickable {
                 TextField {
                     id: txtnewPassWord
                     font.family: txtForFontFamily.font
-                    text: globalUserData.passWord
+                    text: gConUserSettings.getPassWord()
                     implicitWidth: changePasswordColumn.width / 4 * 3
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     echoMode: TextInput.Password
@@ -397,7 +397,7 @@ Flickable {
                 TextField {
                     id: txtnewPassWordReplay
                     font.family: txtForFontFamily.font
-                    text: globalUserData.passWord
+                    text: gConUserSettings.getPassWord()
                     implicitWidth: changePasswordColumn.width / 4 * 3
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     echoMode: TextInput.Password

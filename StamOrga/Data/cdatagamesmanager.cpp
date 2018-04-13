@@ -59,6 +59,8 @@ cDataGamesManager::cDataGamesManager(QObject* parent)
 
 qint32 cDataGamesManager::initialize()
 {
+    qRegisterMetaType<GamePlay*>("GamePlay*");
+
     if (!g_StaGlobalSettings.getSaveInfosOnApp())
         g_StaSettingsManager.removeGroup(GAMES_GROUP);
 
@@ -135,6 +137,34 @@ void cDataGamesManager::addNewGamesPlay(GamePlay* sGame, const quint16 updateInd
             pGame->setTimeFixed(sGame->timeFixed());
         }
         delete sGame;
+    }
+}
+
+bool cDataGamesManager::setGamePlayItemHasEvent(qint32 gameIndex)
+{
+    if (!this->m_initialized)
+        return false;
+
+    QMutexLocker lock(&this->m_mutex);
+
+    for (int i = 0; i < this->m_lGames.count(); i++) {
+        if (this->m_lGames[i]->index() == gameIndex) {
+            this->m_lGames[i]->setEvent(this->m_lGames[i]->getEvent() + 1);
+            return true;
+        }
+    }
+    return false;
+}
+
+void cDataGamesManager::resetAllGamePlayEvents()
+{
+    if (!this->m_initialized)
+        return;
+
+    QMutexLocker lock(&this->m_mutex);
+
+    for (int i = 0; i < this->m_lGames.count(); i++) {
+        this->m_lGames[i]->setEvent(0);
     }
 }
 

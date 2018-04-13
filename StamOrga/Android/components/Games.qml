@@ -397,8 +397,7 @@ Rectangle {
                 }
             }
 
-            var gameUserData = globalUserData.getGameUserDataHandler();
-            var favIndex = gameUserData.getFavoriteGameIndex(gamePlayItem.index);
+            var favIndex = gDataGameUserData.getFavoriteGameIndex(gamePlayItem.index);
             if (favIndex <= 0) {
                 mainRectangleGame.border.color = "grey";
                 mainRectangleGame.border.width = 2;
@@ -473,8 +472,7 @@ Rectangle {
         if (!gamePlayItem.isGameASeasonTicketGame())
             return;
 
-        var gameUserData = globalUserData.getGameUserDataHandler();
-        var ticketIndex = gameUserData.getTicketGameIndex(gamePlayItem.index);
+        var ticketIndex = gDataGameUserData.getTicketGameIndex(gamePlayItem.index);
             if (ticketIndex === 2) {
                 itemTicketShare.visible = true;
                 itemTicketBookmark.visible = false;

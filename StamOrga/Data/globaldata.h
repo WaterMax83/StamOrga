@@ -28,12 +28,12 @@
 #include "../../Common/General/backgroundcontroller.h"
 #include "../../Common/General/globalfunctions.h"
 #include "../../Common/General/logging.h"
-#include "cdatameetinginfo.h"
-#include "gameplay.h"
-#include "gameuserdata.h"
-#include "newsdataitem.h"
-#include "seasonticket.h"
-#include "source/pushnotification.h"
+//#include "cdatagameuserdata.h"
+//#include "cdatameetinginfo.h"
+//#include "gameplay.h"
+//#include "newsdataitem.h"
+//#include "seasonticket.h"
+//#include "source/cadrpushnotifyinfohandler.h"
 
 
 //#define USER_IS_ENABLED(val) ((this->m_UserProperties & val) > 0 ? true : false)
@@ -53,9 +53,9 @@ class GlobalData : public QObject
 public:
     explicit GlobalData(QObject* parent = 0);
 
-    qint32 initialize() { return ERROR_CODE_SUCCESS; }
+    //    qint32 initialize() { return ERROR_CODE_SUCCESS; }
 
-    void loadGlobalSettings();
+    //    void loadGlobalSettings();
 
     //    QString userName();
     //    void    setUserName(const QString& user);
@@ -169,7 +169,7 @@ public:
     //    void                resetAllNewsDataEvents();
     //    bool                setNewsDataItemHasEvent(quint32 newsIndex);
 
-    Q_INVOKABLE GameUserData* getGameUserDataHandler() { return &this->m_gameUserData; }
+    //    Q_INVOKABLE GameUserData* getGameUserDataHandler() { return &this->m_gameUserData; }
 
     //    QString getCurrentAppGUID() { return this->m_AppInstanceGUID; }
     //    QString getCurrentAppToken() { return this->m_pushNotificationToken; }
@@ -180,13 +180,13 @@ public:
     //    Q_INVOKABLE QString getUpdateLink() { return this->m_updateLink; }
 
 signals:
-    void
-    userNameChanged();
-    void passWordChanged();
-    void readableNameChanged();
-    void ipAddrChanged();
-    void conMasterPortChanged();
-    void bIsConnectedChanged();
+    //    void
+    //    userNameChanged();
+    //    void passWordChanged();
+    //    void readableNameChanged();
+    //    void ipAddrChanged();
+    //    void conMasterPortChanged();
+    //    void bIsConnectedChanged();
 
 
 public slots:
@@ -194,7 +194,7 @@ public slots:
 private slots:
 //    void callBackLookUpHost(const QHostInfo& host);
 #ifdef Q_OS_ANDROID
-    void slotNewFcmRegistrationToken(QString token);
+//    void slotNewFcmRegistrationToken(QString token);
 #endif
 
 private:
@@ -237,14 +237,14 @@ private:
     //    qint64               m_ndLastLocalUpdateTimeStamp;
     //    qint64               m_ndLastServerUpdateTimeStamp;
 
-    PushNotificationInformationHandler* m_pushNotificationInfoHandler;
-    QMutex                              m_pushNotificationMutex;
-    QString                             m_pushNotificationToken;
-    QString                             m_AppInstanceGUID;
+    //    AdrPushNotifyInfoHandler* m_pushNotificationInfoHandler;
+    //    QMutex                              m_pushNotificationMutex;
+    //    QString                             m_pushNotificationToken;
+    //    QString                             m_AppInstanceGUID;
 
     //    QString m_updateLink;
 
-    GameUserData m_gameUserData;
+    //    GameUserData m_gameUserData;
 
     //    Logging*             m_logApp;
     //    BackgroundController m_ctrlLog;

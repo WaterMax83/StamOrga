@@ -25,7 +25,6 @@
 //#include <QtQml/QQmlEngine>
 
 #include "globaldata.h"
-#include "globalsettings.h"
 
 // clang-format off
 #define GROUP_ARRAY_ITEM    "item"
@@ -66,19 +65,19 @@ GlobalData::GlobalData(QObject* parent)
 
     //    QQmlEngine::setObjectOwnership(&this->m_meetingInfo, QQmlEngine::CppOwnership);
     //    QQmlEngine::setObjectOwnership(&this->m_awayTripInfo, QQmlEngine::CppOwnership);
-    QQmlEngine::setObjectOwnership(&this->m_gameUserData, QQmlEngine::CppOwnership);
+    //    QQmlEngine::setObjectOwnership(&this->m_gameUserData, QQmlEngine::CppOwnership);
 
     this->m_pMainUserSettings = new QSettings();
     this->m_pMainUserSettings->setIniCodec(("UTF-8"));
 
-    QMutexLocker lock(&this->m_pushNotificationMutex);
+//    QMutexLocker lock(&this->m_pushNotificationMutex);
 //    this->m_pMainUserSettings->beginGroup(APP_INFO_GROUP);
 #ifdef Q_OS_ANDROID
-    this->m_pushNotificationInfoHandler = new PushNotificationInformationHandler(this);
-    connect(this->m_pushNotificationInfoHandler, &PushNotificationInformationHandler::fcmRegistrationTokenChanged,
-            this, &GlobalData::slotNewFcmRegistrationToken);
+//    this->m_pushNotificationInfoHandler = new AdrPushNotifyInfoHandler(this);
+//    connect(this->m_pushNotificationInfoHandler, &AdrPushNotifyInfoHandler::fcmRegistrationTokenChanged,
+//            this, &GlobalData::slotNewFcmRegistrationToken);
 
-    this->m_pushNotificationToken = this->m_pMainUserSettings->value(APP_INFO_TOKEN, "").toString();
+//    this->m_pushNotificationToken = this->m_pMainUserSettings->value(APP_INFO_TOKEN, "").toString();
 #endif
     //    this->m_AppInstanceGUID = this->m_pMainUserSettings->value(APP_INFO_GUID, "").toString();
     //    if (this->m_AppInstanceGUID == "") {
@@ -90,88 +89,88 @@ GlobalData::GlobalData(QObject* parent)
     //    this->m_pMainUserSettings->endGroup();
 }
 
-void GlobalData::loadGlobalSettings()
-{
-    //    this->m_bIpAdressWasSet = false;
-    //    QHostInfo::lookupHost("watermax83.ddns.net", this, SLOT(callBackLookUpHost(QHostInfo)));
+//void GlobalData::loadGlobalSettings()
+//{
+//    this->m_bIpAdressWasSet = false;
+//    QHostInfo::lookupHost("watermax83.ddns.net", this, SLOT(callBackLookUpHost(QHostInfo)));
 
-    //    qInfo().noquote() << this->m_pMainUserSettings->fileName();
+//    qInfo().noquote() << this->m_pMainUserSettings->fileName();
 
-    //    this->m_pMainUserSettings->beginGroup("USER_LOGIN");
+//    this->m_pMainUserSettings->beginGroup("USER_LOGIN");
 
-    //    this->setUserName(this->m_pMainUserSettings->value("UserName", "").toString());
-    //    this->setPassWord(this->m_pMainUserSettings->value("Password", "").toString());
-    //    this->setSalt(this->m_pMainUserSettings->value("Salt", "").toString());
-    //    //    this->setReadableName(this->m_pMainUserSettings->value("ReadableName", "").toString());
-    //    this->setIpAddr(this->m_pMainUserSettings->value("IPAddress", "140.80.61.57").toString());
-    //    //    this->setConMasterPort(this->m_pMainUserSettings->value("ConMasterPort", 55000).toInt());
+//    this->setUserName(this->m_pMainUserSettings->value("UserName", "").toString());
+//    this->setPassWord(this->m_pMainUserSettings->value("Password", "").toString());
+//    this->setSalt(this->m_pMainUserSettings->value("Salt", "").toString());
+//    //    this->setReadableName(this->m_pMainUserSettings->value("ReadableName", "").toString());
+//    this->setIpAddr(this->m_pMainUserSettings->value("IPAddress", "140.80.61.57").toString());
+//    //    this->setConMasterPort(this->m_pMainUserSettings->value("ConMasterPort", 55000).toInt());
 
-    //    this->m_pMainUserSettings->endGroup();
+//    this->m_pMainUserSettings->endGroup();
 
-    //    if (!g_GlobalSettings->saveInfosOnApp()) {
-    //        this->m_pMainUserSettings->beginGroup(GAMES_GROUP);
-    //        if (this->m_pMainUserSettings->childGroups().length() > 0 || this->m_pMainUserSettings->childKeys().length() > 0)
-    //            this->m_pMainUserSettings->remove("");
-    //        this->m_pMainUserSettings->endGroup();
-    //        this->m_pMainUserSettings->beginGroup(SEASONTICKET_GROUP);
-    //        if (this->m_pMainUserSettings->childGroups().length() > 0 || this->m_pMainUserSettings->childKeys().length() > 0)
-    //            this->m_pMainUserSettings->remove("");
-    //        this->m_pMainUserSettings->endGroup();
-    //        return;
-    //    }
+//    if (!g_GlobalSettings->saveInfosOnApp()) {
+//        this->m_pMainUserSettings->beginGroup(GAMES_GROUP);
+//        if (this->m_pMainUserSettings->childGroups().length() > 0 || this->m_pMainUserSettings->childKeys().length() > 0)
+//            this->m_pMainUserSettings->remove("");
+//        this->m_pMainUserSettings->endGroup();
+//        this->m_pMainUserSettings->beginGroup(SEASONTICKET_GROUP);
+//        if (this->m_pMainUserSettings->childGroups().length() > 0 || this->m_pMainUserSettings->childKeys().length() > 0)
+//            this->m_pMainUserSettings->remove("");
+//        this->m_pMainUserSettings->endGroup();
+//        return;
+//    }
 
-    /* Getting data from last Games */
-    //    this->m_pMainUserSettings->beginGroup(GAMES_GROUP);
-    //    this->m_gpLastLocalUpdateTimeStamp  = this->m_pMainUserSettings->value("LocalGamesUpdateTime", 0).toLongLong();
-    //    this->m_gpLastServerUpdateTimeStamp = this->m_pMainUserSettings->value("ServerGamesUpdateTime", 0).toLongLong();
-    //    int count                           = this->m_pMainUserSettings->beginReadArray(GROUP_ARRAY_ITEM);
-    //    for (int i = 0; i < count; i++) {
-    //        this->m_pMainUserSettings->setArrayIndex(i);
-    //        GamePlay* play = new GamePlay();
-    //        play->setHome(this->m_pMainUserSettings->value(PLAY_HOME, "").toString());
-    //        play->setAway(this->m_pMainUserSettings->value(PLAY_AWAY, "").toString());
-    //        play->setTimeStamp(this->m_pMainUserSettings->value(PLAY_DATETIME, 0).toLongLong());
-    //        play->setSeasonIndex(quint8(this->m_pMainUserSettings->value(PLAY_SAISON_INDEX, 0).toUInt()));
-    //        play->setIndex(this->m_pMainUserSettings->value(ITEM_INDEX, 0).toUInt());
-    //        play->setScore(this->m_pMainUserSettings->value(PLAY_SCORE, "").toString());
-    //        play->setCompetition(CompetitionIndex(quint8(this->m_pMainUserSettings->value(PLAY_COMPETITION, 0).toUInt())));
-    //        play->setTimeFixed(this->m_pMainUserSettings->value(PLAY_TIME_FIXED, false).toBool());
+/* Getting data from last Games */
+//    this->m_pMainUserSettings->beginGroup(GAMES_GROUP);
+//    this->m_gpLastLocalUpdateTimeStamp  = this->m_pMainUserSettings->value("LocalGamesUpdateTime", 0).toLongLong();
+//    this->m_gpLastServerUpdateTimeStamp = this->m_pMainUserSettings->value("ServerGamesUpdateTime", 0).toLongLong();
+//    int count                           = this->m_pMainUserSettings->beginReadArray(GROUP_ARRAY_ITEM);
+//    for (int i = 0; i < count; i++) {
+//        this->m_pMainUserSettings->setArrayIndex(i);
+//        GamePlay* play = new GamePlay();
+//        play->setHome(this->m_pMainUserSettings->value(PLAY_HOME, "").toString());
+//        play->setAway(this->m_pMainUserSettings->value(PLAY_AWAY, "").toString());
+//        play->setTimeStamp(this->m_pMainUserSettings->value(PLAY_DATETIME, 0).toLongLong());
+//        play->setSeasonIndex(quint8(this->m_pMainUserSettings->value(PLAY_SAISON_INDEX, 0).toUInt()));
+//        play->setIndex(this->m_pMainUserSettings->value(ITEM_INDEX, 0).toUInt());
+//        play->setScore(this->m_pMainUserSettings->value(PLAY_SCORE, "").toString());
+//        play->setCompetition(CompetitionIndex(quint8(this->m_pMainUserSettings->value(PLAY_COMPETITION, 0).toUInt())));
+//        play->setTimeFixed(this->m_pMainUserSettings->value(PLAY_TIME_FIXED, false).toBool());
 
-    //        QQmlEngine::setObjectOwnership(play, QQmlEngine::CppOwnership);
-    //        this->addNewGamePlay(play);
-    //    }
-    //    this->m_pMainUserSettings->endArray();
-    //    this->m_pMainUserSettings->endGroup();
-    //    this->m_bGamePlayLastUpdateDidChanges = false;
+//        QQmlEngine::setObjectOwnership(play, QQmlEngine::CppOwnership);
+//        this->addNewGamePlay(play);
+//    }
+//    this->m_pMainUserSettings->endArray();
+//    this->m_pMainUserSettings->endGroup();
+//    this->m_bGamePlayLastUpdateDidChanges = false;
 
-    /* Getting data from last SeasonTickets */
-    //    this->m_pMainUserSettings->beginGroup(SEASONTICKET_GROUP);
-    //    this->m_stLastLocalUpdateTimeStamp  = this->m_pMainUserSettings->value("LocalTicketsUpdateTime", 0).toLongLong();
-    //    this->m_stLastServerUpdateTimeStamp = this->m_pMainUserSettings->value("ServerTicketsUpdateTime", 0).toLongLong();
+/* Getting data from last SeasonTickets */
+//    this->m_pMainUserSettings->beginGroup(SEASONTICKET_GROUP);
+//    this->m_stLastLocalUpdateTimeStamp  = this->m_pMainUserSettings->value("LocalTicketsUpdateTime", 0).toLongLong();
+//    this->m_stLastServerUpdateTimeStamp = this->m_pMainUserSettings->value("ServerTicketsUpdateTime", 0).toLongLong();
 
-    //    int ticketCount = this->m_pMainUserSettings->beginReadArray(GROUP_ARRAY_ITEM);
-    //    for (int i = 0; i < ticketCount; i++) {
-    //        this->m_pMainUserSettings->setArrayIndex(i);
-    //        SeasonTicketItem* ticket = new SeasonTicketItem();
+//    int ticketCount = this->m_pMainUserSettings->beginReadArray(GROUP_ARRAY_ITEM);
+//    for (int i = 0; i < ticketCount; i++) {
+//        this->m_pMainUserSettings->setArrayIndex(i);
+//        SeasonTicketItem* ticket = new SeasonTicketItem();
 
-    //        ticket->setName(this->m_pMainUserSettings->value(TICKET_NAME, "").toString());
-    //        ticket->setPlace(this->m_pMainUserSettings->value(TICKET_PLACE, "").toString());
-    //        ticket->setDiscount(quint8(this->m_pMainUserSettings->value(TICKET_DISCOUNT, 0).toUInt()));
-    //        ticket->setIndex(this->m_pMainUserSettings->value(ITEM_INDEX, 0).toUInt());
-    //        ticket->setUserIndex(this->m_pMainUserSettings->value(TICKET_USER_INDEX, 0).toUInt());
+//        ticket->setName(this->m_pMainUserSettings->value(TICKET_NAME, "").toString());
+//        ticket->setPlace(this->m_pMainUserSettings->value(TICKET_PLACE, "").toString());
+//        ticket->setDiscount(quint8(this->m_pMainUserSettings->value(TICKET_DISCOUNT, 0).toUInt()));
+//        ticket->setIndex(this->m_pMainUserSettings->value(ITEM_INDEX, 0).toUInt());
+//        ticket->setUserIndex(this->m_pMainUserSettings->value(TICKET_USER_INDEX, 0).toUInt());
 
-    //        QQmlEngine::setObjectOwnership(ticket, QQmlEngine::CppOwnership);
-    //        this->addNewSeasonTicket(ticket);
-    //    }
+//        QQmlEngine::setObjectOwnership(ticket, QQmlEngine::CppOwnership);
+//        this->addNewSeasonTicket(ticket);
+//    }
 
-    //    this->m_pMainUserSettings->endArray();
-    //    this->m_pMainUserSettings->endGroup();
-    //    this->m_bSeasonTicketLastUpdateDidChanges = false;
+//    this->m_pMainUserSettings->endArray();
+//    this->m_pMainUserSettings->endGroup();
+//    this->m_bSeasonTicketLastUpdateDidChanges = false;
 
-    //    this->resetNewsDataLastServerUpdate();
+//    this->resetNewsDataLastServerUpdate();
 
-    this->m_gameUserData.initialize();
-}
+//    this->m_gameUserData.initialize();
+//}
 
 //void GlobalData::saveGlobalUserSettings()
 //{
@@ -336,7 +335,7 @@ void GlobalData::loadGlobalSettings()
 //    QMutexLocker lock(&this->m_mutexUser);
 //    if (this->m_userIndex != userIndex) {
 //        this->m_userIndex = userIndex;
-//        PushNotificationInformationHandler::setUserIndexForTopics(QString::number(userIndex));
+//        AdrPushNotifyInfoHandler::setUserIndexForTopics(QString::number(userIndex));
 //    }
 //}
 
@@ -781,18 +780,18 @@ void GlobalData::loadGlobalSettings()
 //}
 
 #ifdef Q_OS_ANDROID
-void GlobalData::slotNewFcmRegistrationToken(QString token)
-{
-    QMutexLocker lock(&this->m_pushNotificationMutex);
+//void GlobalData::slotNewFcmRegistrationToken(QString token)
+//{
+//    QMutexLocker lock(&this->m_pushNotificationMutex);
 
-    this->m_pushNotificationToken = token;
+//    this->m_pushNotificationToken = token;
 
-    this->m_pMainUserSettings->beginGroup(APP_INFO_GROUP);
-    this->m_pMainUserSettings->setValue(APP_INFO_TOKEN, this->m_pushNotificationToken);
-    this->m_pMainUserSettings->endGroup();
+//    this->m_pMainUserSettings->beginGroup(APP_INFO_GROUP);
+//    this->m_pMainUserSettings->setValue(APP_INFO_TOKEN, this->m_pushNotificationToken);
+//    this->m_pMainUserSettings->endGroup();
 
-    qInfo().noquote() << QString("Global Data got a new token %1").arg(token);
-}
+//    qInfo().noquote() << QString("Global Data got a new token %1").arg(token);
+//}
 #endif
 
 //bool GlobalData::userIsDebugEnabled()

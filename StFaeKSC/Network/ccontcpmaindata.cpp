@@ -160,7 +160,7 @@ MessageProtocol* cConTcpMainData::getUserProperties(UserConData* pUserCon, Messa
     QString     guid    = rootObj.value("guid").toString();
     QString     token   = rootObj.value("token").toString();
     qint32      os      = rootObj.value("os").toInt();
-    bool loadAll = rootObj.value("loadAll").toBool();
+    bool        loadAll = rootObj.value("loadAll").toBool();
 
     pUserCon->m_guid = guid;
     g_pushNotify->addNewAppInformation(guid, token, os, pUserCon->m_userID);
@@ -178,6 +178,10 @@ MessageProtocol* cConTcpMainData::getUserProperties(UserConData* pUserCon, Messa
         QJsonArray arrTickets;
         if (g_GlobalData->requestGetAvailableTicketFromUser(pUserCon->m_userID, arrTickets) == ERROR_CODE_SUCCESS)
             rootObjAns.insert("tickets", arrTickets);
+
+        QJsonArray eventsArr;
+        if (g_GlobalData->getCurrentUserEvents(eventsArr, pUserCon->m_userID) == ERROR_CODE_SUCCESS)
+            rootObjAns.insert("events", eventsArr);
     }
 
     QByteArray answer = QJsonDocument(rootObjAns).toJson(QJsonDocument::Compact);

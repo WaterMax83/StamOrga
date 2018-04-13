@@ -39,16 +39,7 @@ public:
     qint32 initialize();
 
     qint32 startMainConnection(QString name, QString passw);
-    //    qint32 startGettingUserEvents();
     //    qint32 startSettingUserEvents(qint64 eventID, qint32 status);
-    //    qint32 startListAvailableTicket(quint32 gameIndex);
-    //    qint32 startSaveMeetingInfo(const quint32 gameIndex, const QString when, const QString where, const QString info,
-    //                                const quint32 type);
-    //    qint32 startAcceptMeetingInfo(const quint32 gameIndex, const quint32 accept,
-    //                                  const QString name, const quint32 type,
-    //                                  const quint32 acceptIndex = 0);
-
-    //    ConnectionInfo *GetConnectionInfo() { return &this->m_conInfo; }
 
     void sendLoginRequest();
     void sendNewRequest(TcpDataConRequest* request);
