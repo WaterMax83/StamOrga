@@ -23,6 +23,7 @@
 #include "../Common/General/globalfunctions.h"
 #include "../Common/General/globaltiming.h"
 #include "../Common/Network/messagecommand.h"
+#include "../Data/cdataappuserevents.h"
 #include "../Data/cdatagamesmanager.h"
 #include "../Data/cdatameetinginfo.h"
 #include "../Data/cdatanewsdatamanager.h"
@@ -58,8 +59,6 @@ int cConTcpData::DoBackgroundWork()
     this->m_pConTimeout->setSingleShot(true);
     this->m_pConTimeout->setInterval(SOCKET_TIMEOUT_MS);
     connect(this->m_pConTimeout, &QTimer::timeout, this, &cConTcpData::slotConnectionTimeoutFired);
-
-    //    this->m_pDataHandle = new DataHandling(this->m_pGlobalData);
 
     this->m_pDataTcpSocket = new QTcpSocket(this);
     if (!this->m_pDataTcpSocket->bind()) {
@@ -168,9 +167,9 @@ void cConTcpData::checkNewOncomingData()
             //            request.m_result = this->m_pDataHandle->getHandleUserEventsResponse(msg);
             //            break;
 
-            //        case OP_CODE_CMD_RES::ACK_SET_USER_EVENTS:
-            //            request.m_result = msg->getIntData();
-            //            break;
+        case OP_CODE_CMD_RES::ACK_SET_USER_EVENTS:
+            request->m_result = g_DataAppUserEvents.handleSetUserEventsResponse(msg);
+            break;
 
         case OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN:
             request->m_result = g_ConUserSettings.handleUpdatePasswordResponse(msg);
@@ -259,27 +258,6 @@ void cConTcpData::checkNewOncomingData()
     }
 }
 
-//void cConTcpData::startSendGetUserEventsRequest(DataConRequest request)
-//{
-//    char data[8];
-//    memset(&data[0], 0x0, 8);
-
-//    MessageProtocol msg(request.m_request, &data[0], 8);
-//    this->sendMessageRequest(&msg, request);
-//}
-
-//void cConTcpData::startSendSetUserEventsRequest(DataConRequest request)
-//{
-//    qint32 data[3];
-
-//    qint64 eventID = qToLittleEndian(request.m_lData.at(0).toLongLong());
-//    memcpy(&data[0], &eventID, sizeof(qint64));
-//    data[2] = qToLittleEndian(request.m_lData.at(1).toInt()); // Status
-
-//    MessageProtocol msg(request.m_request, (char*)&data[0], 12);
-//    this->sendMessageRequest(&msg, request);
-//}
-
 qint32 cConTcpData::sendMessageRequest(MessageProtocol* msg, TcpDataConRequest* request)
 {
     if (this->m_pDataTcpSocket == NULL)
@@ -362,18 +340,6 @@ void cConTcpData::startSendNewRequest(TcpDataConRequest* request)
 {
     MessageProtocol msg(request->m_request, request->m_lData);
     this->sendMessageRequest(&msg, request);
-
-    //    case OP_CODE_CMD_REQ::REQ_GET_USER_EVENTS:
-    //        this->startSendGetUserEventsRequest(request);
-    //        break;
-
-    //    case OP_CODE_CMD_REQ::REQ_SET_USER_EVENTS:
-    //        this->startSendSetUserEventsRequest(request);
-    //        break;
-
-    //    default:
-    //        return;
-    //    }
 }
 
 qint32 cConTcpData::terminate()

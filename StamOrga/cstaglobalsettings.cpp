@@ -24,6 +24,7 @@
 #include "../Common/General/config.h"
 #include "../Common/General/globalfunctions.h"
 #include "../Common/Network/messagecommand.h"
+#include "../Data/cdatagamesmanager.h"
 #include "../cstasettingsmanager.h"
 #include "Connection/cconmanager.h"
 #include "Connection/cconusersettings.h"
@@ -475,17 +476,7 @@ void cStaGlobalSettings::slotStateFromAppChanged(Qt::ApplicationState state)
     if (g_ConUserSettings.getUserName() == "" || g_ConUserSettings.getPassWord() == "")
         return;
 
-    /* Move this to later created GameManager */
-    //    qint64 now = QDateTime::currentMSecsSinceEpoch();
-    //    if ((now - this->m_lastGameInfoUpdate) < TIMEOUT_LOAD_GAMEINFO)
-    //        return;
-
-    //    if ((now - this->m_pGlobalData->m_gpLastLocalUpdateTimeStamp) < TIMEOUT_LOAD_GAMES)
-    //        emit this->sendAppStateChangedToActive(1);
-    //    else
-    //        emit this->sendAppStateChangedToActive(2);
-
-    //    this->m_lastGameInfoUpdate = now;
+    g_DataGamesManager.stateChangeCheckUdpate();
 }
 
 void cStaGlobalSettings::slotCallBackLookUpHost(const QHostInfo& host)

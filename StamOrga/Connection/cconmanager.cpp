@@ -76,15 +76,6 @@ qint32 cConManager::startMainConnection(QString name, QString passw)
     return ERROR_CODE_SUCCESS;
 }
 
-//qint32 cConManager::startSettingUserEvents(qint64 eventID, qint32 status)
-//{
-//    DataConRequest req(OP_CODE_CMD_REQ::REQ_SET_USER_EVENTS);
-//    req.m_lData.append(QString::number(eventID));
-//    req.m_lData.append(QString::number(status));
-//    this->sendNewRequest(req);
-//    return ERROR_CODE_SUCCESS;
-//}
-
 /*
      * Answer function after connection with username
      */

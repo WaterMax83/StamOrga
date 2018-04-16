@@ -16,12 +16,17 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "cdataappuserevents.h"
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+
 #include "../../Common/General/config.h"
 #include "../../Common/General/globalfunctions.h"
+#include "../Common/Network/messagecommand.h"
+#include "../Connection/cconmanager.h"
 #include "../Connection/cconusersettings.h"
 #include "../Data/cdatagamesmanager.h"
 #include "../Data/cdatanewsdatamanager.h"
+#include "cdataappuserevents.h"
 
 cDataAppUserEvents g_DataAppUserEvents;
 
@@ -54,14 +59,15 @@ qint32 cDataAppUserEvents::addNewUserEvents(QJsonArray& jsArr)
         pEvent->m_type     = jsObj.value("type").toString();
         pEvent->m_eventID  = static_cast<qint64>(jsObj.value("id").toDouble());
 
-        qDebug() << "New Event " << pEvent->m_info << " " << pEvent->m_type;
+        //        qDebug() << "New Event " << pEvent->m_info << " " << pEvent->m_type;
 
         if (pEvent->m_type == NOTIFY_TOPIC_NEW_APP_VERSION) {
 
             this->m_eventNewAppVersion = false;
-            if (QString::compare(STAM_ORGA_VERSION_S, pEvent->m_info) >= 0)
+            if (QString::compare(STAM_ORGA_VERSION_S, pEvent->m_info) >= 0) {
+                this->startSetUserEvents(pEvent->m_eventID, 0);
                 continue; /* already have newest version */
-            else
+            } else
                 this->m_eventNewAppVersion = true;
         } else if (pEvent->m_type == NOTIFY_TOPIC_NEW_FANCLUB_NEWS) {
 
@@ -130,7 +136,7 @@ qint32 cDataAppUserEvents::clearUserEventFanclub(qint32 newsIndex)
         if (this->m_lEvents[i]->m_type == NOTIFY_TOPIC_NEW_FANCLUB_NEWS) {
             if (this->m_lEvents[i]->m_info.toInt() == newsIndex) {
                 this->m_eventNewFanclubNews--;
-                //                pInt->startSetUserEvents(this->m_lEvents[i]->m_eventID, 0);
+                this->startSetUserEvents(this->m_lEvents[i]->m_eventID, 0);
                 delete this->m_lEvents[i];
                 this->m_lEvents.removeAt(i);
             }
@@ -139,7 +145,7 @@ qint32 cDataAppUserEvents::clearUserEventFanclub(qint32 newsIndex)
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 cDataAppUserEvents::clearUserEventGamPlay(qint32 gameIndex)
+qint32 cDataAppUserEvents::clearUserEventGamePlay(qint32 gameIndex)
 {
     for (int i = this->m_lEvents.count() - 1; i >= 0; i--) {
         if (this->m_lEvents[i]->m_type == NOTIFY_TOPIC_NEW_FREE_TICKET
@@ -148,7 +154,7 @@ qint32 cDataAppUserEvents::clearUserEventGamPlay(qint32 gameIndex)
             || this->m_lEvents[i]->m_type == NOTIFY_TOPIC_NEW_MEETING) {
 
             if (this->m_lEvents[i]->m_info.toInt() == gameIndex) {
-                //                pInt->startSetUserEvents(this->m_lEvents[i]->m_eventID, 0);
+                this->startSetUserEvents(this->m_lEvents[i]->m_eventID, 0);
                 delete this->m_lEvents[i];
                 this->m_lEvents.removeAt(i);
             }
@@ -162,10 +168,39 @@ qint32 cDataAppUserEvents::clearUserEventUpdate()
     for (int i = this->m_lEvents.count() - 1; i >= 0; i--) {
         if (this->m_lEvents[i]->m_type == NOTIFY_TOPIC_NEW_APP_VERSION) {
             this->m_eventNewAppVersion = false;
-            //            pInt->startSetUserEvents(this->m_lEvents[i]->m_eventID, 0);
+            this->startSetUserEvents(this->m_lEvents[i]->m_eventID, 0);
             delete this->m_lEvents[i];
             this->m_lEvents.removeAt(i);
         }
     }
     return ERROR_CODE_SUCCESS;
+}
+
+qint32 cDataAppUserEvents::startSetUserEvents(const qint64 eventID, const qint32 status)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QJsonObject rootObj;
+    rootObj.insert("eventID", eventID);
+    rootObj.insert("status", status);
+
+    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_SET_USER_EVENTS);
+    req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+
+    g_ConManager.sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 cDataAppUserEvents::handleSetUserEventsResponse(MessageProtocol* msg)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QByteArray  data(msg->getPointerToData());
+    QJsonObject rootObj = QJsonDocument::fromJson(data).object();
+
+    qint32 result = rootObj.value("ack").toInt(ERROR_CODE_NOT_FOUND);
+
+    return result;
 }

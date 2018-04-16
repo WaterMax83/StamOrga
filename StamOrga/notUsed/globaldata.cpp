@@ -67,8 +67,8 @@ GlobalData::GlobalData(QObject* parent)
     //    QQmlEngine::setObjectOwnership(&this->m_awayTripInfo, QQmlEngine::CppOwnership);
     //    QQmlEngine::setObjectOwnership(&this->m_gameUserData, QQmlEngine::CppOwnership);
 
-    this->m_pMainUserSettings = new QSettings();
-    this->m_pMainUserSettings->setIniCodec(("UTF-8"));
+//    this->m_pMainUserSettings = new QSettings();
+//    this->m_pMainUserSettings->setIniCodec(("UTF-8"));
 
 //    QMutexLocker lock(&this->m_pushNotificationMutex);
 //    this->m_pMainUserSettings->beginGroup(APP_INFO_GROUP);

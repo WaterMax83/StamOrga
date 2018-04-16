@@ -25,8 +25,6 @@ VERSION=$${STAMORGA_VERSION}
 
 SOURCES += main.cpp \
 	userinterface.cpp \
-    ../ConnectionHandling.cpp \
-    ../mainconnection.cpp \
     ../../Common/General/backgroundcontroller.cpp \
     ../../Common/General/backgroundworker.cpp \
     ../../Common/General/logging.cpp \
@@ -43,9 +41,6 @@ SOURCES += main.cpp \
     ../cstasettingsmanager.cpp \
     ../cstaglobalsettings.cpp \
     ../Data/cdatappinfomanager.cpp \
-    ../dataconnection.cpp \
-    ../datahandling.cpp \
-    ../Data/globaldata.cpp \
     ../Data/gameplay.cpp \
     ../Data/newsdataitem.cpp \
     ../Data/seasonticket.cpp \
@@ -85,8 +80,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     userinterface.h \
-    ../connectionhandling.h \
-    ../mainconnection.h \
     ../../Common/General/backgroundcontroller.h \
     ../../Common/General/backgroundworker.h \
     ../../Common/General/config.h \
@@ -105,9 +98,6 @@ HEADERS += \
     ../cstasettingsmanager.h \
     ../cstaglobalsettings.h \
     ../Data/cdatappinfomanager.h \
-    ../dataconnection.h \
-    ../datahandling.h \
-    ../Data/globaldata.h \
     ../Data/gameplay.h \
     ../Data/seasonticket.h \
     ../Data/newsdataitem.h \

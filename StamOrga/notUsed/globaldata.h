@@ -218,7 +218,7 @@ private:
 
     //    bool m_bIsConnected;
 
-    QSettings* m_pMainUserSettings;
+    //    QSettings* m_pMainUserSettings;
 
     //    QList<GamePlay*> m_lGamePlay;
     //    qint64           m_gpLastLocalUpdateTimeStamp;

@@ -26,7 +26,6 @@
 
 #include "../Common/General/backgroundworker.h"
 #include "../Common/Network/messagebuffer.h"
-//#include "../Data/globaldata.h"
 
 class cConTcpMain : public BackgroundWorker
 {

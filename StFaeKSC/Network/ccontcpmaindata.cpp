@@ -222,6 +222,23 @@ MessageProtocol* cConTcpMainData::getUserChangePassword(UserConData* pUserCon, M
         return new MessageProtocol(OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN, ERROR_CODE_COMMON);
 }
 
+MessageProtocol* cConTcpMainData::getSetUserEvent(UserConData* pUserCon, MessageProtocol* request)
+{
+    QByteArray  data(request->getPointerToData());
+    QJsonObject rootObj = QJsonDocument::fromJson(data).object();
+    qint64      eventID = (qint64)rootObj.value("eventID").toDouble();
+    qint32      status  = rootObj.value("status").toInt();
+
+    qint32 rCode = g_GlobalData->acceptUserEvent(eventID, pUserCon->m_userID, status);
+
+    QJsonObject rootObjAns;
+    rootObjAns.insert("ack", rCode);
+
+    QByteArray answer = QJsonDocument(rootObjAns).toJson(QJsonDocument::Compact);
+
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_SET_USER_EVENTS, answer);
+}
+
 quint16 cConTcpMainData::getFreeDataPort()
 {
     QMutexLocker lock(&this->m_mutex);

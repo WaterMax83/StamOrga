@@ -445,16 +445,16 @@ ApplicationWindow {
         onNotifyStatisticsCommandFinished: stackView.currentItem.notifyStatisticsCommandFinished(result);
     }
 
-//    Connections {
-//       target: globalSettings
-//       onSendAppStateChangedToActive: {
-//           viewMainGames.showLoadingGameInfos("Lade Spielinfos", true)
+    Connections {
+       target: gDataGamesManager
+       onSendAppStateChangedToActive: {
+           viewMainGames.showLoadingGameInfos("Lade Spielinfos", true)
 //           if (value === 1)
 //                gDataGamesManager.startListGamesInfo();
 //           else if (value === 2)
 //                gDataGamesManager.startListGames();
-//       }
-//    }
+       }
+    }
 
     function openUserLogin(open) {
 

@@ -198,6 +198,9 @@ MessageProtocol* cConTcpDataServer::checkNewMessage(MessageProtocol* msg)
         case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
             ack = g_ConTcpMainData.getUserChangePassword(this->m_pUserConData, msg);
             break;
+        case OP_CODE_CMD_REQ::REQ_SET_USER_EVENTS:
+            ack = g_ConTcpMainData.getSetUserEvent(this->m_pUserConData, msg);
+            break;
 
         case OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST:
             ack = g_TicketManager.getSeasonTicketList(this->m_pUserConData, msg);

@@ -23,6 +23,7 @@
 #include <QtCore/QObject>
 
 #include "../../Common/General/globalfunctions.h"
+#include "Connection/cconmanager.h"
 
 class UserInterface : public QObject
 {
@@ -31,8 +32,6 @@ public:
     explicit UserInterface(QObject* parent = 0);
 
     Q_INVOKABLE qint32 startMainConnection(QString name, QString passw);
-
-    Q_INVOKABLE qint32 startSetUserEvents(qint64 eventID, qint32 status);
 
     Q_INVOKABLE bool isDebuggingEnabled()
     {

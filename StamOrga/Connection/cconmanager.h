@@ -24,7 +24,6 @@
 
 #include "../Common/General/backgroundcontroller.h"
 #include "../Common/General/cgendisposer.h"
-//#include "../Data/globaldata.h"
 #include "ccontcpdata.h"
 #include "ccontcpmain.h"
 
@@ -39,7 +38,6 @@ public:
     qint32 initialize();
 
     qint32 startMainConnection(QString name, QString passw);
-    //    qint32 startSettingUserEvents(qint64 eventID, qint32 status);
 
     void sendLoginRequest();
     void sendNewRequest(TcpDataConRequest* request);

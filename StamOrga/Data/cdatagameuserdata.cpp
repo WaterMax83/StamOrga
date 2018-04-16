@@ -22,10 +22,6 @@
 #include "../cstasettingsmanager.h"
 #include "cdatagameuserdata.h"
 #include "gameplay.h"
-#include "globaldata.h"
-
-extern GlobalData* g_GlobalData;
-
 
 cDataGameUserData g_DataGameUserData;
 
@@ -199,11 +195,10 @@ qint32 cDataGameUserData::handleUserPropTickets(QJsonArray& arrTickets)
     if (arrTickets.isEmpty() || arrTickets.count() == 0)
         return ERROR_CODE_NOT_FOUND;
 
-    //    GameUserData* pGameUserData = this->m_pGlobalData->getGameUserDataHandler();
     this->clearTicketGameList();
 
+    //    qInfo() << arrTickets;
 
-    qInfo() << arrTickets;
     for (int i = 0; i < arrTickets.count(); i++) {
         QJsonObject ticket    = arrTickets.at(i).toObject();
         qint32      gameIndex = ticket.value("gameIndex").toInt(-1);

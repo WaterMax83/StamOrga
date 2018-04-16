@@ -35,13 +35,10 @@
 #include "../Data/cdataappuserevents.h"
 #include "../Data/cdatagameuserdata.h"
 #include "../Data/cdatastatisticmanager.h"
-#include "../Data/globaldata.h"
 #include "../cstaglobalmanager.h"
 #include "../cstaglobalsettings.h"
-#include "../dataconnection.h"
 #include "userinterface.h"
 
-GlobalData* g_GlobalData;
 
 int main(int argc, char* argv[])
 {
@@ -62,9 +59,6 @@ int main(int argc, char* argv[])
 
     cStaGlobalManager staGlobalManager;
     staGlobalManager.initialize();
-
-    GlobalData globalUserData;
-    g_GlobalData = &globalUserData;
 
     QFontDatabase base;
     QStringList   fontFamilies = base.families();
@@ -92,13 +86,10 @@ int main(int argc, char* argv[])
     // engine to start qml display -> takes about half a second
     QQmlApplicationEngine engine;
     staGlobalManager.setQmlInformationClasses(&engine);
-    engine.rootContext()->setContextProperty("globalUserData", &globalUserData);
     engine.rootContext()->setContextProperty("fontFamiliesModel", &fontFamiliesModel);
     //    engine.rootContext()->setContextProperty("fontFamiliesModel", QVariant::fromValue(fontFamilies));
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));
 
-    // load settings to update data
-    //    globalUserData.loadGlobalSettings();
 
     if (engine.rootObjects().size() == 0) {
         qCritical() << "Warning no root qml object loaded, end programm";

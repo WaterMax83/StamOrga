@@ -57,6 +57,8 @@ public:
 
     MessageProtocol* getUserChangePassword(UserConData* pUserCon, MessageProtocol* request);
 
+    MessageProtocol* getSetUserEvent(UserConData* pUserCon, MessageProtocol* request);
+
 private slots:
     void slotServerClosed(quint16 destPort);
 

@@ -28,14 +28,11 @@
 #include "../Common/General/backgroundworker.h"
 #include "../Common/Network/messagebuffer.h"
 #include "../Common/Network/messageprotocol.h"
-//#include "../Data/globaldata.h"
-//#include "datahandling.h"
 
 struct TcpDataConRequest {
     quint32    m_request;
     QByteArray m_lData;
     qint32     m_result;
-    //    QString    m_sInfoData;
 
     TcpDataConRequest(quint32 req)
     {
@@ -79,10 +76,6 @@ private:
 
     QTimer*     m_pConTimeout;
     QTcpSocket* m_pDataTcpSocket = NULL;
-
-    //    void startSendGetUserEventsRequest(DataConRequest request);
-    //    void startSendSetUserEventsRequest(DataConRequest request);
-
 
     void               checkNewOncomingData();
     qint32             sendMessageRequest(MessageProtocol* msg, TcpDataConRequest* request);

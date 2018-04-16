@@ -24,7 +24,7 @@
 #include <QtCore/QJsonObject>
 
 #include "../Common/General/cgendisposer.h"
-//#include "globaldata.h"
+#include "../Common/Network/messageprotocol.h"
 #include "userinterface.h"
 
 struct EventInfo {
@@ -50,8 +50,10 @@ public:
     Q_INVOKABLE qint32 getCurrentFanclubEventCounter();
 
     Q_INVOKABLE qint32 clearUserEventFanclub(qint32 newsIndex);
-    Q_INVOKABLE qint32 clearUserEventGamPlay(qint32 gameIndex);
+    Q_INVOKABLE qint32 clearUserEventGamePlay(qint32 gameIndex);
     Q_INVOKABLE qint32 clearUserEventUpdate();
+
+    qint32 handleSetUserEventsResponse(MessageProtocol* msg);
 
 signals:
 
@@ -61,7 +63,7 @@ private:
     bool   m_eventNewAppVersion;
     qint32 m_eventNewFanclubNews;
 
-    //    GlobalData*       m_pGlobalData;
+    qint32            startSetUserEvents(const qint64 eventID, const qint32 status);
     QList<EventInfo*> m_lEvents;
 };
 

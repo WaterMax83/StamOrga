@@ -16,6 +16,7 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QtCore/QDateTime>
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
@@ -69,6 +70,8 @@ qint32 cDataGamesManager::initialize()
     this->m_stLastLocalUpdateTimeStamp = iValue;
     g_StaSettingsManager.getInt64Value(GAMES_GROUP, SERVER_GAMES_UDPATE, iValue);
     this->m_stLastServerUpdateTimeStamp = iValue;
+
+    this->m_LastGameInfoUpdate = 0;
 
     this->m_initialized = true;
 
@@ -420,29 +423,25 @@ qint32 cDataGamesManager::handleChangeGameResponse(MessageProtocol* msg)
     return msg->getIntData();
 }
 
-//qint32 cDataGamesManager::startRemoveSeasonTicket(const qint32 index)
-//{
-//    if (!this->m_initialized)
-//        return ERROR_CODE_NOT_INITIALIZED;
+qint32 cDataGamesManager::stateChangeCheckUdpate()
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
 
-//    QJsonObject rootObj;
-//    rootObj.insert("index", index);
+    qint64 now = QDateTime::currentMSecsSinceEpoch();
+    if ((now - this->m_LastGameInfoUpdate) < TIMEOUT_LOAD_GAMEINFO)
+        return ERROR_CODE_NOT_READY;
 
-//    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_REMOVE_TICKET);
-//    req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+    if ((now - this->m_stLastLocalUpdateTimeStamp) < TIMEOUT_LOAD_GAMES) {
+        emit this->sendAppStateChangedToActive(1);
+        this->startListGamesInfo();
 
-//    g_ConManager.sendNewRequest(req);
-//    return ERROR_CODE_SUCCESS;
-//}
+    } else {
+        emit this->sendAppStateChangedToActive(2);
+        this->startListGames();
+    }
 
-//qint32 cDataGamesManager::handleRemoveSeasonTicketResponse(MessageProtocol* msg)
-//{
-//    if (!this->m_initialized)
-//        return ERROR_CODE_NOT_INITIALIZED;
+    this->m_LastGameInfoUpdate = now;
 
-//    QMutexLocker lock(&this->m_mutex);
-
-//    this->m_stLastServerUpdateTimeStamp = 0;
-
-//    return msg->getIntData();
-//}
+    return ERROR_CODE_SUCCESS;
+}

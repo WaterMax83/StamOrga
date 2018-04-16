@@ -20,7 +20,6 @@
 
 #include "../../Common/Network/messagecommand.h"
 #include "../Data/cdatagamesmanager.h"
-#include "Connection/cconmanager.h"
 #include "Connection/cconusersettings.h"
 #include "userinterface.h"
 
@@ -49,12 +48,6 @@ qint32 UserInterface::startMainConnection(QString name, QString passw)
     }
 
     return g_ConManager.startMainConnection(name, passw);
-}
-
-qint32 UserInterface::startSetUserEvents(qint64 eventID, qint32 status)
-{
-    //    return this->m_pConHandle->startSettingUserEvents(eventID, status);
-    return ERROR_CODE_NOT_IMPLEMENTED;
 }
 
 void UserInterface::slotConnectionRequestFinished(qint32 result, const QString msg)

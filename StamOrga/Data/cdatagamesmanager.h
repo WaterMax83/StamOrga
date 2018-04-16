@@ -57,10 +57,10 @@ public:
                                        const QString score, const bool fixedTime);
     qint32             handleChangeGameResponse(MessageProtocol* msg);
 
-    //    Q_INVOKABLE qint32 startRemoveSeasonTicket(const qint32 index);
-    //    qint32             handleRemoveSeasonTicketResponse(MessageProtocol* msg);
+    qint32 stateChangeCheckUdpate();
 
 signals:
+    void sendAppStateChangedToActive(qint32 state);
 
 public slots:
 
@@ -70,6 +70,7 @@ private:
 
     qint64 m_stLastLocalUpdateTimeStamp;
     qint64 m_stLastServerUpdateTimeStamp;
+    qint64 m_LastGameInfoUpdate;
 };
 
 extern cDataGamesManager g_DataGamesManager;

@@ -52,7 +52,7 @@ qint32 cDatAppInfoManager::initialize()
 #ifdef Q_OS_ANDROID
     this->m_pushNotificationInfoHandler = new AdrPushNotifyInfoHandler(this);
     connect(this->m_pushNotificationInfoHandler, &AdrPushNotifyInfoHandler::fcmRegistrationTokenChanged,
-            this, &GlobalData::slotNewFcmRegistrationToken);
+            this, &cDatAppInfoManager::slotNewFcmRegistrationToken);
 
     g_StaSettingsManager.getValue(APP_INFO_GROUP, APP_INFO_TOKEN, value);
     this->m_pushNotificationToken = value;
