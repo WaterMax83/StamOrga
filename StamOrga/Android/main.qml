@@ -325,6 +325,10 @@ ApplicationWindow {
         id: viewFanclubNewList
         MyPages.FanclubNewsList{}
     }
+    Component {
+        id: viewConsolePage
+        MyPages.Console {}
+    }
 
     UserInterface {
         id: userInt
@@ -363,6 +367,7 @@ ApplicationWindow {
         property bool isLoggingWindowShown : false;
         property bool isFanclubNewsWindowShown : false;
         property bool isNewVersionElementShown : false;
+        property bool isConsoleWindowShown : false;
         onNotifyUserPropertiesFinished: {
             if (result > 0 && !userInt.isDebuggingEnabled()) {
                 if (!isLoggingWindowShown) {
@@ -386,6 +391,17 @@ ApplicationWindow {
                                                 event : 0,
                                                 listImgSource : "images/group.png"
                                             })
+                    }
+                }
+                if (!isConsoleWindowShown) {
+                    isConsoleWindowShown = true;
+                    if (gConUserSettings.userIsConsoleEnabled()) {
+                        listViewListModel.append({
+                                                     title: "Console",
+                                                     element: viewConsolePage,
+                                                     toolButtonImgSource: "",
+                                                     listImgSource: ""
+                                                 });
                     }
                 }
             }

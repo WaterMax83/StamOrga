@@ -267,7 +267,7 @@ qint32 cConUserSettings::startUpdatePassword(QString password)
     if (password.length() > 0)
         newPassWord = this->createHashValue(password, this->getSalt());
     else
-        newPassWord = this->m_newPassWord;
+        newPassWord             = this->m_newPassWord;
     QString     currentPassWord = this->createHashValue(this->getPassWord(), this->m_currentRandomValue);
     QJsonObject rootObj;
     rootObj.insert("new", newPassWord);
@@ -323,6 +323,10 @@ bool cConUserSettings::userIsFanclubEnabled()
 bool cConUserSettings::userIsFanclubEditEnabled()
 {
     return USER_IS_ENABLED(USER_ENABLE_FANCLUB_EDIT);
+}
+bool cConUserSettings::userIsConsoleEnabled()
+{
+    return USER_IS_ENABLED(USER_ENABLE_CONSOLE);
 }
 
 cConUserSettings::~cConUserSettings()

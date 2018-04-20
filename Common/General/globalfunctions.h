@@ -122,8 +122,8 @@ enum MeetingType {
 };
 
 extern CompetitionIndex getCompetitionIndex(QString comp);
-extern QString          getCompetitionString(CompetitionIndex index);
-extern QString          createRandomString(qint32 size);
+extern QString getCompetitionString(CompetitionIndex index);
+extern QString createRandomString(qint32 size);
 
 // clang-format off
 #define USER_ENABLE_LOG                     0x0001
@@ -131,6 +131,7 @@ extern QString          createRandomString(qint32 size);
 #define USER_ENABLE_FIXED_GAME_TIME         0x0004
 #define USER_ENABLE_FANCLUB                 0x0008
 #define USER_ENABLE_FANCLUB_EDIT            0x0010
+#define USER_ENABLE_CONSOLE                 0x0020
 // clang-format on
 
 

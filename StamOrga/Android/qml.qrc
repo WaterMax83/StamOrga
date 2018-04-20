@@ -102,5 +102,6 @@
         <file>images/chart.png</file>
         <file>images/share.png</file>
         <file>images/+material/chart.png</file>
+        <file>pages/Console.qml</file>
     </qresource>
 </RCC>

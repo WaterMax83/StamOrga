@@ -16,10 +16,12 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "cdataconsolemanager.h"
+#include <QtCore/QJsonDocument>
+
 #include "../../Common/General/globalfunctions.h"
 #include "../Common/Network/messagecommand.h"
 #include "../Connection/cconmanager.h"
+#include "cdataconsolemanager.h"
 
 cDataConsoleManager g_DataConsoleManager;
 

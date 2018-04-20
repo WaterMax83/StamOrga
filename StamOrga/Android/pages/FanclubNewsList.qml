@@ -104,7 +104,6 @@ Flickable {
         if (!isViewAlreadyOpened)
             updateFanclubNewsList();
         isViewAlreadyOpened = true;
-        console.log("Show from open")
         showNewsDataList();
     }
 
@@ -163,7 +162,6 @@ Flickable {
             busyIndicatorNewsList.infoText = "Fehler beim Laden der Events"
         }
 
-        console.log("Show from user properties")
         showNewsDataList();
     }
 
