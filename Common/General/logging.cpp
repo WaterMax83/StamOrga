@@ -111,10 +111,11 @@ void Logging::addNewEntry(QtMsgType type, /*const QMessageLogContext context, */
     emit this->signalNewLogEntries();
 }
 
-int Logging::showLoggingInfo(quint16 numbOfLines)
+QString Logging::showLoggingInfo(quint16 numbOfLines)
 {
+    QString rValue;
     if (!this->m_initialized)
-        return 0;
+        return rValue;
 
     QMutexLocker lock(&this->m_internalMutex);
 
@@ -127,10 +128,10 @@ int Logging::showLoggingInfo(quint16 numbOfLines)
         cnt = aList.size() - numbOfLines;
 
     for (; cnt < aList.size(); cnt++) {
-        std::cout << aList[cnt].toStdString() << std::endl;
+        rValue.append(aList[cnt] + "\n");
     }
 
-    return numbOfLines;
+    return rValue;
 }
 
 void Logging::clearCurrentLoggingList(int index)

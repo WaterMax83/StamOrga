@@ -35,18 +35,18 @@ enum CSV_IMPORT_GROUP {
     GAME    = 2
 };
 
-int ReadDataCSV::readNewCSVData(QString path)
+QString ReadDataCSV::readNewCSVData(QString path)
 {
     QFile csvFile(path);
 
     if (!csvFile.exists()) {
         CONSOLE_CRITICAL(QString("CSV File %1 does not exist").arg(path));
-        return -1;
+        return "Error";
     }
 
     if (!csvFile.open(QIODevice::ReadOnly)) {
         CONSOLE_CRITICAL(QString("Could not open file %1: %2").arg(path).arg(csvFile.errorString()));
-        return -1;
+        return "Error";
     }
 
     CSV_IMPORT_GROUP actGroup = CSV_IMPORT_GROUP::NOTHING;
@@ -75,7 +75,7 @@ int ReadDataCSV::readNewCSVData(QString path)
             }
         }
     }
-    return 0;
+    return "Success";
 }
 
 int ReadDataCSV::readNewGameData(QStringList line)

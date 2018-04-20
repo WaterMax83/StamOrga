@@ -157,8 +157,9 @@ int FanclubNews::changeFanclubNews(const quint32 newsIndex, const QString header
 }
 
 
-int FanclubNews::showNewsData()
+QString FanclubNews::showNewsData()
 {
+    QString      rValue;
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
     for (int i = 0; i < this->getNumberOfInternalList(); i++) {
@@ -167,15 +168,15 @@ int FanclubNews::showNewsData()
             continue;
 
         QString date   = QDateTime::fromMSecsSinceEpoch(pItem->m_timestamp).toString("dd.MM.yyyy hh:mm");
-        QString output = QString("%1 - %2: %3 - %4")
+        QString output = QString("%1 - %2: %3 - %4\n")
                              .arg(pItem->m_index, 2, 10, QChar('0'))
                              .arg(date)
                              .arg(g_ListedUser->getItemName(pItem->m_userID), -15)
                              .arg(pItem->m_itemName);
 
-        std::cout << output.toStdString() << std::endl;
+        rValue.append(output);
     }
-    return 0;
+    return rValue;
 }
 
 void FanclubNews::saveCurrentInteralList()

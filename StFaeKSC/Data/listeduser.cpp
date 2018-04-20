@@ -141,8 +141,9 @@ int ListedUser::addNewUser(const QString name, const QString password, quint32 p
     return newIndex;
 }
 
-int ListedUser::showAllUsers()
+QString ListedUser::showAllUsers()
 {
+    QString      rValue;
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
     for (int i = 0; i < this->getNumberOfInternalList(); i++) {
@@ -150,11 +151,11 @@ int ListedUser::showAllUsers()
         if (pLogin == NULL)
             continue;
         QString output = QString("%1 - %2").arg(pLogin->m_itemName, -25).arg(pLogin->m_readName, -20);
-        output.append(QString(" : 0x%1").arg(QString::number(pLogin->m_properties, 16)));
-        std::cout << output.toStdString() << std::endl;
+        output.append(QString(" : 0x%1\n").arg(QString::number(pLogin->m_properties, 16)));
+        rValue.append(output);
     }
 
-    return 0;
+    return rValue;
 }
 
 void ListedUser::saveCurrentInteralList()

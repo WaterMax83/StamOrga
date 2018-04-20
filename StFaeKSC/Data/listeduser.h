@@ -72,7 +72,7 @@ public:
     ~ListedUser();
 
     int addNewUser(const QString name, const QString password = "", quint32 props = DEFAULT_LOGIN_PROPS);
-    int showAllUsers();
+    QString showAllUsers();
 
     bool userCheckPassword(QString name, QString passw);
     qint32 userCheckPasswordHash(QString name, QString hash, QString random);

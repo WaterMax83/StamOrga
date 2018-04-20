@@ -22,6 +22,7 @@
 #include "../Data/cdatagameuserdata.h"
 #include "Connection/cconmanager.h"
 #include "Connection/cconusersettings.h"
+#include "Data/cdataconsolemanager.h"
 #include "Data/cdatagamesmanager.h"
 #include "Data/cdatameetinginfo.h"
 #include "Data/cdatanewsdatamanager.h"
@@ -87,6 +88,9 @@ qint32 cStaGlobalManager::initialize()
         rCode = g_DataAppUserEvents.initialize();
 
     if (rCode == ERROR_CODE_SUCCESS)
+        rCode = g_DataConsoleManager.initialize();
+
+    if (rCode == ERROR_CODE_SUCCESS)
         rCode = g_ConManager.initialize();
 
     if (rCode == ERROR_CODE_SUCCESS)
@@ -107,5 +111,6 @@ void cStaGlobalManager::setQmlInformationClasses(QQmlApplicationEngine* engine)
     engine->rootContext()->setContextProperty("gDataGameUserData", &g_DataGameUserData);
     engine->rootContext()->setContextProperty("gDataAppUserEvents", &g_DataAppUserEvents);
     engine->rootContext()->setContextProperty("gDataTripInfo", &g_DataTripInfo);
+    engine->rootContext()->setContextProperty("gDataConsoleManager", &g_DataConsoleManager);
     engine->rootContext()->setContextProperty("gConUserSettings", &g_ConUserSettings);
 }

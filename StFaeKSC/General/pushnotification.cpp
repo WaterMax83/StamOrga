@@ -647,8 +647,9 @@ bool PushNotification::addNewAppToken(AppTokenUID* app, bool checkApp)
     return true;
 }
 
-void PushNotification::showCurrentTokenInformation(const QString cmd)
+QString PushNotification::showCurrentTokenInformation(const QString cmd)
 {
+    QString      rValue;
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
     for (int i = 0; i < this->getNumberOfInternalList(); i++) {
@@ -667,8 +668,10 @@ void PushNotification::showCurrentTokenInformation(const QString cmd)
         else if (cmd == "version")
             output.append(QString(" - %1 %2").arg(version, 15).arg(app->m_oSystem));
 
-        std::cout << output.toStdString() << std::endl;
+        rValue.append(output);
+        rValue.append("\n");
     }
+    return rValue;
 }
 
 void PushNotification::saveCurrentInteralList()

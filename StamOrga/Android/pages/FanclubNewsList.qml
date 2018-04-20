@@ -85,7 +85,7 @@ Flickable {
                 anchors.right: parent.right
                 anchors.left: parent.left
                 width: parent.width
-                spacing: 10
+                spacing: 5
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
             }

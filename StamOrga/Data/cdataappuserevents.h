@@ -25,7 +25,7 @@
 
 #include "../Common/General/cgendisposer.h"
 #include "../Common/Network/messageprotocol.h"
-#include "userinterface.h"
+//#include "userinterface.h"
 
 struct EventInfo {
     QString m_type;

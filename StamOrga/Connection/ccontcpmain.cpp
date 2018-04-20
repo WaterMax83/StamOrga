@@ -82,6 +82,7 @@ int cConTcpMain::DoBackgroundWork()
     connect(this->m_pConTimeout, &QTimer::timeout, this, &cConTcpMain::slotConnectionTimeoutFired);
 
     this->m_pMasterTcpSocket->connectToHost(this->m_hMasterReceiver, g_ConUserSettings.getMasterConPort());
+
     this->m_pConTimeout->start(SOCKET_TIMEOUT_MS);
     this->m_bIsConnecting = true;
 

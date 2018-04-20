@@ -165,8 +165,9 @@ int SeasonTicket::changeSeasonTicketInfos(const qint32 index, const qint32 disco
     return ERROR_CODE_NOT_FOUND;
 }
 
-int SeasonTicket::showAllSeasonTickets()
+QString SeasonTicket::showAllSeasonTickets()
 {
+    QString      rValue;
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
     for (int i = 0; i < this->getNumberOfInternalList(); i++) {
@@ -176,10 +177,10 @@ int SeasonTicket::showAllSeasonTickets()
         QString date   = QDateTime::fromMSecsSinceEpoch(pTicket->m_timestamp).toString("dd.MM.yyyy hh:mm");
         QString output = QString("%1: %2").arg(pTicket->m_itemName, -20).arg(pTicket->m_discount);
         output.append(QString(" - %1 - %2").arg(date).arg(pTicket->m_place, -20));
-        output.append(QString(" - %1").arg(pTicket->m_user));
-        std::cout << output.toStdString() << std::endl;
+        output.append(QString(" - %1\n").arg(pTicket->m_user));
+        rValue.append(output);
     }
-    return 0;
+    return rValue;
 }
 
 void SeasonTicket::saveCurrentInteralList()

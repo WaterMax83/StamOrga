@@ -49,7 +49,7 @@ public:
 
     void addNewEntry(QtMsgType type, /*const QMessageLogContext context,*/ const QString& msg);
 
-    int showLoggingInfo(quint16 numbOfLines);
+    QString showLoggingInfo(quint16 numbOfLines);
 
     void clearCurrentLoggingList(int index);
 

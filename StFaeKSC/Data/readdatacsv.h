@@ -28,12 +28,12 @@
 class ReadDataCSV
 {
 public:
-    ReadDataCSV(GlobalData *pGlobalData);
+    ReadDataCSV(GlobalData* pGlobalData);
 
-    int readNewCSVData(QString path);
+    QString readNewCSVData(QString path);
 
 private:
-    GlobalData  *m_pGlobalData;
+    GlobalData* m_pGlobalData;
 
 
     int readNewGameData(QStringList line);

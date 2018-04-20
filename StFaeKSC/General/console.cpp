@@ -22,22 +22,28 @@
 #include <QThread>
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
 
 #include <iostream>
 #include <signal.h>
 #include <stdlib.h>
 
 #include "../Common/General/globalfunctions.h"
+#include "../Common/Network/messagecommand.h"
 #include "console.h"
 #include "usercommand.h"
 
+
+Console*           g_Console;
+extern GlobalData* g_GlobalData;
 
 #define SETTINGS_PATH "/Settings/settings.ini"
 
 #define ADD_USER "adduser"
 #define ADD_USER_SIZE QString(ADD_USER).size()
 
-Console::Console(GlobalData* pData, QObject* parent)
+Console::Console(QObject* parent)
     : QObject(parent)
 {
     /* Notifier to get console input */
@@ -45,8 +51,6 @@ Console::Console(GlobalData* pData, QObject* parent)
 
     /* path for storing and reading files */
     this->m_applicationPath = QCoreApplication::applicationDirPath();
-
-    this->m_pGlobalData = pData;
 
     this->m_logging = new Logging();
     this->m_logging->initialize();
@@ -70,12 +74,12 @@ void Console::run()
     if (appDirFiles.size() == 0)
         return;
 
-    for (int i = 0; i < appDirFiles.size(); i++) {
-        if (appDirFiles.at(i).endsWith(".csv")) {
-            qInfo() << (QString("Found %1 trying to read in").arg(appDirFiles.at(i)));
-            UserCommand::runReadCommand("read " + this->m_applicationPath + "/" + appDirFiles.at(i), this->m_pGlobalData);
-        }
-    }
+    //    for (int i = 0; i < appDirFiles.size(); i++) {
+    //        if (appDirFiles.at(i).endsWith(".csv")) {
+    //            qInfo() << (QString("Found %1 trying to read in").arg(appDirFiles.at(i)));
+    //            UserCommand::runReadCommand("read " + this->m_applicationPath + "/" + appDirFiles.at(i), this->m_pGlobalData);
+    //        }
+    //    }
 }
 
 /* parsing the input commands */
@@ -87,57 +91,88 @@ void Console::readCommand()
         std::cout << "Ending console!" << std::endl;
         emit quit();
     } else {
-        QString qLine = QString::fromStdString(line);
-        if (qLine == "help") {
-            this->printHelp();
-        } else if (qLine == "user" || qLine.left(5) == "user ") {
-            UserCommand::runUserCommand(qLine, &this->m_pGlobalData->m_UserList);
-        } else if (qLine == "game" || qLine.left(5) == "game ") {
-            UserCommand::runGameCommand(qLine, &this->m_pGlobalData->m_GamesList);
-        } else if (qLine == "ticket" || qLine.left(7) == "ticket ") {
-            UserCommand::runTicketCommand(qLine, &this->m_pGlobalData->m_SeasonTicket);
-        } else if (qLine == "token" || qLine.left(6) == "token ") {
-            UserCommand::runTokenCommand(qLine);
-        } else if (qLine == "news" || qLine.left(5) == "news ") {
-            UserCommand::runFanclubNewsCommand(qLine, &this->m_pGlobalData->m_fanclubNews);
-        } else if (qLine == "read" || qLine.left(5) == "read ") {
-            UserCommand::runReadCommand(qLine, this->m_pGlobalData);
-        } else if (qLine == "log" || qLine.left(4) == "log ") {
-            UserCommand::runLoggingCommand(this->m_logging, qLine);
-        } else if (line.length() == 0) {
-
-        } else {
-            std::cout << "Unkown command: " << qLine.toStdString() << std::endl;
-        }
+        QString qLine  = QString::fromStdString(line);
+        QString output = this->runCommand(qLine);
+        std::cout << output.toStdString() << std::endl;
         std::cout << "> " << std::flush;
     }
 }
 
-void Console::printHelp()
+QString Console::runCommand(QString& command)
 {
-    std::cout << "\nConsole for StFaeKSC\n\n";
+    QString rValue;
+    if (command == "help") {
+        rValue = this->printHelp();
+    } else if (command == "user" || command.left(5) == "user ") {
+        rValue = UserCommand::runUserCommand(command, &g_GlobalData->m_UserList);
+    } else if (command == "game" || command.left(5) == "game ") {
+        rValue = UserCommand::runGameCommand(command, &g_GlobalData->m_GamesList);
+    } else if (command == "ticket" || command.left(7) == "ticket ") {
+        rValue = UserCommand::runTicketCommand(command, &g_GlobalData->m_SeasonTicket);
+    } else if (command == "token" || command.left(6) == "token ") {
+        rValue = UserCommand::runTokenCommand(command);
+    } else if (command == "news" || command.left(5) == "news ") {
+        rValue = UserCommand::runFanclubNewsCommand(command, &g_GlobalData->m_fanclubNews);
+    } else if (command == "read" || command.left(5) == "read ") {
+        rValue = UserCommand::runReadCommand(command, g_GlobalData);
+    } else if (command == "log" || command.left(4) == "log ") {
+        rValue = UserCommand::runLoggingCommand(this->m_logging, command);
+    } else if (command.length() == 0) {
 
-    std::cout << "Known commands are:" << std::endl;
-    std::cout << "help:\t\t"
-              << "Show this info" << std::endl;
-    std::cout << "user:\t\t"
-              << "use the user command" << std::endl;
-    std::cout << "game:\t\t"
-              << "use the game command" << std::endl;
-    std::cout << "ticket:\t\t"
-              << "use the ticket command" << std::endl;
-    std::cout << "token:\t\t"
-              << "show the current token Info" << std::endl;
-    std::cout << "news:\t\t"
-              << "show the news Info" << std::endl;
-    std::cout << "read %PATH%:\t"
-              << "read a new file in csv file format" << std::endl;
-    std::cout << "log %i:\t\t"
-              << "show the last user log" << std::endl;
-    std::cout << "exit:\t\t"
-              << "exit the program" << std::endl;
-    std::cout << "quit:\t\t"
-              << "exit the program" << std::endl;
+    } else {
+        rValue = QString("Unkown command: %1\n").arg(command);
+    }
+
+    return rValue;
+}
+
+MessageProtocol* Console::getCommandAnswer(UserConData* pUserCon, MessageProtocol* request)
+{
+    QByteArray  data    = QByteArray(request->getPointerToData());
+    QJsonObject rootObj = QJsonDocument::fromJson(data).object();
+
+    QString    command = rootObj.value("cmd").toString();
+    QByteArray result  = qCompress(this->runCommand(command).toUtf8(), 9);
+
+    QJsonObject rootAns;
+    rootAns.insert("ack", ERROR_CODE_SUCCESS);
+    rootAns.insert("result", QString(result.toHex()));
+
+    QByteArray answer = QJsonDocument(rootAns).toJson(QJsonDocument::Compact);
+
+    qInfo().noquote() << QString("User %1 run command %2").arg(pUserCon->m_userName).arg(command);
+
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_SEND_CONSOLE_CMD, answer);
+}
+
+QString Console::printHelp()
+{
+    QString rValue;
+    rValue.append("\nConsole for StFaeKSC\n\n");
+
+    rValue.append("Known commands are:\n");
+    rValue.append("help:\t\t");
+    rValue.append("Show this info\n");
+    rValue.append("user:\t\t");
+    rValue.append("use the user command\n");
+    rValue.append("game:\t\t");
+    rValue.append("use the game command\n");
+    rValue.append("ticket:\t\t");
+    rValue.append("use the ticket command\n");
+    rValue.append("token:\t\t");
+    rValue.append("show the current token Info\n");
+    rValue.append("news:\t\t");
+    rValue.append("show the news Info\n");
+    rValue.append("read %PATH%:\t");
+    rValue.append("read a new file in csv file format\n");
+    rValue.append("log %i:\t\t");
+    rValue.append("show the last user log\n");
+    rValue.append("exit:\t\t");
+    rValue.append("exit the program\n");
+    rValue.append("quit:\t\t");
+    rValue.append("exit the program\n");
+
+    return rValue;
 }
 
 

@@ -20,6 +20,7 @@
 #include "../Common/General/globalfunctions.h"
 #include "../Common/General/globaltiming.h"
 #include "../Common/Network/messagecommand.h"
+#include "../General/console.h"
 #include "../Manager/cgamesmanager.h"
 #include "../Manager/cmeetinginfomanager.h"
 #include "../Manager/cnewsdatamanager.h"
@@ -200,6 +201,9 @@ MessageProtocol* cConTcpDataServer::checkNewMessage(MessageProtocol* msg)
             break;
         case OP_CODE_CMD_REQ::REQ_SET_USER_EVENTS:
             ack = g_ConTcpMainData.getSetUserEvent(this->m_pUserConData, msg);
+            break;
+        case OP_CODE_CMD_REQ::REQ_SEND_CONSOLE_CMD:
+            ack = g_Console->getCommandAnswer(this->m_pUserConData, msg);
             break;
 
         case OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST:

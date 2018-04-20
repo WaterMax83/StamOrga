@@ -207,8 +207,9 @@ int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sInde
     return newIndex;
 }
 
-int Games::showAllGames(const bool showUpdate)
+QString Games::showAllGames(const bool showUpdate)
 {
+    QString      rValue;
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
     for (int i = 0; i < this->getNumberOfInternalList(); i++) {
@@ -228,9 +229,10 @@ int Games::showAllGames(const bool showUpdate)
         } else
             output.append(" - " + update);
 
-        std::cout << output.toStdString() << std::endl;
+        rValue.append(output);
+        rValue.append("\n");
     }
-    return 0;
+    return rValue;
 }
 
 int Games::changeScheduledValue(const quint32 gameIndex, const qint32 fixedTime)

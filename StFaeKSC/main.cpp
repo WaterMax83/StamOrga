@@ -48,8 +48,9 @@ int main(int argc, char* argv[])
 
     GlobalData globalData;
     g_GlobalData = &globalData;
-    Console* con = new Console(&globalData);
     globalData.initialize();
+
+    g_Console = new Console();
 
     PushNotification pushNotify;
     pushNotify.initialize(&globalData);
@@ -88,15 +89,15 @@ int main(int argc, char* argv[])
 
     /* TODO: Connect for ctrlUdp::notifyBackgroundWorkerFinished */
 
-    con->run();
-    QObject::connect(con, SIGNAL(quit()), &a, SLOT(quit()));
+    g_Console->run();
+    QObject::connect(g_Console, SIGNAL(quit()), &a, SLOT(quit()));
 
     int result = a.exec();
 
     qDebug().noquote() << QString("Ending program %1: %2").arg(result).arg(QCoreApplication::applicationPid());
     ctrlReadOnline.Stop();
     ctrlUdp.Stop();
-    delete con;
+    delete g_Console;
 
     delete checkConsistData;
     delete online;

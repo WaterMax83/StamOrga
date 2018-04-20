@@ -56,7 +56,7 @@ public:
 
     int changeFanclubNews(const quint32 newsIndex, const QString header, const QByteArray info, const quint32 userID);
 
-    int showNewsData();
+    QString showNewsData();
 
     virtual qint32 checkConsistency() { return -12; }
 

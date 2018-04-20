@@ -24,16 +24,22 @@
 
 #include "../Common/General/backgroundcontroller.h"
 #include "../Common/General/logging.h"
+#include "../Common/Network/messageprotocol.h"
+#include "../Network/connectiondata.h"
 #include "globaldata.h"
 
 class Console : public QObject
 {
     Q_OBJECT
 public:
-    explicit Console(GlobalData* pData, QObject* parent = 0);
+    explicit Console(QObject* parent = 0);
     ~Console();
 
+    QString runCommand(QString& command);
+
     void run();
+
+    MessageProtocol* getCommandAnswer(UserConData* pUserCon, MessageProtocol* request);
 
 signals:
     void quit();
@@ -46,14 +52,15 @@ private:
 
     QString m_applicationPath;
 
-    GlobalData* m_pGlobalData;
 
     BackgroundController m_ctrlLog;
     Logging*             m_logging;
 
 
-    void printHelp();
-    int  ShowUDPHelp();
+    QString printHelp();
+    int     ShowUDPHelp();
 };
+
+extern Console* g_Console;
 
 #endif // CONSOLE_H
