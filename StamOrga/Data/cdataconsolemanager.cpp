@@ -32,6 +32,8 @@ cDataConsoleManager::cDataConsoleManager(QObject* parent)
 
 qint32 cDataConsoleManager::initialize()
 {
+    this->m_consoleOutput = "";
+
     this->m_initialized = true;
 
     return ERROR_CODE_SUCCESS;
@@ -50,4 +52,26 @@ qint32 cDataConsoleManager::startSendConsoleCommand(const QString command)
 
     g_ConManager.sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
+}
+
+qint32 cDataConsoleManager::handleConsoleCommandResponse(MessageProtocol* msg)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QByteArray  data(msg->getPointerToData());
+    QJsonObject rootObj = QJsonDocument::fromJson(data).object();
+
+    qint32  rValue = rootObj.value("ack").toInt(ERROR_CODE_NOT_FOUND);
+    QString result = rootObj.value("result").toString();
+
+    QByteArray output     = QByteArray::fromBase64(result.toUtf8());
+    this->m_consoleOutput = qUncompress(output);
+
+    return rValue;
+}
+
+QString cDataConsoleManager::getLastConsoleOutput()
+{
+    return this->m_consoleOutput;
 }

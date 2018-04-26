@@ -91,10 +91,13 @@ ApplicationWindow {
 
             ToolButton {
                 implicitHeight: 50
-                Image {
+                contentItem: Image {
                     id: imageToolButton
-                    anchors.fill: parent
-                    anchors.margins: 5
+//                    anchors.fill: parent
+//                    anchors.margins: 5
+                    fillMode: Image.Pad
+                    horizontalAlignment: Image.AlignHCenter
+                    verticalAlignment: Image.AlignVCenter
                 }
                 onClicked: {
                     if (imageToolButton.visible === true) {
@@ -393,16 +396,17 @@ ApplicationWindow {
                                             })
                     }
                 }
-                if (!isConsoleWindowShown) {
-                    isConsoleWindowShown = true;
-                    if (gConUserSettings.userIsConsoleEnabled()) {
-                        listViewListModel.append({
-                                                     title: "Console",
-                                                     element: viewConsolePage,
-                                                     toolButtonImgSource: "",
-                                                     listImgSource: ""
-                                                 });
-                    }
+
+            }
+            if (result > 0 && !isConsoleWindowShown) {
+                 isConsoleWindowShown = true;
+                if (gConUserSettings.userIsConsoleEnabled()) {
+                    listViewListModel.append({
+                                                 title: "Console",
+                                                 element: viewConsolePage,
+                                                 toolButtonImgSource: "",
+                                                 listImgSource: ""
+                                             });
                 }
             }
             if (stackView.currentItem === viewMainGames) {
@@ -426,6 +430,7 @@ ApplicationWindow {
             if (stackView.currentItem.notifyGetUserProperties)
                 stackView.currentItem.notifyGetUserProperties(result);
         }
+        onNotifyConsoleCommandFinished: stackView.currentItem.notifyConsoleCommandFinished(result)
 
         onNotifyUpdatePasswordRequestFinished: {
             stackView.currentItem.notifyUserIntUpdatePasswordFinished(result)
@@ -478,7 +483,7 @@ ApplicationWindow {
             stackView.push(viewUserLogin)
             imageToolButton.visible = false
         } else {
-            stackView.currentItem.showListedGames()
+//            stackView.currentItem.showListedGames()
             gStaGlobalSettings.checkNewStateChangedAtStart();
 
             if (!gStaGlobalSettings.isVersionChangeAlreadyShown()) {

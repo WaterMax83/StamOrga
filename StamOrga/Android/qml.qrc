@@ -3,17 +3,11 @@
         <file>main.qml</file>
         <file>qtquickcontrols2.conf</file>
         <file>images/+material/back.png</file>
-        <file>images/+material/back@2x.png</file>
         <file>images/+material/drawer.png</file>
-        <file>images/+material/drawer@2x.png</file>
         <file>images/+material/menu.png</file>
-        <file>images/+material/menu@2x.png</file>
         <file>images/back.png</file>
-        <file>images/back@2x.png</file>
         <file>images/drawer.png</file>
-        <file>images/drawer@2x.png</file>
         <file>images/menu.png</file>
-        <file>images/menu@2x.png</file>
         <file>pages/UserLogin.qml</file>
         <file>images/+material/refresh.png</file>
         <file>images/refresh.png</file>
@@ -103,5 +97,7 @@
         <file>images/share.png</file>
         <file>images/+material/chart.png</file>
         <file>pages/Console.qml</file>
+        <file>images/+material/send.png</file>
+        <file>images/send.png</file>
     </qresource>
 </RCC>

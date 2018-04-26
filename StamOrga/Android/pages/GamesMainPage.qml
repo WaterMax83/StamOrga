@@ -222,7 +222,6 @@ Page {
         showLoadingGameInfos("", false);
         if (result === 1) {
             toastManager.show("Spiele geladen", 2000)
-//            showListedGames()
         }
         else{
             toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
@@ -259,7 +258,6 @@ Page {
     function showListedGames() {
         gamesListPagePresent.showListedGames()
         gamesListPagePast.showListedGames()
-
 
         if (gDataGamesManager.getGamePlayLength() > 0) {
             showLoadingGameInfos("Letztes Update am " + gDataGamesManager.getGamePlayLastLocalUpdateString(), false);

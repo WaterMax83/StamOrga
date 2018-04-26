@@ -24,6 +24,7 @@
 #include "../Common/General/globaltiming.h"
 #include "../Common/Network/messagecommand.h"
 #include "../Data/cdataappuserevents.h"
+#include "../Data/cdataconsolemanager.h"
 #include "../Data/cdatagamesmanager.h"
 #include "../Data/cdatameetinginfo.h"
 #include "../Data/cdatanewsdatamanager.h"
@@ -162,10 +163,8 @@ void cConTcpData::checkNewOncomingData()
         case OP_CODE_CMD_RES::ACK_GET_USER_PROPS:
             request->m_result = g_ConUserSettings.handleUserPropsResponse(msg);
             break;
-
-            //        case OP_CODE_CMD_RES::ACK_GET_USER_EVENTS:
-            //            request.m_result = this->m_pDataHandle->getHandleUserEventsResponse(msg);
-            //            break;
+        case OP_CODE_CMD_RES::ACK_SEND_CONSOLE_CMD:
+            request->m_result = g_DataConsoleManager.handleConsoleCommandResponse(msg);
 
         case OP_CODE_CMD_RES::ACK_SET_USER_EVENTS:
             request->m_result = g_DataAppUserEvents.handleSetUserEventsResponse(msg);

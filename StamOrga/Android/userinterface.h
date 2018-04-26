@@ -60,6 +60,7 @@ signals:
     void notifyConnectionFinished(qint32 result, const QString msg);
     void notifyVersionRequestFinished(qint32 result);
     void notifyUserPropertiesFinished(qint32 result);
+    void notifyConsoleCommandFinished(qint32 result);
     void notifyUpdatePasswordRequestFinished(qint32 result);
     void notifyUpdateReadableNameRequest(qint32 result);
     void notifyGamesListFinished(qint32 result);

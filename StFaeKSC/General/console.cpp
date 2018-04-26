@@ -136,7 +136,7 @@ MessageProtocol* Console::getCommandAnswer(UserConData* pUserCon, MessageProtoco
 
     QJsonObject rootAns;
     rootAns.insert("ack", ERROR_CODE_SUCCESS);
-    rootAns.insert("result", QString(result.toHex()));
+    rootAns.insert("result", QString(result.toBase64()));
 
     QByteArray answer = QJsonDocument(rootAns).toJson(QJsonDocument::Compact);
 

@@ -24,67 +24,91 @@ import com.watermax.demo 1.0
 
 import "../components" as MyComponents
 
-Flickable {
-   id: flickableLogging
-   contentHeight: mainPaneLogging.height
-//   width: parent.width
-   Pane {
+Item {
+    Pane {
        id: mainPaneLogging
        width: parent.width
-
-       ColumnLayout {
-           width: parent.width
-           spacing: 5
+       height: parent.height
 
            Text {
                id: txtForFontFamily
                visible: false
            }
 
-           Text {
-               id: txtConsole
-               wrapMode: Text.WordWrap
-               Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-               Layout.maximumWidth: parent.width
-               rightPadding: 5
-               visible: true
-               font.pixelSize: 10
-               color: "white"
+           Item {
+               width: parent.width
+               anchors.top : parent.top
+               anchors.bottom: rowConsoleCommand.top
+               anchors.bottomMargin: 5
+
+               Flickable {
+                   anchors.fill: parent
+                   flickableDirection: Flickable.VerticalFlick
+
+                   TextArea.flickable: TextArea {
+                       id: textAreaConsole
+                       font.family: txtForFontFamily.font
+                       width: parent.width
+                       color: "#ffffff"
+                       leftPadding: 5
+                       rightPadding: 5
+                       font.pixelSize: 11
+                       wrapMode: TextEdit.Wrap
+                       focus: true
+                       enabled: false
+                   }
+
+                   ScrollIndicator.vertical: ScrollIndicator { }
+               }
            }
 
-//           MyComponents.CustomButton {
-//               text: "Kopieren"
-//               font.family: txtForFontFamily.font
-//               implicitWidth: parent.width / 3 * 2
-//               Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-//               onClicked: {
-//                    gDataAppInfoManager.copyTextToClipBoard(txtLogging.text);
-//                    toastManager.show("Daten wurden in die Zwischenablage kopiert", 2000);
-//               }
-//           }
+       RowLayout {
+           id: rowConsoleCommand
+           width: parent.width
+           anchors.bottom: parent.bottom
 
-//           MyComponents.CustomButton {
-//               text: "Löschen"
-//               font.family: txtForFontFamily.font
-//               implicitWidth: parent.width / 3 * 2
-//               Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-//               onClicked: {
-//                   gDataAppInfoManager.deleteCurrentLoggingFile(logFilesCombo.currentIndex);
-//                   if (logFilesCombo.count > 0)
-//                       txtLogging.text = gDataAppInfoManager.getCurrentLoggingList(logFilesCombo.currentIndex);
-//                   else
-//                       txtLogging.text = gDataAppInfoManager.getCurrentLoggingList(0);
-//               }
-//           }
+           MyComponents.EditableTextWithHint {
+               id: textInput
+               Layout.fillWidth: true
+               hint: "Command"
+               imageSource: ""
+               enableImage: false
+               enabled: true
+               color: "#FFFFFF"
+               onKeysEnterPressed: gDataConsoleManager.startSendConsoleCommand(textInput.input)
+           }
+
+           MyComponents.GraphicalButton {
+               imageSource: "../images/send.png"
+               enabled:  true
+               onClickedButton: {
+                    gDataConsoleManager.startSendConsoleCommand(textInput.input)
+               }
+               Layout.alignment: Qt.AlignRight
+           }
        }
+
+
+
    }
 
    function pageOpenedUpdateView() {
 
    }
 
+   function notifyConsoleCommandFinished(result) {
+
+       if (result === 1) {
+           textAreaConsole.text = gDataConsoleManager.getLastConsoleOutput();
+           toastManager.show("Kommando erfolgreich ausgeführt", 2000);
+           textInput.clear();
+       } else {
+           toastManager.show(userIntCurrentNews.getErrorCodeToString(result), 4000);
+       }
+   }
+
    function notifyUserIntConnectionFinished(result, msg) {}
 
 
-   ScrollIndicator.vertical: ScrollIndicator { }
+//   ScrollIndicator.vertical: ScrollIndicator { }
 }

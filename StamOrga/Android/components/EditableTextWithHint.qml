@@ -31,6 +31,7 @@ Rectangle {
     property bool  enableImage: false
 
     signal textInputChanged();
+    signal keysEnterPressed();
 
     implicitWidth: parent.width
     implicitHeight: 30
@@ -56,6 +57,7 @@ Rectangle {
                 return;
             textInputChanged();
         }
+        Keys.onReturnPressed: keysEnterPressed();
     }
 
     Image {
@@ -76,6 +78,10 @@ Rectangle {
         isInit = true;
         inputText.text = text;
         isInit = false;
+    }
+
+    function clear() {
+        inputText.text = "";
     }
 }
 

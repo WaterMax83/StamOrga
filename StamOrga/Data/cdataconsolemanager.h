@@ -29,12 +29,19 @@
 
 class cDataConsoleManager : public cGenDisposer
 {
+    Q_OBJECT
 public:
     explicit cDataConsoleManager(QObject* parent = nullptr);
 
     qint32 initialize();
 
+    Q_INVOKABLE QString getLastConsoleOutput();
+
     Q_INVOKABLE qint32 startSendConsoleCommand(const QString command);
+    qint32             handleConsoleCommandResponse(MessageProtocol* msg);
+
+private:
+    QString m_consoleOutput;
 };
 
 extern cDataConsoleManager g_DataConsoleManager;

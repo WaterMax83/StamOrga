@@ -75,6 +75,10 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
         emit this->notifyUserPropertiesFinished(result);
         break;
 
+    case OP_CODE_CMD_REQ::REQ_SEND_CONSOLE_CMD:
+        emit this->notifyConsoleCommandFinished(result);
+        break;
+
     case OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME:
         emit this->notifyUpdateReadableNameRequest(result);
         break;
