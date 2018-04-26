@@ -44,7 +44,7 @@ public:
     Q_INVOKABLE int setFavoriteGameIndex(qint32 gameIndex, qint32 favIndex);
 
     Q_INVOKABLE int getTicketGameIndex(qint32 gameIndex);
-    int             setTicketGameIndex(qint32 gameIndex, qint32 favIndex);
+    int setTicketGameIndex(qint32 gameIndex, qint32 favIndex);
 
 
     qint32 handleUserPropTickets(QJsonArray& arrTickets);
@@ -60,10 +60,10 @@ private:
     QMutex              m_mutex;
 
     void clearTicketGameList();
-    int  getGameIndex(QList<FavGameInfo*>* pList, const qint32 gameIndex);
-    int  setGameIndex(QList<FavGameInfo*>* pList, const qint32 gameIndex, qint32 favIndex, bool writeToStorage = false);
+    int getGameIndex(QList<FavGameInfo*>* pList, const qint32 gameIndex);
+    int setGameIndex(QList<FavGameInfo*>* pList, const qint32 gameIndex, qint32 favIndex, bool writeToStorage = false);
 };
 
-extern cDataGameUserData g_DataGameUserData;
+extern cDataGameUserData* g_DataGameUserData;
 
 #endif // FAVORITEGAME_H

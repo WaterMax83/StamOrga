@@ -31,7 +31,7 @@
 #include "cstaglobalsettings.h"
 #include "source/cadrpushnotifyinfohandler.h"
 
-cStaGlobalSettings g_StaGlobalSettings;
+cStaGlobalSettings* g_StaGlobalSettings;
 
 // clang-format off
 
@@ -64,23 +64,23 @@ qint32 cStaGlobalSettings::initialize()
     bool    bValue;
     qint64  iValue;
 
-    g_StaSettingsManager.getBoolValue(SETTINGS_GROUP, SETT_ALREADY_CONNECTED, bValue);
+    g_StaSettingsManager->getBoolValue(SETTINGS_GROUP, SETT_ALREADY_CONNECTED, bValue);
     this->m_bAlreadyConnected = bValue;
-    g_StaSettingsManager.getBoolValue(SETTINGS_GROUP, SETT_SAVE_INFO_ON_APP, bValue, true);
+    g_StaSettingsManager->getBoolValue(SETTINGS_GROUP, SETT_SAVE_INFO_ON_APP, bValue, true);
     this->m_bSaveInfosOnApp = bValue;
-    g_StaSettingsManager.getBoolValue(SETTINGS_GROUP, SETT_LOAD_GAME_INFO, bValue, true);
+    g_StaSettingsManager->getBoolValue(SETTINGS_GROUP, SETT_LOAD_GAME_INFO, bValue, true);
     this->m_bLoadGameInfo = bValue;
-    g_StaSettingsManager.getBoolValue(SETTINGS_GROUP, SETT_USE_VERSION_POPUP, bValue, true);
+    g_StaSettingsManager->getBoolValue(SETTINGS_GROUP, SETT_USE_VERSION_POPUP, bValue, true);
     this->m_bUseVersionPopup = bValue;
-    g_StaSettingsManager.getValue(SETTINGS_GROUP, SETT_LAST_SHOWN_VERSION, value);
+    g_StaSettingsManager->getValue(SETTINGS_GROUP, SETT_LAST_SHOWN_VERSION, value);
     this->m_lastShownVersion = value;
-    g_StaSettingsManager.getValue(SETTINGS_GROUP, SETT_CHANGE_DEFAULT_FONT, value, "Default");
+    g_StaSettingsManager->getValue(SETTINGS_GROUP, SETT_CHANGE_DEFAULT_FONT, value, "Default");
     this->m_changeDefaultFont = value != "" ? value : "Default";
-    g_StaSettingsManager.getValue(SETTINGS_GROUP, SETT_DEBUG_IP, value);
+    g_StaSettingsManager->getValue(SETTINGS_GROUP, SETT_DEBUG_IP, value);
     this->m_debugIP = value;
-    g_StaSettingsManager.getValue(SETTINGS_GROUP, SETT_DEBUG_IP_WIFI, value);
+    g_StaSettingsManager->getValue(SETTINGS_GROUP, SETT_DEBUG_IP_WIFI, value);
     this->m_debugIPWifi = value;
-    g_StaSettingsManager.getInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, iValue, 0xFFFFFFFF);
+    g_StaSettingsManager->getInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, iValue, 0xFFFFFFFF);
     this->m_notificationEnabledValue = iValue;
 
     this->m_bIpAddressWasSet = false;
@@ -110,7 +110,7 @@ qint32 cStaGlobalSettings::startGettingVersionInfo()
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_GET_VERSION);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
-    g_ConManager.sendNewRequest(req);
+    g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 
@@ -146,7 +146,7 @@ void cStaGlobalSettings::setSaveInfosOnApp(const bool save)
     if (this->m_bSaveInfosOnApp != save) {
         this->m_bSaveInfosOnApp = save;
 
-        g_StaSettingsManager.setBoolValue(SETTINGS_GROUP, SETT_SAVE_INFO_ON_APP, save);
+        g_StaSettingsManager->setBoolValue(SETTINGS_GROUP, SETT_SAVE_INFO_ON_APP, save);
     }
 }
 
@@ -160,7 +160,7 @@ void cStaGlobalSettings::setLoadGameInfos(const bool load)
     if (this->m_bLoadGameInfo != load) {
         this->m_bLoadGameInfo = load;
 
-        g_StaSettingsManager.setBoolValue(SETTINGS_GROUP, SETT_LOAD_GAME_INFO, load);
+        g_StaSettingsManager->setBoolValue(SETTINGS_GROUP, SETT_LOAD_GAME_INFO, load);
     }
 }
 
@@ -174,7 +174,7 @@ void cStaGlobalSettings::setUseVersionPopup(const bool use)
     if (this->m_bUseVersionPopup != use) {
         this->m_bUseVersionPopup = use;
 
-        g_StaSettingsManager.setBoolValue(SETTINGS_GROUP, SETT_USE_VERSION_POPUP, use);
+        g_StaSettingsManager->setBoolValue(SETTINGS_GROUP, SETT_USE_VERSION_POPUP, use);
     }
 }
 
@@ -189,7 +189,7 @@ void cStaGlobalSettings::setDebugIP(const QString ip)
     if (this->m_debugIP != ip) {
         this->m_debugIP = ip;
 
-        g_StaSettingsManager.setValue(SETTINGS_GROUP, SETT_DEBUG_IP, ip);
+        g_StaSettingsManager->setValue(SETTINGS_GROUP, SETT_DEBUG_IP, ip);
     }
 }
 
@@ -203,7 +203,7 @@ void cStaGlobalSettings::setDebugIPWifi(const QString ip)
     if (this->m_debugIPWifi != ip) {
         this->m_debugIPWifi = ip;
 
-        g_StaSettingsManager.setValue(SETTINGS_GROUP, SETT_DEBUG_IP_WIFI, ip);
+        g_StaSettingsManager->setValue(SETTINGS_GROUP, SETT_DEBUG_IP_WIFI, ip);
     }
 }
 
@@ -218,7 +218,7 @@ void cStaGlobalSettings::setChangeDefaultFont(const QString font)
     if (this->m_changeDefaultFont != font) {
         this->m_changeDefaultFont = font;
 
-        g_StaSettingsManager.setValue(SETTINGS_GROUP, SETT_CHANGE_DEFAULT_FONT, font);
+        g_StaSettingsManager->setValue(SETTINGS_GROUP, SETT_CHANGE_DEFAULT_FONT, font);
 
         if (this->m_fontList != NULL)
             this->m_currentFontIndex = this->m_fontList->indexOf(font);
@@ -303,7 +303,7 @@ QString cStaGlobalSettings::getVersionChangeInfo()
     if (this->m_lastShownVersion != STAM_ORGA_VERSION_S) {
         this->m_lastShownVersion = STAM_ORGA_VERSION_S;
 
-        g_StaSettingsManager.setValue(SETTINGS_GROUP, SETT_LAST_SHOWN_VERSION, this->m_lastShownVersion);
+        g_StaSettingsManager->setValue(SETTINGS_GROUP, SETT_LAST_SHOWN_VERSION, this->m_lastShownVersion);
     }
 
     return rValue;
@@ -316,7 +316,7 @@ void cStaGlobalSettings::setAlreadyConnected(const bool con)
         this->m_bAlreadyConnected = con;
         this->updatePushNotification();
 
-        g_StaSettingsManager.setBoolValue(SETTINGS_GROUP, SETT_ALREADY_CONNECTED, con);
+        g_StaSettingsManager->setBoolValue(SETTINGS_GROUP, SETT_ALREADY_CONNECTED, con);
     }
 }
 
@@ -380,42 +380,42 @@ void cStaGlobalSettings::setNotificationNewAppVersionEnabled(bool enable)
 {
     this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_NEWAPPV);
     this->m_notificationEnabledValue |= (enable ? 1 : 0) << NOT_OFFSET_NEWAPPV;
-    g_StaSettingsManager.setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
+    g_StaSettingsManager->setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
     this->updatePushNotification();
 }
 void cStaGlobalSettings::setNotificationNewMeetingEnabled(bool enable)
 {
     this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_NEWMEET);
     this->m_notificationEnabledValue |= (enable ? 1 : 0) << NOT_OFFSET_NEWMEET;
-    g_StaSettingsManager.setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
+    g_StaSettingsManager->setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
     this->updatePushNotification();
 }
 void cStaGlobalSettings::setNotificationChangedMeetingEnabled(bool enable)
 {
     this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_CHGGAME);
     this->m_notificationEnabledValue |= (enable ? 1 : 0) << NOT_OFFSET_CHGGAME;
-    g_StaSettingsManager.setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
+    g_StaSettingsManager->setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
     this->updatePushNotification();
 }
 void cStaGlobalSettings::setNotificationNewFreeTicketEnabled(bool enable)
 {
     this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_NEWTICK);
     this->m_notificationEnabledValue |= (enable ? 1 : 0) << NOT_OFFSET_NEWTICK;
-    g_StaSettingsManager.setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
+    g_StaSettingsManager->setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
     this->updatePushNotification();
 }
 void cStaGlobalSettings::setNotificationNewAwayAcceptEnabled(bool enable)
 {
     this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_NEWAWAY);
     this->m_notificationEnabledValue |= (enable ? 1 : 0) << NOT_OFFSET_NEWAWAY;
-    g_StaSettingsManager.setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
+    g_StaSettingsManager->setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
     this->updatePushNotification();
 }
 void cStaGlobalSettings::setNotificationFanclubNewsEnabled(bool enable)
 {
     this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_FANCLUB);
     this->m_notificationEnabledValue |= (enable ? 1 : 0) << NOT_OFFSET_FANCLUB;
-    g_StaSettingsManager.setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
+    g_StaSettingsManager->setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
     this->updatePushNotification();
 }
 
@@ -448,7 +448,7 @@ void cStaGlobalSettings::updatePushNotification()
         AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_AWAY_ACCEPT);
 
     if (this->m_bAlreadyConnected && this->isNotificationFanclubNewsEnabled()) {
-        if (g_ConUserSettings.userIsFanclubEnabled())
+        if (g_ConUserSettings->userIsFanclubEnabled())
             AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_FANCLUB_NEWS);
     } else
         AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_FANCLUB_NEWS);
@@ -478,10 +478,10 @@ void cStaGlobalSettings::slotStateFromAppChanged(Qt::ApplicationState state)
     if (!this->getLoadGameInfos())
         return;
 
-    if (g_ConUserSettings.getUserName() == "" || g_ConUserSettings.getPassWord() == "")
+    if (g_ConUserSettings->getUserName() == "" || g_ConUserSettings->getPassWord() == "")
         return;
 
-    g_DataGamesManager.stateChangeCheckUdpate();
+    g_DataGamesManager->stateChangeCheckUdpate();
 }
 
 void cStaGlobalSettings::slotCallBackLookUpHost(const QHostInfo& host)
@@ -512,9 +512,9 @@ void cStaGlobalSettings::slotCallBackLookUpHost(const QHostInfo& host)
 #endif // DEBUG
 
     if (newChangedIP.isEmpty())
-        newChangedIP = g_ConUserSettings.getIPAddr();
+        newChangedIP = g_ConUserSettings->getIPAddr();
 
-    g_ConUserSettings.setIPAddr(newChangedIP);
+    g_ConUserSettings->setIPAddr(newChangedIP);
 
     qInfo().noquote() << QString("Setting IP Address: %1").arg(newChangedIP);
 

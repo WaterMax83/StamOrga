@@ -25,7 +25,7 @@
 #include "../Connection/cconmanager.h"
 #include "cdatastatisticmanager.h"
 
-cDataStatisticManager g_DataStatisticManager;
+cDataStatisticManager* g_DataStatisticManager;
 
 cDataStatisticManager::cDataStatisticManager(QObject* parent)
     : cGenDisposer(parent)
@@ -155,6 +155,6 @@ qint32 cDataStatisticManager::startSendCommand(QJsonObject& rootObj)
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CMD_STATISTIC);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
-    g_ConManager.sendNewRequest(req);
+    g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }

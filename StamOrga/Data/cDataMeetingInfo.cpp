@@ -63,7 +63,7 @@ qint32 cDataMeetingInfo::startLoadMeetingInfo(const qint32 gameIndex, const qint
         req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_GET_AWAYTRIP_INFO);
     req->m_lData = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
-    g_ConManager.sendNewRequest(req);
+    g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 
@@ -115,7 +115,7 @@ qint32 cDataMeetingInfo::handleLoadMeetingInfoResponse(MessageProtocol* msg)
         this->m_acceptInfo.append(pAmi);
     }
 
-    GamePlay* pGame = g_DataGamesManager.getGamePlay(gameIndex);
+    GamePlay* pGame = g_DataGamesManager->getGamePlay(gameIndex);
     if (pGame != NULL) {
         if (type == MEETING_TYPE_MEETING) {
             pGame->setAcceptedMeetingCount(acceptMeeting);
@@ -165,7 +165,7 @@ qint32 cDataMeetingInfo::startSaveMeetingInfo(const qint32 gameIndex, const QStr
         req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CHANGE_AWAYTRIP_INFO);
     req->m_lData = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
-    g_ConManager.sendNewRequest(req);
+    g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 
@@ -206,7 +206,7 @@ qint32 cDataMeetingInfo::startAcceptMeetingInfo(const qint32 gameIndex, const qi
         req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_ACCEPT_AWAYTRIP);
     req->m_lData = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
-    g_ConManager.sendNewRequest(req);
+    g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 

@@ -26,28 +26,28 @@
 UserInterface::UserInterface(QObject* parent)
     : QObject(parent)
 {
-    connect(&g_ConManager, &cConManager::signalNotifyConnectionFinished,
+    connect(g_ConManager, &cConManager::signalNotifyConnectionFinished,
             this, &UserInterface::slotConnectionRequestFinished);
 
-    connect(&g_ConManager, &cConManager::signalNotifyCommandFinished,
+    connect(g_ConManager, &cConManager::signalNotifyCommandFinished,
             this, &UserInterface::slotCommandFinished);
 }
 
 qint32 UserInterface::startMainConnection(QString name, QString passw)
 {
-    if (name != g_ConUserSettings.getUserName()) {
-        g_ConUserSettings.setUserName("");
-        g_ConUserSettings.setPassWord("");
-        g_ConUserSettings.setSalt("");
+    if (name != g_ConUserSettings->getUserName()) {
+        g_ConUserSettings->setUserName("");
+        g_ConUserSettings->setPassWord("");
+        g_ConUserSettings->setSalt("");
     }
     if (passw == "dEf1AuLt") {
-        passw = g_ConUserSettings.getPassWord();
+        passw = g_ConUserSettings->getPassWord();
     } else {
-        g_ConUserSettings.setPassWord("");
-        g_ConUserSettings.setSalt("");
+        g_ConUserSettings->setPassWord("");
+        g_ConUserSettings->setSalt("");
     }
 
-    return g_ConManager.startMainConnection(name, passw);
+    return g_ConManager->startMainConnection(name, passw);
 }
 
 void UserInterface::slotConnectionRequestFinished(qint32 result, const QString msg)
@@ -86,7 +86,7 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
     case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
         emit this->notifyGamesListFinished(result);
         if (result == ERROR_CODE_SUCCESS)
-            g_DataGamesManager.startListGamesInfo();
+            g_DataGamesManager->startListGamesInfo();
         //        if (result == ERROR_CODE_SUCCESS) {
         //            this->m_pConHandle->startGettingUserEvents();
         //            this->m_pConHandle->startListGettingGamesInfo();
@@ -96,7 +96,7 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
     case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST:
         emit this->notifyGamesInfoListFinished(result);
         if (result == ERROR_CODE_SUCCESS)
-            g_ConUserSettings.startGettingUserProps(true);
+            g_ConUserSettings->startGettingUserProps(true);
         break;
 
     case OP_CODE_CMD_REQ::REQ_ADD_TICKET:
@@ -117,7 +117,7 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
 
     case OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET:
         if (result == ERROR_CODE_SUCCESS)
-            g_ConUserSettings.startGettingUserProps(true);
+            g_ConUserSettings->startGettingUserProps(true);
         emit this->notifyAvailableTicketStateChangedFinished(result);
         break;
 
@@ -169,13 +169,13 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
         emit this->notifyDeleteFanclubNewsItemFinished(result);
         break;
 
-        //    case OP_CODE_CMD_REQ::REQ_GET_USER_EVENTS:
-        //        emit this->notifyGetUserEvents(result);
-        //        break;
+    //    case OP_CODE_CMD_REQ::REQ_GET_USER_EVENTS:
+    //        emit this->notifyGetUserEvents(result);
+    //        break;
 
     case OP_CODE_CMD_REQ::REQ_SET_USER_EVENTS:
         if (result == ERROR_CODE_SUCCESS)
-            g_ConUserSettings.startGettingUserProps(true);
+            g_ConUserSettings->startGettingUserProps(true);
         break;
 
     case OP_CODE_CMD_REQ::REQ_CMD_STATISTIC:

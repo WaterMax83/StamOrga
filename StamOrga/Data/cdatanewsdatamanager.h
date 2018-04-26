@@ -47,17 +47,17 @@ public:
     Q_INVOKABLE QString getNewsDataLastLocalUpdateString();
 
     Q_INVOKABLE qint32 startListNewsData();
-    qint32             handleListNewsDataResponse(MessageProtocol* msg);
+    qint32 handleListNewsDataResponse(MessageProtocol* msg);
 
     Q_INVOKABLE qint32 startGetNewsDataItem(qint32 index);
-    qint32             handleGetNewsDataItem(MessageProtocol* msg);
+    qint32 handleGetNewsDataItem(MessageProtocol* msg);
 
     Q_INVOKABLE qint32 startChangeNewsDataItem(const qint32 index, const QString header, const QString info);
-    qint32             handleChangeNewsDataResponse(MessageProtocol* msg);
+    qint32 handleChangeNewsDataResponse(MessageProtocol* msg);
     Q_INVOKABLE NewsDataItem* getCurrentEditedItem();
 
     Q_INVOKABLE qint32 startRemoveNewsDataItem(const qint32 index);
-    qint32             handleRemoveNewsDataItemResponse(MessageProtocol* msg);
+    qint32 handleRemoveNewsDataItemResponse(MessageProtocol* msg);
 
 signals:
 
@@ -75,6 +75,6 @@ private:
     NewsDataItem* m_editItem = NULL;
 };
 
-extern cDataNewsDataManager g_DataNewsDataManager;
+extern cDataNewsDataManager* g_DataNewsDataManager;
 
 #endif // CDATANEWSDATAMANAGER_H

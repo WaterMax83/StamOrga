@@ -65,7 +65,7 @@ int cConTcpMain::DoBackgroundWork()
 
     /* Wait till IP address was set */
     qint32 sleepCounter = 0;
-    while (g_StaGlobalSettings.isIpAddressAlreadySet()) {
+    while (g_StaGlobalSettings->isIpAddressAlreadySet()) {
         QThread::msleep(100);
         sleepCounter++;
         if (sleepCounter >= 10)
@@ -81,7 +81,7 @@ int cConTcpMain::DoBackgroundWork()
     this->m_pConTimeout->setSingleShot(true);
     connect(this->m_pConTimeout, &QTimer::timeout, this, &cConTcpMain::slotConnectionTimeoutFired);
 
-    this->m_pMasterTcpSocket->connectToHost(this->m_hMasterReceiver, g_ConUserSettings.getMasterConPort());
+    this->m_pMasterTcpSocket->connectToHost(this->m_hMasterReceiver, g_ConUserSettings->getMasterConPort());
 
     this->m_pConTimeout->start(SOCKET_TIMEOUT_MS);
     this->m_bIsConnecting = true;

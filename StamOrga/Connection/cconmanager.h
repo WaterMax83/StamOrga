@@ -79,6 +79,6 @@ private:
     bool isMainConnectionActive() { return this->m_ctrlMainCon.IsRunning(); }
 };
 
-extern cConManager g_ConManager;
+extern cConManager* g_ConManager;
 
 #endif // CONNECTIONHANDLING_H

@@ -31,7 +31,7 @@
 #include "cconmanager.h"
 #include "cconusersettings.h"
 
-cConManager g_ConManager;
+cConManager* g_ConManager;
 
 cConManager::cConManager(QObject* parent)
     : cGenDisposer(parent)
@@ -61,7 +61,7 @@ qint32 cConManager::startMainConnection(QString name, QString passw)
 
     if (this->m_pMainCon == NULL) {
         this->m_pMainCon = new cConTcpMain();
-        qint32 rCode     = this->m_pMainCon->initialize(g_ConUserSettings.getIPAddr(), name);
+        qint32 rCode     = this->m_pMainCon->initialize(g_ConUserSettings->getIPAddr(), name);
         if (rCode != ERROR_CODE_SUCCESS)
             return rCode;
         connect(this->m_pMainCon, &cConTcpMain::connectionRequestFinished, this, &cConManager::slMainConReqFin);
@@ -87,11 +87,11 @@ void cConManager::slMainConReqFin(qint32 result, const QString msg, const QStrin
         this->m_mainConRequestDataPort = result;
         this->m_mainConRequestSalt     = salt;
         this->m_mainConRequestRandom   = random;
-        g_ConUserSettings.setRandomLoginValue(random);
+        g_ConUserSettings->setRandomLoginValue(random);
         this->startDataConnection();
 
-        if (g_ConUserSettings.getUserName() != m_mainConRequestUserName)
-            g_ConUserSettings.setUserName(m_mainConRequestUserName);
+        if (g_ConUserSettings->getUserName() != m_mainConRequestUserName)
+            g_ConUserSettings->setUserName(m_mainConRequestUserName);
 
         //        QThread::msleep(20);
 
@@ -104,7 +104,7 @@ void cConManager::slMainConReqFin(qint32 result, const QString msg, const QStrin
         emit this->signalNotifyConnectionFinished(result, msg);
 
         if (result == ERROR_CODE_NO_USER)
-            g_StaGlobalSettings.setAlreadyConnected(false);
+            g_StaGlobalSettings->setAlreadyConnected(false);
 
         while (this->m_lRequestConError.size() > 0) {
             TcpDataConRequest* request = this->m_lRequestConError.last();
@@ -133,12 +133,15 @@ void cConManager::slotDataConnnectionFinished(qint32 result, const QString msg)
  */
 void cConManager::sendLoginRequest()
 {
+    if (!this->m_initialized)
+        return;
+
     QString passWord = this->m_mainConRequestPassWord;
-    if (g_ConUserSettings.getSalt() == "")
-        passWord = g_ConUserSettings.createHashValue(passWord, this->m_mainConRequestSalt);
+    if (g_ConUserSettings->getSalt() == "")
+        passWord = g_ConUserSettings->createHashValue(passWord, this->m_mainConRequestSalt);
 
 
-    passWord = g_ConUserSettings.createHashValue(passWord, this->m_mainConRequestRandom);
+    passWord = g_ConUserSettings->createHashValue(passWord, this->m_mainConRequestRandom);
     QJsonObject rootObj;
     rootObj.insert("passWord", passWord);
 
@@ -150,6 +153,9 @@ void cConManager::sendLoginRequest()
 
 void cConManager::sendNewRequest(TcpDataConRequest* request)
 {
+    if (!this->m_initialized)
+        return;
+
     if (this->isDataConnectionActive()) {
         emit this->signalStartSendNewRequest(request);
     } else {
@@ -157,7 +163,7 @@ void cConManager::sendNewRequest(TcpDataConRequest* request)
         this->m_lRequestConError.prepend(request);
         if (this->m_lRequestConError.size() == 1) {
             qInfo().noquote() << QString("Trying to restart connection from cConManager ");
-            this->startMainConnection(g_ConUserSettings.getUserName(), g_ConUserSettings.getPassWord());
+            this->startMainConnection(g_ConUserSettings->getUserName(), g_ConUserSettings->getPassWord());
         }
     }
 }
@@ -170,23 +176,23 @@ void cConManager::slotDataConLastRequestFinished(TcpDataConRequest* request)
     switch (request->m_request) {
     case OP_CODE_CMD_REQ::REQ_LOGIN_USER:
         if (request->m_result == ERROR_CODE_SUCCESS) {
-            g_StaGlobalSettings.startGettingVersionInfo();
-            g_ConUserSettings.startGettingUserProps(false);
+            g_StaGlobalSettings->startGettingVersionInfo();
+            g_ConUserSettings->startGettingUserProps(false);
 
             while (this->m_lRequestConError.size() > 0) {
                 TcpDataConRequest* request = this->m_lRequestConError.last();
                 if (request->m_request != OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN)
                     this->sendNewRequest(request);
                 else
-                    g_ConUserSettings.startUpdatePassword("");
+                    g_ConUserSettings->startUpdatePassword("");
                 this->m_lRequestConError.removeLast();
             }
             QString passWord = this->m_mainConRequestPassWord;
-            if (g_ConUserSettings.getSalt() == "")
-                passWord = g_ConUserSettings.createHashValue(passWord, this->m_mainConRequestSalt);
+            if (g_ConUserSettings->getSalt() == "")
+                passWord = g_ConUserSettings->createHashValue(passWord, this->m_mainConRequestSalt);
 
-            g_ConUserSettings.setSalt(this->m_mainConRequestSalt);
-            g_ConUserSettings.setPassWord(passWord);
+            g_ConUserSettings->setSalt(this->m_mainConRequestSalt);
+            g_ConUserSettings->setPassWord(passWord);
 
             emit this->signalNotifyConnectionFinished(request->m_result, "");
         } else {
@@ -198,10 +204,10 @@ void cConManager::slotDataConLastRequestFinished(TcpDataConRequest* request)
                 this->m_lRequestConError.removeLast();
             }
             if (request->m_result == ERROR_CODE_WRONG_PASSWORD)
-                g_StaGlobalSettings.setAlreadyConnected(false);
+                g_StaGlobalSettings->setAlreadyConnected(false);
 
-            g_ConUserSettings.setSalt("");
-            g_ConUserSettings.setPassWord("");
+            g_ConUserSettings->setSalt("");
+            g_ConUserSettings->setPassWord("");
             emit this->signalNotifyConnectionFinished(request->m_result, getErrorCodeString(request->m_result));
             this->stopDataConnection();
         }
@@ -214,7 +220,7 @@ void cConManager::slotDataConLastRequestFinished(TcpDataConRequest* request)
         static quint32 retryGetGamesInfoCount = 0;
         if (request->m_result == ERROR_CODE_UPDATE_LIST) {
             if (retryGetGamesInfoCount < 3) {
-                g_DataGamesManager.startListGames();
+                g_DataGamesManager->startListGames();
                 retryGetGamesInfoCount++;
                 delete request;
                 return;
@@ -230,7 +236,7 @@ void cConManager::slotDataConLastRequestFinished(TcpDataConRequest* request)
         static quint32 retryGetTicketCount = 0;
         if (request->m_result == ERROR_CODE_UPDATE_LIST || request->m_result == ERROR_CODE_MISSING_TICKET) {
             if (retryGetTicketCount < 3) {
-                g_DataTicketManager.startListSeasonTickets();
+                g_DataTicketManager->startListSeasonTickets();
                 retryGetTicketCount++;
                 delete request;
                 return;
@@ -274,7 +280,7 @@ void cConManager::startDataConnection()
     }
 
     this->m_pDataCon = new cConTcpData();
-    this->m_pDataCon->initialize(g_ConUserSettings.getIPAddr(), this->m_mainConRequestDataPort);
+    this->m_pDataCon->initialize(g_ConUserSettings->getIPAddr(), this->m_mainConRequestDataPort);
 
     connect(this->m_pDataCon, &cConTcpData::signalDataConnectionFinished,
             this, &cConManager::slotDataConnnectionFinished);

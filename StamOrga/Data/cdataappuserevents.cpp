@@ -28,7 +28,7 @@
 #include "../Data/cdatanewsdatamanager.h"
 #include "cdataappuserevents.h"
 
-cDataAppUserEvents g_DataAppUserEvents;
+cDataAppUserEvents* g_DataAppUserEvents;
 
 cDataAppUserEvents::cDataAppUserEvents(QObject* parent)
     : cGenDisposer(parent)
@@ -71,18 +71,18 @@ qint32 cDataAppUserEvents::addNewUserEvents(QJsonArray& jsArr)
                 this->m_eventNewAppVersion = true;
         } else if (pEvent->m_type == NOTIFY_TOPIC_NEW_FANCLUB_NEWS) {
 
-            if (g_ConUserSettings.userIsFanclubEnabled()) {
-                g_DataNewsDataManager.setNewsDataItemHasEvent(pEvent->m_info.toInt());
+            if (g_ConUserSettings->userIsFanclubEnabled()) {
+                g_DataNewsDataManager->setNewsDataItemHasEvent(pEvent->m_info.toInt());
                 this->m_eventNewFanclubNews++;
             } else {
                 this->m_eventNewFanclubNews = 0;
             }
         } else if (pEvent->m_type == NOTIFY_TOPIC_NEW_FREE_TICKET) {
-            g_DataGamesManager.setGamePlayItemHasEvent(pEvent->m_info.toInt());
+            g_DataGamesManager->setGamePlayItemHasEvent(pEvent->m_info.toInt());
         } else if (pEvent->m_type == NOTIFY_TOPIC_NEW_MEETING || pEvent->m_type == NOTIFY_TOPIC_CHANGE_MEETING) {
-            g_DataGamesManager.setGamePlayItemHasEvent(pEvent->m_info.toInt());
+            g_DataGamesManager->setGamePlayItemHasEvent(pEvent->m_info.toInt());
         } else if (pEvent->m_type == NOTIFY_TOPIC_NEW_AWAY_ACCEPT) {
-            g_DataGamesManager.setGamePlayItemHasEvent(pEvent->m_info.toInt());
+            g_DataGamesManager->setGamePlayItemHasEvent(pEvent->m_info.toInt());
         } else
             continue;
 
@@ -96,8 +96,8 @@ void cDataAppUserEvents::resetCurrentEvents()
 {
     this->m_eventNewAppVersion  = false;
     this->m_eventNewFanclubNews = 0;
-    g_DataGamesManager.resetAllGamePlayEvents();
-    g_DataNewsDataManager.resetAllNewsDataEvents();
+    g_DataGamesManager->resetAllGamePlayEvents();
+    g_DataNewsDataManager->resetAllNewsDataEvents();
     for (int i = this->m_lEvents.count() - 1; i >= 0; i--) {
         delete this->m_lEvents[i];
         this->m_lEvents.removeAt(i);
@@ -188,7 +188,7 @@ qint32 cDataAppUserEvents::startSetUserEvents(const qint64 eventID, const qint32
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_SET_USER_EVENTS);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
-    g_ConManager.sendNewRequest(req);
+    g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 

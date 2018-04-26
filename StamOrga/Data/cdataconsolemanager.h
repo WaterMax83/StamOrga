@@ -38,12 +38,12 @@ public:
     Q_INVOKABLE QString getLastConsoleOutput();
 
     Q_INVOKABLE qint32 startSendConsoleCommand(const QString command);
-    qint32             handleConsoleCommandResponse(MessageProtocol* msg);
+    qint32 handleConsoleCommandResponse(MessageProtocol* msg);
 
 private:
     QString m_consoleOutput;
 };
 
-extern cDataConsoleManager g_DataConsoleManager;
+extern cDataConsoleManager* g_DataConsoleManager;
 
 #endif // CDATACONSOLEMANAGER_H

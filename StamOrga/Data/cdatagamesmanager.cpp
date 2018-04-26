@@ -51,7 +51,7 @@
 
 // clang-format on
 
-cDataGamesManager g_DataGamesManager;
+cDataGamesManager* g_DataGamesManager;
 
 cDataGamesManager::cDataGamesManager(QObject* parent)
     : cGenDisposer(parent)
@@ -62,13 +62,13 @@ qint32 cDataGamesManager::initialize()
 {
     qRegisterMetaType<GamePlay*>("GamePlay*");
 
-    if (!g_StaGlobalSettings.getSaveInfosOnApp())
-        g_StaSettingsManager.removeGroup(GAMES_GROUP);
+    if (!g_StaGlobalSettings->getSaveInfosOnApp())
+        g_StaSettingsManager->removeGroup(GAMES_GROUP);
 
     qint64 iValue;
-    g_StaSettingsManager.getInt64Value(GAMES_GROUP, LOCAL_GAMES_UDPATE, iValue);
+    g_StaSettingsManager->getInt64Value(GAMES_GROUP, LOCAL_GAMES_UDPATE, iValue);
     this->m_stLastLocalUpdateTimeStamp = iValue;
-    g_StaSettingsManager.getInt64Value(GAMES_GROUP, SERVER_GAMES_UDPATE, iValue);
+    g_StaSettingsManager->getInt64Value(GAMES_GROUP, SERVER_GAMES_UDPATE, iValue);
     this->m_stLastServerUpdateTimeStamp = iValue;
 
     this->m_LastGameInfoUpdate = 0;
@@ -78,22 +78,22 @@ qint32 cDataGamesManager::initialize()
     QString value;
     bool    bValue;
     qint32  index = 0;
-    while (g_StaSettingsManager.getValue(GAMES_GROUP, PLAY_HOME, index, value) == ERROR_CODE_SUCCESS) {
+    while (g_StaSettingsManager->getValue(GAMES_GROUP, PLAY_HOME, index, value) == ERROR_CODE_SUCCESS) {
         GamePlay* pGame = new GamePlay();
         pGame->setHome(value);
-        g_StaSettingsManager.getValue(GAMES_GROUP, PLAY_AWAY, index, value);
+        g_StaSettingsManager->getValue(GAMES_GROUP, PLAY_AWAY, index, value);
         pGame->setAway(value);
-        g_StaSettingsManager.getInt64Value(GAMES_GROUP, PLAY_DATETIME, index, iValue);
+        g_StaSettingsManager->getInt64Value(GAMES_GROUP, PLAY_DATETIME, index, iValue);
         pGame->setTimeStamp(iValue);
-        g_StaSettingsManager.getInt64Value(GAMES_GROUP, ITEM_INDEX, index, iValue);
+        g_StaSettingsManager->getInt64Value(GAMES_GROUP, ITEM_INDEX, index, iValue);
         pGame->setIndex(iValue);
-        g_StaSettingsManager.getInt64Value(GAMES_GROUP, PLAY_SAISON_INDEX, index, iValue);
+        g_StaSettingsManager->getInt64Value(GAMES_GROUP, PLAY_SAISON_INDEX, index, iValue);
         pGame->setSeasonIndex(iValue);
-        g_StaSettingsManager.getValue(GAMES_GROUP, PLAY_SCORE, index, value);
+        g_StaSettingsManager->getValue(GAMES_GROUP, PLAY_SCORE, index, value);
         pGame->setScore(value);
-        g_StaSettingsManager.getInt64Value(GAMES_GROUP, PLAY_COMPETITION, index, iValue);
+        g_StaSettingsManager->getInt64Value(GAMES_GROUP, PLAY_COMPETITION, index, iValue);
         pGame->setCompetition((CompetitionIndex)iValue);
-        g_StaSettingsManager.getBoolValue(GAMES_GROUP, PLAY_TIME_FIXED, index, bValue);
+        g_StaSettingsManager->getBoolValue(GAMES_GROUP, PLAY_TIME_FIXED, index, bValue);
         pGame->setTimeFixed(bValue);
 
         QQmlEngine::setObjectOwnership(pGame, QQmlEngine::CppOwnership);
@@ -228,7 +228,7 @@ qint32 cDataGamesManager::startListGames()
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
-    g_ConManager.sendNewRequest(req);
+    g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 
@@ -278,30 +278,30 @@ qint32 cDataGamesManager::handleListGamesResponse(MessageProtocol* msg)
     std::sort(this->m_lGames.begin(), this->m_lGames.end(), GamePlay::compareTimeStampFunctionAscending);
 
     if (timestamp == this->m_stLastServerUpdateTimeStamp && arrGames.count() == 0 && updateIndex != UpdateAll) {
-        if (!g_StaGlobalSettings.getSaveInfosOnApp())
+        if (!g_StaGlobalSettings->getSaveInfosOnApp())
             return result;
 
-        g_StaSettingsManager.setInt64Value(GAMES_GROUP, LOCAL_GAMES_UDPATE, this->m_stLastLocalUpdateTimeStamp);
+        g_StaSettingsManager->setInt64Value(GAMES_GROUP, LOCAL_GAMES_UDPATE, this->m_stLastLocalUpdateTimeStamp);
         return result;
     }
 
     this->m_stLastServerUpdateTimeStamp = timestamp;
 
-    if (!g_StaGlobalSettings.getSaveInfosOnApp())
+    if (!g_StaGlobalSettings->getSaveInfosOnApp())
         return result;
 
-    g_StaSettingsManager.setInt64Value(GAMES_GROUP, LOCAL_GAMES_UDPATE, this->m_stLastLocalUpdateTimeStamp);
-    g_StaSettingsManager.setInt64Value(GAMES_GROUP, SERVER_GAMES_UDPATE, this->m_stLastServerUpdateTimeStamp);
+    g_StaSettingsManager->setInt64Value(GAMES_GROUP, LOCAL_GAMES_UDPATE, this->m_stLastLocalUpdateTimeStamp);
+    g_StaSettingsManager->setInt64Value(GAMES_GROUP, SERVER_GAMES_UDPATE, this->m_stLastServerUpdateTimeStamp);
 
     for (int i = 0; i < this->m_lGames.size(); i++) {
-        g_StaSettingsManager.setValue(GAMES_GROUP, PLAY_HOME, i, this->m_lGames[i]->home());
-        g_StaSettingsManager.setValue(GAMES_GROUP, PLAY_AWAY, i, this->m_lGames[i]->away());
-        g_StaSettingsManager.setValue(GAMES_GROUP, PLAY_SCORE, i, this->m_lGames[i]->score());
-        g_StaSettingsManager.setInt64Value(GAMES_GROUP, PLAY_DATETIME, i, this->m_lGames[i]->timestamp64Bit());
-        g_StaSettingsManager.setInt64Value(GAMES_GROUP, PLAY_SAISON_INDEX, i, this->m_lGames[i]->seasonIndex());
-        g_StaSettingsManager.setInt64Value(GAMES_GROUP, PLAY_COMPETITION, i, this->m_lGames[i]->competitionValue());
-        g_StaSettingsManager.setBoolValue(GAMES_GROUP, PLAY_TIME_FIXED, i, this->m_lGames[i]->timeFixed());
-        g_StaSettingsManager.setInt64Value(GAMES_GROUP, ITEM_INDEX, i, this->m_lGames[i]->index());
+        g_StaSettingsManager->setValue(GAMES_GROUP, PLAY_HOME, i, this->m_lGames[i]->home());
+        g_StaSettingsManager->setValue(GAMES_GROUP, PLAY_AWAY, i, this->m_lGames[i]->away());
+        g_StaSettingsManager->setValue(GAMES_GROUP, PLAY_SCORE, i, this->m_lGames[i]->score());
+        g_StaSettingsManager->setInt64Value(GAMES_GROUP, PLAY_DATETIME, i, this->m_lGames[i]->timestamp64Bit());
+        g_StaSettingsManager->setInt64Value(GAMES_GROUP, PLAY_SAISON_INDEX, i, this->m_lGames[i]->seasonIndex());
+        g_StaSettingsManager->setInt64Value(GAMES_GROUP, PLAY_COMPETITION, i, this->m_lGames[i]->competitionValue());
+        g_StaSettingsManager->setBoolValue(GAMES_GROUP, PLAY_TIME_FIXED, i, this->m_lGames[i]->timeFixed());
+        g_StaSettingsManager->setInt64Value(GAMES_GROUP, ITEM_INDEX, i, this->m_lGames[i]->index());
     }
 
     return result;
@@ -320,7 +320,7 @@ qint32 cDataGamesManager::startListGamesInfo()
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
-    g_ConManager.sendNewRequest(req);
+    g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 
@@ -411,7 +411,7 @@ qint32 cDataGamesManager::startChangeGame(const qint32 index, const qint32 sInde
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CHANGE_GAME);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
-    g_ConManager.sendNewRequest(req);
+    g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 

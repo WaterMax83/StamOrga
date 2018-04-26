@@ -63,10 +63,10 @@ private:
     bool   m_eventNewAppVersion;
     qint32 m_eventNewFanclubNews;
 
-    qint32            startSetUserEvents(const qint64 eventID, const qint32 status);
+    qint32 startSetUserEvents(const qint64 eventID, const qint32 status);
     QList<EventInfo*> m_lEvents;
 };
 
-extern cDataAppUserEvents g_DataAppUserEvents;
+extern cDataAppUserEvents* g_DataAppUserEvents;
 
 #endif // APPUSEREVENTS_H

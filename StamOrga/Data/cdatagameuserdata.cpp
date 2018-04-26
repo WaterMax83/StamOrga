@@ -23,7 +23,7 @@
 #include "cdatagameuserdata.h"
 #include "gameplay.h"
 
-cDataGameUserData g_DataGameUserData;
+cDataGameUserData* g_DataGameUserData;
 
 #define GROUP_FAVGAME "FavoriteGames"
 #define VAL_GAME_INDEX "GameIndex"
@@ -58,10 +58,10 @@ int cDataGameUserData::initialize()
 
     qint32 index = 0;
     qint64 iValue;
-    while (g_StaSettingsManager.getInt64Value(GROUP_FAVGAME, VAL_GAME_INDEX, index, iValue) == ERROR_CODE_SUCCESS) {
+    while (g_StaSettingsManager->getInt64Value(GROUP_FAVGAME, VAL_GAME_INDEX, index, iValue) == ERROR_CODE_SUCCESS) {
         FavGameInfo* fGame = new FavGameInfo();
         fGame->m_gameIndex = iValue;
-        g_StaSettingsManager.getInt64Value(GROUP_FAVGAME, VAL_FAV_INDEX, index, iValue);
+        g_StaSettingsManager->getInt64Value(GROUP_FAVGAME, VAL_FAV_INDEX, index, iValue);
         fGame->m_favIndex = iValue;
 
         //        /* remove games which are older */
@@ -165,9 +165,9 @@ int cDataGameUserData::setGameIndex(QList<FavGameInfo*>* pList, const qint32 gam
             if (writeToStorage) {
                 for (int i = 0; i < pList->size(); i++) {
                     qint64 gIndex;
-                    g_StaSettingsManager.getInt64Value(GROUP_FAVGAME, VAL_GAME_INDEX, i, gIndex);
+                    g_StaSettingsManager->getInt64Value(GROUP_FAVGAME, VAL_GAME_INDEX, i, gIndex);
                     if (gIndex == gameIndex) {
-                        g_StaSettingsManager.setInt64Value(GROUP_FAVGAME, VAL_FAV_INDEX, i, favIndex);
+                        g_StaSettingsManager->setInt64Value(GROUP_FAVGAME, VAL_FAV_INDEX, i, favIndex);
                         break;
                     }
                 }
@@ -177,8 +177,8 @@ int cDataGameUserData::setGameIndex(QList<FavGameInfo*>* pList, const qint32 gam
     }
 
     if (writeToStorage) {
-        g_StaSettingsManager.setInt64Value(GROUP_FAVGAME, VAL_GAME_INDEX, pList->size(), gameIndex);
-        g_StaSettingsManager.setInt64Value(GROUP_FAVGAME, VAL_FAV_INDEX, pList->size(), favIndex);
+        g_StaSettingsManager->setInt64Value(GROUP_FAVGAME, VAL_GAME_INDEX, pList->size(), gameIndex);
+        g_StaSettingsManager->setInt64Value(GROUP_FAVGAME, VAL_FAV_INDEX, pList->size(), favIndex);
     }
 
 

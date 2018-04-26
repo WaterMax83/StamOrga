@@ -33,8 +33,8 @@
 #include "cstaglobalsettings.h"
 #include "cstasettingsmanager.h"
 
-cDataMeetingInfo g_DataMeetingInfo;
-cDataMeetingInfo g_DataTripInfo;
+cDataMeetingInfo* g_DataMeetingInfo;
+cDataMeetingInfo* g_DataTripInfo;
 
 
 cStaGlobalManager::cStaGlobalManager(QObject* parent)
@@ -52,46 +52,61 @@ qint32 cStaGlobalManager::initialize()
     // Register our component type with QML.
     qmlRegisterType<UserInterface>("com.watermax.demo", 1, 0, "UserInterface");
 
-    rCode = g_StaSettingsManager.initialize();
+    g_StaSettingsManager = new cStaSettingsManager();
+    rCode                = g_StaSettingsManager->initialize();
 
-    if (rCode == ERROR_CODE_SUCCESS)
-        rCode = g_DatAppInfoManager.initialize();
-
-    if (rCode == ERROR_CODE_SUCCESS)
-        rCode = g_StaGlobalSettings.initialize();
-
-    if (rCode == ERROR_CODE_SUCCESS)
-        rCode = g_ConUserSettings.initialize();
-
-    if (rCode == ERROR_CODE_SUCCESS)
-        rCode = g_DataGamesManager.initialize();
-
-    if (rCode == ERROR_CODE_SUCCESS)
-        rCode = g_DataTicketManager.initialize();
-
-    if (rCode == ERROR_CODE_SUCCESS)
-        rCode = g_DataNewsDataManager.initialize();
-
-    if (rCode == ERROR_CODE_SUCCESS)
-        rCode = g_DataStatisticManager.initialize();
-
-    if (rCode == ERROR_CODE_SUCCESS)
-        rCode = g_DataMeetingInfo.initialize();
-
-    if (rCode == ERROR_CODE_SUCCESS)
-        rCode = g_DataTripInfo.initialize();
-
-    if (rCode == ERROR_CODE_SUCCESS)
-        rCode = g_DataGameUserData.initialize();
-
-    if (rCode == ERROR_CODE_SUCCESS)
-        rCode = g_DataAppUserEvents.initialize();
-
-    if (rCode == ERROR_CODE_SUCCESS)
-        rCode = g_DataConsoleManager.initialize();
-
-    if (rCode == ERROR_CODE_SUCCESS)
-        rCode = g_ConManager.initialize();
+    if (rCode == ERROR_CODE_SUCCESS) {
+        g_DatAppInfoManager = new cDatAppInfoManager();
+        rCode               = g_DatAppInfoManager->initialize();
+    }
+    if (rCode == ERROR_CODE_SUCCESS) {
+        g_StaGlobalSettings = new cStaGlobalSettings();
+        rCode               = g_StaGlobalSettings->initialize();
+    }
+    if (rCode == ERROR_CODE_SUCCESS) {
+        g_ConUserSettings = new cConUserSettings();
+        rCode             = g_ConUserSettings->initialize();
+    }
+    if (rCode == ERROR_CODE_SUCCESS) {
+        g_DataGamesManager = new cDataGamesManager();
+        rCode              = g_DataGamesManager->initialize();
+    }
+    if (rCode == ERROR_CODE_SUCCESS) {
+        g_DataTicketManager = new cDataTicketManager();
+        rCode               = g_DataTicketManager->initialize();
+    }
+    if (rCode == ERROR_CODE_SUCCESS) {
+        g_DataNewsDataManager = new cDataNewsDataManager();
+        rCode                 = g_DataNewsDataManager->initialize();
+    }
+    if (rCode == ERROR_CODE_SUCCESS) {
+        g_DataStatisticManager = new cDataStatisticManager();
+        rCode                  = g_DataStatisticManager->initialize();
+    }
+    if (rCode == ERROR_CODE_SUCCESS) {
+        g_DataMeetingInfo = new cDataMeetingInfo();
+        rCode             = g_DataMeetingInfo->initialize();
+    }
+    if (rCode == ERROR_CODE_SUCCESS) {
+        g_DataTripInfo = new cDataMeetingInfo();
+        rCode          = g_DataTripInfo->initialize();
+    }
+    if (rCode == ERROR_CODE_SUCCESS) {
+        g_DataGameUserData = new cDataGameUserData();
+        rCode              = g_DataGameUserData->initialize();
+    }
+    if (rCode == ERROR_CODE_SUCCESS) {
+        g_DataAppUserEvents = new cDataAppUserEvents();
+        rCode               = g_DataAppUserEvents->initialize();
+    }
+    if (rCode == ERROR_CODE_SUCCESS) {
+        g_DataConsoleManager = new cDataConsoleManager();
+        rCode                = g_DataConsoleManager->initialize();
+    }
+    if (rCode == ERROR_CODE_SUCCESS) {
+        g_ConManager = new cConManager();
+        rCode        = g_ConManager->initialize();
+    }
 
     if (rCode == ERROR_CODE_SUCCESS)
         this->m_initialized = true;
@@ -101,16 +116,16 @@ qint32 cStaGlobalManager::initialize()
 
 void cStaGlobalManager::setQmlInformationClasses(QQmlApplicationEngine* engine)
 {
-    engine->rootContext()->setContextProperty("gDataAppInfoManager", &g_DatAppInfoManager);
-    engine->rootContext()->setContextProperty("gStaGlobalSettings", &g_StaGlobalSettings);
-    engine->rootContext()->setContextProperty("gDataGamesManager", &g_DataGamesManager);
-    engine->rootContext()->setContextProperty("gDataTicketManager", &g_DataTicketManager);
-    engine->rootContext()->setContextProperty("gDataNewsDataManager", &g_DataNewsDataManager);
-    engine->rootContext()->setContextProperty("gDataStatisticManager", &g_DataStatisticManager);
-    engine->rootContext()->setContextProperty("gDataMeetingInfo", &g_DataMeetingInfo);
-    engine->rootContext()->setContextProperty("gDataGameUserData", &g_DataGameUserData);
-    engine->rootContext()->setContextProperty("gDataAppUserEvents", &g_DataAppUserEvents);
-    engine->rootContext()->setContextProperty("gDataTripInfo", &g_DataTripInfo);
-    engine->rootContext()->setContextProperty("gDataConsoleManager", &g_DataConsoleManager);
-    engine->rootContext()->setContextProperty("gConUserSettings", &g_ConUserSettings);
+    engine->rootContext()->setContextProperty("gDataAppInfoManager", g_DatAppInfoManager);
+    engine->rootContext()->setContextProperty("gStaGlobalSettings", g_StaGlobalSettings);
+    engine->rootContext()->setContextProperty("gDataGamesManager", g_DataGamesManager);
+    engine->rootContext()->setContextProperty("gDataTicketManager", g_DataTicketManager);
+    engine->rootContext()->setContextProperty("gDataNewsDataManager", g_DataNewsDataManager);
+    engine->rootContext()->setContextProperty("gDataStatisticManager", g_DataStatisticManager);
+    engine->rootContext()->setContextProperty("gDataMeetingInfo", g_DataMeetingInfo);
+    engine->rootContext()->setContextProperty("gDataGameUserData", g_DataGameUserData);
+    engine->rootContext()->setContextProperty("gDataAppUserEvents", g_DataAppUserEvents);
+    engine->rootContext()->setContextProperty("gDataTripInfo", g_DataTripInfo);
+    engine->rootContext()->setContextProperty("gDataConsoleManager", g_DataConsoleManager);
+    engine->rootContext()->setContextProperty("gConUserSettings", g_ConUserSettings);
 }

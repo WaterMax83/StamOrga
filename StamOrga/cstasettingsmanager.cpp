@@ -22,7 +22,7 @@
 
 #define GROUP_ARRAY_ITEM "item"
 
-cStaSettingsManager g_StaSettingsManager;
+cStaSettingsManager* g_StaSettingsManager;
 
 cStaSettingsManager::cStaSettingsManager(QObject* parent)
     : cGenDisposer(parent)

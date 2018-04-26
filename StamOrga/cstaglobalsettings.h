@@ -45,16 +45,16 @@ public:
     Q_INVOKABLE void setUseVersionPopup(const bool use);
 
     Q_INVOKABLE QString getDebugIP();
-    Q_INVOKABLE void    setDebugIP(const QString ip);
+    Q_INVOKABLE void setDebugIP(const QString ip);
 
     Q_INVOKABLE QString getDebugIPWifi();
-    Q_INVOKABLE void    setDebugIPWifi(const QString ip);
+    Q_INVOKABLE void setDebugIPWifi(const QString ip);
 
     Q_INVOKABLE QString getChangeDefaultFont();
-    Q_INVOKABLE void    setChangeDefaultFont(const QString font);
+    Q_INVOKABLE void setChangeDefaultFont(const QString font);
 
     Q_INVOKABLE qint32 getCurrentFontIndex();
-    void               setCurrentFontList(QStringList* list);
+    void setCurrentFontList(QStringList* list);
 
     Q_INVOKABLE bool isVersionChangeAlreadyShown();
     Q_INVOKABLE QString getVersionChangeInfo();
@@ -115,6 +115,6 @@ private:
     void updatePushNotification(void);
 };
 
-extern cStaGlobalSettings g_StaGlobalSettings;
+extern cStaGlobalSettings* g_StaGlobalSettings;
 
 #endif // CSTAGLOBALSETTINGS_H

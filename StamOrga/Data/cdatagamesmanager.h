@@ -47,15 +47,15 @@ public:
     Q_INVOKABLE QString getGamePlayLastLocalUpdateString();
 
     Q_INVOKABLE qint32 startListGames();
-    qint32             handleListGamesResponse(MessageProtocol* msg);
+    qint32 handleListGamesResponse(MessageProtocol* msg);
 
     Q_INVOKABLE qint32 startListGamesInfo();
-    qint32             handleListGamesInfoResponse(MessageProtocol* msg);
+    qint32 handleListGamesInfoResponse(MessageProtocol* msg);
 
     Q_INVOKABLE qint32 startChangeGame(const qint32 index, const qint32 sIndex, const QString competition,
                                        const QString home, const QString away, const QString date,
                                        const QString score, const bool fixedTime);
-    qint32             handleChangeGameResponse(MessageProtocol* msg);
+    qint32 handleChangeGameResponse(MessageProtocol* msg);
 
     qint32 stateChangeCheckUdpate();
 
@@ -73,6 +73,6 @@ private:
     qint64 m_LastGameInfoUpdate;
 };
 
-extern cDataGamesManager g_DataGamesManager;
+extern cDataGamesManager* g_DataGamesManager;
 
 #endif // CDATAGAMESMANAGER_H

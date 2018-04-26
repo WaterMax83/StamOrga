@@ -61,6 +61,6 @@ private:
     qint32 setValue(const QString group, const QString key, const qint32 index, const QVariant value);
 };
 
-extern cStaSettingsManager g_StaSettingsManager;
+extern cStaSettingsManager* g_StaSettingsManager;
 
 #endif // CSTASETTINGSMANAGER_H

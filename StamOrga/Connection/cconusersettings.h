@@ -98,6 +98,6 @@ private:
     void setUserProperties(const quint32 userProperties);
 };
 
-extern cConUserSettings g_ConUserSettings;
+extern cConUserSettings* g_ConUserSettings;
 
 #endif // CCONSETTINGS_H

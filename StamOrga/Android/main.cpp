@@ -26,7 +26,7 @@
 #include <QtQml/QQmlContext>
 #include <QtWidgets/QApplication>
 
-#include <iostream>
+//#include <iostream>
 
 #include "../../Common/General/backgroundcontroller.h"
 #include "../../Common/General/config.h"
@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
 
     QFontDatabase base;
     QStringList   fontFamilies = base.families();
-    QString       chFontFam    = g_StaGlobalSettings.getChangeDefaultFont();
+    QString       chFontFam    = g_StaGlobalSettings->getChangeDefaultFont();
     if (chFontFam != "Default") {
 
         if (fontFamilies.contains(chFontFam)) {
@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
     }
 
     fontFamilies.insert(0, "Default");
-    g_StaGlobalSettings.setCurrentFontList(&fontFamilies);
+    g_StaGlobalSettings->setCurrentFontList(&fontFamilies);
     QStringListModel fontFamiliesModel;
     fontFamiliesModel.setStringList(fontFamilies);
 
@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
     QQmlApplicationEngine engine;
     staGlobalManager.setQmlInformationClasses(&engine);
     engine.rootContext()->setContextProperty("fontFamiliesModel", &fontFamiliesModel);
-    //    engine.rootContext()->setContextProperty("fontFamiliesModel", QVariant::fromValue(fontFamilies));
+    // //    engine.rootContext()->setContextProperty("fontFamiliesModel", QVariant::fromValue(fontFamilies));
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));
 
 
@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
 #endif
 
     QObject* pRootObject = engine.rootObjects().first();
-    if (g_ConUserSettings.getUserName().size() == 0 || g_ConUserSettings.getPassWord() == 0)
+    if (g_ConUserSettings->getUserName().size() == 0 || g_ConUserSettings->getPassWord() == 0)
         QMetaObject::invokeMethod(pRootObject, "openUserLogin", Q_ARG(QVariant, true));
     else
         QMetaObject::invokeMethod(pRootObject, "openUserLogin", Q_ARG(QVariant, false));

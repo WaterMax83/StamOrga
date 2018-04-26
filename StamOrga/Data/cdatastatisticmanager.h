@@ -93,6 +93,6 @@ private:
     qint32 startSendCommand(QJsonObject& rootObj);
 };
 
-extern cDataStatisticManager g_DataStatisticManager;
+extern cDataStatisticManager* g_DataStatisticManager;
 
 #endif // CDATASTATISTICMANAGER_H

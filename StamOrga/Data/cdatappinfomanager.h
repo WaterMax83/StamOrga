@@ -26,6 +26,7 @@
 #include "../../Common/General/globalfunctions.h"
 #include "../../Common/General/logging.h"
 #include "../Common/General/cgendisposer.h"
+#include "source/cadrpushnotifyinfohandler.h"
 
 class cDatAppInfoManager : public cGenDisposer
 {
@@ -57,10 +58,13 @@ private:
     QString m_pushNotificationToken;
     QString m_AppInstanceGUID;
 
+    AdrPushNotifyInfoHandler* m_pushNotificationInfoHandler;
+
     Logging*             m_logApp;
     BackgroundController m_ctrlLog;
+    QMutex               m_pushNotificationMutex;
 };
 
-extern cDatAppInfoManager g_DatAppInfoManager;
+extern cDatAppInfoManager* g_DatAppInfoManager;
 
 #endif // CDATAPPINFOMANAGER_H

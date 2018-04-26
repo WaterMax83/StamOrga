@@ -23,7 +23,7 @@
 #include "../Connection/cconmanager.h"
 #include "cdataconsolemanager.h"
 
-cDataConsoleManager g_DataConsoleManager;
+cDataConsoleManager* g_DataConsoleManager;
 
 cDataConsoleManager::cDataConsoleManager(QObject* parent)
     : cGenDisposer(parent)
@@ -50,7 +50,7 @@ qint32 cDataConsoleManager::startSendConsoleCommand(const QString command)
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_SEND_CONSOLE_CMD);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
-    g_ConManager.sendNewRequest(req);
+    g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 

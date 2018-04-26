@@ -137,7 +137,7 @@ void cConTcpData::checkNewOncomingData()
             this->m_pConTimeout->stop();
             //            emit this->signalDataConnectionFinished(ERROR_CODE_NOT_LOGGED_IN, "Not logged in");
             this->m_bRequestLoginAgain = true;
-            g_ConManager.sendLoginRequest();
+            g_ConManager->sendLoginRequest();
             return;
         }
         TcpDataConRequest* request = this->getActualRequest(msg->getIndex() & 0x00FFFFFF);
@@ -158,33 +158,33 @@ void cConTcpData::checkNewOncomingData()
             break;
 
         case OP_CODE_CMD_RES::ACK_GET_VERSION:
-            request->m_result = g_StaGlobalSettings.handleVersionResponse(msg);
+            request->m_result = g_StaGlobalSettings->handleVersionResponse(msg);
             break;
         case OP_CODE_CMD_RES::ACK_GET_USER_PROPS:
-            request->m_result = g_ConUserSettings.handleUserPropsResponse(msg);
+            request->m_result = g_ConUserSettings->handleUserPropsResponse(msg);
             break;
         case OP_CODE_CMD_RES::ACK_SEND_CONSOLE_CMD:
-            request->m_result = g_DataConsoleManager.handleConsoleCommandResponse(msg);
+            request->m_result = g_DataConsoleManager->handleConsoleCommandResponse(msg);
 
         case OP_CODE_CMD_RES::ACK_SET_USER_EVENTS:
-            request->m_result = g_DataAppUserEvents.handleSetUserEventsResponse(msg);
+            request->m_result = g_DataAppUserEvents->handleSetUserEventsResponse(msg);
             break;
 
         case OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN:
-            request->m_result = g_ConUserSettings.handleUpdatePasswordResponse(msg);
+            request->m_result = g_ConUserSettings->handleUpdatePasswordResponse(msg);
             break;
         case OP_CODE_CMD_RES::ACK_USER_CHANGE_READNAME:
-            request->m_result = g_ConUserSettings.handleUpdateReadableNameResponse(msg);
+            request->m_result = g_ConUserSettings->handleUpdateReadableNameResponse(msg);
             break;
 
         case OP_CODE_CMD_RES::ACK_GET_GAMES_LIST:
-            request->m_result = g_DataGamesManager.handleListGamesResponse(msg);
+            request->m_result = g_DataGamesManager->handleListGamesResponse(msg);
             break;
         case OP_CODE_CMD_RES::ACK_GET_GAMES_INFO_LIST:
-            request->m_result = g_DataGamesManager.handleListGamesInfoResponse(msg);
+            request->m_result = g_DataGamesManager->handleListGamesInfoResponse(msg);
             break;
         case OP_CODE_CMD_RES::ACK_CHANGE_GAME:
-            request->m_result = g_DataGamesManager.handleChangeGameResponse(msg);
+            request->m_result = g_DataGamesManager->handleChangeGameResponse(msg);
             break;
 
             //        case OP_CODE_CMD_RES::ACK_SET_FIXED_GAME_TIME:
@@ -192,56 +192,56 @@ void cConTcpData::checkNewOncomingData()
             //            break;
 
         case OP_CODE_CMD_RES::ACK_ADD_TICKET:
-            request->m_result = g_DataTicketManager.handleAddSeasonTicketResponse(msg);
+            request->m_result = g_DataTicketManager->handleAddSeasonTicketResponse(msg);
             break;
         case OP_CODE_CMD_RES::ACK_REMOVE_TICKET:
-            request->m_result = g_DataTicketManager.handleRemoveSeasonTicketResponse(msg);
+            request->m_result = g_DataTicketManager->handleRemoveSeasonTicketResponse(msg);
             break;
         case OP_CODE_CMD_RES::ACK_GET_TICKETS_LIST:
-            request->m_result = g_DataTicketManager.handleListSeasonTicketsResponse(msg);
+            request->m_result = g_DataTicketManager->handleListSeasonTicketsResponse(msg);
             break;
 
         case OP_CODE_CMD_RES::ACK_STATE_CHANGE_SEASON_TICKET:
-            request->m_result = g_DataTicketManager.handleChangeAvailableTicketResponse(msg);
+            request->m_result = g_DataTicketManager->handleChangeAvailableTicketResponse(msg);
             break;
         case OP_CODE_CMD_RES::ACK_GET_AVAILABLE_TICKETS:
-            request->m_result = g_DataTicketManager.handleListAvailableSeasonTicketResponse(msg);
+            request->m_result = g_DataTicketManager->handleListAvailableSeasonTicketResponse(msg);
             break;
 
         case OP_CODE_CMD_RES::ACK_CHANGE_MEETING_INFO:
-            request->m_result = g_DataMeetingInfo.handleSaveMeetingInfoResponse(msg);
+            request->m_result = g_DataMeetingInfo->handleSaveMeetingInfoResponse(msg);
             break;
         case OP_CODE_CMD_RES::ACK_CHANGE_AWAYTRIP_INFO:
-            request->m_result = g_DataTripInfo.handleSaveMeetingInfoResponse(msg);
+            request->m_result = g_DataTripInfo->handleSaveMeetingInfoResponse(msg);
             break;
         case OP_CODE_CMD_RES::ACK_GET_MEETING_INFO:
-            request->m_result = g_DataMeetingInfo.handleLoadMeetingInfoResponse(msg);
+            request->m_result = g_DataMeetingInfo->handleLoadMeetingInfoResponse(msg);
             break;
         case OP_CODE_CMD_RES::ACK_GET_AWAYTRIP_INFO:
-            request->m_result = g_DataTripInfo.handleLoadMeetingInfoResponse(msg);
+            request->m_result = g_DataTripInfo->handleLoadMeetingInfoResponse(msg);
             break;
         case OP_CODE_CMD_RES::ACK_ACCEPT_MEETING:
-            request->m_result = g_DataMeetingInfo.handAcceptMeetingInfo(msg);
+            request->m_result = g_DataMeetingInfo->handAcceptMeetingInfo(msg);
             break;
         case OP_CODE_CMD_RES::ACK_ACCEPT_AWAYTRIP:
-            request->m_result = g_DataTripInfo.handAcceptMeetingInfo(msg);
+            request->m_result = g_DataTripInfo->handAcceptMeetingInfo(msg);
             break;
 
         case OP_CODE_CMD_RES::ACK_CHANGE_NEWS_DATA:
-            request->m_result = g_DataNewsDataManager.handleChangeNewsDataResponse(msg);
+            request->m_result = g_DataNewsDataManager->handleChangeNewsDataResponse(msg);
             break;
         case OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_LIST:
-            request->m_result = g_DataNewsDataManager.handleListNewsDataResponse(msg);
+            request->m_result = g_DataNewsDataManager->handleListNewsDataResponse(msg);
             break;
         case OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_ITEM:
-            request->m_result = g_DataNewsDataManager.handleGetNewsDataItem(msg);
+            request->m_result = g_DataNewsDataManager->handleGetNewsDataItem(msg);
             break;
         case OP_CODE_CMD_RES::ACK_DEL_NEWS_DATA_ITEM:
-            request->m_result = g_DataNewsDataManager.handleRemoveNewsDataItemResponse(msg);
+            request->m_result = g_DataNewsDataManager->handleRemoveNewsDataItemResponse(msg);
             break;
 
         case OP_CODE_CMD_RES::ACK_CMD_STATISTIC:
-            request->m_result = g_DataStatisticManager.handleStatisticResponse(msg);
+            request->m_result = g_DataStatisticManager->handleStatisticResponse(msg);
             break;
 
 

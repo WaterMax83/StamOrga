@@ -31,7 +31,7 @@
 //#include "../cstaglobalsettings.h"
 
 
-cDataNewsDataManager g_DataNewsDataManager;
+cDataNewsDataManager* g_DataNewsDataManager;
 
 cDataNewsDataManager::cDataNewsDataManager(QObject* parent)
     : cGenDisposer(parent)
@@ -161,7 +161,7 @@ qint32 cDataNewsDataManager::startListNewsData()
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_GET_NEWS_DATA_LIST);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
-    g_ConManager.sendNewRequest(req);
+    g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 
@@ -220,7 +220,7 @@ qint32 cDataNewsDataManager::startGetNewsDataItem(qint32 index)
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_GET_NEWS_DATA_ITEM);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
-    g_ConManager.sendNewRequest(req);
+    g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 
@@ -278,7 +278,7 @@ qint32 cDataNewsDataManager::startChangeNewsDataItem(const qint32 index, const Q
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CHANGE_NEWS_DATA);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
-    g_ConManager.sendNewRequest(req);
+    g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 
@@ -308,7 +308,7 @@ qint32 cDataNewsDataManager::handleChangeNewsDataResponse(MessageProtocol* msg)
         pItem->setHeader(this->m_editHeader);
         pItem->setInfo(this->m_editInfo);
         pItem->setTimeStamp(QDateTime::currentMSecsSinceEpoch());
-        pItem->setUser(g_ConUserSettings.getReadableName());
+        pItem->setUser(g_ConUserSettings->getReadableName());
 
         this->m_mutex.unlock();
 
@@ -343,7 +343,7 @@ qint32 cDataNewsDataManager::startRemoveNewsDataItem(const qint32 index)
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_DEL_NEWS_DATA_ITEM);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
-    g_ConManager.sendNewRequest(req);
+    g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 

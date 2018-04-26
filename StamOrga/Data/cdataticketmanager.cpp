@@ -48,7 +48,7 @@
 
 // clang-format on
 
-cDataTicketManager g_DataTicketManager;
+cDataTicketManager* g_DataTicketManager;
 
 cDataTicketManager::cDataTicketManager(QObject* parent)
     : cGenDisposer(parent)
@@ -59,29 +59,29 @@ qint32 cDataTicketManager::initialize()
 {
     qRegisterMetaType<SeasonTicketItem*>("SeasonTicketItem*");
 
-    if (!g_StaGlobalSettings.getSaveInfosOnApp())
-        g_StaSettingsManager.removeGroup(SEASONTICKET_GROUP);
+    if (!g_StaGlobalSettings->getSaveInfosOnApp())
+        g_StaSettingsManager->removeGroup(SEASONTICKET_GROUP);
 
     qint64 iValue;
-    g_StaSettingsManager.getInt64Value(SEASONTICKET_GROUP, LOCAL_TICKET_UDPATE, iValue);
+    g_StaSettingsManager->getInt64Value(SEASONTICKET_GROUP, LOCAL_TICKET_UDPATE, iValue);
     this->m_stLastLocalUpdateTimeStamp = iValue;
-    g_StaSettingsManager.getInt64Value(SEASONTICKET_GROUP, SERVER_TICKET_UDPATE, iValue);
+    g_StaSettingsManager->getInt64Value(SEASONTICKET_GROUP, SERVER_TICKET_UDPATE, iValue);
     this->m_stLastServerUpdateTimeStamp = iValue;
 
     this->m_initialized = true;
 
     QString value;
     qint32  index = 0;
-    while (g_StaSettingsManager.getValue(SEASONTICKET_GROUP, TICKET_NAME, index, value) == ERROR_CODE_SUCCESS) {
+    while (g_StaSettingsManager->getValue(SEASONTICKET_GROUP, TICKET_NAME, index, value) == ERROR_CODE_SUCCESS) {
         SeasonTicketItem* pTicket = new SeasonTicketItem();
         pTicket->setName(value);
-        g_StaSettingsManager.getValue(SEASONTICKET_GROUP, TICKET_PLACE, index, value);
+        g_StaSettingsManager->getValue(SEASONTICKET_GROUP, TICKET_PLACE, index, value);
         pTicket->setPlace(value);
-        g_StaSettingsManager.getInt64Value(SEASONTICKET_GROUP, TICKET_DISCOUNT, index, iValue);
+        g_StaSettingsManager->getInt64Value(SEASONTICKET_GROUP, TICKET_DISCOUNT, index, iValue);
         pTicket->setDiscount(iValue);
-        g_StaSettingsManager.getInt64Value(SEASONTICKET_GROUP, ITEM_INDEX, index, iValue);
+        g_StaSettingsManager->getInt64Value(SEASONTICKET_GROUP, ITEM_INDEX, index, iValue);
         pTicket->setIndex(iValue);
-        g_StaSettingsManager.getInt64Value(SEASONTICKET_GROUP, TICKET_USER_INDEX, index, iValue);
+        g_StaSettingsManager->getInt64Value(SEASONTICKET_GROUP, TICKET_USER_INDEX, index, iValue);
         pTicket->setUserIndex(iValue);
 
         QQmlEngine::setObjectOwnership(pTicket, QQmlEngine::CppOwnership);
@@ -175,7 +175,7 @@ qint32 cDataTicketManager::startListSeasonTickets()
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_GET_TICKETS_LIST);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
-    g_ConManager.sendNewRequest(req);
+    g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 
@@ -212,7 +212,7 @@ qint32 cDataTicketManager::handleListSeasonTicketsResponse(MessageProtocol* msg)
         pTicket->setUserIndex(ticketObj.value("userIndex").toInt());
         pTicket->setName(ticketObj.value("name").toString());
         pTicket->setPlace(ticketObj.value("place").toString());
-        pTicket->checkTicketOwn(g_ConUserSettings.getUserIndex());
+        pTicket->checkTicketOwn(g_ConUserSettings->getUserIndex());
 
         QQmlEngine::setObjectOwnership(pTicket, QQmlEngine::CppOwnership);
         this->addNewSeasonTicket(pTicket, updateIndex);
@@ -221,27 +221,27 @@ qint32 cDataTicketManager::handleListSeasonTicketsResponse(MessageProtocol* msg)
     QMutexLocker lock(&this->m_mutex);
 
     if (timestamp == this->m_stLastServerUpdateTimeStamp && arrTickets.count() == 0 && updateIndex != UpdateAll) {
-        if (!g_StaGlobalSettings.getSaveInfosOnApp())
+        if (!g_StaGlobalSettings->getSaveInfosOnApp())
             return result;
 
-        g_StaSettingsManager.setInt64Value(SEASONTICKET_GROUP, LOCAL_TICKET_UDPATE, this->m_stLastLocalUpdateTimeStamp);
+        g_StaSettingsManager->setInt64Value(SEASONTICKET_GROUP, LOCAL_TICKET_UDPATE, this->m_stLastLocalUpdateTimeStamp);
         return result;
     }
 
     this->m_stLastServerUpdateTimeStamp = timestamp;
 
-    if (!g_StaGlobalSettings.getSaveInfosOnApp())
+    if (!g_StaGlobalSettings->getSaveInfosOnApp())
         return result;
 
-    g_StaSettingsManager.setInt64Value(SEASONTICKET_GROUP, LOCAL_TICKET_UDPATE, this->m_stLastLocalUpdateTimeStamp);
-    g_StaSettingsManager.setInt64Value(SEASONTICKET_GROUP, SERVER_TICKET_UDPATE, this->m_stLastServerUpdateTimeStamp);
+    g_StaSettingsManager->setInt64Value(SEASONTICKET_GROUP, LOCAL_TICKET_UDPATE, this->m_stLastLocalUpdateTimeStamp);
+    g_StaSettingsManager->setInt64Value(SEASONTICKET_GROUP, SERVER_TICKET_UDPATE, this->m_stLastServerUpdateTimeStamp);
 
     for (int i = 0; i < this->m_lTickets.size(); i++) {
-        g_StaSettingsManager.setValue(SEASONTICKET_GROUP, TICKET_NAME, i, this->m_lTickets[i]->name());
-        g_StaSettingsManager.setValue(SEASONTICKET_GROUP, TICKET_PLACE, i, this->m_lTickets[i]->place());
-        g_StaSettingsManager.setInt64Value(SEASONTICKET_GROUP, TICKET_DISCOUNT, i, this->m_lTickets[i]->discount());
-        g_StaSettingsManager.setInt64Value(SEASONTICKET_GROUP, TICKET_USER_INDEX, i, this->m_lTickets[i]->userIndex());
-        g_StaSettingsManager.setInt64Value(SEASONTICKET_GROUP, ITEM_INDEX, i, this->m_lTickets[i]->index());
+        g_StaSettingsManager->setValue(SEASONTICKET_GROUP, TICKET_NAME, i, this->m_lTickets[i]->name());
+        g_StaSettingsManager->setValue(SEASONTICKET_GROUP, TICKET_PLACE, i, this->m_lTickets[i]->place());
+        g_StaSettingsManager->setInt64Value(SEASONTICKET_GROUP, TICKET_DISCOUNT, i, this->m_lTickets[i]->discount());
+        g_StaSettingsManager->setInt64Value(SEASONTICKET_GROUP, TICKET_USER_INDEX, i, this->m_lTickets[i]->userIndex());
+        g_StaSettingsManager->setInt64Value(SEASONTICKET_GROUP, ITEM_INDEX, i, this->m_lTickets[i]->index());
     }
 
     return result;
@@ -262,7 +262,7 @@ qint32 cDataTicketManager::startAddSeasonTicket(const qint32 index, const QStrin
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_ADD_TICKET);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
-    g_ConManager.sendNewRequest(req);
+    g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 
@@ -285,7 +285,7 @@ qint32 cDataTicketManager::startRemoveSeasonTicket(const qint32 index)
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_REMOVE_TICKET);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
-    g_ConManager.sendNewRequest(req);
+    g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 
@@ -318,7 +318,7 @@ qint32 cDataTicketManager::startListAvailableTickets(const qint32 gameIndex)
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_GET_AVAILABLE_TICKETS);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
-    g_ConManager.sendNewRequest(req);
+    g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 
@@ -368,7 +368,7 @@ qint32 cDataTicketManager::handleListAvailableSeasonTicketResponse(MessageProtoc
         pItem->setReserveName(name);
     }
 
-    GamePlay* pGame = g_DataGamesManager.getGamePlay(gameIndex);
+    GamePlay* pGame = g_DataGamesManager->getGamePlay(gameIndex);
     if (pGame != NULL) {
         pGame->setFreeTickets(freeArr.count());
         pGame->setReservedTickets(resArr.count());
@@ -396,7 +396,7 @@ qint32 cDataTicketManager::startChangeAvailableTicketState(const qint32 ticketIn
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_STATE_CHANGE_SEASON_TICKET);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
-    g_ConManager.sendNewRequest(req);
+    g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 

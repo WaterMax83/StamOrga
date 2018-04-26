@@ -31,6 +31,7 @@
 #include "../cstasettingsmanager.h"
 #include "cconmanager.h"
 #include "cconusersettings.h"
+#include "source/cadrpushnotifyinfohandler.h"
 
 // clang-format off
 
@@ -47,7 +48,7 @@
 // clang-format on
 
 
-cConUserSettings g_ConUserSettings;
+cConUserSettings* g_ConUserSettings;
 
 cConUserSettings::cConUserSettings(QObject* parent)
     : cGenDisposer(parent)
@@ -58,15 +59,15 @@ qint32 cConUserSettings::initialize()
 {
     QString value;
 
-    g_StaSettingsManager.getValue(USER_GROUP, USER_IPADDR, value);
+    g_StaSettingsManager->getValue(USER_GROUP, USER_IPADDR, value);
     this->m_ipAddr = value;
-    g_StaSettingsManager.getValue(USER_GROUP, USER_USERNAME, value);
+    g_StaSettingsManager->getValue(USER_GROUP, USER_USERNAME, value);
     this->m_userName = value;
-    g_StaSettingsManager.getValue(USER_GROUP, USER_PASSWORD, value);
+    g_StaSettingsManager->getValue(USER_GROUP, USER_PASSWORD, value);
     this->m_passWord = value;
-    g_StaSettingsManager.getValue(USER_GROUP, USER_SALT, value);
+    g_StaSettingsManager->getValue(USER_GROUP, USER_SALT, value);
     this->m_salt = value;
-    g_StaSettingsManager.getValue(USER_GROUP, USER_READABLE, value);
+    g_StaSettingsManager->getValue(USER_GROUP, USER_READABLE, value);
     this->m_readableName = value;
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 9, 0)
@@ -91,7 +92,7 @@ void cConUserSettings::setIPAddr(const QString ipaddr)
 {
     if (this->m_ipAddr != ipaddr) {
         this->m_ipAddr = ipaddr;
-        g_StaSettingsManager.setValue(USER_GROUP, USER_IPADDR, ipaddr);
+        g_StaSettingsManager->setValue(USER_GROUP, USER_IPADDR, ipaddr);
     }
 }
 
@@ -104,7 +105,7 @@ void cConUserSettings::setUserName(const QString name)
 {
     if (this->m_userName != name) {
         this->m_userName = name;
-        g_StaSettingsManager.setValue(USER_GROUP, USER_USERNAME, name);
+        g_StaSettingsManager->setValue(USER_GROUP, USER_USERNAME, name);
     }
 }
 
@@ -117,7 +118,7 @@ void cConUserSettings::setPassWord(const QString password)
 {
     if (this->m_passWord != password) {
         this->m_passWord = password;
-        g_StaSettingsManager.setValue(USER_GROUP, USER_PASSWORD, password);
+        g_StaSettingsManager->setValue(USER_GROUP, USER_PASSWORD, password);
     }
 }
 
@@ -130,7 +131,7 @@ void cConUserSettings::setReadableName(const QString name)
 {
     if (this->m_readableName != name) {
         this->m_readableName = name;
-        g_StaSettingsManager.setValue(USER_GROUP, USER_READABLE, name);
+        g_StaSettingsManager->setValue(USER_GROUP, USER_READABLE, name);
     }
 }
 
@@ -144,7 +145,7 @@ void cConUserSettings::setSalt(const QString salt)
 {
     if (this->m_salt != salt) {
         this->m_salt = salt;
-        g_StaSettingsManager.setValue(USER_GROUP, USER_SALT, salt);
+        g_StaSettingsManager->setValue(USER_GROUP, USER_SALT, salt);
     }
 }
 
@@ -158,7 +159,7 @@ void cConUserSettings::setUserIndex(const qint32 userIndex)
     if (this->m_userIndex != userIndex) {
         this->m_userIndex = userIndex;
 #ifdef Q_OS_ANDROID
-        Push_NotificationInformationHandler::setUserIndexForTopics(QString::number(userIndex));
+        AdrPushNotifyInfoHandler::setUserIndexForTopics(QString::number(userIndex));
 #endif
     }
 }
@@ -178,8 +179,8 @@ void cConUserSettings::setUserProperties(const quint32 userProperties)
 qint32 cConUserSettings::startGettingUserProps(const bool loadEverything)
 {
     QJsonObject rootObj;
-    rootObj.insert("guid", g_DatAppInfoManager.getCurrentAppGUID());
-    rootObj.insert("token", g_DatAppInfoManager.getCurrentAppToken());
+    rootObj.insert("guid", g_DatAppInfoManager->getCurrentAppGUID());
+    rootObj.insert("token", g_DatAppInfoManager->getCurrentAppToken());
 #ifdef Q_OS_WIN
     rootObj.insert("os", 1);
 #elif defined(Q_OS_ANDROID)
@@ -192,7 +193,7 @@ qint32 cConUserSettings::startGettingUserProps(const bool loadEverything)
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_GET_USER_PROPS);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
-    g_ConManager.sendNewRequest(req);
+    g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 
@@ -213,25 +214,25 @@ qint32 cConUserSettings::handleUserPropsResponse(MessageProtocol* msg)
             this->setUserProperties(properties);
             qInfo().noquote() << QString("Setting user properties to 0x%1").arg(QString::number(properties, 16));
         }
-        g_StaGlobalSettings.setAlreadyConnected(true);
+        g_StaGlobalSettings->setAlreadyConnected(true);
     } else
         this->setUserProperties(0);
 
 
     SeasonTicketItem* seasonTicket;
     int               i = 0;
-    while ((seasonTicket = g_DataTicketManager.getSeasonTicketFromArrayIndex(i++)) != NULL) {
+    while ((seasonTicket = g_DataTicketManager->getSeasonTicketFromArrayIndex(i++)) != NULL) {
         seasonTicket->checkTicketOwn(index);
     }
 
     if (rootObj.contains("tickets")) {
         QJsonArray arrTickets = rootObj.value("tickets").toArray();
-        g_DataGameUserData.handleUserPropTickets(arrTickets);
+        g_DataGameUserData->handleUserPropTickets(arrTickets);
     }
 
     if (rootObj.contains("events")) {
         QJsonArray arrEvents = rootObj.value("events").toArray();
-        g_DataAppUserEvents.addNewUserEvents(arrEvents);
+        g_DataAppUserEvents->addNewUserEvents(arrEvents);
     }
 
     return rValue;
@@ -247,7 +248,7 @@ qint32 cConUserSettings::startUpdateReadableName(QString name)
 
     this->m_newReadableName = name;
 
-    g_ConManager.sendNewRequest(req);
+    g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 
@@ -278,7 +279,7 @@ qint32 cConUserSettings::startUpdatePassword(QString password)
 
     this->m_newPassWord = newPassWord;
 
-    g_ConManager.sendNewRequest(req);
+    g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 

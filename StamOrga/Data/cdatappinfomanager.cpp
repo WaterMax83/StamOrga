@@ -24,9 +24,8 @@
 
 #include "../Common/General/globalfunctions.h"
 #include "../cstasettingsmanager.h"
-#include "source/cadrpushnotifyinfohandler.h"
 
-cDatAppInfoManager g_DatAppInfoManager;
+cDatAppInfoManager* g_DatAppInfoManager;
 
 // clang-format off
 
@@ -54,16 +53,16 @@ qint32 cDatAppInfoManager::initialize()
     connect(this->m_pushNotificationInfoHandler, &AdrPushNotifyInfoHandler::fcmRegistrationTokenChanged,
             this, &cDatAppInfoManager::slotNewFcmRegistrationToken);
 
-    g_StaSettingsManager.getValue(APP_INFO_GROUP, APP_INFO_TOKEN, value);
+    g_StaSettingsManager->getValue(APP_INFO_GROUP, APP_INFO_TOKEN, value);
     this->m_pushNotificationToken = value;
 #endif
 
-    g_StaSettingsManager.getValue(APP_INFO_GROUP, APP_INFO_GUID, value);
+    g_StaSettingsManager->getValue(APP_INFO_GROUP, APP_INFO_GUID, value);
     this->m_AppInstanceGUID = value;
 
     if (this->m_AppInstanceGUID == "") {
         this->m_AppInstanceGUID = QUuid::createUuid().toString();
-        g_StaSettingsManager.setValue(APP_INFO_GROUP, APP_INFO_GUID, this->m_AppInstanceGUID);
+        g_StaSettingsManager->setValue(APP_INFO_GROUP, APP_INFO_GUID, this->m_AppInstanceGUID);
         qInfo().noquote() << QString("Create a new GUID for this instance %1").arg(this->m_AppInstanceGUID);
     }
 
@@ -79,7 +78,7 @@ void cDatAppInfoManager::slotNewFcmRegistrationToken(QString token)
 
     this->m_pushNotificationToken = token;
 
-    g_StaSettingsManager.setValue(APP_INFO_GROUP, APP_INFO_TOKEN, token);
+    g_StaSettingsManager->setValue(APP_INFO_GROUP, APP_INFO_TOKEN, token);
 
     qInfo().noquote() << QString("Global Data got a new token %1").arg(token);
 }
