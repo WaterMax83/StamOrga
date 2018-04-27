@@ -197,17 +197,17 @@ MessageProtocol* cGamesManager::getChangeGameRequest(UserConData* pUserCon, Mess
         GamesPlay* pGame = g_GlobalData->m_GamesList.gameExists(sIndex, comp, saison, timestamp);
         if (pGame == NULL) {
             qWarning().noquote() << QString("user %1 tried to change game %2, but game would be added, abort it").arg(pUserCon->m_userName).arg(index);
-            return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME, ERROR_CODE_NOT_FOUND);
+            return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME_TCP, ERROR_CODE_NOT_FOUND);
         }
     }
 
     qint32 result = g_GlobalData->m_GamesList.addNewGame(home, away, timestamp, sIndex, score, comp);
     if (result < 0)
-        return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME, result);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME_TCP, result);
     if (index > 0 && index != result) {
         qWarning().noquote() << QString("user %1 tried to changed game %2, but added game %3").arg(pUserCon->m_userName).arg(index).arg(result);
     }
     result = g_GlobalData->m_GamesList.changeScheduledValue(result, fixed ? 1 : 0);
 
-    return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME, result);
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME_TCP, result);
 }

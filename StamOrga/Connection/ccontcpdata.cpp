@@ -183,7 +183,7 @@ void cConTcpData::checkNewOncomingData()
         case OP_CODE_CMD_RES::ACK_GET_GAMES_INFO_LIST:
             request->m_result = g_DataGamesManager->handleListGamesInfoResponse(msg);
             break;
-        case OP_CODE_CMD_RES::ACK_CHANGE_GAME:
+        case OP_CODE_CMD_RES::ACK_CHANGE_GAME_TCP:
             request->m_result = g_DataGamesManager->handleChangeGameResponse(msg);
             break;
 

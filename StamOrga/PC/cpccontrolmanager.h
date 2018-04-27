@@ -17,33 +17,28 @@
 */
 
 
-#ifndef CDATACONSOLEMANAGER_H
-#define CDATACONSOLEMANAGER_H
+#ifndef CPCCONTROLMANAGER_H
+#define CPCCONTROLMANAGER_H
 
 #include <QObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonObject>
 
 #include "../Common/General/cgendisposer.h"
-#include "../Common/Network/messageprotocol.h"
 
-class cDataConsoleManager : public cGenDisposer
+class cPCControlManager : public cGenDisposer
 {
     Q_OBJECT
 public:
-    explicit cDataConsoleManager(QObject* parent = nullptr);
+    explicit cPCControlManager(QObject* parent = nullptr);
 
     qint32 initialize();
 
-    Q_INVOKABLE QString getLastConsoleOutput();
+    qint32 refreshControlList();
 
-    Q_INVOKABLE qint32 startSendConsoleCommand(const QString command);
-    qint32 handleConsoleCommandResponse(MessageProtocol* msg);
+signals:
 
-private:
-    QString m_consoleOutput;
+public slots:
 };
 
-extern cDataConsoleManager* g_DataConsoleManager;
+extern cPCControlManager* g_PCControlManager;
 
-#endif // CDATACONSOLEMANAGER_H
+#endif // CPCCONTROLMANAGER_H

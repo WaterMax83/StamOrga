@@ -181,14 +181,14 @@ qint64 UserEvents::getEventID()
     return this->m_timestamp;
 }
 
-qint32 UserEvents::checkCanEventRunOut(quint32& gameIndex)
+qint32 UserEvents::checkIsEventForAGame(quint32& gameIndex)
 {
     if (this->m_type == NOTIFY_TOPIC_NEW_FREE_TICKET
         || this->m_type == NOTIFY_TOPIC_CHANGE_MEETING
         || this->m_type == NOTIFY_TOPIC_NEW_MEETING
         || this->m_type == NOTIFY_TOPIC_NEW_AWAY_ACCEPT) {
 
-        gameIndex = this->m_info.toInt();
+        gameIndex = this->m_info.toInt(0);
         return ERROR_CODE_UPDATE_LIST;
     }
 

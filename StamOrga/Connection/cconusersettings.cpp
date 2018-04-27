@@ -31,7 +31,9 @@
 #include "../cstasettingsmanager.h"
 #include "cconmanager.h"
 #include "cconusersettings.h"
+#ifdef Q_OS_ANDROID
 #include "source/cadrpushnotifyinfohandler.h"
+#endif
 
 // clang-format off
 
@@ -268,7 +270,7 @@ qint32 cConUserSettings::startUpdatePassword(QString password)
     if (password.length() > 0)
         newPassWord = this->createHashValue(password, this->getSalt());
     else
-        newPassWord             = this->m_newPassWord;
+        newPassWord = this->m_newPassWord;
     QString     currentPassWord = this->createHashValue(this->getPassWord(), this->m_currentRandomValue);
     QJsonObject rootObj;
     rootObj.insert("new", newPassWord);

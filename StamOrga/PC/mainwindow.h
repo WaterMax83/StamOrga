@@ -53,6 +53,8 @@ private slots:
 
     void on_btnUdpatePassword_clicked();
 
+    void on_btnRefreshControl_clicked();
+
 private:
     Ui::MainWindow* ui;
 

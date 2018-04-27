@@ -20,8 +20,10 @@
 #define CSTAGLOBALMANAGER_H
 
 #include <QObject>
+#ifdef STAMORGA_APP
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/QQmlContext>
+#endif
 
 #include "../Common/General/cgendisposer.h"
 
@@ -34,7 +36,11 @@ public:
 
     qint32 initialize();
 
+#ifdef STAMORGA_APP
     void setQmlInformationClasses(QQmlApplicationEngine* engine);
+#endif
+
+    void setQMLObjectOwnershipToCpp(QObject* pObject);
 
 signals:
 

@@ -29,7 +29,9 @@
 #include "Connection/cconmanager.h"
 #include "Connection/cconusersettings.h"
 #include "cstaglobalsettings.h"
+#ifdef STAMORGA_APP
 #include "source/cadrpushnotifyinfohandler.h"
+#endif
 
 cStaGlobalSettings* g_StaGlobalSettings;
 
@@ -86,7 +88,9 @@ qint32 cStaGlobalSettings::initialize()
     this->m_bIpAddressWasSet = false;
     QHostInfo::lookupHost("watermax83.ddns.net", this, SLOT(slotCallBackLookUpHost(QHostInfo)));
 
+#ifdef STAMORGA_APP
     connect(qGuiApp, &QGuiApplication::applicationStateChanged, this, &cStaGlobalSettings::slotStateFromAppChanged);
+#endif
 
     this->m_initialized = true;
 
@@ -422,6 +426,7 @@ void cStaGlobalSettings::setNotificationFanclubNewsEnabled(bool enable)
 
 void cStaGlobalSettings::updatePushNotification()
 {
+#ifdef STAMORGA_APP
     if (this->m_bAlreadyConnected && this->isNotificationNewAppVersionEnabled())
         AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_APP_VERSION);
     else
@@ -460,6 +465,7 @@ void cStaGlobalSettings::updatePushNotification()
         AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_GENERAL);
         AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_GENERAL_BACKUP);
     }
+#endif
 }
 
 /* Under Android it takes too long to register for app changed at first start, so call it */

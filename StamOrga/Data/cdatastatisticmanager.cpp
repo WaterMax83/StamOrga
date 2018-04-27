@@ -19,11 +19,13 @@
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
-#include <QtQml/QQmlEngine>
 
 #include "../Common/Network/messagecommand.h"
 #include "../Connection/cconmanager.h"
 #include "cdatastatisticmanager.h"
+#include "cstaglobalmanager.h"
+
+extern cStaGlobalManager* g_GlobalManager;
 
 cDataStatisticManager* g_DataStatisticManager;
 
@@ -66,14 +68,28 @@ qint32 cDataStatisticManager::handleStatisticResponse(MessageProtocol* msg)
         return ERROR_CODE_WRONG_PARAMETER;
     }
 
-    QString cmd = rootObj.value("cmd").toString("");
+    qint32  rCode = rootObj.value("ack").toInt(ERROR_CODE_NOT_POSSIBLE);
+    QString cmd   = rootObj.value("cmd").toString("");
     if (cmd.isEmpty()) {
         qWarning().noquote() << QString("No cmd found in JSON Statistics answer");
         return ERROR_CODE_MISSING_PARAMETER;
     }
 
+    if (rCode != ERROR_CODE_SUCCESS) {
+        for (int i = 0; i < this->m_statBars.count(); i++)
+            delete this->m_statBars.at(i);
+        this->m_statBars.clear();
+
+        this->m_title = "Keine Daten";
+        this->m_maxX  = 1;
+
+        emit this->propertiesChanged();
+        return rCode;
+    }
+
     if (cmd == "overview") {
-        QJsonArray arr = rootObj.value("parameter").toArray();
+        QJsonArray arr   = rootObj.value("parameter").toArray();
+        QJsonArray years = rootObj.value("years").toArray();
 
         this->m_overView.clear();
         for (int i = 0; i < arr.count(); i++) {
@@ -82,6 +98,14 @@ qint32 cDataStatisticManager::handleStatisticResponse(MessageProtocol* msg)
                 continue;
             this->m_overView.append(item);
         }
+        this->m_years.clear();
+        for (int i = 0; i < years.count(); i++) {
+            QString item = QString::number(years.at(i).toInt());
+            if (item.isEmpty())
+                continue;
+
+            this->m_years.append(item);
+        }
     } else if (cmd == "content") {
 
         this->m_categories.clear();
@@ -89,9 +113,12 @@ qint32 cDataStatisticManager::handleStatisticResponse(MessageProtocol* msg)
         for (int i = 0; i < cat.count(); i++)
             this->m_categories.append(cat.at(i).toString(""));
 
+        if (this->m_categories.size() == 0)
+            this->m_categories.append("Keine Daten");
+
         this->m_title = rootObj.value("title").toString("NoTitle");
 
-        this->m_maxX = rootObj.value("maxX").toInt();
+        this->m_maxX = rootObj.value("maxX").toInt(1);
 
         for (int i = 0; i < this->m_statBars.count(); i++)
             delete this->m_statBars.at(i);
@@ -107,7 +134,7 @@ qint32 cDataStatisticManager::handleStatisticResponse(MessageProtocol* msg)
             for (int j = 0; j < jsonValues.count(); j++)
                 pBar->m_values.append(jsonValues.at(j).toInt());
 
-            QQmlEngine::setObjectOwnership(pBar, QQmlEngine::CppOwnership);
+            g_GlobalManager->setQMLObjectOwnershipToCpp(pBar);
             this->m_statBars.append(pBar);
         }
 
@@ -115,29 +142,25 @@ qint32 cDataStatisticManager::handleStatisticResponse(MessageProtocol* msg)
     } else
         return ERROR_CODE_NOT_FOUND;
 
-    return ERROR_CODE_SUCCESS;
+    return rCode;
 }
 
-qint32 cDataStatisticManager::startLoadStatisticContent(qint32 index)
+qint32 cDataStatisticManager::startLoadStatisticContent(qint32 catIndex, qint32 yearIndex)
 {
     if (!this->m_initialized)
         return ERROR_CODE_NOT_INITIALIZED;
 
-    if (index >= this->m_overView.count())
+    if (catIndex >= this->m_overView.count())
         return ERROR_CODE_WRONG_SIZE;
 
     QJsonObject rootObj;
     rootObj.insert("cmd", "content");
-    rootObj.insert("parameter", this->m_overView.at(index));
+    rootObj.insert("parameter", this->m_overView.at(catIndex));
+    rootObj.insert("year", this->m_years.at(yearIndex).toInt());
 
     return this->startSendCommand(rootObj);
 
     return ERROR_CODE_SUCCESS;
-}
-
-QStringList cDataStatisticManager::getCurrentOverviewList()
-{
-    return this->m_overView;
 }
 
 StatBars* cDataStatisticManager::getNextStatBar(const qint32 index)

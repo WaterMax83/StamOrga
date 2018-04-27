@@ -32,7 +32,21 @@ SOURCES += main.cpp\
     ../cstasettingsmanager.cpp \
     ../cstaglobalsettings.cpp \
     ../Connection/cconusersettings.cpp \
-    ../Data/cdatappinfomanager.cpp
+    ../Data/cdatappinfomanager.cpp \
+    ../Data/cdataappuserevents.cpp \
+    ../Data/cdataconsolemanager.cpp \
+    ../Data/cdatagamesmanager.cpp \
+    ../Data/cdatagameuserdata.cpp \
+    ../Data/cDataMeetingInfo.cpp \
+    ../Data/cdatanewsdatamanager.cpp \
+    ../Data/cdatappinfomanager.cpp \
+    ../Data/cdatastatisticmanager.cpp \
+    ../Data/cdataticketmanager.cpp \
+    ../Data/gameplay.cpp \
+    ../Data/newsdataitem.cpp \
+    ../Data/seasonticket.cpp \
+    ../../Common/General/logging.cpp \
+    cpccontrolmanager.cpp
 
 
 
@@ -53,7 +67,22 @@ HEADERS  += mainwindow.h \
     ../cstasettingsmanager.h \
     ../cstaglobalsettings.h \
     ../Connection/cconusersettings.h \
-    ../Data/cdatappinfomanager.h
+    ../Data/cdatappinfomanager.h \
+    ../Data/acceptmeetinginfo.h \
+    ../Data/cdataappuserevents.h \
+    ../Data/cdataconsolemanager.h \
+    ../Data/cdatagamesmanager.h \
+    ../Data/cdatagameuserdata.h \
+    ../Data/cdatameetinginfo.h \
+    ../Data/cdatanewsdatamanager.h \
+    ../Data/cdatappinfomanager.h \
+    ../Data/cdatastatisticmanager.h \
+    ../Data/cdataticketmanager.h \
+    ../Data/gameplay.h \
+    ../Data/newsdataitem.h \
+    ../Data/seasonticket.h \
+    ../../Common/General/logging.h \
+    cpccontrolmanager.h
 
 
 

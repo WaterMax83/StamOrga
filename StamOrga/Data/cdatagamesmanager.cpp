@@ -20,7 +20,6 @@
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
-#include <QtQml/QQmlEngine>
 
 #include "cdatagamesmanager.h"
 
@@ -31,6 +30,9 @@
 #include "../Connection/cconusersettings.h"
 #include "../cstaglobalsettings.h"
 #include "../cstasettingsmanager.h"
+#include "cstaglobalmanager.h"
+
+extern cStaGlobalManager* g_GlobalManager;
 
 
 // clang-format off
@@ -96,7 +98,7 @@ qint32 cDataGamesManager::initialize()
         g_StaSettingsManager->getBoolValue(GAMES_GROUP, PLAY_TIME_FIXED, index, bValue);
         pGame->setTimeFixed(bValue);
 
-        QQmlEngine::setObjectOwnership(pGame, QQmlEngine::CppOwnership);
+        g_GlobalManager->setQMLObjectOwnershipToCpp(pGame);
         this->addNewGamesPlay(pGame);
         index++;
     }
@@ -269,7 +271,7 @@ qint32 cDataGamesManager::handleListGamesResponse(MessageProtocol* msg)
         pGame->setTimeFixed(gameObj.value("fixed").toBool());
         pGame->setSeasonIndex(gameObj.value("seasonIndex").toInt());
 
-        QQmlEngine::setObjectOwnership(pGame, QQmlEngine::CppOwnership);
+        g_GlobalManager->setQMLObjectOwnershipToCpp(pGame);
         this->addNewGamesPlay(pGame, updateIndex);
     }
 
@@ -408,7 +410,7 @@ qint32 cDataGamesManager::startChangeGame(const qint32 index, const qint32 sInde
     rootObj.insert("timestamp", timestamp);
     rootObj.insert("fixed", fixedTime);
 
-    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CHANGE_GAME);
+    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CHANGE_GAME_TCP);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
     g_ConManager->sendNewRequest(req);

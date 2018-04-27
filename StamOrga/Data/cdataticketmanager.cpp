@@ -19,7 +19,6 @@
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
-#include <QtQml/QQmlEngine>
 
 #include "cdataticketmanager.h"
 
@@ -31,7 +30,9 @@
 #include "../cstaglobalsettings.h"
 #include "../cstasettingsmanager.h"
 #include "cdatagamesmanager.h"
+#include "cstaglobalmanager.h"
 
+extern cStaGlobalManager* g_GlobalManager;
 
 // clang-format off
 
@@ -84,7 +85,7 @@ qint32 cDataTicketManager::initialize()
         g_StaSettingsManager->getInt64Value(SEASONTICKET_GROUP, TICKET_USER_INDEX, index, iValue);
         pTicket->setUserIndex(iValue);
 
-        QQmlEngine::setObjectOwnership(pTicket, QQmlEngine::CppOwnership);
+        g_GlobalManager->setQMLObjectOwnershipToCpp(pTicket);
         this->addNewSeasonTicket(pTicket);
         index++;
     }
@@ -214,7 +215,7 @@ qint32 cDataTicketManager::handleListSeasonTicketsResponse(MessageProtocol* msg)
         pTicket->setPlace(ticketObj.value("place").toString());
         pTicket->checkTicketOwn(g_ConUserSettings->getUserIndex());
 
-        QQmlEngine::setObjectOwnership(pTicket, QQmlEngine::CppOwnership);
+        g_GlobalManager->setQMLObjectOwnershipToCpp(pTicket);
         this->addNewSeasonTicket(pTicket, updateIndex);
     }
 

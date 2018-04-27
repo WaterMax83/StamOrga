@@ -204,7 +204,7 @@ MessageProtocol* UdpDataServer::checkNewMessage(MessageProtocol* msg)
             ack = this->m_pDataConnection->requestGetAvailableTicketList(msg);
             break;
 
-        case OP_CODE_CMD_REQ::REQ_CHANGE_GAME:
+        case OP_CODE_CMD_REQ::REQ_CHANGE_GAME_UDP:
             ack = this->m_pDataConnection->requestChangeGame(msg);
             break;
 

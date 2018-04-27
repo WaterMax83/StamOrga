@@ -62,20 +62,36 @@ void CheckConsistentData::slotTimerFired()
     quint32 gameIndex;
     qint64  yesterday = QDateTime::currentDateTime().addDays(-1).toMSecsSinceEpoch();
     for (int i = g_GlobalData->m_userEvents.count() - 1; i >= 0; i--) {
-        if (g_GlobalData->m_userEvents.at(i)->checkCanEventRunOut(gameIndex) == ERROR_CODE_UPDATE_LIST) {
+        if (g_GlobalData->m_userEvents.at(i)->checkIsEventForAGame(gameIndex) == ERROR_CODE_UPDATE_LIST) {
             GamesPlay* pGame = (GamesPlay*)g_GlobalData->m_GamesList.getItem(gameIndex);
-            if (pGame == NULL)
-                continue;
-            if (pGame->m_timestamp < yesterday) {
+            if (gameIndex > 0 && (pGame == NULL || pGame->m_timestamp < yesterday)) {
                 QString fileName = g_GlobalData->m_userEvents.at(i)->getFileName();
                 QFile   eventFile(fileName);
                 if (eventFile.exists() && eventFile.remove()) {
                     g_GlobalData->m_userEvents.at(i)->terminate();
-                    qInfo().noquote() << QString("Delete Event of game %1:%2, because it is too old").arg(pGame->m_itemName, pGame->m_away);
+                    if (pGame != NULL)
+                        qInfo().noquote() << QString("Delete Event of game %1:%2, because it is too old").arg(pGame->m_itemName, pGame->m_away);
+                    else
+                        qInfo().noquote() << QString("Delete Event of game with index %1, because its deleted").arg(gameIndex);
                     g_GlobalData->m_userEvents.removeAt(i);
                 }
             }
         }
+        //        else if (g_GlobalData->m_userEvents.at(i)->getType() == NOTIFY_TOPIC_NEW_FANCLUB_NEWS) {
+        //            qint32 newsIndex = g_GlobalData->m_userEvents.at(i)->getInfo().toInt(0);
+        //            if (newsIndex == 0)
+        //                continue;
+        //            NewsData* pNews = (NewsData*)g_GlobalData->m_fanclubNews.getItem(newsIndex);
+        //            if (pNews == NULL) {
+        //                QString fileName = g_GlobalData->m_userEvents.at(i)->getFileName();
+        //                QFile   eventFile(fileName);
+        //                if (eventFile.exists() && eventFile.remove()) {
+        //                    g_GlobalData->m_userEvents.at(i)->terminate();
+        //                    qInfo().noquote() << QString("Delete Event of news with index %1, because its deleted").arg(newsIndex);
+        //                    g_GlobalData->m_userEvents.removeAt(i);
+        //                }
+        //            }
+        //        }
     }
 
     this->m_timer->start(3 * 60 * 60 * 1000); // 3h

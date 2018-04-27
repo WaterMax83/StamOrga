@@ -229,7 +229,7 @@ MessageProtocol* cConTcpDataServer::checkNewMessage(MessageProtocol* msg)
         case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST:
             ack = g_GamesManager.getGamesInfoList(this->m_pUserConData, msg);
             break;
-        case OP_CODE_CMD_REQ::REQ_CHANGE_GAME:
+        case OP_CODE_CMD_REQ::REQ_CHANGE_GAME_TCP:
             ack = g_GamesManager.getChangeGameRequest(this->m_pUserConData, msg);
             break;
 

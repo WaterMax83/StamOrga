@@ -99,7 +99,7 @@ Games::Games()
         this->saveCurrentInteralList();
 }
 
-int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, CompetitionIndex comp, quint16 saison, qint64 lastUpdate)
+int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sIndex, QString score, CompetitionIndex comp, qint32 saison, qint64 lastUpdate)
 {
     if (sIndex == 0 || comp == NO_COMPETITION) {
         qWarning().noquote() << "Could not add game because saisonIndex or competition were zero";

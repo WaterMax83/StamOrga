@@ -29,7 +29,6 @@
 
 #include "../Common/General/cgendisposer.h"
 #include "../Common/Network/messageprotocol.h"
-#include "userinterface.h"
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -63,11 +62,12 @@ public:
 
     Q_INVOKABLE qint32 startLoadStatisticOverview();
 
-    Q_INVOKABLE qint32 startLoadStatisticContent(qint32 index);
+    Q_INVOKABLE qint32 startLoadStatisticContent(qint32 catIndex, qint32 yearIndex);
 
     Q_INVOKABLE qint32 handleStatisticResponse(MessageProtocol* msg);
 
-    Q_INVOKABLE QStringList getCurrentOverviewList();
+    Q_INVOKABLE QStringList getCurrentOverviewList() { return this->m_overView; }
+    Q_INVOKABLE QStringList getCurrentYearList() { return this->m_years; }
 
     Q_INVOKABLE StatBars* getNextStatBar(const qint32 index);
     Q_INVOKABLE qint32 getStatBarCount() { return this->m_statBars.count(); }
@@ -84,6 +84,7 @@ public slots:
 
 private:
     QStringList m_overView;
+    QStringList m_years;
 
     QStringList      m_categories;
     QString          m_title;

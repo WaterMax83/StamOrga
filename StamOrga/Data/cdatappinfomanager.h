@@ -26,7 +26,9 @@
 #include "../../Common/General/globalfunctions.h"
 #include "../../Common/General/logging.h"
 #include "../Common/General/cgendisposer.h"
+#ifdef Q_OS_ANDROID
 #include "source/cadrpushnotifyinfohandler.h"
+#endif
 
 class cDatAppInfoManager : public cGenDisposer
 {
@@ -58,8 +60,9 @@ private:
     QString m_pushNotificationToken;
     QString m_AppInstanceGUID;
 
+#ifdef Q_OS_ANDROID
     AdrPushNotifyInfoHandler* m_pushNotificationInfoHandler;
-
+#endif
     Logging*             m_logApp;
     BackgroundController m_ctrlLog;
     QMutex               m_pushNotificationMutex;

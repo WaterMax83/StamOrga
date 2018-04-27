@@ -115,6 +115,14 @@ struct StatsMeeting {
     }
 };
 
+struct StatsPerYear {
+    qint32                m_year;
+    QList<StatsTickets*>  m_statsTickets;
+    QList<StatsReserved*> m_reservedTicketNames;
+    QList<StatsMeeting*>  m_meetingNames;
+    QList<StatsMeeting*>  m_awayTripNames;
+};
+
 class cStatisticManager : public BackgroundWorker
 {
     Q_OBJECT
@@ -125,28 +133,31 @@ public:
 
     MessageProtocol* handleStatisticCommand(UserConData* pUserCon, MessageProtocol* request);
 
+    qint32 addYearToStatistic(qint32 year);
+
 signals:
+    void signalNewYearAdded();
 
 private slots:
     void slotCycleTimerFired();
+    void slotNewYearAdded();
 
 protected:
     int DoBackgroundWork() override;
 
     BackgroundController* m_bckGrndCtrl;
     QTimer*               m_cycleTimer;
-    QList<StatsTickets*>  m_statsTickets;
     QMutex                m_statsMutex;
-    QList<StatsReserved*> m_reservedTicketNames;
-    QList<StatsMeeting*>  m_meetingNames;
-    QList<StatsMeeting*>  m_awayTripNames;
+    QList<StatsPerYear*>  m_stats;
+
+    void calculateStatsForAllYears();
 
     QString cleanName(QString name);
 
-    qint32 handleSeasonTicketCommand(QJsonObject& rootObjAnswer);
-    qint32 handleReservesCommand(QJsonObject& rootObjAnswer);
-    qint32 handleMeetingCommand(QJsonObject& rootObjAnswer);
-    qint32 handleAwayTripCommand(QJsonObject& rootObjAnswer);
+    qint32 handleSeasonTicketCommand(QJsonObject& rootObjAnswer, StatsPerYear* pStats);
+    qint32 handleReservesCommand(QJsonObject& rootObjAnswer, StatsPerYear* pStats);
+    qint32 handleMeetingCommand(QJsonObject& rootObjAnswer, StatsPerYear* pStats);
+    qint32 handleAwayTripCommand(QJsonObject& rootObjAnswer, StatsPerYear* pStats);
 };
 
 extern cStatisticManager g_StatisticManager;

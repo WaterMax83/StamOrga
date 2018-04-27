@@ -50,7 +50,7 @@ public:
 
     virtual qint32 checkConsistency() { return -12; }
 
-    qint32 checkCanEventRunOut(quint32& gameIndex);
+    qint32 checkIsEventForAGame(quint32& gameIndex);
 
 
 private:

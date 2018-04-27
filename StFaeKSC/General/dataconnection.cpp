@@ -907,14 +907,14 @@ MessageProtocol* DataConnection::requestChangeGame(MessageProtocol* msg)
 {
     if (msg->getDataLength() < 4) {
         qWarning().noquote() << QString("Wrong message size for request change game for user %1").arg(this->m_pUserConData->m_userName);
-        return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME, ERROR_CODE_WRONG_SIZE);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME_UDP, ERROR_CODE_WRONG_SIZE);
     }
 
     QString     info(msg->getPointerToData());
     QStringList parts = info.split(";");
     if (parts.length() < 7) {
         qWarning().noquote() << QString("Wrong message content count %1 for request change game for user %2").arg(parts.length()).arg(this->m_pUserConData->m_userName);
-        return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME, ERROR_CODE_WRONG_PARAMETER);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME_UDP, ERROR_CODE_WRONG_PARAMETER);
     }
 
 
@@ -924,7 +924,7 @@ MessageProtocol* DataConnection::requestChangeGame(MessageProtocol* msg)
     qint64    timestamp = test.toMSecsSinceEpoch();
     if (timestamp < 0) {
         qWarning().noquote() << QString("Wrong timestamp %1 for request change game for user %2").arg(parts[2], this->m_pUserConData->m_userName);
-        return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME, ERROR_CODE_WRONG_PARAMETER);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME_UDP, ERROR_CODE_WRONG_PARAMETER);
     }
     QString          score  = parts[3];
     qint32           index  = parts[4].toInt();
@@ -942,17 +942,17 @@ MessageProtocol* DataConnection::requestChangeGame(MessageProtocol* msg)
         GamesPlay* pGame = this->m_pGlobalData->m_GamesList.gameExists(sIndex, comp, saison, timestamp);
         if (pGame == NULL) {
             qWarning().noquote() << QString("user %1 tried to change game %2, but game would be added, abort it").arg(this->m_pUserConData->m_userName).arg(index);
-            return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME, ERROR_CODE_NOT_FOUND);
+            return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME_UDP, ERROR_CODE_NOT_FOUND);
         }
     }
 
     qint32 result = this->m_pGlobalData->m_GamesList.addNewGame(home, away, timestamp, sIndex, score, comp);
     if (result < 0)
-        return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME, result);
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME_UDP, result);
     if (index > 0 && index != result) {
         qWarning().noquote() << QString("user %1 tried to changed game %2, but added game %3").arg(this->m_pUserConData->m_userName).arg(index).arg(result);
     }
-    return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME, ERROR_CODE_SUCCESS);
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME_UDP, ERROR_CODE_SUCCESS);
 }
 
 /*  request

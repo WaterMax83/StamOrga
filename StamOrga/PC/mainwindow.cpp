@@ -28,6 +28,7 @@
 #include "../../Common/Network/messageprotocol.h"
 #include "Connection/cconmanager.h"
 #include "Connection/cconusersettings.h"
+#include "PC/cpccontrolmanager.h"
 #include "cstaglobalsettings.h"
 
 MainWindow::MainWindow(QWidget* parent)
@@ -38,16 +39,16 @@ MainWindow::MainWindow(QWidget* parent)
 
     SetMessagePattern();
 
-    this->ui->lEditIpAddr->setText(g_ConUserSettings.getIPAddr());
+    this->ui->lEditIpAddr->setText(g_ConUserSettings->getIPAddr());
 
-    this->ui->lEditSendUserName->setText(g_ConUserSettings.getUserName());
+    this->ui->lEditSendUserName->setText(g_ConUserSettings->getUserName());
 
-    connect(&g_ConManager, &cConManager::signalNotifyConnectionFinished,
+    connect(g_ConManager, &cConManager::signalNotifyConnectionFinished,
             this, &MainWindow::connectionFinished);
-    connect(&g_ConManager, &cConManager::signalNotifyCommandFinished,
+    connect(g_ConManager, &cConManager::signalNotifyCommandFinished,
             this, &MainWindow::slotNotifyCommandFinished);
 
-    this->ui->lEditReadableName->setText(g_ConUserSettings.getReadableName());
+    this->ui->lEditReadableName->setText(g_ConUserSettings->getReadableName());
 }
 
 MainWindow::~MainWindow()
@@ -71,12 +72,12 @@ void MainWindow::slotNotifyCommandFinished(quint32 command, qint32 result)
     switch (command) {
     case OP_CODE_CMD_REQ::REQ_GET_VERSION:
         if (result == ERROR_CODE_SUCCESS)
-            this->ui->lEditTextVersion->setText(g_StaGlobalSettings.getRemoteVersion());
+            this->ui->lEditTextVersion->setText(g_StaGlobalSettings->getRemoteVersion());
         break;
     case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
         if (result == ERROR_CODE_SUCCESS) {
-            this->ui->lEditTextProperties->setText(QString("0x%1").arg(g_ConUserSettings.getUserProperties(), 8, 16));
-            this->ui->lEditReadableName->setText(g_ConUserSettings.getReadableName());
+            this->ui->lEditTextProperties->setText(QString("0x%1").arg(g_ConUserSettings->getUserProperties(), 8, 16));
+            this->ui->lEditReadableName->setText(g_ConUserSettings->getReadableName());
         }
         break;
     case OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME:
@@ -94,16 +95,16 @@ void MainWindow::slotNotifyCommandFinished(quint32 command, qint32 result)
 
 void MainWindow::on_btnLogin_clicked()
 {
-    g_ConUserSettings.setIPAddr(this->ui->lEditIpAddr->text());
+    g_ConUserSettings->setIPAddr(this->ui->lEditIpAddr->text());
     QString passWord;
     if (this->ui->lEditTextPassword->text().isEmpty())
-        passWord = g_ConUserSettings.getPassWord();
+        passWord = g_ConUserSettings->getPassWord();
     else {
         passWord = this->ui->lEditTextPassword->text();
-        g_ConUserSettings.setSalt("");
+        g_ConUserSettings->setSalt("");
     }
 
-    qint32 rCode = g_ConManager.startMainConnection(this->ui->lEditSendUserName->text(), passWord);
+    qint32 rCode = g_ConManager->startMainConnection(this->ui->lEditSendUserName->text(), passWord);
     if (rCode != ERROR_CODE_SUCCESS)
         qWarning() << getErrorCodeString(rCode);
 }
@@ -113,10 +114,10 @@ void MainWindow::on_btnSetReadableName_clicked()
     QString name = this->ui->lEditReadableName->text();
     if (name.isEmpty())
         qInfo() << "No readable name";
-    else if (name == g_ConUserSettings.getReadableName())
+    else if (name == g_ConUserSettings->getReadableName())
         qInfo() << "Name nicht verändert";
     else
-        g_ConUserSettings.startUpdateReadableName(name);
+        g_ConUserSettings->startUpdateReadableName(name);
 }
 
 void MainWindow::on_btnUdpatePassword_clicked()
@@ -125,5 +126,10 @@ void MainWindow::on_btnUdpatePassword_clicked()
     if (password.isEmpty())
         qInfo() << "No password";
     else
-        g_ConUserSettings.startUpdatePassword(password);
+        g_ConUserSettings->startUpdatePassword(password);
+}
+
+void MainWindow::on_btnRefreshControl_clicked()
+{
+    g_PCControlManager->refreshControlList();
 }

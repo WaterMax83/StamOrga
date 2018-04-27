@@ -81,6 +81,7 @@ extern bool checkFilePathExistAndCreate(const QString& path);
 #define ERROR_CODE_NOT_INITIALIZED      -22
 #define ERROR_CODE_NOT_LOGGED_IN        -23
 #define ERROR_CODE_NO_CONNECTION        -24
+#define ERROR_CODE_NOT_UNIQUE           -25
 // clang-format on
 
 extern QString getErrorCodeString(qint32 code);

@@ -153,6 +153,7 @@ void cConManager::sendLoginRequest()
 
 void cConManager::sendNewRequest(TcpDataConRequest* request)
 {
+    qInfo() << request->m_request;
     if (!this->m_initialized)
         return;
 

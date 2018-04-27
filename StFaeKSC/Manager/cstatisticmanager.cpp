@@ -23,9 +23,9 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonValue>
 
+#include "../Common/Network/messagecommand.h"
 #include "../General/globaldata.h"
 #include "cstatisticmanager.h"
-#include "../Common/Network/messagecommand.h"
 
 extern GlobalData* g_GlobalData;
 
@@ -42,6 +42,11 @@ int cStatisticManager::initialize()
     this->m_bckGrndCtrl = new BackgroundController();
     this->m_bckGrndCtrl->Start(this, false);
 
+    //#ifdef QT_DEBUG
+    //    this->m_cycleTimer->start(1000);
+    //#else
+    //    this->m_cycleTimer->start(10000);
+    //#endif
     return 1;
 }
 
@@ -50,13 +55,38 @@ int cStatisticManager::DoBackgroundWork()
     this->m_cycleTimer = new QTimer();
     this->m_cycleTimer->setSingleShot(true);
     connect(this->m_cycleTimer, &QTimer::timeout, this, &cStatisticManager::slotCycleTimerFired);
+
+    connect(this, &cStatisticManager::signalNewYearAdded, this, &cStatisticManager::slotNewYearAdded);
+
+    this->addYearToStatistic(g_GlobalData->m_currentSeason);
+    this->addYearToStatistic(2018);
+
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 cStatisticManager::addYearToStatistic(qint32 year)
+{
+    for (int i = 0; i < this->m_stats.size(); i++) {
+        StatsPerYear* pStats = this->m_stats.at(i);
+        if (pStats->m_year == year)
+            return ERROR_CODE_NOT_UNIQUE;
+    }
+    StatsPerYear* pStats = new StatsPerYear();
+    pStats->m_year       = year;
+    this->m_stats.append(pStats);
+
+    emit this->signalNewYearAdded();
+
+    return ERROR_CODE_SUCCESS;
+}
+
+void cStatisticManager::slotNewYearAdded()
+{
 #ifdef QT_DEBUG
     this->m_cycleTimer->start(1000);
 #else
     this->m_cycleTimer->start(10000);
 #endif
-
-    return ERROR_CODE_SUCCESS;
 }
 
 void cStatisticManager::slotCycleTimerFired()
@@ -65,51 +95,70 @@ void cStatisticManager::slotCycleTimerFired()
     QMutexLocker lock1(&this->m_statsMutex);
 
     /* Clear all info */
-    foreach (StatsTickets* pStats, this->m_statsTickets)
-        delete pStats;
-    this->m_statsTickets.clear();
+    for (int i = 0; i < this->m_stats.size(); i++) {
+        StatsPerYear* pStats = this->m_stats.at(i);
+        foreach (StatsTickets* pTickets, pStats->m_statsTickets)
+            delete pTickets;
+        pStats->m_statsTickets.clear();
 
-    foreach (StatsReserved* pRes, this->m_reservedTicketNames)
-        delete pRes;
-    this->m_reservedTicketNames.clear();
+        foreach (StatsReserved* pRes, pStats->m_reservedTicketNames)
+            delete pRes;
+        pStats->m_reservedTicketNames.clear();
 
-    foreach (StatsMeeting* pMeet, this->m_meetingNames)
-        delete pMeet;
-    this->m_meetingNames.clear();
-    foreach (StatsMeeting* pMeet, this->m_awayTripNames)
-        delete pMeet;
-    this->m_awayTripNames.clear();
-
-
-    /* First collect all tickets */
-    for (int i = 0; i < g_GlobalData->m_SeasonTicket.getNumberOfInternalList(); i++) {
-        TicketInfo* pTicket = (TicketInfo*)g_GlobalData->m_SeasonTicket.getRequestConfigItemFromListIndex(i);
-        if (pTicket == NULL)
-            continue;
-
-        StatsTickets* pStats  = new StatsTickets();
-        pStats->m_ticketIndex = pTicket->m_index;
-        pStats->m_name        = pTicket->m_itemName;
-        pStats->m_timestamp   = pTicket->m_creation;
-
-        this->m_statsTickets.append(pStats);
+        foreach (StatsMeeting* pMeet, pStats->m_meetingNames)
+            delete pMeet;
+        pStats->m_meetingNames.clear();
+        foreach (StatsMeeting* pMeet, pStats->m_awayTripNames)
+            delete pMeet;
+        pStats->m_awayTripNames.clear();
     }
 
+    for (int i = 0; i < this->m_stats.size(); i++) {
+        StatsPerYear* pStats = this->m_stats.at(i);
+        /* First collect all tickets */
+        for (int i = 0; i < g_GlobalData->m_SeasonTicket.getNumberOfInternalList(); i++) {
+            TicketInfo* pTicket = (TicketInfo*)g_GlobalData->m_SeasonTicket.getRequestConfigItemFromListIndex(i);
+            if (pTicket == NULL)
+                continue;
+
+            StatsTickets* pTicks  = new StatsTickets();
+            pTicks->m_ticketIndex = pTicket->m_index;
+            pTicks->m_name        = pTicket->m_itemName;
+            pTicks->m_timestamp   = pTicket->m_creation;
+
+            pStats->m_statsTickets.append(pTicks);
+        }
+    }
+
+    this->calculateStatsForAllYears();
+
+    this->m_cycleTimer->start(6 * 60 * 60 * 1000);
+}
+
+void cStatisticManager::calculateStatsForAllYears()
+{
     qint64 currentTimeStamp = QDateTime::currentMSecsSinceEpoch();
 
     /* get all games to get the number of tickets for blocked */
     for (int i = 0; i < g_GlobalData->m_GamesList.getNumberOfInternalList(); i++) {
         GamesPlay* pGame = (GamesPlay*)g_GlobalData->m_GamesList.getRequestConfigItemFromListIndex(i);
-        if (pGame == NULL || pGame->m_saison != g_GlobalData->m_currentSeason || pGame->m_timestamp > currentTimeStamp)
+        if (pGame == NULL || pGame->m_timestamp > currentTimeStamp)
             continue;
 
         if (pGame->m_itemName != "KSC" || pGame->m_competition > LIGA_3 || pGame->m_competition < BUNDESLIGA_1)
             continue;
 
-        foreach (StatsTickets* pStats, this->m_statsTickets) {
-            if (pStats->m_timestamp > pGame->m_timestamp)
+        for (int i = 0; i < this->m_stats.size(); i++) {
+            StatsPerYear* pStats = this->m_stats.at(i);
+
+            if (pGame->m_saison != pStats->m_year)
                 continue;
-            pStats->m_blocked++;
+
+            foreach (StatsTickets* pTicks, pStats->m_statsTickets) {
+                if (pTicks->m_timestamp > pGame->m_timestamp)
+                    continue;
+                pTicks->m_blocked++;
+            }
         }
     }
 
@@ -117,45 +166,52 @@ void cStatisticManager::slotCycleTimerFired()
     foreach (AvailableGameTickets* pAvTick, g_GlobalData->m_availableTickets) {
         GamesPlay* pGame = (GamesPlay*)g_GlobalData->m_GamesList.getItem(pAvTick->getGameIndex());
 
-        if (pGame == NULL || pGame->m_saison != g_GlobalData->m_currentSeason || pGame->m_timestamp > currentTimeStamp)
+        if (pGame == NULL || pGame->m_timestamp > currentTimeStamp)
             continue;
 
         if (pGame->m_itemName != "KSC" || pGame->m_competition > LIGA_3 || pGame->m_competition < BUNDESLIGA_1)
             continue;
 
-        for (int i = 0; i < pAvTick->getNumberOfInternalList(); i++) {
-            AvailableTicketInfo* pTicket = (AvailableTicketInfo*)pAvTick->getRequestConfigItemFromListIndex(i);
-            if (pTicket == NULL)
+        for (int i = 0; i < this->m_stats.size(); i++) {
+            StatsPerYear* pStats = this->m_stats.at(i);
+
+            if (pGame->m_saison != pStats->m_year)
                 continue;
 
-            /* add counter for free or reserved */
-            foreach (StatsTickets* pStats, this->m_statsTickets) {
-                if (pStats->m_ticketIndex != pTicket->m_ticketID)
+            for (int i = 0; i < pAvTick->getNumberOfInternalList(); i++) {
+                AvailableTicketInfo* pTicket = (AvailableTicketInfo*)pAvTick->getRequestConfigItemFromListIndex(i);
+                if (pTicket == NULL)
                     continue;
 
-                if (pTicket->m_state != TICKET_STATE_BLOCKED && pStats->m_blocked > 0) {
-                    pStats->m_blocked--;
-                    if (pTicket->m_state == TICKET_STATE_FREE)
-                        pStats->m_free++;
-                    else if (pTicket->m_state == TICKET_STATE_RESERVED)
-                        pStats->m_reserved++;
-                }
-            }
+                /* add counter for free or reserved */
+                foreach (StatsTickets* pTicks, pStats->m_statsTickets) {
+                    if (pTicks->m_ticketIndex != pTicket->m_ticketID)
+                        continue;
 
-            if (pTicket->m_state == TICKET_STATE_RESERVED) {
-                bool bFoundItem = false;
-                foreach (StatsReserved* pRes, this->m_reservedTicketNames) {
-                    if (this->cleanName(pRes->m_name) == this->cleanName(pTicket->m_itemName)) {
-                        pRes->m_count++;
-                        bFoundItem = true;
-                        break;
+                    if (pTicket->m_state != TICKET_STATE_BLOCKED && pTicks->m_blocked > 0) {
+                        pTicks->m_blocked--;
+                        if (pTicket->m_state == TICKET_STATE_FREE)
+                            pTicks->m_free++;
+                        else if (pTicket->m_state == TICKET_STATE_RESERVED)
+                            pTicks->m_reserved++;
                     }
                 }
-                if (!bFoundItem) {
-                    StatsReserved* pRes = new StatsReserved();
-                    pRes->m_name        = pTicket->m_itemName;
-                    pRes->m_count       = 1;
-                    this->m_reservedTicketNames.append(pRes);
+
+                if (pTicket->m_state == TICKET_STATE_RESERVED) {
+                    bool bFoundItem = false;
+                    foreach (StatsReserved* pRes, pStats->m_reservedTicketNames) {
+                        if (this->cleanName(pRes->m_name) == this->cleanName(pTicket->m_itemName)) {
+                            pRes->m_count++;
+                            bFoundItem = true;
+                            break;
+                        }
+                    }
+                    if (!bFoundItem) {
+                        StatsReserved* pRes = new StatsReserved();
+                        pRes->m_name        = pTicket->m_itemName;
+                        pRes->m_count       = 1;
+                        pStats->m_reservedTicketNames.append(pRes);
+                    }
                 }
             }
         }
@@ -164,33 +220,40 @@ void cStatisticManager::slotCycleTimerFired()
     foreach (MeetingInfo* pMeetingInfo, g_GlobalData->m_meetingInfos) {
         GamesPlay* pGame = (GamesPlay*)g_GlobalData->m_GamesList.getItem(pMeetingInfo->getGameIndex());
 
-        if (pGame == NULL || pGame->m_saison != g_GlobalData->m_currentSeason || pGame->m_timestamp > currentTimeStamp)
+        if (pGame == NULL || pGame->m_timestamp > currentTimeStamp)
             continue;
 
-        for (int i = 0; i < pMeetingInfo->getNumberOfInternalList(); i++) {
-            AcceptMeetingInfo* pInfo = (AcceptMeetingInfo*)pMeetingInfo->getRequestConfigItemFromListIndex(i);
-            if (pInfo == NULL)
+        for (int i = 0; i < this->m_stats.size(); i++) {
+            StatsPerYear* pStats = this->m_stats.at(i);
+
+            if (pGame->m_saison != pStats->m_year)
                 continue;
 
-            bool bFoundItem = false;
-            foreach (StatsMeeting* pMeet, this->m_meetingNames) {
-                if (this->cleanName(pMeet->m_name) == this->cleanName(pInfo->m_itemName)) {
-                    bFoundItem = true;
+            for (int i = 0; i < pMeetingInfo->getNumberOfInternalList(); i++) {
+                AcceptMeetingInfo* pInfo = (AcceptMeetingInfo*)pMeetingInfo->getRequestConfigItemFromListIndex(i);
+                if (pInfo == NULL)
+                    continue;
+
+                bool bFoundItem = false;
+                foreach (StatsMeeting* pMeet, pStats->m_meetingNames) {
+                    if (this->cleanName(pMeet->m_name) == this->cleanName(pInfo->m_itemName)) {
+                        bFoundItem = true;
+                        if (pInfo->m_state == ACCEPT_STATE_ACCEPT)
+                            pMeet->m_accepted++;
+                        else if (pInfo->m_state == ACCEPT_STATE_MAYBE)
+                            pMeet->m_interested++;
+                        break;
+                    }
+                }
+                if (!bFoundItem && pInfo->m_state != ACCEPT_STATE_DECLINE) {
+                    StatsMeeting* pMeet = new StatsMeeting();
+                    pMeet->m_name       = pInfo->m_itemName;
                     if (pInfo->m_state == ACCEPT_STATE_ACCEPT)
                         pMeet->m_accepted++;
                     else if (pInfo->m_state == ACCEPT_STATE_MAYBE)
                         pMeet->m_interested++;
-                    break;
+                    pStats->m_meetingNames.append(pMeet);
                 }
-            }
-            if (!bFoundItem && pInfo->m_state != ACCEPT_STATE_DECLINE) {
-                StatsMeeting* pMeet = new StatsMeeting();
-                pMeet->m_name       = pInfo->m_itemName;
-                if (pInfo->m_state == ACCEPT_STATE_ACCEPT)
-                    pMeet->m_accepted++;
-                else if (pInfo->m_state == ACCEPT_STATE_MAYBE)
-                    pMeet->m_interested++;
-                this->m_meetingNames.append(pMeet);
             }
         }
     }
@@ -198,44 +261,52 @@ void cStatisticManager::slotCycleTimerFired()
     foreach (AwayTripInfo* pMeetingInfo, g_GlobalData->m_awayTripInfos) {
         GamesPlay* pGame = (GamesPlay*)g_GlobalData->m_GamesList.getItem(pMeetingInfo->getGameIndex());
 
-        if (pGame == NULL || pGame->m_saison != g_GlobalData->m_currentSeason || pGame->m_timestamp > currentTimeStamp)
+        if (pGame == NULL || pGame->m_timestamp > currentTimeStamp)
             continue;
 
-        for (int i = 0; i < pMeetingInfo->getNumberOfInternalList(); i++) {
-            AcceptMeetingInfo* pInfo = (AcceptMeetingInfo*)pMeetingInfo->getRequestConfigItemFromListIndex(i);
-            if (pInfo == NULL)
+        for (int i = 0; i < this->m_stats.size(); i++) {
+            StatsPerYear* pStats = this->m_stats.at(i);
+
+            if (pGame->m_saison != pStats->m_year)
                 continue;
 
-            bool bFoundItem = false;
-            foreach (StatsMeeting* pMeet, this->m_awayTripNames) {
-                if (this->cleanName(pMeet->m_name) == this->cleanName(pInfo->m_itemName)) {
-                    bFoundItem = true;
+            for (int i = 0; i < pMeetingInfo->getNumberOfInternalList(); i++) {
+                AcceptMeetingInfo* pInfo = (AcceptMeetingInfo*)pMeetingInfo->getRequestConfigItemFromListIndex(i);
+                if (pInfo == NULL)
+                    continue;
+
+                bool bFoundItem = false;
+                foreach (StatsMeeting* pMeet, pStats->m_awayTripNames) {
+                    if (this->cleanName(pMeet->m_name) == this->cleanName(pInfo->m_itemName)) {
+                        bFoundItem = true;
+                        if (pInfo->m_state == ACCEPT_STATE_ACCEPT)
+                            pMeet->m_accepted++;
+                        else if (pInfo->m_state == ACCEPT_STATE_MAYBE)
+                            pMeet->m_interested++;
+                        break;
+                    }
+                }
+                if (!bFoundItem && pInfo->m_state != ACCEPT_STATE_DECLINE) {
+                    StatsMeeting* pMeet = new StatsMeeting();
+                    pMeet->m_name       = pInfo->m_itemName;
                     if (pInfo->m_state == ACCEPT_STATE_ACCEPT)
                         pMeet->m_accepted++;
                     else if (pInfo->m_state == ACCEPT_STATE_MAYBE)
                         pMeet->m_interested++;
-                    break;
+                    pStats->m_awayTripNames.append(pMeet);
                 }
-            }
-            if (!bFoundItem && pInfo->m_state != ACCEPT_STATE_DECLINE) {
-                StatsMeeting* pMeet = new StatsMeeting();
-                pMeet->m_name       = pInfo->m_itemName;
-                if (pInfo->m_state == ACCEPT_STATE_ACCEPT)
-                    pMeet->m_accepted++;
-                else if (pInfo->m_state == ACCEPT_STATE_MAYBE)
-                    pMeet->m_interested++;
-                this->m_awayTripNames.append(pMeet);
             }
         }
     }
 
+    for (int i = 0; i < this->m_stats.size(); i++) {
+        StatsPerYear* pStats = this->m_stats.at(i);
 
-    std::sort(this->m_statsTickets.begin(), this->m_statsTickets.end(), StatsTickets::compareCountFunctionAscending);
-    std::sort(this->m_reservedTicketNames.begin(), this->m_reservedTicketNames.end(), StatsReserved::compareCountFunctionAscending);
-    std::sort(this->m_meetingNames.begin(), this->m_meetingNames.end(), StatsMeeting::compareCountFunctionAscending);
-    std::sort(this->m_awayTripNames.begin(), this->m_awayTripNames.end(), StatsMeeting::compareCountFunctionAscending);
-
-    this->m_cycleTimer->start(6 * 60 * 60 * 1000);
+        std::sort(pStats->m_statsTickets.begin(), pStats->m_statsTickets.end(), StatsTickets::compareCountFunctionAscending);
+        std::sort(pStats->m_reservedTicketNames.begin(), pStats->m_reservedTicketNames.end(), StatsReserved::compareCountFunctionAscending);
+        std::sort(pStats->m_meetingNames.begin(), pStats->m_meetingNames.end(), StatsMeeting::compareCountFunctionAscending);
+        std::sort(pStats->m_awayTripNames.begin(), pStats->m_awayTripNames.end(), StatsMeeting::compareCountFunctionAscending);
+    }
 }
 
 QString cStatisticManager::cleanName(QString name)
@@ -274,9 +345,9 @@ MessageProtocol* cStatisticManager::handleStatisticCommand(UserConData* pUserCon
 {
     QMutexLocker lock(&this->m_statsMutex);
 
-    qint32 rCode = ERROR_CODE_SUCCESS;
+    qint32          rCode = ERROR_CODE_SUCCESS;
     QJsonParseError jerror;
-    QByteArray  data    = QByteArray(request->getPointerToData());
+    QByteArray      data    = QByteArray(request->getPointerToData());
     QJsonObject     rootObj = QJsonDocument::fromJson(data, &jerror).object();
     if (jerror.error != QJsonParseError::NoError) {
         qWarning().noquote() << QString("Could not answer statistic command, json parse errror: %1 - %2").arg(jerror.errorString()).arg(jerror.offset);
@@ -297,20 +368,34 @@ MessageProtocol* cStatisticManager::handleStatisticCommand(UserConData* pUserCon
             parameter.append("Reservierungen");
             parameter.append("Treffen");
             parameter.append("Auswärtsfahrt");
+            QJsonArray years;
+            for (int i = 0; i < this->m_stats.size(); i++)
+                years.append(this->m_stats.at(i)->m_year);
 
             rootObjAnswer.insert("parameter", parameter);
+            rootObjAnswer.insert("years", years);
 
         } else if (cmd == "content") {
 
-            QString para = rootObj.value("parameter").toString("");
-            if (para == "Dauerkarten")
-                this->handleSeasonTicketCommand(rootObjAnswer);
+            StatsPerYear* pStats = NULL;
+            qint32        year   = rootObj.value("year").toInt(g_GlobalData->m_currentSeason);
+            QString       para   = rootObj.value("parameter").toString("");
+            for (int i = 0; i < this->m_stats.size(); i++) {
+                if (this->m_stats.at(i)->m_year == year) {
+                    pStats = this->m_stats.at(i);
+                    break;
+                }
+            }
+            if (pStats == NULL)
+                rCode = ERROR_CODE_NOT_POSSIBLE;
+            else if (para == "Dauerkarten")
+                this->handleSeasonTicketCommand(rootObjAnswer, pStats);
             else if (para == "Reservierungen")
-                this->handleReservesCommand(rootObjAnswer);
+                this->handleReservesCommand(rootObjAnswer, pStats);
             else if (para == "Treffen")
-                this->handleMeetingCommand(rootObjAnswer);
+                this->handleMeetingCommand(rootObjAnswer, pStats);
             else if (para == "Auswärtsfahrt")
-                this->handleAwayTripCommand(rootObjAnswer);
+                this->handleAwayTripCommand(rootObjAnswer, pStats);
             else
                 rCode = ERROR_CODE_NOT_POSSIBLE;
         } else
@@ -342,12 +427,12 @@ MessageProtocol* cStatisticManager::handleStatisticCommand(UserConData* pUserCon
  *              }]
  * }
  */
-qint32 cStatisticManager::handleSeasonTicketCommand(QJsonObject& rootObjAnswer)
+qint32 cStatisticManager::handleSeasonTicketCommand(QJsonObject& rootObjAnswer, StatsPerYear* pStats)
 {
     QJsonArray categories, blocked, reserved, free;
-    qint32     maxX = 0;
-    foreach (StatsTickets* pStats, this->m_statsTickets) {
-        QString name = pStats->m_name;
+    qint32     maxX = 1;
+    foreach (StatsTickets* pTicks, pStats->m_statsTickets) {
+        QString name = pTicks->m_name;
         /* clean name to 8 characters and check if not already used */
         if (name.size() > 8)
             name.resize(8);
@@ -358,11 +443,11 @@ qint32 cStatisticManager::handleSeasonTicketCommand(QJsonObject& rootObjAnswer)
         }
         categories.append(name);
 
-        blocked.append(pStats->m_blocked);
-        reserved.append(pStats->m_reserved);
-        free.append(pStats->m_free);
+        blocked.append(pTicks->m_blocked);
+        reserved.append(pTicks->m_reserved);
+        free.append(pTicks->m_free);
 
-        qint32 tmp = pStats->m_blocked + pStats->m_free + pStats->m_reserved;
+        qint32 tmp = pTicks->m_blocked + pTicks->m_free + pTicks->m_reserved;
         if (tmp > maxX)
             maxX = tmp;
     }
@@ -383,7 +468,7 @@ qint32 cStatisticManager::handleSeasonTicketCommand(QJsonObject& rootObjAnswer)
     bars.append(barReserved);
     bars.append(barFree);
 
-    qint32 currentSeason = g_GlobalData->m_currentSeason % 2000;
+    qint32 currentSeason = pStats->m_year % 2000;
     rootObjAnswer.insert("categories", categories);
     rootObjAnswer.insert("bars", bars);
     rootObjAnswer.insert("title", QString("Dauerkarten %1/%2").arg(currentSeason).arg(currentSeason + 1));
@@ -406,11 +491,11 @@ qint32 cStatisticManager::handleSeasonTicketCommand(QJsonObject& rootObjAnswer)
  *              }]
  * }
  */
-qint32 cStatisticManager::handleReservesCommand(QJsonObject& rootObjAnswer)
+qint32 cStatisticManager::handleReservesCommand(QJsonObject& rootObjAnswer, StatsPerYear* pStats)
 {
     QJsonArray categories, reserved;
-    qint32     maxX = 0;
-    foreach (StatsReserved* pRes, this->m_reservedTicketNames) {
+    qint32     maxX = 1;
+    foreach (StatsReserved* pRes, pStats->m_reservedTicketNames) {
         categories.append(pRes->m_name);
 
         reserved.append(pRes->m_count);
@@ -427,7 +512,7 @@ qint32 cStatisticManager::handleReservesCommand(QJsonObject& rootObjAnswer)
     QJsonArray bars;
     bars.append(barReserved);
 
-    qint32 currentSeason = g_GlobalData->m_currentSeason % 2000;
+    qint32 currentSeason = pStats->m_year % 2000;
     rootObjAnswer.insert("categories", categories);
     rootObjAnswer.insert("bars", bars);
     rootObjAnswer.insert("title", QString("Reservierungen %1/%2").arg(currentSeason).arg(currentSeason + 1));
@@ -455,11 +540,11 @@ qint32 cStatisticManager::handleReservesCommand(QJsonObject& rootObjAnswer)
  *              }]
  * }
  */
-qint32 cStatisticManager::handleMeetingCommand(QJsonObject& rootObjAnswer)
+qint32 cStatisticManager::handleMeetingCommand(QJsonObject& rootObjAnswer, StatsPerYear* pStats)
 {
     QJsonArray categories, accepted, interested;
-    qint32     maxX = 0;
-    foreach (StatsMeeting* pRes, this->m_meetingNames) {
+    qint32     maxX = 1;
+    foreach (StatsMeeting* pRes, pStats->m_meetingNames) {
         categories.append(pRes->m_name);
 
         accepted.append(pRes->m_accepted);
@@ -481,7 +566,7 @@ qint32 cStatisticManager::handleMeetingCommand(QJsonObject& rootObjAnswer)
     bars.append(barReserved);
     bars.append(barInterested);
 
-    qint32 currentSeason = g_GlobalData->m_currentSeason % 2000;
+    qint32 currentSeason = pStats->m_year % 2000;
     rootObjAnswer.insert("categories", categories);
     rootObjAnswer.insert("bars", bars);
     rootObjAnswer.insert("title", QString("Treffen %1/%2").arg(currentSeason).arg(currentSeason + 1));
@@ -509,11 +594,11 @@ qint32 cStatisticManager::handleMeetingCommand(QJsonObject& rootObjAnswer)
  *              }]
  * }
  */
-qint32 cStatisticManager::handleAwayTripCommand(QJsonObject& rootObjAnswer)
+qint32 cStatisticManager::handleAwayTripCommand(QJsonObject& rootObjAnswer, StatsPerYear* pStats)
 {
     QJsonArray categories, accepted, interested;
-    qint32     maxX = 0;
-    foreach (StatsMeeting* pRes, this->m_awayTripNames) {
+    qint32     maxX = 1;
+    foreach (StatsMeeting* pRes, pStats->m_awayTripNames) {
         categories.append(pRes->m_name);
 
         accepted.append(pRes->m_accepted);
@@ -535,7 +620,7 @@ qint32 cStatisticManager::handleAwayTripCommand(QJsonObject& rootObjAnswer)
     bars.append(barReserved);
     bars.append(barInterested);
 
-    qint32 currentSeason = g_GlobalData->m_currentSeason % 2000;
+    qint32 currentSeason = pStats->m_year % 2000;
     rootObjAnswer.insert("categories", categories);
     rootObjAnswer.insert("bars", bars);
     rootObjAnswer.insert("title", QString("Auswärtsfahrt %1/%2").arg(currentSeason).arg(currentSeason + 1));

@@ -19,7 +19,6 @@
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
-#include <QtQml/QQmlEngine>
 
 #include "cdatanewsdatamanager.h"
 
@@ -28,7 +27,9 @@
 #include "../Common/Network/messagecommand.h"
 #include "../Connection/cconmanager.h"
 #include "../Connection/cconusersettings.h"
-//#include "../cstaglobalsettings.h"
+#include "cstaglobalmanager.h"
+
+extern cStaGlobalManager* g_GlobalManager;
 
 
 cDataNewsDataManager* g_DataNewsDataManager;
@@ -198,7 +199,7 @@ qint32 cDataNewsDataManager::handleListNewsDataResponse(MessageProtocol* msg)
         pNews->setHeader(newsObj.value("header").toString());
         pNews->setUser(newsObj.value("user").toString());
 
-        QQmlEngine::setObjectOwnership(pNews, QQmlEngine::CppOwnership);
+        g_GlobalManager->setQMLObjectOwnershipToCpp(pNews);
         this->addNewNewsData(pNews, updateIndex);
     }
 
@@ -300,7 +301,7 @@ qint32 cDataNewsDataManager::handleChangeNewsDataResponse(MessageProtocol* msg)
             pItem->setIndex(index);
             bAddedItem = true;
 
-            QQmlEngine::setObjectOwnership(pItem, QQmlEngine::CppOwnership);
+            g_GlobalManager->setQMLObjectOwnershipToCpp(pItem);
         }
 
         this->m_mutex.lock();

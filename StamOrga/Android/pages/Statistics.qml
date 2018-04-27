@@ -34,25 +34,51 @@ Item {
         Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
         spacing: 0
 
-        ComboBox {
-            id: comboStatisticOverview
-            Layout.leftMargin: 10
-            Layout.rightMargin: 10
-            Layout.topMargin: 10
-            font.family: txtForFontFamily.font
-            model: gDataStatisticManager.getCurrentOverviewList()
-            anchors.horizontalCenter: parent.horizontalCenter
+        RowLayout {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignTop
-            onCurrentIndexChanged: {
-                if (iLoadingIndex < 0 || bComboBoxIndexEnabled === false)
-                    return;
 
-                gDataStatisticManager.startLoadStatisticContent(comboStatisticOverview.currentIndex);
-                busyIndicatorStatistic.loadingVisible = true;
-                chartView.visible = false;
-                iLoadingIndex = 1;
+            ComboBox {
+                id: comboStatisticOverview
+                Layout.leftMargin: 10
+                Layout.rightMargin: 10
+                Layout.topMargin: 10
+                font.family: txtForFontFamily.font
+                model: gDataStatisticManager.getCurrentOverviewList()
+//                anchors.horizontalCenter: parent.horizontalCenter
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignLeft
+                onCurrentIndexChanged: {
+                    if (iLoadingIndex < 0 || bComboBoxIndexEnabled === false)
+                        return;
 
+                    gDataStatisticManager.startLoadStatisticContent(comboStatisticOverview.currentIndex, comboStatisticYear.currentIndex);
+                    busyIndicatorStatistic.loadingVisible = true;
+                    chartView.visible = false;
+                    iLoadingIndex = 1;
+
+                }
+            }
+            ComboBox {
+                id: comboStatisticYear
+                Layout.leftMargin: 10
+                Layout.rightMargin: 10
+                Layout.topMargin: 10
+                font.family: txtForFontFamily.font
+                model: gDataStatisticManager.getCurrentYearList()
+//                anchors.horizontalCenter: parent.horizontalCenter
+//                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignRight
+                onCurrentIndexChanged: {
+                    if (iLoadingIndex < 0 || bComboBoxIndexEnabled === false)
+                        return;
+
+                    gDataStatisticManager.startLoadStatisticContent(comboStatisticOverview.currentIndex, comboStatisticYear.currentIndex);
+                    busyIndicatorStatistic.loadingVisible = true;
+                    chartView.visible = false;
+                    iLoadingIndex = 1;
+
+                }
             }
         }
 
@@ -84,7 +110,7 @@ Item {
                 if (iLoadingIndex === 0)
                     gDataStatisticManager.startLoadStatisticOverview()
                 else
-                    gDataStatisticManager.startLoadStatisticContent(comboStatisticOverview.currentIndex)
+                    gDataStatisticManager.startLoadStatisticContent(comboStatisticOverview.currentIndex, comboStatisticYear.currentIndex)
                 busyIndicatorStatistic.loadingVisible = true;
                 chartView.visible = false;
             }
@@ -143,7 +169,8 @@ Item {
             if (iLoadingIndex === 0) {
 
                 comboStatisticOverview.model = gDataStatisticManager.getCurrentOverviewList();
-                gDataStatisticManager.startLoadStatisticContent(comboStatisticOverview.currentIndex)
+                comboStatisticYear.model = gDataStatisticManager.getCurrentYearList();
+                gDataStatisticManager.startLoadStatisticContent(comboStatisticOverview.currentIndex, comboStatisticYear.currentIndex)
                 iLoadingIndex = 1;
                 bComboBoxIndexEnabled = true;
             } else {

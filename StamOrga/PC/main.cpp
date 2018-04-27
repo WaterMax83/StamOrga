@@ -21,11 +21,14 @@
 
 #include "../cstaglobalmanager.h"
 
+cStaGlobalManager* g_GlobalManager;
+
 int main(int argc, char* argv[])
 {
     QApplication a(argc, argv);
 
     cStaGlobalManager globalManager;
+    g_GlobalManager = &globalManager;
     globalManager.initialize();
 
     MainWindow w;

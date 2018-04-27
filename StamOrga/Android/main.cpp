@@ -39,6 +39,7 @@
 #include "../cstaglobalsettings.h"
 #include "userinterface.h"
 
+cStaGlobalManager* g_GlobalManager;
 
 int main(int argc, char* argv[])
 {
@@ -58,6 +59,7 @@ int main(int argc, char* argv[])
     //    qRegisterMetaType<StatBars*>("StatBars*");
 
     cStaGlobalManager staGlobalManager;
+    g_GlobalManager = &staGlobalManager;
     staGlobalManager.initialize();
 
     QFontDatabase base;

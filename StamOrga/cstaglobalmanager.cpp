@@ -32,6 +32,9 @@
 #include "cstaglobalmanager.h"
 #include "cstaglobalsettings.h"
 #include "cstasettingsmanager.h"
+#ifndef STAMORGA_APP
+#include "PC/cpccontrolmanager.h"
+#endif
 
 cDataMeetingInfo* g_DataMeetingInfo;
 cDataMeetingInfo* g_DataTripInfo;
@@ -50,7 +53,9 @@ qint32 cStaGlobalManager::initialize()
     QGuiApplication::setApplicationName("StamOrga");
 
     // Register our component type with QML.
+#ifdef STAMORGA_APP
     qmlRegisterType<UserInterface>("com.watermax.demo", 1, 0, "UserInterface");
+#endif
 
     g_StaSettingsManager = new cStaSettingsManager();
     rCode                = g_StaSettingsManager->initialize();
@@ -107,6 +112,12 @@ qint32 cStaGlobalManager::initialize()
         g_ConManager = new cConManager();
         rCode        = g_ConManager->initialize();
     }
+#ifndef STAMORGA_APP
+    if (rCode == ERROR_CODE_SUCCESS) {
+        g_PCControlManager = new cPCControlManager();
+        rCode              = g_PCControlManager->initialize();
+    }
+#endif
 
     if (rCode == ERROR_CODE_SUCCESS)
         this->m_initialized = true;
@@ -114,6 +125,7 @@ qint32 cStaGlobalManager::initialize()
     return rCode;
 }
 
+#ifdef STAMORGA_APP
 void cStaGlobalManager::setQmlInformationClasses(QQmlApplicationEngine* engine)
 {
     engine->rootContext()->setContextProperty("gDataAppInfoManager", g_DatAppInfoManager);
@@ -128,4 +140,14 @@ void cStaGlobalManager::setQmlInformationClasses(QQmlApplicationEngine* engine)
     engine->rootContext()->setContextProperty("gDataTripInfo", g_DataTripInfo);
     engine->rootContext()->setContextProperty("gDataConsoleManager", g_DataConsoleManager);
     engine->rootContext()->setContextProperty("gConUserSettings", g_ConUserSettings);
+}
+#endif
+
+void cStaGlobalManager::setQMLObjectOwnershipToCpp(QObject* pObject)
+{
+#ifdef STAMORGA_APP
+    QQmlEngine::setObjectOwnership(pObject, QQmlEngine::CppOwnership);
+#else
+    Q_UNUSED(pObject);
+#endif
 }

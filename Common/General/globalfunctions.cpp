@@ -111,6 +111,8 @@ QString getErrorCodeString(qint32 code)
         return QString("Nicht eingeloggt: %1").arg(code);
     case ERROR_CODE_NO_CONNECTION:
         return QString("Verbindung nicht möglich: %1").arg(code);
+    case ERROR_CODE_NOT_UNIQUE:
+        return QString("Element ist schon vorhanden: %1").arg(code);
     default:
         return QString("Unbekannter Fehler: %1").arg(code);
     }

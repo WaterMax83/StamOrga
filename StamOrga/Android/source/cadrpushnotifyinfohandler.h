@@ -20,7 +20,6 @@
 #define ADRPUSHNOTIFYINFOHANDLER_H
 
 #include <QObject>
-#include <QQmlEngine>
 
 class AdrPushNotifyInfoHandler : public QObject
 {

@@ -19,13 +19,15 @@
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
-#include <QtQml/QQmlEngine>
 
 #include "../Common/General/globalfunctions.h"
 #include "../Common/Network/messagecommand.h"
 #include "../Connection/cconmanager.h"
 #include "cdatagamesmanager.h"
 #include "cdatameetinginfo.h"
+#include "cstaglobalmanager.h"
+
+extern cStaGlobalManager* g_GlobalManager;
 
 cDataMeetingInfo::cDataMeetingInfo(QObject* parent)
     : cGenDisposer(parent)
@@ -111,7 +113,7 @@ qint32 cDataMeetingInfo::handleLoadMeetingInfoResponse(MessageProtocol* msg)
         else if (pAmi->value() == ACCEPT_STATE_DECLINE)
             declineMeeting++;
 
-        QQmlEngine::setObjectOwnership(pAmi, QQmlEngine::CppOwnership);
+        g_GlobalManager->setQMLObjectOwnershipToCpp(pAmi);
         this->m_acceptInfo.append(pAmi);
     }
 
