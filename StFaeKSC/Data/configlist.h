@@ -104,6 +104,8 @@ protected:
     ConfigItem* getItemFromArrayIndex(int index);
     ConfigItem* getProblemItemFromArrayIndex(int index);
 
+    void restartConfigSettings();
+
     bool updateItemValue(ConfigItem* pItem, QString key, QVariant value, qint64 timeStamp = 0);
 
     void addNewConfigItem(ConfigItem* item, QList<ConfigItem*>* pList);

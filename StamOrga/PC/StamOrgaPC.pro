@@ -39,7 +39,6 @@ SOURCES += main.cpp\
     ../Data/cdatagameuserdata.cpp \
     ../Data/cDataMeetingInfo.cpp \
     ../Data/cdatanewsdatamanager.cpp \
-    ../Data/cdatappinfomanager.cpp \
     ../Data/cdatastatisticmanager.cpp \
     ../Data/cdataticketmanager.cpp \
     ../Data/gameplay.cpp \
@@ -75,7 +74,6 @@ HEADERS  += mainwindow.h \
     ../Data/cdatagameuserdata.h \
     ../Data/cdatameetinginfo.h \
     ../Data/cdatanewsdatamanager.h \
-    ../Data/cdatappinfomanager.h \
     ../Data/cdatastatisticmanager.h \
     ../Data/cdataticketmanager.h \
     ../Data/gameplay.h \

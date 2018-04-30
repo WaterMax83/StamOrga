@@ -67,7 +67,7 @@ public:
     Q_INVOKABLE qint32 handleStatisticResponse(MessageProtocol* msg);
 
     Q_INVOKABLE QStringList getCurrentOverviewList() { return this->m_overView; }
-    Q_INVOKABLE QStringList getCurrentYearList() { return this->m_years; }
+    Q_INVOKABLE QStringList getCurrentYearList();
 
     Q_INVOKABLE StatBars* getNextStatBar(const qint32 index);
     Q_INVOKABLE qint32 getStatBarCount() { return this->m_statBars.count(); }

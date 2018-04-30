@@ -208,6 +208,7 @@ qint32 cConUserSettings::handleUserPropsResponse(MessageProtocol* msg)
     qint32  index        = rootObj.value("index").toInt(-1);
     quint32 properties   = (quint32)rootObj.value("property").toDouble(0);
     QString readableName = rootObj.value("readableName").toString();
+    bool    loadAll      = rootObj.value("loadAll").toBool();
 
     this->setUserIndex(index);
     this->setReadableName(readableName);
@@ -219,6 +220,9 @@ qint32 cConUserSettings::handleUserPropsResponse(MessageProtocol* msg)
         g_StaGlobalSettings->setAlreadyConnected(true);
     } else
         this->setUserProperties(0);
+
+    if (!loadAll)
+        return ERROR_CODE_NO_ERROR;
 
 
     SeasonTicketItem* seasonTicket;
@@ -270,7 +274,7 @@ qint32 cConUserSettings::startUpdatePassword(QString password)
     if (password.length() > 0)
         newPassWord = this->createHashValue(password, this->getSalt());
     else
-        newPassWord = this->m_newPassWord;
+        newPassWord             = this->m_newPassWord;
     QString     currentPassWord = this->createHashValue(this->getPassWord(), this->m_currentRandomValue);
     QJsonObject rootObj;
     rootObj.insert("new", newPassWord);

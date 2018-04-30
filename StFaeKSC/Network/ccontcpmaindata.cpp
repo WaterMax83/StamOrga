@@ -173,6 +173,7 @@ MessageProtocol* cConTcpMainData::getUserProperties(UserConData* pUserCon, Messa
     rootObjAns.insert("property", (double)this->m_pListedUser->getUserProperties(pUserCon->m_userName));
     rootObjAns.insert("index", pUserCon->m_userID);
     rootObjAns.insert("readableName", this->m_pListedUser->getReadableName(pUserCon->m_userID));
+    rootObjAns.insert("loadAll", loadAll);
 
     if (loadAll) {
         QJsonArray arrTickets;

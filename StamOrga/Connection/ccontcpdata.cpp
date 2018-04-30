@@ -34,6 +34,9 @@
 #include "cconmanager.h"
 #include "ccontcpdata.h"
 #include "cconusersettings.h"
+#ifndef STAMORGA_APP
+#include "../PC/cpccontrolmanager.h"
+#endif
 
 cConTcpData::cConTcpData()
     : BackgroundWorker()
@@ -187,9 +190,9 @@ void cConTcpData::checkNewOncomingData()
             request->m_result = g_DataGamesManager->handleChangeGameResponse(msg);
             break;
 
-            //        case OP_CODE_CMD_RES::ACK_SET_FIXED_GAME_TIME:
-            //                    request.m_result = msg->getIntData();
-            //            break;
+        //        case OP_CODE_CMD_RES::ACK_SET_FIXED_GAME_TIME:
+        //                    request.m_result = msg->getIntData();
+        //            break;
 
         case OP_CODE_CMD_RES::ACK_ADD_TICKET:
             request->m_result = g_DataTicketManager->handleAddSeasonTicketResponse(msg);
@@ -243,6 +246,11 @@ void cConTcpData::checkNewOncomingData()
         case OP_CODE_CMD_RES::ACK_CMD_STATISTIC:
             request->m_result = g_DataStatisticManager->handleStatisticResponse(msg);
             break;
+#ifndef STAMORGA_APP
+        case OP_CODE_CMD_RES::ACK_CMD_CONTROL:
+            request->m_result = g_PCControlManager->handleControlCommand(msg);
+            break;
+#endif
 
 
         default:

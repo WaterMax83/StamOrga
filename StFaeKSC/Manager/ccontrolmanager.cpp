@@ -1,0 +1,163 @@
+/*
+*	This file is part of StamOrga
+*   Copyright (C) 2017 Markus Schneider
+*
+*	This program is free software; you can redistribute it and/or modify
+*   it under the terms of the GNU General Public License as published by
+*   the Free Software Foundation; either version 3 of the License, or
+*   (at your option) any later version.
+*
+*	StamOrga is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+
+*    You should have received a copy of the GNU General Public License
+*    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#include <QtCore/QJsonArray>
+
+#include "ccontrolmanager.h"
+#include "../Common/General/globalfunctions.h"
+#include "../Common/Network/messagecommand.h"
+#include "cstatisticmanager.h"
+
+// clang-format off
+#define GROUP_STATS     "Statistic"
+// clang-format on
+
+cControlManager g_ControlManager;
+
+cControlManager::cControlManager(QObject *parent) : cGenDisposer(parent)
+{
+
+}
+
+qint32 cControlManager::initialize()
+{
+    QString configSetFilePath = getUserHomeConfigPath() + "/Settings/ControlManager.ini";
+
+    if (!checkFilePathExistAndCreate(configSetFilePath)) {
+        CONSOLE_CRITICAL(QString("Could not create File for Games setting"));
+        return ERROR_CODE_NOT_READY;
+    }
+
+    this->m_pConfigSettings = new QSettings(configSetFilePath, QSettings::IniFormat);
+    this->m_pConfigSettings->setIniCodec(("UTF-8"));
+
+    /* Check wheter we have to save data after reading again */
+    bool bProblems = false;
+    {
+        QMutexLocker locker(&this->m_mConfigIniMutex);
+
+        this->m_pConfigSettings->beginGroup(GROUP_STATS);
+        int sizeOfArray = this->m_pConfigSettings->beginReadArray(CONFIG_LIST_ARRAY);
+
+        for (int i = 0; i < sizeOfArray; i++) {
+            this->m_pConfigSettings->setArrayIndex(i);
+            qint32 year      = this->m_pConfigSettings->value(ITEM_NAME, -1).toInt();
+            if (year < 2015 || year > 2025)
+                bProblems = true;
+            else
+                this->m_statistic.append(year);
+        }
+        this->m_pConfigSettings->endArray();
+        this->m_pConfigSettings->endGroup();
+    }
+    if (this->readLastUpdateTime() == 0)
+        this->setNewUpdateTime();
+
+    if (bProblems)
+        this->saveCurrentInteralList();
+
+    this->m_initialized = true;
+
+    return ERROR_CODE_SUCCESS;
+}
+
+void cControlManager::saveCurrentInteralList()
+{
+    this->m_mConfigIniMutex.lock();
+
+    this->m_pConfigSettings->beginGroup(GROUP_STATS);
+    this->m_pConfigSettings->remove(""); // clear all elements
+
+    this->m_pConfigSettings->beginWriteArray(CONFIG_LIST_ARRAY);
+    for (int i = 0; i < this->m_statistic.size(); i++) {
+        this->m_pConfigSettings->setArrayIndex(i);
+
+        this->m_pConfigSettings->setValue(ITEM_NAME, this->m_statistic.at(i));
+    }
+
+    this->m_pConfigSettings->endArray();
+    this->m_pConfigSettings->endGroup();
+
+    this->m_mConfigIniMutex.unlock();
+
+    this->setNewUpdateTime();
+
+    qDebug().noquote() << QString("saved current Statistic List");
+}
+
+MessageProtocol* cControlManager::getControlCommandResponse(UserConData *pUserCon, MessageProtocol *request)
+{
+    if (!this->m_initialized)
+        return NULL;
+
+    QByteArray  data    = QByteArray(request->getPointerToData());
+    QJsonObject rootObj = QJsonDocument::fromJson(data).object();
+
+    QString cmd = rootObj.value("cmd").toString();
+
+    QJsonObject rootAns;
+    qint32 result = ERROR_CODE_NOT_FOUND;
+
+    if (cmd == "refresh")
+        result = this->handleRefreshCommand(rootAns);
+    else if (cmd == "save")
+        result = this->handleSaveCommand(rootObj);
+
+    rootAns.insert("ack", result);
+    rootAns.insert("cmd", cmd);
+    qInfo() << QString("Handle control cmd of type %1 with %3 for %2").arg(cmd, pUserCon->m_userName).arg(result);
+
+    QByteArray answer = QJsonDocument(rootAns).toJson(QJsonDocument::Compact);
+
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_CMD_CONTROL, answer);
+}
+
+qint32 cControlManager::handleRefreshCommand(QJsonObject &rootAns)
+{
+    QJsonArray statsYearsArr;
+    QJsonArray readOnlGameArr;
+
+    foreach (qint32 stat, this->m_statistic)
+        statsYearsArr.append(stat);
+
+    rootAns.insert("stats", statsYearsArr);
+    rootAns.insert("readOnlineGame", readOnlGameArr);
+
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 cControlManager::handleSaveCommand(QJsonObject &rootObj)
+{
+    QJsonArray statsArr = rootObj.value("stats").toArray();
+
+    foreach (qint32 year, this->m_statistic)
+        g_StatisticManager.removeYearFromStatistic(year);
+    this->m_statistic.clear();
+
+    for(int i=0; i < statsArr.size(); i++)   {
+        qint32 year = statsArr.at(i).toInt();
+        if (year > 2015 && year < 2025) {
+            this->m_statistic.append(year);
+            g_StatisticManager.addYearToStatistic(year);
+        }
+    }
+
+    this->saveCurrentInteralList();
+
+    return ERROR_CODE_SUCCESS;
+}

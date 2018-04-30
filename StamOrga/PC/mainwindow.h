@@ -23,7 +23,7 @@
 
 namespace Ui
 {
-    class MainWindow;
+class MainWindow;
 }
 
 class MainWindow : public QMainWindow
@@ -35,17 +35,8 @@ public:
     ~MainWindow();
 
 private slots:
-    //    void on_btnSendData_clicked();
     void connectionFinished(const qint32 result, const QString msg);
     void slotNotifyCommandFinished(quint32 command, qint32 result);
-    //    void versionRequestFinished(qint32 result, QString msg);
-    //    void propertyRequestFinished(qint32 result, quint32 value);
-    //    void updatePasswordFinished(qint32 result);
-    //    void getGamesListFinished(qint32 result);
-
-    //    void on_btnUdpatePassword_clicked();
-
-    //    void on_btnGetGamesList_clicked();
 
     void on_btnLogin_clicked();
 
@@ -55,11 +46,10 @@ private slots:
 
     void on_btnRefreshControl_clicked();
 
+    void on_btnSaveControl_clicked();
+
 private:
     Ui::MainWindow* ui;
-
-    //    cConManager* m_pConHandling;
-    //    GlobalData*         m_pGlobalData;
 };
 
 #endif // MAINWINDOW_H

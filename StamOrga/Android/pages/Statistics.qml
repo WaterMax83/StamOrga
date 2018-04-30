@@ -52,10 +52,12 @@ Item {
                     if (iLoadingIndex < 0 || bComboBoxIndexEnabled === false)
                         return;
 
-                    gDataStatisticManager.startLoadStatisticContent(comboStatisticOverview.currentIndex, comboStatisticYear.currentIndex);
-                    busyIndicatorStatistic.loadingVisible = true;
-                    chartView.visible = false;
-                    iLoadingIndex = 1;
+                    if(gDataStatisticManager.startLoadStatisticContent(comboStatisticOverview.currentIndex,
+                                                                       comboStatisticYear.currentIndex) === 1) {
+                        busyIndicatorStatistic.loadingVisible = true;
+                        chartView.visible = false;
+                        iLoadingIndex = 1;
+                    }
 
                 }
             }
@@ -73,10 +75,12 @@ Item {
                     if (iLoadingIndex < 0 || bComboBoxIndexEnabled === false)
                         return;
 
-                    gDataStatisticManager.startLoadStatisticContent(comboStatisticOverview.currentIndex, comboStatisticYear.currentIndex);
-                    busyIndicatorStatistic.loadingVisible = true;
-                    chartView.visible = false;
-                    iLoadingIndex = 1;
+                    if(gDataStatisticManager.startLoadStatisticContent(comboStatisticOverview.currentIndex,
+                                                                       comboStatisticYear.currentIndex) === 1) {
+                        busyIndicatorStatistic.loadingVisible = true;
+                        chartView.visible = false;
+                        iLoadingIndex = 1;
+                    }
 
                 }
             }
@@ -107,12 +111,19 @@ Item {
             onClicked: {
                 loadAgainButton.visible = false;
                 busyIndicatorStatistic.infoVisible = false;
-                if (iLoadingIndex === 0)
+                if (iLoadingIndex === 0) {
                     gDataStatisticManager.startLoadStatisticOverview()
-                else
-                    gDataStatisticManager.startLoadStatisticContent(comboStatisticOverview.currentIndex, comboStatisticYear.currentIndex)
-                busyIndicatorStatistic.loadingVisible = true;
-                chartView.visible = false;
+                    busyIndicatorStatistic.loadingVisible = true;
+                    chartView.visible = false;
+                } else {
+                    if(gDataStatisticManager.startLoadStatisticContent(comboStatisticOverview.currentIndex,
+                                                                       comboStatisticYear.currentIndex) === 1) {
+                        busyIndicatorStatistic.loadingVisible = true;
+                        chartView.visible = false;
+                        iLoadingIndex = 1;
+                    }
+                }
+
             }
         }
 
@@ -170,8 +181,12 @@ Item {
 
                 comboStatisticOverview.model = gDataStatisticManager.getCurrentOverviewList();
                 comboStatisticYear.model = gDataStatisticManager.getCurrentYearList();
-                gDataStatisticManager.startLoadStatisticContent(comboStatisticOverview.currentIndex, comboStatisticYear.currentIndex)
-                iLoadingIndex = 1;
+                if(gDataStatisticManager.startLoadStatisticContent(comboStatisticOverview.currentIndex,
+                                                                   comboStatisticYear.currentIndex) === 1) {
+                    busyIndicatorStatistic.loadingVisible = true;
+                    chartView.visible = false;
+                    iLoadingIndex = 1;
+                }
                 bComboBoxIndexEnabled = true;
             } else {
 

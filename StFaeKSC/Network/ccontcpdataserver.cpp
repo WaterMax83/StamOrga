@@ -27,6 +27,7 @@
 #include "../Manager/cstatisticmanager.h"
 #include "../Manager/cticketmanager.h"
 #include "ccontcpmaindata.h"
+#include "../Manager/ccontrolmanager.h"
 
 cConTcpDataServer::cConTcpDataServer()
     : BackgroundWorker()
@@ -261,6 +262,10 @@ MessageProtocol* cConTcpDataServer::checkNewMessage(MessageProtocol* msg)
 
         case OP_CODE_CMD_REQ::REQ_CMD_STATISTIC:
             ack = g_StatisticManager.handleStatisticCommand(this->m_pUserConData, msg);
+            break;
+
+        case OP_CODE_CMD_REQ::REQ_CMD_CONTROL:
+            ack = g_ControlManager.getControlCommandResponse(this->m_pUserConData, msg);
             break;
         }
     } else if (msg->getIndex() == OP_CODE_CMD_REQ::REQ_LOGIN_USER) {

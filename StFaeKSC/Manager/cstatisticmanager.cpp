@@ -42,11 +42,6 @@ int cStatisticManager::initialize()
     this->m_bckGrndCtrl = new BackgroundController();
     this->m_bckGrndCtrl->Start(this, false);
 
-    //#ifdef QT_DEBUG
-    //    this->m_cycleTimer->start(1000);
-    //#else
-    //    this->m_cycleTimer->start(10000);
-    //#endif
     return 1;
 }
 
@@ -56,16 +51,23 @@ int cStatisticManager::DoBackgroundWork()
     this->m_cycleTimer->setSingleShot(true);
     connect(this->m_cycleTimer, &QTimer::timeout, this, &cStatisticManager::slotCycleTimerFired);
 
-    connect(this, &cStatisticManager::signalNewYearAdded, this, &cStatisticManager::slotNewYearAdded);
+    connect(this, &cStatisticManager::signalYearChanged, this, &cStatisticManager::slotYearChanged);
 
-    this->addYearToStatistic(g_GlobalData->m_currentSeason);
-    this->addYearToStatistic(2018);
+//    this->addYearToStatistic(g_GlobalData->m_currentSeason);
+//    this->addYearToStatistic(2018);
+#ifdef QT_DEBUG
+    this->m_cycleTimer->start(2000);
+#else
+    this->m_cycleTimer->start(10000);
+#endif
 
     return ERROR_CODE_SUCCESS;
 }
 
 qint32 cStatisticManager::addYearToStatistic(qint32 year)
 {
+    QMutexLocker lock1(&this->m_statsMutex);
+
     for (int i = 0; i < this->m_stats.size(); i++) {
         StatsPerYear* pStats = this->m_stats.at(i);
         if (pStats->m_year == year)
@@ -75,15 +77,43 @@ qint32 cStatisticManager::addYearToStatistic(qint32 year)
     pStats->m_year       = year;
     this->m_stats.append(pStats);
 
-    emit this->signalNewYearAdded();
+    emit this->signalYearChanged();
 
     return ERROR_CODE_SUCCESS;
 }
 
-void cStatisticManager::slotNewYearAdded()
+qint32 cStatisticManager::removeYearFromStatistic(qint32 year)
+{
+    QMutexLocker lock1(&this->m_statsMutex);
+
+    for (int i = 0; i < this->m_stats.size(); i++) {
+        StatsPerYear* pStats = this->m_stats.at(i);
+        if (pStats->m_year == year) {
+
+            foreach (StatsTickets* pTickets, pStats->m_statsTickets)
+                delete pTickets;
+            foreach (StatsReserved* pRes, pStats->m_reservedTicketNames)
+                delete pRes;
+            foreach (StatsMeeting* pMeet, pStats->m_meetingNames)
+                delete pMeet;
+            foreach (StatsMeeting* pMeet, pStats->m_awayTripNames)
+                delete pMeet;
+            delete pStats;
+            this->m_stats.removeAt(i);
+
+            emit this->signalYearChanged();
+
+            return ERROR_CODE_SUCCESS;
+        }
+    }
+
+    return ERROR_CODE_NOT_FOUND;
+}
+
+void cStatisticManager::slotYearChanged()
 {
 #ifdef QT_DEBUG
-    this->m_cycleTimer->start(1000);
+    this->m_cycleTimer->start(2000);
 #else
     this->m_cycleTimer->start(10000);
 #endif

@@ -34,6 +34,8 @@
 #include "cstasettingsmanager.h"
 #ifndef STAMORGA_APP
 #include "PC/cpccontrolmanager.h"
+#else
+#include "userinterface.h"
 #endif
 
 cDataMeetingInfo* g_DataMeetingInfo;
@@ -52,7 +54,7 @@ qint32 cStaGlobalManager::initialize()
     QGuiApplication::setOrganizationName("WaterMax");
     QGuiApplication::setApplicationName("StamOrga");
 
-    // Register our component type with QML.
+// Register our component type with QML.
 #ifdef STAMORGA_APP
     qmlRegisterType<UserInterface>("com.watermax.demo", 1, 0, "UserInterface");
 #endif

@@ -49,6 +49,8 @@ MainWindow::MainWindow(QWidget* parent)
             this, &MainWindow::slotNotifyCommandFinished);
 
     this->ui->lEditReadableName->setText(g_ConUserSettings->getReadableName());
+
+    this->ui->txtEditStatistic->setText(g_PCControlManager->getStastistic());
 }
 
 MainWindow::~MainWindow()
@@ -87,6 +89,13 @@ void MainWindow::slotNotifyCommandFinished(quint32 command, qint32 result)
     case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
         if (result == ERROR_CODE_SUCCESS)
             qInfo() << "Update password war erfolgreich";
+        break;
+    case OP_CODE_CMD_REQ::REQ_CMD_CONTROL:
+        qInfo() << "Control command " << result;
+        if (result == ERROR_CODE_SUCCESS) {
+            this->ui->txtEditStatistic->setText(g_PCControlManager->getStastistic());
+            this->ui->btnSaveControl->setEnabled(true);
+        }
         break;
     default:
         break;
@@ -132,4 +141,10 @@ void MainWindow::on_btnUdpatePassword_clicked()
 void MainWindow::on_btnRefreshControl_clicked()
 {
     g_PCControlManager->refreshControlList();
+}
+
+void MainWindow::on_btnSaveControl_clicked()
+{
+    g_PCControlManager->setStatistic(this->ui->txtEditStatistic->toPlainText());
+    g_PCControlManager->saveControlList();
 }

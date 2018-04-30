@@ -21,8 +21,10 @@
 #define CPCCONTROLMANAGER_H
 
 #include <QObject>
+#include <QtCore/QMutex>
 
 #include "../Common/General/cgendisposer.h"
+#include "../Common/Network/messageprotocol.h"
 
 class cPCControlManager : public cGenDisposer
 {
@@ -32,11 +34,24 @@ public:
 
     qint32 initialize();
 
+    qint32 terminate();
+
     qint32 refreshControlList();
+
+    qint32 saveControlList();
+
+    qint32 handleControlCommand(MessageProtocol* msg);
+
+    qint32 setStatistic(QString stats);
+    QString getStastistic();
 
 signals:
 
 public slots:
+
+private:
+    QStringList m_statistic;
+    QMutex      m_mutex;
 };
 
 extern cPCControlManager* g_PCControlManager;

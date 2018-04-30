@@ -153,7 +153,6 @@ void cConManager::sendLoginRequest()
 
 void cConManager::sendNewRequest(TcpDataConRequest* request)
 {
-    qInfo() << request->m_request;
     if (!this->m_initialized)
         return;
 
@@ -214,6 +213,12 @@ void cConManager::slotDataConLastRequestFinished(TcpDataConRequest* request)
         }
 
         this->m_bIsConnecting = false;
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
+        if (request->m_result == ERROR_CODE_NO_ERROR)
+            return;
+        emit this->signalNotifyCommandFinished(request->m_request, request->m_result);
         break;
 
     case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST: {

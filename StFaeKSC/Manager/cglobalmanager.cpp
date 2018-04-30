@@ -24,6 +24,7 @@
 #include "cnewsdatamanager.h"
 #include "cstatisticmanager.h"
 #include "cticketmanager.h"
+#include "ccontrolmanager.h"
 
 cGlobalManager::cGlobalManager(QObject* parent)
     : cGenDisposer(parent)
@@ -47,6 +48,9 @@ qint32 cGlobalManager::initialize()
 
     if (rValue == ERROR_CODE_SUCCESS)
         rValue = g_MeetingInfoManager.initialize();
+
+    if (rValue == ERROR_CODE_SUCCESS)
+        rValue = g_ControlManager.initialize();
 
     this->m_initialized = true;
 

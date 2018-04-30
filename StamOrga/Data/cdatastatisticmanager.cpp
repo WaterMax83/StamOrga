@@ -20,6 +20,7 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 
+
 #include "../Common/Network/messagecommand.h"
 #include "../Connection/cconmanager.h"
 #include "cdatastatisticmanager.h"
@@ -153,6 +154,9 @@ qint32 cDataStatisticManager::startLoadStatisticContent(qint32 catIndex, qint32 
     if (catIndex >= this->m_overView.count())
         return ERROR_CODE_WRONG_SIZE;
 
+    if (yearIndex >= this->m_years.count())
+        return ERROR_CODE_WRONG_SIZE;
+
     QJsonObject rootObj;
     rootObj.insert("cmd", "content");
     rootObj.insert("parameter", this->m_overView.at(catIndex));
@@ -180,4 +184,13 @@ qint32 cDataStatisticManager::startSendCommand(QJsonObject& rootObj)
 
     g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
+}
+
+QStringList cDataStatisticManager::getCurrentYearList()
+{
+    if (this->m_years.size() > 0)
+        return this->m_years;
+    QStringList tmp;
+    tmp << "KeinDaten";
+    return tmp;
 }

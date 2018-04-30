@@ -125,7 +125,7 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
         emit this->notifyAvailableTicketListFinsished(result);
         break;
 
-    case OP_CODE_CMD_REQ::REQ_CHANGE_GAME:
+    case OP_CODE_CMD_REQ::REQ_CHANGE_GAME_TCP:
         emit this->notifyChangedGameFinished(result);
         break;
 

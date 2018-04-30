@@ -134,13 +134,14 @@ public:
     MessageProtocol* handleStatisticCommand(UserConData* pUserCon, MessageProtocol* request);
 
     qint32 addYearToStatistic(qint32 year);
+    qint32 removeYearFromStatistic(qint32 year);
 
 signals:
-    void signalNewYearAdded();
+    void signalYearChanged();
 
 private slots:
     void slotCycleTimerFired();
-    void slotNewYearAdded();
+    void slotYearChanged();
 
 protected:
     int DoBackgroundWork() override;

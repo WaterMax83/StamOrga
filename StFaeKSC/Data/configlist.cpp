@@ -169,6 +169,8 @@ bool ConfigList::updateItemValue(ConfigItem* pItem, QString key, QVariant value,
     this->m_pConfigSettings->endArray();
     this->m_pConfigSettings->endGroup();
 
+    this->m_pConfigSettings->sync();
+
     this->m_mConfigIniMutex.unlock();
 
     this->setNewUpdateTime(timeStamp);
@@ -207,6 +209,18 @@ quint32 ConfigList::getNextInternalIndex()
     this->m_pConfigSettings->endGroup();
 
     return savedIndex;
+}
+
+void ConfigList::restartConfigSettings()
+{
+    QString fileName = this->getFileName();
+
+    QMutexLocker locker(&this->m_mConfigIniMutex);
+
+    delete this->m_pConfigSettings;
+
+    this->m_pConfigSettings = new QSettings(fileName, QSettings::IniFormat);
+    this->m_pConfigSettings->setIniCodec(("UTF-8"));
 }
 
 qint64 ConfigList::getLastUpdateTime()
