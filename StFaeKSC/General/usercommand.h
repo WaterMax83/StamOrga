@@ -160,15 +160,15 @@ private:
         QString rValue;
         rValue.append("User functions - Usage\n\n");
 
-        rValue.append("add %NAME%\t\t");
+        rValue.append(QString("add %NAME%").leftJustified(25));
         rValue.append("add a new user\n");
-        rValue.append("remove %NAME%\t\t");
+        rValue.append(QString("remove %NAME%").leftJustified(25));
         rValue.append("remove a user\n");
-        rValue.append("change %NAME% %PASSW%\t");
+        rValue.append(QString("change %NAME% %PASSW%").leftJustified(25));
         rValue.append("change password a user\n");
-        rValue.append("prop %NAME% %PROP%\t");
+        rValue.append(QString("prop %NAME% %PROP%").leftJustified(25));
         rValue.append("change property a user\n");
-        rValue.append("show\t\t\t");
+        rValue.append(QString("show").leftJustified(25));
         rValue.append("show all users\n");
 
         return rValue;
@@ -179,7 +179,7 @@ private:
         QString rValue;
         rValue.append("Games functions - Usage\n\n");
 
-        rValue.append("show [update]\t\t\t");
+        rValue.append(QString("show [update]").leftJustified(20));
         rValue.append("show all games\n");
 
         return rValue;
@@ -190,7 +190,7 @@ private:
         QString rValue;
         rValue.append("Ticket functions - Usage\n\n");
 
-        rValue.append("show\t\t\t");
+        rValue.append(QString("show").leftJustified(15));
         rValue.append("show all season tickets\n");
 
         return rValue;
@@ -201,7 +201,7 @@ private:
         QString rValue;
         rValue.append("Read functions - Usage\n\n");
 
-        rValue.append("%PATH%\t\t\t");
+        rValue.append(QString("%PATH%").leftJustified(15));
         rValue.append("file path to a csv file\n");
 
         return rValue;
@@ -212,7 +212,7 @@ private:
         QString rValue;
         rValue.append("News functions - Usage\n\n");
 
-        rValue.append("show\t\t\t");
+        rValue.append(QString("show").leftJustified(15));
         rValue.append("show all news\n");
 
         return rValue;
@@ -223,11 +223,11 @@ private:
         QString rValue;
         rValue.append("Token functions - Usage\n\n");
 
-        rValue.append("token\t\t\t");
+        rValue.append(QString("token").leftJustified(15));
         rValue.append("show all token information\n");
-        rValue.append("guid\t\t\t");
+        rValue.append(QString("guid").leftJustified(15));
         rValue.append("show all guid information\n");
-        rValue.append("version\t\t\t");
+        rValue.append(QString("version").leftJustified(15));
         rValue.append("show all version information\n");
 
         return rValue;

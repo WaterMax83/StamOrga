@@ -67,6 +67,10 @@ qint32 cDataConsoleManager::handleConsoleCommandResponse(MessageProtocol* msg)
 
     QByteArray output     = QByteArray::fromBase64(result.toUtf8());
     this->m_consoleOutput = qUncompress(output);
+    //    QStringList strs      = this->m_consoleOutput.split("\n");
+    //    foreach (QString str, strs) {
+    //        qInfo() << str << " " << str.size();
+    //    }
 
     return rValue;
 }

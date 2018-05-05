@@ -162,16 +162,26 @@ QString FanclubNews::showNewsData()
     QString      rValue;
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
+    qint32 maxSizeUser = 0;
+    for (int i = 0; i < this->getNumberOfInternalList(); i++) {
+        NewsData* pItem = (NewsData*)(this->getItemFromArrayIndex(i));
+        if (pItem == NULL)
+            continue;
+
+        if (g_ListedUser->getItemName(pItem->m_userID).size() > maxSizeUser)
+            maxSizeUser = g_ListedUser->getItemName(pItem->m_userID).size();
+    }
+
     for (int i = 0; i < this->getNumberOfInternalList(); i++) {
         NewsData* pItem = (NewsData*)(this->getItemFromArrayIndex(i));
         if (pItem == NULL)
             continue;
 
         QString date   = QDateTime::fromMSecsSinceEpoch(pItem->m_timestamp).toString("dd.MM.yyyy hh:mm");
-        QString output = QString("%1 - %2: %3 - %4\n")
+        QString output = QString("%1 - %2: %3 \n  %4\n")
                              .arg(pItem->m_index, 2, 10, QChar('0'))
                              .arg(date)
-                             .arg(g_ListedUser->getItemName(pItem->m_userID), -15)
+                             .arg(g_ListedUser->getItemName(pItem->m_userID), -maxSizeUser)
                              .arg(pItem->m_itemName);
 
         rValue.append(output);

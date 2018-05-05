@@ -78,8 +78,8 @@ MessageProtocol* cMeetingInfoManager::getMeetingInfo(UserConData* pUserCon, Mess
         QString      when;
         QString      where;
         QString      info;
-        qint32       result;
-        MeetingInfo* mInfo = NULL;
+        qint32       result = ERROR_CODE_NOT_FOUND;
+        MeetingInfo* mInfo  = NULL;
         for (int i = 0; i < pList->size(); i++) {
             MeetingInfo* mi = pList->at(i);
             if (mi->getGameIndex() == gameIndex) {

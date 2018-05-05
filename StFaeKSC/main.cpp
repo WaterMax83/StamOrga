@@ -76,10 +76,10 @@ int main(int argc, char* argv[])
         g_ConTcpMainData.initialize(&globalData.m_UserList);
     }
 
-    BackgroundController ctrlReadOnline;
-    ReadOnlineGames*     online = new ReadOnlineGames();
-    online->initialize(&globalData);
-    ctrlReadOnline.Start(online, false);
+    //    BackgroundController ctrlReadOnline;
+    ReadOnlineGames* online = new ReadOnlineGames();
+    online->initialize();
+    //    ctrlReadOnline.Start(online, false);
 
     BackgroundController ctrlConsistent;
     CheckConsistentData* checkConsistData = new CheckConsistentData();
@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
     int result = a.exec();
 
     qDebug().noquote() << QString("Ending program %1: %2").arg(result).arg(QCoreApplication::applicationPid());
-    ctrlReadOnline.Stop();
+//    ctrlReadOnline.Stop();
     ctrlUdp.Stop();
     delete g_Console;
 

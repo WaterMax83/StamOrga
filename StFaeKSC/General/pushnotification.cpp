@@ -652,6 +652,17 @@ QString PushNotification::showCurrentTokenInformation(const QString cmd)
     QString      rValue;
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
+    //    qint32 maxSizeName = 0, maxSizePlace = 0;
+    //    for (int i = 0; i < this->getNumberOfInternalList(); i++) {
+    //        AppTokenUID* app = (AppTokenUID*)(this->getItemFromArrayIndex(i));
+    //        if (app == NULL)
+    //            continue;
+
+    //        if (app->m_itemName.size() > maxSizeName)
+    //            maxSizeName = app->m_itemName.size();
+
+    //    }
+
     for (int i = 0; i < this->getNumberOfInternalList(); i++) {
         AppTokenUID* app = (AppTokenUID*)(this->getItemFromArrayIndex(i));
         if (app == NULL)
@@ -660,13 +671,13 @@ QString PushNotification::showCurrentTokenInformation(const QString cmd)
         QString token   = app->m_fcmToken == "" ? "Kein Token" : app->m_fcmToken;
         QString version = app->m_version == "" ? "Keine Version" : app->m_version;
         QString output  = QString("%1: %2").arg(app->m_index, 2, 10).arg(date);
-        output.append(QString(" - %1").arg(this->m_pGlobalData->m_UserList.getItemName(app->m_userIndex), 25));
+        output.append(QString(" - %1").arg(this->m_pGlobalData->m_UserList.getItemName(app->m_userIndex)));
         if (cmd == "token")
-            output.append(QString(" - %1").arg(token));
+            output.append(QString("\n   %1").arg(token));
         else if (cmd == "guid")
-            output.append(QString(" - %1").arg(app->m_guid));
+            output.append(QString("\n   %1").arg(app->m_guid));
         else if (cmd == "version")
-            output.append(QString(" - %1 %2").arg(version, 15).arg(app->m_oSystem));
+            output.append(QString("\n   %1 %2").arg(version, -15).arg(app->m_oSystem));
 
         rValue.append(output);
         rValue.append("\n");

@@ -390,7 +390,7 @@ qint32 cDataGamesManager::startChangeGame(const qint32 index, const qint32 sInde
     if (!this->m_initialized)
         return ERROR_CODE_NOT_INITIALIZED;
 
-    if (sIndex > 38 || competition == "" || home == "" || away == "" || date == "") {
+    if (sIndex > 60 || competition == "" || home == "" || away == "" || date == "") {
         qWarning().noquote() << "Standart parameter for changing game are wrong";
         return ERROR_CODE_WRONG_PARAMETER;
     }

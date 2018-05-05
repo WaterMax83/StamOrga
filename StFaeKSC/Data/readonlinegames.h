@@ -27,8 +27,8 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 
+#include "../Common/General/backgroundcontroller.h"
 #include "../Common/General/backgroundworker.h"
-#include "../General/globaldata.h"
 
 struct OnlineGameInfo {
     QString m_team1;
@@ -64,7 +64,9 @@ public:
     explicit ReadOnlineGames(QObject* parent = 0);
 
 
-    void initialize(GlobalData* globalData);
+    qint32 initialize();
+
+    qint32 terminate();
 
 signals:
 
@@ -77,9 +79,10 @@ public slots:
 protected:
     int DoBackgroundWork();
 
-    GlobalData*            m_globalData;
+    //    GlobalData*            m_globalData;
+    BackgroundController   m_ctrl;
     QNetworkAccessManager* m_netAccess;
-    QTimer*                m_networkTimout;
+    QTimer*                m_networkTimout = NULL;
     bool                   m_bRequestCanceled;
     qint32                 m_currentRequestIndex;
 
@@ -90,7 +93,7 @@ protected:
     qint32              getTotalCountOfRequest();
     OnlineGameInfo* getNextRequest(OnlineGameInfo* currentGame);
 
-    QTimer* m_networkUpdate;
+    QTimer* m_networkUpdate = NULL;
 
     void startNetWorkRequest(OnlineGameInfo* info);
 

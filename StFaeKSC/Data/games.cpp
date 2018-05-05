@@ -212,6 +212,21 @@ QString Games::showAllGames(const bool showUpdate)
     QString      rValue;
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
+    qint32 maxSizeHome = 0, maxSizeAway = 0;
+    if (!showUpdate) {
+        for (int i = 0; i < this->getNumberOfInternalList(); i++) {
+            GamesPlay* pGame = (GamesPlay*)(this->getItemFromArrayIndex(i));
+            if (pGame == NULL)
+                continue;
+
+            if (pGame->m_itemName.size() > maxSizeHome)
+                maxSizeHome = pGame->m_itemName.size();
+
+            if (pGame->m_away.size() > maxSizeAway)
+                maxSizeAway = pGame->m_away.size();
+        }
+    }
+
     for (int i = 0; i < this->getNumberOfInternalList(); i++) {
         GamesPlay* pGame = (GamesPlay*)(this->getItemFromArrayIndex(i));
         if (pGame == NULL)
@@ -221,7 +236,7 @@ QString Games::showAllGames(const bool showUpdate)
         QString output = QString("%1:  %2").arg(pGame->m_index, 3, 10).arg(pGame->m_saisonIndex, 2, 10);
         output.append(QString("  %1  %2 ").arg(pGame->m_competition).arg(date));
         if (!showUpdate) {
-            output.append(QString("%1 - %2").arg(pGame->m_itemName, -22).arg(pGame->m_away, -22));
+            output.append(QString("\n    %1 - %2").arg(pGame->m_itemName, -maxSizeHome).arg(pGame->m_away, -maxSizeAway));
             if (pGame->m_score.size() > 0)
                 output.append(QString(" %1 ").arg(pGame->m_score));
             if (pGame->m_scheduled)

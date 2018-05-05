@@ -146,11 +146,25 @@ QString ListedUser::showAllUsers()
     QString      rValue;
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
+    qint32 mxSzName = 0, mxSzRdName = 0;
     for (int i = 0; i < this->getNumberOfInternalList(); i++) {
         UserLogin* pLogin = (UserLogin*)(this->getItemFromArrayIndex(i));
         if (pLogin == NULL)
             continue;
-        QString output = QString("%1 - %2").arg(pLogin->m_itemName, -25).arg(pLogin->m_readName, -20);
+
+        if (pLogin->m_itemName.size() > mxSzName)
+            mxSzName = pLogin->m_itemName.size();
+        if (pLogin->m_readName.size() > mxSzRdName)
+            mxSzRdName = pLogin->m_readName.size();
+    }
+
+    mxSzName += 2;
+    mxSzRdName += 2;
+    for (int i = 0; i < this->getNumberOfInternalList(); i++) {
+        UserLogin* pLogin = (UserLogin*)(this->getItemFromArrayIndex(i));
+        if (pLogin == NULL)
+            continue;
+        QString output = QString("%1 - %2").arg(pLogin->m_itemName, -mxSzName).arg(pLogin->m_readName, -mxSzRdName);
         output.append(QString(" : 0x%1\n").arg(QString::number(pLogin->m_properties, 16)));
         rValue.append(output);
     }

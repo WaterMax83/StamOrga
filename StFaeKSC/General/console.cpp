@@ -151,25 +151,25 @@ QString Console::printHelp()
     rValue.append("\nConsole for StFaeKSC\n\n");
 
     rValue.append("Known commands are:\n");
-    rValue.append("help:\t\t");
+    rValue.append(QString("help:").leftJustified(15));
     rValue.append("Show this info\n");
-    rValue.append("user:\t\t");
+    rValue.append(QString("user:").leftJustified(15));
     rValue.append("use the user command\n");
-    rValue.append("game:\t\t");
+    rValue.append(QString("game:").leftJustified(15));
     rValue.append("use the game command\n");
-    rValue.append("ticket:\t\t");
+    rValue.append(QString("ticket:").leftJustified(15));
     rValue.append("use the ticket command\n");
-    rValue.append("token:\t\t");
+    rValue.append(QString("token:").leftJustified(15));
     rValue.append("show the current token Info\n");
-    rValue.append("news:\t\t");
+    rValue.append(QString("news:").leftJustified(15));
     rValue.append("show the news Info\n");
-    rValue.append("read %PATH%:\t");
+    rValue.append(QString("read %PATH%:").leftJustified(15));
     rValue.append("read a new file in csv file format\n");
-    rValue.append("log %i:\t\t");
+    rValue.append(QString("log %i:").leftJustified(15));
     rValue.append("show the last user log\n");
-    rValue.append("exit:\t\t");
+    rValue.append(QString("exit:").leftJustified(15));
     rValue.append("exit the program\n");
-    rValue.append("quit:\t\t");
+    rValue.append(QString("quit:").leftJustified(15));
     rValue.append("exit the program\n");
 
     return rValue;

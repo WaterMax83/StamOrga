@@ -287,11 +287,12 @@ Rectangle {
                 font.bold: true
                 color: "white"
                 font.pixelSize: 14
-                rightPadding: parent.width / 100 * 30
+                Layout.rightMargin: parent.width / 100 * 30
                 Layout.alignment: Qt.AlignRight // | Qt.AlignHCenter
             }
 
             RowLayout {
+                id: layoutCurrentInfoItem
                 Layout.alignment: Qt.AlignRight
                 Layout.rightMargin: 5
                 spacing: 5
@@ -379,6 +380,7 @@ Rectangle {
             if (gamePlayItem.isGameInPast()) {
                 mainRectangleGame.gradColorStart = "#505050"
                 mainRectangleGame.gradColorStop = "#909090"
+                layoutCurrentInfoItem.visible = false;
                 return;
             } else if (gamePlayItem.isGameRunning()) {
                 mainRectangleGame.gradColorStart = "#f30707"

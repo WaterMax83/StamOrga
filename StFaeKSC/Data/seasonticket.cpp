@@ -170,13 +170,26 @@ QString SeasonTicket::showAllSeasonTickets()
     QString      rValue;
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
+    qint32 maxSizeName = 0, maxSizePlace = 0;
+    for (int i = 0; i < this->getNumberOfInternalList(); i++) {
+        TicketInfo* pTicket = (TicketInfo*)(this->getItemFromArrayIndex(i));
+        if (pTicket == NULL)
+            continue;
+
+        if (pTicket->m_itemName.size() > maxSizeName)
+            maxSizeName = pTicket->m_itemName.size();
+
+        if (pTicket->m_place.size() > maxSizePlace)
+            maxSizePlace = pTicket->m_place.size();
+    }
+
     for (int i = 0; i < this->getNumberOfInternalList(); i++) {
         TicketInfo* pTicket = (TicketInfo*)(this->getItemFromArrayIndex(i));
         if (pTicket == NULL)
             continue;
         QString date   = QDateTime::fromMSecsSinceEpoch(pTicket->m_timestamp).toString("dd.MM.yyyy hh:mm");
-        QString output = QString("%1: %2").arg(pTicket->m_itemName, -20).arg(pTicket->m_discount);
-        output.append(QString(" - %1 - %2").arg(date).arg(pTicket->m_place, -20));
+        QString output = QString("%1: %2").arg(pTicket->m_itemName, -maxSizeName).arg(pTicket->m_discount);
+        output.append(QString(" - %1 \n  %2").arg(date).arg(pTicket->m_place, -maxSizePlace));
         output.append(QString(" - %1\n").arg(pTicket->m_user));
         rValue.append(output);
     }

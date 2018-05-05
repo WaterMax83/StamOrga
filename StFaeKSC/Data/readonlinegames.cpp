@@ -23,6 +23,7 @@
 #include <QtCore/QJsonValue>
 
 #include "../Common/General/globalfunctions.h"
+#include "../General/globaldata.h"
 #include "readonlinegames.h"
 
 #define GETMATCH_DATA "https://www.openligadb.de/api/getmatchdata"
@@ -30,16 +31,23 @@
 #define MINUTE_IN_MSEC 60 * qint64(1000)
 #define HOUR_IN_MSEC 60 * 60 * qint64(1000)
 
+extern GlobalData* g_GlobalData;
+
 
 ReadOnlineGames::ReadOnlineGames(QObject* parent)
     : BackgroundWorker(parent)
 {
 }
 
-void ReadOnlineGames::initialize(GlobalData* globalData)
+qint32 ReadOnlineGames::initialize()
 {
-    this->m_globalData          = globalData;
     this->m_currentRequestIndex = -1;
+
+    this->m_ctrl.Start(this, false);
+
+    this->m_initialized = true;
+
+    return ERROR_CODE_SUCCESS;
 }
 
 
@@ -62,14 +70,16 @@ int ReadOnlineGames::DoBackgroundWork()
     this->m_netAccess = new QNetworkAccessManager();
     connect(this->m_netAccess, &QNetworkAccessManager::finished, this, &ReadOnlineGames::slotNetWorkRequestFinished);
 
-    this->m_networkTimout = new QTimer();
+    this->m_networkTimout = new QTimer(this);
     this->m_networkTimout->setSingleShot(true);
     this->m_networkTimout->setInterval(5000);
     connect(this->m_networkTimout, &QTimer::timeout, this, &ReadOnlineGames::slotNetWorkRequestTimeout);
 
-    this->m_networkUpdate = new QTimer();
+    this->m_networkUpdate = new QTimer(this);
     this->m_networkUpdate->setSingleShot(true);
     connect(this->m_networkUpdate, &QTimer::timeout, this, &ReadOnlineGames::slotNetWorkUpdateTimeout);
+
+    connect(this, &ReadOnlineGames::signalFinishThreadSafe, this, &ReadOnlineGames::slotFinishThreadSafe);
 
 #ifdef QT_DEBUG
     qInfo().noquote() << "Did not use ReadOnlineGame because of debugging";
@@ -391,14 +401,14 @@ bool ReadOnlineGames::readSingleGame(QJsonObject& json)
         comp = LIGA_3;
     else if (this->m_currentGameInfo->m_competition == "dfb2017")
         comp = DFB_POKAL;
-    this->m_globalData->m_GamesList.addNewGame(this->m_currentGameInfo->m_team1,
-                                               this->m_currentGameInfo->m_team2,
-                                               this->m_currentGameInfo->m_timeStamp,
-                                               this->m_currentGameInfo->m_index,
-                                               this->m_currentGameInfo->m_score,
-                                               comp,
-                                               this->m_currentGameInfo->m_season,
-                                               this->m_currentGameInfo->m_lastUpdate);
+    g_GlobalData->m_GamesList.addNewGame(this->m_currentGameInfo->m_team1,
+                                         this->m_currentGameInfo->m_team2,
+                                         this->m_currentGameInfo->m_timeStamp,
+                                         this->m_currentGameInfo->m_index,
+                                         this->m_currentGameInfo->m_score,
+                                         comp,
+                                         this->m_currentGameInfo->m_season,
+                                         this->m_currentGameInfo->m_lastUpdate);
 
     return true;
     /*
@@ -433,4 +443,22 @@ QString ReadOnlineGames::readSingleGameResult(QJsonArray& json)
     }
 
     return rValue;
+}
+
+qint32 ReadOnlineGames::terminate()
+{
+    this->m_initialized = false;
+
+    if (this->m_ctrl.IsRunning())
+        this->m_ctrl.Stop(true);
+
+    if (this->m_networkTimout != NULL)
+        this->m_networkTimout->deleteLater();
+    this->m_networkTimout = NULL;
+
+    if (this->m_networkUpdate != NULL)
+        this->m_networkUpdate->deleteLater();
+    this->m_networkUpdate = NULL;
+
+    return ERROR_CODE_SUCCESS;
 }
