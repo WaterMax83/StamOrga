@@ -123,8 +123,8 @@ enum MeetingType {
 };
 
 extern CompetitionIndex getCompetitionIndex(QString comp);
-extern QString getCompetitionString(CompetitionIndex index);
-extern QString createRandomString(qint32 size);
+extern QString          getCompetitionString(CompetitionIndex index);
+extern QString          createRandomString(qint32 size);
 
 // clang-format off
 #define USER_ENABLE_LOG                     0x0001
@@ -147,5 +147,10 @@ extern QString createRandomString(qint32 size);
 #define NOTIFY_TOPIC_GENERAL_BACKUP         "GeneralBackup"     // after versoin 1.0.3
 // clang-format on
 
+
+// clang-format off
+#define MAX_GAME_YEAR       2025
+#define MIN_GAME_YEAR       2015
+// clang-format on
 
 #endif // GLOBALFUNCTIONS_H

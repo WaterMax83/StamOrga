@@ -37,13 +37,24 @@ extern GlobalData* g_GlobalData;
 ReadOnlineGames::ReadOnlineGames(QObject* parent)
     : BackgroundWorker(parent)
 {
+    //    this->m_ctrl          = new BackgroundController();
+    this->m_networkTimout = NULL;
+    this->m_networkUpdate = NULL;
 }
 
-qint32 ReadOnlineGames::initialize()
+ReadOnlineGames::~ReadOnlineGames()
+{
+    //    delete this->m_ctrl;
+}
+
+qint32 ReadOnlineGames::initialize(QString comp, qint32 max, qint32 season)
 {
     this->m_currentRequestIndex = -1;
+    this->m_comp                = comp;
+    this->m_maxIndex            = max;
+    this->m_season              = season;
 
-    this->m_ctrl.Start(this, false);
+    //    this->m_ctrl->Start(this, false);
 
     this->m_initialized = true;
 
@@ -55,17 +66,17 @@ int ReadOnlineGames::DoBackgroundWork()
 {
     this->m_currentRequestIndex = -1;
 
-    RequestList* list1 = new RequestList();
-    list1->m_comp      = "bl3";
-    list1->m_maxIndex  = 38;
-    list1->m_season    = 2017;
-    this->m_requestList.append(list1);
+    //    OnlineGamesRequestList* list1 = new OnlineGamesRequestList();
+    //    list1->m_comp      = "bl3";
+    //    list1->m_maxIndex  = 38;
+    //    list1->m_season    = 2017;
+    //    this->m_requestList.append(list1);
 
-    RequestList* list2 = new RequestList();
-    list2->m_comp      = "dfb2017";
-    list2->m_maxIndex  = 1;
-    list2->m_season    = 2017;
-    this->m_requestList.append(list2);
+    //    OnlineGamesRequestList* list2 = new OnlineGamesRequestList();
+    //    list2->m_comp      = "dfb2017";
+    //    list2->m_maxIndex  = 1;
+    //    list2->m_season    = 2017;
+    //    this->m_requestList.append(list2);
 
     this->m_netAccess = new QNetworkAccessManager();
     connect(this->m_netAccess, &QNetworkAccessManager::finished, this, &ReadOnlineGames::slotNetWorkRequestFinished);
@@ -79,9 +90,9 @@ int ReadOnlineGames::DoBackgroundWork()
     this->m_networkUpdate->setSingleShot(true);
     connect(this->m_networkUpdate, &QTimer::timeout, this, &ReadOnlineGames::slotNetWorkUpdateTimeout);
 
-    connect(this, &ReadOnlineGames::signalFinishThreadSafe, this, &ReadOnlineGames::slotFinishThreadSafe);
+//    connect(this, &ReadOnlineGames::signalFinishThreadSafe, this, &ReadOnlineGames::slotFinishThreadSafe);
 
-#ifdef QT_DEBUG
+#ifdef QT_DEBUG123
     qInfo().noquote() << "Did not use ReadOnlineGame because of debugging";
     return 0;
 #endif
@@ -93,44 +104,32 @@ int ReadOnlineGames::DoBackgroundWork()
 
 qint32 ReadOnlineGames::getTotalCountOfRequest()
 {
-    qint32 rValue = 0;
-    foreach (RequestList* request, this->m_requestList)
-        rValue += request->m_maxIndex;
+    //    qint32 rValue = 0;
+    //    foreach (OnlineGamesRequestList* request, this->m_requestList)
+    //        rValue += request->m_maxIndex;
 
-    return rValue;
+    return this->m_maxIndex;
 }
 
 OnlineGameInfo* ReadOnlineGames::getNextRequest(OnlineGameInfo* currentGame)
 {
-    if (this->m_requestList.size() == 0)
-        return NULL;
+    //    if (this->m_requestList.size() == 0)
+    //        return NULL;
 
     if (currentGame == NULL) {
         OnlineGameInfo* info = new OnlineGameInfo();
-        info->m_competition  = this->m_requestList[0]->m_comp;
-        info->m_season       = this->m_requestList[0]->m_season;
+        info->m_competition  = this->m_comp;
+        info->m_season       = this->m_season;
         info->m_index        = 1;
         return info;
     }
-    bool takeNextGame = false;
-    foreach (RequestList* request, this->m_requestList) {
-        if (takeNextGame) {
-            OnlineGameInfo* info = new OnlineGameInfo();
-            info->m_competition  = request->m_comp;
-            info->m_season       = request->m_season;
-            info->m_index        = 1;
-            return info;
-        }
-        if (currentGame->m_competition == request->m_comp && currentGame->m_season == request->m_season) {
-            if (currentGame->m_index < request->m_maxIndex) {
-                OnlineGameInfo* info = new OnlineGameInfo();
-                info->m_competition  = request->m_comp;
-                info->m_season       = request->m_season;
-                info->m_index        = currentGame->m_index + 1;
-                return info;
-            }
-            takeNextGame = true;
-        }
+
+    if (currentGame->m_index < this->m_maxIndex) {
+        OnlineGameInfo* info = new OnlineGameInfo();
+        info->m_competition  = this->m_comp;
+        info->m_season       = this->m_season;
+        info->m_index        = currentGame->m_index + 1;
+        return info;
     }
 
     return NULL;
@@ -154,12 +153,16 @@ void ReadOnlineGames::startNetWorkRequest(OnlineGameInfo* info)
 
     this->m_bRequestCanceled = false;
 
-    qInfo().noquote() << QString("Request for game %1").arg(this->m_currentGameInfo->m_index);
+    qInfo().noquote() << QString("Request for game %1:%2:%3")
+                             .arg(this->m_currentGameInfo->m_index)
+                             .arg(this->m_currentGameInfo->m_competition)
+                             .arg(this->m_currentGameInfo->m_season);
 
 #ifdef QT_DEBUG
-    qInfo().noquote() << QString("Single game answer for game %1:%2")
+    qInfo().noquote() << QString("Single game answer for game %1:%2:%3")
                              .arg(this->m_currentGameInfo->m_index)
-                             .arg(this->m_currentGameInfo->m_competition);
+                             .arg(this->m_currentGameInfo->m_competition)
+                             .arg(this->m_currentGameInfo->m_season);
     this->checkNewNetworkRequest(true);
 #else
 #if (QT_VERSION < QT_VERSION_CHECK(5, 8, 0))
@@ -303,9 +306,10 @@ void ReadOnlineGames::slotNetWorkRequestFinished(QNetworkReply* reply)
     QJsonDocument d   = QJsonDocument::fromJson(arr);
 
     if (d.isArray()) { /* all Games */
-        qInfo().noquote() << QString("Request answer for game %1:%2")
+        qInfo().noquote() << QString("Request answer for game %1:%2:%3")
                                  .arg(this->m_currentGameInfo->m_index)
-                                 .arg(this->m_currentGameInfo->m_competition);
+                                 .arg(this->m_currentGameInfo->m_competition)
+                                 .arg(this->m_currentGameInfo->m_season);
         QJsonArray array = d.array();
         for (int i = 0; i < array.size(); i++) {
             QJsonObject gameObj = array[i].toObject();
@@ -314,9 +318,10 @@ void ReadOnlineGames::slotNetWorkRequestFinished(QNetworkReply* reply)
         }
     } else { /* just single game */
         QJsonObject gameObj = d.object();
-        qInfo().noquote() << QString("Single game answer for game %1:%2")
+        qInfo().noquote() << QString("Single game answer for game %1:%2:%3")
                                  .arg(this->m_currentGameInfo->m_index)
-                                 .arg(this->m_currentGameInfo->m_competition);
+                                 .arg(this->m_currentGameInfo->m_competition)
+                                 .arg(this->m_currentGameInfo->m_season);
         this->readSingleGame(gameObj);
     }
 
@@ -449,16 +454,18 @@ qint32 ReadOnlineGames::terminate()
 {
     this->m_initialized = false;
 
-    if (this->m_ctrl.IsRunning())
-        this->m_ctrl.Stop(true);
-
     if (this->m_networkTimout != NULL)
-        this->m_networkTimout->deleteLater();
+        delete this->m_networkTimout;
     this->m_networkTimout = NULL;
 
     if (this->m_networkUpdate != NULL)
-        this->m_networkUpdate->deleteLater();
+        delete this->m_networkUpdate;
     this->m_networkUpdate = NULL;
+
+    //    if (this->m_ctrl->IsRunning())
+    //        this->m_ctrl->Stop(true);
+
+    qInfo() << "Shutting down readOnline";
 
     return ERROR_CODE_SUCCESS;
 }

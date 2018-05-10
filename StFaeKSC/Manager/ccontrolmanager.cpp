@@ -18,20 +18,24 @@
 
 #include <QtCore/QJsonArray>
 
-#include "ccontrolmanager.h"
 #include "../Common/General/globalfunctions.h"
 #include "../Common/Network/messagecommand.h"
+#include "ccontrolmanager.h"
 #include "cstatisticmanager.h"
 
 // clang-format off
-#define GROUP_STATS     "Statistic"
+#define GROUP_STATS             "Statistic"
+
+#define GROUP_ONLINE_GAMES      "OnlineGames"
+#define ONL_GAM_MAX_INDEX       "maxIndex"
+#define ONL_GAM_SEASON          "season"
 // clang-format on
 
 cControlManager g_ControlManager;
 
-cControlManager::cControlManager(QObject *parent) : cGenDisposer(parent)
+cControlManager::cControlManager(QObject* parent)
+    : cGenDisposer(parent)
 {
-
 }
 
 qint32 cControlManager::initialize()
@@ -56,11 +60,32 @@ qint32 cControlManager::initialize()
 
         for (int i = 0; i < sizeOfArray; i++) {
             this->m_pConfigSettings->setArrayIndex(i);
-            qint32 year      = this->m_pConfigSettings->value(ITEM_NAME, -1).toInt();
-            if (year < 2015 || year > 2025)
+            qint32 year = this->m_pConfigSettings->value(ITEM_NAME, -1).toInt();
+            if (year < MIN_GAME_YEAR || year > MAX_GAME_YEAR)
                 bProblems = true;
             else
                 this->m_statistic.append(year);
+        }
+        this->m_pConfigSettings->endArray();
+        this->m_pConfigSettings->endGroup();
+
+        this->m_pConfigSettings->beginGroup(GROUP_ONLINE_GAMES);
+        sizeOfArray = this->m_pConfigSettings->beginReadArray(CONFIG_LIST_ARRAY);
+
+        for (int i = 0; i < sizeOfArray; i++) {
+            this->m_pConfigSettings->setArrayIndex(i);
+            QString comp   = this->m_pConfigSettings->value(ITEM_NAME, "").toString();
+            qint32  index  = this->m_pConfigSettings->value(ONL_GAM_MAX_INDEX, -1).toInt();
+            qint32  season = this->m_pConfigSettings->value(ONL_GAM_SEASON, -1).toInt();
+            if (comp.isEmpty() || index <= 0 || season < MIN_GAME_YEAR || season > MAX_GAME_YEAR)
+                bProblems = true;
+            else {
+                OnlineGameCtrl* pCtrl = new OnlineGameCtrl();
+                pCtrl->m_game         = new ReadOnlineGames();
+                pCtrl->m_game->initialize(comp, index, season);
+                pCtrl->m_ctrl.Start(pCtrl->m_game, false);
+                this->m_onlineGames.append(pCtrl);
+            }
         }
         this->m_pConfigSettings->endArray();
         this->m_pConfigSettings->endGroup();
@@ -70,6 +95,8 @@ qint32 cControlManager::initialize()
 
     if (bProblems)
         this->saveCurrentInteralList();
+
+    this->startAllControls();
 
     this->m_initialized = true;
 
@@ -93,14 +120,29 @@ void cControlManager::saveCurrentInteralList()
     this->m_pConfigSettings->endArray();
     this->m_pConfigSettings->endGroup();
 
+    this->m_pConfigSettings->beginGroup(GROUP_ONLINE_GAMES);
+    this->m_pConfigSettings->remove(""); // clear all elements
+
+    this->m_pConfigSettings->beginWriteArray(CONFIG_LIST_ARRAY);
+    for (int i = 0; i < this->m_onlineGames.size(); i++) {
+        this->m_pConfigSettings->setArrayIndex(i);
+
+        this->m_pConfigSettings->setValue(ITEM_NAME, this->m_onlineGames.at(i)->m_game->getCompetition());
+        this->m_pConfigSettings->setValue(ONL_GAM_MAX_INDEX, this->m_onlineGames.at(i)->m_game->getMaxIndex());
+        this->m_pConfigSettings->setValue(ONL_GAM_SEASON, this->m_onlineGames.at(i)->m_game->getSeason());
+    }
+
+    this->m_pConfigSettings->endArray();
+    this->m_pConfigSettings->endGroup();
+
     this->m_mConfigIniMutex.unlock();
 
     this->setNewUpdateTime();
 
-    qDebug().noquote() << QString("saved current Statistic List");
+    qDebug().noquote() << QString("saved current Control List");
 }
 
-MessageProtocol* cControlManager::getControlCommandResponse(UserConData *pUserCon, MessageProtocol *request)
+MessageProtocol* cControlManager::getControlCommandResponse(UserConData* pUserCon, MessageProtocol* request)
 {
     if (!this->m_initialized)
         return NULL;
@@ -111,7 +153,7 @@ MessageProtocol* cControlManager::getControlCommandResponse(UserConData *pUserCo
     QString cmd = rootObj.value("cmd").toString();
 
     QJsonObject rootAns;
-    qint32 result = ERROR_CODE_NOT_FOUND;
+    qint32      result = ERROR_CODE_NOT_FOUND;
 
     if (cmd == "refresh")
         result = this->handleRefreshCommand(rootAns);
@@ -120,14 +162,14 @@ MessageProtocol* cControlManager::getControlCommandResponse(UserConData *pUserCo
 
     rootAns.insert("ack", result);
     rootAns.insert("cmd", cmd);
-    qInfo() << QString("Handle control cmd of type %1 with %3 for %2").arg(cmd, pUserCon->m_userName).arg(result);
+    qInfo().noquote() << QString("Handle control cmd of type %1 with %3 for %2").arg(cmd, pUserCon->m_userName).arg(result);
 
     QByteArray answer = QJsonDocument(rootAns).toJson(QJsonDocument::Compact);
 
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_CMD_CONTROL, answer);
 }
 
-qint32 cControlManager::handleRefreshCommand(QJsonObject &rootAns)
+qint32 cControlManager::handleRefreshCommand(QJsonObject& rootAns)
 {
     QJsonArray statsYearsArr;
     QJsonArray readOnlGameArr;
@@ -135,29 +177,74 @@ qint32 cControlManager::handleRefreshCommand(QJsonObject &rootAns)
     foreach (qint32 stat, this->m_statistic)
         statsYearsArr.append(stat);
 
+    foreach (OnlineGameCtrl* pCtrl, this->m_onlineGames) {
+        QJsonObject gameObj;
+        gameObj.insert("comp", pCtrl->m_game->getCompetition());
+        gameObj.insert("index", pCtrl->m_game->getMaxIndex());
+        gameObj.insert("season", pCtrl->m_game->getSeason());
+
+        readOnlGameArr.append(gameObj);
+    }
+
     rootAns.insert("stats", statsYearsArr);
     rootAns.insert("readOnlineGame", readOnlGameArr);
 
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 cControlManager::handleSaveCommand(QJsonObject &rootObj)
+qint32 cControlManager::handleSaveCommand(QJsonObject& rootObj)
 {
-    QJsonArray statsArr = rootObj.value("stats").toArray();
+    QJsonArray statsArr   = rootObj.value("stats").toArray();
+    QJsonArray readOnlArr = rootObj.value("readOnlineGame").toArray();
 
-    foreach (qint32 year, this->m_statistic)
-        g_StatisticManager.removeYearFromStatistic(year);
-    this->m_statistic.clear();
+    this->stopAllControls();
 
-    for(int i=0; i < statsArr.size(); i++)   {
+    for (int i = 0; i < statsArr.size(); i++) {
         qint32 year = statsArr.at(i).toInt();
-        if (year > 2015 && year < 2025) {
+        if (year > MIN_GAME_YEAR && year < MAX_GAME_YEAR) {
             this->m_statistic.append(year);
-            g_StatisticManager.addYearToStatistic(year);
+        }
+    }
+
+    for (int i = 0; i < readOnlArr.size(); i++) {
+        QJsonObject gameObj  = readOnlArr.at(i).toObject();
+        QString     comp     = gameObj.value("comp").toString();
+        qint32      maxIndex = gameObj.value("index").toInt(-1);
+        qint32      season   = gameObj.value("season").toInt(-1);
+
+        if (comp.isEmpty() || maxIndex <= 0 || season < MIN_GAME_YEAR || season > MAX_GAME_YEAR)
+            continue;
+        else {
+            OnlineGameCtrl* pCtrl = new OnlineGameCtrl();
+            pCtrl->m_game         = new ReadOnlineGames();
+            pCtrl->m_game->initialize(comp, maxIndex, season);
+            pCtrl->m_ctrl.Start(pCtrl->m_game, false);
+            this->m_onlineGames.append(pCtrl);
         }
     }
 
     this->saveCurrentInteralList();
+    this->startAllControls();
 
     return ERROR_CODE_SUCCESS;
+}
+
+void cControlManager::startAllControls()
+{
+    foreach (qint32 year, this->m_statistic)
+        g_StatisticManager.addYearToStatistic(year);
+}
+
+void cControlManager::stopAllControls()
+{
+    foreach (qint32 year, this->m_statistic)
+        g_StatisticManager.removeYearFromStatistic(year);
+    this->m_statistic.clear();
+
+    for (int i = 0; i < this->m_onlineGames.size(); i++) {
+        this->m_onlineGames.at(i)->m_game->terminate();
+        this->m_onlineGames.at(i)->m_ctrl.Stop();
+        delete this->m_onlineGames.at(i);
+    }
+    this->m_onlineGames.clear();
 }

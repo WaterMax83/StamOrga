@@ -26,14 +26,20 @@
 
 #include "../Common/General/cgendisposer.h"
 #include "../Common/Network/messageprotocol.h"
-#include "../Network/connectiondata.h"
 #include "../Data/configlist.h"
+#include "../Data/readonlinegames.h"
+#include "../Network/connectiondata.h"
+
+struct OnlineGameCtrl {
+    BackgroundController m_ctrl;
+    ReadOnlineGames*     m_game;
+};
 
 class cControlManager : public cGenDisposer, public ConfigList
 {
     Q_OBJECT
 public:
-    explicit cControlManager(QObject *parent = 0);
+    explicit cControlManager(QObject* parent = 0);
 
     qint32 initialize();
 
@@ -48,10 +54,14 @@ public slots:
 private:
     void saveCurrentInteralList() override;
 
-    QList<qint32> m_statistic;
+    QList<qint32>          m_statistic;
+    QList<OnlineGameCtrl*> m_onlineGames;
 
     qint32 handleRefreshCommand(QJsonObject& rootAns);
     qint32 handleSaveCommand(QJsonObject& rootObj);
+
+    void stopAllControls();
+    void startAllControls();
 };
 
 extern cControlManager g_ControlManager;

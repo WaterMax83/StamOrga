@@ -42,8 +42,11 @@ public:
 
     qint32 handleControlCommand(MessageProtocol* msg);
 
-    qint32 setStatistic(QString stats);
+    qint32  setStatistic(QString stats);
     QString getStastistic();
+
+    qint32  setOnlineGames(QString games);
+    QString getOnlineGames();
 
 signals:
 
@@ -51,6 +54,7 @@ public slots:
 
 private:
     QStringList m_statistic;
+    QStringList m_onlineGames;
     QMutex      m_mutex;
 };
 

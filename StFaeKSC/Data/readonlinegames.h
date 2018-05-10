@@ -35,8 +35,8 @@ struct OnlineGameInfo {
     QString m_team2;
     QString m_competition;
     QString m_score;
-    quint32 m_season;
-    quint32 m_index;
+    qint32  m_season;
+    qint32  m_index;
     quint32 m_matchID;
     qint64  m_timeStamp;
     qint64  m_lastUpdate;
@@ -51,10 +51,10 @@ struct OnlineGameInfo {
     //    bool m_checkUpdate;
 };
 
-struct RequestList {
+struct OnlineGamesRequestList {
     QString m_comp;
-    quint32 m_season;
-    quint32 m_maxIndex;
+    qint32  m_season;
+    qint32  m_maxIndex;
 };
 
 class ReadOnlineGames : public BackgroundWorker
@@ -62,9 +62,14 @@ class ReadOnlineGames : public BackgroundWorker
     Q_OBJECT
 public:
     explicit ReadOnlineGames(QObject* parent = 0);
+    virtual ~ReadOnlineGames();
 
 
-    qint32 initialize();
+    qint32 initialize(QString comp, qint32 max, qint32 season);
+
+    QString getCompetition() { return this->m_comp; }
+    qint32  getMaxIndex() { return this->m_maxIndex; }
+    qint32  getSeason() { return this->m_season; }
 
     qint32 terminate();
 
@@ -79,21 +84,24 @@ public slots:
 protected:
     int DoBackgroundWork();
 
-    //    GlobalData*            m_globalData;
-    BackgroundController   m_ctrl;
+    /* Starting in own thread does not work at the moment -> segfault in desctructor of controller */
+    //    BackgroundController*  m_ctrl;
     QNetworkAccessManager* m_netAccess;
-    QTimer*                m_networkTimout = NULL;
+    QTimer*                m_networkTimout;
     bool                   m_bRequestCanceled;
     qint32                 m_currentRequestIndex;
 
     QList<OnlineGameInfo*> m_onlineGames;
     OnlineGameInfo*        m_currentGameInfo;
 
-    QList<RequestList*> m_requestList;
-    qint32              getTotalCountOfRequest();
+    //    OnlineGamesRequestList m_requestList;
+    QString         m_comp;
+    qint32          m_season;
+    qint32          m_maxIndex;
+    qint32          getTotalCountOfRequest();
     OnlineGameInfo* getNextRequest(OnlineGameInfo* currentGame);
 
-    QTimer* m_networkUpdate = NULL;
+    QTimer* m_networkUpdate;
 
     void startNetWorkRequest(OnlineGameInfo* info);
 

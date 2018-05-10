@@ -8,6 +8,7 @@ class cGenDisposer : public QObject
     Q_OBJECT
 public:
     explicit cGenDisposer(QObject* parent = nullptr);
+    virtual ~cGenDisposer() {}
 
     virtual qint32 initialize() { return 1; }
 

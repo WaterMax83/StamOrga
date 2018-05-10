@@ -76,16 +76,10 @@ int main(int argc, char* argv[])
         g_ConTcpMainData.initialize(&globalData.m_UserList);
     }
 
-    //    BackgroundController ctrlReadOnline;
-    ReadOnlineGames* online = new ReadOnlineGames();
-    online->initialize();
-    //    ctrlReadOnline.Start(online, false);
-
     BackgroundController ctrlConsistent;
     CheckConsistentData* checkConsistData = new CheckConsistentData();
     checkConsistData->initialize();
     ctrlConsistent.Start(checkConsistData, false);
-
 
     /* TODO: Connect for ctrlUdp::notifyBackgroundWorkerFinished */
 
@@ -95,12 +89,10 @@ int main(int argc, char* argv[])
     int result = a.exec();
 
     qDebug().noquote() << QString("Ending program %1: %2").arg(result).arg(QCoreApplication::applicationPid());
-//    ctrlReadOnline.Stop();
     ctrlUdp.Stop();
     delete g_Console;
 
     delete checkConsistData;
-    delete online;
 
     return result;
 }

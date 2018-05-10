@@ -74,11 +74,23 @@ qint32 cPCControlManager::saveControlList()
 
     QJsonObject rootObj;
     rootObj.insert("cmd", "save");
+
     QJsonArray statsArr;
     foreach (QString stat, this->m_statistic)
         statsArr.append(stat.toInt());
 
+    QJsonArray gamesArr;
+    foreach (QString game, this->m_onlineGames) {
+        QStringList gameInfos = game.split(";");
+        QJsonObject gameObj;
+        gameObj.insert("comp", gameInfos.at(0));
+        gameObj.insert("season", gameInfos.at(1).toInt());
+        gameObj.insert("index", gameInfos.at(2).toInt());
+        gamesArr.append(gameObj);
+    }
+
     rootObj.insert("stats", statsArr);
+    rootObj.insert("readOnlineGame", gamesArr);
 
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CMD_CONTROL);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
@@ -106,9 +118,23 @@ qint32 cPCControlManager::handleControlCommand(MessageProtocol* msg)
         this->m_mutex.lock();
     } else if (cmd == "refresh") {
         this->m_statistic.clear();
+        this->m_onlineGames.clear();
+
         QJsonArray statsArr = rootObj.value("stats").toArray();
         for (int i = 0; i < statsArr.size(); i++) {
             this->m_statistic.append(QString::number(statsArr.at(i).toInt()));
+        }
+
+        QJsonArray gamesArr = rootObj.value("readOnlineGame").toArray();
+        for (int i = 0; i < gamesArr.size(); i++) {
+            QJsonObject gameObj  = gamesArr.at(i).toObject();
+            QString     comp     = gameObj.value("comp").toString();
+            qint32      maxIndex = gameObj.value("index").toInt(-1);
+            qint32      season   = gameObj.value("season").toInt(-1);
+
+            if (comp.isEmpty() || maxIndex <= 0 || season < MIN_GAME_YEAR || season > MAX_GAME_YEAR)
+                continue;
+            this->m_onlineGames.append(QString("%1;%2;%3").arg(comp).arg(season).arg(maxIndex));
         }
     }
 
@@ -118,12 +144,13 @@ qint32 cPCControlManager::handleControlCommand(MessageProtocol* msg)
 qint32 cPCControlManager::setStatistic(QString stats)
 {
     QMutexLocker lock(&this->m_mutex);
-    QStringList  statsList = stats.split("\n");
+
+    QStringList statsList = stats.split("\n");
     for (int i = statsList.size() - 1; i >= 0; i--) {
         QString stat = statsList.at(i);
         bool    ok   = false;
         qint32  tmp  = stat.toInt(&ok);
-        if (!ok || tmp < 2015 || tmp > 2025)
+        if (!ok || tmp < MIN_GAME_YEAR || tmp > MAX_GAME_YEAR)
             statsList.removeAt(i);
     }
 
@@ -139,6 +166,40 @@ QString cPCControlManager::getStastistic()
     QString rValue;
     for (int i = 0; i < this->m_statistic.size(); i++)
         rValue.append(this->m_statistic.at(i) + "\n");
+
+    return rValue;
+}
+
+qint32 cPCControlManager::setOnlineGames(QString games)
+{
+    QMutexLocker lock(&this->m_mutex);
+
+    QStringList gamesList = games.split("\n");
+    for (int i = gamesList.size() - 1; i >= 0; i--) {
+        QStringList gameInfos = gamesList.at(i).split(";");
+        if (gameInfos.size() != 3) {
+            gamesList.removeAt(i);
+            continue;
+        }
+        bool   ok1 = false, ok2 = false;
+        qint32 tmp1 = gameInfos.at(1).toInt(&ok1);
+        qint32 tmp2 = gameInfos.at(2).toInt(&ok2);
+        if (!ok1 || !ok2 || tmp1 < MIN_GAME_YEAR || tmp1 > MAX_GAME_YEAR || tmp2 <= 0 || tmp2 > 64)
+            gamesList.removeAt(i);
+    }
+
+    this->m_onlineGames = gamesList;
+
+    return ERROR_CODE_SUCCESS;
+}
+
+QString cPCControlManager::getOnlineGames()
+{
+    QMutexLocker lock(&this->m_mutex);
+
+    QString rValue;
+    for (int i = 0; i < this->m_onlineGames.size(); i++)
+        rValue.append(this->m_onlineGames.at(i) + "\n");
 
     return rValue;
 }

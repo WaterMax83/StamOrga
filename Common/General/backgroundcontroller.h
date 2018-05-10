@@ -40,7 +40,7 @@ class BackgroundController : public QObject
     Q_OBJECT
 public:
     explicit BackgroundController(QObject* parent = 0);
-    ~BackgroundController();
+    virtual ~BackgroundController();
 
     bool IsRunning() { return m_thread.isRunning(); }
 

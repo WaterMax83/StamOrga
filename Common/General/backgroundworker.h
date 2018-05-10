@@ -41,10 +41,10 @@ class BackgroundWorker : public cGenDisposer
 public:
     explicit BackgroundWorker(QObject* parent = 0);
     explicit BackgroundWorker(QString& name);
-    ~BackgroundWorker();
+    virtual ~BackgroundWorker();
 
-    void     SetWorkerName(const QString& value) { this->m_workerName = value; }
-    QString& GetWorkerName() { return this->m_workerName; }
+    void SetWorkerName(const QString& value) { this->m_workerName = value; }
+    QString&                          GetWorkerName() { return this->m_workerName; }
 
 signals:
     void notifyThreadInfo(const QString& info);
