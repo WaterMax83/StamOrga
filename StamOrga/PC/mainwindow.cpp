@@ -95,6 +95,8 @@ void MainWindow::slotNotifyCommandFinished(quint32 command, qint32 result)
             this->ui->txtEditStatistic->setText(g_PCControlManager->getStastistic());
             this->ui->txtEditOnlineGames->setText(g_PCControlManager->getOnlineGames());
             this->ui->btnSaveControl->setEnabled(true);
+        } else {
+            this->ui->btnSaveControl->setEnabled(false);
         }
         break;
     default:
@@ -141,6 +143,9 @@ void MainWindow::on_btnUdpatePassword_clicked()
 void MainWindow::on_btnRefreshControl_clicked()
 {
     g_PCControlManager->refreshControlList();
+    this->ui->btnSaveControl->setEnabled(false);
+    this->ui->txtEditStatistic->clear();
+    this->ui->txtEditOnlineGames->clear();
 }
 
 void MainWindow::on_btnSaveControl_clicked()
@@ -148,4 +153,7 @@ void MainWindow::on_btnSaveControl_clicked()
     g_PCControlManager->setStatistic(this->ui->txtEditStatistic->toPlainText());
     g_PCControlManager->setOnlineGames(this->ui->txtEditOnlineGames->toPlainText());
     g_PCControlManager->saveControlList();
+    this->ui->btnSaveControl->setEnabled(false);
+    this->ui->txtEditStatistic->clear();
+    this->ui->txtEditOnlineGames->clear();
 }

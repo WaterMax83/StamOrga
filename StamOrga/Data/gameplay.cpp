@@ -89,12 +89,12 @@ QString GamePlay::getCompetitionLine()
         if (this->m_seasonIndex <= 34)
             return QString("%1. Spieltag - ").arg(this->m_seasonIndex);
         else
-            return QString("Relegation %1").arg(this->m_seasonIndex == 35 ? "Hinspiel" : "Rückspiel");
+            return QString("Relegation %1 - ").arg(this->m_seasonIndex == 35 ? "Hinspiel" : "Rückspiel");
     } else if (this->m_comp == LIGA_3) {
         if (this->m_seasonIndex <= 38)
             return QString("%1. Spieltag - ").arg(this->m_seasonIndex);
         else
-            return QString("Relegation %1").arg(this->m_seasonIndex == 39 ? "Hinspiel" : "Rückspiel");
+            return QString("Relegation %1 - ").arg(this->m_seasonIndex == 39 ? "Hinspiel" : "Rückspiel");
     } else if (this->m_comp == DFB_POKAL || this->m_comp == BADISCHER_POKAL) {
         if (this->m_seasonIndex < 6)
             return QString("%1. Runde - ").arg(this->m_seasonIndex);
