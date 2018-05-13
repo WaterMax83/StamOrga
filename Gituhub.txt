@@ -18,3 +18,8 @@ git push origin master			master branch auf server laden
 git reset --hard HEAD			branch zurücksetzen auf letzten Stand
 
 git merge development			branch development mit branch master mergen
+
+
+
+https://github.com/bluetiger9/SmtpClient-for-Qt.git
+

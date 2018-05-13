@@ -558,15 +558,22 @@ qint32 PushNotification::addNewVersionInformation(const QString guid, const QStr
 
         this->m_mInternalInfoMutex.lock();
 
+        bool  bChanged = false;
         if (app->m_version != version) {
             if (this->updateItemValue(app, APP_TOKEN_VERSION, QVariant(version)))
                 app->m_version = version;
 
             if (this->updateItemValue(app, ITEM_TIMESTAMP, QVariant(timestamp)))
                 app->m_timestamp = timestamp;
+
+            bChanged = true;
         }
 
         this->m_mInternalInfoMutex.unlock();
+
+        if (bChanged)
+            this->sortItemListByTimeAscending();
+
         return app->m_index;
     }
 

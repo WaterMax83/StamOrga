@@ -25,6 +25,7 @@
 #include "cstatisticmanager.h"
 #include "cticketmanager.h"
 #include "ccontrolmanager.h"
+#include "csmtpmanager.h"
 
 cGlobalManager::cGlobalManager(QObject* parent)
     : cGenDisposer(parent)
@@ -51,6 +52,11 @@ qint32 cGlobalManager::initialize()
 
     if (rValue == ERROR_CODE_SUCCESS)
         rValue = g_ControlManager.initialize();
+
+    if (rValue == ERROR_CODE_SUCCESS) {
+        rValue = g_SmtpManager.initialize();
+        this->m_ctrlSmtp.Start(&g_SmtpManager, false);
+    }
 
     this->m_initialized = true;
 

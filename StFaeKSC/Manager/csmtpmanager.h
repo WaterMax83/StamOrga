@@ -16,28 +16,42 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CGLOBALMANAGER_H
-#define CGLOBALMANAGER_H
+#ifndef CSMTPMANAGER_H
+#define CSMTPMANAGER_H
 
 #include <QObject>
+#include <QtCore/QMutex>
 
-#include "../Common/General/cgendisposer.h"
-#include "../Common/General/backgroundcontroller.h"
+#include "../Common/General/backgroundworker.h"
 
-class cGlobalManager : public cGenDisposer
+class cSmtpManager : public BackgroundWorker
 {
     Q_OBJECT
 public:
-    explicit cGlobalManager(QObject* parent = nullptr);
+    explicit cSmtpManager(QObject *parent = 0);
 
     qint32 initialize();
+
+    qint32 setServerEmail(const QString email);
+    qint32 setServerPassword(const QString password);
+
+    qint32 addDestinationEmail(const QString email);
+    qint32 clearDestinationEmails();
+
+protected:
+    int DoBackgroundWork();
 
 signals:
 
 public slots:
 
 private:
-    BackgroundController m_ctrlSmtp;
+    QMutex m_mutex;
+    QString m_serverEmail;
+    QString m_serverPassword;
+    QStringList m_destinationAdress;
 };
 
-#endif // CGLOBALMANAGER_H
+extern cSmtpManager g_SmtpManager;
+
+#endif // CSMTPMANAGER_H
