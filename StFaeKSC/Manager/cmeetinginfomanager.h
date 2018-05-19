@@ -39,7 +39,7 @@ public:
 
     MessageProtocol* getAcceptMeetingInfo(UserConData* pUserCon, MessageProtocol* request);
 
-    //    MessageProtocol* getNewsDataRemoveRequest(UserConData* pUserCon, MessageProtocol* request);
+    MessageProtocol* getSendComment(UserConData* pUserCon, MessageProtocol* request);
 
 signals:
 

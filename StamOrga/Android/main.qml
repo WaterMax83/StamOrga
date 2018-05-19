@@ -354,8 +354,6 @@ ApplicationWindow {
                     }
                 }
 
-                console.log(gStaGlobalSettings.getUpdateLink())
-
                 if (!isNewVersionElementShown) {
                     isNewVersionElementShown = true;
                     listViewListModel.append({
@@ -457,6 +455,8 @@ ApplicationWindow {
         onNotifyChangedAwayTripInfoFinished: stackView.currentItem.notifyChangedAwayTripInfoFinished(result);
         onNotifyLoadAwayTripInfoFinished: stackView.currentItem.notifyLoadAwayTripInfoFinished(result);
         onNotifyAcceptAwayTripFinished: stackView.currentItem.notifyAcceptAwayTripFinished(result);
+        onNotifySendCommentMeetFinished: stackView.currentItem.notifySendCommentMeetFinished(result);
+        onNotifySendCommentTripFinished: stackView.currentItem.notifySendCommentTripFinished(result);
 
         onNotifyChangeNewsDataFinished: stackView.currentItem.notifyChangeNewsDataFinished(result);
         onNotifyFanclubNewsListFinished: stackView.currentItem.notifyFanclubNewsListFinished(result);

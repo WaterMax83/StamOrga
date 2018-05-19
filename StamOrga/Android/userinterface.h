@@ -79,6 +79,8 @@ signals:
     void notifyLoadAwayTripInfoFinished(qint32 result);
     void notifyAcceptMeetingFinished(qint32 result);
     void notifyAcceptAwayTripFinished(qint32 result);
+    void notifySendCommentMeetFinished(qint32 result);
+    void notifySendCommentTripFinished(qint32 result);
     void notifyChangeNewsDataFinished(qint32 result);
     void notifyFanclubNewsListFinished(qint32 result);
     void notifyGetFanclubNewsItemFinished(qint32 result);

@@ -29,6 +29,7 @@ Flickable {
     height: parent.height * 1.2
     contentHeight: mainPaneCurrentMeetInfo.height
     property int meetingType: 0
+    property bool useCommentLine : true
 
     signal showInfoHeader(var text, var load);
 
@@ -425,6 +426,10 @@ Flickable {
 
     }
 
+    function sendNewComment(comment) {
+        lDataMeetingInfo.startSendNewComment(m_gamePlayCurrentItem.index, comment, meetingType);
+    }
+
     property var  lDataMeetingInfo;
     property bool isEditMode: false
     property bool isInputAlreadyChanged: false
@@ -547,6 +552,17 @@ Flickable {
         isAcceptVisible = true
     }
 
+    function notifySendCommentMeetFinished(result) {
+        if (result === 1) {
+            toastManager.show("Kommentar erfolgreich gesendet", 2000);
+            loadMeetingInfo();
+
+        } else {
+            toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
+            showInfoHeader("Kommentar senden hat nicht funktioniert", false)
+        }
+    }
+
     function loadMeetingInfo()
     {
         listViewModelAcceptedUsers.clear();
@@ -559,8 +575,9 @@ Flickable {
         lDataMeetingInfo.startLoadMeetingInfo(m_gamePlayCurrentItem.index, meetingType);
 
     }
-
 }
+
+
 
 
 

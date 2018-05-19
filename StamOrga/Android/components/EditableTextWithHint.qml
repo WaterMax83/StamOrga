@@ -52,6 +52,7 @@ Rectangle {
         color: "#505050"
         Layout.fillWidth: true
         wrapMode: Text.Wrap
+        layer.enabled: true
         onTextChanged: {
             if (isInit)
                 return;

@@ -190,9 +190,9 @@ void cConTcpData::checkNewOncomingData()
             request->m_result = g_DataGamesManager->handleChangeGameResponse(msg);
             break;
 
-        //        case OP_CODE_CMD_RES::ACK_SET_FIXED_GAME_TIME:
-        //                    request.m_result = msg->getIntData();
-        //            break;
+            //        case OP_CODE_CMD_RES::ACK_SET_FIXED_GAME_TIME:
+            //                    request.m_result = msg->getIntData();
+            //            break;
 
         case OP_CODE_CMD_RES::ACK_ADD_TICKET:
             request->m_result = g_DataTicketManager->handleAddSeasonTicketResponse(msg);
@@ -220,6 +220,9 @@ void cConTcpData::checkNewOncomingData()
         case OP_CODE_CMD_RES::ACK_GET_MEETING_INFO:
             request->m_result = g_DataMeetingInfo->handleLoadMeetingInfoResponse(msg);
             break;
+        case OP_CODE_CMD_RES::ACK_SEND_COMMENT_MEET:
+            request->m_result = g_DataMeetingInfo->handleSendCommentResponse(msg);
+            break;
         case OP_CODE_CMD_RES::ACK_GET_AWAYTRIP_INFO:
             request->m_result = g_DataTripInfo->handleLoadMeetingInfoResponse(msg);
             break;
@@ -228,6 +231,9 @@ void cConTcpData::checkNewOncomingData()
             break;
         case OP_CODE_CMD_RES::ACK_ACCEPT_AWAYTRIP:
             request->m_result = g_DataTripInfo->handAcceptMeetingInfo(msg);
+            break;
+        case OP_CODE_CMD_RES::ACK_SEND_COMMENT_TRIP:
+            request->m_result = g_DataTripInfo->handleSendCommentResponse(msg);
             break;
 
         case OP_CODE_CMD_RES::ACK_CHANGE_NEWS_DATA:

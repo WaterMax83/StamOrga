@@ -48,6 +48,9 @@ public:
     qint32  setOnlineGames(QString games);
     QString getOnlineGames();
 
+    qint32 setSmtpData(QString login, QString password, QString addresses);
+    qint32 getStmpData(QString& login, QString& password, QString& addresses);
+
 signals:
 
 public slots:
@@ -55,7 +58,11 @@ public slots:
 private:
     QStringList m_statistic;
     QStringList m_onlineGames;
-    QMutex      m_mutex;
+    QString     m_smtpLogin;
+    QString     m_smtpPassword;
+    QStringList m_smtpAddresses;
+
+    QMutex m_mutex;
 };
 
 extern cPCControlManager* g_PCControlManager;

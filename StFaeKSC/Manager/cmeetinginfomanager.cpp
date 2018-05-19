@@ -107,6 +107,9 @@ MessageProtocol* cMeetingInfoManager::getMeetingInfo(UserConData* pUserCon, Mess
                 acceptArr.append(acceptObj);
             }
             rootAns.insert("accept", acceptArr);
+
+            QJsonArray commentArr;
+            qint32     commentCount = mInfo->getMeetingCommentCount();
         }
     }
 
@@ -187,6 +190,46 @@ MessageProtocol* cMeetingInfoManager::getAcceptMeetingInfo(UserConData* pUserCon
                                  .arg(pUserCon->m_userName)
                                  .arg(g_GlobalData->m_GamesList.getItemName(gameIndex))
                                  .arg(accept);
+    }
+
+    QJsonObject rootAns;
+    rootAns.insert("ack", rCode);
+    rootAns.insert("index", gameIndex);
+    rootAns.insert("type", type);
+    rootAns.insert("messageID", messageID);
+
+    QByteArray answer = QJsonDocument(rootAns).toJson(QJsonDocument::Compact);
+
+    return new MessageProtocol(ack, answer);
+}
+
+MessageProtocol* cMeetingInfoManager::getSendComment(UserConData* pUserCon, MessageProtocol* request)
+{
+    if (!this->m_initialized)
+        return NULL;
+
+    QByteArray  data    = QByteArray(request->getPointerToData());
+    QJsonObject rootObj = QJsonDocument::fromJson(data).object();
+
+    qint32  gameIndex = rootObj.value("index").toInt(0);
+    qint32  type      = rootObj.value("type").toInt(-1);
+    QString comment   = rootObj.value("comment").toString();
+
+    quint32 ack;
+    if (type == MEETING_TYPE_MEETING) {
+        ack = OP_CODE_CMD_RES::ACK_SEND_COMMENT_MEET;
+    } else if (type == MEETING_TYPE_AWAYTRIP) {
+        ack = OP_CODE_CMD_RES::ACK_SEND_COMMENT_TRIP;
+    } else
+        return NULL;
+
+    qint64 messageID = -1;
+    qint32 rCode     = g_GlobalData->requestSendCommentMeeting(gameIndex, type, pUserCon->m_userID, comment, messageID);
+    if (rCode == ERROR_CODE_SUCCESS) {
+        qInfo().noquote() << QString("User %1 send comment to MeetingInfo of game %2: \"%3\"")
+                                 .arg(pUserCon->m_userName)
+                                 .arg(g_GlobalData->m_GamesList.getItemName(gameIndex))
+                                 .arg(comment);
     }
 
     QJsonObject rootAns;

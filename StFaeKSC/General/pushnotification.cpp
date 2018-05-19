@@ -21,6 +21,7 @@
 #include "../Common/General/config.h"
 #include "../Common/General/globalfunctions.h"
 #include "pushnotification.h"
+#include "../Manager/csmtpmanager.h"
 
 
 // clang-format off
@@ -398,6 +399,8 @@ void PushNotification::startSendNewPushNotify(PushNotifyInfo* pushNotify)
     if (!this->m_doNotUseSSLbecauseOfVersion)
         this->m_nam->post(request, jsonString);
     this->m_connectionTimeoutTimer->start();
+
+    g_SmtpManager.sendNewEmail(pushNotify->m_header, pushNotify->m_body);
 }
 
 void PushNotification::finished(QNetworkReply* reply)

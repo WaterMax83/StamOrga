@@ -30,6 +30,7 @@ cPCControlManager* g_PCControlManager;
 cPCControlManager::cPCControlManager(QObject* parent)
     : cGenDisposer(parent)
 {
+    this->m_initialized = false;
 }
 
 qint32 cPCControlManager::initialize()
@@ -38,6 +39,7 @@ qint32 cPCControlManager::initialize()
         return ERROR_CODE_SUCCESS;
 
     this->m_initialized = true;
+
 
     return ERROR_CODE_SUCCESS;
 }
@@ -89,8 +91,17 @@ qint32 cPCControlManager::saveControlList()
         gamesArr.append(gameObj);
     }
 
+    QJsonArray addrArr;
+    foreach (QString adr, this->m_smtpAddresses)
+        addrArr.append(adr);
+    QJsonObject smtpObj;
+    smtpObj.insert("login", this->m_smtpLogin);
+    smtpObj.insert("password", this->m_smtpPassword);
+    smtpObj.insert("addresses", addrArr);
+
     rootObj.insert("stats", statsArr);
     rootObj.insert("readOnlineGame", gamesArr);
+    rootObj.insert("smtp", smtpObj);
 
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CMD_CONTROL);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
@@ -104,11 +115,15 @@ qint32 cPCControlManager::handleControlCommand(MessageProtocol* msg)
 {
     QMutexLocker lock(&this->m_mutex);
 
+    qInfo() << "Handle control " << this->m_initialized;
+
     if (!this->m_initialized)
         return ERROR_CODE_NOT_INITIALIZED;
 
     QByteArray  data(msg->getPointerToData());
     QJsonObject rootObj = QJsonDocument::fromJson(data).object();
+
+    qInfo() << rootObj;
 
     qint32  result = rootObj.value("ack").toInt(ERROR_CODE_NOT_FOUND);
     QString cmd    = rootObj.value("cmd").toString();
@@ -119,11 +134,11 @@ qint32 cPCControlManager::handleControlCommand(MessageProtocol* msg)
     } else if (cmd == "refresh") {
         this->m_statistic.clear();
         this->m_onlineGames.clear();
+        this->m_smtpAddresses.clear();
 
         QJsonArray statsArr = rootObj.value("stats").toArray();
-        for (int i = 0; i < statsArr.size(); i++) {
+        for (int i = 0; i < statsArr.size(); i++)
             this->m_statistic.append(QString::number(statsArr.at(i).toInt()));
-        }
 
         QJsonArray gamesArr = rootObj.value("readOnlineGame").toArray();
         for (int i = 0; i < gamesArr.size(); i++) {
@@ -136,6 +151,15 @@ qint32 cPCControlManager::handleControlCommand(MessageProtocol* msg)
                 continue;
             this->m_onlineGames.append(QString("%1;%2;%3").arg(comp).arg(season).arg(maxIndex));
         }
+
+        QJsonObject smtpObj = rootObj.value("smtp").toObject();
+        if (!smtpObj.isEmpty()) {
+            this->m_smtpLogin    = smtpObj.value("login").toString();
+            this->m_smtpPassword = smtpObj.value("password").toString();
+            QJsonArray addrArr   = smtpObj.value("addresses").toArray();
+            for (int i = 0; i < addrArr.size(); i++)
+                this->m_smtpAddresses.append(addrArr.at(i).toString());
+        }
     }
 
     return result;
@@ -143,6 +167,9 @@ qint32 cPCControlManager::handleControlCommand(MessageProtocol* msg)
 
 qint32 cPCControlManager::setStatistic(QString stats)
 {
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
     QMutexLocker lock(&this->m_mutex);
 
     QStringList statsList = stats.split("\n");
@@ -172,6 +199,9 @@ QString cPCControlManager::getStastistic()
 
 qint32 cPCControlManager::setOnlineGames(QString games)
 {
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
     QMutexLocker lock(&this->m_mutex);
 
     QStringList gamesList = games.split("\n");
@@ -202,4 +232,41 @@ QString cPCControlManager::getOnlineGames()
         rValue.append(this->m_onlineGames.at(i) + "\n");
 
     return rValue;
+}
+
+qint32 cPCControlManager::setSmtpData(QString login, QString password, QString addresses)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QMutexLocker lock(&this->m_mutex);
+
+    this->m_smtpLogin    = login;
+    this->m_smtpPassword = password;
+    QStringList addrList = addresses.split("\n");
+    for (int i = addrList.size() - 1; i >= 0; i--) {
+        QString addr = addrList.at(i);
+        if (!addr.contains("@"))
+            addrList.removeAt(i);
+    }
+
+    this->m_smtpAddresses = addrList;
+
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 cPCControlManager::getStmpData(QString& login, QString& password, QString& addresses)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QMutexLocker lock(&this->m_mutex);
+
+    login    = this->m_smtpLogin;
+    password = this->m_smtpPassword;
+    addresses.clear();
+    for (int i = 0; i < this->m_smtpAddresses.size(); i++)
+        addresses.append(this->m_smtpAddresses.at(i) + "\n");
+
+    return ERROR_CODE_SUCCESS;
 }

@@ -71,6 +71,18 @@ public:
     qint32 changeMeetingInfo(const QString when, const QString where, const QString info);
     qint32 getMeetingInfo(QString& when, QString& where, QString& info);
 
+    qint32 addMeetingComment(const qint32 userID, const qint64 timestamp, const QString comment);
+    qint32      getMeetingCommentCount() { return this->m_lComments.size(); }
+    ConfigItem* getRequestMeetingCommentFromListIndex(const qint32 index)
+    {
+        QMutexLocker lock(&this->m_mInternalInfoMutex);
+
+        if (index >= this->getMeetingCommentCount())
+            return NULL;
+
+        return this->m_lComments[index];
+    }
+
     qint32 getGameIndex() { return this->m_gameIndex; }
 
     quint16 getAcceptedNumber(const qint32 state);
@@ -95,6 +107,8 @@ private:
     QString m_where;
     QString m_info;
     quint32 m_type;
+
+    QList<ConfigItem*> m_lComments;
 
     void saveCurrentInteralList() override;
 

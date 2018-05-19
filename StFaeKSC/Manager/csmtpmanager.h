@@ -21,34 +21,48 @@
 
 #include <QObject>
 #include <QtCore/QMutex>
+#include <QtCore/QWaitCondition>
 
 #include "../Common/General/backgroundworker.h"
+
+struct SmtpMail {
+    QString m_header;
+    QString m_body;
+};
 
 class cSmtpManager : public BackgroundWorker
 {
     Q_OBJECT
 public:
-    explicit cSmtpManager(QObject *parent = 0);
+    explicit cSmtpManager(QObject* parent = 0);
 
     qint32 initialize();
 
     qint32 setServerEmail(const QString email);
+    QString getServerEmail();
     qint32 setServerPassword(const QString password);
+    QString getServerPassword();
 
     qint32 addDestinationEmail(const QString email);
-    qint32 clearDestinationEmails();
+    qint32      clearDestinationEmails();
+    QStringList getDestinationEmails();
+
+    qint32 sendNewEmail(const QString header, const QString body);
 
 protected:
     int DoBackgroundWork();
 
 signals:
+    void signalSendNewEmails(SmtpMail* pMail);
 
-public slots:
+private slots:
+    void slotSendNewEmails(SmtpMail* pMail);
 
 private:
     QMutex m_mutex;
-    QString m_serverEmail;
-    QString m_serverPassword;
+
+    QString     m_serverEmail;
+    QString     m_serverPassword;
     QStringList m_destinationAdress;
 };
 

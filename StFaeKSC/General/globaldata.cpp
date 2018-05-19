@@ -664,6 +664,66 @@ qint32 GlobalData::requestAcceptMeetingInfo(const qint32 gameIndex, const qint32
     return ERROR_CODE_SUCCESS;
 }
 
+qint32 GlobalData::requestSendCommentMeeting(const qint32 gameIndex, const qint32 type, const qint32 userID,
+                                             const QString comment, qint64& messageID)
+{
+    if (!this->m_initalized)
+        return ERROR_CODE_NOT_READY;
+
+    QMutexLocker lock(&this->m_globalDataMutex);
+
+    GamesPlay* pGame = (GamesPlay*)this->m_GamesList.getItem(gameIndex);
+    if (pGame == NULL)
+        return ERROR_CODE_NOT_FOUND;
+
+    QList<MeetingInfo*>* pList;
+    if (type == MEETING_TYPE_MEETING)
+        pList = &this->m_meetingInfos;
+    else
+        pList = (QList<MeetingInfo*>*)&this->m_awayTripInfos;
+
+    qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
+    qint32 result    = ERROR_CODE_SUCCESS;
+    for (int i = 0; i < pList->size(); i++) {
+        MeetingInfo* mInfo = pList->at(i);
+        if (mInfo->getGameIndex() == gameIndex) {
+            result = mInfo->addMeetingComment(userID, timestamp, comment);
+            if (result == ERROR_CODE_SUCCESS) {
+                qInfo().noquote() << QString("Added Comment %2 at game %1").arg(pGame->m_index).arg(comment);
+                //                /* Send an info if the first person is going to a game which is not at home */
+                //                if (type == MEETING_TYPE_AWAYTRIP && pGame->m_away == "KSC" && acceptValue == ACCEPT_STATE_ACCEPT && mInfo->getAcceptedNumber(ACCEPT_STATE_ACCEPT) == 1) {
+                //                    QString body = QString(BODY_NEW_AWAY_ACCEPT).arg(name, pGame->m_itemName);
+                //                    messageID    = g_pushNotify->sendNewFirstAwayAccept(body, userID, gameIndex);
+                //                }
+            } else
+                qWarning().noquote() << QString("Error adding comment at game %1: %2").arg(pGame->m_index).arg(result);
+            return result;
+        }
+    }
+
+    MeetingInfo* mInfo;
+    if (type == MEETING_TYPE_MEETING)
+        mInfo = new MeetingInfo();
+    else
+        mInfo = new AwayTripInfo();
+    if (mInfo->initialize(pGame->m_saison, pGame->m_competition, pGame->m_saisonIndex, pGame->m_index)) {
+        pList->append(mInfo);
+        result = mInfo->addMeetingComment(userID, timestamp, comment);
+        qInfo().noquote() << QString("Added Comment %2 at game %1").arg(pGame->m_index).arg(comment);
+        //        /* Send an info if the first person is going to an game which is not at home */
+        //        if (type == MEETING_TYPE_AWAYTRIP && pGame->m_away == "KSC" && acceptValue == ACCEPT_STATE_ACCEPT) {
+        //            QString body = QString(BODY_NEW_AWAY_ACCEPT).arg(name, pGame->m_itemName);
+        //            messageID    = g_pushNotify->sendNewFirstAwayAccept(body, userID, gameIndex);
+        //        }
+    } else {
+        delete mInfo;
+        qWarning().noquote() << QString("Error creating meeting info file for game %1").arg(pGame->m_index);
+        return ERROR_CODE_NOT_POSSIBLE;
+    }
+
+    return result;
+}
+
 qint32 GlobalData::addNewUserEvent(const QString type, const QString info, const qint32 userID)
 {
     /* We need userevents with same type and info */

@@ -21,6 +21,7 @@
 #include "../Common/General/globalfunctions.h"
 #include "../Common/Network/messagecommand.h"
 #include "ccontrolmanager.h"
+#include "csmtpmanager.h"
 #include "cstatisticmanager.h"
 
 // clang-format off
@@ -29,6 +30,11 @@
 #define GROUP_ONLINE_GAMES      "OnlineGames"
 #define ONL_GAM_MAX_INDEX       "maxIndex"
 #define ONL_GAM_SEASON          "season"
+
+#define GROUP_SMTP              "smtp"
+#define SMTP_LOGIN              "login"
+#define SMTP_PASSW              "password"
+
 // clang-format on
 
 cControlManager g_ControlManager;
@@ -69,6 +75,7 @@ qint32 cControlManager::initialize()
         this->m_pConfigSettings->endArray();
         this->m_pConfigSettings->endGroup();
 
+        /************** READ ONLINE GAMES ********************/
         this->m_pConfigSettings->beginGroup(GROUP_ONLINE_GAMES);
         sizeOfArray = this->m_pConfigSettings->beginReadArray(CONFIG_LIST_ARRAY);
 
@@ -88,6 +95,26 @@ qint32 cControlManager::initialize()
             }
         }
         this->m_pConfigSettings->endArray();
+        this->m_pConfigSettings->endGroup();
+
+        /************** SMTP ********************/
+        this->m_pConfigSettings->beginGroup(GROUP_SMTP);
+
+        g_SmtpManager.setServerEmail(this->m_pConfigSettings->value(SMTP_LOGIN, "").toString());
+        g_SmtpManager.setServerPassword(this->m_pConfigSettings->value(SMTP_PASSW, "").toString());
+
+        sizeOfArray = this->m_pConfigSettings->beginReadArray(CONFIG_LIST_ARRAY);
+
+        for (int i = 0; i < sizeOfArray; i++) {
+            this->m_pConfigSettings->setArrayIndex(i);
+            QString addr = this->m_pConfigSettings->value(ITEM_NAME, "").toString();
+            if (addr.isEmpty())
+                bProblems = true;
+            else
+                g_SmtpManager.addDestinationEmail(addr);
+        }
+        this->m_pConfigSettings->endArray();
+
         this->m_pConfigSettings->endGroup();
     }
     if (this->readLastUpdateTime() == 0)
@@ -135,6 +162,24 @@ void cControlManager::saveCurrentInteralList()
     this->m_pConfigSettings->endArray();
     this->m_pConfigSettings->endGroup();
 
+
+    this->m_pConfigSettings->beginGroup(GROUP_SMTP);
+    this->m_pConfigSettings->remove(""); // clear all elements
+
+    this->m_pConfigSettings->setValue(SMTP_LOGIN, g_SmtpManager.getServerEmail());
+    this->m_pConfigSettings->setValue(SMTP_PASSW, g_SmtpManager.getServerPassword());
+
+    QStringList addrs = g_SmtpManager.getDestinationEmails();
+    this->m_pConfigSettings->beginWriteArray(CONFIG_LIST_ARRAY);
+    for (int i = 0; i < addrs.size(); i++) {
+        this->m_pConfigSettings->setArrayIndex(i);
+
+        this->m_pConfigSettings->setValue(ITEM_NAME, addrs.at(i));
+    }
+
+    this->m_pConfigSettings->endArray();
+    this->m_pConfigSettings->endGroup();
+
     this->m_mConfigIniMutex.unlock();
 
     this->setNewUpdateTime();
@@ -171,8 +216,9 @@ MessageProtocol* cControlManager::getControlCommandResponse(UserConData* pUserCo
 
 qint32 cControlManager::handleRefreshCommand(QJsonObject& rootAns)
 {
-    QJsonArray statsYearsArr;
-    QJsonArray readOnlGameArr;
+    QJsonArray  statsYearsArr;
+    QJsonArray  readOnlGameArr;
+    QJsonObject smtpObj;
 
     foreach (qint32 stat, this->m_statistic)
         statsYearsArr.append(stat);
@@ -186,16 +232,26 @@ qint32 cControlManager::handleRefreshCommand(QJsonObject& rootAns)
         readOnlGameArr.append(gameObj);
     }
 
+    QJsonArray  addrArr;
+    QStringList addrs = g_SmtpManager.getDestinationEmails();
+    foreach (QString addr, addrs)
+        addrArr.append(addr);
+    smtpObj.insert("login", g_SmtpManager.getServerEmail());
+    smtpObj.insert("password", g_SmtpManager.getServerPassword());
+    smtpObj.insert("addresses", addrArr);
+
     rootAns.insert("stats", statsYearsArr);
     rootAns.insert("readOnlineGame", readOnlGameArr);
+    rootAns.insert("smtp", smtpObj);
 
     return ERROR_CODE_SUCCESS;
 }
 
 qint32 cControlManager::handleSaveCommand(QJsonObject& rootObj)
 {
-    QJsonArray statsArr   = rootObj.value("stats").toArray();
-    QJsonArray readOnlArr = rootObj.value("readOnlineGame").toArray();
+    QJsonArray  statsArr   = rootObj.value("stats").toArray();
+    QJsonArray  readOnlArr = rootObj.value("readOnlineGame").toArray();
+    QJsonObject smtpObj    = rootObj.value("smtp").toObject();
 
     this->stopAllControls();
 
@@ -223,6 +279,12 @@ qint32 cControlManager::handleSaveCommand(QJsonObject& rootObj)
         }
     }
 
+    g_SmtpManager.setServerEmail(smtpObj.value("login").toString());
+    g_SmtpManager.setServerPassword(smtpObj.value("password").toString());
+    QJsonArray addrArr = smtpObj.value("addresses").toArray();
+    for (int i = 0; i < addrArr.size(); i++)
+        g_SmtpManager.addDestinationEmail(addrArr.at(i).toString());
+
     this->saveCurrentInteralList();
     this->startAllControls();
 
@@ -247,4 +309,8 @@ void cControlManager::stopAllControls()
         delete this->m_onlineGames.at(i);
     }
     this->m_onlineGames.clear();
+
+    g_SmtpManager.setServerEmail("");
+    g_SmtpManager.setServerPassword("");
+    g_SmtpManager.clearDestinationEmails();
 }

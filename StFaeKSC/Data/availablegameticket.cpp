@@ -90,7 +90,7 @@ qint32 AvailableGameTickets::initialize(QString filePath)
             this->m_pConfigSettings->setArrayIndex(i);
             QString name      = this->m_pConfigSettings->value(ITEM_NAME, "").toString();
             quint32 index     = this->m_pConfigSettings->value(ITEM_INDEX, 0).toUInt();
-            qint64  timestamp = this->m_pConfigSettings->value(ITEM_TIMESTAMP, 0x0).toULongLong();
+            qint64  timestamp = this->m_pConfigSettings->value(ITEM_TIMESTAMP, 0x0).toLongLong();
 
             quint32 ticketID = this->m_pConfigSettings->value(AVAILABLE_TICKET_ID, 0x0).toUInt();
             quint32 userID   = this->m_pConfigSettings->value(AVAILABLE_USER_ID, 0x0).toUInt();
@@ -317,11 +317,11 @@ qint32 AvailableGameTickets::checkConsistency()
         if (bErrorInCosistency) {
             this->restartConfigSettings();
             this->saveCurrentInteralList();
-//            this->updateItemValue(pTicketInfo, AVAILABLE_USER_ID, QVariant(pTicketInfo->m_userID), this->m_lastUpdateTimeStamp);
-//            this->updateItemValue(pTicketInfo, AVAILABLE_STATE, QVariant(pTicketInfo->m_state), this->m_lastUpdateTimeStamp);
-//            this->updateItemValue(pTicketInfo, ITEM_NAME, QVariant(pTicketInfo->m_itemName), this->m_lastUpdateTimeStamp);
-//            this->updateItemValue(pTicketInfo, ITEM_TIMESTAMP, QVariant(pTicketInfo->m_timestamp), this->m_lastUpdateTimeStamp);
-//            qInfo().noquote() << QString("Fix consistency of ticket at game %1").arg(this->m_gameIndex);
+            //            this->updateItemValue(pTicketInfo, AVAILABLE_USER_ID, QVariant(pTicketInfo->m_userID), this->m_lastUpdateTimeStamp);
+            //            this->updateItemValue(pTicketInfo, AVAILABLE_STATE, QVariant(pTicketInfo->m_state), this->m_lastUpdateTimeStamp);
+            //            this->updateItemValue(pTicketInfo, ITEM_NAME, QVariant(pTicketInfo->m_itemName), this->m_lastUpdateTimeStamp);
+            //            this->updateItemValue(pTicketInfo, ITEM_TIMESTAMP, QVariant(pTicketInfo->m_timestamp), this->m_lastUpdateTimeStamp);
+            //            qInfo().noquote() << QString("Fix consistency of ticket at game %1").arg(this->m_gameIndex);
         }
         delete pWrittenTicket;
     }
@@ -335,7 +335,7 @@ AvailableTicketInfo* AvailableGameTickets::getWrittenTicketInfo(const qint32 arr
 {
     QMutexLocker lock(&this->m_mConfigIniMutex);
 
-    QSettings *settings = new QSettings(this->m_pConfigSettings->fileName(), QSettings::IniFormat);
+    QSettings* settings = new QSettings(this->m_pConfigSettings->fileName(), QSettings::IniFormat);
     settings->setIniCodec(("UTF-8"));
 
     settings->beginGroup(GROUP_LIST_ITEM);
@@ -348,7 +348,7 @@ AvailableTicketInfo* AvailableGameTickets::getWrittenTicketInfo(const qint32 arr
     settings->setArrayIndex(arrayIndex);
     QString name      = settings->value(ITEM_NAME, "").toString();
     quint32 index     = settings->value(ITEM_INDEX, 0).toUInt();
-    qint64  timestamp = settings->value(ITEM_TIMESTAMP, 0x0).toULongLong();
+    qint64  timestamp = settings->value(ITEM_TIMESTAMP, 0x0).toLongLong();
 
     quint32 ticketID = settings->value(AVAILABLE_TICKET_ID, 0x0).toUInt();
     quint32 userID   = settings->value(AVAILABLE_USER_ID, 0x0).toUInt();

@@ -28,6 +28,7 @@
 #include "../../Common/Network/messageprotocol.h"
 #include "Connection/cconmanager.h"
 #include "Connection/cconusersettings.h"
+#include "Data/cdataconsolemanager.h"
 #include "PC/cpccontrolmanager.h"
 #include "cstaglobalsettings.h"
 
@@ -90,10 +91,18 @@ void MainWindow::slotNotifyCommandFinished(quint32 command, qint32 result)
         if (result == ERROR_CODE_SUCCESS)
             qInfo() << "Update password war erfolgreich";
         break;
+    case OP_CODE_CMD_REQ::REQ_SEND_CONSOLE_CMD:
+        if (result == ERROR_CODE_SUCCESS)
+            this->ui->txtConsole->setPlainText(g_DataConsoleManager->getLastConsoleOutput());
     case OP_CODE_CMD_REQ::REQ_CMD_CONTROL:
         if (result == ERROR_CODE_SUCCESS) {
             this->ui->txtEditStatistic->setText(g_PCControlManager->getStastistic());
             this->ui->txtEditOnlineGames->setText(g_PCControlManager->getOnlineGames());
+            QString login, password, addr;
+            g_PCControlManager->getStmpData(login, password, addr);
+            this->ui->lEditSmtpLogin->setText(login);
+            this->ui->lEditSmtpPassword->setText(password);
+            this->ui->txtEditSmtpEmailAdresses->setText(addr);
             this->ui->btnSaveControl->setEnabled(true);
         } else {
             this->ui->btnSaveControl->setEnabled(false);
@@ -146,14 +155,41 @@ void MainWindow::on_btnRefreshControl_clicked()
     this->ui->btnSaveControl->setEnabled(false);
     this->ui->txtEditStatistic->clear();
     this->ui->txtEditOnlineGames->clear();
+    this->ui->txtEditSmtpEmailAdresses->clear();
+    this->ui->lEditSmtpLogin->clear();
+    this->ui->lEditSmtpPassword->clear();
 }
 
 void MainWindow::on_btnSaveControl_clicked()
 {
+    QString login    = this->ui->lEditSmtpLogin->text();
+    QString password = this->ui->lEditSmtpPassword->text();
     g_PCControlManager->setStatistic(this->ui->txtEditStatistic->toPlainText());
     g_PCControlManager->setOnlineGames(this->ui->txtEditOnlineGames->toPlainText());
+    g_PCControlManager->setSmtpData(login, password, this->ui->txtEditSmtpEmailAdresses->toPlainText());
     g_PCControlManager->saveControlList();
     this->ui->btnSaveControl->setEnabled(false);
     this->ui->txtEditStatistic->clear();
     this->ui->txtEditOnlineGames->clear();
+    this->ui->txtEditSmtpEmailAdresses->clear();
+    this->ui->lEditSmtpLogin->clear();
+    this->ui->lEditSmtpPassword->clear();
+}
+
+void MainWindow::on_btnConsole_clicked()
+{
+    this->sendConsoleCommand();
+}
+
+void MainWindow::on_lEditConsoleCommand_returnPressed()
+{
+    this->sendConsoleCommand();
+}
+
+void MainWindow::sendConsoleCommand()
+{
+    g_DataConsoleManager->startSendConsoleCommand(this->ui->lEditConsoleCommand->text().trimmed());
+
+    this->ui->lEditConsoleCommand->clear();
+    this->ui->txtConsole->clear();
 }

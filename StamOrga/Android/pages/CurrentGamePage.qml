@@ -80,12 +80,52 @@ Item {
             SwipeView {
                 id: swipeViewCurrentHomeGame
                 anchors.top : tabBar.bottom
-                anchors.bottom: parent.bottom
+                anchors.bottom: rowComment.top
                 anchors.left: parent.left
                 anchors.right: parent.right
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
                 Layout.fillHeight: true
                 currentIndex: tabBar.currentIndex
+            }
+
+            RowLayout {
+                id: rowComment
+                width: parent.width
+                anchors.bottom: parent.bottom
+                Layout.topMargin: 50
+                visible: tabModel.get(tabBar.currentIndex) === undefined ? false : tabModel.get(tabBar.currentIndex).useCommentLine
+
+                MyComponents.EditableTextWithHint {
+                    id: textInputConsole
+                    Layout.fillWidth: true
+                    Layout.topMargin: 5
+                    hint: "Füge Kommentar hinzu"
+                    imageSource: ""
+                    enableImage: false
+                    enabled: true
+                    color: "#FFFFFF"
+                    onKeysEnterPressed: {
+                        if (swipeViewCurrentHomeGame.currentItem === currentMeetInfo) {
+                            currentMeetInfo.sendNewComment(textInputConsole.input);
+                        } else {
+                            currentAwayTripInfo.sendNewComment(textInputConsole.input);
+                        }
+                   }
+                }
+
+                MyComponents.GraphicalButton {
+                    imageSource: "../images/send.png"
+                    Layout.topMargin: 5
+                    enabled:  true
+                    onClickedButton: {
+                         if (swipeViewCurrentHomeGame.currentItem === currentMeetInfo) {
+                             currentMeetInfo.sendNewComment(textInputConsole.input);
+                         } else {
+                             currentAwayTripInfo.sendNewComment(textInputConsole.input);
+                         }
+                    }
+                    Layout.alignment: Qt.AlignRight
+                }
             }
         }
     }
@@ -228,13 +268,13 @@ Item {
         gameHeader.showGamesInfo(sender)
 
         if (sender.isGameASeasonTicketGame()) {
-            tabModel.append({ "text": "Karten"});
+            tabModel.append({ "text": "Karten", "useCommentLine" : false});
             swipeViewCurrentHomeGame.addItem(currentTicketInfo)
             currentTicketInfo.showInfoHeader.connect(currentTicketInfoNewHeaderInfo);
             currentTicketInfo.showAllInfoAboutGame(sender);
         }
 
-        tabModel.append({ "text": "Treffen"});
+        tabModel.append({ "text": "Treffen", "useCommentLine" : true});
         swipeViewCurrentHomeGame.addItem(currentMeetInfo)
 
         currentMeetInfo.meetingType = 0;
@@ -242,7 +282,7 @@ Item {
         currentMeetInfo.showAllInfoAboutGame();
 
         if (!sender.isGameAHomeGame()) {
-            tabModel.append({ "text": "Fahrt"});
+            tabModel.append({ "text": "Fahrt", "useCommentLine" : true});
             swipeViewCurrentHomeGame.addItem(currentAwayTripInfo)
 
             currentAwayTripInfo.meetingType = 1;
@@ -283,9 +323,7 @@ Item {
             gameHeader.showGamesInfo(m_gamePlayCurrentItem)
     }
 
-    function notifyChangedMeetingInfoFinished(result) {
-        currentMeetInfo.notifyChangedMeetingInfoFinished(result);
-    }
+    /* ************************ MEETING ***************************/
 
     function notifyLoadMeetingInfoFinished(result) {
         currentMeetInfo.notifyLoadMeetingInfoFinished(result);
@@ -293,14 +331,21 @@ Item {
             gameHeader.showGamesInfo(m_gamePlayCurrentItem)
     }
 
+    function notifyChangedMeetingInfoFinished(result) {
+        currentMeetInfo.notifyChangedMeetingInfoFinished(result);
+    }
+
     function notifyAcceptMeetingFinished(result) {
         currentMeetInfo.notifyAcceptMeetingFinished(result);
     }
 
-
-    function notifyChangedAwayTripInfoFinished(result) {
-        currentAwayTripInfo.notifyChangedMeetingInfoFinished(result);
+    function notifySendCommentMeetFinished(result) {
+        if (result === 1)
+            textInputConsole.clear()
+        currentMeetInfo.notifySendCommentMeetFinished(result);
     }
+
+    /* ************************ AwayTrip ***************************/
 
     function notifyLoadAwayTripInfoFinished(result) {
         currentAwayTripInfo.notifyLoadMeetingInfoFinished(result);
@@ -308,8 +353,18 @@ Item {
             gameHeader.showGamesInfo(m_gamePlayCurrentItem)
     }
 
+    function notifyChangedAwayTripInfoFinished(result) {
+        currentAwayTripInfo.notifyChangedMeetingInfoFinished(result);
+    }
+
     function notifyAcceptAwayTripFinished(result) {
         currentAwayTripInfo.notifyAcceptMeetingFinished(result);
+    }
+
+    function notifySendCommentTripFinished(result) {
+        if (result === 1)
+            textInputConsole.clear()
+        currentAwayTripInfo.notifySendCommentMeetFinished(result);
     }
 
     function notifyUserIntConnectionFinished(result, msg) {}

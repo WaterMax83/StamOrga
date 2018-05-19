@@ -54,6 +54,8 @@ public:
     qint32 requestAcceptMeetingInfo(const qint32 gameIndex, const qint32 version, const qint32 acceptValue,
                                     const qint32 acceptIndex, const QString name,
                                     const qint32 userID, const qint32 type, qint64& messageID);
+    qint32 requestSendCommentMeeting(const qint32 gameIndex, const qint32 type, const qint32 userID,
+                                     const QString comment, qint64& messageID);
 
     quint16 getTicketNumber(const qint32 gamesIndex, const qint32 state);
     quint16 getAcceptedNumber(const qint32 type, const qint32 gamesIndex, const qint32 state);

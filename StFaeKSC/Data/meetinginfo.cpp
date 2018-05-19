@@ -33,6 +33,8 @@
 
 #define MEET_INFO_STATE         "acceptState"
 #define MEET_INFO_USER_ID       "userID"
+
+#define GROUP_COMMENTS          "Comments"
 // clang-format on
 
 MeetingInfo::MeetingInfo()
@@ -111,6 +113,23 @@ qint32 MeetingInfo::initialize(QString filePath)
     if (this->m_year == 0 || this->m_competition == 0 || this->m_seasonIndex == 0 || this->m_gameIndex == 0)
         return ERROR_CODE_COMMON;
 
+    this->m_pConfigSettings->beginGroup(GROUP_COMMENTS);
+    int sizeOfArray = this->m_pConfigSettings->beginReadArray(CONFIG_LIST_ARRAY);
+
+    for (int i = 0; i < sizeOfArray; i++) {
+        this->m_pConfigSettings->setArrayIndex(i);
+        ConfigItem* pComment  = new ConfigItem();
+        pComment->m_itemName  = this->m_pConfigSettings->value(ITEM_NAME, "").toString();
+        pComment->m_index     = this->m_pConfigSettings->value(ITEM_INDEX, 0).toUInt();
+        pComment->m_timestamp = this->m_pConfigSettings->value(ITEM_TIMESTAMP, 0x0).toLongLong();
+
+        this->m_lComments.append(pComment);
+    }
+    this->m_pConfigSettings->endArray();
+    this->m_pConfigSettings->endGroup();
+
+    std::sort(this->m_lComments.begin(), this->m_lComments.end(), ConfigItem::compareTimeStampFunctionAscending);
+
     /* Check wheter we have to save data after reading again */
     bool bProblems = false;
     {
@@ -123,7 +142,7 @@ qint32 MeetingInfo::initialize(QString filePath)
             this->m_pConfigSettings->setArrayIndex(i);
             QString name      = this->m_pConfigSettings->value(ITEM_NAME, "").toString();
             qint32  index     = this->m_pConfigSettings->value(ITEM_INDEX, 0).toUInt();
-            qint64  timestamp = this->m_pConfigSettings->value(ITEM_TIMESTAMP, 0x0).toULongLong();
+            qint64  timestamp = this->m_pConfigSettings->value(ITEM_TIMESTAMP, 0x0).toLongLong();
 
             qint32 state  = this->m_pConfigSettings->value(MEET_INFO_STATE, 0x0).toUInt();
             qint32 userID = this->m_pConfigSettings->value(MEET_INFO_USER_ID, 0x0).toUInt();
@@ -289,6 +308,35 @@ quint16 MeetingInfo::getAcceptedNumber(const qint32 state)
             rValue++;
     }
     return rValue;
+}
+
+qint32 MeetingInfo::addMeetingComment(const qint32 userID, const qint64 timestamp, const QString comment)
+{
+    QMutexLocker locker1(&this->m_mConfigIniMutex);
+    QMutexLocker locker2(&this->m_mInternalInfoMutex);
+
+    ConfigItem* pComment  = new ConfigItem();
+    pComment->m_itemName  = comment;
+    pComment->m_index     = userID;
+    pComment->m_timestamp = timestamp;
+
+    this->m_pConfigSettings->beginGroup(GROUP_COMMENTS);
+    this->m_pConfigSettings->beginWriteArray(CONFIG_LIST_ARRAY);
+    this->m_pConfigSettings->setArrayIndex(this->m_lComments.size());
+
+    this->m_pConfigSettings->setValue(ITEM_NAME, comment);
+    this->m_pConfigSettings->setValue(ITEM_TIMESTAMP, timestamp);
+    this->m_pConfigSettings->setValue(ITEM_INDEX, userID);
+
+    this->m_pConfigSettings->endArray();
+    this->m_pConfigSettings->endGroup();
+    this->m_pConfigSettings->sync();
+
+    this->m_lComments.append(pComment);
+
+    std::sort(this->m_lComments.begin(), this->m_lComments.end(), ConfigItem::compareTimeStampFunctionAscending);
+
+    return ERROR_CODE_SUCCESS;
 }
 
 

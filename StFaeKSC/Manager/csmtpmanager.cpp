@@ -15,15 +15,17 @@
 *    You should have received a copy of the GNU General Public License
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include <QtCore/QThread>
 
-#include "csmtpmanager.h"
 #include "../Common/General/globalfunctions.h"
+#include "csmtpmanager.h"
+#include "SmtpMime"
 
 cSmtpManager g_SmtpManager;
 
-cSmtpManager::cSmtpManager(QObject *parent) : BackgroundWorker(parent)
+cSmtpManager::cSmtpManager(QObject* parent)
+    : BackgroundWorker(parent)
 {
-
 }
 
 
@@ -38,6 +40,8 @@ qint32 cSmtpManager::initialize()
 
 int cSmtpManager::DoBackgroundWork()
 {
+    connect(this, &cSmtpManager::signalSendNewEmails, this, &cSmtpManager::slotSendNewEmails);
+
     return ERROR_CODE_SUCCESS;
 }
 
@@ -53,6 +57,16 @@ qint32 cSmtpManager::setServerEmail(const QString email)
     return ERROR_CODE_SUCCESS;
 }
 
+QString cSmtpManager::getServerEmail()
+{
+    if (!this->m_initialized)
+        return "";
+
+    QMutexLocker lock(&this->m_mutex);
+
+    return this->m_serverEmail;
+}
+
 qint32 cSmtpManager::setServerPassword(const QString password)
 {
     if (!this->m_initialized)
@@ -63,6 +77,16 @@ qint32 cSmtpManager::setServerPassword(const QString password)
     this->m_serverPassword = password;
 
     return ERROR_CODE_SUCCESS;
+}
+
+QString cSmtpManager::getServerPassword()
+{
+    if (!this->m_initialized)
+        return "";
+
+    QMutexLocker lock(&this->m_mutex);
+
+    return this->m_serverPassword;
 }
 
 qint32 cSmtpManager::addDestinationEmail(const QString email)
@@ -90,4 +114,75 @@ qint32 cSmtpManager::clearDestinationEmails()
     this->m_destinationAdress.clear();
 
     return ERROR_CODE_SUCCESS;
+}
+
+QStringList cSmtpManager::getDestinationEmails()
+{
+    if (!this->m_initialized)
+        return QStringList();
+
+    QMutexLocker lock(&this->m_mutex);
+
+    return this->m_destinationAdress;
+}
+
+qint32 cSmtpManager::sendNewEmail(const QString header, const QString body)
+{
+    QMutexLocker lock(&this->m_mutex);
+
+    if (this->m_serverEmail.isEmpty() || this->m_serverPassword.isEmpty()) {
+        qWarning().noquote() << "No address and password to send email to";
+        return ERROR_CODE_NOT_FOUND;
+    }
+
+    SmtpMail* pMail = new SmtpMail();
+    pMail->m_header = header;
+    pMail->m_body   = body;
+
+    QThread::sleep(1);
+
+    emit this->signalSendNewEmails(pMail);
+
+    return ERROR_CODE_SUCCESS;
+}
+
+
+void cSmtpManager::slotSendNewEmails(SmtpMail* pMail)
+{
+    QMutexLocker lock(&this->m_mutex);
+
+    SmtpClient client("mail.gmx.net", 465, SmtpClient::ConnectionType::SslConnection);
+
+    client.setUser(this->m_serverEmail);
+    client.setPassword(this->m_serverPassword);
+
+    MimeMessage message;
+
+    message.setSender(new EmailAddress(this->m_serverEmail, "StamOrga"));
+    for (int i= 0; i < this->m_destinationAdress.size(); i++)
+        message.addRecipient(new EmailAddress(this->m_destinationAdress.at(i), "Empfänger"));
+    message.setSubject(pMail->m_header);
+
+    // Now add some text to the email.
+    // First we create a MimeText object.
+
+    MimeText text;
+
+    QString strTxt = pMail->m_body;
+    strTxt.append("\n\nViele Grüße\nStamOrga");
+    text.setText(strTxt);
+
+    // Now add it to the mail
+
+    message.addPart(&text);
+
+    // Now we can send the mail
+
+    qInfo() << "Starting send eamil";
+    qInfo() << client.connectToHost();
+    qInfo() << client.login();
+    qInfo() << client.sendMail(message);
+    client.quit();
+
+    delete pMail;
 }

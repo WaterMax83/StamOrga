@@ -153,6 +153,14 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
         emit this->notifyAcceptAwayTripFinished(result);
         break;
 
+    case OP_CODE_CMD_REQ::REQ_SEND_COMMENT_MEET:
+        emit this->notifySendCommentMeetFinished(result);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_SEND_COMMENT_TRIP:
+        emit this->notifySendCommentTripFinished(result);
+        break;
+
     case OP_CODE_CMD_REQ::REQ_CHANGE_NEWS_DATA:
         emit this->notifyChangeNewsDataFinished(result);
         break;
@@ -169,9 +177,9 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
         emit this->notifyDeleteFanclubNewsItemFinished(result);
         break;
 
-    //    case OP_CODE_CMD_REQ::REQ_GET_USER_EVENTS:
-    //        emit this->notifyGetUserEvents(result);
-    //        break;
+        //    case OP_CODE_CMD_REQ::REQ_GET_USER_EVENTS:
+        //        emit this->notifyGetUserEvents(result);
+        //        break;
 
     case OP_CODE_CMD_REQ::REQ_SET_USER_EVENTS:
         if (result == ERROR_CODE_SUCCESS)

@@ -21,13 +21,13 @@
 #include "../Common/General/globaltiming.h"
 #include "../Common/Network/messagecommand.h"
 #include "../General/console.h"
+#include "../Manager/ccontrolmanager.h"
 #include "../Manager/cgamesmanager.h"
 #include "../Manager/cmeetinginfomanager.h"
 #include "../Manager/cnewsdatamanager.h"
 #include "../Manager/cstatisticmanager.h"
 #include "../Manager/cticketmanager.h"
 #include "ccontcpmaindata.h"
-#include "../Manager/ccontrolmanager.h"
 
 cConTcpDataServer::cConTcpDataServer()
     : BackgroundWorker()
@@ -258,6 +258,10 @@ MessageProtocol* cConTcpDataServer::checkNewMessage(MessageProtocol* msg)
         case OP_CODE_CMD_REQ::REQ_ACCEPT_MEETING:
         case OP_CODE_CMD_REQ::REQ_ACCEPT_AWAYTRIP:
             ack = g_MeetingInfoManager.getAcceptMeetingInfo(this->m_pUserConData, msg);
+            break;
+        case OP_CODE_CMD_REQ::REQ_SEND_COMMENT_MEET:
+        case OP_CODE_CMD_REQ::REQ_SEND_COMMENT_TRIP:
+            ack = g_MeetingInfoManager.getSendComment(this->m_pUserConData, msg);
             break;
 
         case OP_CODE_CMD_REQ::REQ_CMD_STATISTIC:

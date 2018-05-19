@@ -44,14 +44,14 @@ SeasonTicket::SeasonTicket()
         for (int i = 0; i < sizeOfArray; i++) {
             this->m_pConfigSettings->setArrayIndex(i);
             QString ticketName = this->m_pConfigSettings->value(ITEM_NAME, "").toString();
-            qint64  timestamp  = this->m_pConfigSettings->value(ITEM_TIMESTAMP, 0x0).toULongLong();
+            qint64  timestamp  = this->m_pConfigSettings->value(ITEM_TIMESTAMP, 0x0).toLongLong();
             quint32 index      = this->m_pConfigSettings->value(ITEM_INDEX, 0).toInt();
 
             QString user      = this->m_pConfigSettings->value(TICKET_USER, "").toString();
             qint32  userIndex = this->m_pConfigSettings->value(TICKET_USER_INDEX, 0).toInt();
             quint8  discount  = quint8(this->m_pConfigSettings->value(TICKET_DISCOUNT, 0).toUInt());
             QString place     = this->m_pConfigSettings->value(TICKET_PLACE, "").toString();
-            qint64  creation  = this->m_pConfigSettings->value(TICKET_CREATE, 0).toULongLong();
+            qint64  creation  = this->m_pConfigSettings->value(TICKET_CREATE, 0).toLongLong();
 
             if (creation == 0) {
                 creation  = QDateTime::fromString("10.07.2017", "dd.MM.yyyy").toMSecsSinceEpoch();

@@ -226,6 +226,44 @@ qint32 cDataMeetingInfo::handAcceptMeetingInfo(MessageProtocol* msg)
     return result;
 }
 
+qint32 cDataMeetingInfo::startSendNewComment(const qint32 gameIndex, const QString comment,
+                                             const qint32 type)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QMutexLocker lock(&this->m_mutex);
+
+    QJsonObject rootObj;
+    rootObj.insert("index", gameIndex);
+    rootObj.insert("type", type);
+    rootObj.insert("comment", comment);
+
+    TcpDataConRequest* req;
+    if (type == MEETING_TYPE_MEETING)
+        req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_SEND_COMMENT_MEET);
+    else
+        req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_SEND_COMMENT_TRIP);
+    req->m_lData = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+
+    g_ConManager->sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 cDataMeetingInfo::handleSendCommentResponse(MessageProtocol* msg)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QByteArray  data(msg->getPointerToData());
+    QJsonObject rootObj = QJsonDocument::fromJson(data).object();
+    qint32      result  = rootObj.value("ack").toInt(ERROR_CODE_NOT_FOUND);
+
+    /* rest is not handled */
+
+    return result;
+}
+
 
 AcceptMeetingInfo* cDataMeetingInfo::getAcceptInfoFromIndex(quint32 index)
 {

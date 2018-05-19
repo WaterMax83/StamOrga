@@ -28,6 +28,7 @@ Flickable {
     clip: true
     height: parent.height * 1.2
     contentHeight: mainPaneCurrentTicketInfo.height
+    property bool useCommentLine : false
 
     signal showInfoHeader(var text, var load)
 
