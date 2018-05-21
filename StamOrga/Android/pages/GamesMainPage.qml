@@ -24,6 +24,7 @@ import com.watermax.demo 1.0
 
 import "../pages" as MyPages
 import "../components" as MyComponents
+import "../controls" as MyControls
 
 Page {
     id: mainItemGamesMainPage
@@ -54,7 +55,7 @@ Page {
 //            Layout.columnSpan: 2
 //        }
 
-        TabBar {
+        MyControls.TabBar {
                 id: tabBarGamesMainPage
                 anchors.left: parent.left
                 anchors.right: parent.right

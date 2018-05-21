@@ -40,6 +40,7 @@ cDataMeetingInfo::cDataMeetingInfo(QObject* parent)
 qint32 cDataMeetingInfo::initialize()
 {
     qRegisterMetaType<AcceptMeetingInfo*>("AcceptMeetingInfo*");
+    qRegisterMetaType<cDataCommentItem*>("cDataCommentItem*");
 
     this->m_initialized = true;
 
@@ -79,6 +80,7 @@ qint32 cDataMeetingInfo::handleLoadMeetingInfoResponse(MessageProtocol* msg)
     qint32      result  = rootObj.value("ack").toInt(ERROR_CODE_NOT_FOUND);
 
     this->clearAcceptInfoList();
+    this->clearCommentList();
 
     QMutexLocker lock(&this->m_mutex);
 
@@ -136,6 +138,19 @@ qint32 cDataMeetingInfo::handleLoadMeetingInfoResponse(MessageProtocol* msg)
             else
                 pGame->setMeetingInfo(0);
         }
+    }
+
+    QJsonArray commentArr = rootObj.value("comment").toArray();
+    for (int i = 0; i < commentArr.size(); i++) {
+        QJsonObject        commentObj = commentArr.at(i).toObject();
+        cDataCommentItem* pItem      = new cDataCommentItem();
+
+        pItem->setUser(commentObj.value("name").toString());
+        pItem->setTimeStamp(commentObj.value("timestamp").toDouble());
+        pItem->setComment(commentObj.value("comment").toString());
+
+        g_GlobalManager->setQMLObjectOwnershipToCpp(pItem);
+        this->m_comments.append(pItem);
     }
 
     return result;
@@ -265,11 +280,11 @@ qint32 cDataMeetingInfo::handleSendCommentResponse(MessageProtocol* msg)
 }
 
 
-AcceptMeetingInfo* cDataMeetingInfo::getAcceptInfoFromIndex(quint32 index)
+AcceptMeetingInfo* cDataMeetingInfo::getAcceptInfoFromIndex(qint32 index)
 {
     QMutexLocker lock(&this->m_mutex);
 
-    if (qint32(index) >= this->m_acceptInfo.size())
+    if (index >= this->m_acceptInfo.size())
         return NULL;
 
     return this->m_acceptInfo[index];
@@ -302,4 +317,29 @@ qint32 cDataMeetingInfo::getAcceptedListCount()
     QMutexLocker lock(&this->m_mutex);
 
     return this->m_acceptInfo.size();
+}
+
+cDataCommentItem* cDataMeetingInfo::getCommentFromIndex(qint32 index)
+{
+    QMutexLocker lock(&this->m_mutex);
+
+    if (index >= this->m_comments.size())
+        return NULL;
+
+    return this->m_comments[index];
+}
+void cDataMeetingInfo::clearCommentList()
+{
+    QMutexLocker lock(&this->m_mutex);
+
+    for (int i = 0; i < this->m_comments.size(); i++)
+        delete this->m_comments[i];
+    this->m_comments.clear();
+}
+
+qint32 cDataMeetingInfo::getCommentCount()
+{
+    QMutexLocker lock(&this->m_mutex);
+
+    return this->m_comments.size();
 }

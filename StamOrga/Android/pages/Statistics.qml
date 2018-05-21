@@ -24,6 +24,7 @@ import QtCharts 2.2
 import com.watermax.demo 1.0
 
 import "../components" as MyComponents
+import "../controls" as MyControls
 
 Item {
     id: tmp
@@ -101,7 +102,7 @@ Item {
             infoVisible: false
         }
 
-        MyComponents.CustomButton {
+        MyControls.Button {
             id: loadAgainButton
             visible: false
             text: "Erneut laden"

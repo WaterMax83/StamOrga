@@ -253,7 +253,10 @@ QString cStaGlobalSettings::getVersionChangeInfo()
 {
     QString rValue;
 
-    rValue.append("<b>V1.1.0:</b>(10.05.2018)<br>");
+    rValue.append("<b>V1.1.1:</b>(10.05.2018)<br>");
+    rValue.append("- Notification per Email (auf Wunsch)<br>");
+
+    rValue.append("<br><b>V1.1.0:</b>(10.05.2018)<br>");
     rValue.append("- Umstellung UDP auf TCP<br>");
     rValue.append("- interne Struktur umgebaut<br>");
     rValue.append("- Statistik nach Jahren getrennt<br>");

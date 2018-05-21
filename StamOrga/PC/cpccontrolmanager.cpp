@@ -135,6 +135,8 @@ qint32 cPCControlManager::handleControlCommand(MessageProtocol* msg)
         this->m_statistic.clear();
         this->m_onlineGames.clear();
         this->m_smtpAddresses.clear();
+        this->m_smtpLogin.clear();
+        this->m_smtpPassword.clear();
 
         QJsonArray statsArr = rootObj.value("stats").toArray();
         for (int i = 0; i < statsArr.size(); i++)

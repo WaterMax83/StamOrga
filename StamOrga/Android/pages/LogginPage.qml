@@ -22,7 +22,7 @@ import QtQuick.Layouts 1.2
 
 import com.watermax.demo 1.0
 
-import "../components" as MyComponents
+import "../controls" as MyControls
 
 Flickable {
    id: flickableLogging
@@ -61,7 +61,7 @@ Flickable {
                color: "white"
            }
 
-           MyComponents.CustomButton {
+           MyControls.Button {
                text: "Kopieren"
                font.family: txtForFontFamily.font
                implicitWidth: parent.width / 3 * 2
@@ -72,7 +72,7 @@ Flickable {
                }
            }
 
-           MyComponents.CustomButton {
+           MyControls.Button {
                text: "Löschen"
                font.family: txtForFontFamily.font
                implicitWidth: parent.width / 3 * 2

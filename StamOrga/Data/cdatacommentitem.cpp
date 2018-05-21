@@ -1,0 +1,56 @@
+/*
+*	This file is part of StamOrga
+*   Copyright (C) 2017 Markus Schneider
+*
+*	This program is free software; you can redistribute it and/or modify
+*   it under the terms of the GNU General Public License as published by
+*   the Free Software Foundation; either version 3 of the License, or
+*   (at your option) any later version.
+*
+*	StamOrga is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+
+*    You should have received a copy of the GNU General Public License
+*    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#include <QtCore/QDateTime>
+#include <QtCore/QDebug>
+
+#include "cdatacommentitem.h"
+
+cDataCommentItem::cDataCommentItem(QObject* parent)
+    : QObject(parent)
+{
+}
+
+
+void cDataCommentItem::setUser(const QString user)
+{
+    this->m_user = user;
+}
+QString cDataCommentItem::getUser()
+{
+    return this->m_user;
+}
+
+void cDataCommentItem::setTimeStamp(const qint64 timeStamp)
+{
+    this->m_timestamp = timeStamp;
+}
+
+QString cDataCommentItem::getReadableTime()
+{
+    return QDateTime::fromMSecsSinceEpoch(this->m_timestamp).toString("ddd, dd.MM.yy hh:mm");
+}
+
+void cDataCommentItem::setComment(const QString comment)
+{
+    this->m_comment = comment;
+}
+QString cDataCommentItem::getComment()
+{
+    return this->m_comment;
+}

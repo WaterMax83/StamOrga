@@ -219,7 +219,7 @@ void FanclubNews::saveCurrentInteralList()
 
     this->setNewUpdateTime();
 
-    qDebug().noquote() << QString("saved current NewsData List with %1 entries").arg(this->getNumberOfInternalList());
+    qInfo().noquote() << QString("saved current NewsData List with %1 entries").arg(this->getNumberOfInternalList());
 }
 
 bool FanclubNews::addNewNewsData(NewsData* news, bool checkItem)

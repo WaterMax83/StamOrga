@@ -66,7 +66,6 @@
         <file>images/cut.png</file>
         <file>images/paste.png</file>
         <file>components/NewsDataItem.qml</file>
-        <file>components/CustomButton.qml</file>
         <file>components/CustomDialog.qml</file>
         <file>components/EventIndicator.qml</file>
         <file>images/+material/train.png</file>
@@ -99,5 +98,10 @@
         <file>pages/Console.qml</file>
         <file>images/+material/send.png</file>
         <file>images/send.png</file>
+        <file>controls/TabBar.qml</file>
+        <file>controls/Button.qml</file>
+        <file>components/CommentItem.qml</file>
+        <file>components/ShiftableSeperator.qml</file>
+        <file>components/AcceptInfoSingleItem.qml</file>
     </qresource>
 </RCC>

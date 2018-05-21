@@ -47,17 +47,6 @@ int main(int argc, char* argv[])
     QCoreApplication::setAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles, true);
     QApplication app(argc, argv);
 
-    //    // Register our component type with QML.
-    //    qmlRegisterType<UserInterface>("com.watermax.demo", 1, 0, "UserInterface");
-    //    qRegisterMetaType<GamePlay*>("GamePlay*");
-    //    qRegisterMetaType<SeasonTicketItem*>("SeasonTicketItem*");
-    //    qRegisterMetaType<cDataMeetingInfo*>("cDataMeetingInfo*");
-    //    qRegisterMetaType<NewsDataItem*>("NewsDataItem*");
-    //    qRegisterMetaType<AcceptMeetingInfo*>("AcceptMeetingInfo*");
-    //    qRegisterMetaType<DataConRequest>("DataConRequest");
-    //    //    qRegisterMetaType<GameUserData*>("GameUserData*");
-    //    qRegisterMetaType<StatBars*>("StatBars*");
-
     cStaGlobalManager staGlobalManager;
     g_GlobalManager = &staGlobalManager;
     staGlobalManager.initialize();

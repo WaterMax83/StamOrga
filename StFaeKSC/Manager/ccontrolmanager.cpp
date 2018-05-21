@@ -184,7 +184,7 @@ void cControlManager::saveCurrentInteralList()
 
     this->setNewUpdateTime();
 
-    qDebug().noquote() << QString("saved current Control List");
+    qInfo().noquote() << QString("saved current Control List");
 }
 
 MessageProtocol* cControlManager::getControlCommandResponse(UserConData* pUserCon, MessageProtocol* request)

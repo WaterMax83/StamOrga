@@ -23,6 +23,7 @@ import QtQuick.Layouts 1.2
 import com.watermax.demo 1.0
 
 import "../components" as MyComponents
+import "../controls" as MyControls
 
 Flickable {
     id: flickableUser
@@ -114,7 +115,7 @@ Flickable {
                     Layout.bottomMargin: 35
                 }
 
-                MyComponents.CustomButton {
+                MyControls.Button {
                     id: btnSendData
                     font.family: txtForFontFamily.font
                     text: qsTr("Verbinden")
@@ -146,7 +147,7 @@ Flickable {
                 width: parent.width
                 spacing: 5
 
-                  MyComponents.CustomButton {
+                  MyControls.Button {
                     id: btnChangeReadableName
                     font.family: txtForFontFamily.font
                     implicitWidth: parent.width / 4 * 3
@@ -201,7 +202,7 @@ Flickable {
                     Layout.bottomMargin: 35
                 }
 
-                MyComponents.CustomButton {
+                MyControls.Button {
                     id: btnChangePassWord
                     font.family: txtForFontFamily.font
                     text: qsTr("Passwort ändern")
@@ -224,7 +225,7 @@ Flickable {
                     Layout.topMargin: 30
                 }
 
-                MyComponents.CustomButton {
+                MyControls.Button {
                     id: btnBacktoStart
                     font.family: txtForFontFamily.font
                     text: qsTr("< Zurück zur StartSeite")

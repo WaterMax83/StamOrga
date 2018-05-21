@@ -725,7 +725,7 @@ void PushNotification::saveCurrentInteralList()
 
     this->m_mConfigIniMutex.unlock();
 
-    qDebug().noquote() << QString("saved current App Token Guid List with %1 entries").arg(this->getNumberOfInternalList());
+    qInfo().noquote() << QString("saved current App Token Guid List with %1 entries").arg(this->getNumberOfInternalList());
 }
 
 

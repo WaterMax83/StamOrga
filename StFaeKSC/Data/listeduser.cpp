@@ -200,7 +200,7 @@ void ListedUser::saveCurrentInteralList()
     this->m_pConfigSettings->endArray();
     this->m_pConfigSettings->endGroup();
 
-    qDebug().noquote() << QString("saved current User List with %1 entries").arg(this->getNumberOfInternalList());
+    qInfo().noquote() << QString("saved current User List with %1 entries").arg(this->getNumberOfInternalList());
 }
 
 bool ListedUser::userCheckPassword(QString name, QString passw)

@@ -19,7 +19,7 @@
 
 #include "../Common/General/globalfunctions.h"
 #include "csmtpmanager.h"
-#include "SmtpMime"
+#include "SmtpClient-for-Qt/src/SmtpMime"
 
 cSmtpManager g_SmtpManager;
 
@@ -159,13 +159,13 @@ void cSmtpManager::slotSendNewEmails(SmtpMail* pMail)
     MimeMessage message;
 
     message.setSender(new EmailAddress(this->m_serverEmail, "StamOrga"));
+    message.addTo(new EmailAddress(this->m_serverEmail, "StamOrga"));
     for (int i= 0; i < this->m_destinationAdress.size(); i++)
-        message.addRecipient(new EmailAddress(this->m_destinationAdress.at(i), "Empfänger"));
+        message.addBcc(new EmailAddress(this->m_destinationAdress.at(i)));
     message.setSubject(pMail->m_header);
 
     // Now add some text to the email.
     // First we create a MimeText object.
-
     MimeText text;
 
     QString strTxt = pMail->m_body;
@@ -173,16 +173,25 @@ void cSmtpManager::slotSendNewEmails(SmtpMail* pMail)
     text.setText(strTxt);
 
     // Now add it to the mail
-
     message.addPart(&text);
 
     // Now we can send the mail
-
-    qInfo() << "Starting send eamil";
-    qInfo() << client.connectToHost();
-    qInfo() << client.login();
-    qInfo() << client.sendMail(message);
+    qint32 successCnt = 0;
+    bool rCode = client.connectToHost();
+    if (rCode) {
+        successCnt++;
+        rCode = client.login();
+    }
+    if (rCode) {
+        successCnt++;
+        rCode = client.sendMail(message);
+    }
     client.quit();
+
+    if (rCode)
+        qInfo().noquote() << QString("Sending email with success to %1 recipients").arg(this->m_destinationAdress.size());
+    else
+        qWarning().noquote() << QString("Error sending email with step %1").arg(successCnt);
 
     delete pMail;
 }
