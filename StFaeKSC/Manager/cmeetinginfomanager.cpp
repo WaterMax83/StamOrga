@@ -110,7 +110,7 @@ MessageProtocol* cMeetingInfoManager::getMeetingInfo(UserConData* pUserCon, Mess
 
             QJsonArray commentArr;
             qint32     commentCount = mInfo->getMeetingCommentCount();
-            for(int i = 0; i< commentCount; i++) {
+            for (int i = 0; i < commentCount; i++) {
                 ConfigItem* pItem = mInfo->getRequestMeetingCommentFromListIndex(i);
                 QJsonObject comObj;
                 comObj.insert("name", g_GlobalData->m_UserList.getReadableName(pItem->m_index));

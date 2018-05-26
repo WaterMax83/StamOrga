@@ -43,6 +43,8 @@ public:
     qint32 setServerPassword(const QString password);
     QString getServerPassword();
 
+    void setDeactivate(const bool bValue) { this->m_bDeactivate = bValue; }
+
     qint32 addDestinationEmail(const QString email);
     qint32      clearDestinationEmails();
     QStringList getDestinationEmails();
@@ -64,6 +66,7 @@ private:
     QString     m_serverEmail;
     QString     m_serverPassword;
     QStringList m_destinationAdress;
+    bool        m_bDeactivate;
 };
 
 extern cSmtpManager g_SmtpManager;

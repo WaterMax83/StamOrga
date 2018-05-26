@@ -55,7 +55,6 @@
         <file>components/TicketInfoDoubleItem.qml</file>
         <file>images/+material/info.png</file>
         <file>images/info.png</file>
-        <file>components/NotificationSettingsDialog.qml</file>
         <file>pages/FanclubNewsList.qml</file>
         <file>pages/FanclubNewsItem.qml</file>
         <file>components/BusyLoadingIndicator.qml</file>
@@ -103,5 +102,6 @@
         <file>components/CommentItem.qml</file>
         <file>components/ShiftableSeperator.qml</file>
         <file>components/AcceptInfoSingleItem.qml</file>
+        <file>pages/NotificationSettings.qml</file>
     </qresource>
 </RCC>

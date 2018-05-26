@@ -16,6 +16,7 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QtCore/QDateTime>
 #include <QtCore/QStandardPaths>
 #include <QtCore/QUuid>
 
@@ -56,6 +57,15 @@ bool checkFilePathExistAndCreate(const QString& path)
         }
     }
     return true;
+}
+
+qint32 getSeasonFromTimeStamp(qint64 msec)
+{
+    QDate date = QDateTime::fromMSecsSinceEpoch(msec).date();
+    if (date.month() >= 6)
+        return date.year();
+    else
+        return date.year() - 1;
 }
 
 QString getErrorCodeString(qint32 code)

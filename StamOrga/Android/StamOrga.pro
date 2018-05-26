@@ -52,7 +52,8 @@ SOURCES += main.cpp \
     ../Data/cdatagameuserdata.cpp \
     source/cadrpushnotifyinfohandler.cpp \
     ../Data/cdataappuserevents.cpp \
-    ../Data/cdataconsolemanager.cpp
+    ../Data/cdataconsolemanager.cpp \
+    ../Data/cdatacommentitem.cpp
 
 
 RESOURCES += qml.qrc
@@ -111,7 +112,8 @@ HEADERS += \
     ../Data/cdatagameuserdata.h \
     source/cadrpushnotifyinfohandler.h \
     ../Data/cdataappuserevents.h \
-    ../Data/cdataconsolemanager.h
+    ../Data/cdataconsolemanager.h \
+    ../Data/cdatacommentitem.h
 
 INCLUDEPATH += \
     ../ \

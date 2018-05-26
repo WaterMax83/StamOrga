@@ -37,14 +37,14 @@ struct StatsTickets {
         this->m_free        = 0;
         this->m_reserved    = 0;
         this->m_blocked     = 0;
-        this->m_timestamp   = 0;
+        this->m_creation    = 0;
     }
     qint32  m_ticketIndex;
     QString m_name;
     qint32  m_free;
     qint32  m_reserved;
     qint32  m_blocked;
-    qint64  m_timestamp;
+    qint64  m_creation;
 
     static bool compareCountFunctionAscending(StatsTickets* p1, StatsTickets* p2)
     {

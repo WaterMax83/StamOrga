@@ -63,12 +63,8 @@ Games::Games()
             quint32          scheduled   = this->m_pConfigSettings->value(PLAY_SCHEDULED, false).toUInt();
 
             if (saison == 0) {
-                bProblems  = true;
-                QDate date = QDateTime::fromMSecsSinceEpoch(timestamp).date();
-                if (date.month() >= 7)
-                    saison = date.year();
-                else
-                    saison = date.year() - 1;
+                bProblems = true;
+                saison    = getSeasonFromTimeStamp(timestamp);
             }
 
             GamesPlay* play = new GamesPlay(home, away, timestamp, saisonIndex, score, competition, saison, index, lastUpdate, scheduled);
@@ -107,11 +103,7 @@ int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sInde
     }
 
     if (saison == 0) {
-        QDate date = QDateTime::fromMSecsSinceEpoch(timestamp).date();
-        if (date.month() >= 6)
-            saison = date.year();
-        else
-            saison = date.year() - 1;
+        saison = getSeasonFromTimeStamp(timestamp);
     }
 
     if (lastUpdate == 0)

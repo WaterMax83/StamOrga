@@ -151,10 +151,16 @@ void cStatisticManager::slotCycleTimerFired()
             if (pTicket == NULL)
                 continue;
 
+            if (getSeasonFromTimeStamp(pTicket->m_creation) > pStats->m_year)
+                continue;
+
+            if (pTicket->isTicketRemoved() && getSeasonFromTimeStamp(pTicket->m_deleteTimeStamp) < pStats->m_year)
+                continue;
+
             StatsTickets* pTicks  = new StatsTickets();
             pTicks->m_ticketIndex = pTicket->m_index;
             pTicks->m_name        = pTicket->m_itemName;
-            pTicks->m_timestamp   = pTicket->m_creation;
+            pTicks->m_creation    = pTicket->m_creation;
 
             pStats->m_statsTickets.append(pTicks);
         }
@@ -185,7 +191,7 @@ void cStatisticManager::calculateStatsForAllYears()
                 continue;
 
             foreach (StatsTickets* pTicks, pStats->m_statsTickets) {
-                if (pTicks->m_timestamp > pGame->m_timestamp)
+                if (pTicks->m_creation > pGame->m_timestamp)
                     continue;
                 pTicks->m_blocked++;
             }

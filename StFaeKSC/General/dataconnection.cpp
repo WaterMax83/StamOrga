@@ -670,7 +670,7 @@ MessageProtocol* DataConnection::requestGetTicketsList(MessageProtocol* msg)
 
     for (quint32 i = 0; i < numbOfTickets; i++) {
         TicketInfo* pTicket = (TicketInfo*)(this->m_pGlobalData->m_SeasonTicket.getRequestConfigItemFromListIndex(i));
-        if (pTicket == NULL)
+        if (pTicket == NULL || pTicket->isTicketRemoved())
             continue;
 
         if (msg->getVersion() >= MSG_HEADER_ADD_FANCLUB && updateIndex == UpdateIndex::UpdateDiff) {
@@ -745,7 +745,7 @@ MessageProtocol* DataConnection::requestRemoveSeasonTicket(MessageProtocol* msg)
     const char* pData = msg->getPointerToData();
     quint32     index = qFromLittleEndian(*((quint32*)pData));
 
-    if ((rCode = this->m_pGlobalData->m_SeasonTicket.removeItem(index)) == ERROR_CODE_SUCCESS) {
+    if ((rCode = this->m_pGlobalData->m_SeasonTicket.removeTicketItem(index)) == ERROR_CODE_SUCCESS) {
         qInfo().noquote() << QString("User %1 removed SeasonTicket %2")
                                  .arg(this->m_pUserConData->m_userName)
                                  .arg(index);
@@ -933,13 +933,8 @@ MessageProtocol* DataConnection::requestChangeGame(MessageProtocol* msg)
 
     /* game already exists, should only be changed */
     if (index > 0) {
-        quint16 saison;
-        QDate   date = QDateTime::fromMSecsSinceEpoch(timestamp).date();
-        if (date.month() >= 6)
-            saison = date.year();
-        else
-            saison       = date.year() - 1;
-        GamesPlay* pGame = this->m_pGlobalData->m_GamesList.gameExists(sIndex, comp, saison, timestamp);
+        quint16    saison = getSeasonFromTimeStamp(timestamp);
+        GamesPlay* pGame  = this->m_pGlobalData->m_GamesList.gameExists(sIndex, comp, saison, timestamp);
         if (pGame == NULL) {
             qWarning().noquote() << QString("user %1 tried to change game %2, but game would be added, abort it").arg(this->m_pUserConData->m_userName).arg(index);
             return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME_UDP, ERROR_CODE_NOT_FOUND);

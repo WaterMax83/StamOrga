@@ -40,7 +40,8 @@ enum PUSH_NOTIFY_TOPIC {
     PUSH_NOT_CHG_MEETING     = 3,
     PUSH_NOT_NEW_TICKET      = 4,
     PUSH_NOT_NEW_AWAY_ACCEPT = 5,
-    PUSH_NOT_NEW_FAN_NEWS    = 6
+    PUSH_NOT_NEW_FAN_NEWS    = 6,
+    PUSH_NOT_NEW_COMMENT     = 7
 };
 
 
@@ -105,12 +106,13 @@ public:
     QString showCurrentTokenInformation(const QString cmd);
 
     qint64 sendNewVersionNotification(const QString body);
-    qint64 sendNewMeetingNotification(const QString body, const qint32 userID, const quint32 gameIndex);
-    qint64 sendChangeMeetingNotification(const QString body, const qint32 userID, const quint32 gameIndex);
+    qint64 sendNewMeetingNotification(const QString body, const qint32 userID, const quint32 gameIndex, const qint32 type);
+    qint64 sendChangeMeetingNotification(const QString body, const qint32 userID, const quint32 gameIndex, const qint32 type);
     qint64 sendNewTicketNotification(const QString body, const qint32 userID, const quint32 gameIndex, const quint32 ticketIndex);
     qint64 removeNewTicketNotification(const quint32 gameIndex, const quint32 ticketIndex);
     qint64 sendNewFirstAwayAccept(const QString body, const qint32 userID, const quint32 gameIndex);
     qint64 sendNewFanclubNewsNotification(const QString body, const qint32 userID, const qint32 newsID);
+    qint64 sendNewMeetingComment(const QString body, const qint32 userID, const quint32 gameIndex);
 
     virtual qint32 checkConsistency() { return -12; }
 

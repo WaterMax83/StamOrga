@@ -53,6 +53,8 @@ extern QString getUserAppDataLocation();
 
 extern QString getUserHomeConfigPath();
 
+extern qint32 getSeasonFromTimeStamp(qint64 msec);
+
 extern bool checkFilePathExistAndCreate(const QString& path);
 
 // clang-format off
@@ -123,8 +125,8 @@ enum MeetingType {
 };
 
 extern CompetitionIndex getCompetitionIndex(QString comp);
-extern QString          getCompetitionString(CompetitionIndex index);
-extern QString          createRandomString(qint32 size);
+extern QString getCompetitionString(CompetitionIndex index);
+extern QString createRandomString(qint32 size);
 
 // clang-format off
 #define USER_ENABLE_LOG                     0x0001
@@ -143,6 +145,7 @@ extern QString          createRandomString(qint32 size);
 #define NOTIFY_TOPIC_NEW_FREE_TICKET        "NewFreeTicket"
 #define NOTIFY_TOPIC_NEW_AWAY_ACCEPT        "NewAwayAccept"
 #define NOTIFY_TOPIC_NEW_FANCLUB_NEWS       "FanclubNews"
+#define NOTIFY_TOPIC_NEW_COMMENT            "MeetComment"
 #define NOTIFY_TOPIC_GENERAL                "GeneralTopic"
 #define NOTIFY_TOPIC_GENERAL_BACKUP         "GeneralBackup"     // after versoin 1.0.3
 // clang-format on

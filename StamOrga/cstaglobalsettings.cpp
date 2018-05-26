@@ -255,6 +255,7 @@ QString cStaGlobalSettings::getVersionChangeInfo()
 
     rValue.append("<b>V1.1.1:</b>(10.05.2018)<br>");
     rValue.append("- Notification per Email (auf Wunsch)<br>");
+    rValue.append("- Kommentare bei Treffen und Fahrt<br>");
 
     rValue.append("<br><b>V1.1.0:</b>(10.05.2018)<br>");
     rValue.append("- Umstellung UDP auf TCP<br>");
@@ -312,6 +313,8 @@ QString cStaGlobalSettings::getVersionChangeInfo()
         this->m_lastShownVersion = STAM_ORGA_VERSION_S;
 
         g_StaSettingsManager->setValue(SETTINGS_GROUP, SETT_LAST_SHOWN_VERSION, this->m_lastShownVersion);
+
+        this->updatePushNotification();
     }
 
     return rValue;
@@ -358,6 +361,7 @@ QString cStaGlobalSettings::getCurrentVersionLink()
 #define NOT_OFFSET_NEWTICK 3
 #define NOT_OFFSET_NEWAWAY 4
 #define NOT_OFFSET_FANCLUB 5
+#define NOT_OFFSET_COMMENT 6
 
 bool cStaGlobalSettings::isNotificationNewAppVersionEnabled()
 {
@@ -378,6 +382,10 @@ bool cStaGlobalSettings::isNotificationNewFreeTicketEnabled()
 bool cStaGlobalSettings::isNotificationNewAwayAcceptEnabled()
 {
     return (this->m_notificationEnabledValue & (1 << NOT_OFFSET_NEWAWAY)) ? true : false;
+}
+bool cStaGlobalSettings::isNotificationMeetingCommentEnabled()
+{
+    return (this->m_notificationEnabledValue & (1 << NOT_OFFSET_COMMENT)) ? true : false;
 }
 bool cStaGlobalSettings::isNotificationFanclubNewsEnabled()
 {
@@ -419,6 +427,13 @@ void cStaGlobalSettings::setNotificationNewAwayAcceptEnabled(bool enable)
     g_StaSettingsManager->setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
     this->updatePushNotification();
 }
+void cStaGlobalSettings::setNotificationMeetingCommentEnabled(bool enable)
+{
+    this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_COMMENT);
+    this->m_notificationEnabledValue |= (enable ? 1 : 0) << NOT_OFFSET_COMMENT;
+    g_StaSettingsManager->setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
+    this->updatePushNotification();
+}
 void cStaGlobalSettings::setNotificationFanclubNewsEnabled(bool enable)
 {
     this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_FANCLUB);
@@ -455,6 +470,11 @@ void cStaGlobalSettings::updatePushNotification()
         AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_AWAY_ACCEPT);
     else
         AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_AWAY_ACCEPT);
+
+    if (this->m_bAlreadyConnected && this->isNotificationMeetingCommentEnabled())
+        AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_COMMENT);
+    else
+        AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_COMMENT);
 
     if (this->m_bAlreadyConnected && this->isNotificationFanclubNewsEnabled()) {
         if (g_ConUserSettings->userIsFanclubEnabled())

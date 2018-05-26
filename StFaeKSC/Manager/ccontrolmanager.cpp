@@ -34,6 +34,7 @@
 #define GROUP_SMTP              "smtp"
 #define SMTP_LOGIN              "login"
 #define SMTP_PASSW              "password"
+#define SMTP_DEACTIVATE         "Deactivate"
 
 // clang-format on
 
@@ -102,6 +103,9 @@ qint32 cControlManager::initialize()
 
         g_SmtpManager.setServerEmail(this->m_pConfigSettings->value(SMTP_LOGIN, "").toString());
         g_SmtpManager.setServerPassword(this->m_pConfigSettings->value(SMTP_PASSW, "").toString());
+
+        if (this->m_pConfigSettings->value(SMTP_DEACTIVATE, 0).toInt() != 0)
+            g_SmtpManager.setDeactivate(true);
 
         sizeOfArray = this->m_pConfigSettings->beginReadArray(CONFIG_LIST_ARRAY);
 

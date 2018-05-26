@@ -133,8 +133,10 @@ Flickable {
             updateSeasonTicketList()
             toastManager.show("Karte erfolgreich hinzugefügt", 2000);
         }
-        else
+        else {
             busyIndicatorTicket.infoText = userInt.getErrorCodeToString(result)
+            toastManager.show(userInt.getErrorCodeToString(result), 4000);
+        }
     }
 
     function notifyUserIntSeasonTicketRemoveFinished(result) {

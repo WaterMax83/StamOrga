@@ -42,11 +42,7 @@ void GlobalData::initialize()
 
     QStringList nameFilter;
 
-    QDate date = QDate::currentDate();
-    if (date.month() >= 6)
-        this->m_currentSeason = date.year();
-    else
-        this->m_currentSeason = date.year() - 1;
+    this->m_currentSeason = getSeasonFromTimeStamp(QDateTime::currentMSecsSinceEpoch());
 
     nameFilter << "Tickets_Game_*.ini";
     QStringList infoConfigList = userSetDir.entryList(nameFilter, QDir::Files | QDir::Readable);
@@ -61,7 +57,7 @@ void GlobalData::initialize()
                 if (info == NULL)
                     continue;
                 TicketInfo* tInfo = (TicketInfo*)this->m_SeasonTicket.getItem(info->m_ticketID);
-                if (tInfo == NULL)
+                if (tInfo == NULL || tInfo->isTicketRemoved())
                     ticket->removeItem(info->m_index); /* Ticket is no longer present, remove it */
             }
             this->m_availableTickets.append(ticket);
@@ -123,7 +119,7 @@ qint32 GlobalData::requestChangeStateSeasonTicket(const qint32 ticketIndex, cons
 
     GamesPlay*  pGame   = (GamesPlay*)this->m_GamesList.getItem(gameIndex);
     TicketInfo* pTicket = (TicketInfo*)this->m_SeasonTicket.getItem(ticketIndex);
-    if (pGame == NULL || pTicket == NULL)
+    if (pGame == NULL || pTicket == NULL || pTicket->isTicketRemoved())
         return ERROR_CODE_NOT_FOUND;
 
     if (newState == TICKET_STATE_NOT_POSSIBLE)
@@ -240,7 +236,7 @@ qint32 GlobalData::requestGetAvailableSeasonTicket(const qint32 gameIndex, const
                     continue;
                 }
                 TicketInfo* tInfo = (TicketInfo*)this->m_SeasonTicket.getItem(info->m_ticketID);
-                if (tInfo == NULL) {
+                if (tInfo == NULL || tInfo->isTicketRemoved()) {
                     ticket->removeItem(info->m_index);
                     continue; /* Ticket is no longer present, remove it */
                 }
@@ -311,7 +307,7 @@ qint32 GlobalData::requestGetAvailableTicketFromUser(const qint32 userID, QJsonA
                 gameObj.insert("type", "reserved");
             } else { /* Then check if this users card is not blocked */
                 TicketInfo* pTicket = (TicketInfo*)this->m_SeasonTicket.getItem(pTicketInfo->m_ticketID);
-                if (pTicket == NULL || pTicket->m_userIndex != userID) // only tickets from this user
+                if (pTicket == NULL || pTicket->isTicketRemoved() || pTicket->m_userIndex != userID) // only tickets from this user
                     continue;
                 gameObj.insert("type", "free");
             }
@@ -417,6 +413,7 @@ quint16 GlobalData::getMeetingInfoValue(const qint32 type, const qint32 gamesInd
 }
 
 #define BODY_CHANGE_MEET "Beim Spiel %1 : %2 wurde das Treffen geändert"
+#define BODY_CHANGE_TRIP "Beim Spiel %1 : %2 wurde die Fahrt geändert"
 #define BODY_ADD_MEETING "Kommst du zu %1 : %2 ?"
 
 qint32 GlobalData::requestChangeMeetingInfo(const qint32 gameIndex, const qint32 version,
@@ -458,11 +455,16 @@ qint32 GlobalData::requestChangeMeetingInfo(const qint32 gameIndex, const qint32
 
                 /* When there were no infos saved, this was also a new meeting */
                 if (oldWhen.length() > 0 || oldWhere.length() > 0 || oldInfo.length() > 0) {
-                    QString body = QString(BODY_CHANGE_MEET).arg(pGame->m_itemName, pGame->m_away);
-                    messageID    = g_pushNotify->sendChangeMeetingNotification(body, userID, gameIndex);
+                    QString body;
+                    if (type == MEETING_TYPE_MEETING)
+                        body = QString(BODY_CHANGE_MEET).arg(pGame->m_itemName, pGame->m_away);
+                    else
+                        body  = QString(BODY_CHANGE_TRIP).arg(pGame->m_itemName, pGame->m_away);
+                    messageID = g_pushNotify->sendChangeMeetingNotification(body, userID, gameIndex, type);
+
                 } else {
                     QString body = QString(BODY_ADD_MEETING).arg(pGame->m_itemName, pGame->m_away);
-                    messageID    = g_pushNotify->sendNewMeetingNotification(body, userID, gameIndex);
+                    messageID    = g_pushNotify->sendNewMeetingNotification(body, userID, gameIndex, type);
                 }
             } else
                 qWarning().noquote() << QString("Error setting meeting info at game %1: %2").arg(pGame->m_index).arg(result);
@@ -481,7 +483,7 @@ qint32 GlobalData::requestChangeMeetingInfo(const qint32 gameIndex, const qint32
         mInfo->changeMeetingInfo(when, where, info);
         qInfo().noquote() << QString("Added MeetingInfo at game %1:%2, %3").arg(pGame->m_itemName, pGame->m_away).arg(pGame->m_index);
         QString body = QString(BODY_ADD_MEETING).arg(pGame->m_itemName, pGame->m_away);
-        messageID    = g_pushNotify->sendNewMeetingNotification(body, userID, gameIndex);
+        messageID    = g_pushNotify->sendNewMeetingNotification(body, userID, gameIndex, type);
     } else {
         delete mInfo;
         qWarning().noquote() << QString("Error creating meeting info file for game %1").arg(pGame->m_index);
@@ -682,19 +684,18 @@ qint32 GlobalData::requestSendCommentMeeting(const qint32 gameIndex, const qint3
     else
         pList = (QList<MeetingInfo*>*)&this->m_awayTripInfos;
 
-    qint64 timestamp = QDateTime::currentMSecsSinceEpoch();
-    qint32 result    = ERROR_CODE_SUCCESS;
+    QString userName  = this->m_UserList.getReadableName(userID);
+    qint64  timestamp = QDateTime::currentMSecsSinceEpoch();
+    qint32  result    = ERROR_CODE_SUCCESS;
     for (int i = 0; i < pList->size(); i++) {
         MeetingInfo* mInfo = pList->at(i);
         if (mInfo->getGameIndex() == gameIndex) {
             result = mInfo->addMeetingComment(userID, timestamp, comment);
             if (result == ERROR_CODE_SUCCESS) {
                 qInfo().noquote() << QString("Added Comment %2 at game %1").arg(pGame->m_index).arg(comment);
-                //                /* Send an info if the first person is going to a game which is not at home */
-                //                if (type == MEETING_TYPE_AWAYTRIP && pGame->m_away == "KSC" && acceptValue == ACCEPT_STATE_ACCEPT && mInfo->getAcceptedNumber(ACCEPT_STATE_ACCEPT) == 1) {
-                //                    QString body = QString(BODY_NEW_AWAY_ACCEPT).arg(name, pGame->m_itemName);
-                //                    messageID    = g_pushNotify->sendNewFirstAwayAccept(body, userID, gameIndex);
-                //                }
+
+                QString body = QString("%1 hat einen Kommentar bei Spiel %2:%3 hinzugefügt").arg(userName, pGame->m_itemName, pGame->m_away);
+                messageID    = g_pushNotify->sendNewMeetingComment(body, userID, gameIndex);
             } else
                 qWarning().noquote() << QString("Error adding comment at game %1: %2").arg(pGame->m_index).arg(result);
             return result;
@@ -710,11 +711,8 @@ qint32 GlobalData::requestSendCommentMeeting(const qint32 gameIndex, const qint3
         pList->append(mInfo);
         result = mInfo->addMeetingComment(userID, timestamp, comment);
         qInfo().noquote() << QString("Added Comment %2 at game %1").arg(pGame->m_index).arg(comment);
-        //        /* Send an info if the first person is going to an game which is not at home */
-        //        if (type == MEETING_TYPE_AWAYTRIP && pGame->m_away == "KSC" && acceptValue == ACCEPT_STATE_ACCEPT) {
-        //            QString body = QString(BODY_NEW_AWAY_ACCEPT).arg(name, pGame->m_itemName);
-        //            messageID    = g_pushNotify->sendNewFirstAwayAccept(body, userID, gameIndex);
-        //        }
+        QString body = QString("%1 hat einen Kommentar bei Spiel %2:%3 hinzugefügt").arg(userName, pGame->m_itemName, pGame->m_away);
+        messageID    = g_pushNotify->sendNewMeetingComment(body, userID, gameIndex);
     } else {
         delete mInfo;
         qWarning().noquote() << QString("Error creating meeting info file for game %1").arg(pGame->m_index);

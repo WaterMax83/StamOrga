@@ -32,22 +32,27 @@ struct TicketInfo : public ConfigItem {
     quint8  m_discount;
     QString m_place;
     qint64  m_creation;
+    qint64  m_deleteTimeStamp;
 
     TicketInfo(QString user, qint32 userIndex,
                QString ticketName, qint64 timestamp,
                quint8 discount, QString place,
-               quint32 index, qint64 creation)
+               quint32 index, qint64 creation,
+               qint64 deleteTimeStamp = 0)
     {
         this->m_itemName  = ticketName;
         this->m_timestamp = timestamp;
         this->m_index     = index;
 
-        this->m_user      = user;
-        this->m_userIndex = userIndex;
-        this->m_discount  = discount;
-        this->m_place     = place;
-        this->m_creation  = creation;
+        this->m_user            = user;
+        this->m_userIndex       = userIndex;
+        this->m_discount        = discount;
+        this->m_place           = place;
+        this->m_creation        = creation;
+        this->m_deleteTimeStamp = deleteTimeStamp;
     }
+
+    bool isTicketRemoved() { return this->m_deleteTimeStamp != 0 ? true : false; }
 };
 
 
@@ -56,6 +61,7 @@ struct TicketInfo : public ConfigItem {
 #define TICKET_DISCOUNT "discount"
 #define TICKET_PLACE "place"
 #define TICKET_CREATE "creation"
+#define TICKET_DELETE "delete"
 
 #define TICKET_INDEX_GROUP "IndexCount"
 #define TICKET_MAX_COUNT "CurrentCount"
@@ -70,6 +76,8 @@ public:
     int addNewSeasonTicket(QString user, qint32 userIndex, QString ticketName, quint8 discount);
     int changeSeasonTicketInfos(const qint32 index, const qint32 discount, const QString name, const QString place);
     QString showAllSeasonTickets();
+
+    int removeTicketItem(qint32 index);
 
     virtual qint32 checkConsistency() { return -12; }
 

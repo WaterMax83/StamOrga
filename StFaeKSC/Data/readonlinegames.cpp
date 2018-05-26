@@ -92,7 +92,7 @@ int ReadOnlineGames::DoBackgroundWork()
 
 //    connect(this, &ReadOnlineGames::signalFinishThreadSafe, this, &ReadOnlineGames::slotFinishThreadSafe);
 
-#ifdef QT_DEBUG123
+#ifdef QT_DEBUG
     qInfo().noquote() << "Did not use ReadOnlineGame because of debugging";
     return 0;
 #endif

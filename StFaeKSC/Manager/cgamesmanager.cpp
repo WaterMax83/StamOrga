@@ -188,13 +188,8 @@ MessageProtocol* cGamesManager::getChangeGameRequest(UserConData* pUserCon, Mess
 
     /* game already exists, should only be changed */
     if (index > 0) {
-        quint16 saison;
-        QDate   date = QDateTime::fromMSecsSinceEpoch(timestamp).date();
-        if (date.month() >= 6)
-            saison = date.year();
-        else
-            saison       = date.year() - 1;
-        GamesPlay* pGame = g_GlobalData->m_GamesList.gameExists(sIndex, comp, saison, timestamp);
+        quint16    saison = getSeasonFromTimeStamp(timestamp);
+        GamesPlay* pGame  = g_GlobalData->m_GamesList.gameExists(sIndex, comp, saison, timestamp);
         if (pGame == NULL) {
             qWarning().noquote() << QString("user %1 tried to change game %2, but game would be added, abort it").arg(pUserCon->m_userName).arg(index);
             return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME_TCP, ERROR_CODE_NOT_FOUND);

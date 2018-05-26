@@ -64,7 +64,7 @@ MessageProtocol* cTicketManager::getSeasonTicketList(UserConData* pUserCon, Mess
     QJsonArray arrTickets;
     for (quint32 i = 0; i < numbOfTickets; i++) {
         TicketInfo* pTicket = (TicketInfo*)(g_GlobalData->m_SeasonTicket.getRequestConfigItemFromListIndex(i));
-        if (pTicket == NULL)
+        if (pTicket == NULL || pTicket->isTicketRemoved())
             continue;
         QJsonObject ticketObj;
 
@@ -128,7 +128,7 @@ MessageProtocol* cTicketManager::getSeasonTicketRemoveRequest(UserConData* pUser
 
     qint32 index = rootObj.value("index").toInt(0);
     qint32 rCode;
-    if ((rCode = g_GlobalData->m_SeasonTicket.removeItem(index)) == ERROR_CODE_SUCCESS) {
+    if ((rCode = g_GlobalData->m_SeasonTicket.removeTicketItem(index)) == ERROR_CODE_SUCCESS) {
         qInfo().noquote() << QString("User %1 removed SeasonTicket %2")
                                  .arg(pUserCon->m_userName)
                                  .arg(index);
@@ -174,7 +174,7 @@ MessageProtocol* cTicketManager::getAvailableSeasonTicketList(UserConData* pUser
                             continue;
 
                         TicketInfo* tInfo = (TicketInfo*)g_GlobalData->m_SeasonTicket.getItem(info->m_ticketID);
-                        if (tInfo == NULL) {
+                        if (tInfo == NULL || tInfo->isTicketRemoved()) {
                             ticket->removeItem(info->m_index);
                             continue; /* Ticket is no longer present, remove it */
                         }

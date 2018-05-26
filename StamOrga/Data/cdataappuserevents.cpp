@@ -83,6 +83,8 @@ qint32 cDataAppUserEvents::addNewUserEvents(QJsonArray& jsArr)
             g_DataGamesManager->setGamePlayItemHasEvent(pEvent->m_info.toInt());
         } else if (pEvent->m_type == NOTIFY_TOPIC_NEW_AWAY_ACCEPT) {
             g_DataGamesManager->setGamePlayItemHasEvent(pEvent->m_info.toInt());
+        } else if (pEvent->m_type == NOTIFY_TOPIC_NEW_COMMENT) {
+            g_DataGamesManager->setGamePlayItemHasEvent(pEvent->m_info.toInt());
         } else
             continue;
 
@@ -151,7 +153,8 @@ qint32 cDataAppUserEvents::clearUserEventGamePlay(qint32 gameIndex)
         if (this->m_lEvents[i]->m_type == NOTIFY_TOPIC_NEW_FREE_TICKET
             || this->m_lEvents[i]->m_type == NOTIFY_TOPIC_NEW_AWAY_ACCEPT
             || this->m_lEvents[i]->m_type == NOTIFY_TOPIC_CHANGE_MEETING
-            || this->m_lEvents[i]->m_type == NOTIFY_TOPIC_NEW_MEETING) {
+            || this->m_lEvents[i]->m_type == NOTIFY_TOPIC_NEW_MEETING
+            || this->m_lEvents[i]->m_type == NOTIFY_TOPIC_NEW_COMMENT) {
 
             if (this->m_lEvents[i]->m_info.toInt() == gameIndex) {
                 this->startSetUserEvents(this->m_lEvents[i]->m_eventID, 0);

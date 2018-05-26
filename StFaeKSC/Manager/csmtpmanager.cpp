@@ -18,14 +18,15 @@
 #include <QtCore/QThread>
 
 #include "../Common/General/globalfunctions.h"
-#include "csmtpmanager.h"
 #include "SmtpClient-for-Qt/src/SmtpMime"
+#include "csmtpmanager.h"
 
 cSmtpManager g_SmtpManager;
 
 cSmtpManager::cSmtpManager(QObject* parent)
     : BackgroundWorker(parent)
 {
+    this->m_bDeactivate = false;
 }
 
 
@@ -151,6 +152,12 @@ void cSmtpManager::slotSendNewEmails(SmtpMail* pMail)
 {
     QMutexLocker lock(&this->m_mutex);
 
+    if (this->m_bDeactivate) {
+        qInfo() << "Do not send email because it is deactivated";
+        delete pMail;
+        return;
+    }
+
     SmtpClient client("mail.gmx.net", 465, SmtpClient::ConnectionType::SslConnection);
 
     client.setUser(this->m_serverEmail);
@@ -160,7 +167,7 @@ void cSmtpManager::slotSendNewEmails(SmtpMail* pMail)
 
     message.setSender(new EmailAddress(this->m_serverEmail, "StamOrga"));
     message.addTo(new EmailAddress(this->m_serverEmail, "StamOrga"));
-    for (int i= 0; i < this->m_destinationAdress.size(); i++)
+    for (int i = 0; i < this->m_destinationAdress.size(); i++)
         message.addBcc(new EmailAddress(this->m_destinationAdress.at(i)));
     message.setSubject(pMail->m_header);
 
@@ -177,7 +184,7 @@ void cSmtpManager::slotSendNewEmails(SmtpMail* pMail)
 
     // Now we can send the mail
     qint32 successCnt = 0;
-    bool rCode = client.connectToHost();
+    bool   rCode      = client.connectToHost();
     if (rCode) {
         successCnt++;
         rCode = client.login();

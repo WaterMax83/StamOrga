@@ -86,7 +86,6 @@ Flickable {
 
             RowLayout {
                 width: parent.width
-                spacing: 20
                 Layout.fillWidth: true
 
                 MyComponents.GraphicalButton {
@@ -95,8 +94,9 @@ Flickable {
                     onClickedButton: {
                         isEditMode = true;
                     }
-                    Layout.alignment: Qt.AlignLeft
                 }
+
+                Item { Layout.fillWidth: true }
 
                 MyComponents.GraphicalButton {
                     imageSource: "../images/save.png"
@@ -112,13 +112,18 @@ Flickable {
                         }
 
                     }
-                    Layout.alignment: Qt.AlignRight
                 }
 
+                Item { Layout.fillWidth: true }
+
                 Text {
+                    id: fillText
                     text: " - "
                     font.bold: true
+                    Layout.alignment: Qt.AlignHCenter
                 }
+
+                Item { Layout.fillWidth: true }
 
                 MyComponents.GraphicalButton {
                     imageSource: "../images/done.png"
@@ -131,8 +136,9 @@ Flickable {
                         //                        else
                         //                            showTextDialogAccept("Zusagen", "");
                     }
-                    Layout.alignment: Qt.AlignRight
                 }
+
+                Item { Layout.fillWidth: true }
 
                 MyComponents.GraphicalButton {
                     imageSource: "../images/help.png"
@@ -145,8 +151,9 @@ Flickable {
                         //                        else
                         //                            showTextDialogAccept("Interesse/Vorbehalt", "");
                     }
-                    Layout.alignment: Qt.AlignRight
                 }
+
+                Item { Layout.fillWidth: true }
 
                 MyComponents.GraphicalButton {
                     imageSource: "../images/close.png"
@@ -159,7 +166,6 @@ Flickable {
                         //                        else
                         //                            showTextDialogAccept("Absagen", "");
                     }
-                    Layout.alignment: Qt.AlignRight
                 }
             }
 
@@ -231,63 +237,6 @@ Flickable {
                 visible: acceptSeperator.isShiftVisible
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             }
-
-            //            ListView {
-            //                id: listViewAcceptedUsers
-            //                visible: acceptSeperator.isShiftVisible
-            //                interactive: false
-            //                //                implicitWidth: mainColumnLayoutCurrentGame.width
-            //                implicitWidth: parent.width
-
-            //                delegate: RowLayout {
-            //                    id: singleRowAccepted
-            //                    width: parent.width
-            //                    height: listViewItemHeight
-
-            //                    Rectangle {
-            //                        id: imageItemAccepted
-            //                        anchors.left: parent.left
-            //                        anchors.leftMargin: parent.height
-            //                        width: parent.height / 4 * 3
-            //                        height: parent.height / 4 * 3
-            //                        radius: width * 0.5
-            //                        color: model.color
-            //                        Image {
-            //                            anchors.fill: parent
-            //                            source: model.source
-            //                        }
-            //                    }
-
-            //                    Text {
-            //                        id: textItemAccepted
-            //                        text: model.title
-            //                        anchors.left: imageItemAccepted.right
-            //                        anchors.leftMargin: 10
-            //                        anchors.verticalCenter: parent.verticalCenter
-            //                        Layout.alignment: Qt.AlignVCenter
-            //                        color: "white"
-            //                        font.pixelSize: parent.height / 5 * 3
-            //                    }
-            //                    MouseArea {
-            //                        anchors.top: parent.top
-            //                        anchors.bottom: parent.bottom
-            //                        anchors.left: imageItemAccepted.left
-            //                        anchors.right: textItemAccepted.right
-            //                        onClicked: {
-            //                            var globalCoordinates = singleRowAccepted.mapToItem(flickableCurrentMeetInfo, 0, 0)
-            //                            clickedAcceptedUserMenu.y = globalCoordinates.y - singleRowAccepted.height / 2
-            //                            menuAcceptIndex = model.index
-            //                            menuAcceptValue = model.value
-            //                            menuAcceptText = model.title
-            //                            clickedAcceptedUserMenu.open();
-            //                        }
-            //                    }
-            //                }
-
-            //                model: ListModel {
-            //                    id: listViewModelAcceptedUsers
-            //                }
-            //            }
 
             MyComponents.ShiftableSeperator {
                 id: commentSeperator
@@ -477,8 +426,6 @@ Flickable {
             showInfoHeader("Infos laden hat nicht funktioniert", false)
         }
 
-//        listViewModelAcceptedUsers.clear();
-
         if (result === 1 && lDataMeetingInfo.getAcceptedListCount() > 0) {
             if (!acceptSeperator.userClosedShift)
                 acceptSeperator.isShiftVisible = true;
@@ -504,21 +451,7 @@ Flickable {
                 sprAccepts.infoValue = acceptInfo.value();
                 sprAccepts.imageColor = btnColor;
                 sprAccepts.imageSource = imgSource;
-
-//                listViewModelAcceptedUsers.append({
-//                                                      title: acceptInfo.name(),
-//                                                      index: acceptInfo.index(),
-//                                                      color: btnColor,
-//                                                      source: imgSource,
-//                                                      value: acceptInfo.value()
-//                                                  });
-
             }
-            /* Does not work in defintion for freeTickets, so set it here */
-//            listViewAcceptedUsers.implicitHeight = listViewModelAcceptedUsers.count * listViewItemHeight
-
-        } else {
-//            listViewAcceptedUsers.implicitHeight = 0;
         }
 
         if (result === 1 && lDataMeetingInfo.getCommentCount() > 0) {
@@ -584,15 +517,10 @@ Flickable {
 
     function loadMeetingInfo()
     {
-//        listViewModelAcceptedUsers.clear();
         lDataMeetingInfo.clearAcceptInfoList();
         lDataMeetingInfo.clearCommentList();
         deleteValues();
         showInfoHeader("Aktualisiere Daten", true)
-        //        if (meetingType === 0)
-        //            gDataMeetingInfo.startLoadMeetingInfo(m_gamePlayCurrentItem.index, meetingType);
-        //        else
-        //            gDataTripInfo.startLoadMeetingInfo(m_gamePlayCurrentItem.index, meetingType);
         lDataMeetingInfo.startLoadMeetingInfo(m_gamePlayCurrentItem.index, meetingType);
 
     }

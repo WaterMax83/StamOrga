@@ -52,13 +52,15 @@ SeasonTicket::SeasonTicket()
             quint8  discount  = quint8(this->m_pConfigSettings->value(TICKET_DISCOUNT, 0).toUInt());
             QString place     = this->m_pConfigSettings->value(TICKET_PLACE, "").toString();
             qint64  creation  = this->m_pConfigSettings->value(TICKET_CREATE, 0).toLongLong();
+            qint64  delts     = this->m_pConfigSettings->value(TICKET_DELETE, 0).toLongLong();
+
 
             if (creation == 0) {
                 creation  = QDateTime::fromString("10.07.2017", "dd.MM.yyyy").toMSecsSinceEpoch();
                 bProblems = true;
             }
 
-            TicketInfo* info = new TicketInfo(user, userIndex, ticketName, timestamp, discount, place, index, creation);
+            TicketInfo* info = new TicketInfo(user, userIndex, ticketName, timestamp, discount, place, index, creation, delts);
             if (!this->addNewTicketInfo(info))
                 bProblems = true;
         }
@@ -110,6 +112,7 @@ int SeasonTicket::addNewSeasonTicket(QString user, qint32 userIndex, QString tic
     this->m_pConfigSettings->setValue(TICKET_DISCOUNT, discount);
     this->m_pConfigSettings->setValue(TICKET_PLACE, ticketName);
     this->m_pConfigSettings->setValue(TICKET_CREATE, timestamp);
+    this->m_pConfigSettings->setValue(TICKET_DELETE, 0);
 
     this->m_pConfigSettings->endArray();
     this->m_pConfigSettings->endGroup();
@@ -196,6 +199,21 @@ QString SeasonTicket::showAllSeasonTickets()
     return rValue;
 }
 
+qint32 SeasonTicket::removeTicketItem(const qint32 index)
+{
+    TicketInfo* pTicket = (TicketInfo*)this->getItem(index);
+    if (pTicket == NULL)
+        return ERROR_CODE_NOT_FOUND;
+
+    QMutexLocker locker(&this->m_mInternalInfoMutex);
+
+    pTicket->m_deleteTimeStamp = QDateTime::currentMSecsSinceEpoch();
+    this->updateItemValue(pTicket, TICKET_DELETE, QVariant(pTicket->m_deleteTimeStamp));
+
+    qInfo().noquote() << QString("Removed ticket item \"%1\"").arg(pTicket->m_itemName);
+    return ERROR_CODE_SUCCESS;
+}
+
 void SeasonTicket::saveCurrentInteralList()
 {
     this->m_mConfigIniMutex.lock();
@@ -219,6 +237,7 @@ void SeasonTicket::saveCurrentInteralList()
         this->m_pConfigSettings->setValue(TICKET_PLACE, pItem->m_place);
         this->m_pConfigSettings->setValue(TICKET_DISCOUNT, pItem->m_discount);
         this->m_pConfigSettings->setValue(TICKET_CREATE, pItem->m_creation);
+        this->m_pConfigSettings->setValue(TICKET_DELETE, pItem->m_deleteTimeStamp);
     }
 
     this->m_pConfigSettings->endArray();

@@ -25,8 +25,8 @@ import com.watermax.demo 1.0
 
 
 Rectangle {
-    property alias hint: hintText.text
-    property alias input: inputText.displayText
+    property alias hint: inputText.placeholderText
+    property alias input: inputText.text
     property alias imageSource: rightImage.source
     property bool  enableImage: false
 
@@ -34,18 +34,18 @@ Rectangle {
     signal keysEnterPressed();
 
     implicitWidth: parent.width
-    implicitHeight: 30
-    Text {
-        id: hintText
-        anchors { fill: parent; leftMargin: 14 }
-        verticalAlignment: Text.AlignVCenter
-        color: "#707070"
-        opacity: inputText.displayText.length ? 0 : 1
-    }
+    implicitHeight: inputText.height > 0 ? inputText.height : 30
+//    Text {
+//        id: hintText
+//        anchors { fill: parent; leftMargin: 14 }
+//        verticalAlignment: Text.AlignVCenter
+//        color: "#707070"
+//        opacity: inputText.displayText.length ? 0 : 1
+//    }
 
-    TextInput {
+    TextArea {
         id: inputText
-        font.family: hintText.font
+//        font.family: hintText.font
         anchors { fill:parent; leftMargin: 5 }
         verticalAlignment: Text.AlignVCenter
         font.pixelSize: 16
@@ -67,11 +67,11 @@ Rectangle {
         height: parent.height
         anchors.right: parent.right
     }
-    ColorOverlay {
-        anchors.fill: rightImage
-        source: rightImage
-        color: "#2196F3"
-    }
+//    ColorOverlay {
+//        anchors.fill: rightImage
+//        source: rightImage
+//        color: "#2196F3"
+//    }
 
     property bool isInit: false
 

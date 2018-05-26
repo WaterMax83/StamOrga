@@ -20,8 +20,8 @@
 
 #include "../Common/General/config.h"
 #include "../Common/General/globalfunctions.h"
-#include "pushnotification.h"
 #include "../Manager/csmtpmanager.h"
+#include "pushnotification.h"
 
 
 // clang-format off
@@ -148,14 +148,17 @@ qint64 PushNotification::sendNewVersionNotification(const QString body)
     return push->m_sendMessageID;
 }
 
-qint64 PushNotification::sendNewMeetingNotification(const QString body, const qint32 userID, const quint32 gameIndex)
+qint64 PushNotification::sendNewMeetingNotification(const QString body, const qint32 userID, const quint32 gameIndex, const qint32 type)
 {
     if (!this->m_initialized)
         return ERROR_CODE_NOT_READY;
 
-    PushNotifyInfo* push   = new PushNotifyInfo();
-    push->m_topic          = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING;
-    push->m_header         = "Neues Treffen angelegt";
+    PushNotifyInfo* push = new PushNotifyInfo();
+    push->m_topic        = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING;
+    if (type == MEETING_TYPE_MEETING)
+        push->m_header = "Neues Treffen angelegt";
+    else
+        push->m_header     = "Neue Fahrt angelegt";
     push->m_body           = body;
     push->m_sendMessageID  = getNextInternalPushNumber();
     push->m_sendTime       = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND; // 5min
@@ -168,7 +171,7 @@ qint64 PushNotification::sendNewMeetingNotification(const QString body, const qi
     return push->m_sendMessageID;
 }
 
-qint64 PushNotification::sendChangeMeetingNotification(const QString body, const qint32 userID, const quint32 gameIndex)
+qint64 PushNotification::sendChangeMeetingNotification(const QString body, const qint32 userID, const quint32 gameIndex, const qint32 type)
 {
     if (!this->m_initialized)
         return ERROR_CODE_NOT_READY;
@@ -186,9 +189,12 @@ qint64 PushNotification::sendChangeMeetingNotification(const QString body, const
 
     this->m_notifyMutex.unlock();
 
-    PushNotifyInfo* push   = new PushNotifyInfo();
-    push->m_topic          = PUSH_NOTIFY_TOPIC::PUSH_NOT_CHG_MEETING;
-    push->m_header         = "Treffen wurde verändert";
+    PushNotifyInfo* push = new PushNotifyInfo();
+    push->m_topic        = PUSH_NOTIFY_TOPIC::PUSH_NOT_CHG_MEETING;
+    if (type == MEETING_TYPE_MEETING)
+        push->m_header = "Treffen wurde verändert";
+    else
+        push->m_header     = "Fahrt wurde verändert";
     push->m_body           = body;
     push->m_sendMessageID  = getNextInternalPushNumber();
     push->m_sendTime       = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND;
@@ -292,6 +298,25 @@ qint64 PushNotification::sendNewFanclubNewsNotification(const QString body, cons
     push->m_sendTime      = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND;
     push->m_userID        = userID;
     push->m_info          = QString::number(newsID);
+
+    this->insertNewNotification(push);
+
+    return push->m_sendMessageID;
+}
+
+qint64 PushNotification::sendNewMeetingComment(const QString body, const qint32 userID, const quint32 gameIndex)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_READY;
+
+    PushNotifyInfo* push  = new PushNotifyInfo();
+    push->m_topic         = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_COMMENT;
+    push->m_header        = "Neuer Kommentar";
+    push->m_body          = body;
+    push->m_sendMessageID = getNextInternalPushNumber();
+    push->m_sendTime      = QDateTime::currentMSecsSinceEpoch();
+    push->m_userID        = userID;
+    push->m_info          = QString::number(gameIndex);
 
     this->insertNewNotification(push);
 
@@ -461,6 +486,8 @@ QString PushNotification::getTopicStringFromIndex(const PUSH_NOTIFY_TOPIC topic)
         return NOTIFY_TOPIC_NEW_AWAY_ACCEPT;
     case PUSH_NOT_NEW_FAN_NEWS:
         return NOTIFY_TOPIC_NEW_FANCLUB_NEWS;
+    case PUSH_NOT_NEW_COMMENT:
+        return NOTIFY_TOPIC_NEW_COMMENT;
     default:
         return NOTIFY_TOPIC_GENERAL;
     }
@@ -561,7 +588,7 @@ qint32 PushNotification::addNewVersionInformation(const QString guid, const QStr
 
         this->m_mInternalInfoMutex.lock();
 
-        bool  bChanged = false;
+        bool bChanged = false;
         if (app->m_version != version) {
             if (this->updateItemValue(app, APP_TOKEN_VERSION, QVariant(version)))
                 app->m_version = version;
