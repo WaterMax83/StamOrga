@@ -116,9 +116,13 @@ Item {
                 hint: "Füge Kommentar hinzu"
                 imageSource: ""
                 enableImage: false
+                enableKeyEnterSignal: true
                 enabled: true
                 color: "#FFFFFF"
                 onKeysEnterPressed: {
+                    if (textInputConsole.input === "")
+                        return;
+
                     if (swipeViewCurrentHomeGame.currentItem === currentMeetInfo) {
                         currentMeetInfo.sendNewComment(textInputConsole.input)
                     } else {

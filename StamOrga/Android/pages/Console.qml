@@ -73,6 +73,7 @@ Item {
                hint: "Command"
                imageSource: ""
                enableImage: false
+               enableKeyEnterSignal: true
                enabled: true
                color: "#FFFFFF"
                onKeysEnterPressed: gDataConsoleManager.startSendConsoleCommand(textInput.input)

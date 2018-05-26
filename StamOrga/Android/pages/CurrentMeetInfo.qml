@@ -44,6 +44,12 @@ Flickable {
 
     property int listViewItemHeight : 30
 
+    onContentHeightChanged: {
+        if (isLastLoadFromComment)
+            flickableCurrentMeetInfo.contentY = flickableCurrentMeetInfo.contentHeight - flickableCurrentMeetInfo.height
+        isLastLoadFromComment = false;
+    }
+
     onDragEnded: {
         if (flickableCurrentMeetInfo.contentY < -75) {
             lDataMeetingInfo.clearCommentList();
@@ -104,7 +110,7 @@ Flickable {
                     onClickedButton: {
                         isEditMode = false;
                         var result = lDataMeetingInfo.startSaveMeetingInfo(m_gamePlayCurrentItem.index, textWhen.input, textWhere.input,
-                                                                           textInfo.text, meetingType);
+                                                                           textInfo.input, meetingType);
                         if (result === 0)
                             toastManager.show("Keine Änderung, nichts gespeichert", 2000);
                         else {
@@ -176,7 +182,7 @@ Flickable {
                 enableImage: true
                 width: parent.width
                 enabled: isEditMode
-                color: isEditMode ? "#FFFFFF" : "#AAAAAA";
+                color: isEditMode ? "#FFFFFF" : "#536878";
                 onTextInputChanged: checkNewTextInput()
             }
 
@@ -187,7 +193,7 @@ Flickable {
                 enableImage: true
                 width: parent.width
                 enabled: isEditMode
-                color: isEditMode ? "#FFFFFF" : "#AAAAAA";
+                color: isEditMode ? "#FFFFFF" : "#536878";
                 onTextInputChanged: checkNewTextInput()
             }
 
@@ -197,31 +203,42 @@ Flickable {
                 textToShow: "Info"
             }
 
-            Rectangle {
-                implicitWidth: parent.width
-                implicitHeight: textInfo.height > 0 ? textInfo.height : listViewItemHeight
-                color: isEditMode ? "#FFFFFF" : "#AAAAAA";
+            MyComponents.EditableTextWithHint {
+                id: textInfo
+                hint: "Information"
+                enableImage: false
+                width: parent.width
+                enabled: isEditMode
                 visible: infoSeperator.isShiftVisible
-                //                Text {
-                //                    id: hintTextInfo
-                //                    anchors { fill: parent; leftMargin: 14 }
-                //                    verticalAlignment: Text.AlignVCenter
-                //                    color: "#808080"
-                //                    text: "Info"
-                //                    opacity: textInfo.text.length ? 0 : 1
-                //                }
-                TextArea {
-                    id: textInfo
-                    font.family: txtForFontFamily.font
-                    width: parent.width
-                    color: "#505050"
-                    placeholderText: "Information"
-                    leftPadding: 5
-                    font.pixelSize: 16
-                    enabled: isEditMode
-                    onTextChanged: checkNewTextInput()
-                }
+                color: isEditMode ? "#FFFFFF" : "#536878";
+                onTextInputChanged: checkNewTextInput()
             }
+
+//            Rectangle {
+//                implicitWidth: parent.width
+//                implicitHeight: textInfo.height > 0 ? textInfo.height : listViewItemHeight
+//                color: isEditMode ? "#FFFFFF" : "#AAAAAA";
+//                visible: infoSeperator.isShiftVisible
+//                //                Text {
+//                //                    id: hintTextInfo
+//                //                    anchors { fill: parent; leftMargin: 14 }
+//                //                    verticalAlignment: Text.AlignVCenter
+//                //                    color: "#808080"
+//                //                    text: "Info"
+//                //                    opacity: textInfo.text.length ? 0 : 1
+//                //                }
+//                TextArea {
+//                    id: textInfo
+//                    font.family: txtForFontFamily.font
+//                    width: parent.width
+//                    color: "#505050"
+//                    placeholderText: "Information"
+//                    leftPadding: 5
+//                    font.pixelSize: 16
+//                    enabled: isEditMode
+//                    onTextChanged: checkNewTextInput()
+//                }
+//            }
 
             MyComponents.ShiftableSeperator {
                 id: acceptSeperator
@@ -375,6 +392,7 @@ Flickable {
     property var  lDataMeetingInfo;
     property bool isEditMode: false
     property bool isInputAlreadyChanged: false
+    property bool isLastLoadFromComment : false
 
     function showAllInfoAboutGame() {
 
@@ -407,10 +425,10 @@ Flickable {
                 toastManager.show("Info übers Treffen geladen", 2000);
             else
                 toastManager.show("Info über die Fahrt geladen", 2000);
-            textInfo.text = lDataMeetingInfo.info();
-            textWhen.init(lDataMeetingInfo.when())
-            textWhere.init(lDataMeetingInfo.where())
-            if (textInfo.text.length > 0 && !infoSeperator.userClosedShift)
+            textInfo.init(lDataMeetingInfo.info());
+            textWhen.init(lDataMeetingInfo.when());
+            textWhere.init(lDataMeetingInfo.where());
+            if (textInfo.input.length > 0 && !infoSeperator.userClosedShift)
                 infoSeperator.isShiftVisible = true;
             showInfoHeader("", false)
         } else if (result === -5) {
@@ -418,7 +436,7 @@ Flickable {
                 toastManager.show("Bisher noch kein Treffen gespeichert", 2000);
             else
                 toastManager.show("Bisher noch keine Fahrt gespeichert", 2000);
-            textInfo.text = "";
+            textInfo.init("");
             textWhen.init("")
             textWhere.init("")
             showInfoHeader("", false)
@@ -496,7 +514,7 @@ Flickable {
         if (result === 1) {
             toastManager.show("Kommentar erfolgreich gesendet", 2000);
             loadMeetingInfo();
-
+            isLastLoadFromComment = true;
         } else {
             toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
             showInfoHeader("Kommentar senden hat nicht funktioniert", false)

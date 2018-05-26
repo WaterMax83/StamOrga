@@ -25,53 +25,65 @@ import com.watermax.demo 1.0
 
 
 Rectangle {
-    property alias hint: inputText.placeholderText
+    property alias hint: hintText.text
     property alias input: inputText.text
     property alias imageSource: rightImage.source
     property bool  enableImage: false
+    property bool enableKeyEnterSignal : false
+
+    property int minHeight: 30
 
     signal textInputChanged();
     signal keysEnterPressed();
 
-    implicitWidth: parent.width
-    implicitHeight: inputText.height > 0 ? inputText.height : 30
-//    Text {
-//        id: hintText
-//        anchors { fill: parent; leftMargin: 14 }
-//        verticalAlignment: Text.AlignVCenter
-//        color: "#707070"
-//        opacity: inputText.displayText.length ? 0 : 1
-//    }
 
-    TextArea {
-        id: inputText
-//        font.family: hintText.font
-        anchors { fill:parent; leftMargin: 5 }
+    implicitWidth: parent.width
+    implicitHeight: Math.max(inputText.height, minHeight)
+    Text {
+        id: hintText
+        anchors { fill: parent; leftMargin: 14 }
         verticalAlignment: Text.AlignVCenter
-        font.pixelSize: 16
-        color: "#505050"
-        Layout.fillWidth: true
+        color: "grey"
+        opacity: inputText.text.length ? 0 : 1
+    }
+
+    TextEdit {
+        id: inputText
+        font.family: hintText.font
+        width: parent.width
+        topPadding: 2
+        bottomPadding: 2
+        leftPadding: 5
+        rightPadding: rightImage.width + 5
+        anchors.centerIn: parent
+        font.pixelSize: 14
+        color: parent.enabled ? "#505050" : "#B0BEC5"
         wrapMode: Text.Wrap
-        layer.enabled: true
+        textFormat: Text.PlainText
         onTextChanged: {
             if (isInit)
                 return;
             textInputChanged();
         }
-        Keys.onReturnPressed: keysEnterPressed();
+        Keys.onReturnPressed: {
+            if (enableKeyEnterSignal)
+                keysEnterPressed();
+            else
+                inputText.append("")
+        }
     }
 
     Image {
         id: rightImage
-        width: enableImage ? parent.height : 0
-        height: parent.height
+        width: enableImage ? minHeight : 0
+        height: minHeight
         anchors.right: parent.right
     }
-//    ColorOverlay {
-//        anchors.fill: rightImage
-//        source: rightImage
-//        color: "#2196F3"
-//    }
+    ColorOverlay {
+        anchors.fill: rightImage
+        source: rightImage
+        color: "#2196F3"
+    }
 
     property bool isInit: false
 

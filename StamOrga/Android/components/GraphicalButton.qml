@@ -18,6 +18,7 @@
 import QtQuick 2.9
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.2
+import QtGraphicalEffects 1.0
 
 import com.watermax.demo 1.0
 
@@ -29,17 +30,24 @@ Rectangle {
     id: rectButton
     width: 30
     height: 30
-    color: enabled ? "#2196F3" : "BlueGrey"
+    color: enabled ? "#2196F3" : "#36454f"
     radius: 8
     onEnabledChanged: {
         if (enabled)
             color = "#2196F3";
         else
-            color = "BlueGrey"
+            color = "#36454f"
     }
     Image {
         id: imageButton
         anchors.fill: parent
+        fillMode: Image.Pad
+    }
+    ColorOverlay {
+        anchors.fill: imageButton
+        source: imageButton
+        color: "grey"
+        visible: !rectButton.enabled
     }
     MouseArea {
         anchors.fill: parent
