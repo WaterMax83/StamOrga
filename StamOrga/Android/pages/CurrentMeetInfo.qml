@@ -42,8 +42,6 @@ Flickable {
         }
     }
 
-    property int listViewItemHeight : 30
-
     onContentHeightChanged: {
         if (isLastLoadFromComment)
             flickableCurrentMeetInfo.contentY = flickableCurrentMeetInfo.contentHeight - flickableCurrentMeetInfo.height
@@ -51,7 +49,7 @@ Flickable {
     }
 
     onDragEnded: {
-        if (flickableCurrentMeetInfo.contentY < -75) {
+        if (flickableCurrentMeetInfo.contentY < -refreshItem.refreshHeight) {
             lDataMeetingInfo.clearCommentList();
             deleteValues();
             showInfoHeader("Aktualisiere Daten", true)
@@ -59,21 +57,9 @@ Flickable {
         }
     }
 
-    Rectangle {
-        Image {
-            id: refreshImage
-            source: "../images/refresh.png"
-            rotation: (flickableCurrentMeetInfo.contentY > -75) ? (flickableCurrentMeetInfo.contentY * -1) * 2 : 220
-            transformOrigin: Item.Center
-        }
-        opacity: (flickableCurrentMeetInfo.contentY * -1) / 75
-        color: "black"
-        width: refreshImage.width
-        height: refreshImage.height
-        radius: width * 0.5
-        y: 50
-        x: (mainWindow.width / 2) - (width / 2)
-        z: 1000
+    MyComponents.RefreshItem {
+        id: refreshItem
+        contentY: flickableCurrentMeetInfo.contentY
     }
 
     Pane {
@@ -183,6 +169,7 @@ Flickable {
                 width: parent.width
                 enabled: isEditMode
                 color: isEditMode ? "#FFFFFF" : "#536878";
+
                 onTextInputChanged: checkNewTextInput()
             }
 
@@ -213,32 +200,6 @@ Flickable {
                 color: isEditMode ? "#FFFFFF" : "#536878";
                 onTextInputChanged: checkNewTextInput()
             }
-
-//            Rectangle {
-//                implicitWidth: parent.width
-//                implicitHeight: textInfo.height > 0 ? textInfo.height : listViewItemHeight
-//                color: isEditMode ? "#FFFFFF" : "#AAAAAA";
-//                visible: infoSeperator.isShiftVisible
-//                //                Text {
-//                //                    id: hintTextInfo
-//                //                    anchors { fill: parent; leftMargin: 14 }
-//                //                    verticalAlignment: Text.AlignVCenter
-//                //                    color: "#808080"
-//                //                    text: "Info"
-//                //                    opacity: textInfo.text.length ? 0 : 1
-//                //                }
-//                TextArea {
-//                    id: textInfo
-//                    font.family: txtForFontFamily.font
-//                    width: parent.width
-//                    color: "#505050"
-//                    placeholderText: "Information"
-//                    leftPadding: 5
-//                    font.pixelSize: 16
-//                    enabled: isEditMode
-//                    onTextChanged: checkNewTextInput()
-//                }
-//            }
 
             MyComponents.ShiftableSeperator {
                 id: acceptSeperator

@@ -18,102 +18,125 @@
 import QtQuick 2.9
 import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.2
+import QtGraphicalEffects 1.0
 
 import com.watermax.demo 1.0
 
-
-ColumnLayout {
+Item {
+    id: doubleTicketInfoItem
     width: parent.width
-    spacing: 0
-    property var itemModel
+    height: doubleTicketInfoColumn.height
 
-    signal clickedItem()
+    property string imageColor : "grey"
+    property int ticketIndex
+    property int menuOpen
+    property string title
+    property string place
+    property string reserve
+    property bool  isTicketYourOwn: false
 
-    RowLayout {
-        id: rowItemReserved
+    signal clickedItem(var y)
+
+    ColumnLayout {
+        id: doubleTicketInfoColumn
         width: parent.width
-        height: listViewItemHeight
-        anchors.left: parent.left
-        anchors.leftMargin: listViewItemHeight
+        spacing: 0
 
+        RowLayout {
+            id: rowItemReserved
+            width: parent.width
+            height: textItemName.height + 5
 
-        Rectangle {
-            id: imageItemReserved
-            anchors.left: parent.left
-            width: parent.height / 4 * 2
-            height: parent.height / 4 * 2
-            radius: width * 0.5
-            color: itemModel.menuOpen ? "blue": "yellow"
+            Rectangle {
+                id: imageItemReserved
+                anchors.left: parent.left
+                anchors.leftMargin: parent.height
+                anchors.verticalCenter: parent.verticalCenter
+                width: parent.height / 4 * 2
+                height: parent.height / 4 * 2
+                radius: width * 0.5
+                color: menuOpen ? "blue": "yellow"
+            }
+
+            Text {
+                id: textItemName
+                text: title
+                anchors.left: imageItemReserved.right
+                anchors.leftMargin: 10
+                anchors.verticalCenter: parent.verticalCenter
+                Layout.alignment: Qt.AlignVCenter
+                color: isTicketYourOwn ? "white" : "#B0BEC5"
+                font.pixelSize: 16
+            }
+
+            Image {
+                id: imageInfoItemButton1
+                Layout.preferredHeight: parent.height
+                Layout.preferredWidth:  parent.height
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.left: textItemName.right
+                anchors.leftMargin: textItemName.width > textReservedFor.width ? 35 : 35 + (textReservedFor.width - textItemName.width)
+                fillMode: Image.PreserveAspectFit
+                source: "../images/info.png"
+
+            }
+            MouseArea {
+                anchors.fill: imageInfoItemButton1
+                onClicked: {
+                    var component = Qt.createComponent("../components/AcceptDialog.qml");
+                    if (component.status === Component.Ready) {
+                        var dialog = component.createObject(mainPaneCurrentGame,{popupType: 1});
+                        dialog.headerText = "Information";
+                        dialog.parentHeight = mainPaneCurrentGame.height
+                        dialog.parentWidth = mainPaneCurrentGame.width
+                        dialog.textToAccept = "Die Karte von<br><br><b>" + title + "</b><br><br>befindet sich aktuell bei<br><br> <b>" + place + "</b>";
+                        dialog.showCancelButton = false
+                        dialog.font.family= txtForFontFamily.font
+                        dialog.open();
+                    }
+                }
+            }
+            ColorOverlay {
+                anchors.fill: imageInfoItemButton1
+                source: imageInfoItemButton1
+                color: "#536878"
+            }
+
+            MouseArea {
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.left: imageItemReserved.left
+                anchors.right: imageInfoItemButton1.left
+                onClicked: clickedItem();
+            }
+
+            Text {
+                id: txtForFontFamily
+                visible: false
+            }
+
         }
 
         Text {
-            id: textItemName
-            text: itemModel.title
-            anchors.left: imageItemReserved.right
-            anchors.leftMargin: 10
-            anchors.verticalCenter: parent.verticalCenter
+            id: textReservedFor
+            text: "-> für " + reserve
+            anchors.left: parent.left
+            anchors.leftMargin: rowItemReserved.height + imageItemReserved.width + 10
+            bottomPadding: 5
             Layout.alignment: Qt.AlignVCenter
-            color: itemModel.isTicketYourOwn ? "orange" : "white"
-            font.pixelSize: listViewItemHeight / 5 * 3
+            color: "#B0BEC5"
+            font.pixelSize: 16
         }
 
-        Image {
-            id: imageInfoItemButton
-            Layout.preferredHeight: textItemName.height / 10 * 11
-            Layout.preferredWidth:  textItemName.height / 10 * 11
-            anchors.left: textItemName.right
-            anchors.leftMargin: textItemName.width > textReservedFor.width ? 35 : 35 + (textReservedFor.width - textItemName.width)
-            source: "../images/info.png"
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: {
-                            var component = Qt.createComponent("../components/AcceptDialog.qml");
-                            if (component.status === Component.Ready) {
-                                var dialog = component.createObject(mainPaneCurrentGame,{popupType: 1});
-                                dialog.headerText = "Information";
-                                dialog.parentHeight = mainPaneCurrentGame.height
-                                dialog.parentWidth = mainPaneCurrentGame.width
-                                dialog.textToAccept = "Die Karte von<br><br><b>" + itemModel.title + "</b><br><br>befindet sich aktuell bei<br><br> <b>" + itemModel.place + "</b>";
-                                dialog.showCancelButton = false
-                                dialog.font.family= txtForFontFamily.font
-                                dialog.open();
-                            }
-                        }
-                    }
-        }
         MouseArea {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            anchors.left: imageItemReserved.left
-            anchors.right: imageInfoItemButton.left
-            onClicked: clickedItem();
-        }
-
-        Text {
-            id: txtForFontFamily
-            visible: false
-        }
-
-    }
-
-    Text {
-        id: textReservedFor
-        text: "-> für " + itemModel.reserve
-        anchors.left: parent.left
-        anchors.leftMargin: listViewItemHeight + imageItemReserved.width + 10
-        bottomPadding: 5
-        Layout.alignment: Qt.AlignVCenter
-        color: "white"
-        font.pixelSize: listViewItemHeight / 5 * 3
-    }
-
-    MouseArea {
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.left: rowItemReserved.left
-        anchors.right: textReservedFor.right
-        onClicked: {
-            clickedItem();
+            anchors.left: rowItemReserved.left
+            anchors.right: textReservedFor.right
+            onClicked: {
+                var globalCoordinates = doubleTicketInfoColumn.mapToItem(doubleTicketInfoItem.parent, 0, 0)
+                clickedItem(globalCoordinates.y - doubleTicketInfoColumn.height / 2)
+            }
         }
     }
 }

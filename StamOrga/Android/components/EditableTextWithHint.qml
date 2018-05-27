@@ -44,7 +44,8 @@ Rectangle {
         anchors { fill: parent; leftMargin: 14 }
         verticalAlignment: Text.AlignVCenter
         color: "grey"
-        opacity: inputText.text.length ? 0 : 1
+//        opacity: inputText.text.length ? 0 : 1
+        visible: inputText.focus ? false : inputText.length > 0 ? false : true
     }
 
     TextEdit {
@@ -61,6 +62,10 @@ Rectangle {
         wrapMode: Text.Wrap
         textFormat: Text.PlainText
         onTextChanged: {
+//            if (text.length > 0)
+//                hintText.visible = false
+//            else
+//                hintText.visible = true
             if (isInit)
                 return;
             textInputChanged();

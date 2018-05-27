@@ -37,7 +37,7 @@ Flickable {
         }
 
     onDragEnded: {
-        if (flickableGames.contentY < -100) {
+        if (flickableGames.contentY < -refreshItem.refreshHeight) {
             showInfoHeader("Lade Spielinfos")
             gDataGamesManager.startListGames();
             cleanGameLayout();
@@ -48,21 +48,9 @@ Flickable {
     signal acceptedChangeGame(var dialog);
     property bool showOnlyPastGames : false
 
-    Rectangle {
-        Image {
-            id: refreshImage
-            source: "../images/refresh.png"
-            rotation: (flickableGames.contentY > -100) ? (flickableGames.contentY * -1) * 2 : 220
-            transformOrigin: Item.Center
-        }
-        opacity: (flickableGames.contentY * -1) / 100
-        color: "black"
-        width: refreshImage.width
-        height: refreshImage.height
-        radius: width * 0.5
-        y: 50
-        x: (mainWindow.width / 2) - (width / 2)
-        z: 1000
+    MyComponents.RefreshItem {
+        id: refreshItem
+        contentY: flickableGames.contentY
     }
 
     Pane {

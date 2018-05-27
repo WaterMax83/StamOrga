@@ -39,26 +39,14 @@ Flickable {
         }
 
     onDragEnded: {
-        if (flickableTickets.contentY < -100) {
+        if (flickableTickets.contentY < -refreshItem.refreshHeight) {
             updateSeasonTicketList();
         }
     }
 
-    Rectangle {
-        Image {
-            id: refreshImage
-            source: "../images/refresh.png"
-            rotation: (flickableTickets.contentY > -100) ? (flickableTickets.contentY * -1) * 2 : 220
-            transformOrigin: Item.Center
-        }
-        opacity: (flickableTickets.contentY * -1) / 100
-        color: "black"
-        width: refreshImage.width
-        height: refreshImage.height
-        radius: width * 0.5
-        y: 50
-        x: (mainWindow.width / 2) - (width / 2)
-        z: 1000
+    MyComponents.RefreshItem {
+        id: refreshItem
+        contentY: flickableTickets.contentY
     }
 
     Pane {

@@ -103,5 +103,6 @@
         <file>components/ShiftableSeperator.qml</file>
         <file>components/AcceptInfoSingleItem.qml</file>
         <file>pages/NotificationSettings.qml</file>
+        <file>components/RefreshItem.qml</file>
     </qresource>
 </RCC>
