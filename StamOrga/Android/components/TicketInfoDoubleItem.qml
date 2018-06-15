@@ -37,15 +37,19 @@ Item {
 
     signal clickedItem(var y)
 
-    ColumnLayout {
+    GridLayout {
         id: doubleTicketInfoColumn
         width: parent.width
-        spacing: 0
+//        spacing: 0
+        rows: 2
+        columns: 2
 
         RowLayout {
             id: rowItemReserved
-            width: parent.width
-            height: textItemName.height + 5
+//            width: parent.width
+//            height: textItemName.height + 5
+            Layout.column: 0
+            Layout.row: 0
 
             Rectangle {
                 id: imageItemReserved
@@ -69,19 +73,59 @@ Item {
                 font.pixelSize: 16
             }
 
+            Text {
+                id: txtForFontFamily
+                visible: false
+            }
+
+        }
+        RowLayout {
+            id: rowItemReserved2
+            //            width: parent.width
+//            anchors.left: parent.left
+//            anchors.right: parent.right
+//            height: textReservedFor.height + 5
+            Layout.column: 0
+            Layout.row: 1
+
+            Text {
+                id: textReservedFor
+                text: "-> für " + reserve
+                anchors.left: parent.left
+                anchors.leftMargin: height + imageItemReserved.width + 10
+                Layout.alignment: Qt.AlignVCenter
+                color: "#B0BEC5"
+                font.pixelSize: 16
+            }
+
+
+        }
+
+        Item {
+            id: imageItemForInfo
+            width: textReservedFor.height + 5
+            height: textReservedFor.height + 5
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: parent.right
+            anchors.rightMargin: 10
+            Layout.column: 1
+            Layout.rowSpan: 2
             Image {
-                id: imageInfoItemButton1
-                Layout.preferredHeight: parent.height
-                Layout.preferredWidth:  parent.height
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: textItemName.right
-                anchors.leftMargin: textItemName.width > textReservedFor.width ? 35 : 35 + (textReservedFor.width - textItemName.width)
+                id: imageInfoItemButton
+                sourceSize: Qt.size(parent.width, parent.height)
                 fillMode: Image.PreserveAspectFit
+                Layout.alignment: Qt.AlignRight
                 source: "../images/info.png"
 
             }
+
+            ColorOverlay {
+                anchors.fill: imageInfoItemButton
+                source: imageInfoItemButton
+                color: "#536878"
+            }
             MouseArea {
-                anchors.fill: imageInfoItemButton1
+                anchors.fill: imageInfoItemButton
                 onClicked: {
                     var component = Qt.createComponent("../components/AcceptDialog.qml");
                     if (component.status === Component.Ready) {
@@ -96,43 +140,13 @@ Item {
                     }
                 }
             }
-            ColorOverlay {
-                anchors.fill: imageInfoItemButton1
-                source: imageInfoItemButton1
-                color: "#536878"
-            }
-
-            MouseArea {
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                anchors.left: imageItemReserved.left
-                anchors.right: imageInfoItemButton1.left
-                onClicked: clickedItem();
-            }
-
-            Text {
-                id: txtForFontFamily
-                visible: false
-            }
-
-        }
-
-        Text {
-            id: textReservedFor
-            text: "-> für " + reserve
-            anchors.left: parent.left
-            anchors.leftMargin: rowItemReserved.height + imageItemReserved.width + 10
-            bottomPadding: 5
-            Layout.alignment: Qt.AlignVCenter
-            color: "#B0BEC5"
-            font.pixelSize: 16
         }
 
         MouseArea {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            anchors.left: rowItemReserved.left
-            anchors.right: textReservedFor.right
+            anchors.left: parent.left
+            anchors.right: imageItemForInfo.left
             onClicked: {
                 var globalCoordinates = doubleTicketInfoColumn.mapToItem(doubleTicketInfoItem.parent, 0, 0)
                 clickedItem(globalCoordinates.y - doubleTicketInfoColumn.height / 2)

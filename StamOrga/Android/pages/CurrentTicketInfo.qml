@@ -64,7 +64,7 @@ Flickable {
 
             Text {
                 id: txtInfoCurrentGameFreeTickets
-                visible: false
+                visible: columnLayoutFreeTickets.children.length > 0 ? true : false
                 color: "grey"
                 font.pixelSize: 14
                 text: "<b>Freie Karten:</b>"
@@ -81,7 +81,7 @@ Flickable {
 
             Text {
                 id: txtInfoCurrentGameReservedTickets
-                visible: false
+                visible: columnLayoutReservedTickets.children.length > 0 ? true : false
                 color: "grey"
                 font.pixelSize: 14
                 text: "<b>Reservierte Karten:</b>"
@@ -371,13 +371,8 @@ Flickable {
             }
 
             txtInfoCurrentGameBlockedTickets.visible = true
-            txtInfoCurrentGameReservedTickets.visible = true
-            txtInfoCurrentGameFreeTickets.visible = true
-
         } else {
             txtInfoCurrentGameBlockedTickets.visible = false
-            txtInfoCurrentGameReservedTickets.visible = false
-            txtInfoCurrentGameFreeTickets.visible = false
         }
     }
 }

@@ -30,7 +30,7 @@ Rectangle {
     Image {
         id: refreshImage
         source: "../images/refresh.png"
-        rotation: (contentY > - refreshHeight) ? (contentY  * 4 ): -240
+        rotation: (contentY > - refreshHeight) ? (-contentY  * 4 ): 240
         transformOrigin: Item.Center
         opacity: (contentY * -1) / refreshHeight
         anchors.centerIn: parent
@@ -45,8 +45,8 @@ Rectangle {
 
     visible: contentY < 0 ? true : false
     color: "#536878"
-    width: refreshImage.width * 2
-    height: refreshImage.height * 2
+    width: refreshImage.width * 1.5
+    height: refreshImage.height * 1.5
     radius: width * 0.5
     y: contentY + 10
     x: (parent.width / 2) - (width / 2)

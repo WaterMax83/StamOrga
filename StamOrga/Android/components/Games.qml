@@ -416,7 +416,6 @@ Rectangle {
             } else
                 eventIndicator.disableVisibility = true;
 
-            var fixed = gamePlayItem.timeFixed
             if (!gamePlayItem.timeFixed)
                 labelLineTimeNotFixed.visible = true
 

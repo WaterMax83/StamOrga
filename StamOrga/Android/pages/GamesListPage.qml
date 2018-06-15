@@ -29,12 +29,12 @@ Flickable {
     clip: true
     contentHeight: mainPaneGames.height
     rebound: Transition {
-            NumberAnimation {
-                properties: "y"
-                duration: 1000
-                easing.type: Easing.OutBounce
-            }
+        NumberAnimation {
+            properties: "y"
+            duration: 1000
+            easing.type: Easing.OutBounce
         }
+    }
 
     onDragEnded: {
         if (flickableGames.contentY < -refreshItem.refreshHeight) {
@@ -118,7 +118,8 @@ Flickable {
     Component {
         id: gameView
 
-        MyComponents.Games {
+//        MyComponents.Games{
+            MyComponents.GamesDesignItem{
             onClickedCurrentGame: {
                 var component = Qt.createComponent("../pages/CurrentGamePage.qml")
                 if (component.status === Component.Ready) {
@@ -171,9 +172,9 @@ Flickable {
         y: mainItemGamesMainPage.height / 6
 
         background: Rectangle {
-                implicitWidth: menuItemFixedGameTime.width
-                color: "#4f4f4f"
-            }
+            implicitWidth: menuItemFixedGameTime.width
+            color: "#4f4f4f"
+        }
 
         MenuItem {
             id: menuItemEditGame

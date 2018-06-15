@@ -67,8 +67,8 @@ Item {
             Layout.preferredHeight: parent.height
             Layout.preferredWidth:  parent.height
             anchors.verticalCenter: parent.verticalCenter
-            anchors.left: textItemName.right
-            anchors.leftMargin: 35
+            anchors.right: parent.right
+            anchors.rightMargin: 10
             fillMode: Image.PreserveAspectFit
             source: "../images/info.png"
         }
@@ -81,8 +81,8 @@ Item {
         MouseArea {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            anchors.left: imageItemInfo.left
-            anchors.right: textItemName.right
+            anchors.left: parent.left
+            anchors.right: imageInfoItemButton.left
             onClicked: {
                 var globalCoordinates = singleTicketInfoRow.mapToItem(singleTicketInfoItem.parent, 0, 0)
                 clickedItem(globalCoordinates.y - singleTicketInfoRow.height / 2)

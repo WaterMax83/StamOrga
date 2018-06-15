@@ -104,5 +104,6 @@
         <file>components/AcceptInfoSingleItem.qml</file>
         <file>pages/NotificationSettings.qml</file>
         <file>components/RefreshItem.qml</file>
+        <file>components/GamesDesignItem.qml</file>
     </qresource>
 </RCC>

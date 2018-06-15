@@ -85,6 +85,9 @@ Flickable {
                     enabled: isEditMode ? false : true
                     onClickedButton: {
                         isEditMode = true;
+                        infoSeperator.visible = true;
+                        infoSeperator.userClosedShift = false;
+                        infoSeperator.isShiftVisible = true;
                     }
                 }
 
@@ -188,6 +191,7 @@ Flickable {
                 id: infoSeperator
                 width: parent.width
                 textToShow: "Info"
+                visible: false
             }
 
             MyComponents.EditableTextWithHint {
@@ -205,6 +209,7 @@ Flickable {
                 id: acceptSeperator
                 width: parent.width
                 textToShow: "Zusagen"
+                visible: false
             }
 
             Column {
@@ -220,6 +225,7 @@ Flickable {
                 id: commentSeperator
                 width: parent.width
                 textToShow: "Kommentare"
+                visible: false
             }
 
             Column {
@@ -389,8 +395,12 @@ Flickable {
             textInfo.init(lDataMeetingInfo.info());
             textWhen.init(lDataMeetingInfo.when());
             textWhere.init(lDataMeetingInfo.where());
-            if (textInfo.input.length > 0 && !infoSeperator.userClosedShift)
-                infoSeperator.isShiftVisible = true;
+
+            if (textInfo.input.length > 0) {
+                infoSeperator.visible = true;
+                if (!infoSeperator.userClosedShift)
+                    infoSeperator.isShiftVisible = true;
+            }
             showInfoHeader("", false)
         } else if (result === -5) {
             if (meetingType === 0)
@@ -406,6 +416,7 @@ Flickable {
         }
 
         if (result === 1 && lDataMeetingInfo.getAcceptedListCount() > 0) {
+            acceptSeperator.visible = true;
             if (!acceptSeperator.userClosedShift)
                 acceptSeperator.isShiftVisible = true;
             for (var i = 0; i < lDataMeetingInfo.getAcceptedListCount(); i++) {
@@ -434,6 +445,7 @@ Flickable {
         }
 
         if (result === 1 && lDataMeetingInfo.getCommentCount() > 0) {
+            commentSeperator.visible = true;
             if (!commentSeperator.userClosedShift)
                 commentSeperator.isShiftVisible = true;
 
