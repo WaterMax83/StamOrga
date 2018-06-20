@@ -122,6 +122,45 @@ QString GamePlay::getCompetitionRound()
     return "not implemented";
 }
 
+QString GamePlay::getCompetitionShortRound()
+{
+    if (this->m_comp == BUNDESLIGA_1 || this->m_comp == BUNDESLIGA_2) {
+        if (this->m_seasonIndex <= 34)
+            return QString("%1. Spieltag").arg(this->m_seasonIndex);
+        else
+            return QString("Relegation %1 - ").arg(this->m_seasonIndex == 35 ? "Hinspiel" : "Rückspiel");
+    } else if (this->m_comp == LIGA_3) {
+        if (this->m_seasonIndex <= 38)
+            return QString("%1. Spieltag").arg(this->m_seasonIndex);
+        else
+            return QString("Relegation %1 - ").arg(this->m_seasonIndex == 39 ? "Hinspiel" : "Rückspiel");
+    } else if (this->m_comp == DFB_POKAL || this->m_comp == BADISCHER_POKAL) {
+        if (this->m_seasonIndex < 6)
+            return QString("%1.Runde").arg(this->m_seasonIndex);
+        else if (this->m_seasonIndex == 7)
+            return QString("1/8 Finale");
+        else if (this->m_seasonIndex == 8)
+            return QString("1/4 Finale");
+        else if (this->m_seasonIndex == 9)
+            return QString("1/2 Finale");
+        else if (this->m_seasonIndex == 10)
+            return QString("Finale");
+        else
+            return QString("Unb. Runde: %1").arg(this->m_seasonIndex);
+    } else if (this->m_comp == TESTSPIEL) {
+#ifdef QT_DEBUG
+        return QString("%1. TestSpiel").arg(this->m_seasonIndex);
+#else
+        if (this->m_bIsUserGameAddingEnabled)
+            return QString("%1. TestSpiel").arg(this->m_seasonIndex);
+        else
+            return "TestSpiel";
+#endif
+    }
+
+    return "n.i.";
+}
+
 void GamePlay::setEnableAddGame(bool enable)
 {
     this->m_bIsUserGameAddingEnabled = enable;

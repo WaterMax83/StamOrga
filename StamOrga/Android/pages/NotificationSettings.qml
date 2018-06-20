@@ -175,6 +175,10 @@ Item {
             }
         }
 
+        function toolButtonClicked() {
+            saveAllSettings();
+        }
+
 //        RowLayout {
 //            id: rowNotificationButtons
 //            width: parent.width

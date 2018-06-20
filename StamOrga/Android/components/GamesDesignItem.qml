@@ -31,6 +31,8 @@ Item {
     width: parent.width
     height: mainGameLayout.height
 
+    property bool showGameSeperator: true
+
     property var m_gamePlayItem
 
     signal clickedCurrentGame(var sender)
@@ -38,6 +40,7 @@ Item {
 
     property color gradColorStart: "#105050"
     property color gradColorStop: "#509090"
+    property int imageSize : 20
 
     MouseArea {
         anchors.fill: parent
@@ -53,41 +56,34 @@ Item {
         id: eventIndicator
         disableVisibility: true
         eventCount : 1
-        itemSize: labelLineDate.height * 2
+        itemSize: imageSize * 2
         z : 1000
     }
 
     ColumnLayout {
         id: mainGameLayout
         width: parent.width
-        spacing: 0
+        spacing: 3
         Rectangle {
             color: Material.hintTextColor
             height: 1
+            visible: showGameSeperator
             Layout.fillWidth: true
         }
 
         RowLayout {
-//            id: mainGameLayout
             width: parent.width
 
-            Item {
+            ColumnLayout {
                 anchors.top: parent.top
                 anchors.left: parent.left
-                id: imageItemGameInfo
-                width: 50
-                height: 50
-//                Image {
-//                    id: imageGameInfo
-//                    sourceSize: Qt.size(parent.width, parent.height)
-//                    fillMode: Image.PreserveAspectFit
-//                    //                Layout.alignment: Qt.AlignRight
-//                    source: "../images/info.png"
+                anchors.topMargin: 3
+                anchors.leftMargin: 3
 
-//                }
                 Rectangle {
                     id: itemCompetitionInfo
-                    anchors.fill : parent
+                    width: 50
+                    height: 50
                     radius: width / 2
                     border.color: "grey"
                     border.width: 3
@@ -108,7 +104,6 @@ Item {
                         font.pixelSize: 22
                         font.bold: true
                         color: "#B0BEC5"
-//                        Layout.alignment: Qt.AlignCenter
                         anchors.centerIn: parent
                     }
                 }
@@ -131,18 +126,28 @@ Item {
                             text: qsTr("Date")
                             color: "#B0BEC5"
                             font.pixelSize: 14
-//                            Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
                         }
 
+                        //                        Text {
+                        //                            id: labelLineTimeNotFixed
+                        //                            text: "<i>(nicht terminiert)</i>"
+                        //                            textFormat: Text.RichText
+                        //                            font.pixelSize: 12
+                        //                            color: "grey"
+                        //                            leftPadding: 5
+                        //                            //                            Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
+                        //                            visible: false
+                        //                        }
                         Text {
-                            id: labelLineTimeNotFixed
-                            text: "<i>(nicht terminiert)</i>"
-                            textFormat: Text.RichText
-                            font.pixelSize: 12
-                            color: "grey"
-                            leftPadding: 5
-//                            Layout.alignment: Qt.AlignLeft | Qt.AlignHCenter
-                            visible: false
+                            text: " - "
+                            font.pixelSize: 14
+                            color: "#B0BEC5"
+                        }
+                        Text {
+                            id: labelLineGameInfo
+                            text: ""
+                            font.pixelSize: 14
+                            color: "#B0BEC5"
                         }
                     }
                     RowLayout {
@@ -168,20 +173,204 @@ Item {
                         Text {
                             id: labelLineScore
                             anchors.right: parent.right
+                            anchors.rightMargin: 5
                             text: qsTr("")
                             font.bold: true
                             color: "white"
                             font.pixelSize: 14
-//                            Layout.rightMargin: parent.width / 100 * 30
-//                            Layout.alignment: Qt.AlignRight // | Qt.AlignHCenter
                         }
                     }
-                    RowLayout {
-                        Text {
-                            anchors.left: parent.left
-                            text: ""
-                            color: "white"
-                            font.pixelSize: 14
+
+                    GridLayout {
+                        width: parent.width
+                        Layout.fillWidth: true
+                        columns: 3
+                        columnSpacing: 0
+
+                        GridLayout {
+                            Layout.fillWidth: true
+                            Layout.preferredWidth: parent.width / 3
+                            columns: 10
+                            columnSpacing: 0
+
+                            Item {
+                                Layout.column: 0
+                                width: imageSize
+                                height: imageSize
+                                Image {
+                                    id: imageTripIsPresent
+                                    anchors.fill : parent
+                                    source: "../images/train.png";
+                                }
+                            }
+
+                            Text {
+                                Layout.column: 2
+                                id: labelAcceptedTrip
+                                color: "white"
+                                font.pixelSize: 14
+                            }
+
+                            Rectangle {
+                                id: acceptedTripItem
+                                Layout.column: 3
+                                width: imageSize / 1.5
+                                height: imageSize / 1.5
+                                radius: width * 0.5
+                                color: "green"
+                                Image {
+                                    anchors.fill: parent
+                                    source: "../images/done.png";
+                                }
+                            }
+
+                            Text {
+                                Layout.column: 5
+                                id: labelInterestTrip
+                                color: "white"
+                                font.pixelSize: 14
+                            }
+
+                            Rectangle {
+                                id: interestTripItem
+                                Layout.column: 6
+                                width: imageSize / 1.5
+                                height: imageSize / 1.5
+                                radius: width * 0.5
+                                color: "orange"
+                                Image {
+                                    anchors.fill: parent
+                                    source: "../images/help.png";
+                                }
+                            }
+                            Text { Layout.fillWidth: true }
+                        }
+
+                        GridLayout {
+                            Layout.fillWidth: true
+                            Layout.preferredWidth: parent.width / 3
+                            columns: 10
+                            columnSpacing: 0
+
+                            Item {
+                                Layout.column: 0
+                                width: imageSize
+                                height: imageSize
+                                Image {
+                                    id: imageMeetingIsPresent
+                                    anchors.fill : parent
+                                    source: "../images/place.png";
+                                }
+                            }
+
+                            Text {
+                                Layout.column: 2
+                                id: labelAcceptedMeeting
+                                color: "white"
+                                font.pixelSize: 14
+
+                            }
+                            Rectangle {
+                                Layout.column: 3
+                                id : acceptedMeetingItem
+                                width: imageSize / 1.5
+                                height: imageSize / 1.5
+                                radius: width * 0.5
+                                color: "green"
+                                Image {
+                                    anchors.fill: parent
+                                    source: "../images/done.png";
+                                }
+                            }
+
+                            Text {
+                                Layout.column: 5
+                                id: labelInterestMeeting
+                                color: "white"
+                                font.pixelSize: 14
+                            }
+                            Rectangle {
+                                Layout.column: 6
+                                id : interestMeetingItem
+                                width: imageSize / 1.5
+                                height: imageSize / 1.5
+                                radius: width * 0.5
+                                color: "orange"
+                                Image {
+                                    anchors.fill: parent
+                                    source: "../images/help.png";
+                                }
+                            }
+
+                            Text { Layout.fillWidth: true }
+                        }
+
+                        GridLayout {
+                            id: layoutCurrentInfoItem
+                            Layout.fillWidth: true
+                            Layout.preferredWidth: parent.width / 3
+                            columns: 10
+                            columnSpacing: 0
+
+                            Item {
+                                Layout.column: 0
+                                width: imageSize
+                                height: imageSize
+                                Image {
+                                    id: imageTicketItems
+                                    anchors.fill : parent
+                                    source: "../images/card.png";
+                                }
+                            }
+
+                            Text {
+                                Layout.column: 2
+                                id: labelFreeTickets
+                                color: "white"
+                                font.pixelSize: 14
+                            }
+                            Rectangle {
+                                Layout.column: 3
+                                id: itemFreeTickets
+                                width: imageSize / 1.5
+                                height: imageSize / 1.5
+                                radius: width * 0.5
+                                color: "green"
+                            }
+
+                            Item {
+                                Layout.column: 5
+                                id: itemTicketBookmark
+                                width: imageSize
+                                height: imageSize
+                                visible: false
+
+                                Image {
+                                    id: imageItemTicketBookmark
+                                    anchors.fill : parent
+                                    source: "../images/bookmark.png";
+                                }
+                                ColorOverlay {
+                                    anchors.fill: imageItemTicketBookmark
+                                    source: imageItemTicketBookmark
+                                    color: "yellow"
+                                }
+                            }
+
+                            Item {
+                                Layout.column: 7
+                                id: itemTicketShare
+                                width: imageSize
+                                height: imageSize
+                                visible: false
+
+                                Image {
+                                    id: imageItemTicketShare
+                                    anchors.fill : parent
+                                    source: "../images/share.png";
+                                }
+                            }
+                            Text { Layout.fillWidth: true }
                         }
                     }
                 }
@@ -191,10 +380,13 @@ Item {
 
     function showGamesInfo(gamePlayItem) {
         if (gamePlayItem !== null) {
+
+            clearAllInfos();
+
             m_gamePlayItem = gamePlayItem
             labelLineDate.text = gamePlayItem.timestampReadableLine();
-//            labelLineWhat.text = gamePlayItem.getCompetitionRound() + gamePlayItem.competition
             labelLineCompetition.text = gamePlayItem.getShortCompetition();
+            labelLineGameInfo.text = gamePlayItem.getCompetitionShortRound();
             labelLineHome.text = gamePlayItem.home;
             if (gamePlayItem.home === "KSC")
                 labelLineHome.font.letterSpacing = 2
@@ -203,13 +395,12 @@ Item {
                 labelLineAway.font.letterSpacing = 2
             labelLineScore.text = gamePlayItem.score;
 
-//            if (gamePlayItem.isGameInPast()) {
-//                mainRectangleGame.gradColorStart = "#505050"
-//                mainRectangleGame.gradColorStop = "#909090"
-//                layoutCurrentInfoItem.visible = false;
-//                return;
-//            } else
-                if (gamePlayItem.isGameRunning()) {
+            if (gamePlayItem.isGameInPast()) {
+                gradColorStart = "#505050"
+                gradColorStop = "#909090"
+                //                layoutCurrentInfoItem.visible = false;
+                return;
+            } else if (gamePlayItem.isGameRunning()) {
                 gradColorStart = "#f30707"
                 gradColorStop = "#ff4747"
             } else {
@@ -225,8 +416,8 @@ Item {
                     gradColorStop = "#905090"
                 }
             }
-                if (gamePlayItem.isGameInPast())
-                    return;
+            if (gamePlayItem.isGameInPast())
+                return;
 
             var favIndex = gDataGameUserData.getFavoriteGameIndex(gamePlayItem.index);
             if (favIndex <= 0) {
@@ -245,14 +436,99 @@ Item {
             } else
                 eventIndicator.disableVisibility = true;
 
-            if (!gamePlayItem.timeFixed)
-                labelLineTimeNotFixed.visible = true
+            if (!gamePlayItem.timeFixed) {
+                //                labelLineTimeNotFixed.visible = true
+                labelLineDate.text = gamePlayItem.timestampReadableLineWithoutTime();
+                labelLineDate.font.italic = true
 
-//            showTripInfo(gamePlayItem);
+            }
 
-//            showMeetingInfo(gamePlayItem);
+            showTripInfo(gamePlayItem);
 
-//            showTicketInfo(gamePlayItem);
+            showMeetingInfo(gamePlayItem);
+
+            showTicketInfo(gamePlayItem);
         }
+    }
+
+    function clearAllInfos() {
+        acceptedTripItem.visible = false;
+        labelAcceptedTrip.text = ""
+        interestTripItem.visible = false;
+        labelInterestTrip.text = ""
+        imageTripIsPresent.visible = false;
+
+        acceptedMeetingItem.visible = false;
+        labelAcceptedMeeting.text = "";
+        interestMeetingItem.visible = false;
+        labelInterestMeeting.text = "";
+        imageMeetingIsPresent.visible = false;
+
+        imageTicketItems.visible = false;
+        itemTicketShare.visible = false;
+        itemTicketBookmark.visible = false;
+        itemFreeTickets.visible = false;
+        labelFreeTickets.text = ""
+    }
+
+    function showTripInfo(gamePlayItem) {
+
+        var tripPresend = gamePlayItem.getTripInfo();
+        if (tripPresend > 0) {
+            imageTripIsPresent.visible = true
+            var acceptedTrip = gamePlayItem.getAcceptedTripCount();
+            if (acceptedTrip > 0) {
+                acceptedTripItem.visible = true;
+                labelAcceptedTrip.text = acceptedTrip;
+            }
+            var interestTrip = gamePlayItem.getInterestedTripCount();
+            if (interestTrip > 0) {
+                interestTripItem.visible = true;
+                labelInterestTrip.text = interestTrip;
+            }
+        }
+    }
+
+    function showMeetingInfo(gamePlayItem) {
+
+        var meetingPresent = gamePlayItem.getMeetingInfo();
+        if (meetingPresent > 0) {
+            imageMeetingIsPresent.visible = true
+            if (gamePlayItem.getAcceptedMeetingCount() > 0) {
+                acceptedMeetingItem.visible = true;
+                labelAcceptedMeeting.text = gamePlayItem.getAcceptedMeetingCount();
+            }
+
+            if (gamePlayItem.getInterestedMeetingCount() > 0) {
+                interestMeetingItem.visible = true;
+                labelInterestMeeting.text = gamePlayItem.getInterestedMeetingCount();
+            }
+        }
+    }
+
+    function showTicketInfo(gamePlayItem) {
+
+        if (!gamePlayItem.isGameASeasonTicketGame())
+            return;
+
+        var ticketIndex = gDataGameUserData.getTicketGameIndex(gamePlayItem.index);
+        if (ticketIndex === 2) {
+            itemTicketShare.visible = true;
+            itemTicketBookmark.visible = false;
+        } else if (ticketIndex === 3) {
+            itemTicketShare.visible = false;
+            itemTicketBookmark.visible = true;
+        }
+
+        var freeTickets = gamePlayItem.getFreeTickets();
+        if (freeTickets > 0) {
+            itemFreeTickets.visible = true;
+            labelFreeTickets.text = freeTickets;
+        }
+
+        if (freeTickets > 0 || ticketIndex > 1)
+            imageTicketItems.visible = true;
+        //        else
+        //            itemFreeTickets.visible = false;
     }
 }

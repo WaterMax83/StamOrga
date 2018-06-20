@@ -56,6 +56,8 @@ Flickable {
     Pane {
         id: mainPaneGames
         width: parent.width
+        padding: 0
+
 
         ColumnLayout {
             id: mainColumnLayoutGames
@@ -118,8 +120,8 @@ Flickable {
     Component {
         id: gameView
 
-//        MyComponents.Games{
-            MyComponents.GamesDesignItem{
+        //        MyComponents.Games{
+        MyComponents.GamesDesignItem{
             onClickedCurrentGame: {
                 var component = Qt.createComponent("../pages/CurrentGamePage.qml")
                 if (component.status === Component.Ready) {

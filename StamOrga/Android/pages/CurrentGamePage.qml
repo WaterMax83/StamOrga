@@ -30,10 +30,10 @@ Item {
     property var m_gamePlayCurrentItem
     width: parent.width
     height: parent.height
-//    Rectangle {
-//        anchors.fill: parent
-//        color: "#536878"
-//    }
+    //    Rectangle {
+    //        anchors.fill: parent
+    //        color: "#536878"
+    //    }
 
     ColumnLayout {
         id: mainColumnLayoutCurrentGame
@@ -47,13 +47,15 @@ Item {
             visible: false
         }
 
-        MyComponents.Games {
+        //        MyComponents.Games {
+        MyComponents.GamesDesignItem{
             id: gameHeader
             Layout.fillWidth: true
             Layout.topMargin: gameTopMargin
-            Layout.leftMargin: 5
-            Layout.rightMargin: 5
+//            Layout.leftMargin: 5
+//            Layout.rightMargin: 5
             Layout.alignment: Qt.AlignTop
+            showGameSeperator: false
             onPressedAndHoldCurrentGame: Qt.openUrlExternally(
                                              "https://www.youtube.com/watch?v=4DNGMoMNLRY")
         }

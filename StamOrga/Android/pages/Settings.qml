@@ -269,6 +269,10 @@ Flickable {
     }
 
     function toolButtonClicked() {
+        saveAllSettings();
+    }
+
+    function saveAllSettings() {
         var saveFonts = false;
 
         //        if (globalSettings.useReadableName !== useReadableName.checked) {
