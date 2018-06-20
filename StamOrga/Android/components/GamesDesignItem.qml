@@ -30,12 +30,14 @@ import "../components" as MyComponents
 Item {
     width: parent.width
     height: mainGameLayout.height
-//    color: "#36454f"
 
     property var m_gamePlayItem
 
     signal clickedCurrentGame(var sender)
     signal pressedAndHoldCurrentGame(var sender)
+
+    property color gradColorStart: "#105050"
+    property color gradColorStop: "#509090"
 
     MouseArea {
         anchors.fill: parent
@@ -45,6 +47,14 @@ Item {
         onPressAndHold: {
             pressedAndHoldCurrentGame(m_gamePlayItem);
         }
+    }
+
+    MyComponents.EventIndicator {
+        id: eventIndicator
+        disableVisibility: true
+        eventCount : 1
+        itemSize: labelLineDate.height * 2
+        z : 1000
     }
 
     ColumnLayout {
@@ -67,13 +77,40 @@ Item {
                 id: imageItemGameInfo
                 width: 50
                 height: 50
-                Image {
-                    id: imageGameInfo
-                    sourceSize: Qt.size(parent.width, parent.height)
-                    fillMode: Image.PreserveAspectFit
-                    //                Layout.alignment: Qt.AlignRight
-                    source: "../images/info.png"
+//                Image {
+//                    id: imageGameInfo
+//                    sourceSize: Qt.size(parent.width, parent.height)
+//                    fillMode: Image.PreserveAspectFit
+//                    //                Layout.alignment: Qt.AlignRight
+//                    source: "../images/info.png"
 
+//                }
+                Rectangle {
+                    id: itemCompetitionInfo
+                    anchors.fill : parent
+                    radius: width / 2
+                    border.color: "grey"
+                    border.width: 3
+                    gradient: Gradient {
+                        GradientStop {
+                            position: 0
+                            color: gradColorStart
+                        }
+
+                        GradientStop {
+                            position: 0.9
+                            color: gradColorStop
+                        }
+                    }
+                    Text {
+                        id: labelLineCompetition
+                        text: "BL"
+                        font.pixelSize: 22
+                        font.bold: true
+                        color: "#B0BEC5"
+//                        Layout.alignment: Qt.AlignCenter
+                        anchors.centerIn: parent
+                    }
                 }
             }
 
@@ -156,7 +193,8 @@ Item {
         if (gamePlayItem !== null) {
             m_gamePlayItem = gamePlayItem
             labelLineDate.text = gamePlayItem.timestampReadableLine();
-//            labelLineWhat.text = gamePlayItem.getCompetitionLine() + gamePlayItem.competition
+//            labelLineWhat.text = gamePlayItem.getCompetitionRound() + gamePlayItem.competition
+            labelLineCompetition.text = gamePlayItem.getShortCompetition();
             labelLineHome.text = gamePlayItem.home;
             if (gamePlayItem.home === "KSC")
                 labelLineHome.font.letterSpacing = 2
@@ -165,44 +203,47 @@ Item {
                 labelLineAway.font.letterSpacing = 2
             labelLineScore.text = gamePlayItem.score;
 
-            if (gamePlayItem.isGameInPast()) {
+//            if (gamePlayItem.isGameInPast()) {
 //                mainRectangleGame.gradColorStart = "#505050"
 //                mainRectangleGame.gradColorStop = "#909090"
 //                layoutCurrentInfoItem.visible = false;
-                return;
-            } else if (gamePlayItem.isGameRunning()) {
-//                mainRectangleGame.gradColorStart = "#f30707"
-//                mainRectangleGame.gradColorStop = "#ff4747"
+//                return;
+//            } else
+                if (gamePlayItem.isGameRunning()) {
+                gradColorStart = "#f30707"
+                gradColorStop = "#ff4747"
             } else {
-//                var comp = gamePlayItem.competitionValue();
-//                if (comp === 4) { // dfb pokal
-//                    mainRectangleGame.gradColorStart = "#105010"
-//                    mainRectangleGame.gradColorStop = "#509050"
-//                }else if (comp === 5) { // badischer pokal
-//                    mainRectangleGame.gradColorStart = "#103050"
-//                    mainRectangleGame.gradColorStop = "#507090"
-//                } else if (comp === 6) { // TestSpiel
-//                    mainRectangleGame.gradColorStart = "#101050"
-//                    mainRectangleGame.gradColorStop = "#905090"
-//                }
+                var comp = gamePlayItem.competitionValue();
+                if (comp === 4) { // dfb pokal
+                    gradColorStart = "#105010"
+                    gradColorStop = "#509050"
+                }else if (comp === 5) { // badischer pokal
+                    gradColorStart = "#103050"
+                    gradColorStop = "#507090"
+                } else if (comp === 6) { // TestSpiel
+                    gradColorStart = "#101050"
+                    gradColorStop = "#905090"
+                }
+            }
+                if (gamePlayItem.isGameInPast())
+                    return;
+
+            var favIndex = gDataGameUserData.getFavoriteGameIndex(gamePlayItem.index);
+            if (favIndex <= 0) {
+                itemCompetitionInfo.border.color = "grey";
+                itemCompetitionInfo.border.width = 3;
+            }
+            else{
+                itemCompetitionInfo.border.color = "orange";
+                itemCompetitionInfo.border.width = 4;
             }
 
-//            var favIndex = gDataGameUserData.getFavoriteGameIndex(gamePlayItem.index);
-//            if (favIndex <= 0) {
-//                mainRectangleGame.border.color = "grey";
-//                mainRectangleGame.border.width = 2;
-//            }
-//            else{
-//                mainRectangleGame.border.color = "orange";
-//                mainRectangleGame.border.width = 3;
-//            }
-
-//            var eventCount = gamePlayItem.event;
-//            if (eventCount > 0) {
-//                eventIndicator.disableVisibility = false;
-//                eventIndicator.eventCount = eventCount;
-//            } else
-//                eventIndicator.disableVisibility = true;
+            var eventCount = gamePlayItem.event;
+            if (eventCount > 0) {
+                eventIndicator.disableVisibility = false;
+                eventIndicator.eventCount = eventCount;
+            } else
+                eventIndicator.disableVisibility = true;
 
             if (!gamePlayItem.timeFixed)
                 labelLineTimeNotFixed.visible = true

@@ -76,6 +76,7 @@ Flickable {
                 anchors.right: parent.right
                 anchors.left: parent.left
                 spacing: 5
+                visible: children.length > 0 ? true : false
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             }
 
@@ -93,6 +94,7 @@ Flickable {
                 anchors.right: parent.right
                 anchors.left: parent.left
                 spacing: 5
+                visible: children.length > 0 ? true : false
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             }
 

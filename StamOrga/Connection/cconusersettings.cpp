@@ -231,15 +231,16 @@ qint32 cConUserSettings::handleUserPropsResponse(MessageProtocol* msg)
         seasonTicket->checkTicketOwn(index);
     }
 
-    if (rootObj.contains("tickets")) {
-        QJsonArray arrTickets = rootObj.value("tickets").toArray();
-        g_DataGameUserData->handleUserPropTickets(arrTickets);
-    }
+    /* Call this classes to remove all old data */
+    //    if (rootObj.contains("tickets")) {
+    QJsonArray arrTickets = rootObj.value("tickets").toArray();
+    g_DataGameUserData->handleUserPropTickets(arrTickets);
+    //    }
 
-    if (rootObj.contains("events")) {
-        QJsonArray arrEvents = rootObj.value("events").toArray();
-        g_DataAppUserEvents->addNewUserEvents(arrEvents);
-    }
+    //    if (rootObj.contains("events")) {
+    QJsonArray arrEvents = rootObj.value("events").toArray();
+    g_DataAppUserEvents->addNewUserEvents(arrEvents);
+    //    }
 
     return rValue;
 }

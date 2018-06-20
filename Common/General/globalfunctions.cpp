@@ -177,6 +177,26 @@ QString getCompetitionString(CompetitionIndex index)
     }
 }
 
+QString getCompetitionShortString(CompetitionIndex index)
+{
+    switch (index) {
+    case BUNDESLIGA_1:
+        return "Bl";
+    case BUNDESLIGA_2:
+        return "2B";
+    case LIGA_3:
+        return "3L";
+    case DFB_POKAL:
+        return "DFB";
+    case BADISCHER_POKAL:
+        return "Bfv";
+    case TESTSPIEL:
+        return "T";
+    default:
+        return "not implemented";
+    }
+}
+
 QString createRandomString(qint32 size)
 {
     QString rValue = QUuid::createUuid().toString();

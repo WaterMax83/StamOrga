@@ -368,7 +368,7 @@ Rectangle {
         if (gamePlayItem !== null) {
             m_gamePlayItem = gamePlayItem
             labelLineDate.text = gamePlayItem.timestampReadableLine();
-            labelLineWhat.text = gamePlayItem.getCompetitionLine() + gamePlayItem.competition
+            labelLineWhat.text = gamePlayItem.getCompetitionRound() + gamePlayItem.competition
             labelLineHome.text = gamePlayItem.home;
             if (gamePlayItem.home === "KSC")
                 labelLineHome.font.letterSpacing = 2

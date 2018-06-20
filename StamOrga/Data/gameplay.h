@@ -94,6 +94,10 @@ public:
         return this->m_comp;
     }
 
+    Q_INVOKABLE QString getShortCompetition() { return getCompetitionShortString(this->m_comp); }
+
+    Q_INVOKABLE QString getCompetitionRound();
+
     void setCompetition(CompetitionIndex co)
     {
         if (this->m_comp != co) {
@@ -141,8 +145,6 @@ public:
             emit this->eventChanged();
         }
     }
-
-    Q_INVOKABLE QString getCompetitionLine();
 
     Q_INVOKABLE qint16 getFreeTickets() { return this->m_freeTickets; }
     void               setFreeTickets(qint16 number)

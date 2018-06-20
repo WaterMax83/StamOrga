@@ -192,12 +192,10 @@ int cDataGameUserData::setGameIndex(QList<FavGameInfo*>* pList, const qint32 gam
 
 qint32 cDataGameUserData::handleUserPropTickets(QJsonArray& arrTickets)
 {
-    if (arrTickets.isEmpty() || arrTickets.count() == 0)
-        return ERROR_CODE_NOT_FOUND;
-
     this->clearTicketGameList();
 
-    //    qInfo() << arrTickets;
+    if (arrTickets.isEmpty() || arrTickets.count() == 0)
+        return ERROR_CODE_NOT_FOUND;
 
     for (int i = 0; i < arrTickets.count(); i++) {
         QJsonObject ticket    = arrTickets.at(i).toObject();

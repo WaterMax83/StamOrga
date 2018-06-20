@@ -125,8 +125,9 @@ enum MeetingType {
 };
 
 extern CompetitionIndex getCompetitionIndex(QString comp);
-extern QString getCompetitionString(CompetitionIndex index);
-extern QString createRandomString(qint32 size);
+extern QString          getCompetitionString(CompetitionIndex index);
+extern QString          getCompetitionShortString(CompetitionIndex index);
+extern QString          createRandomString(qint32 size);
 
 // clang-format off
 #define USER_ENABLE_LOG                     0x0001

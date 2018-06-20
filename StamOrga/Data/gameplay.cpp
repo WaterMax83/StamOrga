@@ -83,7 +83,7 @@ bool GamePlay::isGameASeasonTicketGame()
     return false;
 }
 
-QString GamePlay::getCompetitionLine()
+QString GamePlay::getCompetitionRound()
 {
     if (this->m_comp == BUNDESLIGA_1 || this->m_comp == BUNDESLIGA_2) {
         if (this->m_seasonIndex <= 34)
