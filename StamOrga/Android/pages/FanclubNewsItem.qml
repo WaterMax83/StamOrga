@@ -58,7 +58,7 @@ Item {
 //                imageSource: ""
                 width: parent.width
                 enabled: isEditMode
-                color: isEditMode ? "#FFFFFF" : "#CCFFFF";
+                color: isEditMode ? "#FFFFFF" : "#536878";
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
                 onTextInputChanged: checkNewTextInput();
             }
@@ -75,15 +75,16 @@ Item {
                         id: textAreaInfo
                         font.family: txtForFontFamily.font
                         width: parent.width
-                        color: "#505050"
+//                        color: "#505050"
+                        color: isEditMode ? "#505050" : "#B0BEC5";
                         background: Rectangle {
                             implicitWidth: parent.width
                             implicitHeight: parent.height
-                            color: isEditMode ? "#FFFFFF" : "#CCFFFF";
+                            color: isEditMode ? "#FFFFFF" : "#536878";
                         }
                         leftPadding: 5
                         rightPadding: 5
-                        font.pixelSize: 16
+                        font.pixelSize: 14
                         wrapMode: TextEdit.Wrap
                         textFormat: Qt.RichText
                         focus: true

@@ -38,19 +38,19 @@ public:
     {
         QString     rValue;
         QStringList list = cmd.split(' ');
-        if (list.size() < 2 || list.value(0) != "user")
+        if (list.size() < 2 || list.value(0).toLower() != "user")
             return ShowUserCommandHelp();
 
-        if (list.value(1) == "add" && list.size() == 3) {
+        if (list.value(1).toLower() == "add" && list.size() == 3) {
             int result = pUsers->addNewUser(list.value(2));
             if (result > 0)
                 rValue.append(QString("Added new user: %1\n").arg(list.value(2)));
             return rValue;
-        } else if (list.value(1) == "remove" && list.size() == 3) {
+        } else if (list.value(1).toLower() == "remove" && list.size() == 3) {
             if (pUsers->removeItem(list.value(2)) == ERROR_CODE_SUCCESS)
                 rValue.append(QString("Removed user %1\n").arg(list.value(2)));
             return rValue;
-        } else if (list.value(1) == "change" && list.size() == 4) {
+        } else if (list.value(1).toLower() == "change" && list.size() == 4) {
             if (pUsers->itemExists(list.value(2))) {
                 if (pUsers->userChangePassword(list.value(2), list.value(3)))
                     rValue.append(QString("Changed password from user %1\n").arg(list.value(2)));
@@ -60,7 +60,7 @@ public:
             } else {
                 rValue.append(QString("User %1 does not exist\n").arg(list.value(2)));
             }
-        } else if (list.value(1) == "prop" && list.size() == 4) {
+        } else if (list.value(1).toLower() == "prop" && list.size() == 4) {
             if (pUsers->itemExists(list.value(2))) {
                 bool    ok;
                 quint32 prop = list.value(3).toInt(&ok, 16);
@@ -72,7 +72,7 @@ public:
             } else {
                 rValue.append(QString("User %1 does not exist\n").arg(list.value(2)));
             }
-        } else if (list.value(1) == "show" && list.size() == 2)
+        } else if (list.value(1).toLower() == "show" && list.size() == 2)
             return pUsers->showAllUsers();
 
         return ShowUserCommandHelp();
@@ -81,7 +81,7 @@ public:
     static QString runLoggingCommand(Logging* log, const QString& cmd)
     {
         QStringList list = cmd.split(' ');
-        if (list.size() < 2 || list.value(0) != "log")
+        if (list.size() < 2 || list.value(0).toLower() != "log")
             return log->showLoggingInfo(5);
 
         bool ok;
@@ -94,12 +94,12 @@ public:
     static QString runGameCommand(const QString& cmd, Games* pGames)
     {
         QStringList list = cmd.split(' ');
-        if (list.size() < 2 || list.value(0) != "game")
+        if (list.size() < 2 || list.value(0).toLower() != "game")
             return ShowGamesCommandHelp();
 
-        if (list.value(1) == "show" && list.size() == 2)
+        if (list.value(1).toLower() == "show" && list.size() == 2)
             return pGames->showAllGames(false);
-        else if (list.value(1) == "show" && list.size() == 3 && list.value(2) == "update")
+        else if (list.value(1).toLower() == "show" && list.size() == 3 && list.value(2) == "update")
             return pGames->showAllGames(true);
 
         return ShowGamesCommandHelp();
@@ -108,10 +108,10 @@ public:
     static QString runTicketCommand(const QString& cmd, SeasonTicket* pTicket)
     {
         QStringList list = cmd.split(' ');
-        if (list.size() < 2 || list.value(0) != "ticket")
+        if (list.size() < 2 || list.value(0).toLower() != "ticket")
             return ShowTicketsCommandHelp();
 
-        if (list.value(1) == "show" && list.size() == 2)
+        if (list.value(1).toLower() == "show" && list.size() == 2)
             return pTicket->showAllSeasonTickets();
 
         return ShowTicketsCommandHelp();
@@ -121,7 +121,7 @@ public:
     {
         QStringList list = cmd.split(' ');
 
-        if (list.size() != 2 || list.value(0) != "read")
+        if (list.size() != 2 || list.value(0).toLower() != "read")
             return ShowReadCommandHelp();
 
 
@@ -132,10 +132,10 @@ public:
     static QString runFanclubNewsCommand(const QString& cmd, FanclubNews* pNews)
     {
         QStringList list = cmd.split(' ');
-        if (list.size() < 2 || list.value(0) != "news")
+        if (list.size() < 2 || list.value(0).toLower() != "news")
             return ShowFanclubNewsHelp();
 
-        if (list.value(1) == "show" && list.size() == 2)
+        if (list.value(1).toLower() == "show" && list.size() == 2)
             return pNews->showNewsData();
 
         return ShowFanclubNewsHelp();
@@ -144,11 +144,11 @@ public:
     static QString runTokenCommand(const QString& cmd)
     {
         QStringList list = cmd.split(' ');
-        if (list.size() != 2 || list.value(0) != "token")
+        if (list.size() != 2 || list.value(0).toLower() != "token")
             return ShowTokenHelp();
 
-        if (list.value(1) == "token" || list.value(1) == "guid" || list.value(1) == "version") {
-            return g_pushNotify->showCurrentTokenInformation(list.value(1));
+        if (list.value(1).toLower() == "token" || list.value(1).toLower() == "guid" || list.value(1).toLower() == "version") {
+            return g_pushNotify->showCurrentTokenInformation(list.value(1).toLower());
         }
 
         return ShowTokenHelp();

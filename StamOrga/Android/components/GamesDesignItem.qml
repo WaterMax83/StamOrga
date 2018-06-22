@@ -29,7 +29,8 @@ import "../components" as MyComponents
 
 Item {
     width: parent.width
-    height: mainGameLayout.height
+    height: mainGameLayout.implicitHeight
+    Layout.minimumHeight: mainGameLayout.height
 
     property bool showGameSeperator: true
 
@@ -41,6 +42,7 @@ Item {
     property color gradColorStart: "#105050"
     property color gradColorStop: "#509090"
     property int imageSize : 20
+    property int marginBetweenImages : 3
 
     MouseArea {
         anchors.fill: parent
@@ -62,7 +64,7 @@ Item {
 
     ColumnLayout {
         id: mainGameLayout
-        width: parent.width
+        anchors.fill : parent
         spacing: 3
         Rectangle {
             color: Material.hintTextColor
@@ -73,6 +75,8 @@ Item {
 
         RowLayout {
             width: parent.width
+            Layout.minimumHeight: columnItem.height
+            Layout.bottomMargin: 5
 
             ColumnLayout {
                 anchors.top: parent.top
@@ -86,7 +90,7 @@ Item {
                     height: 50
                     radius: width / 2
                     border.color: "grey"
-                    border.width: 3
+                    border.width: 2
                     gradient: Gradient {
                         GradientStop {
                             position: 0
@@ -97,6 +101,16 @@ Item {
                             position: 0.9
                             color: gradColorStop
                         }
+                    }
+                    Image {
+                        id: itemImageTimeLaps
+                        height: 24
+                        width: 24
+                        source: "../images/timelaps.png"
+                        anchors.right : parent.right
+                        anchors.top: parent.top
+                        anchors.topMargin: -3
+                        anchors.rightMargin: -3
                     }
                     Text {
                         id: labelLineCompetition
@@ -113,7 +127,7 @@ Item {
                 id: columnItem
                 Layout.fillWidth: true
                 Layout.leftMargin: 5
-                height: columnItemLayout.height
+                Layout.minimumHeight: columnItemLayout.implicitHeight
                 ColumnLayout {
                     id: columnItemLayout
                     width: parent.width
@@ -205,6 +219,7 @@ Item {
                             }
 
                             Text {
+                                Layout.leftMargin: marginBetweenImages
                                 Layout.column: 2
                                 id: labelAcceptedTrip
                                 color: "white"
@@ -225,6 +240,7 @@ Item {
                             }
 
                             Text {
+                                Layout.leftMargin: marginBetweenImages
                                 Layout.column: 5
                                 id: labelInterestTrip
                                 color: "white"
@@ -264,6 +280,7 @@ Item {
                             }
 
                             Text {
+                                Layout.leftMargin: marginBetweenImages
                                 Layout.column: 2
                                 id: labelAcceptedMeeting
                                 color: "white"
@@ -284,6 +301,7 @@ Item {
                             }
 
                             Text {
+                                Layout.leftMargin: marginBetweenImages
                                 Layout.column: 5
                                 id: labelInterestMeeting
                                 color: "white"
@@ -324,6 +342,7 @@ Item {
                             }
 
                             Text {
+                                Layout.leftMargin: marginBetweenImages
                                 Layout.column: 2
                                 id: labelFreeTickets
                                 color: "white"
@@ -339,6 +358,7 @@ Item {
                             }
 
                             Item {
+                                Layout.leftMargin: marginBetweenImages
                                 Layout.column: 5
                                 id: itemTicketBookmark
                                 width: imageSize
@@ -358,6 +378,7 @@ Item {
                             }
 
                             Item {
+                                Layout.leftMargin: marginBetweenImages
                                 Layout.column: 7
                                 id: itemTicketShare
                                 width: imageSize
@@ -422,11 +443,11 @@ Item {
             var favIndex = gDataGameUserData.getFavoriteGameIndex(gamePlayItem.index);
             if (favIndex <= 0) {
                 itemCompetitionInfo.border.color = "grey";
-                itemCompetitionInfo.border.width = 3;
+                itemCompetitionInfo.border.width = 2;
             }
             else{
                 itemCompetitionInfo.border.color = "orange";
-                itemCompetitionInfo.border.width = 4;
+                itemCompetitionInfo.border.width = 3;
             }
 
             var eventCount = gamePlayItem.event;
@@ -437,10 +458,9 @@ Item {
                 eventIndicator.disableVisibility = true;
 
             if (!gamePlayItem.timeFixed) {
-                //                labelLineTimeNotFixed.visible = true
-                labelLineDate.text = gamePlayItem.timestampReadableLineWithoutTime();
-                labelLineDate.font.italic = true
-
+//                labelLineDate.text = gamePlayItem.timestampReadableLineWithoutTime();
+                labelLineDate.font.italic = true;
+                itemImageTimeLaps.visible = true;
             }
 
             showTripInfo(gamePlayItem);
@@ -452,6 +472,8 @@ Item {
     }
 
     function clearAllInfos() {
+        itemImageTimeLaps.visible = false;
+
         acceptedTripItem.visible = false;
         labelAcceptedTrip.text = ""
         interestTripItem.visible = false;

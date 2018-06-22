@@ -98,24 +98,24 @@ void Console::readCommand()
     }
 }
 
-QString Console::runCommand(QString& command)
+QString Console::runCommand(QString command)
 {
     QString rValue;
     if (command == "help") {
         rValue = this->printHelp();
-    } else if (command == "user" || command.left(5) == "user ") {
+    } else if (command.toLower() == "user" || command.left(5).toLower() == "user ") {
         rValue = UserCommand::runUserCommand(command, &g_GlobalData->m_UserList);
-    } else if (command == "game" || command.left(5) == "game ") {
+    } else if (command.toLower() == "game" || command.left(5).toLower() == "game ") {
         rValue = UserCommand::runGameCommand(command, &g_GlobalData->m_GamesList);
-    } else if (command == "ticket" || command.left(7) == "ticket ") {
+    } else if (command.toLower() == "ticket" || command.left(7).toLower() == "ticket ") {
         rValue = UserCommand::runTicketCommand(command, &g_GlobalData->m_SeasonTicket);
-    } else if (command == "token" || command.left(6) == "token ") {
+    } else if (command.toLower() == "token" || command.left(6).toLower() == "token ") {
         rValue = UserCommand::runTokenCommand(command);
-    } else if (command == "news" || command.left(5) == "news ") {
+    } else if (command.toLower() == "news" || command.left(5).toLower() == "news ") {
         rValue = UserCommand::runFanclubNewsCommand(command, &g_GlobalData->m_fanclubNews);
-    } else if (command == "read" || command.left(5) == "read ") {
+    } else if (command.toLower() == "read" || command.left(5).toLower() == "read ") {
         rValue = UserCommand::runReadCommand(command, g_GlobalData);
-    } else if (command == "log" || command.left(4) == "log ") {
+    } else if (command.toLower() == "log" || command.left(4).toLower() == "log ") {
         rValue = UserCommand::runLoggingCommand(this->m_logging, command);
     } else if (command.length() == 0) {
 
@@ -132,7 +132,7 @@ MessageProtocol* Console::getCommandAnswer(UserConData* pUserCon, MessageProtoco
     QJsonObject rootObj = QJsonDocument::fromJson(data).object();
 
     QString    command = rootObj.value("cmd").toString();
-    QByteArray result  = qCompress(this->runCommand(command).toUtf8(), 9);
+    QByteArray result  = qCompress(this->runCommand(command.trimmed()).toUtf8(), 9);
 
     QJsonObject rootAns;
     rootAns.insert("ack", ERROR_CODE_SUCCESS);
@@ -140,7 +140,7 @@ MessageProtocol* Console::getCommandAnswer(UserConData* pUserCon, MessageProtoco
 
     QByteArray answer = QJsonDocument(rootAns).toJson(QJsonDocument::Compact);
 
-    qInfo().noquote() << QString("User %1 run command %2").arg(pUserCon->m_userName).arg(command);
+    qInfo().noquote() << QString("User %1 run command \"%2\"").arg(pUserCon->m_userName).arg(command);
 
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_SEND_CONSOLE_CMD, answer);
 }

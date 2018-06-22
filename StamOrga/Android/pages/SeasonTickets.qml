@@ -49,7 +49,7 @@ Flickable {
         contentY: flickableTickets.contentY
     }
 
-    Pane {
+    Item {
         id: mainPaneTickets
         width: parent.width
 
@@ -185,7 +185,8 @@ Flickable {
 
     Component {
         id: seasonTicketItem
-        MyComponents.SeasonTicket {
+//        MyComponents.SeasonTicket {
+        MyComponents.SeasonTicketDesignItem {
             onClickedSeasonTicket: {
                 seasonTicketClickedMenu.openWithNameAndIndex(sender.name, sender.place, sender.discount, sender.index)
             }

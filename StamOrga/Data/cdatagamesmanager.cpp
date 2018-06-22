@@ -116,7 +116,7 @@ void cDataGamesManager::addNewGamesPlay(GamePlay* sGame, const quint16 updateInd
     if (pGame == NULL) {
         QMutexLocker lock(&this->m_mutex);
 
-        //        gPlay->setEnableAddGame(this->userIsGameAddingEnabled());
+        sGame->setEnableAddGame(g_ConUserSettings->userIsGameAddingEnabled());
         this->m_lGames.append(sGame);
         return;
     } else if (updateIndex == UpdateIndex::UpdateDiff) {

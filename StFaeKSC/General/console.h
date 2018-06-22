@@ -35,7 +35,7 @@ public:
     explicit Console(QObject* parent = 0);
     ~Console();
 
-    QString runCommand(QString& command);
+    QString runCommand(QString command);
 
     void run();
 

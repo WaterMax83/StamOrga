@@ -110,6 +110,13 @@ public:
         this->m_ticketReserveName = name;
     }
 
+    Q_INVOKABLE QString getTicketShortName()
+    {
+        if (this->m_name.size() > 0)
+            return this->m_name.left(1);
+        return "";
+    }
+
 
 signals:
     void nameChanged();

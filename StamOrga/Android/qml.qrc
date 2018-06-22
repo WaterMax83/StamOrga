@@ -105,5 +105,11 @@
         <file>pages/NotificationSettings.qml</file>
         <file>components/RefreshItem.qml</file>
         <file>components/GamesDesignItem.qml</file>
+        <file>components/SeasonTicketDesignItem.qml</file>
+        <file>images/+material/discount.png</file>
+        <file>images/discount.png</file>
+        <file>components/NewsDataDesignItem.qml</file>
+        <file>images/+material/timelaps.png</file>
+        <file>images/timelaps.png</file>
     </qresource>
 </RCC>

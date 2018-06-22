@@ -49,7 +49,7 @@ Flickable {
         contentY: flickableFanclubNewsList.contentY
     }
 
-    Pane {
+    Item {
         id: mainPaneFanClubNewsList
         width: parent.width
         height: parent.height
@@ -172,7 +172,7 @@ Flickable {
 
     Component {
         id: newsDataItem
-        MyComponents.NewsDataItem {
+        MyComponents.NewsDataDesignItem {
             onClickedItem: {
                 var component = Qt.createComponent("../pages/FanclubNewsItem.qml")
                 if (component.status === Component.Ready) {
