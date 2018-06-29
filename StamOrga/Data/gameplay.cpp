@@ -172,3 +172,10 @@ bool GamePlay::compareTimeStampFunctionAscending(GamePlay* p1, GamePlay* p2)
         return false;
     return true;
 }
+
+bool GamePlay::compareTimeStampFunctionDescending(GamePlay* p1, GamePlay* p2)
+{
+    if (p1->m_timestamp < p2->m_timestamp)
+        return false;
+    return true;
+}

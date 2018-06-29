@@ -56,6 +56,8 @@ public:
     Q_INVOKABLE qint32 getCurrentFontIndex();
     void               setCurrentFontList(QStringList* list);
 
+    Q_INVOKABLE qint64 getKeepPastItemsCount();
+
     Q_INVOKABLE bool isVersionChangeAlreadyShown();
     Q_INVOKABLE QString getVersionChangeInfo();
 
@@ -107,6 +109,8 @@ private:
     bool    m_bUseVersionPopup;
     bool    m_bIpAddressWasSet;
     quint64 m_notificationEnabledValue;
+    qint64  m_iKeepPastItemsCount;
+
 
     QString      m_changeDefaultFont;
     qint64       m_currentFontIndex;

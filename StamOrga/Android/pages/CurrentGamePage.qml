@@ -115,7 +115,7 @@ Item {
                 id: textInputConsole
                 Layout.fillWidth: true
                 Layout.topMargin: 5
-                hint: "Füge Kommentar hinzu"
+                hint: "Kommentar hinzufügen"
                 imageSource: ""
                 enableImage: false
                 enableKeyEnterSignal: true

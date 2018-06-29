@@ -46,16 +46,18 @@ public:
     Q_INVOKABLE GamePlay* getGamePlayFromArrayIndex(int index);
     Q_INVOKABLE QString getGamePlayLastLocalUpdateString();
 
-    Q_INVOKABLE qint32 startListGames();
-    qint32 handleListGamesResponse(MessageProtocol* msg);
+    Q_INVOKABLE qint32 startListGames(qint32 pastGames = -1);
+    qint32             handleListGamesResponse(MessageProtocol* msg);
 
     Q_INVOKABLE qint32 startListGamesInfo();
-    qint32 handleListGamesInfoResponse(MessageProtocol* msg);
+    qint32             handleListGamesInfoResponse(MessageProtocol* msg);
 
     Q_INVOKABLE qint32 startChangeGame(const qint32 index, const qint32 sIndex, const QString competition,
                                        const QString home, const QString away, const QString date,
                                        const QString score, const bool fixedTime);
-    qint32 handleChangeGameResponse(MessageProtocol* msg);
+    qint32             handleChangeGameResponse(MessageProtocol* msg);
+
+    Q_INVOKABLE bool getSkipedOldGames() { return this->m_bSkipedOldGames; }
 
     qint32 stateChangeCheckUdpate();
 
@@ -71,6 +73,7 @@ private:
     qint64 m_stLastLocalUpdateTimeStamp;
     qint64 m_stLastServerUpdateTimeStamp;
     qint64 m_LastGameInfoUpdate;
+    bool   m_bSkipedOldGames;
 };
 
 extern cDataGamesManager* g_DataGamesManager;

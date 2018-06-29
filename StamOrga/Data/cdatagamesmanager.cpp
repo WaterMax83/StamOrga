@@ -74,12 +74,14 @@ qint32 cDataGamesManager::initialize()
     this->m_stLastServerUpdateTimeStamp = iValue;
 
     this->m_LastGameInfoUpdate = 0;
+    this->m_bSkipedOldGames    = true;
 
     this->m_initialized = true;
 
     QString value;
     bool    bValue;
     qint32  index = 0;
+
     while (g_StaSettingsManager->getValue(GAMES_GROUP, PLAY_HOME, index, value) == ERROR_CODE_SUCCESS) {
         GamePlay* pGame = new GamePlay();
         pGame->setHome(value);
@@ -101,6 +103,22 @@ qint32 cDataGamesManager::initialize()
         g_GlobalManager->setQMLObjectOwnershipToCpp(pGame);
         this->addNewGamesPlay(pGame);
         index++;
+    }
+
+    std::sort(this->m_lGames.begin(), this->m_lGames.end(), GamePlay::compareTimeStampFunctionDescending);
+
+    /* check to keep only last X past values */
+    qint32 firstPastIndex   = -1;
+    qint64 currentTimeStamp = QDateTime::currentMSecsSinceEpoch() + 2 * MSEC_PER_HOUR;
+    for (int i = this->m_lGames.size() - 1; i >= 0; i--) {
+        if (this->m_lGames.at(i)->timestamp64Bit() < currentTimeStamp)
+            firstPastIndex = i;
+    }
+
+    if (firstPastIndex + g_StaGlobalSettings->getKeepPastItemsCount() < this->m_lGames.size()) {
+        firstPastIndex += g_StaGlobalSettings->getKeepPastItemsCount();
+        for (int i = this->m_lGames.size(); i > firstPastIndex; i--)
+            this->m_lGames.removeLast();
     }
 
     return ERROR_CODE_SUCCESS;
@@ -212,7 +230,7 @@ QString cDataGamesManager::getGamePlayLastLocalUpdateString()
     return QDateTime::fromMSecsSinceEpoch(this->m_stLastLocalUpdateTimeStamp).toString("dd.MM.yy hh:mm:ss");
 }
 
-qint32 cDataGamesManager::startListGames()
+qint32 cDataGamesManager::startListGames(qint32 pastGames)
 {
     if (!this->m_initialized)
         return ERROR_CODE_NOT_INITIALIZED;
@@ -220,12 +238,18 @@ qint32 cDataGamesManager::startListGames()
     QMutexLocker lock(&this->m_mutex);
 
     QJsonObject rootObj;
+    if (pastGames == -1)
+        pastGames = g_StaGlobalSettings->getKeepPastItemsCount();
+    else
+        rootObj.insert("skipDiffForPast", true);
+
     if (this->m_stLastLocalUpdateTimeStamp + TIMEOUT_UPDATE_GAMES > QDateTime::currentMSecsSinceEpoch() && this->m_lGames.count() > 0)
-        rootObj.insert("index", UpdateIndex::UpdateDiff);
+        rootObj.insert("index", UpdateIndex::UpdateDiff); //UpdateIndex::UpdateDiff);
     else
         rootObj.insert("index", UpdateIndex::UpdateAll);
 
     rootObj.insert("timestamp", this->m_stLastServerUpdateTimeStamp);
+    rootObj.insert("pastGames", pastGames);
 
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
@@ -242,10 +266,11 @@ qint32 cDataGamesManager::handleListGamesResponse(MessageProtocol* msg)
     QByteArray  data(msg->getPointerToData());
     QJsonObject rootObj = QJsonDocument::fromJson(data).object();
 
-    qint32     result      = rootObj.value("ack").toInt(ERROR_CODE_NOT_FOUND);
-    qint32     updateIndex = rootObj.value("index").toInt(UpdateAll);
-    qint64     timestamp   = (qint64)rootObj.value("timestamp").toDouble(0);
-    QJsonArray arrGames    = rootObj.value("games").toArray();
+    qint32     result       = rootObj.value("ack").toInt(ERROR_CODE_NOT_FOUND);
+    qint32     updateIndex  = rootObj.value("index").toInt(UpdateAll);
+    qint64     timestamp    = (qint64)rootObj.value("timestamp").toDouble(0);
+    QJsonArray arrGames     = rootObj.value("games").toArray();
+    this->m_bSkipedOldGames = rootObj.value("skipOldGames").toBool(true);
 
     this->m_mutex.lock();
 
@@ -277,7 +302,7 @@ qint32 cDataGamesManager::handleListGamesResponse(MessageProtocol* msg)
 
     QMutexLocker lock(&this->m_mutex);
 
-    std::sort(this->m_lGames.begin(), this->m_lGames.end(), GamePlay::compareTimeStampFunctionAscending);
+    std::sort(this->m_lGames.begin(), this->m_lGames.end(), GamePlay::compareTimeStampFunctionDescending);
 
     if (timestamp == this->m_stLastServerUpdateTimeStamp && arrGames.count() == 0 && updateIndex != UpdateAll) {
         if (!g_StaGlobalSettings->getSaveInfosOnApp())
@@ -292,10 +317,21 @@ qint32 cDataGamesManager::handleListGamesResponse(MessageProtocol* msg)
     if (!g_StaGlobalSettings->getSaveInfosOnApp())
         return result;
 
+    /* check to keep only last X past values */
+    qint32 firstPastIndex   = -1;
+    qint64 currentTimeStamp = QDateTime::currentMSecsSinceEpoch() + 2 * MSEC_PER_HOUR;
+    for (int i = this->m_lGames.size() - 1; i >= 0; i--) {
+        if (this->m_lGames.at(i)->timestamp64Bit() < currentTimeStamp)
+            firstPastIndex = i;
+    }
+    firstPastIndex += g_StaGlobalSettings->getKeepPastItemsCount();
+
     g_StaSettingsManager->setInt64Value(GAMES_GROUP, LOCAL_GAMES_UDPATE, this->m_stLastLocalUpdateTimeStamp);
     g_StaSettingsManager->setInt64Value(GAMES_GROUP, SERVER_GAMES_UDPATE, this->m_stLastServerUpdateTimeStamp);
 
     for (int i = 0; i < this->m_lGames.size(); i++) {
+        if (i >= firstPastIndex)
+            break;
         g_StaSettingsManager->setValue(GAMES_GROUP, PLAY_HOME, i, this->m_lGames[i]->home());
         g_StaSettingsManager->setValue(GAMES_GROUP, PLAY_AWAY, i, this->m_lGames[i]->away());
         g_StaSettingsManager->setValue(GAMES_GROUP, PLAY_SCORE, i, this->m_lGames[i]->score());

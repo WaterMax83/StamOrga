@@ -37,7 +37,7 @@ Item {
     property var m_newsDataItem
 
     signal clickedItem(var sender)
-    signal pressAndHold(var sender)
+    signal pressAndHoldItem(var sender)
 
     property color gradColorStart: "#003333"
     property color gradColorStop: "#008080"
@@ -49,7 +49,7 @@ Item {
             clickedItem(m_newsDataItem);
         }
         onPressAndHold: {
-            pressAndHold(m_newsDataItem);
+            pressAndHoldItem(m_newsDataItem);
         }
     }
 

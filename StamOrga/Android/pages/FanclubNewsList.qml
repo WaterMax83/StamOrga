@@ -184,11 +184,12 @@ Flickable {
                         gDataAppUserEvents.clearUserEventFanclub(sender.index);
                 }
             }
-            onPressAndHold: {
+            onPressAndHoldItem: {
                 if (!gConUserSettings.userIsFanclubEditEnabled() &&  !userInt.isDebuggingEnabled())
                     return;
 
                 m_newsItemEditIndex = sender.index;
+
                 newsItemClickedMenu.open();
             }
         }

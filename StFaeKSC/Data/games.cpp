@@ -89,7 +89,7 @@ Games::Games()
     }
     this->m_lAddItemProblems.clear();
 
-    this->sortItemListByTimeAscending();
+    this->sortItemListByTimeDescending();
 
     if (bProblems)
         this->saveCurrentInteralList();
@@ -133,7 +133,7 @@ int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sInde
             }
 
             this->m_mInternalInfoMutex.unlock();
-            this->sortItemListByTimeAscending();
+            this->sortItemListByTimeDescending();
             this->m_mInternalInfoMutex.lock();
         }
         if (pGame->m_score != score && score.size() > 0) {
@@ -191,7 +191,7 @@ int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sInde
 
     this->addNewGamesPlay(play, false);
 
-    this->sortItemListByTimeAscending();
+    this->sortItemListByTimeDescending();
 
     this->setNewUpdateTime();
 

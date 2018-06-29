@@ -23,6 +23,7 @@ import QtQuick.Layouts 1.2
 import com.watermax.demo 1.0
 
 import "../components" as MyComponents
+import "../controls" as MyControls
 
 Flickable {
     id: flickableGames
@@ -82,24 +83,52 @@ Flickable {
                 spacing: 5
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             }
+
+            MyControls.Button {
+                id: reloadGamesButton
+                text: "Lade mehr"
+                visible: bShowLoadMoreGames
+                font.family: txtForFontFamily.font
+                implicitWidth: parent.width / 3 * 2
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                onClicked: {
+                    gDataGamesManager.startListGames(columnLayoutGames.children.length + 5);
+                    bLoadMorePastGames = true;
+                    bShowLoadMoreGames = false;
+                }
+            }
+
+            MyComponents.BusyLoadingIndicator {
+                width: parent.width
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                Layout.fillHeight: false
+                infoVisible: false
+                loadingVisible: true
+                visible: bLoadMorePastGames
+            }
         }
     }
+    property bool bLoadMorePastGames: false
+    property bool bShowLoadMoreGames: false
 
     function showListedGames() {
 
         cleanGameLayout();
+        bLoadMorePastGames = false;
+        bShowLoadMoreGames = false;
 
         if (gDataGamesManager.getGamePlayLength() > 0) {
             if (showOnlyPastGames) {
-                for (var i = gDataGamesManager.getGamePlayLength() - 1; i >= 0; i--) {
+                for (var i = 0; i < gDataGamesManager.getGamePlayLength(); i++) {
                     var gameInfo = gDataGamesManager.getGamePlayFromArrayIndex(i);
                     if (gameInfo.isGameInPast()) {
                         var sprite = gameView.createObject(columnLayoutGames)
                         sprite.showGamesInfo(gameInfo)
                     }
                 }
+                bShowLoadMoreGames = gDataGamesManager.getSkipedOldGames();
             } else {
-                for (var j = 0; j < gDataGamesManager.getGamePlayLength(); j++) {
+                for (var j = gDataGamesManager.getGamePlayLength() - 1; j >= 0; j--) {
                     var gameInfo2 = gDataGamesManager.getGamePlayFromArrayIndex(j);
                     if (!gameInfo2.isGameInPast()) {
                         var sprite2 = gameView.createObject(columnLayoutGames)
@@ -242,6 +271,7 @@ Flickable {
 
     function showLoadingGameInfosInternal(text, loading)
     {
+        bLoadMorePastGames = false;
         busyIndicatorGames.loadingVisible = loading
         if (text !== "")
             busyIndicatorGames.infoText = text

@@ -53,6 +53,8 @@ MessageProtocol* cGamesManager::getGamesList(UserConData* pUserCon, MessageProto
 
     qint32 updateIndex            = rootObj.value("index").toInt(UpdateIndex::UpdateAll);
     qint64 lastUpdateGamesFromApp = (qint64)rootObj.value("timestamp").toDouble(0);
+    qint32 loadGameInPastCount    = rootObj.value("pastGames").toInt(-1);
+    bool   bSkipDiffForPast       = rootObj.value("skipDiffForPast").toBool(false);
 
     if (lastUpdateGamesFromApp == 0)
         updateIndex = UpdateIndex::UpdateAll;
@@ -63,16 +65,26 @@ MessageProtocol* cGamesManager::getGamesList(UserConData* pUserCon, MessageProto
 
     quint16 numbOfGames = g_GlobalData->m_GamesList.getNumberOfInternalList();
 
+    qint64     currentTimeStamp = QDateTime::currentMSecsSinceEpoch() + 2 * MSEC_PER_HOUR;
+    qint32     gameInPastCount  = 0;
+    bool       bSkipedOldGames  = false;
     QJsonArray arrGames;
     for (quint32 i = 0; i < numbOfGames; i++) {
         GamesPlay* pGame = (GamesPlay*)(g_GlobalData->m_GamesList.getRequestConfigItemFromListIndex(i));
         if (pGame == NULL)
             continue;
-        QJsonObject gameObj;
+        if (pGame->m_timestamp < currentTimeStamp)
+            gameInPastCount++;
+        if (loadGameInPastCount > 0 && gameInPastCount > loadGameInPastCount) {
+            bSkipedOldGames = true;
+            continue;
+        }
 
-        if (updateIndex == UpdateIndex::UpdateDiff && pGame->m_lastUpdate <= lastUpdateGamesFromApp)
+        if (!(bSkipDiffForPast && pGame->m_timestamp < currentTimeStamp)
+            && updateIndex == UpdateIndex::UpdateDiff && pGame->m_lastUpdate <= lastUpdateGamesFromApp)
             continue; // Skip ticket because user already has all info
 
+        QJsonObject gameObj;
         gameObj.insert("home", pGame->m_itemName);
         gameObj.insert("away", pGame->m_away);
         gameObj.insert("score", pGame->m_score);
@@ -86,6 +98,7 @@ MessageProtocol* cGamesManager::getGamesList(UserConData* pUserCon, MessageProto
         arrGames.append(gameObj);
     }
 
+    rootAns.insert("skipOldGames", bSkipedOldGames);
     rootAns.insert("timestamp", g_GlobalData->m_GamesList.getLastUpdateTime());
     rootAns.insert("games", arrGames);
 

@@ -48,6 +48,8 @@ cStaGlobalSettings* g_StaGlobalSettings;
 #define SETT_DEBUG_IP               "DebugIP"
 #define SETT_DEBUG_IP_WIFI          "DebugIPWifi"
 #define SETT_ENABLE_NOTIFICATION    "EnableNotification"
+#define SETT_KEEP_PAST_VALUE        "KeepPastValue"
+
 //#define USER_READABLE   "ReadableName"
 
 // clang-format on
@@ -84,6 +86,8 @@ qint32 cStaGlobalSettings::initialize()
     this->m_debugIPWifi = value;
     g_StaSettingsManager->getInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, iValue, 0xFFFFFFFF);
     this->m_notificationEnabledValue = iValue;
+    g_StaSettingsManager->getInt64Value(SETTINGS_GROUP, SETT_KEEP_PAST_VALUE, iValue, 5);
+    this->m_iKeepPastItemsCount = iValue;
 
     this->m_bIpAddressWasSet = false;
     QHostInfo::lookupHost("watermax83.ddns.net", this, SLOT(slotCallBackLookUpHost(QHostInfo)));
@@ -241,6 +245,11 @@ void cStaGlobalSettings::setCurrentFontList(QStringList* list)
         this->m_currentFontIndex = this->m_fontList->indexOf(this->m_changeDefaultFont);
 }
 
+qint64 cStaGlobalSettings::getKeepPastItemsCount()
+{
+    return this->m_iKeepPastItemsCount;
+}
+
 bool cStaGlobalSettings::isVersionChangeAlreadyShown()
 {
     if (this->m_lastShownVersion == STAM_ORGA_VERSION_S)
@@ -253,10 +262,10 @@ QString cStaGlobalSettings::getVersionChangeInfo()
 {
     QString rValue;
 
-    rValue.append("<b>V1.1.1:</b>(10.05.2018)<br>");
+    rValue.append("<b>V1.1.1:</b>(XX.XX.2018)<br>");
     rValue.append("- Benachrichtigung per Email (auf Wunsch)<br>");
     rValue.append("- Kommentare bei Treffen und Fahrt<br>");
-    rValue.append("- neue Benachrichtigung \"Kommentare\"<br>");
+    rValue.append("- lade vergange Spiele dynamisch<br>");
     rValue.append("- Design Überarbeitung<br>");
 
     rValue.append("<br><b>V1.1.0:</b>(10.05.2018)<br>");
