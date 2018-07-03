@@ -49,9 +49,10 @@ Flickable {
         contentY: flickableTickets.contentY
     }
 
-    Item {
+    Pane {
         id: mainPaneTickets
         width: parent.width
+        padding: 0
 
         ColumnLayout {
             id: mainTicketColumnLayout

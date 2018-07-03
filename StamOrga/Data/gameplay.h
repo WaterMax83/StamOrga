@@ -259,7 +259,6 @@ private:
     qint16           m_interestedTrip;
     qint16           m_declinedTrip;
     qint16           m_driveInfo;
-    bool             m_bIsUserGameAddingEnabled;
     quint32          m_eventCount;
 };
 

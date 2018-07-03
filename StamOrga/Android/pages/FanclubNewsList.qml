@@ -49,10 +49,11 @@ Flickable {
         contentY: flickableFanclubNewsList.contentY
     }
 
-    Item {
+    Pane {
         id: mainPaneFanClubNewsList
         width: parent.width
-        height: parent.height
+//        height: parent.height
+        padding: 0
 
         ColumnLayout {
             id: mainFanClubColumnLayout

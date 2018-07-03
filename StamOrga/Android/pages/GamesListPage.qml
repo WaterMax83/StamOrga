@@ -86,7 +86,7 @@ Flickable {
 
             MyControls.Button {
                 id: reloadGamesButton
-                text: "Lade mehr"
+                text: "weitere Laden"
                 visible: bShowLoadMoreGames
                 font.family: txtForFontFamily.font
                 implicitWidth: parent.width / 3 * 2

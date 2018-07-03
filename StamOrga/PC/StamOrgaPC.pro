@@ -45,7 +45,8 @@ SOURCES += main.cpp\
     ../Data/newsdataitem.cpp \
     ../Data/seasonticket.cpp \
     ../../Common/General/logging.cpp \
-    cpccontrolmanager.cpp
+    cpccontrolmanager.cpp \
+    ../Data/cdatacommentitem.cpp
 
 
 
@@ -80,7 +81,8 @@ HEADERS  += mainwindow.h \
     ../Data/newsdataitem.h \
     ../Data/seasonticket.h \
     ../../Common/General/logging.h \
-    cpccontrolmanager.h
+    cpccontrolmanager.h \
+    ../Data/cdatacommentitem.h
 
 
 

@@ -18,24 +18,24 @@
 
 #include <QtCore/QDebug>
 
+#include "../Connection/cconusersettings.h"
 #include "gameplay.h"
 
 GamePlay::GamePlay(QObject* parent)
     : QObject(parent)
 {
-    this->m_freeTickets              = 0;
-    this->m_blockedTickets           = 0;
-    this->m_reservedTickets          = 0;
-    this->m_acceptedMeeting          = 0;
-    this->m_interestedMeeting        = 0;
-    this->m_declinedMeeting          = 0;
-    this->m_meetingInfo              = 0;
-    this->m_acceptedTrip             = 0;
-    this->m_interestedTrip           = 0;
-    this->m_declinedTrip             = 0;
-    this->m_driveInfo                = 0;
-    this->m_eventCount               = 0;
-    this->m_bIsUserGameAddingEnabled = false;
+    this->m_freeTickets       = 0;
+    this->m_blockedTickets    = 0;
+    this->m_reservedTickets   = 0;
+    this->m_acceptedMeeting   = 0;
+    this->m_interestedMeeting = 0;
+    this->m_declinedMeeting   = 0;
+    this->m_meetingInfo       = 0;
+    this->m_acceptedTrip      = 0;
+    this->m_interestedTrip    = 0;
+    this->m_declinedTrip      = 0;
+    this->m_driveInfo         = 0;
+    this->m_eventCount        = 0;
 }
 
 
@@ -112,7 +112,7 @@ QString GamePlay::getCompetitionRound()
 #ifdef QT_DEBUG
         return QString("%1. ").arg(this->m_seasonIndex);
 #else
-        if (this->m_bIsUserGameAddingEnabled)
+        if (g_ConUserSettings->userIsGameAddingEnabled())
             return QString("%1. ").arg(this->m_seasonIndex);
         else
             return "";
@@ -151,7 +151,7 @@ QString GamePlay::getCompetitionShortRound()
 #ifdef QT_DEBUG
         return QString("%1. TestSpiel").arg(this->m_seasonIndex);
 #else
-        if (this->m_bIsUserGameAddingEnabled)
+        if (g_ConUserSettings->userIsGameAddingEnabled())
             return QString("%1. TestSpiel").arg(this->m_seasonIndex);
         else
             return "TestSpiel";
@@ -159,11 +159,6 @@ QString GamePlay::getCompetitionShortRound()
     }
 
     return "n.i.";
-}
-
-void GamePlay::setEnableAddGame(bool enable)
-{
-    this->m_bIsUserGameAddingEnabled = enable;
 }
 
 bool GamePlay::compareTimeStampFunctionAscending(GamePlay* p1, GamePlay* p2)
