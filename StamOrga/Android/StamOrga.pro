@@ -53,7 +53,8 @@ SOURCES += main.cpp \
     source/cadrpushnotifyinfohandler.cpp \
     ../Data/cdataappuserevents.cpp \
     ../Data/cdataconsolemanager.cpp \
-    ../Data/cdatacommentitem.cpp
+    ../Data/cdatacommentitem.cpp \
+    ../cstaversionmanager.cpp
 
 
 RESOURCES += qml.qrc
@@ -113,7 +114,8 @@ HEADERS += \
     source/cadrpushnotifyinfohandler.h \
     ../Data/cdataappuserevents.h \
     ../Data/cdataconsolemanager.h \
-    ../Data/cdatacommentitem.h
+    ../Data/cdatacommentitem.h \
+    ../cstaversionmanager.h
 
 INCLUDEPATH += \
     ../ \

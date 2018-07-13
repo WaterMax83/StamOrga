@@ -30,11 +30,13 @@
 #ifdef Q_OS_WIN
 #undef STAM_ORGA_VERSION_LINK_WITH_TEXT
 #define STAM_ORGA_VERSION_LINK_WITH_TEXT "<a href=\"https://github.com/WaterMax83/StamOrga/releases/download/%1/StamOrga.Winx64.%1.7z\">Lade %2</a>\n"
+#define STAM_ORGA_VERSION_COPY_WITH_TEXT "<a href=\"https://github.com/WaterMax83/StamOrga/releases/download/%1/StamOrga.Winx64.%1.7z\">Kopiere %2</a>\n"
 #define STAM_ORGA_VERSION_LINK "https://github.com/WaterMax83/StamOrga/releases/download/%1/StamOrga.Winx64.%1.7z"
 #endif
 #ifdef Q_OS_ANDROID
 #undef STAM_ORGA_VERSION_LINK_WITH_TEXT
 #define STAM_ORGA_VERSION_LINK_WITH_TEXT "<a href=\"https://github.com/WaterMax83/StamOrga/releases/download/%1/StamOrga.Android.%1.apk\">Lade %2</a>\n"
+#define STAM_ORGA_VERSION_COPY_WITH_TEXT "<a href=\"https://github.com/WaterMax83/StamOrga/releases/download/%1/StamOrga.Android.%1.apk\">Kopiere %2</a>\n"
 #define STAM_ORGA_VERSION_LINK "https://github.com/WaterMax83/StamOrga/releases/download/%1/StamOrga.Android.%1.apk"
 #endif
 

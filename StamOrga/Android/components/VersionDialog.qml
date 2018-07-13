@@ -34,7 +34,7 @@ MyComponents.CustomDialog {
     x: (parentWidth - width) / 2
     y: parentHeight / 6
     width: Math.min(parentWidth, parentHeight) / 3 * 2
-        contentHeight: versionColumn.height
+    contentHeight: versionColumn.height
 
     Column {
         id: versionColumn
@@ -55,7 +55,14 @@ MyComponents.CustomDialog {
             wrapMode: Text.Wrap
             font.pixelSize: 12
             color: "white"
-            onLinkActivated: Qt.openUrlExternally(link)
+            onLinkActivated:  {
+                var component = Qt.createComponent("../pages/UpdatePage.qml");
+                if (component.status === Component.Ready) {
+                    stackView.push(component);
+                }
+                versionDialog.close();
+                //                Qt.openUrlExternally(link)
+            }
         }
     }
 }

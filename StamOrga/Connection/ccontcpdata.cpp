@@ -31,6 +31,7 @@
 #include "../Data/cdatastatisticmanager.h"
 #include "../Data/cdataticketmanager.h"
 #include "../cstaglobalsettings.h"
+#include "../cstaversionmanager.h"
 #include "cconmanager.h"
 #include "ccontcpdata.h"
 #include "cconusersettings.h"
@@ -161,7 +162,7 @@ void cConTcpData::checkNewOncomingData()
             break;
 
         case OP_CODE_CMD_RES::ACK_GET_VERSION:
-            request->m_result = g_StaGlobalSettings->handleVersionResponse(msg);
+            request->m_result = g_StaVersionManager->handleVersionResponse(msg);
             break;
         case OP_CODE_CMD_RES::ACK_GET_USER_PROPS:
             request->m_result = g_ConUserSettings->handleUserPropsResponse(msg);

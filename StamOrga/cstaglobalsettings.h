@@ -58,20 +58,7 @@ public:
 
     Q_INVOKABLE qint64 getKeepPastItemsCount();
 
-    Q_INVOKABLE bool isVersionChangeAlreadyShown();
-    Q_INVOKABLE QString getVersionChangeInfo();
-
-    qint32 startGettingVersionInfo();
-    qint32 handleVersionResponse(MessageProtocol* msg);
-
     void setAlreadyConnected(const bool con);
-
-    QString     getRemoteVersion();
-    Q_INVOKABLE QString getUpdateLink();
-    Q_INVOKABLE QString getVersionInfo();
-
-    Q_INVOKABLE QString getCurrentVersion();
-    Q_INVOKABLE QString getCurrentVersionLink();
 
     Q_INVOKABLE bool isNotificationNewAppVersionEnabled();
     Q_INVOKABLE bool isNotificationNewMeetingEnabled();
@@ -91,6 +78,8 @@ public:
 
     bool isIpAddressAlreadySet() { return this->m_bIpAddressWasSet; }
 
+    void updatePushNotification(void);
+
 signals:
 
 public slots:
@@ -98,10 +87,6 @@ public slots:
     void slotCallBackLookUpHost(const QHostInfo& host);
 
 private:
-    QString m_versionInfo;
-    QString m_remoteVersion;
-    QString m_updateLink;
-    QString m_lastShownVersion;
     QString m_debugIP;
     QString m_debugIPWifi;
     bool    m_bSaveInfosOnApp;
@@ -117,8 +102,6 @@ private:
     QStringList* m_fontList = NULL;
 
     bool m_bAlreadyConnected;
-
-    void updatePushNotification(void);
 };
 
 extern cStaGlobalSettings* g_StaGlobalSettings;

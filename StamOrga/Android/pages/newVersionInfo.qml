@@ -37,42 +37,46 @@ Flickable {
 
 
         ColumnLayout {
-                id: accepptTextDialogColumn
-                width: parent.width
-                spacing: 20
+            id: accepptTextDialogColumn
+            width: parent.width
+            spacing: 20
 
-                Text {
-                    id: labelAcceptTextHeader
-                    wrapMode: Text.WordWrap
-                    Layout.maximumWidth: parent.width
-                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                    text: "Was ist neu:"
-                    color: "white"
-                    font.bold: true
-                    font.pixelSize: 18
-                }
+            Text {
+                id: labelAcceptTextHeader
+                wrapMode: Text.WordWrap
+                Layout.maximumWidth: parent.width
+                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                text: "Was ist neu:"
+                color: "white"
+                font.bold: true
+                font.pixelSize: 18
+            }
 
-                Text {
-                    id: labelAcceptText
-                    textFormat: Text.RichText
-                    wrapMode: Text.WordWrap
-                    Layout.maximumWidth: parent.width
-                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                    font.pixelSize: 12
-                    color: "white"
-                    text: gStaGlobalSettings.getVersionChangeInfo()
-                }
+            Text {
+                id: labelAcceptText
+                textFormat: Text.RichText
+                wrapMode: Text.WordWrap
+                Layout.maximumWidth: parent.width
+                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                font.pixelSize: 12
+                color: "white"
+                text: gStaVersionManager.getVersionChangeInfo()
+            }
 
-                Text {
-                    id: labelLinkToCurrentVersion
-                    textFormat: Text.RichText
-                    wrapMode: Text.Wrap
-                    font.pixelSize: 12
-                    color: "white"
-                    text: gStaGlobalSettings.getCurrentVersionLink()
-                    onLinkActivated: Qt.openUrlExternally(link)
+            Text {
+                id: labelLinkToCurrentVersion
+                textFormat: Text.RichText
+                wrapMode: Text.Wrap
+                font.pixelSize: 12
+                color: "white"
+                text: gStaVersionManager.getCurrentVersionLink()
+                onLinkActivated:  {
+                    gDataAppInfoManager.copyTextToClipBoard(link);
+                    toastManager.show("Link wurde in die Zwischenablage kopiert", 2000);
+                    //                        Qt.openUrlExternally(link)
                 }
             }
+        }
     }
 
     function pageOpenedUpdateView() {

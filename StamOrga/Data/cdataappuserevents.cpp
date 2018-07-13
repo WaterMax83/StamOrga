@@ -59,8 +59,6 @@ qint32 cDataAppUserEvents::addNewUserEvents(QJsonArray& jsArr)
         pEvent->m_type     = jsObj.value("type").toString();
         pEvent->m_eventID  = static_cast<qint64>(jsObj.value("id").toDouble());
 
-        //        qDebug() << "New Event " << pEvent->m_info << " " << pEvent->m_type;
-
         if (pEvent->m_type == NOTIFY_TOPIC_NEW_APP_VERSION) {
 
             this->m_eventNewAppVersion = false;

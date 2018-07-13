@@ -93,8 +93,8 @@ ApplicationWindow {
                 implicitHeight: 50
                 contentItem: Image {
                     id: imageToolButton
-//                    anchors.fill: parent
-//                    anchors.margins: 5
+                    //                    anchors.fill: parent
+                    //                    anchors.margins: 5
                     fillMode: Image.Pad
                     horizontalAlignment: Image.AlignHCenter
                     verticalAlignment: Image.AlignVCenter
@@ -150,7 +150,6 @@ ApplicationWindow {
                         append({
                                    title: "Benutzerprofil",
                                    element: viewUserLogin,
-                                   link: "",
                                    event: 0,
                                    toolButtonImgSource: "images/menu.png",
                                    listImgSource : "images/account.png"
@@ -158,35 +157,35 @@ ApplicationWindow {
                         append({
                                    title: "Dauerkarten",
                                    element: viewSeasonTickets,
-                                   link: "",
                                    toolButtonImgSource: "images/add.png",
                                    listImgSource : "images/card.png"
                                })
                         append({
                                    title: "Statistik",
                                    element: viewStatistics,
-                                   link: "",
                                    listImgSource : "images/chart.png"
                                })
                         if (userInt.isDebuggingEnabled())
                             append({
                                        title: "Fanclub",
                                        element: viewFanclubNewList,
-                                       link: "",
                                        event: 0,
                                        listImgSource : "images/group.png"
                                    })
                         append({
                                    title: "Einstellungen",
                                    element: viewSettingsPage,
-                                   link: "",
                                    listImgSource : "images/settings.png"
+                               })
+                        append({
+                                   title: "Update",
+                                   element: viewUpdatePage,
+                                   listImgSource : "images/download.png"
                                })
                         if (userInt.isDebuggingEnabled())
                             append({
                                        title: "Logging",
                                        element: viewLoggingPage,
-                                       link: "",
                                        listImgSource : "images/bug.png"
                                    })
                     }
@@ -233,13 +232,13 @@ ApplicationWindow {
     }
 
     Component {
-            id: highlightBar
-            Rectangle {
-                width: listView.width
-                height: 50
-                color: "#808080"
-            }
+        id: highlightBar
+        Rectangle {
+            width: listView.width
+            height: 50
+            color: "#808080"
         }
+    }
 
     Component {
         id: listDelegate
@@ -278,7 +277,7 @@ ApplicationWindow {
                 anchors.fill: parent
                 hoverEnabled: true
                 onClicked: {
-                     listView.currentIndex = index
+                    listView.currentIndex = index
                     if (model.element) {
                         titleLabel.text = title
                         if (toolButtonImgSource) {
@@ -288,10 +287,6 @@ ApplicationWindow {
                             imageToolButton.visible = false
                         }
                         stackView.push(element)
-                    } else if (model.link && model.link !== "") {
-                        Qt.openUrlExternally(model.link);
-                        if (model.title === "Update")
-                            gDataAppUserEvents.clearUserEventUpdate();
                     }
 
                     drawer.close()
@@ -324,6 +319,10 @@ ApplicationWindow {
         id: viewLoggingPage
         MyPages.LogginPage {}
     }
+    Component{
+        id: viewUpdatePage
+        MyPages.UpdatePage {}
+    }
     Component {
         id: viewFanclubNewList
         MyPages.FanclubNewsList{}
@@ -341,33 +340,24 @@ ApplicationWindow {
         }
         onNotifyVersionRequestFinished: {
             if (result === 5) {
-                if (gStaGlobalSettings.getUseVersionPopup()) {
+                if (gStaGlobalSettings.getUseVersionPopup() && titleLabel.text !== "Update") {
                     var component = Qt.createComponent("/components/VersionDialog.qml")
                     if (component.status === Component.Ready) {
                         var dialog = component.createObject(stackView, {
                                                                 popupType: 1
                                                             })
-                        dialog.versionText = gStaGlobalSettings.getVersionInfo();
+                        dialog.versionText = gStaVersionManager.getVersionInfo();
                         dialog.parentHeight = stackView.height
                         dialog.parentWidth = stackView.width
                         dialog.open()
                     }
                 }
-
-                if (!isNewVersionElementShown) {
-                    isNewVersionElementShown = true;
-                    listViewListModel.append({
-                                            title: "Update",
-                                            link: gStaGlobalSettings.getUpdateLink(),
-                                            event : 0,
-                                            listImgSource : "images/download.png"
-                                        })
-                }
             }
+            if (stackView.currentItem.notifyVersionRequestFinished)
+                stackView.currentItem.notifyVersionRequestFinished(result);
         }
         property bool isLoggingWindowShown : false;
         property bool isFanclubNewsWindowShown : false;
-        property bool isNewVersionElementShown : false;
         property bool isConsoleWindowShown : false;
         onNotifyUserPropertiesFinished: {
             if (result > 0 && !userInt.isDebuggingEnabled()) {
@@ -375,29 +365,29 @@ ApplicationWindow {
                     isLoggingWindowShown = true;
                     if (gConUserSettings.userIsDebugEnabled()) {
                         listViewListModel.append({
-                                                title: "Logging",
-                                                element: viewLoggingPage,
-                                                toolButtonImgSource: "",
-                                                listImgSource : "images/bug.png"
-                                            })
+                                                     title: "Logging",
+                                                     element: viewLoggingPage,
+                                                     toolButtonImgSource: "",
+                                                     listImgSource : "images/bug.png"
+                                                 })
                     }
                 }
                 if (!isFanclubNewsWindowShown) {
                     isFanclubNewsWindowShown = true;
                     if (gConUserSettings.userIsFanclubEnabled()) {
                         listViewListModel.insert(2, {
-                                                title: "Fanclub",
-                                                element: viewFanclubNewList,
-                                                toolButtonImgSource: "",
-                                                event : 0,
-                                                listImgSource : "images/group.png"
-                                            })
+                                                     title: "Fanclub",
+                                                     element: viewFanclubNewList,
+                                                     toolButtonImgSource: "",
+                                                     event : 0,
+                                                     listImgSource : "images/group.png"
+                                                 })
                     }
                 }
 
             }
             if (result > 0 && !isConsoleWindowShown) {
-                 isConsoleWindowShown = true;
+                isConsoleWindowShown = true;
                 if (gConUserSettings.userIsConsoleEnabled()) {
                     listViewListModel.append({
                                                  title: "Console",
@@ -438,7 +428,7 @@ ApplicationWindow {
         }
         onNotifyGamesListFinished: viewMainGames.notifyUserIntGamesListFinished(result)
         onNotifyGamesInfoListFinished: viewMainGames.notifyUserIntGamesInfoListFinished(result);
-//        onNotifySetGamesFixedTimeFinished: viewMainGames.notifySetGamesFixedTimeFinished(result);
+        //        onNotifySetGamesFixedTimeFinished: viewMainGames.notifySetGamesFixedTimeFinished(result);
         onNotifyChangedGameFinished: stackView.currentItem.notifyGameChangedFinished(result);
 
         onNotifySeasonTicketAddFinished: stackView.currentItem.notifyUserIntSeasonTicketAdd(result)
@@ -467,14 +457,14 @@ ApplicationWindow {
     }
 
     Connections {
-       target: gDataGamesManager
-       onSendAppStateChangedToActive: {
-           viewMainGames.showLoadingGameInfos("Lade Spielinfos", true)
-//           if (value === 1)
-//                gDataGamesManager.startListGamesInfo();
-//           else if (value === 2)
-//                gDataGamesManager.startListGames();
-       }
+        target: gDataGamesManager
+        onSendAppStateChangedToActive: {
+            viewMainGames.showLoadingGameInfos("Lade Spielinfos", true)
+            //           if (value === 1)
+            //                gDataGamesManager.startListGamesInfo();
+            //           else if (value === 2)
+            //                gDataGamesManager.startListGames();
+        }
     }
 
     function openUserLogin(open) {
@@ -483,10 +473,10 @@ ApplicationWindow {
             stackView.push(viewUserLogin)
             imageToolButton.visible = false
         } else {
-//            stackView.currentItem.showListedGames()
+            //            stackView.currentItem.showListedGames()
             gStaGlobalSettings.checkNewStateChangedAtStart();
 
-            if (!gStaGlobalSettings.isVersionChangeAlreadyShown()) {
+            if (!gStaVersionManager.isVersionChangeAlreadyShown()) {
                 var component = Qt.createComponent("../pages/newVersionInfo.qml");
                 if (component.status === Component.Ready) {
                     stackView.push(component);

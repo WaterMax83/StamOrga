@@ -242,7 +242,7 @@ Flickable {
                 Layout.bottomMargin: (saveInfosOnApp.height - height) / 2
                 font.pixelSize: 14
                 color: "white"
-                text: "Aktuelle Version: <a href=\"tmp\">" + gStaGlobalSettings.getCurrentVersion() + "</a>"
+                text: "Aktuelle Version: <a href=\"tmp\">" + gStaVersionManager.getCurrentVersion() + "</a>"
                 onLinkActivated: {
                     var component = Qt.createComponent("../pages/newVersionInfo.qml");
                     if (component.status === Component.Ready) {

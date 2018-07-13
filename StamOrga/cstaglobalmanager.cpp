@@ -32,6 +32,7 @@
 #include "cstaglobalmanager.h"
 #include "cstaglobalsettings.h"
 #include "cstasettingsmanager.h"
+#include "cstaversionmanager.h"
 #ifndef STAMORGA_APP
 #include "PC/cpccontrolmanager.h"
 #else
@@ -73,6 +74,10 @@ qint32 cStaGlobalManager::initialize()
     if (rCode == ERROR_CODE_SUCCESS) {
         g_ConUserSettings = new cConUserSettings();
         rCode             = g_ConUserSettings->initialize();
+    }
+    if (rCode == ERROR_CODE_SUCCESS) {
+        g_StaVersionManager = new cStaVersionManager();
+        rCode               = g_StaVersionManager->initialize();
     }
     if (rCode == ERROR_CODE_SUCCESS) {
         g_DataGamesManager = new cDataGamesManager();
@@ -132,6 +137,7 @@ void cStaGlobalManager::setQmlInformationClasses(QQmlApplicationEngine* engine)
 {
     engine->rootContext()->setContextProperty("gDataAppInfoManager", g_DatAppInfoManager);
     engine->rootContext()->setContextProperty("gStaGlobalSettings", g_StaGlobalSettings);
+    engine->rootContext()->setContextProperty("gStaVersionManager", g_StaVersionManager);
     engine->rootContext()->setContextProperty("gDataGamesManager", g_DataGamesManager);
     engine->rootContext()->setContextProperty("gDataTicketManager", g_DataTicketManager);
     engine->rootContext()->setContextProperty("gDataNewsDataManager", g_DataNewsDataManager);

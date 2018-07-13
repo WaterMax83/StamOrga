@@ -42,7 +42,6 @@ cStaGlobalSettings* g_StaGlobalSettings;
 #define SETT_ALREADY_CONNECTED      "AlreadyConnected"
 #define SETT_SAVE_INFO_ON_APP       "SaveInfosOnApp"
 #define SETT_LOAD_GAME_INFO         "LoadGameInfo"
-#define SETT_LAST_SHOWN_VERSION     "LastShownVersion"
 #define SETT_USE_VERSION_POPUP      "UseVersionPopup"
 #define SETT_CHANGE_DEFAULT_FONT    "ChangeDefaultFont"
 #define SETT_DEBUG_IP               "DebugIP"
@@ -76,8 +75,6 @@ qint32 cStaGlobalSettings::initialize()
     this->m_bLoadGameInfo = bValue;
     g_StaSettingsManager->getBoolValue(SETTINGS_GROUP, SETT_USE_VERSION_POPUP, bValue, true);
     this->m_bUseVersionPopup = bValue;
-    g_StaSettingsManager->getValue(SETTINGS_GROUP, SETT_LAST_SHOWN_VERSION, value);
-    this->m_lastShownVersion = value;
     g_StaSettingsManager->getValue(SETTINGS_GROUP, SETT_CHANGE_DEFAULT_FONT, value, "Default");
     this->m_changeDefaultFont = value != "" ? value : "Default";
     g_StaSettingsManager->getValue(SETTINGS_GROUP, SETT_DEBUG_IP, value);
@@ -101,48 +98,6 @@ qint32 cStaGlobalSettings::initialize()
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 cStaGlobalSettings::startGettingVersionInfo()
-{
-    QJsonObject rootObj;
-    rootObj.insert("version", (double)STAM_ORGA_VERSION_I);
-    QString sVersion = STAM_ORGA_VERSION_S;
-#ifdef Q_OS_WIN
-    sVersion.append("_Win");
-#elif defined(Q_OS_ANDROID)
-    sVersion.append("_Android");
-#elif defined(Q_OS_IOS)
-    sVersion.append(("_iOS");
-#endif
-    rootObj.insert("sVersion", sVersion);
-
-    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_GET_VERSION);
-    req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
-
-    g_ConManager->sendNewRequest(req);
-    return ERROR_CODE_SUCCESS;
-}
-
-qint32 cStaGlobalSettings::handleVersionResponse(MessageProtocol* msg)
-{
-    QByteArray  data    = QByteArray(msg->getPointerToData());
-    QJsonObject rootObj = QJsonDocument::fromJson(data).object();
-
-    qint32  result        = rootObj.value("ack").toInt(ERROR_CODE_NOT_FOUND);
-    quint32 uVersion      = (quint32)rootObj.value("version").toDouble();
-    this->m_remoteVersion = rootObj.value("sVersion").toString();
-
-    qInfo().noquote() << QString("Version from server %1:0x%2").arg(this->m_remoteVersion, QString::number(uVersion, 16));
-
-    if ((uVersion & 0xFFFFFF00) > (STAM_ORGA_VERSION_I & 0xFFFFFF00)) {
-        this->m_versionInfo = QString("Deine Version: %2<br>Aktuelle Version: %1<br><br>").arg(this->m_remoteVersion, STAM_ORGA_VERSION_S);
-        this->m_versionInfo.append(QString(STAM_ORGA_VERSION_LINK_WITH_TEXT).arg(this->m_remoteVersion.toLower(), this->m_remoteVersion));
-        this->m_updateLink = QString(STAM_ORGA_VERSION_LINK).arg(this->m_remoteVersion.toLower());
-
-        return ERROR_CODE_NEW_VERSION;
-    }
-    //    version->append(remVersion);
-    return result;
-}
 
 bool cStaGlobalSettings::getSaveInfosOnApp()
 {
@@ -250,88 +205,6 @@ qint64 cStaGlobalSettings::getKeepPastItemsCount()
     return this->m_iKeepPastItemsCount;
 }
 
-bool cStaGlobalSettings::isVersionChangeAlreadyShown()
-{
-    if (this->m_lastShownVersion == STAM_ORGA_VERSION_S)
-        return true;
-
-    return false;
-}
-
-QString cStaGlobalSettings::getVersionChangeInfo()
-{
-    QString rValue;
-
-    rValue.append("<b>V1.1.1:</b>(06.07.2018)<br>");
-    rValue.append("- Benachrichtigung per Email (auf Wunsch)<br>");
-    rValue.append("- Kommentare bei Treffen und Fahrt<br>");
-    rValue.append("- lade vergangene Spiele dynamisch<br>");
-    rValue.append("- Design Überarbeitung<br>");
-
-    rValue.append("<br><b>V1.1.0:</b>(10.05.2018)<br>");
-    rValue.append("- Umstellung UDP auf TCP<br>");
-    rValue.append("- interne Struktur umgebaut<br>");
-    rValue.append("- Statistik nach Jahren getrennt<br>");
-    rValue.append("- diverse Fehler beseitigt<br>");
-
-    rValue.append("<br><b>V1.0.7:</b>(03.03.2018)<br>");
-    rValue.append("- Statistic hinzugefügt<br>");
-    rValue.append("- Icons in Drawer und Übersicht überarbeitet<br>");
-    rValue.append("- Easteregg versteckt<br>");
-    rValue.append("- Infos über eigene Karte und Reservierung in der Übersicht<br>");
-
-    rValue.append("<br><b>V1.0.6:</b>(08.02.2018)<br>");
-    rValue.append("- Infos über Fahrt in der Übersicht<br>");
-    rValue.append("- Icons überarbeitet<br>");
-    rValue.append("- Spiel als Favorit markieren<br>");
-
-    rValue.append("<br><b>V1.0.5:</b>(16.12.2017)<br>");
-    rValue.append("- Infos über letzte Neuigkeiten markieren<br>");
-    rValue.append("- Framework Version aktualisiert<br>");
-    rValue.append("- Fahrt bei Auswärtsspiel hinzugefügt<br>");
-    rValue.append("- Versionsupdate über Liste<br>");
-
-    rValue.append("<br><b>V1.0.4:</b>(24.10.2017)<br>");
-    rValue.append("- Fanclub Nachrichten (Mitglieder)<br>");
-    rValue.append("- neue Benachrichtigung \"Erster Auswärtsfahrer\" & \"Fanclub Nachricht\"<br>");
-    rValue.append("- Schrift änderbar (Android)<br>");
-    rValue.append("- Verbindungsfehler beim Start behoben<br>");
-
-    rValue.append("<br><b>V1.0.3:</b>(25.08.2017)<br>");
-    rValue.append("- Push Notifications (Android)<br>");
-    rValue.append("- Schrift änderbar (Windows)<br>");
-    rValue.append("- Infos über Ort bei Spieltagstickets<br>");
-    rValue.append("- Optische Anpassungen<br>");
-
-    rValue.append("<br><b>V1.0.2:</b>(31.07.2017)<br>");
-    rValue.append("- Spielterminierung hinzugefügt<br>");
-    rValue.append("- Spielliste in Aktuell/Vergangenheit aufgeteilt<br>");
-    rValue.append("- Daten nur nach Bedarf vom Server laden<br>");
-    rValue.append("- Fehler beseitigt (Einstellungen/Tickets/etc..)<br>");
-
-    rValue.append("<br><b>V1.0.1:</b>(17.07.2017)<br>");
-    rValue.append("- Mehr Informationen in der Spielübersicht<br>");
-    rValue.append("- automatisches Laden der Spielinformationen<br>");
-    rValue.append("- Dauerkarten editierbar<br>");
-    rValue.append("- Passwörter vollständig gehasht<br>");
-    rValue.append("- Versionshistorie hinzugefügt<br>");
-    rValue.append("- Diverse Fehler beseitigt<br>");
-
-    rValue.append("<br><b>V1.0.0:</b>(30.06.2017)<br>");
-    rValue.append("Erste Version<br>");
-
-    if (this->m_lastShownVersion != STAM_ORGA_VERSION_S) {
-        this->m_lastShownVersion = STAM_ORGA_VERSION_S;
-
-        g_StaSettingsManager->setValue(SETTINGS_GROUP, SETT_LAST_SHOWN_VERSION, this->m_lastShownVersion);
-
-        this->updatePushNotification();
-    }
-
-    return rValue;
-}
-
-
 void cStaGlobalSettings::setAlreadyConnected(const bool con)
 {
     if (con != this->m_bAlreadyConnected) {
@@ -340,30 +213,6 @@ void cStaGlobalSettings::setAlreadyConnected(const bool con)
 
         g_StaSettingsManager->setBoolValue(SETTINGS_GROUP, SETT_ALREADY_CONNECTED, con);
     }
-}
-
-QString cStaGlobalSettings::getRemoteVersion()
-{
-    return this->m_remoteVersion;
-}
-QString cStaGlobalSettings::getUpdateLink()
-{
-    return this->m_updateLink;
-}
-QString cStaGlobalSettings::getVersionInfo()
-{
-    return this->m_versionInfo;
-}
-
-
-QString cStaGlobalSettings::getCurrentVersion()
-{
-    return STAM_ORGA_VERSION_S;
-}
-
-QString cStaGlobalSettings::getCurrentVersionLink()
-{
-    return QString(STAM_ORGA_VERSION_LINK_WITH_TEXT).arg(QString(STAM_ORGA_VERSION_S).toLower(), STAM_ORGA_VERSION_S);
 }
 
 #define NOT_OFFSET_NEWAPPV 0

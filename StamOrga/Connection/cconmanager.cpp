@@ -28,6 +28,7 @@
 #include "../Data/cdatagamesmanager.h"
 #include "../Data/cdataticketmanager.h"
 #include "../cstaglobalsettings.h"
+#include "../cstaversionmanager.h"
 #include "cconmanager.h"
 #include "cconusersettings.h"
 
@@ -176,7 +177,7 @@ void cConManager::slotDataConLastRequestFinished(TcpDataConRequest* request)
     switch (request->m_request) {
     case OP_CODE_CMD_REQ::REQ_LOGIN_USER:
         if (request->m_result == ERROR_CODE_SUCCESS) {
-            g_StaGlobalSettings->startGettingVersionInfo();
+            g_StaVersionManager->startGettingVersionInfo();
             g_ConUserSettings->startGettingUserProps(false);
 
             while (this->m_lRequestConError.size() > 0) {

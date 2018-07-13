@@ -111,5 +111,6 @@
         <file>components/NewsDataDesignItem.qml</file>
         <file>images/+material/timelaps.png</file>
         <file>images/timelaps.png</file>
+        <file>pages/UpdatePage.qml</file>
     </qresource>
 </RCC>
