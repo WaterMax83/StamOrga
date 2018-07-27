@@ -21,6 +21,7 @@
 #include "../Data/cdataappuserevents.h"
 #include "../Data/cdatagameuserdata.h"
 #include "Connection/cconmanager.h"
+#include "Connection/cconnetworkaccess.h"
 #include "Connection/cconusersettings.h"
 #include "Data/cdataconsolemanager.h"
 #include "Data/cdatagamesmanager.h"
@@ -74,6 +75,10 @@ qint32 cStaGlobalManager::initialize()
     if (rCode == ERROR_CODE_SUCCESS) {
         g_ConUserSettings = new cConUserSettings();
         rCode             = g_ConUserSettings->initialize();
+    }
+    if (rCode == ERROR_CODE_SUCCESS) {
+        g_ConNetworkAccess = new cConNetworkAccess();
+        rCode              = g_ConNetworkAccess->initialize();
     }
     if (rCode == ERROR_CODE_SUCCESS) {
         g_StaVersionManager = new cStaVersionManager();

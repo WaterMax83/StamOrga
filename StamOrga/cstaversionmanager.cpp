@@ -18,11 +18,13 @@
 
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
+#include <QtCore/QStandardPaths>
 
 #include "../Common/General/config.h"
 #include "../Common/General/globalfunctions.h"
 #include "../Common/Network/messagecommand.h"
 #include "Connection/cconmanager.h"
+#include "Connection/cconnetworkaccess.h"
 #include "cstaglobalsettings.h"
 #include "cstasettingsmanager.h"
 #include "cstaversionmanager.h"
@@ -33,6 +35,14 @@
 
 #define SETT_LAST_SHOWN_VERSION     "LastShownVersion"
 // clang-format on
+
+enum StaVersionStatus {
+    VersionStatusNoInfo       = 0,
+    VersionStatusNoNewVersion = 1,
+    VersionStatusNewVersion   = 2,
+    VersionStatusBusy         = 3,
+    VersionStatusNoSSL        = 4
+};
 
 cStaVersionManager* g_StaVersionManager;
 
@@ -47,8 +57,16 @@ qint32 cStaVersionManager::initialize()
     g_StaSettingsManager->getValue(SETTINGS_GROUP, SETT_LAST_SHOWN_VERSION, value);
     this->m_lastShownVersion = value;
 
-    this->m_versionUpdateIndex = 0;
+    this->m_versionUpdateIndex = VersionStatusNoInfo;
     emit this->versionUpdateIndexChanged();
+
+    qInfo() << QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    qInfo() << QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
+    qInfo() << QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+
+    qInfo().noquote() << "SSH Version: " << QSslSocket::sslLibraryVersionString();
+
+    connect(g_ConNetworkAccess, &cConNetworkAccess::signalDownloadFinished, this, &cStaVersionManager::slotDownloadFinished);
 
     this->m_initialized = true;
 
@@ -92,19 +110,37 @@ qint32 cStaVersionManager::handleVersionResponse(MessageProtocol* msg)
         this->m_versionInfo.append(QString(STAM_ORGA_VERSION_LINK_WITH_TEXT).arg(this->m_remoteVersion.toLower(), this->m_remoteVersion));
         this->m_updateLink = QString(STAM_ORGA_VERSION_LINK).arg(this->m_remoteVersion.toLower());
 
-        this->m_versionUpdateIndex = 2;
+        if (QSslSocket::supportsSsl())
+            this->m_versionUpdateIndex = VersionStatusNewVersion;
+        else
+            this->m_versionUpdateIndex = VersionStatusNoSSL;
         emit this->versionUpdateIndexChanged();
 
         return ERROR_CODE_NEW_VERSION;
     }
 
     if (result == ERROR_CODE_SUCCESS)
-        this->m_versionUpdateIndex = 1;
+        this->m_versionUpdateIndex = VersionStatusNoNewVersion;
     else
-        this->m_versionUpdateIndex = 0;
+        this->m_versionUpdateIndex = VersionStatusNoInfo;
     emit this->versionUpdateIndexChanged();
 
     return result;
+}
+
+qint32 cStaVersionManager::startDownloadCurrentVersion()
+{
+    emit g_ConNetworkAccess->signalStartDownload("https://github.com/WaterMax83/StamOrga/releases/download/v1.1.1/StamOrga.Winx64.v1.1.1.7z");
+
+    this->m_versionUpdateIndex = VersionStatusBusy;
+    emit this->versionUpdateIndexChanged();
+
+    return ERROR_CODE_SUCCESS;
+}
+
+void cStaVersionManager::slotDownloadFinished(QString url, qint32 statusCode)
+{
+    emit this->signalVersionDownloadFinished();
 }
 
 bool cStaVersionManager::isVersionChangeAlreadyShown()

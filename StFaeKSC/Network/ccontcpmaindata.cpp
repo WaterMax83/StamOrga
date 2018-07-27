@@ -118,7 +118,7 @@ MessageProtocol* cConTcpMainData::getUserCheckVersion(UserConData* pUserCon, Mes
     QJsonObject rootAns;
     rootAns.insert("ack", ERROR_CODE_SUCCESS);
 
-//#define VERSION_TEST
+#define VERSION_TEST
 #ifdef VERSION_TEST
 #define ORGA_VERSION_I 0x0B0A0000 // VX.Y.Z => 0xXXYYZZZZ
 #define ORGA_VERSION_S "VB.A.0"

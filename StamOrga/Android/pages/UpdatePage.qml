@@ -54,7 +54,7 @@ Flickable {
                 Layout.topMargin: 20
                 font.pixelSize: 14
                 color: "white"
-                text: "Aktuelle Version: <a href=\"tmp\">" + gStaVersionManager.getCurrentVersion() + "</a>"
+                text: "Deine Version: <a href=\"tmp\">" + gStaVersionManager.getCurrentVersion() + "</a>"
                 onLinkActivated: {
                     var component = Qt.createComponent("../pages/newVersionInfo.qml");
                     if (component.status === Component.Ready) {
@@ -67,20 +67,11 @@ Flickable {
                 orientation: "Horizontal"
                 implicitWidth: parent.width / 3 * 2
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-//                Layout.bottomMargin: 35
-            }
-
-            MyComponents.BusyLoadingIndicator {
-                id: busyIndicatorUpdate
-                width: parent.width
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                Layout.fillHeight: false
-//                Layout.topMargin: 10
-                infoVisible: false
+                //                Layout.bottomMargin: 35
             }
 
             MyControls.Button {
-                id: btnChangePassWord
+                id: btnChangeCheckVersion
                 font.family: txtForFontFamily.font
                 text: qsTr("Version prüfen")
                 implicitWidth: parent.width / 4 * 2
@@ -104,6 +95,71 @@ Flickable {
                 color: "white"
                 text: "Du hast bereits die aktuellste Version"
             }
+
+            Text {
+                wrapMode: Text.WordWrap
+                Layout.maximumWidth: parent.width
+                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                font.pixelSize: 14
+                visible: gStaVersionManager.versionUpdateIndex === 2 || gStaVersionManager.versionUpdateIndex === 4
+                color: "white"
+                text: "Aktuelle Version: " + gStaVersionManager.remoteVersion;
+            }
+
+            MyControls.Button {
+                id: btnDownloadCurrentVersion
+                font.family: txtForFontFamily.font
+                text: "Lade " + gStaVersionManager.remoteVersion;
+                implicitWidth: parent.width / 4 * 2
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                transformOrigin: Item.Center
+                visible: gStaVersionManager.versionUpdateIndex === 2
+                onClicked: {
+                    busyIndicatorUpdate.loadingVisible = true;
+                    busyIndicatorUpdate.infoVisible = true;
+                    busyIndicatorUpdate.infoText = "Download der aktuellen Version";
+                    gStaVersionManager.startDownloadCurrentVersion();
+                }
+            }
+
+            Text {
+                wrapMode: Text.WordWrap
+                Layout.maximumWidth: parent.width
+                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                font.pixelSize: 14
+                visible: gStaVersionManager.versionUpdateIndex === 4
+                color: "white"
+                text: "Oops leider ist kein SSL installiert um die Version zu laden!";
+            }
+
+            Text {
+                id: labelLinkToCurrentVersion
+                textFormat: Text.RichText
+                wrapMode: Text.Wrap
+                font.pixelSize: 14
+                visible: gStaVersionManager.versionUpdateIndex === 4
+                color: "white"
+                text: "Lade sie extern: <a href=\"" + gStaVersionManager.getUpdateLink() + "\">" + gStaVersionManager.remoteVersion + "</a>"
+                onLinkActivated:  {
+                    Qt.openUrlExternally(link)
+                }
+            }
+
+            MyComponents.BusyLoadingIndicator {
+                id: busyIndicatorUpdate
+                width: parent.width
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                Layout.fillHeight: false
+                infoVisible: false
+            }
+        }
+    }
+
+    Connections {
+        target: gStaVersionManager
+        onSignalVersionDownloadFinished: {
+            busyIndicatorUpdate.loadingVisible = false;
+            busyIndicatorUpdate.infoVisible = false;
         }
     }
 
@@ -114,9 +170,6 @@ Flickable {
     function notifyVersionRequestFinished(result) {
         busyIndicatorUpdate.loadingVisible = false;
         busyIndicatorUpdate.infoVisible = false;
+
     }
-
-//    gStaVersionManager.getUpdateLink()
-
-
 }

@@ -73,8 +73,9 @@ qint32 cDataGamesManager::initialize()
     g_StaSettingsManager->getInt64Value(GAMES_GROUP, SERVER_GAMES_UDPATE, iValue);
     this->m_stLastServerUpdateTimeStamp = iValue;
 
-    this->m_LastGameInfoUpdate = 0;
-    this->m_bSkipedOldGames    = true;
+    this->m_LastGameInfoUpdate       = 0;
+    this->m_bSkipedOldGames          = true;
+    this->m_bLoadedGamesAfterRestart = false;
 
     this->m_initialized = true;
 
@@ -242,7 +243,7 @@ qint32 cDataGamesManager::startListGames(qint32 pastGames)
     else
         rootObj.insert("skipDiffForPast", true);
 
-    if (this->m_stLastLocalUpdateTimeStamp + TIMEOUT_UPDATE_GAMES > QDateTime::currentMSecsSinceEpoch() && this->m_lGames.count() > 0)
+    if (this->m_bLoadedGamesAfterRestart && this->m_stLastLocalUpdateTimeStamp + TIMEOUT_UPDATE_GAMES > QDateTime::currentMSecsSinceEpoch() && this->m_lGames.count() > 0)
         rootObj.insert("index", UpdateIndex::UpdateDiff); //UpdateIndex::UpdateDiff);
     else
         rootObj.insert("index", UpdateIndex::UpdateAll);
@@ -277,6 +278,7 @@ qint32 cDataGamesManager::handleListGamesResponse(MessageProtocol* msg)
         for (int i = 0; i < this->m_lGames.size(); i++)
             delete this->m_lGames[i];
         this->m_lGames.clear();
+        this->m_bLoadedGamesAfterRestart = true;
     }
     this->m_stLastLocalUpdateTimeStamp = QDateTime::currentMSecsSinceEpoch();
 
@@ -323,22 +325,27 @@ qint32 cDataGamesManager::handleListGamesResponse(MessageProtocol* msg)
         if (this->m_lGames.at(i)->timestamp64Bit() < currentTimeStamp)
             firstPastIndex = i;
     }
-    firstPastIndex += g_StaGlobalSettings->getKeepPastItemsCount();
+    qint64 pastItemsCount = g_StaGlobalSettings->getKeepPastItemsCount();
 
+    g_StaSettingsManager->removeGroup(GAMES_GROUP);
     g_StaSettingsManager->setInt64Value(GAMES_GROUP, LOCAL_GAMES_UDPATE, this->m_stLastLocalUpdateTimeStamp);
     g_StaSettingsManager->setInt64Value(GAMES_GROUP, SERVER_GAMES_UDPATE, this->m_stLastServerUpdateTimeStamp);
 
+    qint32 saveIndex = 0;
     for (int i = 0; i < this->m_lGames.size(); i++) {
-        if (i >= firstPastIndex)
+        if (i < (firstPastIndex - pastItemsCount)) /* Do not save more than X future games */
+            continue;
+        if (i >= (firstPastIndex + pastItemsCount)) /* Do not save more than X past games */
             break;
-        g_StaSettingsManager->setValue(GAMES_GROUP, PLAY_HOME, i, this->m_lGames[i]->home());
-        g_StaSettingsManager->setValue(GAMES_GROUP, PLAY_AWAY, i, this->m_lGames[i]->away());
-        g_StaSettingsManager->setValue(GAMES_GROUP, PLAY_SCORE, i, this->m_lGames[i]->score());
-        g_StaSettingsManager->setInt64Value(GAMES_GROUP, PLAY_DATETIME, i, this->m_lGames[i]->timestamp64Bit());
-        g_StaSettingsManager->setInt64Value(GAMES_GROUP, PLAY_SAISON_INDEX, i, this->m_lGames[i]->seasonIndex());
-        g_StaSettingsManager->setInt64Value(GAMES_GROUP, PLAY_COMPETITION, i, this->m_lGames[i]->competitionValue());
-        g_StaSettingsManager->setBoolValue(GAMES_GROUP, PLAY_TIME_FIXED, i, this->m_lGames[i]->timeFixed());
-        g_StaSettingsManager->setInt64Value(GAMES_GROUP, ITEM_INDEX, i, this->m_lGames[i]->index());
+        g_StaSettingsManager->setValue(GAMES_GROUP, PLAY_HOME, saveIndex, this->m_lGames[i]->home());
+        g_StaSettingsManager->setValue(GAMES_GROUP, PLAY_AWAY, saveIndex, this->m_lGames[i]->away());
+        g_StaSettingsManager->setValue(GAMES_GROUP, PLAY_SCORE, saveIndex, this->m_lGames[i]->score());
+        g_StaSettingsManager->setInt64Value(GAMES_GROUP, PLAY_DATETIME, saveIndex, this->m_lGames[i]->timestamp64Bit());
+        g_StaSettingsManager->setInt64Value(GAMES_GROUP, PLAY_SAISON_INDEX, saveIndex, this->m_lGames[i]->seasonIndex());
+        g_StaSettingsManager->setInt64Value(GAMES_GROUP, PLAY_COMPETITION, saveIndex, this->m_lGames[i]->competitionValue());
+        g_StaSettingsManager->setBoolValue(GAMES_GROUP, PLAY_TIME_FIXED, saveIndex, this->m_lGames[i]->timeFixed());
+        g_StaSettingsManager->setInt64Value(GAMES_GROUP, ITEM_INDEX, saveIndex, this->m_lGames[i]->index());
+        saveIndex++;
     }
 
     return result;
@@ -469,7 +476,7 @@ qint32 cDataGamesManager::stateChangeCheckUdpate()
     if ((now - this->m_LastGameInfoUpdate) < TIMEOUT_LOAD_GAMEINFO)
         return ERROR_CODE_NOT_READY;
 
-    if ((now - this->m_stLastLocalUpdateTimeStamp) < TIMEOUT_LOAD_GAMES) {
+    if (this->m_bLoadedGamesAfterRestart && (now - this->m_stLastLocalUpdateTimeStamp) < TIMEOUT_LOAD_GAMES) {
         emit this->sendAppStateChangedToActive(1);
         this->startListGamesInfo();
 

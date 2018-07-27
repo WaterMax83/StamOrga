@@ -74,6 +74,7 @@ private:
     qint64 m_stLastServerUpdateTimeStamp;
     qint64 m_LastGameInfoUpdate;
     bool   m_bSkipedOldGames;
+    bool   m_bLoadedGamesAfterRestart;
 };
 
 extern cDataGamesManager* g_DataGamesManager;

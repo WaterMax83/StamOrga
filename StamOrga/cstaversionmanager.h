@@ -28,6 +28,7 @@ class cStaVersionManager : public cGenDisposer
 {
     Q_OBJECT
     Q_PROPERTY(qint32 versionUpdateIndex READ versionUpdateIndex NOTIFY versionUpdateIndexChanged)
+    Q_PROPERTY(QString remoteVersion READ getRemoteVersion NOTIFY versionUpdateIndexChanged)
 public:
     cStaVersionManager(QObject* parent = nullptr);
 
@@ -35,6 +36,8 @@ public:
 
     Q_INVOKABLE qint32 startGettingVersionInfo();
     qint32             handleVersionResponse(MessageProtocol* msg);
+
+    Q_INVOKABLE qint32 startDownloadCurrentVersion();
 
     Q_INVOKABLE bool isVersionChangeAlreadyShown();
     Q_INVOKABLE QString getVersionChangeInfo();
@@ -50,6 +53,10 @@ public:
 
 signals:
     void versionUpdateIndexChanged(void);
+    void signalVersionDownloadFinished(void);
+
+private slots:
+    void slotDownloadFinished(QString url, qint32 statusCode);
 
 private:
     QString m_versionInfo;
