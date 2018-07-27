@@ -29,15 +29,17 @@ class cStaVersionManager : public cGenDisposer
     Q_OBJECT
     Q_PROPERTY(qint32 versionUpdateIndex READ versionUpdateIndex NOTIFY versionUpdateIndexChanged)
     Q_PROPERTY(QString remoteVersion READ getRemoteVersion NOTIFY versionUpdateIndexChanged)
+    Q_PROPERTY(double currentProgress READ currentProgress NOTIFY currentProgressChanged)
 public:
     cStaVersionManager(QObject* parent = nullptr);
 
     qint32 initialize() override;
 
     Q_INVOKABLE qint32 startGettingVersionInfo();
-    qint32             handleVersionResponse(MessageProtocol* msg);
+    qint32 handleVersionResponse(MessageProtocol* msg);
 
     Q_INVOKABLE qint32 startDownloadCurrentVersion();
+    Q_INVOKABLE qint32 startInstallCurrentVersion();
 
     Q_INVOKABLE bool isVersionChangeAlreadyShown();
     Q_INVOKABLE QString getVersionChangeInfo();
@@ -49,13 +51,18 @@ public:
     Q_INVOKABLE QString getCurrentVersion();
     Q_INVOKABLE QString getCurrentVersionLink();
 
+    double currentProgress() { return this->m_progress; }
+
     qint32 versionUpdateIndex() { return this->m_versionUpdateIndex; }
 
 signals:
     void versionUpdateIndexChanged(void);
-    void signalVersionDownloadFinished(void);
+    void currentProgressChanged(void);
+    void signalVersionDownloadFinished(qint32 result);
+
 
 private slots:
+    void slotDownloadProgress(qint64 current, qint64 max);
     void slotDownloadFinished(QString url, qint32 statusCode);
 
 private:
@@ -64,6 +71,10 @@ private:
     QString m_updateLink;
     QString m_lastShownVersion;
     qint32  m_versionUpdateIndex;
+    double  m_progress;
+
+    QString m_downloadURL;
+    QString m_downloadSavePath;
 };
 
 extern cStaVersionManager* g_StaVersionManager;

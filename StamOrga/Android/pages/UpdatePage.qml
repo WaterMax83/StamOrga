@@ -117,7 +117,7 @@ Flickable {
                 onClicked: {
                     busyIndicatorUpdate.loadingVisible = true;
                     busyIndicatorUpdate.infoVisible = true;
-                    busyIndicatorUpdate.infoText = "Download der aktuellen Version";
+                    busyIndicatorUpdate.infoText = "Download der aktuellen Version " + gStaVersionManager.remoteVersion;
                     gStaVersionManager.startDownloadCurrentVersion();
                 }
             }
@@ -145,12 +145,54 @@ Flickable {
                 }
             }
 
+
+
+            Text {
+                wrapMode: Text.WordWrap
+                Layout.maximumWidth: parent.width
+                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                font.pixelSize: 14
+                visible: gStaVersionManager.versionUpdateIndex === 5 || gStaVersionManager.versionUpdateIndex === 6
+                color: "white"
+                text: "Neue Version " + gStaVersionManager.remoteVersion + " erfolgreich geladen.";
+            }
+
+            MyControls.Button {
+                id: btnInstallCurrentVersion
+                font.family: txtForFontFamily.font
+                text: gStaVersionManager.versionUpdateIndex === 5 ? "Zielordner öffnen" : "Installiere " + gStaVersionManager.remoteVersion;
+                implicitWidth: parent.width / 4 * 2
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                transformOrigin: Item.Center
+                visible: gStaVersionManager.versionUpdateIndex === 5 || gStaVersionManager.versionUpdateIndex === 6
+                onClicked: {
+                    gStaVersionManager.startInstallCurrentVersion();
+                }
+            }
+
+            Text {
+                id: txtErrorString
+                wrapMode: Text.WordWrap
+                Layout.maximumWidth: parent.width
+                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                font.pixelSize: 14
+                visible: gStaVersionManager.versionUpdateIndex === 7
+                color: "white"
+            }
+
             MyComponents.BusyLoadingIndicator {
                 id: busyIndicatorUpdate
                 width: parent.width
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                 Layout.fillHeight: false
                 infoVisible: false
+            }
+
+            ProgressBar {
+                width: parent.width
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                visible: gStaVersionManager.versionUpdateIndex === 3
+                value: gStaVersionManager.currentProgress
             }
         }
     }
@@ -160,6 +202,12 @@ Flickable {
         onSignalVersionDownloadFinished: {
             busyIndicatorUpdate.loadingVisible = false;
             busyIndicatorUpdate.infoVisible = false;
+            if (result === 1) {
+                toastManager.show("Download erfolgreich", 2000)
+            } else {
+                toastManager.show(userInt.getErrorCodeToString(result), 5000)
+                txtErrorString.text = "Fehler beim Laden von " + gStaVersionManager.getUpdateLink();
+            }
         }
     }
 

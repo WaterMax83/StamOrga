@@ -18,7 +18,9 @@
 
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
+#include <QtCore/QProcess>
 #include <QtCore/QStandardPaths>
+#include <QtGui/QDesktopServices>
 
 #include "../Common/General/config.h"
 #include "../Common/General/globalfunctions.h"
@@ -41,7 +43,10 @@ enum StaVersionStatus {
     VersionStatusNoNewVersion = 1,
     VersionStatusNewVersion   = 2,
     VersionStatusBusy         = 3,
-    VersionStatusNoSSL        = 4
+    VersionStatusNoSSL        = 4,
+    VersionStatusWinOpenFold  = 5,
+    VersionStatusAndroidIns   = 6,
+    VersionStatusErrorDownl   = 7
 };
 
 cStaVersionManager* g_StaVersionManager;
@@ -60,12 +65,9 @@ qint32 cStaVersionManager::initialize()
     this->m_versionUpdateIndex = VersionStatusNoInfo;
     emit this->versionUpdateIndexChanged();
 
-    qInfo() << QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-    qInfo() << QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
-    qInfo() << QStandardPaths::writableLocation(QStandardPaths::TempLocation);
-
     qInfo().noquote() << "SSH Version: " << QSslSocket::sslLibraryVersionString();
 
+    connect(g_ConNetworkAccess, &cConNetworkAccess::signalDownloadProgress, this, &cStaVersionManager::slotDownloadProgress);
     connect(g_ConNetworkAccess, &cConNetworkAccess::signalDownloadFinished, this, &cStaVersionManager::slotDownloadFinished);
 
     this->m_initialized = true;
@@ -101,14 +103,14 @@ qint32 cStaVersionManager::handleVersionResponse(MessageProtocol* msg)
 
     qint32  result        = rootObj.value("ack").toInt(ERROR_CODE_NOT_FOUND);
     quint32 uVersion      = (quint32)rootObj.value("version").toDouble();
-    this->m_remoteVersion = rootObj.value("sVersion").toString();
+    this->m_remoteVersion = rootObj.value("sVersion").toString().toLower();
 
     qInfo().noquote() << QString("Version from server %1:0x%2").arg(this->m_remoteVersion, QString::number(uVersion, 16));
 
     if ((uVersion & 0xFFFFFF00) > (STAM_ORGA_VERSION_I & 0xFFFFFF00)) {
         this->m_versionInfo = QString("Deine Version: %2<br>Aktuelle Version: %1<br><br>").arg(this->m_remoteVersion, STAM_ORGA_VERSION_S);
-        this->m_versionInfo.append(QString(STAM_ORGA_VERSION_LINK_WITH_TEXT).arg(this->m_remoteVersion.toLower(), this->m_remoteVersion));
-        this->m_updateLink = QString(STAM_ORGA_VERSION_LINK).arg(this->m_remoteVersion.toLower());
+        this->m_versionInfo.append(QString(STAM_ORGA_VERSION_LINK_WITH_TEXT).arg(this->m_remoteVersion));
+        this->m_updateLink = QString(STAM_ORGA_VERSION_LINK).arg(this->m_remoteVersion);
 
         if (QSslSocket::supportsSsl())
             this->m_versionUpdateIndex = VersionStatusNewVersion;
@@ -130,17 +132,68 @@ qint32 cStaVersionManager::handleVersionResponse(MessageProtocol* msg)
 
 qint32 cStaVersionManager::startDownloadCurrentVersion()
 {
-    emit g_ConNetworkAccess->signalStartDownload("https://github.com/WaterMax83/StamOrga/releases/download/v1.1.1/StamOrga.Winx64.v1.1.1.7z");
+    this->m_downloadURL = this->m_updateLink;
+    emit g_ConNetworkAccess->signalStartDownload(this->m_downloadURL);
+    this->m_downloadSavePath = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
+    this->m_downloadSavePath.append(QString("/%1").arg(QString(STAM_ORGA_VERSION_SAVE).arg(this->m_remoteVersion)));
 
+    this->m_progress = 0.0;
+    emit this->currentProgressChanged();
     this->m_versionUpdateIndex = VersionStatusBusy;
     emit this->versionUpdateIndexChanged();
 
     return ERROR_CODE_SUCCESS;
 }
 
+void cStaVersionManager::slotDownloadProgress(qint64 current, qint64 max)
+{
+    this->m_progress = (double)current / max;
+    emit this->currentProgressChanged();
+}
+
 void cStaVersionManager::slotDownloadFinished(QString url, qint32 statusCode)
 {
-    emit this->signalVersionDownloadFinished();
+    if (this->m_downloadURL == url) {
+        if (statusCode == ERROR_CODE_SUCCESS) {
+
+            QByteArray data;
+            if (g_ConNetworkAccess->getDownload(url, data) == ERROR_CODE_SUCCESS) {
+                QFile file(this->m_downloadSavePath);
+                if (file.open(QIODevice::WriteOnly)) {
+                    file.write(data);
+                    file.flush();
+                    file.close();
+                    qInfo().noquote() << "Saved to " << this->m_downloadSavePath;
+#ifdef Q_OS_WIN
+                    this->m_versionUpdateIndex = VersionStatusWinOpenFold;
+#elif defined(Q_OS_ANDROID)
+                    this->m_versionUpdateIndex = VersionStatusAndroidIns;
+#endif
+
+                } else
+                    statusCode = ERROR_CODE_NOT_POSSIBLE;
+            } else
+                statusCode = ERROR_CODE_NOT_FOUND;
+        } else
+            this->m_versionUpdateIndex = VersionStatusErrorDownl;
+
+        emit this->versionUpdateIndexChanged();
+        emit this->signalVersionDownloadFinished(statusCode);
+    }
+}
+
+qint32 cStaVersionManager::startInstallCurrentVersion()
+{
+    QString filePath = QDir::toNativeSeparators(this->m_downloadSavePath);
+#ifdef Q_OS_WIN
+    QFileInfo fileInfo(filePath);
+    QString   pathToOpen = QString("explorer \"%1\"").arg(QDir::toNativeSeparators(fileInfo.absolutePath()));
+    QProcess::startDetached(pathToOpen);
+#elif defined Q_OS_ANDROID
+    QDesktopServices::openUrl(QUrl(filePath));
+#endif
+
+    return ERROR_CODE_SUCCESS;
 }
 
 bool cStaVersionManager::isVersionChangeAlreadyShown()
@@ -243,7 +296,7 @@ QString cStaVersionManager::getVersionInfo()
 
 QString cStaVersionManager::getCurrentVersion()
 {
-    return STAM_ORGA_VERSION_S;
+    return QString(STAM_ORGA_VERSION_S).toLower();
 }
 
 QString cStaVersionManager::getCurrentVersionLink()

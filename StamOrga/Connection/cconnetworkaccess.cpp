@@ -49,16 +49,18 @@ int cConNetworkAccess::DoBackgroundWork()
 
 void cConNetworkAccess::slotStartDownload(QString url)
 {
-    qInfo() << "Start to download " << url;
+    qInfo() << "Starting to download " << url;
     cConNADownload* pDownload = new cConNADownload();
     pDownload->m_url          = url;
     this->m_downloads.append(pDownload);
 
-    this->m_nam->get(QNetworkRequest(QUrl(url)));
+    QNetworkReply* reply = this->m_nam->get(QNetworkRequest(QUrl(url)));
+    connect(reply, &QNetworkReply::downloadProgress, this, &cConNetworkAccess::slotDownloadProgress);
 }
 
 void cConNetworkAccess::slotDownloadFinished(QNetworkReply* reply)
 {
+    disconnect(reply, &QNetworkReply::downloadProgress, this, &cConNetworkAccess::slotDownloadProgress);
     if (reply->error()) {
         for (int i = 0; i < this->m_downloads.size(); i++) {
             cConNADownload* pDownload = this->m_downloads.at(i);
@@ -83,9 +85,9 @@ void cConNetworkAccess::slotDownloadFinished(QNetworkReply* reply)
                 }
             }
 
-            this->m_nam->get(QNetworkRequest(reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl()));
+            QNetworkReply* reply2 = this->m_nam->get(QNetworkRequest(reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl()));
+            connect(reply2, &QNetworkReply::downloadProgress, this, &cConNetworkAccess::slotDownloadProgress);
         } else {
-            qInfo() << statusCode;
             foreach (cConNADownload* pDownload, this->m_downloads) {
                 if (reply->url().toString() == pDownload->m_url || reply->url().toString() == pDownload->m_redirectUrl) {
                     pDownload->m_data = reply->readAll();
@@ -95,4 +97,23 @@ void cConNetworkAccess::slotDownloadFinished(QNetworkReply* reply)
             }
         }
     }
+}
+
+void cConNetworkAccess::slotDownloadProgress(qint64 current, qint64 max)
+{
+    emit this->signalDownloadProgress(current, max);
+}
+
+qint32 cConNetworkAccess::getDownload(const QString url, QByteArray& data)
+{
+    for (int i = 0; i < this->m_downloads.size(); i++) {
+        cConNADownload* pDownload = this->m_downloads.at(i);
+        if (url == pDownload->m_url || url == pDownload->m_redirectUrl) {
+            data = pDownload->m_data;
+            delete pDownload;
+            this->m_downloads.removeAt(i);
+            return ERROR_CODE_SUCCESS;
+        }
+    }
+    return ERROR_CODE_NOT_FOUND;
 }

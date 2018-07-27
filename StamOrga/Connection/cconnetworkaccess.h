@@ -42,13 +42,17 @@ public:
 
     int DoBackgroundWork() override;
 
+    qint32 getDownload(const QString url, QByteArray& data);
+
 signals:
     void signalStartDownload(QString url);
     void signalDownloadFinished(QString url, qint32 statusCode);
+    void signalDownloadProgress(qint64 current, qint64 max);
 
 private slots:
     void slotStartDownload(QString url);
     void slotDownloadFinished(QNetworkReply* reply);
+    void slotDownloadProgress(qint64 current, qint64 max);
 
 private:
     BackgroundController   m_ctrlNetWork;
