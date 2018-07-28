@@ -23,7 +23,7 @@
 
 namespace Ui
 {
-    class MainWindow;
+class MainWindow;
 }
 
 class MainWindow : public QMainWindow
@@ -52,10 +52,13 @@ private slots:
 
     void on_lEditConsoleCommand_returnPressed();
 
+    void on_btnSendNotify_clicked();
+
 private:
     Ui::MainWindow* ui;
 
-    void sendConsoleCommand();
+    QString m_lastControlCommand;
+    void    sendConsoleCommand();
 };
 
 #endif // MAINWINDOW_H

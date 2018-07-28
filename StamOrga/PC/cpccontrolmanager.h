@@ -40,12 +40,14 @@ public:
 
     qint32 saveControlList();
 
+    qint32 sendGeneralNotification(const QString header, const QString info);
+
     qint32 handleControlCommand(MessageProtocol* msg);
 
-    qint32  setStatistic(QString stats);
+    qint32 setStatistic(QString stats);
     QString getStastistic();
 
-    qint32  setOnlineGames(QString games);
+    qint32 setOnlineGames(QString games);
     QString getOnlineGames();
 
     qint32 setSmtpData(QString login, QString password, QString addresses);

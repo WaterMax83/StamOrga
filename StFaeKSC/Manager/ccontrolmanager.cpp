@@ -23,6 +23,7 @@
 #include "ccontrolmanager.h"
 #include "csmtpmanager.h"
 #include "cstatisticmanager.h"
+#include "General/pushnotification.h"
 
 // clang-format off
 #define GROUP_STATS             "Statistic"
@@ -208,6 +209,8 @@ MessageProtocol* cControlManager::getControlCommandResponse(UserConData* pUserCo
         result = this->handleRefreshCommand(rootAns);
     else if (cmd == "save")
         result = this->handleSaveCommand(rootObj);
+    else if (cmd == "notify")
+        result = this->handleNotifyCommand(rootObj);
 
     rootAns.insert("ack", result);
     rootAns.insert("cmd", cmd);
@@ -292,6 +295,17 @@ qint32 cControlManager::handleSaveCommand(QJsonObject& rootObj)
     this->saveCurrentInteralList();
     this->startAllControls();
 
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 cControlManager::handleNotifyCommand(QJsonObject &rootObj)
+{
+    QString  header   = rootObj.value("header").toString();
+    QString  body = rootObj.value("body").toString();
+
+    qint64 result = g_pushNotify->sendNewGeneralTopicNotification(header, body);
+    if (result < 0)
+        return (qint32) result;
     return ERROR_CODE_SUCCESS;
 }
 

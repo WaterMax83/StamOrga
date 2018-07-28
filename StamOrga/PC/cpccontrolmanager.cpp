@@ -110,12 +110,29 @@ qint32 cPCControlManager::saveControlList()
     return ERROR_CODE_SUCCESS;
 }
 
+qint32 cPCControlManager::sendGeneralNotification(const QString header, const QString info)
+{
+    QMutexLocker lock(&this->m_mutex);
+
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QJsonObject rootObj;
+    rootObj.insert("cmd", "notify");
+    rootObj.insert("header", header);
+    rootObj.insert("body", info);
+
+    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CMD_CONTROL);
+    req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+
+    g_ConManager->sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
+}
+
 
 qint32 cPCControlManager::handleControlCommand(MessageProtocol* msg)
 {
     QMutexLocker lock(&this->m_mutex);
-
-    qInfo() << "Handle control " << this->m_initialized;
 
     if (!this->m_initialized)
         return ERROR_CODE_NOT_INITIALIZED;

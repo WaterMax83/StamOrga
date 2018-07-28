@@ -59,6 +59,7 @@ private:
 
     qint32 handleRefreshCommand(QJsonObject& rootAns);
     qint32 handleSaveCommand(QJsonObject& rootObj);
+    qint32 handleNotifyCommand(QJsonObject& rootObj);
 
     void stopAllControls();
     void startAllControls();

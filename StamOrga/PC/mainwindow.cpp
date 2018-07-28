@@ -17,8 +17,8 @@
 */
 
 #include <QMessageBox>
+#include <QtCore/QDateTime>
 #include <QtCore/QString>
-
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -31,6 +31,7 @@
 #include "Data/cdataconsolemanager.h"
 #include "PC/cpccontrolmanager.h"
 #include "cstaglobalsettings.h"
+#include "cstaversionmanager.h"
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -75,7 +76,7 @@ void MainWindow::slotNotifyCommandFinished(quint32 command, qint32 result)
     switch (command) {
     case OP_CODE_CMD_REQ::REQ_GET_VERSION:
         if (result == ERROR_CODE_SUCCESS)
-            this->ui->lEditTextVersion->setText(g_StaGlobalSettings->getRemoteVersion());
+            this->ui->lEditTextVersion->setText(g_StaVersionManager->getRemoteVersion());
         break;
     case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
         if (result == ERROR_CODE_SUCCESS) {
@@ -96,14 +97,24 @@ void MainWindow::slotNotifyCommandFinished(quint32 command, qint32 result)
             this->ui->txtConsole->setPlainText(g_DataConsoleManager->getLastConsoleOutput());
     case OP_CODE_CMD_REQ::REQ_CMD_CONTROL:
         if (result == ERROR_CODE_SUCCESS) {
-            this->ui->txtEditStatistic->setText(g_PCControlManager->getStastistic());
-            this->ui->txtEditOnlineGames->setText(g_PCControlManager->getOnlineGames());
-            QString login, password, addr;
-            g_PCControlManager->getStmpData(login, password, addr);
-            this->ui->lEditSmtpLogin->setText(login);
-            this->ui->lEditSmtpPassword->setText(password);
-            this->ui->txtEditSmtpEmailAdresses->setText(addr);
-            this->ui->btnSaveControl->setEnabled(true);
+            if (this->m_lastControlCommand == "refresh" || this->m_lastControlCommand == "save") {
+                this->ui->txtEditStatistic->setText(g_PCControlManager->getStastistic());
+                this->ui->txtEditOnlineGames->setText(g_PCControlManager->getOnlineGames());
+                QString login, password, addr;
+                g_PCControlManager->getStmpData(login, password, addr);
+                this->ui->lEditSmtpLogin->setText(login);
+                this->ui->lEditSmtpPassword->setText(password);
+                this->ui->txtEditSmtpEmailAdresses->setText(addr);
+                this->ui->btnSaveControl->setEnabled(true);
+            } else if (this->m_lastControlCommand == "notify") {
+                QString header  = this->ui->lEditNotifyHeader->text();
+                QString body    = this->ui->txtEditNotifyBody->toPlainText();
+                QString time    = QDateTime::currentDateTime().toString("dd.MM hh:mm:ss");
+                QString message = QString("%1: %2 - %3\n").arg(time, header, body);
+                this->ui->txtEditNotifyLastMessage->append(message);
+                this->ui->lEditNotifyHeader->setText("");
+                this->ui->txtEditNotifyBody->setText("");
+            }
         } else {
             this->ui->btnSaveControl->setEnabled(false);
         }
@@ -158,6 +169,7 @@ void MainWindow::on_btnRefreshControl_clicked()
     this->ui->txtEditSmtpEmailAdresses->clear();
     this->ui->lEditSmtpLogin->clear();
     this->ui->lEditSmtpPassword->clear();
+    this->m_lastControlCommand = "refresh";
 }
 
 void MainWindow::on_btnSaveControl_clicked()
@@ -174,6 +186,15 @@ void MainWindow::on_btnSaveControl_clicked()
     this->ui->txtEditSmtpEmailAdresses->clear();
     this->ui->lEditSmtpLogin->clear();
     this->ui->lEditSmtpPassword->clear();
+    this->m_lastControlCommand = "save";
+}
+
+void MainWindow::on_btnSendNotify_clicked()
+{
+    QString header = this->ui->lEditNotifyHeader->text();
+    QString body   = this->ui->txtEditNotifyBody->toPlainText();
+    g_PCControlManager->sendGeneralNotification(header, body);
+    this->m_lastControlCommand = "notify";
 }
 
 void MainWindow::on_btnConsole_clicked()

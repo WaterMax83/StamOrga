@@ -16,6 +16,8 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QtNetwork/QSslSocket>
+
 #include "ccontcpmainserver.h"
 #include "../../Common/General/globalfunctions.h"
 #include "../../Common/Network/messagecommand.h"
@@ -29,6 +31,8 @@ cConTcpMainServer::cConTcpMainServer()
 
 qint32 cConTcpMainServer::initialize()
 {
+    qInfo().noquote() << "SSH Version: " << QSslSocket::sslLibraryVersionString();
+
     this->m_initialized = true;
 
     return ERROR_CODE_SUCCESS;

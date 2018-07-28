@@ -28,9 +28,11 @@ SOURCES += main.cpp\
     ../Connection/cconmanager.cpp \
     ../Connection/ccontcpmain.cpp \
     ../Connection/ccontcpdata.cpp \
+    ../Connection/cconnetworkaccess.cpp \
     ../cstaglobalmanager.cpp \
     ../cstasettingsmanager.cpp \
     ../cstaglobalsettings.cpp \
+    ../cstaversionmanager.cpp \
     ../Connection/cconusersettings.cpp \
     ../Data/cdatappinfomanager.cpp \
     ../Data/cdataappuserevents.cpp \
@@ -63,9 +65,11 @@ HEADERS  += mainwindow.h \
     ../Connection/cconmanager.h \
     ../Connection/ccontcpmain.h \
     ../Connection/ccontcpdata.h \
+    ../Connection/cconnetworkaccess.h \
     ../cstaglobalmanager.h \
     ../cstasettingsmanager.h \
     ../cstaglobalsettings.h \
+    ../cstaversionmanager.h \
     ../Connection/cconusersettings.h \
     ../Data/cdatappinfomanager.h \
     ../Data/acceptmeetinginfo.h \

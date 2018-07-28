@@ -129,6 +129,25 @@ int PushNotification::DoBackgroundWork()
     return ERROR_CODE_SUCCESS;
 }
 
+qint64 PushNotification::sendNewGeneralTopicNotification(const QString header, const QString body)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_READY;
+
+    PushNotifyInfo* push  = new PushNotifyInfo();
+    push->m_topic         = PUSH_NOTIFY_TOPIC::PUSH_NOT_GEN_TOPIC;
+    push->m_header        = header;
+    push->m_body          = body;
+    push->m_sendMessageID = getNextInternalPushNumber();
+    push->m_sendTime      = QDateTime::currentMSecsSinceEpoch();
+    push->m_userID        = -1;
+    push->m_info          = "";
+
+    this->insertNewNotification(push);
+
+    return push->m_sendMessageID;
+}
+
 qint64 PushNotification::sendNewVersionNotification(const QString body)
 {
     if (!this->m_initialized)
