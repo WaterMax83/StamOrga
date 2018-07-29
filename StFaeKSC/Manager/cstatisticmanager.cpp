@@ -145,21 +145,25 @@ void cStatisticManager::slotCycleTimerFired()
 
     for (int i = 0; i < this->m_stats.size(); i++) {
         StatsPerYear* pStats = this->m_stats.at(i);
+
+        qint64 seasonStart = g_GlobalData->m_GamesList.getTimeStampofFirstGame(pStats->m_year);
         /* First collect all tickets */
-        for (int i = 0; i < g_GlobalData->m_SeasonTicket.getNumberOfInternalList(); i++) {
-            TicketInfo* pTicket = (TicketInfo*)g_GlobalData->m_SeasonTicket.getRequestConfigItemFromListIndex(i);
+        for (int j = 0; j < g_GlobalData->m_SeasonTicket.getNumberOfInternalList(); j++) {
+            TicketInfo* pTicket = (TicketInfo*)g_GlobalData->m_SeasonTicket.getRequestConfigItemFromListIndex(j);
             if (pTicket == NULL)
                 continue;
 
             if (getSeasonFromTimeStamp(pTicket->m_creation) > pStats->m_year)
                 continue;
 
-            if (pTicket->isTicketRemoved() && getSeasonFromTimeStamp(pTicket->m_deleteTimeStamp) < pStats->m_year)
+            if (pTicket->isTicketRemoved() && pTicket->m_deleteTimeStamp < seasonStart)
                 continue;
 
             StatsTickets* pTicks  = new StatsTickets();
             pTicks->m_ticketIndex = pTicket->m_index;
             pTicks->m_name        = pTicket->m_itemName;
+            if (pTicks->m_name.endsWith("_DELETED"))
+                pTicks->m_name.replace("_DELETED", "");
             pTicks->m_creation    = pTicket->m_creation;
 
             pStats->m_statsTickets.append(pTicks);
@@ -187,7 +191,7 @@ void cStatisticManager::calculateStatsForAllYears()
         for (int i = 0; i < this->m_stats.size(); i++) {
             StatsPerYear* pStats = this->m_stats.at(i);
 
-            if (pGame->m_saison != pStats->m_year)
+            if (pGame->m_season != pStats->m_year)
                 continue;
 
             foreach (StatsTickets* pTicks, pStats->m_statsTickets) {
@@ -211,7 +215,7 @@ void cStatisticManager::calculateStatsForAllYears()
         for (int i = 0; i < this->m_stats.size(); i++) {
             StatsPerYear* pStats = this->m_stats.at(i);
 
-            if (pGame->m_saison != pStats->m_year)
+            if (pGame->m_season != pStats->m_year)
                 continue;
 
             for (int i = 0; i < pAvTick->getNumberOfInternalList(); i++) {
@@ -262,7 +266,7 @@ void cStatisticManager::calculateStatsForAllYears()
         for (int i = 0; i < this->m_stats.size(); i++) {
             StatsPerYear* pStats = this->m_stats.at(i);
 
-            if (pGame->m_saison != pStats->m_year)
+            if (pGame->m_season != pStats->m_year)
                 continue;
 
             for (int i = 0; i < pMeetingInfo->getNumberOfInternalList(); i++) {
@@ -303,7 +307,7 @@ void cStatisticManager::calculateStatsForAllYears()
         for (int i = 0; i < this->m_stats.size(); i++) {
             StatsPerYear* pStats = this->m_stats.at(i);
 
-            if (pGame->m_saison != pStats->m_year)
+            if (pGame->m_season != pStats->m_year)
                 continue;
 
             for (int i = 0; i < pMeetingInfo->getNumberOfInternalList(); i++) {

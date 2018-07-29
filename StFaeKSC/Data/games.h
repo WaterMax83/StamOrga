@@ -31,16 +31,16 @@ class GamesPlay : public ConfigItem
 {
 public:
     QString          m_away;
-    quint8           m_saisonIndex;
+    quint8           m_seasonIndex;
     CompetitionIndex m_competition;
-    qint32           m_saison;
+    qint32           m_season;
     QString          m_score;
     qint64           m_lastUpdate;
     qint32           m_scheduled;
 
     GamesPlay(QString home, QString away, qint64 timestamp,
               quint8 sIndex, QString score, CompetitionIndex comp,
-              qint32 saison, quint32 index, qint64 lastUpdate,
+              qint32 season, quint32 index, qint64 lastUpdate,
               qint32 scheduled)
     {
         this->m_itemName  = home;
@@ -48,10 +48,10 @@ public:
         this->m_timestamp = timestamp;
 
         this->m_away        = away;
-        this->m_saisonIndex = sIndex;
+        this->m_seasonIndex = sIndex;
         this->m_score       = score;
         this->m_competition = comp;
-        this->m_saison      = saison;
+        this->m_season      = season;
         this->m_lastUpdate  = lastUpdate;
         this->m_scheduled   = scheduled;
     }
@@ -80,6 +80,7 @@ public:
 
     int changeScheduledValue(const quint32 gameIndex, const qint32 fixedTime);
 
+    qint64 getTimeStampofFirstGame(const qint32 season);
 
     GamesPlay* gameExists(quint8 sIndex, CompetitionIndex comp, quint16 saison, qint64 timestamp);
 

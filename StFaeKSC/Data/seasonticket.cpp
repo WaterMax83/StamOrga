@@ -60,6 +60,11 @@ SeasonTicket::SeasonTicket()
                 bProblems = true;
             }
 
+            if (delts != 0 && !ticketName.endsWith("DELETED")) {
+                ticketName.append("_DELETED");
+                bProblems = true;
+            }
+
             TicketInfo* info = new TicketInfo(user, userIndex, ticketName, timestamp, discount, place, index, creation, delts);
             if (!this->addNewTicketInfo(info))
                 bProblems = true;
@@ -125,7 +130,7 @@ int SeasonTicket::addNewSeasonTicket(QString user, qint32 userIndex, QString tic
     TicketInfo* info = new TicketInfo(user, userIndex, ticketName, timestamp, discount, ticketName, newIndex, timestamp);
     this->addNewTicketInfo(info, false);
 
-    //    qInfo() << (QString("Added new ticket: %1").arg(ticketName));
+    qInfo() << (QString("Added new ticket: %1").arg(ticketName));
     return newIndex;
 }
 
@@ -209,6 +214,9 @@ qint32 SeasonTicket::removeTicketItem(const qint32 index)
 
     pTicket->m_deleteTimeStamp = QDateTime::currentMSecsSinceEpoch();
     this->updateItemValue(pTicket, TICKET_DELETE, QVariant(pTicket->m_deleteTimeStamp));
+
+    pTicket->m_itemName = QString("%1_%2").arg(pTicket->m_itemName, "DELETED");
+    this->updateItemValue(pTicket, ITEM_NAME, QVariant(pTicket->m_itemName));
 
     qInfo().noquote() << QString("Removed ticket item \"%1\"").arg(pTicket->m_itemName);
     return ERROR_CODE_SUCCESS;

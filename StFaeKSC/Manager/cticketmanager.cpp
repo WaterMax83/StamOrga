@@ -200,13 +200,13 @@ MessageProtocol* cTicketManager::getAvailableSeasonTicketList(UserConData* pUser
                                          .arg(pUserCon->m_userName)
                                          .arg(index)
                                          .arg(pGame->m_competition)
-                                         .arg(pGame->m_saisonIndex);
+                                         .arg(pGame->m_seasonIndex);
             else
                 qInfo().noquote() << QString("User %1 got available SeasonTicket List for game %2:%3:%4 with no entries")
                                          .arg(pUserCon->m_userName)
                                          .arg(index)
                                          .arg(pGame->m_competition)
-                                         .arg(pGame->m_saisonIndex);
+                                         .arg(pGame->m_seasonIndex);
         }
     }
 

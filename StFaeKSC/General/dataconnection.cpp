@@ -401,12 +401,12 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
         wAckArray.device()->seek(ackArray.size());
         wAckArray << quint16(game.toUtf8().size() + GAMES_OFFSET);
         if (msg->getVersion() >= MSG_HEADER_ADD_FANCLUB || pGame->m_competition != BADISCHER_POKAL)
-            wAckArray << quint8(pGame->m_saisonIndex);
+            wAckArray << quint8(pGame->m_seasonIndex);
         else {
-            if (pGame->m_saisonIndex > 6)
-                wAckArray << quint8(pGame->m_saisonIndex - 3);
+            if (pGame->m_seasonIndex > 6)
+                wAckArray << quint8(pGame->m_seasonIndex - 3);
             else
-                wAckArray << quint8(pGame->m_saisonIndex);
+                wAckArray << quint8(pGame->m_seasonIndex);
         }
 
 
@@ -1029,7 +1029,7 @@ MessageProtocol* DataConnection::requestGetMeetingInfo(MessageProtocol* msg, con
                                  .arg(this->m_pUserConData->m_userName)
                                  .arg(gameIndex)
                                  .arg(pGame->m_competition)
-                                 .arg(pGame->m_saisonIndex);
+                                 .arg(pGame->m_seasonIndex);
         return new MessageProtocol(ack, &buffer[0], size);
     }
     qInfo().noquote() << QString("User %1 got MeetingInfo of game %2 with result %3")

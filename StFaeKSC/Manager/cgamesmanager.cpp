@@ -92,8 +92,8 @@ MessageProtocol* cGamesManager::getGamesList(UserConData* pUserCon, MessageProto
         gameObj.insert("timestamp", pGame->m_timestamp);
         gameObj.insert("fixed", pGame->m_scheduled > 0 ? true : false);
         gameObj.insert("competition", pGame->m_competition);
-        gameObj.insert("seasonIndex", pGame->m_saisonIndex);
-        gameObj.insert("season", pGame->m_saison);
+        gameObj.insert("seasonIndex", pGame->m_seasonIndex);
+        gameObj.insert("season", pGame->m_season);
 
         arrGames.append(gameObj);
     }

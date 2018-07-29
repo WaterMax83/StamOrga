@@ -175,7 +175,7 @@ qint32 GlobalData::requestChangeStateSeasonTicket(const qint32 ticketIndex, cons
     }
 
     AvailableGameTickets* ticket = new AvailableGameTickets();
-    if (ticket->initialize(pGame->m_saison, pGame->m_competition, pGame->m_saisonIndex, pGame->m_index)) {
+    if (ticket->initialize(pGame->m_season, pGame->m_competition, pGame->m_seasonIndex, pGame->m_index)) {
         this->m_availableTickets.append(ticket);
         ticket->addNewTicket(ticketIndex, userID, TICKET_STATE_FREE, reserveName);
         qInfo().noquote() << QString("Changed ticketState from %1 at game %2 to %3").arg(pTicket->m_itemName).arg(pGame->m_index).arg(TICKET_STATE_FREE);
@@ -263,7 +263,7 @@ qint32 GlobalData::requestGetAvailableSeasonTicket(const qint32 gameIndex, const
                                      .arg(userName)
                                      .arg(gameIndex)
                                      .arg(pGame->m_competition)
-                                     .arg(pGame->m_saisonIndex);
+                                     .arg(pGame->m_seasonIndex);
 
             return ERROR_CODE_SUCCESS;
         }
@@ -278,7 +278,7 @@ qint32 GlobalData::requestGetAvailableSeasonTicket(const qint32 gameIndex, const
                              .arg(userName)
                              .arg(gameIndex)
                              .arg(pGame->m_competition)
-                             .arg(pGame->m_saisonIndex);
+                             .arg(pGame->m_seasonIndex);
 
     return ERROR_CODE_SUCCESS;
 }
@@ -478,7 +478,7 @@ qint32 GlobalData::requestChangeMeetingInfo(const qint32 gameIndex, const qint32
     else
         mInfo = new AwayTripInfo();
 
-    if (mInfo->initialize(pGame->m_saison, pGame->m_competition, pGame->m_saisonIndex, pGame->m_index)) {
+    if (mInfo->initialize(pGame->m_season, pGame->m_competition, pGame->m_seasonIndex, pGame->m_index)) {
         pList->append(mInfo);
         mInfo->changeMeetingInfo(when, where, info);
         qInfo().noquote() << QString("Added MeetingInfo at game %1:%2, %3").arg(pGame->m_itemName, pGame->m_away).arg(pGame->m_index);
@@ -647,7 +647,7 @@ qint32 GlobalData::requestAcceptMeetingInfo(const qint32 gameIndex, const qint32
         mInfo = new MeetingInfo();
     else
         mInfo = new AwayTripInfo();
-    if (mInfo->initialize(pGame->m_saison, pGame->m_competition, pGame->m_saisonIndex, pGame->m_index)) {
+    if (mInfo->initialize(pGame->m_season, pGame->m_competition, pGame->m_seasonIndex, pGame->m_index)) {
         pList->append(mInfo);
         mInfo->addNewAcceptation(acceptValue, userID, name);
         qInfo().noquote() << QString("Changed Acceptation of %2 at game %1").arg(pGame->m_index).arg(name);
@@ -707,7 +707,7 @@ qint32 GlobalData::requestSendCommentMeeting(const qint32 gameIndex, const qint3
         mInfo = new MeetingInfo();
     else
         mInfo = new AwayTripInfo();
-    if (mInfo->initialize(pGame->m_saison, pGame->m_competition, pGame->m_saisonIndex, pGame->m_index)) {
+    if (mInfo->initialize(pGame->m_season, pGame->m_competition, pGame->m_seasonIndex, pGame->m_index)) {
         pList->append(mInfo);
         result = mInfo->addMeetingComment(userID, timestamp, comment);
         qInfo().noquote() << QString("Added Comment %2 at game %1").arg(pGame->m_index).arg(comment);
