@@ -209,12 +209,12 @@ QString cStaVersionManager::getVersionChangeInfo()
     QString rValue;
 
     rValue.append("<b>V1.1.2:</b>(XX.XX.2018)<br>");
-    rValue.append("- Update überarbeitet<br>");
+    rValue.append("- Installiere neue Version intern<br>");
 
     rValue.append("<br><b>V1.1.1:</b>(06.07.2018)<br>");
     rValue.append("- Benachrichtigung per Email (auf Wunsch)<br>");
     rValue.append("- Kommentare bei Treffen und Fahrt<br>");
-    rValue.append("- lade vergangene Spiele dynamisch<br>");
+    rValue.append("- Lade vergangene Spiele dynamisch<br>");
     rValue.append("- Design Überarbeitung<br>");
 
     rValue.append("<br><b>V1.1.0:</b>(10.05.2018)<br>");

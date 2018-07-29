@@ -260,7 +260,7 @@ int Games::changeScheduledValue(const quint32 gameIndex, const qint32 fixedTime)
     return ERROR_CODE_SUCCESS;
 }
 
-qint64 Games::getTimeStampofFirstGame(const qint32 season)
+qint64 Games::getTimeStampofFirstTicketGame(const qint32 season)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
@@ -271,6 +271,9 @@ qint64 Games::getTimeStampofFirstGame(const qint32 season)
             continue;
 
         if (pGame->m_season != season)
+            continue;
+
+        if (pGame->m_competition > LIGA_3 || pGame->m_competition < BUNDESLIGA_1)
             continue;
 
         if (pGame->m_timestamp < startTime)

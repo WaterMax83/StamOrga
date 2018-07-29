@@ -80,7 +80,7 @@ public:
 
     int changeScheduledValue(const quint32 gameIndex, const qint32 fixedTime);
 
-    qint64 getTimeStampofFirstGame(const qint32 season);
+    qint64 getTimeStampofFirstTicketGame(const qint32 season);
 
     GamesPlay* gameExists(quint8 sIndex, CompetitionIndex comp, quint16 saison, qint64 timestamp);
 

@@ -146,7 +146,7 @@ void cStatisticManager::slotCycleTimerFired()
     for (int i = 0; i < this->m_stats.size(); i++) {
         StatsPerYear* pStats = this->m_stats.at(i);
 
-        qint64 seasonStart = g_GlobalData->m_GamesList.getTimeStampofFirstGame(pStats->m_year);
+        qint64 seasonStart = g_GlobalData->m_GamesList.getTimeStampofFirstTicketGame(pStats->m_year);
         /* First collect all tickets */
         for (int j = 0; j < g_GlobalData->m_SeasonTicket.getNumberOfInternalList(); j++) {
             TicketInfo* pTicket = (TicketInfo*)g_GlobalData->m_SeasonTicket.getRequestConfigItemFromListIndex(j);
@@ -478,7 +478,8 @@ qint32 cStatisticManager::handleSeasonTicketCommand(QJsonObject& rootObjAnswer, 
             name.resize(8);
         qint32 index = 0;
         while (categories.contains(name)) {
-            name.resize(7);
+            if (name.length() > 7)
+                name.resize(7);
             name.append(QString::number(index++));
         }
         categories.append(name);

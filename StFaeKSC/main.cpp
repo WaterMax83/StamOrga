@@ -22,6 +22,9 @@
 #include <QtCore/QFile>
 #include <QtCore/QUuid>
 
+#ifdef Q_OS_LINUX
+#include <sys/resource.h>
+#endif
 #include "../Common/General/backgroundcontroller.h"
 #include "../Common/General/backgroundworker.h"
 #include "../Common/General/config.h"
@@ -45,6 +48,13 @@ int main(int argc, char* argv[])
     QCoreApplication::setOrganizationName("WaterMax");
     QCoreApplication::setOrganizationDomain("watermax.com");
     QCoreApplication::setApplicationName("StFaeKSC");
+
+#ifdef Q_OS_LINUX
+    // core dumps may be disallowed by parent of this process; change that
+    struct rlimit core_limits;
+    core_limits.rlim_cur = core_limits.rlim_max = RLIM_INFINITY;
+    setrlimit(RLIMIT_CORE, &core_limits);
+#endif
 
     GlobalData globalData;
     g_GlobalData = &globalData;

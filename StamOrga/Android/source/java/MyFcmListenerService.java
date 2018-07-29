@@ -44,6 +44,7 @@ public class MyFcmListenerService extends FirebaseMessagingService
         Log.d(TAG, "From: " + from);
         Log.d(TAG, "Size: " + data.size());
 
+        int messageNumber = 0;
         if (from.startsWith("/topics/")) {
             // message received from some topic.
 //            long time = System.currentTimeMillis();
@@ -51,6 +52,12 @@ public class MyFcmListenerService extends FirebaseMessagingService
             String userIndex = "unknown";
             if (data.containsKey("u_id"))
                 userIndex = data.get("u_id").toString();
+
+            String sMsgNumb = "0";
+            if (data.containsKey("m_id")) {
+                sMsgNumb = data.get("m_id").toString();
+                messageNumber = Integer.parseInt(sMsgNumb);
+            }
 
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
             String savedUserIndex = sharedPreferences.getString(QuickstartPreferences.FCM_TOPIC_USER_INDEX, "");
@@ -62,10 +69,10 @@ public class MyFcmListenerService extends FirebaseMessagingService
             }
         }
 
-        sendNotification(title, body);
+        sendNotification(title, body, messageNumber);
     }
 
-    private void sendNotification(String title, String message)
+    private void sendNotification(String title, String message, int msgNmb)
     {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -83,6 +90,6 @@ public class MyFcmListenerService extends FirebaseMessagingService
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+        notificationManager.notify(msgNmb /* ID of notification */, notificationBuilder.build());
     }
 }
