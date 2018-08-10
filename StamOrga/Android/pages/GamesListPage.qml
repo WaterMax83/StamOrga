@@ -148,21 +148,18 @@ Flickable {
 
     Component {
         id: gameView
-
-        //        MyComponents.Games{
         MyComponents.GamesDesignItem{
             onClickedCurrentGame: {
                 var component = Qt.createComponent("../pages/CurrentGamePage.qml")
                 if (component.status === Component.Ready) {
                     var sprite = stackView.push(component)
-                    sprite.userIntCurrentGame = userIntGames
                     sprite.showAllInfoAboutGame(sender)
 
                     if (sender.event > 0)
                         gDataAppUserEvents.clearUserEventGamePlay(sender.index);
 
                 } else
-                    console.error("Fehler beim laden von der Spielseite " + component.errorString())
+                    console.error("Fehler beim Laden von der Spielseite " + component.errorString())
             }
             onPressedAndHoldCurrentGame: {
                 menuSender = sender;
@@ -227,6 +224,7 @@ Flickable {
                     dialog.date = menuSender.timestamp;
                     dialog.index = menuSender.index;
                     dialog.fixedTime = menuSender.timeFixed;
+                    dialog.onlyFanclub = menuSender.onlyFanclub;
                     dialog.font.family= txtForFontFamily.font
                     dialog.acceptedDialog.connect(acceptedChangeGameDialog);
                     changeGameDialog = dialog
@@ -243,7 +241,7 @@ Flickable {
             onClicked: gDataGamesManager.startChangeGame(menuSender.index, menuSender.seasonIndex,
                                                          menuSender.competition, menuSender.home,
                                                          menuSender.away, menuSender.timestamp,
-                                                         menuSender.score, true);
+                                                         menuSender.score, true, menuSender.onlyFanclub);
         }
 
         MenuItem {
@@ -254,7 +252,7 @@ Flickable {
             onClicked: gDataGamesManager.startChangeGame(menuSender.index, menuSender.seasonIndex,
                                                          menuSender.competition, menuSender.home,
                                                          menuSender.away, menuSender.timestamp,
-                                                         menuSender.score, false);
+                                                         menuSender.score, false, menuSender.onlyFanclub);
         }
     }
 

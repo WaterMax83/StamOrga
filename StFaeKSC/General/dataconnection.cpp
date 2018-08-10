@@ -411,7 +411,7 @@ MessageProtocol* DataConnection::requestGetGamesList(MessageProtocol* msg)
 
 
         if (msg->getVersion() >= MSG_HEADER_VERSION_GAME_LIST)
-            wAckArray << quint8(quint8(pGame->m_competition) | quint8(pGame->m_scheduled ? 0x80 : 0x0));
+            wAckArray << quint8(quint8(pGame->m_competition) | quint8(IS_PLAY_FIXED(pGame->m_options) ? 0x80 : 0x0));
         else
             wAckArray << quint8(pGame->m_competition);
         wAckArray << pGame->m_timestamp;
@@ -582,44 +582,11 @@ MessageProtocol* DataConnection::requestGetGamesInfoList(MessageProtocol* msg)
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_GAMES_INFO_LIST, &buffer[0], offset);
 }
 
-/* request
- * 0    quint32 gameIndex   4
- * 4    quint32 fixedTime   4
- */
 MessageProtocol* DataConnection::requestSetFixedGameTime(MessageProtocol* msg)
 {
-    /* The first 1 in ACK was missing, for older version */
-    quint32 msgIndex = OP_CODE_CMD_RES::ACK_SET_FIXED_GAME_TIME;
-    if (msg->getVersion() < MSG_HEADER_ADD_FANCLUB)
-        msgIndex &= 0x0FFFFFFF;
-    if (msg->getDataLength() != 8) {
-        qWarning().noquote() << QString("Error getting wrong message size %1 for set games fixed time from %2")
-                                    .arg(msg->getDataLength())
-                                    .arg(this->m_pUserConData->m_userName);
-        return new MessageProtocol(msgIndex, ERROR_CODE_WRONG_SIZE);
-    }
+    Q_UNUSED(msg);
 
-    const char* pData = msg->getPointerToData();
-    quint32     gameIndex, fixedTime;
-    memcpy(&gameIndex, pData, sizeof(quint32));
-    gameIndex = qFromLittleEndian(gameIndex);
-    memcpy(&fixedTime, pData + 4, sizeof(quint32));
-    fixedTime = qFromLittleEndian(fixedTime);
-
-    int rValue = this->m_pGlobalData->m_GamesList.changeScheduledValue(gameIndex, fixedTime);
-    if (rValue == ERROR_CODE_SUCCESS)
-        qInfo().noquote() << QString("Update scheduled fixed time to %1 from game %2 from %3")
-                                 .arg(fixedTime)
-                                 .arg(gameIndex)
-                                 .arg(this->m_pUserConData->m_userName);
-    else
-        qWarning().noquote() << QString("Could not update scheduled fixed time to %1 from game %2 from %3")
-                                    .arg(fixedTime)
-                                    .arg(gameIndex)
-                                    .arg(this->m_pUserConData->m_userName);
-
-
-    return new MessageProtocol(msgIndex, rValue);
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_SET_FIXED_GAME_TIME, ERROR_CODE_NOT_IMPLEMENTED);
 }
 
 /*

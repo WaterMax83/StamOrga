@@ -28,9 +28,10 @@ cConTcpMainSocket::cConTcpMainSocket()
 {
 }
 
-qint32 cConTcpMainSocket::initialize(QTcpSocket* socket)
+qint32 cConTcpMainSocket::initialize(QTcpSocket* socket, const cConSslUsage sslUsage)
 {
     this->m_pTcpMasterSocket = socket;
+    this->m_sslUsage         = sslUsage;
     this->m_pTcpMasterSocket->setParent(this);
 
     this->SetWorkerName(QString("TCPMastSock%1").arg(socket->peerAddress().toString()));
@@ -90,7 +91,7 @@ void cConTcpMainSocket::checkNewOncomingData()
             this->m_pConTimeout->start();
             /* Get userName from packet */
             QString          userName(QByteArray(msg->getPointerToData(), msg->getDataLength()));
-            MessageProtocol* ack = g_ConTcpMainData.getNewUserAcknowledge(userName, this->m_pTcpMasterSocket->peerAddress());
+            MessageProtocol* ack = g_ConTcpMainData.getNewUserAcknowledge(userName, this->m_pTcpMasterSocket->peerAddress(), this->m_sslUsage);
 
             /* send answer */
             const char* pData = ack->getNetworkProtocol();

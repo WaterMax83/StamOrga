@@ -36,6 +36,8 @@ GamePlay::GamePlay(QObject* parent)
     this->m_declinedTrip      = 0;
     this->m_driveInfo         = 0;
     this->m_eventCount        = 0;
+    this->m_timeFixed         = false;
+    this->m_bOnlyFanclub      = false;
 }
 
 
@@ -156,6 +158,8 @@ QString GamePlay::getCompetitionShortRound()
         else
             return "TestSpiel";
 #endif
+    } else if (this->m_comp == ONLY_MEETING) {
+        return "";
     }
 
     return "n.i.";

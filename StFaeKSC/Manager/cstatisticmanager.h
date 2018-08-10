@@ -121,6 +121,13 @@ struct StatsPerYear {
     QList<StatsReserved*> m_reservedTicketNames;
     QList<StatsMeeting*>  m_meetingNames;
     QList<StatsMeeting*>  m_awayTripNames;
+
+    static bool compareYearDescending(StatsPerYear* p1, StatsPerYear* p2)
+    {
+        if (p1->m_year < p2->m_year)
+            return false;
+        return true;
+    }
 };
 
 class cStatisticManager : public BackgroundWorker

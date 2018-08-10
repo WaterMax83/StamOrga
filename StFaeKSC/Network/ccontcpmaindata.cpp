@@ -42,7 +42,7 @@ qint32 cConTcpMainData::initialize(ListedUser* pListedUser)
     return ERROR_CODE_SUCCESS;
 }
 
-MessageProtocol* cConTcpMainData::getNewUserAcknowledge(const QString userName, const QHostAddress addr)
+MessageProtocol* cConTcpMainData::getNewUserAcknowledge(const QString userName, const QHostAddress addr, const cConSslUsage sslUsage)
 {
     QJsonObject rootObj;
     qint32      userIndex = this->m_pListedUser->getItemIndex(userName);
@@ -67,7 +67,7 @@ MessageProtocol* cConTcpMainData::getNewUserAcknowledge(const QString userName, 
         userCon->m_userConData.m_sender      = addr;
         userCon->m_userConData.m_randomLogin = random;
         userCon->m_pDataServer               = new cConTcpDataServer();
-        userCon->m_pDataServer->initialize(&userCon->m_userConData);
+        userCon->m_pDataServer->initialize(&userCon->m_userConData, sslUsage);
         this->connect(userCon->m_pDataServer, &cConTcpDataServer::signalServerClosed, this, &cConTcpMainData::slotServerClosed);
 
         userCon->m_pctrlTcpDataServer = new BackgroundController();
@@ -244,7 +244,7 @@ quint16 cConTcpMainData::getFreeDataPort()
 {
     QMutexLocker lock(&this->m_mutex);
 
-    quint16 retPort = TCP_PORT + 1;
+    quint16 retPort = TCP_PORT + 5;
     do {
         bool bAlreadyUsed = false;
         foreach (TcpUserConnection* pUsrCon, this->m_lTcpUserCons) {

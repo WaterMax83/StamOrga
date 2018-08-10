@@ -22,6 +22,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
 #include <QtNetwork/QHostAddress>
+#include <QtNetwork/QSslPreSharedKeyAuthenticator>
+#include <QtNetwork/QSslSocket>
 #include <QtNetwork/QTcpSocket>
 
 #include "../Common/General/backgroundworker.h"
@@ -49,6 +51,9 @@ private slots:
     void slotMasterSocketConnected();
     void slotReadyReadMasterSocket();
     void slotMainSocketError(QAbstractSocket::SocketError socketError);
+    void slotEncrypted();
+    void slotPreSharedKeyAuthenticationRequired(QSslPreSharedKeyAuthenticator* authenticator);
+    void slotSslErrors(const QList<QSslError>& errors);
 
 
 private:

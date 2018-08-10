@@ -288,6 +288,11 @@ qint32 cDataGamesManager::handleListGamesResponse(MessageProtocol* msg)
         QJsonObject gameObj = arrGames.at(i).toObject();
         GamePlay*   pGame   = new GamePlay();
 
+        pGame->setOnlyFanclub(gameObj.value("fc").toBool());
+        if (pGame->onlyFanclub() && !g_ConUserSettings->userIsFanclubEnabled()) {
+            delete pGame;
+            continue;
+        }
         pGame->setHome(gameObj.value("home").toString());
         pGame->setAway(gameObj.value("away").toString());
         pGame->setScore(gameObj.value("score").toString());
@@ -426,7 +431,8 @@ qint32 cDataGamesManager::handleListGamesInfoResponse(MessageProtocol* msg)
 qint32 cDataGamesManager::startChangeGame(const qint32 index, const qint32 sIndex,
                                           const QString competition, const QString home,
                                           const QString away, const QString date,
-                                          const QString score, const bool fixedTime)
+                                          const QString score, const bool fixedTime,
+                                          const bool onlyFanclub)
 
 {
     if (!this->m_initialized)
@@ -451,6 +457,7 @@ qint32 cDataGamesManager::startChangeGame(const qint32 index, const qint32 sInde
     rootObj.insert("competition", compIndex);
     rootObj.insert("timestamp", timestamp);
     rootObj.insert("fixed", fixedTime);
+    rootObj.insert("onlyFanclub", onlyFanclub);
 
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CHANGE_GAME_TCP);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);

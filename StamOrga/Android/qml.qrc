@@ -112,5 +112,7 @@
         <file>images/+material/timelaps.png</file>
         <file>images/timelaps.png</file>
         <file>pages/UpdatePage.qml</file>
+        <file>certs/ca.crt</file>
+        <file>components/GamesMeetingItem.qml</file>
     </qresource>
 </RCC>

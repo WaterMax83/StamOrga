@@ -63,32 +63,32 @@ qint32 cDataTicketManager::initialize()
     if (!g_StaGlobalSettings->getSaveInfosOnApp())
         g_StaSettingsManager->removeGroup(SEASONTICKET_GROUP);
 
-    qint64 iValue;
-    g_StaSettingsManager->getInt64Value(SEASONTICKET_GROUP, LOCAL_TICKET_UDPATE, iValue);
+    qint64 iValue = 0;
+    //    g_StaSettingsManager->getInt64Value(SEASONTICKET_GROUP, LOCAL_TICKET_UDPATE, iValue);
     this->m_stLastLocalUpdateTimeStamp = iValue;
-    g_StaSettingsManager->getInt64Value(SEASONTICKET_GROUP, SERVER_TICKET_UDPATE, iValue);
+    //    g_StaSettingsManager->getInt64Value(SEASONTICKET_GROUP, SERVER_TICKET_UDPATE, iValue);
     this->m_stLastServerUpdateTimeStamp = iValue;
 
     this->m_initialized = true;
 
-    QString value;
-    qint32  index = 0;
-    while (g_StaSettingsManager->getValue(SEASONTICKET_GROUP, TICKET_NAME, index, value) == ERROR_CODE_SUCCESS) {
-        SeasonTicketItem* pTicket = new SeasonTicketItem();
-        pTicket->setName(value);
-        g_StaSettingsManager->getValue(SEASONTICKET_GROUP, TICKET_PLACE, index, value);
-        pTicket->setPlace(value);
-        g_StaSettingsManager->getInt64Value(SEASONTICKET_GROUP, TICKET_DISCOUNT, index, iValue);
-        pTicket->setDiscount(iValue);
-        g_StaSettingsManager->getInt64Value(SEASONTICKET_GROUP, ITEM_INDEX, index, iValue);
-        pTicket->setIndex(iValue);
-        g_StaSettingsManager->getInt64Value(SEASONTICKET_GROUP, TICKET_USER_INDEX, index, iValue);
-        pTicket->setUserIndex(iValue);
+    //    QString value;
+    //    qint32  index = 0;
+    //    while (g_StaSettingsManager->getValue(SEASONTICKET_GROUP, TICKET_NAME, index, value) == ERROR_CODE_SUCCESS) {
+    //        SeasonTicketItem* pTicket = new SeasonTicketItem();
+    //        pTicket->setName(value);
+    //        g_StaSettingsManager->getValue(SEASONTICKET_GROUP, TICKET_PLACE, index, value);
+    //        pTicket->setPlace(value);
+    //        g_StaSettingsManager->getInt64Value(SEASONTICKET_GROUP, TICKET_DISCOUNT, index, iValue);
+    //        pTicket->setDiscount(iValue);
+    //        g_StaSettingsManager->getInt64Value(SEASONTICKET_GROUP, ITEM_INDEX, index, iValue);
+    //        pTicket->setIndex(iValue);
+    //        g_StaSettingsManager->getInt64Value(SEASONTICKET_GROUP, TICKET_USER_INDEX, index, iValue);
+    //        pTicket->setUserIndex(iValue);
 
-        g_GlobalManager->setQMLObjectOwnershipToCpp(pTicket);
-        this->addNewSeasonTicket(pTicket);
-        index++;
-    }
+    //        g_GlobalManager->setQMLObjectOwnershipToCpp(pTicket);
+    //        this->addNewSeasonTicket(pTicket);
+    //        index++;
+    //    }
 
     return ERROR_CODE_SUCCESS;
 }
@@ -214,6 +214,7 @@ qint32 cDataTicketManager::handleListSeasonTicketsResponse(MessageProtocol* msg)
         pTicket->setName(ticketObj.value("name").toString());
         pTicket->setPlace(ticketObj.value("place").toString());
         pTicket->checkTicketOwn(g_ConUserSettings->getUserIndex());
+        pTicket->setTimeStamp((qint64)ticketObj.value("timestamp").toDouble());
 
         g_GlobalManager->setQMLObjectOwnershipToCpp(pTicket);
         this->addNewSeasonTicket(pTicket, updateIndex);
@@ -234,16 +235,16 @@ qint32 cDataTicketManager::handleListSeasonTicketsResponse(MessageProtocol* msg)
     if (!g_StaGlobalSettings->getSaveInfosOnApp())
         return result;
 
-    g_StaSettingsManager->setInt64Value(SEASONTICKET_GROUP, LOCAL_TICKET_UDPATE, this->m_stLastLocalUpdateTimeStamp);
-    g_StaSettingsManager->setInt64Value(SEASONTICKET_GROUP, SERVER_TICKET_UDPATE, this->m_stLastServerUpdateTimeStamp);
+    //    g_StaSettingsManager->setInt64Value(SEASONTICKET_GROUP, LOCAL_TICKET_UDPATE, this->m_stLastLocalUpdateTimeStamp);
+    //    g_StaSettingsManager->setInt64Value(SEASONTICKET_GROUP, SERVER_TICKET_UDPATE, this->m_stLastServerUpdateTimeStamp);
 
-    for (int i = 0; i < this->m_lTickets.size(); i++) {
-        g_StaSettingsManager->setValue(SEASONTICKET_GROUP, TICKET_NAME, i, this->m_lTickets[i]->name());
-        g_StaSettingsManager->setValue(SEASONTICKET_GROUP, TICKET_PLACE, i, this->m_lTickets[i]->place());
-        g_StaSettingsManager->setInt64Value(SEASONTICKET_GROUP, TICKET_DISCOUNT, i, this->m_lTickets[i]->discount());
-        g_StaSettingsManager->setInt64Value(SEASONTICKET_GROUP, TICKET_USER_INDEX, i, this->m_lTickets[i]->userIndex());
-        g_StaSettingsManager->setInt64Value(SEASONTICKET_GROUP, ITEM_INDEX, i, this->m_lTickets[i]->index());
-    }
+    //    for (int i = 0; i < this->m_lTickets.size(); i++) {
+    //        g_StaSettingsManager->setValue(SEASONTICKET_GROUP, TICKET_NAME, i, this->m_lTickets[i]->name());
+    //        g_StaSettingsManager->setValue(SEASONTICKET_GROUP, TICKET_PLACE, i, this->m_lTickets[i]->place());
+    //        g_StaSettingsManager->setInt64Value(SEASONTICKET_GROUP, TICKET_DISCOUNT, i, this->m_lTickets[i]->discount());
+    //        g_StaSettingsManager->setInt64Value(SEASONTICKET_GROUP, TICKET_USER_INDEX, i, this->m_lTickets[i]->userIndex());
+    //        g_StaSettingsManager->setInt64Value(SEASONTICKET_GROUP, ITEM_INDEX, i, this->m_lTickets[i]->index());
+    //    }
 
     return result;
 }

@@ -35,10 +35,11 @@ cConTcpDataServer::cConTcpDataServer()
     //    this->SetWorkerName("TCPDataServer");
 }
 
-qint32 cConTcpDataServer::initialize(UserConData* pData)
+qint32 cConTcpDataServer::initialize(UserConData* pData, const cConSslUsage sslUsage)
 {
     this->m_pUserConData = pData;
-    this->SetWorkerName(QString("TCPDataServer%1").arg(pData->m_sender.toString()));
+    this->m_sslUsage     = sslUsage;
+    this->SetWorkerName(QString("TCPDataServer%1-%2").arg(sslUsage == USE_SSL ? "SSL" : "").arg(pData->m_sender.toString()));
 
     this->m_initialized = true;
 
@@ -53,7 +54,7 @@ int cConTcpDataServer::DoBackgroundWork()
 
     QMutexLocker lock(&this->m_mutex);
 
-    this->m_pTcpDataServer = new QTcpServer(this);
+    this->m_pTcpDataServer = new cConSslServer(this->m_sslUsage, this);
     if (!this->m_pTcpDataServer->listen(QHostAddress::Any, this->m_pUserConData->m_dstDataPort)) {
         qCritical() << QString("Error listening data server %1\n").arg(this->m_pTcpDataServer->errorString());
         return -1;

@@ -122,7 +122,6 @@ Item {
                 id: columnItem
                 Layout.fillWidth: true
                 Layout.leftMargin: 10
-
                 Layout.minimumHeight: columnItemLayout.implicitHeight
                 ColumnLayout {
                     id: columnItemLayout
@@ -147,6 +146,15 @@ Item {
                             color: "#B0BEC5"
                             font.pixelSize: 14
                         }
+
+                        Text {
+                            id: labelInfoSince
+                            anchors.right: parent.right
+                            anchors.rightMargin: 5
+                            font.bold: true
+                            color: "#B0BEC5"
+                            font.pixelSize: 13
+                        }
                     }
                 }
             }
@@ -160,6 +168,7 @@ Item {
             m_SeasonTicketItem = seasonTicketItem
             labelTicketItem.text = m_SeasonTicketItem.name
             labelInfoWhere.text = m_SeasonTicketItem.place;
+            labelInfoSince.text = "seit " + m_SeasonTicketItem.getTimeStamp();
 
             labelLineTicketShortName.text = m_SeasonTicketItem.getTicketShortName();
             if (m_SeasonTicketItem.discount === 0)

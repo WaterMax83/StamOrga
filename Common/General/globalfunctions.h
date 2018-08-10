@@ -53,6 +53,8 @@ extern QString getUserAppDataLocation();
 
 extern QString getUserHomeConfigPath();
 
+extern QString getApplicationPath();
+
 extern qint32 getSeasonFromTimeStamp(qint64 msec);
 
 extern bool checkFilePathExistAndCreate(const QString& path);
@@ -84,6 +86,7 @@ extern bool checkFilePathExistAndCreate(const QString& path);
 #define ERROR_CODE_NOT_LOGGED_IN        -23
 #define ERROR_CODE_NO_CONNECTION        -24
 #define ERROR_CODE_NOT_UNIQUE           -25
+#define ERROR_CODE_NOT_SUPPORTED        -26
 // clang-format on
 
 extern QString getErrorCodeString(qint32 code);
@@ -111,7 +114,8 @@ enum CompetitionIndex {
     DFB_POKAL       = 4,
     BADISCHER_POKAL = 5,
     TESTSPIEL       = 6,
-    MAX_COMPETITION = 7,
+    ONLY_MEETING    = 7,
+    MAX_COMPETITION = 8,
 };
 
 enum UpdateIndex {
@@ -125,9 +129,9 @@ enum MeetingType {
 };
 
 extern CompetitionIndex getCompetitionIndex(QString comp);
-extern QString          getCompetitionString(CompetitionIndex index);
-extern QString          getCompetitionShortString(CompetitionIndex index);
-extern QString          createRandomString(qint32 size);
+extern QString getCompetitionString(CompetitionIndex index);
+extern QString getCompetitionShortString(CompetitionIndex index);
+extern QString createRandomString(qint32 size);
 
 // clang-format off
 #define USER_ENABLE_LOG                     0x0001

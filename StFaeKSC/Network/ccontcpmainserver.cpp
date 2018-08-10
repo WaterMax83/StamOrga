@@ -18,10 +18,10 @@
 
 #include <QtNetwork/QSslSocket>
 
-#include "ccontcpmainserver.h"
 #include "../../Common/General/globalfunctions.h"
 #include "../../Common/Network/messagecommand.h"
 #include "ccontcpmaindata.h"
+#include "ccontcpmainserver.h"
 
 cConTcpMainServer::cConTcpMainServer()
     : BackgroundWorker()
@@ -41,36 +41,58 @@ qint32 cConTcpMainServer::initialize()
 
 int cConTcpMainServer::DoBackgroundWork()
 {
-    this->m_pTcpMasterServer = new QTcpServer();
-    if (!this->m_pTcpMasterServer->listen(QHostAddress::Any, TCP_PORT)) {
-        qCritical() << QString("Error listening master server %1\n").arg(this->m_pTcpMasterServer->errorString());
+    this->m_pTcpMasterServerNoSsl = new cConSslServer(cConSslUsage::NO_SSL);
+    if (!this->m_pTcpMasterServerNoSsl->listen(QHostAddress::Any, TCP_PORT)) {
+        qCritical() << QString("Error listening master server no ssl %1\n").arg(this->m_pTcpMasterServerNoSsl->errorString());
         return -1;
     }
 
-    connect(this->m_pTcpMasterServer, &QTcpServer::newConnection, this, &cConTcpMainServer::slotSocketConnected);
+    this->m_pTcpMasterServerSsl = new cConSslServer(cConSslUsage::USE_SSL);
+    if (!this->m_pTcpMasterServerSsl->listen(QHostAddress::Any, TCP_PORT + 1)) {
+        qCritical() << QString("Error listening master server ssl %1\n").arg(this->m_pTcpMasterServerSsl->errorString());
+        return -1;
+    }
 
-    qInfo().noquote() << "Started Master TCP Server";
+    connect(this->m_pTcpMasterServerNoSsl, &QTcpServer::newConnection, this, &cConTcpMainServer::slotSocketConnected);
+    connect(this->m_pTcpMasterServerSsl, &QTcpServer::newConnection, this, &cConTcpMainServer::slotSocketConnected);
+
+    qInfo().noquote() << QString("Started Master TCP Server with ports %1, %2").arg(TCP_PORT).arg(TCP_PORT + 1);
 
     return ERROR_CODE_SUCCESS;
 }
 
+
 void cConTcpMainServer::slotSocketConnected()
 {
-    while (this->m_pTcpMasterServer->hasPendingConnections()) {
-        QTcpSocket* socket = this->m_pTcpMasterServer->nextPendingConnection();
-        if (socket == NULL)
+    while (this->m_pTcpMasterServerNoSsl->hasPendingConnections()) {
+        QTcpSocket* pSocket = this->m_pTcpMasterServerNoSsl->nextPendingConnection();
+        if (pSocket == NULL)
             continue;
 
-        UserMainConnection* pMain = new UserMainConnection();
-        pMain->m_pMainSocket      = new cConTcpMainSocket();
-        pMain->m_pctrlMainSocket  = new BackgroundController();
-        pMain->m_remotePort       = socket->peerPort();
-        pMain->m_pMainSocket->initialize(socket);
-        this->connect(pMain->m_pMainSocket, &cConTcpMainSocket::signalSocketClosed, this, &cConTcpMainServer::slotSocketClosed);
-        pMain->m_pctrlMainSocket->Start(pMain->m_pMainSocket, false);
-
-        this->m_lUserMainCons.append(pMain);
+        this->createNewUserMainConnection(pSocket, this->m_pTcpMasterServerNoSsl->getSslUsage());
     }
+    while (this->m_pTcpMasterServerSsl->hasPendingConnections()) {
+        QSslSocket* pSocket = dynamic_cast<QSslSocket*>(this->m_pTcpMasterServerSsl->nextPendingConnection());
+        if (pSocket == NULL)
+            continue;
+
+        connect(pSocket, SIGNAL(sslErrors(const QList<QSslError>&)), this, SLOT(slotSslErrors(const QList<QSslError>&)));
+
+        this->createNewUserMainConnection(pSocket, this->m_pTcpMasterServerSsl->getSslUsage());
+    }
+}
+
+void cConTcpMainServer::createNewUserMainConnection(QTcpSocket* pSocket, const cConSslUsage sslUsage)
+{
+    UserMainConnection* pMain = new UserMainConnection();
+    pMain->m_pMainSocket      = new cConTcpMainSocket();
+    pMain->m_pctrlMainSocket  = new BackgroundController();
+    pMain->m_remotePort       = pSocket->peerPort();
+    pMain->m_pMainSocket->initialize(pSocket, sslUsage);
+    this->connect(pMain->m_pMainSocket, &cConTcpMainSocket::signalSocketClosed, this, &cConTcpMainServer::slotSocketClosed);
+    pMain->m_pctrlMainSocket->Start(pMain->m_pMainSocket, false);
+
+    this->m_lUserMainCons.append(pMain);
 }
 
 
@@ -88,8 +110,16 @@ void cConTcpMainServer::slotSocketClosed(quint16 remotePort)
     }
 }
 
+void cConTcpMainServer::slotSslErrors(const QList<QSslError>& errors)
+{
+    qInfo() << "SSL Main Server Errors " << errors;
+}
+
 cConTcpMainServer::~cConTcpMainServer()
 {
-    if (this->m_pTcpMasterServer != NULL)
-        delete this->m_pTcpMasterServer;
+    if (this->m_pTcpMasterServerNoSsl != NULL)
+        delete this->m_pTcpMasterServerNoSsl;
+
+    if (this->m_pTcpMasterServerSsl != NULL)
+        delete this->m_pTcpMasterServerSsl;
 }

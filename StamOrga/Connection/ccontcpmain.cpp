@@ -21,7 +21,10 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QThread>
 #include <QtCore/QtEndian>
+#include <QtNetwork/QNetworkProxy>
+#include <QtNetwork/QSslSocket>
 
+#include "../Common/General/config.h"
 #include "../cstaglobalsettings.h"
 #include "General/globalfunctions.h"
 #include "General/globaltiming.h"
@@ -56,7 +59,10 @@ qint32 cConTcpMain::initialize(QString host, const QString username)
 
 int cConTcpMain::DoBackgroundWork()
 {
-    this->m_pMasterTcpSocket = new QTcpSocket();
+    if (g_StaGlobalSettings->getUseSSL())
+        this->m_pMasterTcpSocket = new QSslSocket();
+    else
+        this->m_pMasterTcpSocket = new QTcpSocket();
 
     if (!this->m_pMasterTcpSocket->bind()) {
         emit this->connectionRequestFinished(0, this->m_pMasterTcpSocket->errorString(), "", "");
@@ -72,6 +78,12 @@ int cConTcpMain::DoBackgroundWork()
             break;
     }
 
+    if (g_StaGlobalSettings->getUseSSL()) {
+        connect((QSslSocket*)this->m_pMasterTcpSocket, &QSslSocket::encrypted, this, &cConTcpMain::slotEncrypted);
+        connect((QSslSocket*)this->m_pMasterTcpSocket, &QSslSocket::preSharedKeyAuthenticationRequired, this, &cConTcpMain::slotPreSharedKeyAuthenticationRequired);
+        connect((QSslSocket*)this->m_pMasterTcpSocket, SIGNAL(sslErrors(const QList<QSslError>&)), this, SLOT(slotSslErrors(const QList<QSslError>&)));
+    }
+
     connect(this->m_pMasterTcpSocket, &QTcpSocket::connected, this, &cConTcpMain::slotMasterSocketConnected);
     typedef void (QAbstractSocket::*QAbstractSocketErrorSignal)(QAbstractSocket::SocketError);
     connect(this->m_pMasterTcpSocket, static_cast<QAbstractSocketErrorSignal>(&QAbstractSocket::error), this, &cConTcpMain::slotMainSocketError);
@@ -81,7 +93,14 @@ int cConTcpMain::DoBackgroundWork()
     this->m_pConTimeout->setSingleShot(true);
     connect(this->m_pConTimeout, &QTimer::timeout, this, &cConTcpMain::slotConnectionTimeoutFired);
 
-    this->m_pMasterTcpSocket->connectToHost(this->m_hMasterReceiver, g_ConUserSettings->getMasterConPort());
+
+    if (g_StaGlobalSettings->getUseSSL()) {
+        this->m_pMasterTcpSocket->setProxy(QNetworkProxy::NoProxy);
+        ((QSslSocket*)this->m_pMasterTcpSocket)->addCaCertificate(g_StaGlobalSettings->getSSLCaCertificate());
+        ((QSslSocket*)this->m_pMasterTcpSocket)->connectToHostEncrypted(SERVER_HOST_ADDRESS, g_ConUserSettings->getMasterConPort() + 1);
+    } else
+        this->m_pMasterTcpSocket->connectToHost(this->m_hMasterReceiver, g_ConUserSettings->getMasterConPort());
+
 
     this->m_pConTimeout->start(SOCKET_TIMEOUT_MS);
     this->m_bIsConnecting = true;
@@ -121,6 +140,27 @@ void cConTcpMain::slotReadyReadMasterSocket()
     this->m_messageBuffer.StoreNewData(datagram);
 
     this->checkNewOncomingData();
+}
+
+void cConTcpMain::slotEncrypted()
+{
+    qInfo() << "Connection for main is encrypted";
+}
+
+void cConTcpMain::slotPreSharedKeyAuthenticationRequired(QSslPreSharedKeyAuthenticator* authenticator)
+{
+    Q_UNUSED(authenticator);
+    qCritical().noquote() << "SSL PreSharedKey wanted for main ";
+}
+
+void cConTcpMain::slotSslErrors(const QList<QSslError>& errors)
+{
+    if (errors.size() == 1 && errors[0].error() == QSslError::SelfSignedCertificate) {
+        ((QSslSocket*)this->m_pMasterTcpSocket)->ignoreSslErrors(errors);
+        return;
+    }
+
+    qCritical().noquote() << "SSL Errors for Main " << errors;
 }
 
 void cConTcpMain::checkNewOncomingData()

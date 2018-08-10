@@ -54,7 +54,7 @@ public:
 
     Q_INVOKABLE qint32 startChangeGame(const qint32 index, const qint32 sIndex, const QString competition,
                                        const QString home, const QString away, const QString date,
-                                       const QString score, const bool fixedTime);
+                                       const QString score, const bool fixedTime, const bool onlyFanclub);
     qint32             handleChangeGameResponse(MessageProtocol* msg);
 
     Q_INVOKABLE bool getSkipedOldGames() { return this->m_bSkipedOldGames; }

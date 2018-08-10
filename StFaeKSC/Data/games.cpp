@@ -60,14 +60,14 @@ Games::Games()
             QString          score       = this->m_pConfigSettings->value(PLAY_SCORE, "").toString();
             CompetitionIndex competition = CompetitionIndex(this->m_pConfigSettings->value(PLAY_COMPETITION, 0).toUInt());
             qint64           lastUpdate  = this->m_pConfigSettings->value(PLAY_LAST_UDPATE, 0).toLongLong();
-            quint32          scheduled   = this->m_pConfigSettings->value(PLAY_SCHEDULED, false).toUInt();
+            qint32           options     = this->m_pConfigSettings->value(PLAY_OPTIONS, 0).toInt();
 
             if (saison == 0) {
                 bProblems = true;
                 saison    = getSeasonFromTimeStamp(timestamp);
             }
 
-            GamesPlay* play = new GamesPlay(home, away, timestamp, saisonIndex, score, competition, saison, index, lastUpdate, scheduled);
+            GamesPlay* play = new GamesPlay(home, away, timestamp, saisonIndex, score, competition, saison, index, lastUpdate, options);
 
             if (!this->addNewGamesPlay(play))
                 bProblems = true;
@@ -102,7 +102,7 @@ int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sInde
         return ERROR_CODE_COMMON;
     }
 
-    if (saison == 0) {
+    if (saison == 0) { /* just for games */
         saison = getSeasonFromTimeStamp(timestamp);
     }
 
@@ -179,7 +179,7 @@ int Games::addNewGame(QString home, QString away, qint64 timestamp, quint8 sInde
     this->m_pConfigSettings->setValue(PLAY_SAISON, saison);
     this->m_pConfigSettings->setValue(PLAY_COMPETITION, comp);
     this->m_pConfigSettings->setValue(PLAY_LAST_UDPATE, lastUpdate);
-    this->m_pConfigSettings->setValue(PLAY_SCHEDULED, 0);
+    this->m_pConfigSettings->setValue(PLAY_OPTIONS, 0);
 
     this->m_pConfigSettings->endArray();
     this->m_pConfigSettings->endGroup();
@@ -231,7 +231,7 @@ QString Games::showAllGames(const bool showUpdate)
             output.append(QString("\n    %1 - %2").arg(pGame->m_itemName, -maxSizeHome).arg(pGame->m_away, -maxSizeAway));
             if (pGame->m_score.size() > 0)
                 output.append(QString(" %1 ").arg(pGame->m_score));
-            if (pGame->m_scheduled)
+            if (IS_PLAY_FIXED(pGame->m_options))
                 output.append(" *");
         } else
             output.append(" - " + update);
@@ -242,16 +242,38 @@ QString Games::showAllGames(const bool showUpdate)
     return rValue;
 }
 
-int Games::changeScheduledValue(const quint32 gameIndex, const qint32 fixedTime)
+int Games::changeScheduledValue(const quint32 gameIndex, const bool fixedTime)
 {
     GamesPlay* gPlay = (GamesPlay*)this->getItem(gameIndex);
     if (gPlay == NULL)
         return ERROR_CODE_NOT_FOUND;
 
-    if (gPlay->m_scheduled != fixedTime) {
-        if (this->updateItemValue(gPlay, PLAY_SCHEDULED, QVariant(fixedTime))) {
-            gPlay->m_scheduled = fixedTime;
-            qint64 lastUpdate  = QDateTime::currentMSecsSinceEpoch();
+    if (IS_PLAY_FIXED(gPlay->m_options) != fixedTime) {
+        qint32 options = gPlay->m_options & ~(qint32)PLAY_OPTIONS_FIXED;
+        options |= fixedTime ? PLAY_OPTIONS_FIXED : 0x0;
+        if (this->updateItemValue(gPlay, PLAY_OPTIONS, QVariant(options))) {
+            gPlay->m_options  = options;
+            qint64 lastUpdate = QDateTime::currentMSecsSinceEpoch();
+            if (this->updateItemValue(gPlay, PLAY_LAST_UDPATE, QVariant(lastUpdate)))
+                gPlay->m_lastUpdate = lastUpdate;
+        } else
+            return ERROR_CODE_COMMON;
+    }
+    return ERROR_CODE_SUCCESS;
+}
+
+int Games::changeOnlyFanclubValue(const quint32 gameIndex, const bool onlyFanclub)
+{
+    GamesPlay* gPlay = (GamesPlay*)this->getItem(gameIndex);
+    if (gPlay == NULL)
+        return ERROR_CODE_NOT_FOUND;
+
+    if (IS_PLAY_ONLY_FANCLUB(gPlay->m_options) != onlyFanclub) {
+        qint32 options = gPlay->m_options & ~(qint32)PLAY_OPTIONS_FANCLUB;
+        options |= onlyFanclub ? PLAY_OPTIONS_FANCLUB : 0x0;
+        if (this->updateItemValue(gPlay, PLAY_OPTIONS, QVariant(options))) {
+            gPlay->m_options  = options;
+            qint64 lastUpdate = QDateTime::currentMSecsSinceEpoch();
             if (this->updateItemValue(gPlay, PLAY_LAST_UDPATE, QVariant(lastUpdate)))
                 gPlay->m_lastUpdate = lastUpdate;
         } else
@@ -308,7 +330,7 @@ void Games::saveCurrentInteralList()
         this->m_pConfigSettings->setValue(PLAY_SCORE, pItem->m_score);
         this->m_pConfigSettings->setValue(PLAY_COMPETITION, pItem->m_competition);
         this->m_pConfigSettings->setValue(PLAY_LAST_UDPATE, pItem->m_lastUpdate);
-        this->m_pConfigSettings->setValue(PLAY_SCHEDULED, pItem->m_scheduled);
+        this->m_pConfigSettings->setValue(PLAY_OPTIONS, pItem->m_options);
     }
 
     this->m_pConfigSettings->endArray();

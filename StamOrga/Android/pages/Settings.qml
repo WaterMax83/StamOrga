@@ -123,6 +123,26 @@ Flickable {
             RowLayout {
                 Layout.preferredWidth: parent.width
                 Layout.fillWidth: true
+
+                Text {
+                    id: text6
+                    text: qsTr("SSL Verschlüsselung:")
+                    Layout.fillWidth: true
+                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                    font.pixelSize: 14
+                    color: gStaGlobalSettings.getCanUseSSL() ? "white" : "grey"
+                }
+                CheckBox {
+                    id: useSSLForConnection
+                    enabled: gStaGlobalSettings.getCanUseSSL();
+                    checked: gStaGlobalSettings.getUseSSLSettings();
+                    onCheckedChanged: valueWasEditedEnableSave()
+                }
+            }
+
+            RowLayout {
+                Layout.preferredWidth: parent.width
+                Layout.fillWidth: true
                 visible: userInt.isDeviceMobile() || userInt.isDebuggingEnabled()
 
                 Text {
@@ -273,7 +293,7 @@ Flickable {
     }
 
     function saveAllSettings() {
-        var saveFonts = false;
+        var restart = false;
 
         //        if (globalSettings.useReadableName !== useReadableName.checked) {
         //           globalSettings.useReadableName = useReadableName.checked;
@@ -292,9 +312,14 @@ Flickable {
             gStaGlobalSettings.setUseVersionPopup(usePopupForVersionInfo.checked);
         }
 
+        if (gStaGlobalSettings.getUseSSLSettings() !== useSSLForConnection.checked) {
+            gStaGlobalSettings.setUseSSL(useSSLForConnection.checked)
+            restart = true;
+        }
+
         if (gStaGlobalSettings.getChangeDefaultFont() !== cbfontFamilies.currentText ) {
             gStaGlobalSettings.setChangeDefaultFont(cbfontFamilies.currentText);
-            saveFonts = true;
+            restart = true;
         }
 
         if (gStaGlobalSettings.getDebugIP() !== txtOtherIPAddr.text) {
@@ -333,14 +358,14 @@ Flickable {
 
         toastManager.show("Daten erfolgreich gespeichert", 3000)
 
-        if (saveFonts) {
+        if (restart) {
             var component = Qt.createComponent("../components/AcceptDialog.qml");
             if (component.status === Component.Ready) {
                 var dialog = component.createObject(mainPaneSettings,{popupType: 1});
                 dialog.headerText = "Information";
                 dialog.parentHeight = mainWindow.height
                 dialog.parentWidth = mainWindow.width
-                dialog.textToAccept = "Zum Aktualisieren der Schrift muss die App neu gestarted werden";
+                dialog.textToAccept = "Zum Aktualisieren muss die App neu gestarted werden";
                 dialog.showCancelButton = false
                 dialog.open();
             }

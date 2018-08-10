@@ -77,6 +77,8 @@ qint32 cStatisticManager::addYearToStatistic(qint32 year)
     pStats->m_year       = year;
     this->m_stats.append(pStats);
 
+    std::sort(this->m_stats.begin(), this->m_stats.end(), StatsPerYear::compareYearDescending);
+
     emit this->signalYearChanged();
 
     return ERROR_CODE_SUCCESS;
@@ -164,7 +166,7 @@ void cStatisticManager::slotCycleTimerFired()
             pTicks->m_name        = pTicket->m_itemName;
             if (pTicks->m_name.endsWith("_DELETED"))
                 pTicks->m_name.replace("_DELETED", "");
-            pTicks->m_creation    = pTicket->m_creation;
+            pTicks->m_creation = pTicket->m_creation;
 
             pStats->m_statsTickets.append(pTicks);
         }

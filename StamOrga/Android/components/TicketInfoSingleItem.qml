@@ -31,6 +31,7 @@ Item {
     property int menuOpen
     property string title
     property string place
+    property string timestamp
     property bool  isTicketYourOwn: false
 
     signal clickedItem(var y)
@@ -103,7 +104,9 @@ Item {
                     dialog.headerText = "Information";
                     dialog.parentHeight = mainPaneCurrentGame.height
                     dialog.parentWidth = mainPaneCurrentGame.width
-                    dialog.textToAccept = "Die Karte von<br><br><b>" + title + "</b><br><br>befindet sich aktuell bei<br><br> <b>" + place + "</b>";
+                    dialog.textToAccept = "Die Karte von<br><br><b>" + title + "</b><br><br>
+                                            befindet sich seit<br><br><b>" + timestamp + "</b><br><br>
+                                            aktuell bei<br><br> <b>" + place + "</b>";
                     dialog.showCancelButton = false
                     dialog.font.family= txtForFontFamily.font
                     dialog.open();

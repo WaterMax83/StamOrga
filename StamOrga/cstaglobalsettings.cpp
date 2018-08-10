@@ -17,7 +17,6 @@
 */
 
 #include <QtCore/QDateTime>
-//#include <QtCore/QDebug>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 
@@ -48,6 +47,7 @@ cStaGlobalSettings* g_StaGlobalSettings;
 #define SETT_DEBUG_IP_WIFI          "DebugIPWifi"
 #define SETT_ENABLE_NOTIFICATION    "EnableNotification"
 #define SETT_KEEP_PAST_VALUE        "KeepPastValue"
+#define SETT_USE_SSL                "UseSSL"
 
 //#define USER_READABLE   "ReadableName"
 
@@ -85,13 +85,37 @@ qint32 cStaGlobalSettings::initialize()
     this->m_notificationEnabledValue = iValue;
     g_StaSettingsManager->getInt64Value(SETTINGS_GROUP, SETT_KEEP_PAST_VALUE, iValue, 5);
     this->m_iKeepPastItemsCount = iValue;
+    g_StaSettingsManager->getBoolValue(SETTINGS_GROUP, SETT_USE_SSL, bValue, false);
+    this->m_bUseSSL = bValue;
 
     this->m_bIpAddressWasSet = false;
-    QHostInfo::lookupHost("watermax83.ddns.net", this, SLOT(slotCallBackLookUpHost(QHostInfo)));
+    QHostInfo::lookupHost(SERVER_HOST_ADDRESS, this, SLOT(slotCallBackLookUpHost(QHostInfo)));
 
 #ifdef STAMORGA_APP
     connect(qGuiApp, &QGuiApplication::applicationStateChanged, this, &cStaGlobalSettings::slotStateFromAppChanged);
 #endif
+
+    this->m_bDisableSSLFrom_Start = true;
+    if (this->m_bUseSSL) {
+        if (QSslSocket::supportsSsl()) {
+            QFile file(":/certs/ca.crt");
+            if (file.exists() && file.open(QIODevice::ReadOnly)) {
+                qInfo().noquote() << QString("Using ssl with %1 certificate").arg(file.fileName());
+
+                this->m_caCert                = QSslCertificate(file.readAll());
+                this->m_bUseSSL               = true;
+                this->m_bDisableSSLFrom_Start = false;
+                file.close();
+            }
+        } else {
+            this->setUseSSL(false);
+            qWarning().noquote() << QString("Disable SSL because necessary ssl libraries are not installed");
+        }
+    }
+    if (QSslSocket::supportsSsl())
+        this->m_bCanUseSSL = true;
+    else
+        this->m_bCanUseSSL = false;
 
     this->m_initialized = true;
 
@@ -213,6 +237,35 @@ void cStaGlobalSettings::setAlreadyConnected(const bool con)
 
         g_StaSettingsManager->setBoolValue(SETTINGS_GROUP, SETT_ALREADY_CONNECTED, con);
     }
+}
+
+bool cStaGlobalSettings::getUseSSL()
+{
+    return this->m_bUseSSL && !this->m_bDisableSSLFrom_Start;
+}
+
+bool cStaGlobalSettings::getUseSSLSettings()
+{
+    return this->m_bUseSSL;
+}
+
+void cStaGlobalSettings::setUseSSL(bool useSSL)
+{
+    if (useSSL != this->m_bUseSSL) {
+        this->m_bUseSSL = useSSL;
+
+        g_StaSettingsManager->setBoolValue(SETTINGS_GROUP, SETT_USE_SSL, useSSL);
+    }
+}
+
+bool cStaGlobalSettings::getCanUseSSL()
+{
+    return this->m_bCanUseSSL;
+}
+
+QSslCertificate cStaGlobalSettings::getSSLCaCertificate()
+{
+    return this->m_caCert;
 }
 
 #define NOT_OFFSET_NEWAPPV 0

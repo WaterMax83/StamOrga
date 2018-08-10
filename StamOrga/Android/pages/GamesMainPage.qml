@@ -197,10 +197,12 @@ Page {
         var result = gDataGamesManager.startChangeGame(dialog.index, dialog.seasonIndex,
                                                   dialog.competition, dialog.homeTeam.trim(),
                                                   dialog.awayTeam.trim(), dialog.date.trim(),
-                                                  dialog.score.trim(), dialog.fixedTime);
+                                                  dialog.score.trim(), dialog.fixedTime,
+                                                  dialog.onlyFanclub);
         if (result !== 1) {
-            toastManager.show(userIntGames.getErrorCodeToString(result), 5000)
-            if (changeGameDialog.index === 0) {
+            toastManager.show(userIntGames.getErrorCodeToString(result), 5000)            
+        } else {
+            if (dialog.index === 0) {
                 showLoadingGameInfos("Füge Spiel hinzu", true);
             }
             else {

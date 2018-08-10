@@ -21,8 +21,10 @@
 
 #include <QtCore/QList>
 #include <QtCore/QObject>
+#include <QtNetwork/QSslError>
 #include <QtNetwork/QTcpServer>
 
+#include "cconsslserver.h"
 #include "ccontcpmainsocket.h"
 #include <../Common/General/backgroundcontroller.h>
 #include <../Common/General/backgroundworker.h>
@@ -49,11 +51,14 @@ protected:
 private slots:
     void slotSocketConnected();
     void slotSocketClosed(quint16 remotePort);
+    void slotSslErrors(const QList<QSslError>& errors);
 
 private:
-    QTcpServer* m_pTcpMasterServer = NULL;
+    cConSslServer* m_pTcpMasterServerNoSsl = NULL;
+    cConSslServer* m_pTcpMasterServerSsl   = NULL;
 
     QList<UserMainConnection*> m_lUserMainCons;
+    void createNewUserMainConnection(QTcpSocket* pSocket, const cConSslUsage sslUsage);
 };
 
 #endif // CCONTCPMAIN_H

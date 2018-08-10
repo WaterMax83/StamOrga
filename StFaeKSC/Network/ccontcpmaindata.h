@@ -45,7 +45,7 @@ public:
 
     qint32 initialize(ListedUser* pListedUser);
 
-    MessageProtocol* getNewUserAcknowledge(const QString userName, const QHostAddress addr);
+    MessageProtocol* getNewUserAcknowledge(const QString userName, const QHostAddress addr, const cConSslUsage sslUsage);
 
     MessageProtocol* getUserCheckLogin(UserConData* pUserCon, MessageProtocol* request);
 

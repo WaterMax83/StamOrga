@@ -212,7 +212,7 @@ Flickable {
     }
 
     function pageOpenedUpdateView() {
-        //    gDataAppUserEvents.clearUserEventUpdate();
+        gDataAppUserEvents.clearUserEventUpdate();
     }
 
     function notifyVersionRequestFinished(result) {

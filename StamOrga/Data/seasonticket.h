@@ -80,6 +80,13 @@ public:
         }
     }
 
+    Q_INVOKABLE QString getTimeStamp() { return QDateTime::fromMSecsSinceEpoch(this->m_timestamp).toString("dd.MMM. yy hh:mm"); }
+    void                setTimeStamp(const qint64 timestamp)
+    {
+        if (this->m_timestamp != timestamp)
+            this->m_timestamp = timestamp;
+    }
+
     Q_INVOKABLE bool isTicketYourOwn() { return this->m_ownTicket; }
     void             checkTicketOwn(qint32 userIndex)
     {
@@ -133,6 +140,7 @@ private:
     quint8  m_discount;
     qint32  m_index;
     qint32  m_userIndex;
+    qint64  m_timestamp;
     bool    m_ownTicket;
 
     quint32 m_ticketState;

@@ -347,6 +347,7 @@ Flickable {
                     sprTicket1.title = seasonTicketItem.name + discount;
                     sprTicket1.ticketIndex = seasonTicketItem.index;
                     sprTicket1.place = seasonTicketItem.place
+                    sprTicket1.timestamp = seasonTicketItem.getTimeStamp();
                     sprTicket1.menuOpen = false;
                     sprTicket1.imageColor = "green";
                     sprTicket1.isTicketYourOwn = seasonTicketItem.isTicketYourOwn();
@@ -357,6 +358,7 @@ Flickable {
                     sprTicket2.ticketIndex = seasonTicketItem.index;
                     sprTicket2.reserve = seasonTicketItem.getTicketReserveName();
                     sprTicket2.place = seasonTicketItem.place
+                    sprTicket2.timestamp = seasonTicketItem.getTimeStamp();
                     sprTicket2.menuOpen = false;
                     sprTicket2.imageColor = "red";
                     sprTicket2.isTicketYourOwn = seasonTicketItem.isTicketYourOwn();
@@ -366,6 +368,7 @@ Flickable {
                     sprTicket3.title = seasonTicketItem.name + discount;
                     sprTicket3.ticketIndex = seasonTicketItem.index;
                     sprTicket3.place = seasonTicketItem.place
+                    sprTicket3.timestamp = seasonTicketItem.getTimeStamp();
                     sprTicket3.menuOpen = false;
                     sprTicket3.imageColor = "red";
                     sprTicket3.isTicketYourOwn = seasonTicketItem.isTicketYourOwn();

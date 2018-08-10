@@ -36,12 +36,12 @@ public:
     qint32           m_season;
     QString          m_score;
     qint64           m_lastUpdate;
-    qint32           m_scheduled;
+    qint32           m_options;
 
     GamesPlay(QString home, QString away, qint64 timestamp,
               quint8 sIndex, QString score, CompetitionIndex comp,
               qint32 season, quint32 index, qint64 lastUpdate,
-              qint32 scheduled)
+              qint32 options)
     {
         this->m_itemName  = home;
         this->m_index     = index;
@@ -53,7 +53,7 @@ public:
         this->m_competition = comp;
         this->m_season      = season;
         this->m_lastUpdate  = lastUpdate;
-        this->m_scheduled   = scheduled;
+        this->m_options     = options;
     }
 };
 
@@ -64,7 +64,13 @@ public:
 #define PLAY_SCORE          "score"
 #define PLAY_COMPETITION    "competition"
 #define PLAY_LAST_UDPATE    "lastUpdate"
-#define PLAY_SCHEDULED      "scheduled"
+#define PLAY_OPTIONS        "scheduled"
+
+#define PLAY_OPTIONS_FIXED      0x1
+#define PLAY_OPTIONS_FANCLUB    0x2
+
+#define IS_PLAY_FIXED(value)            (value & PLAY_OPTIONS_FIXED) ? true : false
+#define IS_PLAY_ONLY_FANCLUB(value)     (value & PLAY_OPTIONS_FANCLUB) ? true : false
 // clang-format on
 
 class Games : public ConfigList
@@ -78,7 +84,9 @@ public:
                    qint32 season = 0, qint64 lastUpdate = 0);
     QString showAllGames(const bool showUpdate);
 
-    int changeScheduledValue(const quint32 gameIndex, const qint32 fixedTime);
+    int changeScheduledValue(const quint32 gameIndex, const bool fixedTime);
+
+    int changeOnlyFanclubValue(const quint32 gameIndex, const bool onlyFanclub);
 
     qint64 getTimeStampofFirstTicketGame(const qint32 season);
 

@@ -35,6 +35,7 @@ class GamePlay : public QObject
     Q_PROPERTY(QString competition READ competition NOTIFY competitionChanged)
     Q_PROPERTY(qint32 index READ index WRITE setIndex NOTIFY indexChanged)
     Q_PROPERTY(bool timeFixed READ timeFixed WRITE setTimeFixed NOTIFY timeFixedChanged)
+    Q_PROPERTY(bool onlyFanclub READ onlyFanclub WRITE setOnlyFanclub NOTIFY onlyFanclubChanged)
     Q_PROPERTY(quint8 seasonIndex READ seasonIndex WRITE setSeasonIndex NOTIFY seasonIndexChanged)
     Q_PROPERTY(quint32 event READ getEvent NOTIFY eventChanged)
 public:
@@ -129,6 +130,19 @@ public:
         if (this->m_timeFixed != fixed) {
             this->m_timeFixed = fixed;
             emit this->timeFixedChanged();
+        }
+    }
+
+    bool onlyFanclub()
+    {
+        return this->m_bOnlyFanclub;
+    }
+
+    void setOnlyFanclub(const bool only)
+    {
+        if (this->m_bOnlyFanclub != only) {
+            this->m_bOnlyFanclub = only;
+            emit this->onlyFanclubChanged();
         }
     }
 
@@ -234,6 +248,7 @@ signals:
     void competitionChanged();
     void indexChanged();
     void timeFixedChanged();
+    void onlyFanclubChanged();
     void seasonIndexChanged();
     void eventChanged();
 
@@ -248,6 +263,7 @@ private:
     quint8           m_seasonIndex;
     qint64           m_timestamp;
     bool             m_timeFixed;
+    bool             m_bOnlyFanclub;
     qint16           m_freeTickets;
     qint16           m_blockedTickets;
     qint16           m_reservedTickets;

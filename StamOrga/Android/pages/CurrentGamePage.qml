@@ -47,13 +47,10 @@ Item {
             visible: false
         }
 
-        //        MyComponents.Games {
         MyComponents.GamesDesignItem{
             id: gameHeader
             Layout.fillWidth: true
             Layout.topMargin: gameTopMargin
-//            Layout.leftMargin: 5
-//            Layout.rightMargin: 5
             Layout.alignment: Qt.AlignTop
             showGameSeperator: false
             onPressedAndHoldCurrentGame: Qt.openUrlExternally(
@@ -135,16 +132,17 @@ Item {
             }
 
             MyComponents.GraphicalButton {
+                id: graphicalButtonComment
                 imageSource: "../images/send.png"
                 Layout.topMargin: 5
                 enabled: true
                 onClickedButton: {
                     if (swipeViewCurrentHomeGame.currentItem === currentMeetInfo) {
-                        currentMeetInfo.sendNewComment(textInputConsole.input)
+                        currentMeetInfo.sendNewComment(textInputConsole.input);
                     } else {
-                        currentAwayTripInfo.sendNewComment(
-                                    textInputConsole.input)
+                        currentAwayTripInfo.sendNewComment(textInputConsole.input);
                     }
+                    enabled = false;
                 }
                 Layout.alignment: Qt.AlignRight
             }
@@ -396,6 +394,7 @@ Item {
     function notifySendCommentMeetFinished(result) {
         if (result === 1)
             textInputConsole.clear()
+        graphicalButtonComment.enabled = true;
         currentMeetInfo.notifySendCommentMeetFinished(result)
     }
 
@@ -418,6 +417,7 @@ Item {
     function notifySendCommentTripFinished(result) {
         if (result === 1)
             textInputConsole.clear()
+        graphicalButtonComment.enabled = true;
         currentAwayTripInfo.notifySendCommentMeetFinished(result)
     }
 

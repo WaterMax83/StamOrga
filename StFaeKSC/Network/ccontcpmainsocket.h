@@ -24,10 +24,7 @@
 #include <QtCore/QTimer>
 #include <QtNetwork/QTcpSocket>
 
-//#include "connectiondata.h"
-//#include "udpdataserver.h"
-//#include "General/globaldata.h"
-//#include <../Common/General/backgroundcontroller.h>
+#include "cconsslserver.h"
 #include <../Common/General/backgroundworker.h>
 #include <../Common/Network/messagebuffer.h>
 
@@ -39,7 +36,7 @@ public:
     cConTcpMainSocket();
     ~cConTcpMainSocket();
 
-    qint32 initialize(QTcpSocket* socket);
+    qint32 initialize(QTcpSocket* socket, const cConSslUsage sslUsage);
 
     qint32 terminate();
 
@@ -59,6 +56,7 @@ private:
     QTcpSocket*   m_pTcpMasterSocket = NULL;
     MessageBuffer m_msgBuffer;
     QTimer*       m_pConTimeout = NULL;
+    cConSslUsage  m_sslUsage;
 
     void checkNewOncomingData();
 };

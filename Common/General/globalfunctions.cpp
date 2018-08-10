@@ -16,6 +16,7 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QDateTime>
 #include <QtCore/QStandardPaths>
 #include <QtCore/QUuid>
@@ -38,6 +39,11 @@ QString getUserHomeConfigPath()
 QString getUserAppDataLocation()
 {
     return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+}
+
+QString getApplicationPath()
+{
+    return QCoreApplication::applicationDirPath();
 }
 
 bool checkFilePathExistAndCreate(const QString& path)
@@ -123,6 +129,8 @@ QString getErrorCodeString(qint32 code)
         return QString("Verbindung nicht möglich: %1").arg(code);
     case ERROR_CODE_NOT_UNIQUE:
         return QString("Element ist schon vorhanden: %1").arg(code);
+    case ERROR_CODE_NOT_SUPPORTED:
+        return QString("Nicht unterstützt: %1").arg(code);
     default:
         return QString("Unbekannter Fehler: %1").arg(code);
     }
@@ -153,6 +161,8 @@ CompetitionIndex getCompetitionIndex(QString comp)
         return BADISCHER_POKAL;
     if (comp == "TestSpiel")
         return TESTSPIEL;
+    if (comp == "Treffen")
+        return ONLY_MEETING;
 
     return NO_COMPETITION;
 }
@@ -192,6 +202,8 @@ QString getCompetitionShortString(CompetitionIndex index)
         return "Bfv";
     case TESTSPIEL:
         return "T";
+    case ONLY_MEETING:
+        return "M";
     default:
         return "not implemented";
     }

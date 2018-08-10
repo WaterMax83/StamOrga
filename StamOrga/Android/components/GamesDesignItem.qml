@@ -154,6 +154,7 @@ Item {
                         //                        }
                         Text {
                             text: " - "
+                            visible: labelLineGameInfo.text.length > 0
                             font.pixelSize: 14
                             color: "#B0BEC5"
                         }
@@ -404,17 +405,21 @@ Item {
 
             clearAllInfos();
 
+            var bIsOnlyMeeting = false;
+            if (gamePlayItem.competitionValue() === 7)
+                bIsOnlyMeeting = true;
+
             m_gamePlayItem = gamePlayItem
             labelLineDate.text = gamePlayItem.timestampReadableLine();
             labelLineCompetition.text = gamePlayItem.getShortCompetition();
             labelLineGameInfo.text = gamePlayItem.getCompetitionShortRound();
             labelLineHome.text = gamePlayItem.home;
+            labelLineAway.text = gamePlayItem.away;
+            labelLineScore.text = gamePlayItem.score;
             if (gamePlayItem.home === "KSC")
                 labelLineHome.font.letterSpacing = 2
-            labelLineAway.text = gamePlayItem.away;
             if (gamePlayItem.away === "KSC")
                 labelLineAway.font.letterSpacing = 2
-            labelLineScore.text = gamePlayItem.score;
 
             if (gamePlayItem.isGameInPast()) {
                 gradColorStart = "#505050"
@@ -435,6 +440,9 @@ Item {
                 } else if (comp === 6) { // TestSpiel
                     gradColorStart = "#101050"
                     gradColorStop = "#905090"
+                } else if (comp === 7) {   // Meeting
+                    gradColorStart = "#FF5050"
+                    gradColorStop = "#FF7040"
                 }
             }
             if (gamePlayItem.isGameInPast())
@@ -458,16 +466,18 @@ Item {
                 eventIndicator.disableVisibility = true;
 
             if (!gamePlayItem.timeFixed) {
-//                labelLineDate.text = gamePlayItem.timestampReadableLineWithoutTime();
+                //                labelLineDate.text = gamePlayItem.timestampReadableLineWithoutTime();
                 labelLineDate.font.italic = true;
                 itemImageTimeLaps.visible = true;
             }
 
-            showTripInfo(gamePlayItem);
+            if (!bIsOnlyMeeting)
+                showTripInfo(gamePlayItem);
 
             showMeetingInfo(gamePlayItem);
 
-            showTicketInfo(gamePlayItem);
+            if (!bIsOnlyMeeting)
+                showTicketInfo(gamePlayItem);
         }
     }
 

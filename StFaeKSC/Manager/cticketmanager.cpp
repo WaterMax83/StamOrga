@@ -76,6 +76,7 @@ MessageProtocol* cTicketManager::getSeasonTicketList(UserConData* pUserCon, Mess
         ticketObj.insert("discount", pTicket->m_discount);
         ticketObj.insert("index", pTicket->m_index);
         ticketObj.insert("userIndex", pTicket->m_userIndex);
+        ticketObj.insert("timestamp", pTicket->m_timestamp);
 
         arrTickets.append(ticketObj);
     }

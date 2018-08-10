@@ -36,7 +36,7 @@ public:
     cConTcpDataServer();
     ~cConTcpDataServer();
 
-    qint32 initialize(UserConData* pData);
+    qint32 initialize(UserConData* pData, const cConSslUsage sslUsage);
 
     qint32 terminate();
 
@@ -53,12 +53,13 @@ private slots:
     void readyReadDataPort();
 
 private:
-    QTcpServer*   m_pTcpDataServer = NULL;
-    UserConData*  m_pUserConData   = NULL;
-    QTimer*       m_pConTimeout    = NULL;
-    QTcpSocket*   m_pTcpDataSocket = NULL;
-    MessageBuffer m_msgBuffer;
-    QMutex        m_mutex;
+    cConSslServer* m_pTcpDataServer = NULL;
+    UserConData*   m_pUserConData   = NULL;
+    QTimer*        m_pConTimeout    = NULL;
+    QTcpSocket*    m_pTcpDataSocket = NULL;
+    cConSslUsage   m_sslUsage;
+    MessageBuffer  m_msgBuffer;
+    QMutex         m_mutex;
 
     void             checkNewOncomingData();
     MessageProtocol* checkNewMessage(MessageProtocol* msg);

@@ -163,7 +163,9 @@ Flickable {
     function notifyUserIntConnectionFinished(result, msg) {}
 
     function pageOpenedUpdateView() {
-        showSeasonTickets()
+
+        updateSeasonTicketList();
+//        showSeasonTickets()
     }
 
     function showSeasonTickets() {

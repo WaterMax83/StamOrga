@@ -22,6 +22,7 @@
 #include <QObject>
 #include <QtGui/QGuiApplication>
 #include <QtNetwork/QHostInfo>
+#include <QtNetwork/QSslSocket>
 
 #include "../Common/General/cgendisposer.h"
 #include "../Common/Network/messageprotocol.h"
@@ -58,6 +59,12 @@ public:
 
     Q_INVOKABLE qint64 getKeepPastItemsCount();
 
+    bool             getUseSSL(void);
+    Q_INVOKABLE bool getUseSSLSettings(void);
+    Q_INVOKABLE void setUseSSL(bool useSSL);
+    Q_INVOKABLE bool getCanUseSSL(void);
+    QSslCertificate  getSSLCaCertificate(void);
+
     void setAlreadyConnected(const bool con);
 
     Q_INVOKABLE bool isNotificationNewAppVersionEnabled();
@@ -87,14 +94,18 @@ public slots:
     void slotCallBackLookUpHost(const QHostInfo& host);
 
 private:
-    QString m_debugIP;
-    QString m_debugIPWifi;
-    bool    m_bSaveInfosOnApp;
-    bool    m_bLoadGameInfo;
-    bool    m_bUseVersionPopup;
-    bool    m_bIpAddressWasSet;
-    quint64 m_notificationEnabledValue;
-    qint64  m_iKeepPastItemsCount;
+    QString         m_debugIP;
+    QString         m_debugIPWifi;
+    bool            m_bSaveInfosOnApp;
+    bool            m_bLoadGameInfo;
+    bool            m_bUseVersionPopup;
+    bool            m_bIpAddressWasSet;
+    bool            m_bUseSSL;
+    bool            m_bDisableSSLFrom_Start;
+    bool            m_bCanUseSSL;
+    QSslCertificate m_caCert;
+    quint64         m_notificationEnabledValue;
+    qint64          m_iKeepPastItemsCount;
 
 
     QString      m_changeDefaultFont;

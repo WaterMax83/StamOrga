@@ -18,8 +18,11 @@
 
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
+#include <QtNetwork/QNetworkProxy>
+#include <QtNetwork/QSslSocket>
 
 
+#include "../Common/General/config.h"
 #include "../Common/General/globalfunctions.h"
 #include "../Common/General/globaltiming.h"
 #include "../Common/Network/messagecommand.h"
@@ -65,7 +68,11 @@ int cConTcpData::DoBackgroundWork()
     this->m_pConTimeout->setInterval(SOCKET_TIMEOUT_MS);
     connect(this->m_pConTimeout, &QTimer::timeout, this, &cConTcpData::slotConnectionTimeoutFired);
 
-    this->m_pDataTcpSocket = new QTcpSocket(this);
+    if (g_StaGlobalSettings->getUseSSL())
+        this->m_pDataTcpSocket = new QSslSocket(this);
+    else
+        this->m_pDataTcpSocket = new QTcpSocket(this);
+
     if (!this->m_pDataTcpSocket->bind()) {
         qCritical().noquote() << QString("Could not bind socket for dataconnection");
         return -1;
@@ -75,7 +82,13 @@ int cConTcpData::DoBackgroundWork()
     typedef void (QAbstractSocket::*QAbstractSocketErrorSignal)(QAbstractSocket::SocketError);
     connect(this->m_pDataTcpSocket, static_cast<QAbstractSocketErrorSignal>(&QAbstractSocket::error), this, &cConTcpData::slotSocketDataError);
 
-    this->m_pDataTcpSocket->connectToHost(this->m_hMasterReceiver, this->m_dataPort);
+    if (g_StaGlobalSettings->getUseSSL()) {
+        this->m_pDataTcpSocket->setProxy(QNetworkProxy::NoProxy);
+        ((QSslSocket*)this->m_pDataTcpSocket)->addCaCertificate(g_StaGlobalSettings->getSSLCaCertificate());
+        ((QSslSocket*)this->m_pDataTcpSocket)->connectToHostEncrypted(SERVER_HOST_ADDRESS, this->m_dataPort);
+    } else
+        this->m_pDataTcpSocket->connectToHost(this->m_hMasterReceiver, this->m_dataPort);
+
     this->m_pConTimeout->start();
 
     return 0;

@@ -74,6 +74,7 @@ qint32 cDataAppUserEvents::addNewUserEvents(QJsonArray& jsArr)
                 this->m_eventNewFanclubNews++;
             } else {
                 this->m_eventNewFanclubNews = 0;
+                this->startSetUserEvents(pEvent->m_eventID, 0);
             }
         } else if (pEvent->m_type == NOTIFY_TOPIC_NEW_FREE_TICKET) {
             g_DataGamesManager->setGamePlayItemHasEvent(pEvent->m_info.toInt());

@@ -42,9 +42,10 @@ struct msg_Header {
 #define MSG_HEADER_ADD_FANCLUB          0x5     // 20.09.17 for V1.0.4
 #define MSG_HEADER_ADD_AWAYTRIP_INFO    0x6     // 25.01.18 for V1.0.6
 #define MSG_HEADER_JSON_USERPROPS       0x7     // 27.02.18 for V1.0.7
+#define MSG_HEADER_ADD_FANCLUB_MEETING  0x8     // 07.08.18 for V1.1.2
 // clang-format on
 
-#define MSG_HEADER_VERSION MSG_HEADER_JSON_USERPROPS
+#define MSG_HEADER_VERSION MSG_HEADER_ADD_FANCLUB_MEETING
 
 #define MAX_DATAGRAMM_SIZE 512
 

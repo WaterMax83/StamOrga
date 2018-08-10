@@ -42,4 +42,6 @@
 #define STAM_ORGA_VERSION_SAVE "StamOrga.Android.%1.apk"
 #endif
 
+#define SERVER_HOST_ADDRESS "watermax83.ddns.net"
+
 #endif // CONFIG_H
