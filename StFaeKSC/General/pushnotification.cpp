@@ -134,14 +134,15 @@ qint64 PushNotification::sendNewGeneralTopicNotification(const QString header, c
     if (!this->m_initialized)
         return ERROR_CODE_NOT_READY;
 
-    PushNotifyInfo* push  = new PushNotifyInfo();
-    push->m_topic         = PUSH_NOTIFY_TOPIC::PUSH_NOT_GEN_TOPIC;
-    push->m_header        = header;
-    push->m_body          = body;
-    push->m_sendMessageID = getNextInternalPushNumber();
-    push->m_sendTime      = QDateTime::currentMSecsSinceEpoch();
-    push->m_userID        = -1;
-    push->m_info          = "";
+    PushNotifyInfo* push   = new PushNotifyInfo();
+    push->m_topic          = PUSH_NOTIFY_TOPIC::PUSH_NOT_GEN_TOPIC;
+    push->m_userEventTopic = PUSH_NOTIFY_TOPIC::PUSH_NOT_GEN_TOPIC;
+    push->m_header         = header;
+    push->m_body           = body;
+    push->m_sendMessageID  = getNextInternalPushNumber();
+    push->m_sendTime       = QDateTime::currentMSecsSinceEpoch();
+    push->m_userID         = -1;
+    push->m_info           = "";
 
     this->insertNewNotification(push);
 
@@ -153,14 +154,15 @@ qint64 PushNotification::sendNewVersionNotification(const QString body)
     if (!this->m_initialized)
         return ERROR_CODE_NOT_READY;
 
-    PushNotifyInfo* push  = new PushNotifyInfo();
-    push->m_topic         = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_VERSION;
-    push->m_header        = "Neue StamOrga Version";
-    push->m_body          = body;
-    push->m_sendMessageID = getNextInternalPushNumber();
-    push->m_sendTime      = QDateTime::currentMSecsSinceEpoch();
-    push->m_userID        = -1;
-    push->m_info          = STAM_ORGA_VERSION_S;
+    PushNotifyInfo* push   = new PushNotifyInfo();
+    push->m_topic          = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_VERSION;
+    push->m_userEventTopic = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_VERSION;
+    push->m_header         = "Neue StamOrga Version";
+    push->m_body           = body;
+    push->m_sendMessageID  = getNextInternalPushNumber();
+    push->m_sendTime       = QDateTime::currentMSecsSinceEpoch();
+    push->m_userID         = -1;
+    push->m_info           = STAM_ORGA_VERSION_S;
 
     this->insertNewNotification(push);
 
@@ -172,8 +174,16 @@ qint64 PushNotification::sendNewMeetingNotification(const QString body, const qi
     if (!this->m_initialized)
         return ERROR_CODE_NOT_READY;
 
+    GamesPlay* pGame = (GamesPlay*)this->m_pGlobalData->m_GamesList.getItem(gameIndex);
+    if (pGame == NULL)
+        return ERROR_CODE_NOT_FOUND;
+
     PushNotifyInfo* push = new PushNotifyInfo();
-    push->m_topic        = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING;
+    if (IS_PLAY_ONLY_FANCLUB(pGame->m_options))
+        push->m_topic = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_FAN_NEWS;
+    else
+        push->m_topic      = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING;
+    push->m_userEventTopic = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING;
     if (type == MEETING_TYPE_MEETING)
         push->m_header = "Neues Treffen angelegt";
     else
@@ -198,7 +208,7 @@ qint64 PushNotification::sendChangeMeetingNotification(const QString body, const
     this->m_notifyMutex.lock();
 
     foreach (PushNotifyInfo* p, this->m_lPushToSend) {
-        if (p->m_topic == PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING || p->m_topic == PUSH_NOTIFY_TOPIC::PUSH_NOT_CHG_MEETING) {
+        if (p->m_userEventTopic == PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING || p->m_userEventTopic == PUSH_NOTIFY_TOPIC::PUSH_NOT_CHG_MEETING) {
             if (p->m_internalIndex1 == gameIndex) {
                 this->m_notifyMutex.unlock();
                 return -1;
@@ -208,8 +218,16 @@ qint64 PushNotification::sendChangeMeetingNotification(const QString body, const
 
     this->m_notifyMutex.unlock();
 
+    GamesPlay* pGame = (GamesPlay*)this->m_pGlobalData->m_GamesList.getItem(gameIndex);
+    if (pGame == NULL)
+        return ERROR_CODE_NOT_FOUND;
+
     PushNotifyInfo* push = new PushNotifyInfo();
-    push->m_topic        = PUSH_NOTIFY_TOPIC::PUSH_NOT_CHG_MEETING;
+    if (IS_PLAY_ONLY_FANCLUB(pGame->m_options))
+        push->m_topic = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_FAN_NEWS;
+    else
+        push->m_topic      = PUSH_NOTIFY_TOPIC::PUSH_NOT_CHG_MEETING;
+    push->m_userEventTopic = PUSH_NOTIFY_TOPIC::PUSH_NOT_CHG_MEETING;
     if (type == MEETING_TYPE_MEETING)
         push->m_header = "Treffen wurde verändert";
     else
@@ -234,7 +252,7 @@ qint64 PushNotification::sendNewTicketNotification(const QString body, const qin
     this->m_notifyMutex.lock();
 
     foreach (PushNotifyInfo* p, this->m_lPushToSend) {
-        if (p->m_topic == PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING || p->m_topic == PUSH_NOTIFY_TOPIC::PUSH_NOT_CHG_MEETING) {
+        if (p->m_userEventTopic == PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING || p->m_userEventTopic == PUSH_NOTIFY_TOPIC::PUSH_NOT_CHG_MEETING) {
             if (p->m_internalIndex1 == gameIndex && p->m_internalIndex2 == ticketIndex) {
                 this->m_notifyMutex.unlock();
                 return -1;
@@ -246,6 +264,7 @@ qint64 PushNotification::sendNewTicketNotification(const QString body, const qin
 
     PushNotifyInfo* push   = new PushNotifyInfo();
     push->m_topic          = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_TICKET;
+    push->m_userEventTopic = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_TICKET;
     push->m_header         = "Neue Karte frei";
     push->m_body           = body;
     push->m_sendMessageID  = getNextInternalPushNumber();
@@ -279,14 +298,15 @@ qint64 PushNotification::sendNewFirstAwayAccept(const QString body, const qint32
     if (!this->m_initialized)
         return ERROR_CODE_NOT_READY;
 
-    PushNotifyInfo* push  = new PushNotifyInfo();
-    push->m_topic         = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_AWAY_ACCEPT;
-    push->m_header        = "Neuer Auswärtsfahrer";
-    push->m_body          = body;
-    push->m_sendMessageID = getNextInternalPushNumber();
-    push->m_sendTime      = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND;
-    push->m_userID        = userID;
-    push->m_info          = QString::number(gameIndex);
+    PushNotifyInfo* push   = new PushNotifyInfo();
+    push->m_topic          = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_AWAY_ACCEPT;
+    push->m_userEventTopic = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_AWAY_ACCEPT;
+    push->m_header         = "Neuer Auswärtsfahrer";
+    push->m_body           = body;
+    push->m_sendMessageID  = getNextInternalPushNumber();
+    push->m_sendTime       = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND;
+    push->m_userID         = userID;
+    push->m_info           = QString::number(gameIndex);
 
     this->insertNewNotification(push);
 
@@ -301,7 +321,7 @@ qint64 PushNotification::sendNewFanclubNewsNotification(const QString body, cons
     this->m_notifyMutex.lock();
 
     foreach (PushNotifyInfo* p, this->m_lPushToSend) {
-        if (p->m_topic == PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_FAN_NEWS) {
+        if (p->m_userEventTopic == PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_FAN_NEWS) {
             this->m_notifyMutex.unlock();
             return -1;
         }
@@ -309,14 +329,15 @@ qint64 PushNotification::sendNewFanclubNewsNotification(const QString body, cons
 
     this->m_notifyMutex.unlock();
 
-    PushNotifyInfo* push  = new PushNotifyInfo();
-    push->m_topic         = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_FAN_NEWS;
-    push->m_header        = "Fanclub Nachricht";
-    push->m_body          = body;
-    push->m_sendMessageID = getNextInternalPushNumber();
-    push->m_sendTime      = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND;
-    push->m_userID        = userID;
-    push->m_info          = QString::number(newsID);
+    PushNotifyInfo* push   = new PushNotifyInfo();
+    push->m_topic          = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_FAN_NEWS;
+    push->m_userEventTopic = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_FAN_NEWS;
+    push->m_header         = "Fanclub Nachricht";
+    push->m_body           = body;
+    push->m_sendMessageID  = getNextInternalPushNumber();
+    push->m_sendTime       = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND;
+    push->m_userID         = userID;
+    push->m_info           = QString::number(newsID);
 
     this->insertNewNotification(push);
 
@@ -328,14 +349,15 @@ qint64 PushNotification::sendNewMeetingComment(const QString body, const qint32 
     if (!this->m_initialized)
         return ERROR_CODE_NOT_READY;
 
-    PushNotifyInfo* push  = new PushNotifyInfo();
-    push->m_topic         = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_COMMENT;
-    push->m_header        = "Neuer Kommentar";
-    push->m_body          = body;
-    push->m_sendMessageID = getNextInternalPushNumber();
-    push->m_sendTime      = QDateTime::currentMSecsSinceEpoch();
-    push->m_userID        = userID;
-    push->m_info          = QString::number(gameIndex);
+    PushNotifyInfo* push   = new PushNotifyInfo();
+    push->m_topic          = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_COMMENT;
+    push->m_userEventTopic = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_COMMENT;
+    push->m_header         = "Neuer Kommentar";
+    push->m_body           = body;
+    push->m_sendMessageID  = getNextInternalPushNumber();
+    push->m_sendTime       = QDateTime::currentMSecsSinceEpoch();
+    push->m_userID         = userID;
+    push->m_info           = QString::number(gameIndex);
 
     this->insertNewNotification(push);
 
@@ -398,7 +420,7 @@ void PushNotification::slotConnectionTimeout()
     QMutexLocker lock(&this->m_notifyMutex);
 
     if (this->m_doNotUseSSLbecauseOfVersion && !this->m_lastPushNotify->m_info.isEmpty()) {
-        QString sendTopic = this->getTopicStringFromIndex(this->m_lastPushNotify->m_topic);
+        QString sendTopic = this->getTopicStringFromIndex(this->m_lastPushNotify->m_userEventTopic);
         this->m_pGlobalData->addNewUserEvent(sendTopic, this->m_lastPushNotify->m_info, this->m_lastPushNotify->m_userID);
     }
     qint64 sendNumber = -1;
@@ -461,7 +483,7 @@ void PushNotification::finished(QNetworkReply* reply)
         qInfo().noquote() << QString("Finished Notification %2: %1").arg(QString(reply->readAll())).arg(sendNumber);
 
         if (this->m_lastPushNotify != NULL && !this->m_lastPushNotify->m_info.isEmpty()) {
-            QString sendTopic = this->getTopicStringFromIndex(this->m_lastPushNotify->m_topic);
+            QString sendTopic = this->getTopicStringFromIndex(this->m_lastPushNotify->m_userEventTopic);
             this->m_pGlobalData->addNewUserEvent(sendTopic, this->m_lastPushNotify->m_info, this->m_lastPushNotify->m_userID);
         }
     } else

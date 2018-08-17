@@ -26,14 +26,9 @@ import "../controls" as MyControls
 
 Item {
     id: mainPaneCurrentGame
-    property UserInterface userIntCurrentGame
     property var m_gamePlayCurrentItem
     width: parent.width
     height: parent.height
-    //    Rectangle {
-    //        anchors.fill: parent
-    //        color: "#536878"
-    //    }
 
     ColumnLayout {
         id: mainColumnLayoutCurrentGame
@@ -53,8 +48,7 @@ Item {
             Layout.topMargin: gameTopMargin
             Layout.alignment: Qt.AlignTop
             showGameSeperator: false
-            onPressedAndHoldCurrentGame: Qt.openUrlExternally(
-                                             "https://www.youtube.com/watch?v=4DNGMoMNLRY")
+            onPressedAndHoldCurrentGame: Qt.openUrlExternally("https://www.youtube.com/watch?v=4DNGMoMNLRY")
         }
 
         MyComponents.BusyLoadingIndicator {
@@ -125,8 +119,7 @@ Item {
                     if (swipeViewCurrentHomeGame.currentItem === currentMeetInfo) {
                         currentMeetInfo.sendNewComment(textInputConsole.input)
                     } else {
-                        currentAwayTripInfo.sendNewComment(
-                                    textInputConsole.input)
+                        currentAwayTripInfo.sendNewComment(textInputConsole.input)
                     }
                 }
             }
@@ -233,6 +226,32 @@ Item {
         }
     }
 
+    CurrentMediaInfo {
+        id: currentMediaInfo
+        onDragStarted: {
+            movedInfoIndex = 2
+            movedStartY = contentY
+            movedStartMargin = gameHeader.Layout.topMargin
+                    === gameTopMargin ? gameTopMargin : -movedInfoHeigth
+        }
+        onDragEnded: {
+            movedInfoIndex = 0
+            checkMovedInfoEnd(movedStartY - contentY)
+        }
+        onContentYChanged: checkMovedInfo(2, movedStartY - contentY)
+    }
+
+    function currentMediaInfoNewHeaderInfo(text, load) {
+        if (swipeViewCurrentHomeGame.currentItem === currentMediaInfo) {
+            busyIndicatorCurrentGame.loadingVisible = load
+            if (text === "")
+                busyIndicatorCurrentGame.infoVisible = false
+            else
+                busyIndicatorCurrentGame.infoVisible = true
+            busyIndicatorCurrentGame.infoText = text
+        }
+    }
+
     NumberAnimation {
         id: animateMoveInfoUp
         target: gameHeader
@@ -329,7 +348,7 @@ Item {
         currentMeetInfo.showInfoHeader.connect(currentMeetInfoNewHeaderInfo)
         currentMeetInfo.showAllInfoAboutGame()
 
-        if (!sender.isGameAHomeGame()) {
+        if (sender.isGameAAwayGame()) {
             tabModel.append({
                                 text: "Fahrt",
                                 useCommentLine: true
@@ -342,6 +361,15 @@ Item {
             currentAwayTripInfo.showAllInfoAboutGame()
         }
 
+        tabModel.append({
+                            text: "Medien",
+                            useCommentLine: false
+                        })
+        swipeViewCurrentHomeGame.addItem(currentMediaInfo)
+        currentMediaInfo.showInfoHeader.connect(
+                    currentMediaInfoNewHeaderInfo)
+        currentMediaInfo.showAllInfoAboutGame(sender)
+
         var icon = ""
         var favIndex = gDataGameUserData.getFavoriteGameIndex(sender.index)
         if (favIndex <= 0)
@@ -351,8 +379,12 @@ Item {
 
         if (sender.isGameAHomeGame())
             updateHeaderFromMain("Heimspiel", icon)
-        else
-            updateHeaderFromMain("Auswärts", icon)
+        else {
+            if (sender.isGameAAwayGame())
+                updateHeaderFromMain("Auswärts", icon)
+            else
+                updateHeaderFromMain("Treffen", icon)
+        }
     }
 
     function pageOpenedUpdateView() {}

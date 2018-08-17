@@ -37,9 +37,10 @@ MyComponents.CustomDialog {
     property alias competitionIndex : comboBoxCompetition.currentIndex
     property alias competition : comboBoxCompetition.currentText
     property alias date : inputDate.text
+    property alias fixedTime : chBoxTimeFixed.checked
     property alias onlyFanclub : chBoxOnlyFanclub.checked
     property var index
-    property var fixedTime
+
 
 
     signal acceptedDialog()
@@ -190,6 +191,23 @@ MyComponents.CustomDialog {
 
             Text {
                 id: text4
+                text: qsTr("Terminiert:")
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                font.pixelSize: 14
+                color: "white"
+            }
+            CheckBox {
+                id: chBoxTimeFixed
+            }
+        }
+
+        RowLayout {
+            Layout.preferredWidth: parent.width
+            Layout.fillWidth: true
+
+            Text {
+                id: text5
                 text: qsTr("Nur Fanclub:")
                 Layout.fillWidth: true
                 Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter

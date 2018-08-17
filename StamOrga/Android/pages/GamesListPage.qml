@@ -213,6 +213,7 @@ Flickable {
                 var component = Qt.createComponent("../components/ChangeGameDialog.qml");
                 if (component.status === Component.Ready) {
                     var dialog = component.createObject(mainItemGamesMainPage,{popupType: 1});
+                    dialog.y = 0;
                     dialog.headerText = "Spiel ändern";
                     dialog.parentHeight = mainItemGamesMainPage.height
                     dialog.parentWidth = mainItemGamesMainPage.width

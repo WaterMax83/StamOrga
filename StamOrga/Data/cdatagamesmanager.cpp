@@ -46,7 +46,7 @@ extern cStaGlobalManager* g_GlobalManager;
 #define PLAY_SAISON_INDEX   "sIndex"
 #define PLAY_SCORE          "score"
 #define PLAY_COMPETITION    "competition"
-#define PLAY_TIME_FIXED     "timeFixed"
+#define PLAY_OPTION         "option"
 
 #define LOCAL_GAMES_UDPATE "LocalGamesUpdateTime"
 #define SERVER_GAMES_UDPATE "ServerGamesUpdateTime"
@@ -80,8 +80,7 @@ qint32 cDataGamesManager::initialize()
     this->m_initialized = true;
 
     QString value;
-    bool    bValue;
-    qint32  index = 0;
+    qint32  index = 0, i32Value;
 
     while (g_StaSettingsManager->getValue(GAMES_GROUP, PLAY_HOME, index, value) == ERROR_CODE_SUCCESS) {
         GamePlay* pGame = new GamePlay();
@@ -98,8 +97,8 @@ qint32 cDataGamesManager::initialize()
         pGame->setScore(value);
         g_StaSettingsManager->getInt64Value(GAMES_GROUP, PLAY_COMPETITION, index, iValue);
         pGame->setCompetition((CompetitionIndex)iValue);
-        g_StaSettingsManager->getBoolValue(GAMES_GROUP, PLAY_TIME_FIXED, index, bValue);
-        pGame->setTimeFixed(bValue);
+        g_StaSettingsManager->getInt32Value(GAMES_GROUP, PLAY_OPTION, index, i32Value);
+        pGame->setOptions(i32Value);
 
         g_GlobalManager->setQMLObjectOwnershipToCpp(pGame);
         this->addNewGamesPlay(pGame);
@@ -156,8 +155,8 @@ void cDataGamesManager::addNewGamesPlay(GamePlay* sGame, const quint16 updateInd
         if (pGame->competitionValue() != sGame->competitionValue()) {
             pGame->setCompetition((CompetitionIndex)sGame->competitionValue());
         }
-        if (pGame->timeFixed() != sGame->timeFixed()) {
-            pGame->setTimeFixed(sGame->timeFixed());
+        if (pGame->options() != sGame->options()) {
+            pGame->setOptions(sGame->options());
         }
         delete sGame;
     }
@@ -288,7 +287,7 @@ qint32 cDataGamesManager::handleListGamesResponse(MessageProtocol* msg)
         QJsonObject gameObj = arrGames.at(i).toObject();
         GamePlay*   pGame   = new GamePlay();
 
-        pGame->setOnlyFanclub(gameObj.value("fc").toBool());
+        pGame->setOptions(gameObj.value("option").toInt());
         if (pGame->onlyFanclub() && !g_ConUserSettings->userIsFanclubEnabled()) {
             delete pGame;
             continue;
@@ -299,7 +298,6 @@ qint32 cDataGamesManager::handleListGamesResponse(MessageProtocol* msg)
         pGame->setIndex(gameObj.value("index").toInt());
         pGame->setCompetition((CompetitionIndex)gameObj.value("competition").toInt());
         pGame->setTimeStamp((qint64)gameObj.value("timestamp").toDouble());
-        pGame->setTimeFixed(gameObj.value("fixed").toBool());
         pGame->setSeasonIndex(gameObj.value("seasonIndex").toInt());
 
         g_GlobalManager->setQMLObjectOwnershipToCpp(pGame);
@@ -348,7 +346,7 @@ qint32 cDataGamesManager::handleListGamesResponse(MessageProtocol* msg)
         g_StaSettingsManager->setInt64Value(GAMES_GROUP, PLAY_DATETIME, saveIndex, this->m_lGames[i]->timestamp64Bit());
         g_StaSettingsManager->setInt64Value(GAMES_GROUP, PLAY_SAISON_INDEX, saveIndex, this->m_lGames[i]->seasonIndex());
         g_StaSettingsManager->setInt64Value(GAMES_GROUP, PLAY_COMPETITION, saveIndex, this->m_lGames[i]->competitionValue());
-        g_StaSettingsManager->setBoolValue(GAMES_GROUP, PLAY_TIME_FIXED, saveIndex, this->m_lGames[i]->timeFixed());
+        g_StaSettingsManager->setInt32Value(GAMES_GROUP, PLAY_OPTION, saveIndex, this->m_lGames[i]->options());
         g_StaSettingsManager->setInt64Value(GAMES_GROUP, ITEM_INDEX, saveIndex, this->m_lGames[i]->index());
         saveIndex++;
     }
@@ -447,6 +445,8 @@ qint32 cDataGamesManager::startChangeGame(const qint32 index, const qint32 sInde
         return ERROR_CODE_WRONG_PARAMETER;
 
     qint64 timestamp = QDateTime::fromString(date, "dd.MM.yyyy hh:mm").toMSecsSinceEpoch();
+    qint32 option    = fixedTime ? PLAY_OPTIONS_FIXED : 0;
+    option |= onlyFanclub ? PLAY_OPTIONS_FANCLUB : 0;
 
     QJsonObject rootObj;
     rootObj.insert("index", index);
@@ -456,8 +456,7 @@ qint32 cDataGamesManager::startChangeGame(const qint32 index, const qint32 sInde
     rootObj.insert("seasonIndex", sIndex);
     rootObj.insert("competition", compIndex);
     rootObj.insert("timestamp", timestamp);
-    rootObj.insert("fixed", fixedTime);
-    rootObj.insert("onlyFanclub", onlyFanclub);
+    rootObj.insert("option", option);
 
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CHANGE_GAME_TCP);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);

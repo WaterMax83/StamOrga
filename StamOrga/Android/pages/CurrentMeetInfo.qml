@@ -29,7 +29,7 @@ Flickable {
     height: parent.height * 1.2
     contentHeight: mainPaneCurrentMeetInfo.height
     property int meetingType: 0
-    property bool useCommentLine : true
+//    property bool useCommentLine : true
 
     signal showInfoHeader(var text, var load);
 
@@ -381,7 +381,7 @@ Flickable {
             toastManager.show("Info erfolgreich gespeichert", 2000);
             loadMeetingInfo();
         } else {
-            toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
+            toastManager.show(userIntGames.getErrorCodeToString(result), 4000);
             showInfoHeader("Infos speichern hat nicht funktioniert", false)
         }
     }
@@ -477,7 +477,7 @@ Flickable {
                 }
             }
 
-            toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
+            toastManager.show(userIntGames.getErrorCodeToString(result), 4000);
             showInfoHeader("Teilnehmen hat nicht funktioniert", false)
         }
         acceptSeperator.isShiftVisible = true
@@ -489,7 +489,7 @@ Flickable {
             loadMeetingInfo();
             isLastLoadFromComment = true;
         } else {
-            toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
+            toastManager.show(userIntGames.getErrorCodeToString(result), 4000);
             showInfoHeader("Kommentar senden hat nicht funktioniert", false)
         }
         commentSeperator.isShiftVisible = true;

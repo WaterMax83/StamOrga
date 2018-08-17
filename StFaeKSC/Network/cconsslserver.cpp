@@ -37,7 +37,7 @@ cConSslServer::cConSslServer(cConSslUsage ssl, QObject* parent)
         if (m_staticIsSslInit == SSL_UNKNOWN) {
             m_staticIsSslInit = NO_SSL;
 
-            QString sslPath = getUserHomeConfigPath() + "/Settings/SSL";
+            QString sslPath = getUserHomeConfigPath() + "/SSL";
             QFile   keyFile(sslPath + "/server.key");
             QFile   localCertFile(sslPath + "/server.crt");
             QFile   caCertFile(sslPath + "/ca.crt");

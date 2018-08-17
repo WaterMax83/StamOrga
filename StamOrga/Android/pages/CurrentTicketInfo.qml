@@ -28,7 +28,7 @@ Flickable {
     clip: true
     height: parent.height * 1.2
     contentHeight: mainPaneCurrentTicketInfo.height
-    property bool useCommentLine : false
+//    property bool useCommentLine : false
 
     signal showInfoHeader(var text, var load)
 
@@ -289,8 +289,8 @@ Flickable {
         if (result === 1) {
             loadAvailableTicketList()
         } else {
-            toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
-            showInfoHeader(userIntCurrentGame.getErrorCodeToString(result), false)
+            toastManager.show(userIntGames.getErrorCodeToString(result), 4000);
+            showInfoHeader(userIntGames.getErrorCodeToString(result), false)
         }
     }
 
@@ -299,7 +299,7 @@ Flickable {
             toastManager.show("Status erfolgreich geändert", 2000);
             loadAvailableTicketList()
         } else {
-            toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
+            toastManager.show(userIntGames.getErrorCodeToString(result), 4000);
             showInfoHeader("", false);
         }
     }
@@ -330,7 +330,7 @@ Flickable {
             toastManager.show("Karten geladen", 2000);
             showInfoHeader("", false)
         } else {
-            toastManager.show(userIntCurrentGame.getErrorCodeToString(result), 4000);
+            toastManager.show(userIntGames.getErrorCodeToString(result), 4000);
             showInfoHeader("Karten konnten nicht geladen werden", false)
         }
         showInternalTicketList(result);

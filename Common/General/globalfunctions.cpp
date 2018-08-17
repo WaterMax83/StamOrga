@@ -182,6 +182,8 @@ QString getCompetitionString(CompetitionIndex index)
         return "Badischer Pokal";
     case TESTSPIEL:
         return "TestSpiel";
+    case ONLY_MEETING:
+        return "Treffen";
     default:
         return "not implemented";
     }

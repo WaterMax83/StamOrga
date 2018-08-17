@@ -242,37 +242,15 @@ QString Games::showAllGames(const bool showUpdate)
     return rValue;
 }
 
-int Games::changeScheduledValue(const quint32 gameIndex, const bool fixedTime)
+int Games::changeOptionValue(const quint32 gameIndex, const qint32 option)
 {
     GamesPlay* gPlay = (GamesPlay*)this->getItem(gameIndex);
     if (gPlay == NULL)
         return ERROR_CODE_NOT_FOUND;
 
-    if (IS_PLAY_FIXED(gPlay->m_options) != fixedTime) {
-        qint32 options = gPlay->m_options & ~(qint32)PLAY_OPTIONS_FIXED;
-        options |= fixedTime ? PLAY_OPTIONS_FIXED : 0x0;
-        if (this->updateItemValue(gPlay, PLAY_OPTIONS, QVariant(options))) {
-            gPlay->m_options  = options;
-            qint64 lastUpdate = QDateTime::currentMSecsSinceEpoch();
-            if (this->updateItemValue(gPlay, PLAY_LAST_UDPATE, QVariant(lastUpdate)))
-                gPlay->m_lastUpdate = lastUpdate;
-        } else
-            return ERROR_CODE_COMMON;
-    }
-    return ERROR_CODE_SUCCESS;
-}
-
-int Games::changeOnlyFanclubValue(const quint32 gameIndex, const bool onlyFanclub)
-{
-    GamesPlay* gPlay = (GamesPlay*)this->getItem(gameIndex);
-    if (gPlay == NULL)
-        return ERROR_CODE_NOT_FOUND;
-
-    if (IS_PLAY_ONLY_FANCLUB(gPlay->m_options) != onlyFanclub) {
-        qint32 options = gPlay->m_options & ~(qint32)PLAY_OPTIONS_FANCLUB;
-        options |= onlyFanclub ? PLAY_OPTIONS_FANCLUB : 0x0;
-        if (this->updateItemValue(gPlay, PLAY_OPTIONS, QVariant(options))) {
-            gPlay->m_options  = options;
+    if (gPlay->m_options != option) {
+        if (this->updateItemValue(gPlay, PLAY_OPTIONS, QVariant(option))) {
+            gPlay->m_options  = option;
             qint64 lastUpdate = QDateTime::currentMSecsSinceEpoch();
             if (this->updateItemValue(gPlay, PLAY_LAST_UDPATE, QVariant(lastUpdate)))
                 gPlay->m_lastUpdate = lastUpdate;

@@ -84,9 +84,7 @@ public:
                    qint32 season = 0, qint64 lastUpdate = 0);
     QString showAllGames(const bool showUpdate);
 
-    int changeScheduledValue(const quint32 gameIndex, const bool fixedTime);
-
-    int changeOnlyFanclubValue(const quint32 gameIndex, const bool onlyFanclub);
+    int changeOptionValue(const quint32 gameIndex, const qint32 option);
 
     qint64 getTimeStampofFirstTicketGame(const qint32 season);
 

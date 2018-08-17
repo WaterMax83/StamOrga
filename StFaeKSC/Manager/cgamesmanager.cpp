@@ -93,11 +93,13 @@ MessageProtocol* cGamesManager::getGamesList(UserConData* pUserCon, MessageProto
         gameObj.insert("score", pGame->m_score);
         gameObj.insert("index", pGame->m_index);
         gameObj.insert("timestamp", pGame->m_timestamp);
-        gameObj.insert("fixed", IS_PLAY_FIXED(pGame->m_options));
         gameObj.insert("competition", pGame->m_competition);
         gameObj.insert("seasonIndex", pGame->m_seasonIndex);
         gameObj.insert("season", pGame->m_season);
-        gameObj.insert("fc", IS_PLAY_ONLY_FANCLUB(pGame->m_options));
+        if (request->getVersion() < MSG_HEADER_ADD_FANCLUB_MEETING)
+            gameObj.insert("fixed", IS_PLAY_FIXED(pGame->m_options));
+        else
+            gameObj.insert("option", pGame->m_options);
 
         arrGames.append(gameObj);
     }
@@ -108,7 +110,7 @@ MessageProtocol* cGamesManager::getGamesList(UserConData* pUserCon, MessageProto
 
     QByteArray answer = QJsonDocument(rootAns).toJson(QJsonDocument::Compact);
 
-    qInfo().noquote() << QString("User %1 request Games List with %2 entries").arg(pUserCon->m_userName).arg(numbOfGames);
+    qInfo().noquote() << QString("User %1 request Games List with %2 entries").arg(pUserCon->m_userName).arg(arrGames.size());
 
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_GAMES_LIST, answer);
 }
@@ -142,6 +144,9 @@ MessageProtocol* cGamesManager::getGamesInfoList(UserConData* pUserCon, MessageP
             if (pGame->m_timestamp + 2 * MSEC_PER_HOUR < currentTime)
                 continue;
             //    #endif
+            if (pGame->m_competition == CompetitionIndex::ONLY_MEETING && request->getVersion() < MSG_HEADER_ADD_FANCLUB_MEETING)
+                continue;
+
             qint16 freeTickets     = g_GlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_FREE);
             qint16 blockTickets    = g_GlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_BLOCKED);
             qint16 reservedTickets = g_GlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_RESERVED);
@@ -191,18 +196,20 @@ MessageProtocol* cGamesManager::getChangeGameRequest(UserConData* pUserCon, Mess
     if (!this->m_initialized)
         return NULL;
 
+    if (request->getVersion() < MSG_HEADER_ADD_FANCLUB_MEETING)
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME_TCP, ERROR_CODE_UPDATE_APP);
+
     QByteArray  data    = QByteArray(request->getPointerToData());
     QJsonObject rootObj = QJsonDocument::fromJson(data).object();
 
-    qint32           index       = rootObj.value("index").toInt(-1);
-    QString          home        = rootObj.value("home").toString();
-    QString          away        = rootObj.value("away").toString();
-    QString          score       = rootObj.value("score").toString();
-    CompetitionIndex comp        = (CompetitionIndex)rootObj.value("competition").toInt();
-    qint32           sIndex      = rootObj.value("seasonIndex").toInt();
-    qint64           timestamp   = (qint64)rootObj.value("timestamp").toDouble();
-    bool             fixed       = rootObj.value("fixed").toBool();
-    bool             onlyFanclub = rootObj.value("onlyFanclub").toBool(true);
+    qint32           index     = rootObj.value("index").toInt(-1);
+    QString          home      = rootObj.value("home").toString();
+    QString          away      = rootObj.value("away").toString();
+    QString          score     = rootObj.value("score").toString();
+    CompetitionIndex comp      = (CompetitionIndex)rootObj.value("competition").toInt();
+    qint32           sIndex    = rootObj.value("seasonIndex").toInt();
+    qint64           timestamp = (qint64)rootObj.value("timestamp").toDouble();
+    qint32           option    = rootObj.value("option").toInt();
 
     /* game already exists, should only be changed */
     if (index > 0) {
@@ -220,11 +227,7 @@ MessageProtocol* cGamesManager::getChangeGameRequest(UserConData* pUserCon, Mess
     if (index > 0 && index != result) {
         qWarning().noquote() << QString("user %1 tried to changed game %2, but added game %3").arg(pUserCon->m_userName).arg(index).arg(result);
     }
-    result = g_GlobalData->m_GamesList.changeScheduledValue(result, fixed);
-    if (result < 0 || request->getVersion() < MSG_HEADER_ADD_FANCLUB_MEETING)
-        return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME_TCP, result);
-
-    result = g_GlobalData->m_GamesList.changeOnlyFanclubValue(result, onlyFanclub);
+    result = g_GlobalData->m_GamesList.changeOptionValue(result, option);
 
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME_TCP, result);
 }

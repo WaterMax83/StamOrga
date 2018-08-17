@@ -48,6 +48,7 @@ enum PUSH_NOTIFY_TOPIC {
 
 struct PushNotifyInfo {
     PUSH_NOTIFY_TOPIC m_topic;
+    PUSH_NOTIFY_TOPIC m_userEventTopic;
     QString           m_header;
     QString           m_body;
     qint64            m_sendMessageID;

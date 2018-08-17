@@ -36,8 +36,6 @@ GamePlay::GamePlay(QObject* parent)
     this->m_declinedTrip      = 0;
     this->m_driveInfo         = 0;
     this->m_eventCount        = 0;
-    this->m_timeFixed         = false;
-    this->m_bOnlyFanclub      = false;
 }
 
 
@@ -83,6 +81,17 @@ bool GamePlay::isGameASeasonTicketGame()
     }
 
     return false;
+}
+
+bool GamePlay::isGameAAwayGame()
+{
+    if (this->isGameAHomeGame())
+        return false;
+
+    if (this->competitionValue() == CompetitionIndex::ONLY_MEETING)
+        return false;
+
+    return true;
 }
 
 QString GamePlay::getCompetitionRound()

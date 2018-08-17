@@ -170,6 +170,7 @@ Page {
             var component = Qt.createComponent("../components/ChangeGameDialog.qml");
             if (component.status === Component.Ready) {
                 var dialog = component.createObject(mainItemGamesMainPage,{popupType: 1});
+                dialog.y = 0;
                 dialog.headerText = "Neues Spiel";
                 dialog.parentHeight = mainItemGamesMainPage.height
                 dialog.parentWidth = mainItemGamesMainPage.width
@@ -181,6 +182,7 @@ Page {
                 dialog.date = "";
                 dialog.index = 0;
                 dialog.fixedTime = false;
+                dialog.onlyFanclub = false;
                 dialog.font.family= txtForFontFamily.font
                 dialog.acceptedDialog.connect(acceptedAddGameDialog);
                 addGameDialog = dialog

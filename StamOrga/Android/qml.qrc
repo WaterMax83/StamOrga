@@ -113,6 +113,8 @@
         <file>images/timelaps.png</file>
         <file>pages/UpdatePage.qml</file>
         <file>certs/ca.crt</file>
-        <file>components/GamesMeetingItem.qml</file>
+        <file>pages/CurrentMediaInfo.qml</file>
+        <file>components/MediaDelegate.qml</file>
+        <file>pages/MediaPage.qml</file>
     </qresource>
 </RCC>

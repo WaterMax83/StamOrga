@@ -25,6 +25,12 @@
 
 #include "../../Common/General/globalfunctions.h"
 
+#define PLAY_OPTIONS_FIXED 0x1
+#define PLAY_OPTIONS_FANCLUB 0x2
+
+#define IS_PLAY_FIXED(value) (value & PLAY_OPTIONS_FIXED) ? true : false
+#define IS_PLAY_ONLY_FANCLUB(value) (value & PLAY_OPTIONS_FANCLUB) ? true : false
+
 class GamePlay : public QObject
 {
     Q_OBJECT
@@ -34,8 +40,8 @@ class GamePlay : public QObject
     Q_PROPERTY(QString timestamp READ timestamp NOTIFY timestampChanged)
     Q_PROPERTY(QString competition READ competition NOTIFY competitionChanged)
     Q_PROPERTY(qint32 index READ index WRITE setIndex NOTIFY indexChanged)
-    Q_PROPERTY(bool timeFixed READ timeFixed WRITE setTimeFixed NOTIFY timeFixedChanged)
-    Q_PROPERTY(bool onlyFanclub READ onlyFanclub WRITE setOnlyFanclub NOTIFY onlyFanclubChanged)
+    Q_PROPERTY(bool timeFixed READ timeFixed NOTIFY timeFixedChanged)
+    Q_PROPERTY(bool onlyFanclub READ onlyFanclub NOTIFY onlyFanclubChanged)
     Q_PROPERTY(quint8 seasonIndex READ seasonIndex WRITE setSeasonIndex NOTIFY seasonIndexChanged)
     Q_PROPERTY(quint32 event READ getEvent NOTIFY eventChanged)
 public:
@@ -121,30 +127,40 @@ public:
         }
     }
 
-    bool timeFixed()
+    qint32 options() { return this->m_options; }
+    void   setOptions(const qint32 option)
     {
-        return this->m_timeFixed;
-    }
-    void setTimeFixed(const bool fixed)
-    {
-        if (this->m_timeFixed != fixed) {
-            this->m_timeFixed = fixed;
+        if (this->m_options != option) {
+            this->m_options = option;
             emit this->timeFixedChanged();
-        }
-    }
-
-    bool onlyFanclub()
-    {
-        return this->m_bOnlyFanclub;
-    }
-
-    void setOnlyFanclub(const bool only)
-    {
-        if (this->m_bOnlyFanclub != only) {
-            this->m_bOnlyFanclub = only;
             emit this->onlyFanclubChanged();
         }
     }
+
+    bool timeFixed()
+    {
+        return IS_PLAY_FIXED(this->m_options);
+    }
+    //    void setTimeFixed(const bool fixed)
+    //    {
+    //        if (this->m_timeFixed != fixed) {
+    //            this->m_timeFixed = fixed;
+    //            emit this->timeFixedChanged();
+    //        }
+    //    }
+
+    bool onlyFanclub()
+    {
+        return IS_PLAY_ONLY_FANCLUB(this->m_options);
+    }
+
+    //    void setOnlyFanclub(const bool only)
+    //    {
+    //        if (this->m_bOnlyFanclub != only) {
+    //            this->m_bOnlyFanclub = only;
+    //            emit this->onlyFanclubChanged();
+    //        }
+    //    }
 
 
     quint8 seasonIndex() { return this->m_seasonIndex; }
@@ -231,9 +247,9 @@ public:
 
     Q_INVOKABLE bool isGameInPast();
     Q_INVOKABLE bool isGameRunning();
-
     Q_INVOKABLE bool isGameAHomeGame();
     Q_INVOKABLE bool isGameASeasonTicketGame();
+    Q_INVOKABLE bool isGameAAwayGame();
 
     void setEnableAddGame(bool enable);
 
@@ -262,8 +278,7 @@ private:
     qint32           m_index;
     quint8           m_seasonIndex;
     qint64           m_timestamp;
-    bool             m_timeFixed;
-    bool             m_bOnlyFanclub;
+    qint32           m_options;
     qint16           m_freeTickets;
     qint16           m_blockedTickets;
     qint16           m_reservedTickets;
