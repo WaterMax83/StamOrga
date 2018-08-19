@@ -55,7 +55,8 @@ SOURCES += main.cpp \
     ../Data/cdataconsolemanager.cpp \
     ../Data/cdatacommentitem.cpp \
     ../cstaversionmanager.cpp \
-    ../Connection/cconnetworkaccess.cpp
+    ../Connection/cconnetworkaccess.cpp \
+    ../Data/cdatamediamanager.cpp
 
 
 RESOURCES += qml.qrc
@@ -117,7 +118,8 @@ HEADERS += \
     ../Data/cdataconsolemanager.h \
     ../Data/cdatacommentitem.h \
     ../cstaversionmanager.h \
-    ../Connection/cconnetworkaccess.h
+    ../Connection/cconnetworkaccess.h \
+    ../Data/cdatamediamanager.h
 
 INCLUDEPATH += \
     ../ \

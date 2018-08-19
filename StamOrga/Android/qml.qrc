@@ -116,5 +116,6 @@
         <file>pages/CurrentMediaInfo.qml</file>
         <file>components/MediaDelegate.qml</file>
         <file>pages/MediaPage.qml</file>
+        <file>components/PictureFileDialog.qml</file>
     </qresource>
 </RCC>

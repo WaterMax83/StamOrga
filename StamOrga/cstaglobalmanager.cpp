@@ -25,6 +25,7 @@
 #include "Connection/cconusersettings.h"
 #include "Data/cdataconsolemanager.h"
 #include "Data/cdatagamesmanager.h"
+#include "Data/cdatamediamanager.h"
 #include "Data/cdatameetinginfo.h"
 #include "Data/cdatanewsdatamanager.h"
 #include "Data/cdatappinfomanager.h"
@@ -121,6 +122,10 @@ qint32 cStaGlobalManager::initialize()
         rCode                = g_DataConsoleManager->initialize();
     }
     if (rCode == ERROR_CODE_SUCCESS) {
+        g_DataMediaManager = new cDataMediaManager();
+        rCode              = g_DataMediaManager->initialize();
+    }
+    if (rCode == ERROR_CODE_SUCCESS) {
         g_ConManager = new cConManager();
         rCode        = g_ConManager->initialize();
     }
@@ -152,6 +157,7 @@ void cStaGlobalManager::setQmlInformationClasses(QQmlApplicationEngine* engine)
     engine->rootContext()->setContextProperty("gDataAppUserEvents", g_DataAppUserEvents);
     engine->rootContext()->setContextProperty("gDataTripInfo", g_DataTripInfo);
     engine->rootContext()->setContextProperty("gDataConsoleManager", g_DataConsoleManager);
+    engine->rootContext()->setContextProperty("gDataMediaManager", g_DataMediaManager);
     engine->rootContext()->setContextProperty("gConUserSettings", g_ConUserSettings);
 }
 #endif

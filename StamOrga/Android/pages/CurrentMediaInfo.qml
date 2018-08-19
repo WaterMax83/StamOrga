@@ -75,9 +75,9 @@ Flickable {
 
         ListModel {
             id: photosModel
-            ListElement { imageSrc: "../images/account.png" }
-            ListElement { imageSrc: "../images/add.png" }
-            ListElement { imageSrc: "../images/back.png" }
+//            ListElement { imageSrc: "../images/account.png" }
+//            ListElement { imageSrc: "../images/add.png" }
+//            ListElement { imageSrc: "../images/back.png" }
         }
 
 //        DelegateModel {
@@ -113,12 +113,24 @@ Flickable {
                     width: originalImage.paintedWidth; height: originalImage.paintedHeight; anchors.centerIn: originalImage
                     onClicked: {
                         console.log("Clicked Image to open " + index)
-                        var component = Qt.createComponent("../pages/MediaPage.qml")
-                        if (component.status === Component.Ready) {
-                            var sprite = stackView.push(component)
-                            sprite.startWithIndex(index)
-                        } else
-                            console.error("Fehler beim Laden von der Medienseite " + component.errorString())
+                        if (index == 0) {
+                            var componentFile = Qt.createComponent("../components/PictureFileDialog.qml")
+                            if (componentFile.status === Component.Ready) {
+                                var dialog = componentFile.createObject(mainPaneCurrentGame);
+                                dialog.acceptedFileDialog.connect(acceptedFileDialogMedia);
+                                dialog.open();
+//                                var sprite = stackView.push(componentFile)
+//                                sprite.startWithIndex(index)
+                            } else
+                                console.error("Fehler beim Laden des File Dialog " + componentFile.errorString())
+                        } else {
+                            var componentPage = Qt.createComponent("../pages/MediaPage.qml")
+                            if (componentPage.status === Component.Ready) {
+                                var spritePage = stackView.push(componentPage)
+                                spritePage.startWithIndex(index)
+                            } else
+                                console.error("Fehler beim Laden von der Medienseite " + componentPage.errorString())
+                        }
                     }
                 }
             }
@@ -135,12 +147,18 @@ Flickable {
 //        }
 
 //        Item { id: foreground; anchors.fill: parent }
+
+
     }
 
     function showAllInfoAboutGame(sender) {
 
 //        loadAvailableTicketList()
-        console.log("mainPaneCurrentMediaInfo " + mainPaneCurrentMediaInfo.width +  " " + mainPaneCurrentMediaInfo.height)
-        console.log("photosGridView " + photosGridView.width + " " + photosGridView.height)
+        photosModel.append({ imageSrc: "../images/add.png"})
+    }
+
+    function acceptedFileDialogMedia(url) {
+        console.log("Try to add " + url)
+        gDataMediaManager.startAddPicture(m_gamePlayCurrentItem.index, url);
     }
 }

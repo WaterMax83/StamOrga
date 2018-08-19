@@ -29,6 +29,7 @@
 #include "../Data/cdataappuserevents.h"
 #include "../Data/cdataconsolemanager.h"
 #include "../Data/cdatagamesmanager.h"
+#include "../Data/cdatamediamanager.h"
 #include "../Data/cdatameetinginfo.h"
 #include "../Data/cdatanewsdatamanager.h"
 #include "../Data/cdatastatisticmanager.h"
@@ -204,9 +205,9 @@ void cConTcpData::checkNewOncomingData()
             request->m_result = g_DataGamesManager->handleChangeGameResponse(msg);
             break;
 
-            //        case OP_CODE_CMD_RES::ACK_SET_FIXED_GAME_TIME:
-            //                    request.m_result = msg->getIntData();
-            //            break;
+        //        case OP_CODE_CMD_RES::ACK_SET_FIXED_GAME_TIME:
+        //                    request.m_result = msg->getIntData();
+        //            break;
 
         case OP_CODE_CMD_RES::ACK_ADD_TICKET:
             request->m_result = g_DataTicketManager->handleAddSeasonTicketResponse(msg);
@@ -265,6 +266,9 @@ void cConTcpData::checkNewOncomingData()
 
         case OP_CODE_CMD_RES::ACK_CMD_STATISTIC:
             request->m_result = g_DataStatisticManager->handleStatisticResponse(msg);
+            break;
+        case OP_CODE_CMD_RES::ACK_CMD_MEDIA:
+            request->m_result = g_DataMediaManager->handleMediaCommandResponse(msg);
             break;
 #ifndef STAMORGA_APP
         case OP_CODE_CMD_RES::ACK_CMD_CONTROL:
