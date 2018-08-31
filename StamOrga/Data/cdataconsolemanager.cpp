@@ -44,8 +44,11 @@ qint32 cDataConsoleManager::startSendConsoleCommand(const QString command)
     if (!this->m_initialized)
         return ERROR_CODE_NOT_INITIALIZED;
 
+    if (command.isEmpty())
+        return ERROR_CODE_MISSING_PARAMETER;
+
     QJsonObject rootObj;
-    rootObj.insert("cmd", command);
+    rootObj.insert("cmd", command.trimmed());
 
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_SEND_CONSOLE_CMD);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);

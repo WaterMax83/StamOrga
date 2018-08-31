@@ -43,6 +43,7 @@ SOURCES += main.cpp\
     ../Data/cdatanewsdatamanager.cpp \
     ../Data/cdatastatisticmanager.cpp \
     ../Data/cdataticketmanager.cpp \
+    ../Data/cdatamediamanager.cpp \
     ../Data/gameplay.cpp \
     ../Data/newsdataitem.cpp \
     ../Data/seasonticket.cpp \
@@ -81,6 +82,7 @@ HEADERS  += mainwindow.h \
     ../Data/cdatanewsdatamanager.h \
     ../Data/cdatastatisticmanager.h \
     ../Data/cdataticketmanager.h \
+    ../Data/cdatamediamanager.h \
     ../Data/gameplay.h \
     ../Data/newsdataitem.h \
     ../Data/seasonticket.h \

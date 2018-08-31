@@ -172,8 +172,6 @@ Flickable {
                 width: parent.width
                 enabled: isEditMode
                 color: isEditMode ? "#FFFFFF" : "#536878";
-
-                onTextInputChanged: checkNewTextInput()
             }
 
             MyComponents.EditableTextWithHint {
@@ -184,7 +182,6 @@ Flickable {
                 width: parent.width
                 enabled: isEditMode
                 color: isEditMode ? "#FFFFFF" : "#536878";
-                onTextInputChanged: checkNewTextInput()
             }
 
             MyComponents.ShiftableSeperator {
@@ -202,7 +199,6 @@ Flickable {
                 enabled: isEditMode
                 visible: infoSeperator.isShiftVisible
                 color: isEditMode ? "#FFFFFF" : "#536878";
-                onTextInputChanged: checkNewTextInput()
             }
 
             MyComponents.ShiftableSeperator {
@@ -358,7 +354,6 @@ Flickable {
 
     property var  lDataMeetingInfo;
     property bool isEditMode: false
-    property bool isInputAlreadyChanged: false
     property bool isLastLoadFromComment : false
 
     function showAllInfoAboutGame() {
@@ -368,12 +363,6 @@ Flickable {
         else
             lDataMeetingInfo = gDataTripInfo;
         loadMeetingInfo();
-    }
-
-    function checkNewTextInput() {
-        if (isInputAlreadyChanged)
-            return;
-        isInputAlreadyChanged = true;
     }
 
     function notifyChangedMeetingInfoFinished(result) {

@@ -160,6 +160,7 @@ qint32 MediaInfo::initialize(QString filePath)
 qint32 MediaInfo::addNewMediaItem(const QString format, QByteArray& data)
 {
 
+    Q_UNUSED(data);
     //qint32 MediaInfo::addNewAcceptation(const qint32 acceptState, const qint32 userID, QString name)
     //{
     //    if (acceptState == ACCEPT_STATE_NOT_POSSIBLE) {

@@ -235,7 +235,7 @@ MessageProtocol* cMeetingInfoManager::getSendComment(UserConData* pUserCon, Mess
     qint64 messageID = -1;
     qint32 rCode     = ERROR_CODE_MISSING_PARAMETER;
     if (!comment.isEmpty()) {
-        g_GlobalData->requestSendCommentMeeting(gameIndex, type, pUserCon->m_userID, comment, messageID);
+        rCode = g_GlobalData->requestSendCommentMeeting(gameIndex, type, pUserCon->m_userID, comment, messageID);
         if (rCode == ERROR_CODE_SUCCESS) {
             qInfo().noquote() << QString("User %1 send comment to MeetingInfo of game %2: \"%3\"")
                                      .arg(pUserCon->m_userName)

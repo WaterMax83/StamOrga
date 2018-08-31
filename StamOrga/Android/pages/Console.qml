@@ -66,7 +66,7 @@ Item {
            id: rowConsoleCommand
            width: parent.width
            anchors.bottom: parent.bottom
-           anchors.bottomMargin: userInt.isDeviceMobile() ? (textInput.inputFocus ? 10 : 0) : 0
+           anchors.bottomMargin: Qt.inputMethod.visible ? 25: 0
 
            MyComponents.EditableTextWithHint {
                id: textInput
@@ -77,22 +77,25 @@ Item {
                enableKeyEnterSignal: true
                enabled: true
                color: "#FFFFFF"
-               onKeysEnterPressed: gDataConsoleManager.startSendConsoleCommand(textInput.input)
+               onKeysEnterPressed: {
+                   var result = gDataConsoleManager.startSendConsoleCommand(textInput.input)
+                   if (result !== 1)
+                       toastManager.show(userIntCurrentNews.getErrorCodeToString(result), 4000);
+               }
            }
 
            MyComponents.GraphicalButton {
                imageSource: "../images/send.png"
                enabled:  true
                onClickedButton: {
-                   Qt.inputMethod.reset()
-                    gDataConsoleManager.startSendConsoleCommand(textInput.input)
+                   Qt.inputMethod.commit()
+                   var result = gDataConsoleManager.startSendConsoleCommand(textInput.input)
+                   if (result !== 1)
+                       toastManager.show(userInt.getErrorCodeToString(result), 4000);
                }
                Layout.alignment: Qt.AlignRight
            }
        }
-
-
-
    }
 
    function pageOpenedUpdateView() {
@@ -105,8 +108,9 @@ Item {
            textAreaConsole.text = gDataConsoleManager.getLastConsoleOutput();
            toastManager.show("Kommando erfolgreich ausgeführt", 2000);
            textInput.clear();
+           Qt.inputMethod.hide();
        } else {
-           toastManager.show(userIntCurrentNews.getErrorCodeToString(result), 4000);
+           toastManager.show(userInt.getErrorCodeToString(result), 4000);
        }
    }
 

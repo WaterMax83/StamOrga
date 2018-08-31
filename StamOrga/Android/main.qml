@@ -420,17 +420,17 @@ ApplicationWindow {
         }
 
 
-        onNotifyUpdatePasswordRequestFinished: viewUserLogin.notifyUserIntUpdatePasswordFinished(result)
-        onNotifyUpdateReadableNameRequest:  viewUserLogin.notifyUserIntUpdateReadableNameFinished(result)
+        onNotifyUpdatePasswordRequestFinished: stackView.currentItem.notifyUserIntUpdatePasswordFinished(result)
+        onNotifyUpdateReadableNameRequest:  stackView.currentItem.notifyUserIntUpdateReadableNameFinished(result)
 
         onNotifyGamesListFinished: viewMainGames.notifyUserIntGamesListFinished(result)
         onNotifyGamesInfoListFinished: viewMainGames.notifyUserIntGamesInfoListFinished(result);
         onNotifyChangedGameFinished: viewMainGames.notifyGameChangedFinished(result);
         onNotifyGetGameEventsFinished: stackView.currentItem.notifyGetGameEventsFinished(result);
 
-        onNotifySeasonTicketAddFinished: viewSeasonTickets.notifyUserIntSeasonTicketAdd(result)
-        onNotifySeasonTicketRemoveFinished: viewSeasonTickets.notifyUserIntSeasonTicketRemoveFinished(result)
-        onNotifySeasonTicketEditFinished: viewSeasonTickets.notifyUserIntSeasonTicketEditFinished(result)
+        onNotifySeasonTicketAddFinished: stackView.currentItem.notifyUserIntSeasonTicketAdd(result)
+        onNotifySeasonTicketRemoveFinished: stackView.currentItem.notifyUserIntSeasonTicketRemoveFinished(result)
+        onNotifySeasonTicketEditFinished: stackView.currentItem.notifyUserIntSeasonTicketEditFinished(result)
         onNotifySeasonTicketListFinished: if (stackView.currentItem.notifyUserIntSeasonTicketListFinished) stackView.currentItem.notifyUserIntSeasonTicketListFinished(result)
 
         onNotifyAvailableTicketStateChangedFinished: stackView.currentItem.notifyAvailableTicketStateChangedFinished(result);
@@ -445,13 +445,13 @@ ApplicationWindow {
         onNotifySendCommentMeetFinished: stackView.currentItem.notifySendCommentMeetFinished(result);
         onNotifySendCommentTripFinished: stackView.currentItem.notifySendCommentTripFinished(result);
 
-        onNotifyChangeNewsDataFinished: viewFanclubNewList.notifyChangeNewsDataFinished(result);
-        onNotifyFanclubNewsListFinished: viewFanclubNewList.notifyFanclubNewsListFinished(result);
-        onNotifyGetFanclubNewsItemFinished: viewFanclubNewList.notifyGetFanclubNewsItemFinished(result);
-        onNotifyDeleteFanclubNewsItemFinished: viewFanclubNewList.notifyDeleteFanclubNewsItemFinished(result);
+        onNotifyChangeNewsDataFinished: stackView.currentItem.notifyChangeNewsDataFinished(result);
+        onNotifyFanclubNewsListFinished: stackView.currentItem.notifyFanclubNewsListFinished(result);
+        onNotifyGetFanclubNewsItemFinished: stackView.currentItem.notifyGetFanclubNewsItemFinished(result);
+        onNotifyDeleteFanclubNewsItemFinished: stackView.currentItem.notifyDeleteFanclubNewsItemFinished(result);
 
-        onNotifyStatisticsCommandFinished: viewStatistics.notifyStatisticsCommandFinished(result);
-        onNotifyConsoleCommandFinished: viewConsolePage.notifyConsoleCommandFinished(result);
+        onNotifyStatisticsCommandFinished: stackView.currentItem.notifyStatisticsCommandFinished(result);
+        onNotifyConsoleCommandFinished: stackView.currentItem.notifyConsoleCommandFinished(result);
         onNotifyMediaCommandFinished: stackView.currentItem.notifyMediaCommandFinished(result);
     }
 

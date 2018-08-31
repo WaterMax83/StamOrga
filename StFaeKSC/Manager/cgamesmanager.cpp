@@ -237,6 +237,8 @@ MessageProtocol* cGamesManager::getGetGameEventsRequest(UserConData* pUserCon, M
     if (!this->m_initialized)
         return NULL;
 
+    Q_UNUSED(pUserCon);
+
     QByteArray  data    = QByteArray(request->getPointerToData());
     QJsonObject rootObj = QJsonDocument::fromJson(data).object();
 

@@ -45,8 +45,7 @@ Rectangle {
         anchors { fill: parent; leftMargin: 14 }
         verticalAlignment: Text.AlignVCenter
         color: "grey"
-//        opacity: inputText.text.length ? 0 : 1
-        visible: inputText.focus ? false : inputText.length > 0 ? false : true
+        visible: inputText.focus ? false : inputText.text.length > 0 ? false : true
     }
 
     TextEdit {
@@ -63,15 +62,11 @@ Rectangle {
         wrapMode: Text.Wrap
         textFormat: Text.PlainText
         onTextChanged: {
-//            if (text.length > 0)
-//                hintText.visible = false
-//            else
-//                hintText.visible = true
             if (isInit)
                 return;
             textInputChanged();
         }
-        onPreeditTextChanged: console.log("onPreeditTextChanged:" + inputText.preeditText)
+//        onPreeditTextChanged: console.log("onPreeditTextChanged:" + inputText.preeditText)
         Keys.onReturnPressed: {
             if (enableKeyEnterSignal)
                 keysEnterPressed();

@@ -43,8 +43,12 @@ Item {
         }
 
         RowLayout {
+            id: gameHeaderLayout
             width: parent.width
+            Layout.topMargin: gameTopMargin
+            Layout.alignment: Qt.AlignTop
             spacing: 0
+
             MyComponents.GamesDesignItem{
                 id: gameHeader
                 Layout.fillWidth: true
@@ -135,7 +139,7 @@ Item {
             id: rowComment
             width: parent.width
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: 5
+            anchors.bottomMargin: Qt.inputMethod.visible ? 25: 5
             Layout.fillWidth: true
             Layout.margins: 5
             visible: bShowComment
@@ -168,6 +172,7 @@ Item {
                 Layout.topMargin: 5
                 enabled: true
                 onClickedButton: {
+                    Qt.inputMethod.commit()
                     if (textInputConsole.input === "")
                         return;
 
@@ -224,7 +229,7 @@ Item {
         onDragStarted: {
             movedInfoIndex = 2
             movedStartY = contentY
-            movedStartMargin = gameHeader.Layout.topMargin
+            movedStartMargin = gameHeaderLayout.Layout.topMargin
                     === gameTopMargin ? gameTopMargin : -movedInfoHeigth
         }
         onDragEnded: {
@@ -252,7 +257,7 @@ Item {
         onDragStarted: {
             movedInfoIndex = 2
             movedStartY = contentY
-            movedStartMargin = gameHeader.Layout.topMargin
+            movedStartMargin = gameHeaderLayout.Layout.topMargin
                     === gameTopMargin ? gameTopMargin : -movedInfoHeigth
         }
         onDragEnded: {
@@ -267,7 +272,7 @@ Item {
         onDragStarted: {
             movedInfoIndex = 2
             movedStartY = contentY
-            movedStartMargin = gameHeader.Layout.topMargin
+            movedStartMargin = gameHeaderLayout.Layout.topMargin
                     === gameTopMargin ? gameTopMargin : -movedInfoHeigth
         }
         onDragEnded: {
@@ -304,7 +309,7 @@ Item {
         onDragStarted: {
             movedInfoIndex = 2
             movedStartY = contentY
-            movedStartMargin = gameHeader.Layout.topMargin
+            movedStartMargin = gameHeaderLayout.Layout.topMargin
                     === gameTopMargin ? gameTopMargin : -movedInfoHeigth
         }
         onDragEnded: {
@@ -327,14 +332,14 @@ Item {
 
     NumberAnimation {
         id: animateMoveInfoUp
-        target: gameHeader
+        target: gameHeaderLayout
         property: "Layout.topMargin"
         to: -movedInfoHeigth
         duration: 250
     }
     NumberAnimation {
         id: animateMoveInfoDown
-        target: gameHeader
+        target: gameHeaderLayout
         property: "Layout.topMargin"
         to: gameTopMargin
         duration: 250
@@ -346,12 +351,12 @@ Item {
 
         if (movedStartMargin === gameTopMargin) {
             if (diff < 0)
-                gameHeader.Layout.topMargin = Math.max(-movedInfoHeigth,
+                gameHeaderLayout.Layout.topMargin = Math.max(-movedInfoHeigth,
                                                        (diff * 0.5))
         } else if (movedStartMargin === -movedInfoHeigth) {
 
             if (diff > 0)
-                gameHeader.Layout.topMargin = Math.min(
+                gameHeaderLayout.Layout.topMargin = Math.min(
                             gameTopMargin, -movedInfoHeigth + (diff * 0.5))
         }
     }
@@ -374,7 +379,7 @@ Item {
     property int movedInfoIndex: 0
     property int movedStartY: 0
     property int movedStartMargin: 0
-    property int movedInfoHeigth: gameHeader.height + 20
+    property int movedInfoHeigth: gameHeaderLayout.height + 20
     property bool bShowComment: false
     property bool bAddedNewEvent : false
 
@@ -527,8 +532,10 @@ Item {
     }
 
     function notifySendCommentMeetFinished(result) {
-        if (result === 1)
+        if (result === 1) {
+            Qt.inputMethod.hide();
             textInputConsole.clear()
+        }
         graphicalButtonComment.enabled = true;
         currentMeetInfo.notifySendCommentMeetFinished(result)
     }
@@ -556,8 +563,10 @@ Item {
     }
 
     function notifySendCommentTripFinished(result) {
-        if (result === 1)
+        if (result === 1) {
+            Qt.inputMethod.hide();
             textInputConsole.clear()
+        }
         graphicalButtonComment.enabled = true;
         currentAwayTripInfo.notifySendCommentMeetFinished(result)
     }
