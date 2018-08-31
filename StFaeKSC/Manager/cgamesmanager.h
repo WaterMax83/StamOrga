@@ -39,7 +39,7 @@ public:
 
     MessageProtocol* getChangeGameRequest(UserConData* pUserCon, MessageProtocol* request);
 
-//    MessageProtocol* getSeasonTicketRemoveRequest(UserConData* pUserCon, MessageProtocol* request);
+    MessageProtocol* getGetGameEventsRequest(UserConData* pUserCon, MessageProtocol* request);
 
 signals:
 
@@ -49,4 +49,3 @@ public slots:
 extern cGamesManager g_GamesManager;
 
 #endif // CGAMESMANAGER_H
-

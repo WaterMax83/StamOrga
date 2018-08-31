@@ -32,9 +32,7 @@ extern cStaGlobalManager* g_GlobalManager;
 cDataMeetingInfo::cDataMeetingInfo(QObject* parent)
     : cGenDisposer(parent)
 {
-    this->m_info  = "";
-    this->m_when  = "";
-    this->m_where = "";
+    this->resetMeetingInfo();
 }
 
 qint32 cDataMeetingInfo::initialize()
@@ -45,6 +43,14 @@ qint32 cDataMeetingInfo::initialize()
     this->m_initialized = true;
 
     return ERROR_CODE_SUCCESS;
+}
+
+void cDataMeetingInfo::resetMeetingInfo()
+{
+    this->m_info           = "";
+    this->m_when           = "";
+    this->m_where          = "";
+    this->m_bDataIsReseted = true;
 }
 
 
@@ -83,6 +89,8 @@ qint32 cDataMeetingInfo::handleLoadMeetingInfoResponse(MessageProtocol* msg)
     this->clearCommentList();
 
     QMutexLocker lock(&this->m_mutex);
+
+    this->m_bDataIsReseted = false;
 
     if (result != ERROR_CODE_SUCCESS) {
         this->m_where = "";
@@ -142,7 +150,7 @@ qint32 cDataMeetingInfo::handleLoadMeetingInfoResponse(MessageProtocol* msg)
 
     QJsonArray commentArr = rootObj.value("comment").toArray();
     for (int i = 0; i < commentArr.size(); i++) {
-        QJsonObject        commentObj = commentArr.at(i).toObject();
+        QJsonObject       commentObj = commentArr.at(i).toObject();
         cDataCommentItem* pItem      = new cDataCommentItem();
 
         pItem->setUser(commentObj.value("name").toString());
@@ -165,7 +173,7 @@ qint32 cDataMeetingInfo::startSaveMeetingInfo(const qint32 gameIndex, const QStr
 
     QMutexLocker lock(&this->m_mutex);
 
-    if (this->m_when == when && this->m_where == where && this->m_info == info)
+    if (!this->m_bDataIsReseted && this->m_when == when && this->m_where == where && this->m_info == info)
         return ERROR_CODE_NO_ERROR;
 
     QJsonObject rootObj;
@@ -252,7 +260,7 @@ qint32 cDataMeetingInfo::startSendNewComment(const qint32 gameIndex, const QStri
     QJsonObject rootObj;
     rootObj.insert("index", gameIndex);
     rootObj.insert("type", type);
-    rootObj.insert("comment", comment);
+    rootObj.insert("comment", comment.trimmed());
 
     TcpDataConRequest* req;
     if (type == MEETING_TYPE_MEETING)

@@ -233,12 +233,15 @@ MessageProtocol* cMeetingInfoManager::getSendComment(UserConData* pUserCon, Mess
         return NULL;
 
     qint64 messageID = -1;
-    qint32 rCode     = g_GlobalData->requestSendCommentMeeting(gameIndex, type, pUserCon->m_userID, comment, messageID);
-    if (rCode == ERROR_CODE_SUCCESS) {
-        qInfo().noquote() << QString("User %1 send comment to MeetingInfo of game %2: \"%3\"")
-                                 .arg(pUserCon->m_userName)
-                                 .arg(g_GlobalData->m_GamesList.getItemName(gameIndex))
-                                 .arg(comment);
+    qint32 rCode     = ERROR_CODE_MISSING_PARAMETER;
+    if (!comment.isEmpty()) {
+        g_GlobalData->requestSendCommentMeeting(gameIndex, type, pUserCon->m_userID, comment, messageID);
+        if (rCode == ERROR_CODE_SUCCESS) {
+            qInfo().noquote() << QString("User %1 send comment to MeetingInfo of game %2: \"%3\"")
+                                     .arg(pUserCon->m_userName)
+                                     .arg(g_GlobalData->m_GamesList.getItemName(gameIndex))
+                                     .arg(comment);
+        }
     }
 
     QJsonObject rootAns;

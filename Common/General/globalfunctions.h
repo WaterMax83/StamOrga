@@ -114,7 +114,7 @@ enum CompetitionIndex {
     DFB_POKAL       = 4,
     BADISCHER_POKAL = 5,
     TESTSPIEL       = 6,
-    ONLY_MEETING    = 7,
+    OTHER_COMP      = 7,
     MAX_COMPETITION = 8,
 };
 
@@ -132,6 +132,7 @@ extern CompetitionIndex getCompetitionIndex(QString comp);
 extern QString getCompetitionString(CompetitionIndex index);
 extern QString getCompetitionShortString(CompetitionIndex index);
 extern QString createRandomString(qint32 size);
+extern bool gIsGameASeasonTicketGame(CompetitionIndex comp);
 
 // clang-format off
 #define USER_ENABLE_LOG                     0x0001

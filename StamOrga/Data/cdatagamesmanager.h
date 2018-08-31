@@ -57,6 +57,9 @@ public:
                                        const QString score, const bool fixedTime, const bool onlyFanclub);
     qint32             handleChangeGameResponse(MessageProtocol* msg);
 
+    Q_INVOKABLE qint32 startGetGamesEvents(const qint32 index);
+    qint32             handleGetGamesEventsResponse(MessageProtocol* msg);
+
     Q_INVOKABLE bool getSkipedOldGames() { return this->m_bSkipedOldGames; }
 
     qint32 stateChangeCheckUdpate();

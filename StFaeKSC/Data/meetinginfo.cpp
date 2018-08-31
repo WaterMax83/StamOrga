@@ -123,6 +123,9 @@ qint32 MeetingInfo::initialize(QString filePath)
         pComment->m_index     = this->m_pConfigSettings->value(ITEM_INDEX, 0).toUInt();
         pComment->m_timestamp = this->m_pConfigSettings->value(ITEM_TIMESTAMP, 0x0).toLongLong();
 
+        if (pComment->m_itemName.isEmpty())
+            continue;
+
         this->m_lComments.append(pComment);
     }
     this->m_pConfigSettings->endArray();

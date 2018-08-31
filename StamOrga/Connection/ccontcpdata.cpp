@@ -204,10 +204,13 @@ void cConTcpData::checkNewOncomingData()
         case OP_CODE_CMD_RES::ACK_CHANGE_GAME_TCP:
             request->m_result = g_DataGamesManager->handleChangeGameResponse(msg);
             break;
+        case OP_CODE_CMD_RES::ACK_GET_GAME_EVENTS:
+            request->m_result = g_DataGamesManager->handleGetGamesEventsResponse(msg);
+            break;
 
-        //        case OP_CODE_CMD_RES::ACK_SET_FIXED_GAME_TIME:
-        //                    request.m_result = msg->getIntData();
-        //            break;
+            //        case OP_CODE_CMD_RES::ACK_SET_FIXED_GAME_TIME:
+            //                    request.m_result = msg->getIntData();
+            //            break;
 
         case OP_CODE_CMD_RES::ACK_ADD_TICKET:
             request->m_result = g_DataTicketManager->handleAddSeasonTicketResponse(msg);

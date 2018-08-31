@@ -436,6 +436,8 @@ qint32 cDataGamesManager::startChangeGame(const qint32 index, const qint32 sInde
     if (!this->m_initialized)
         return ERROR_CODE_NOT_INITIALIZED;
 
+    QMutexLocker lock(&this->m_mutex);
+
     if (sIndex > 60 || competition == "" || home == "" || away == "" || date == "") {
         qWarning().noquote() << "Standart parameter for changing game are wrong";
         return ERROR_CODE_WRONG_PARAMETER;
@@ -471,6 +473,48 @@ qint32 cDataGamesManager::handleChangeGameResponse(MessageProtocol* msg)
         return ERROR_CODE_NOT_INITIALIZED;
 
     return msg->getIntData();
+}
+
+qint32 cDataGamesManager::startGetGamesEvents(const qint32 index)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QMutexLocker lock(&this->m_mutex);
+
+    QJsonObject rootObj;
+    rootObj.insert("index", index);
+
+    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_GET_GAME_EVENTS);
+    req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+
+    g_ConManager->sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 cDataGamesManager::handleGetGamesEventsResponse(MessageProtocol* msg)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QByteArray  data(msg->getPointerToData());
+    QJsonObject rootObj = QJsonDocument::fromJson(data).object();
+
+    qint32 result = rootObj.value("ack").toInt(ERROR_CODE_NOT_FOUND);
+    if (result != ERROR_CODE_SUCCESS)
+        return result;
+
+    GamePlay* play = this->getGamePlay(rootObj.value("index").toInt(-1));
+    if (play == NULL)
+        return ERROR_CODE_NOT_FOUND;
+
+    QMutexLocker lock(&this->m_mutex);
+
+    play->setGameHasTicketEvent(rootObj.value("tickets").toBool(false));
+    play->setGameHasMeetingEvent(rootObj.value("meeting").toBool(false));
+    play->setGameHasAwayTripEvent(rootObj.value("trip").toBool(false));
+
+    return result;
 }
 
 qint32 cDataGamesManager::stateChangeCheckUdpate()

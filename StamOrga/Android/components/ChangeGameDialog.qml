@@ -38,7 +38,7 @@ MyComponents.CustomDialog {
     property alias competition : comboBoxCompetition.currentText
     property alias date : inputDate.text
     property alias fixedTime : chBoxTimeFixed.checked
-    property alias onlyFanclub : chBoxOnlyFanclub.checked
+    property var onlyFanclub
     property var index
 
 
@@ -145,7 +145,7 @@ MyComponents.CustomDialog {
         ComboBox {
             id: comboBoxCompetition
             implicitWidth: parent.width
-            model: ["1.Bundesliga", "2.Bundesliga", "3.Liga", "DFB Pokal", "Badischer Pokal", "TestSpiel", "Treffen"]
+            model: ["1.Bundesliga", "2.Bundesliga", "3.Liga", "DFB Pokal", "Badischer Pokal", "TestSpiel", "Other"]
             KeyNavigation.tab: inputDate
 //            onCurrentIndexChanged:  spBoxSeasonIndex.to = 38;
             onCurrentTextChanged: {
@@ -159,7 +159,7 @@ MyComponents.CustomDialog {
                     spBoxSeasonIndex.to = 10;
                 else if (currentText === "Badischer Pokal")
                     spBoxSeasonIndex.to = 10;
-                else if (currentText === "TestSpiel" || currentText === "Treffen")
+                else if (currentText === "TestSpiel" || currentText === "Other")
                     spBoxSeasonIndex.to = 60;
             }
         }
@@ -199,23 +199,6 @@ MyComponents.CustomDialog {
             }
             CheckBox {
                 id: chBoxTimeFixed
-            }
-        }
-
-        RowLayout {
-            Layout.preferredWidth: parent.width
-            Layout.fillWidth: true
-
-            Text {
-                id: text5
-                text: qsTr("Nur Fanclub:")
-                Layout.fillWidth: true
-                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                font.pixelSize: 14
-                color: "white"
-            }
-            CheckBox {
-                id: chBoxOnlyFanclub
             }
         }
     }

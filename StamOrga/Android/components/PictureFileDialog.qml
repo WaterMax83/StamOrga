@@ -29,11 +29,12 @@ FileDialog {
     folder: shortcuts.pictures
     selectMultiple: false
     onAccepted: {
-        console.log("You chose: " + fileDialog.fileUrls)
-        acceptedFileDialog(fileDialog.fileUrl);
+        var path = fileDialog.fileUrl.toString();
+        path = path.replace(/^(file:\/{3})/,"")
+        var cleanPath = decodeURIComponent(path);
+        acceptedFileDialog(cleanPath);
     }
     onRejected: {
-        console.log("Canceled")
     }
 //    Component.onCompleted: visible = true
 }

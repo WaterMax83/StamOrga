@@ -210,8 +210,9 @@ QString cStaVersionManager::getVersionChangeInfo()
 
     rValue.append("<b>V1.1.2:</b>(XX.XX.2018)<br>");
     rValue.append("- Installiere neue Version intern<br>");
-    rValue.append("- Verbindung über SSL möglich (-> Einstellungen)<br>");
-    rValue.append("- Ticketänderungszeit, mehrere Benachrichtungen, Treffen ohne Spiel<br>");
+    rValue.append("- Verbindung über SSL möglich (-> siehe Einstellungen)<br>");
+    rValue.append("- Ticketänderungszeit, mehrere Benachrichtungen<br>");
+    rValue.append("- Weitere Events in Spielliste möglich<br>");
 
     rValue.append("<br><b>V1.1.1:</b>(06.07.2018)<br>");
     rValue.append("- Benachrichtigung per Email (auf Wunsch)<br>");

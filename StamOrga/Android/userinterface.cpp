@@ -99,6 +99,14 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
             g_ConUserSettings->startGettingUserProps(true);
         break;
 
+    case OP_CODE_CMD_REQ::REQ_CHANGE_GAME_TCP:
+        emit this->notifyChangedGameFinished(result);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_GET_GAME_EVENTS:
+        emit this->notifyGetGameEventsFinished(result);
+        break;
+
     case OP_CODE_CMD_REQ::REQ_ADD_TICKET:
         emit this->notifySeasonTicketAddFinished(result);
         break;
@@ -125,9 +133,6 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
         emit this->notifyAvailableTicketListFinsished(result);
         break;
 
-    case OP_CODE_CMD_REQ::REQ_CHANGE_GAME_TCP:
-        emit this->notifyChangedGameFinished(result);
-        break;
 
     case OP_CODE_CMD_REQ::REQ_CHANGE_MEETING_INFO:
         emit this->notifyChangedMeetingInfoFinished(result);
@@ -177,9 +182,9 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
         emit this->notifyDeleteFanclubNewsItemFinished(result);
         break;
 
-    //    case OP_CODE_CMD_REQ::REQ_GET_USER_EVENTS:
-    //        emit this->notifyGetUserEvents(result);
-    //        break;
+        //    case OP_CODE_CMD_REQ::REQ_GET_USER_EVENTS:
+        //        emit this->notifyGetUserEvents(result);
+        //        break;
 
     case OP_CODE_CMD_REQ::REQ_SET_USER_EVENTS:
         if (result == ERROR_CODE_SUCCESS)
@@ -188,6 +193,10 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
 
     case OP_CODE_CMD_REQ::REQ_CMD_STATISTIC:
         emit this->notifyStatisticsCommandFinished(result);
+        break;
+
+    case OP_CODE_CMD_REQ::REQ_CMD_MEDIA:
+        emit this->notifyMediaCommandFinished(result);
         break;
 
     default:

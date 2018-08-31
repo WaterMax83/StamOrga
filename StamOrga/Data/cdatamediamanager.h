@@ -33,8 +33,9 @@ public:
 
     qint32 initialize() override;
 
+    Q_INVOKABLE qint32 startGetPictureList(const qint32 gameIndex);
     Q_INVOKABLE qint32 startAddPicture(const qint32 gameIndex, QString url);
-    qint32 handleMediaCommandResponse(MessageProtocol* msg);
+    qint32             handleMediaCommandResponse(MessageProtocol* msg);
 
 signals:
 

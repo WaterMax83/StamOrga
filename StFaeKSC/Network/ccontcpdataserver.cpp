@@ -23,6 +23,7 @@
 #include "../General/console.h"
 #include "../Manager/ccontrolmanager.h"
 #include "../Manager/cgamesmanager.h"
+#include "../Manager/cmediamanager.h"
 #include "../Manager/cmeetinginfomanager.h"
 #include "../Manager/cnewsdatamanager.h"
 #include "../Manager/cstatisticmanager.h"
@@ -234,6 +235,9 @@ MessageProtocol* cConTcpDataServer::checkNewMessage(MessageProtocol* msg)
         case OP_CODE_CMD_REQ::REQ_CHANGE_GAME_TCP:
             ack = g_GamesManager.getChangeGameRequest(this->m_pUserConData, msg);
             break;
+        case OP_CODE_CMD_REQ::REQ_GET_GAME_EVENTS:
+            ack = g_GamesManager.getGetGameEventsRequest(this->m_pUserConData, msg);
+            break;
 
         case OP_CODE_CMD_REQ::REQ_GET_NEWS_DATA_LIST:
             ack = g_NewsDataManager.getNewsDataList(this->m_pUserConData, msg);
@@ -267,6 +271,9 @@ MessageProtocol* cConTcpDataServer::checkNewMessage(MessageProtocol* msg)
 
         case OP_CODE_CMD_REQ::REQ_CMD_STATISTIC:
             ack = g_StatisticManager.handleStatisticCommand(this->m_pUserConData, msg);
+            break;
+        case OP_CODE_CMD_REQ::REQ_CMD_MEDIA:
+            ack = g_MediaManager.handleMediaCommand(this->m_pUserConData, msg);
             break;
 
         case OP_CODE_CMD_REQ::REQ_CMD_CONTROL:

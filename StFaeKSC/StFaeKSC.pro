@@ -68,7 +68,9 @@ SOURCES += main.cpp \
     Manager/cmeetinginfomanager.cpp \
     Manager/ccontrolmanager.cpp \
     Manager/csmtpmanager.cpp \
-    Network/cconsslserver.cpp
+    Network/cconsslserver.cpp \
+    Manager/cmediamanager.cpp \
+    Data/mediainfo.cpp
 
 
 HEADERS += \
@@ -114,7 +116,9 @@ HEADERS += \
     Manager/cmeetinginfomanager.h \
     Manager/ccontrolmanager.h \
     Manager/csmtpmanager.h \
-    Network/cconsslserver.h
+    Network/cconsslserver.h \
+    Manager/cmediamanager.h \
+    Data/mediainfo.h
 
 unix {
 #    QMAKE_POST_LINK = mkdir -p $$OUTPUT_FOLDER && cp $$TARGET $$OUTPUT_FOLDER

@@ -80,7 +80,7 @@ public:
         }
     }
 
-    Q_INVOKABLE QString getTimeStamp() { return QDateTime::fromMSecsSinceEpoch(this->m_timestamp).toString("dd.MMM. yy hh:mm"); }
+    Q_INVOKABLE QString getTimeStamp() { return QDateTime::fromMSecsSinceEpoch(this->m_timestamp).toString("dd.MMM yy hh:mm"); }
     void                setTimeStamp(const qint64 timestamp)
     {
         if (this->m_timestamp != timestamp)

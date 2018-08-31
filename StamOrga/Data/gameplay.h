@@ -251,6 +251,13 @@ public:
     Q_INVOKABLE bool isGameASeasonTicketGame();
     Q_INVOKABLE bool isGameAAwayGame();
 
+    Q_INVOKABLE bool hasGameTicketEvent() { return this->m_bHasTicketEvent; }
+    void             setGameHasTicketEvent(const bool en) { this->m_bHasTicketEvent = en; }
+    Q_INVOKABLE bool hasGameMeetingEvent() { return this->m_bHasMeetingEvent; }
+    void             setGameHasMeetingEvent(const bool en) { this->m_bHasMeetingEvent = en; }
+    Q_INVOKABLE bool hasGameAwayTripEvent() { return this->m_bHasAwayTripEvent; }
+    void             setGameHasAwayTripEvent(const bool en) { this->m_bHasAwayTripEvent = en; }
+
     void setEnableAddGame(bool enable);
 
     static bool compareTimeStampFunctionAscending(GamePlay* p1, GamePlay* p2);
@@ -291,6 +298,10 @@ private:
     qint16           m_declinedTrip;
     qint16           m_driveInfo;
     quint32          m_eventCount;
+
+    bool m_bHasTicketEvent;
+    bool m_bHasMeetingEvent;
+    bool m_bHasAwayTripEvent;
 };
 
 #endif // GAMEPLAY_H

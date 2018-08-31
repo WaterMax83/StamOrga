@@ -66,6 +66,7 @@ Item {
            id: rowConsoleCommand
            width: parent.width
            anchors.bottom: parent.bottom
+           anchors.bottomMargin: userInt.isDeviceMobile() ? (textInput.inputFocus ? 10 : 0) : 0
 
            MyComponents.EditableTextWithHint {
                id: textInput
@@ -83,6 +84,7 @@ Item {
                imageSource: "../images/send.png"
                enabled:  true
                onClickedButton: {
+                   Qt.inputMethod.reset()
                     gDataConsoleManager.startSendConsoleCommand(textInput.input)
                }
                Layout.alignment: Qt.AlignRight

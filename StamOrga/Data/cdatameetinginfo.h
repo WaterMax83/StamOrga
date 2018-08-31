@@ -37,22 +37,24 @@ public:
 
     qint32 initialize();
 
+    Q_INVOKABLE void resetMeetingInfo();
+
     Q_INVOKABLE qint32 startLoadMeetingInfo(const qint32 gameIndex, const qint32 type);
-    qint32 handleLoadMeetingInfoResponse(MessageProtocol* msg);
+    qint32             handleLoadMeetingInfoResponse(MessageProtocol* msg);
 
     Q_INVOKABLE qint32 startSaveMeetingInfo(const qint32 gameIndex, const QString when,
                                             const QString where, const QString info,
                                             const qint32 type);
-    qint32 handleSaveMeetingInfoResponse(MessageProtocol* msg);
+    qint32             handleSaveMeetingInfoResponse(MessageProtocol* msg);
 
     Q_INVOKABLE qint32 startAcceptMeetingInfo(const qint32 gameIndex, const qint32 accept,
                                               const QString name, const qint32 type,
                                               const qint32 acceptIndex = 0);
-    qint32 handAcceptMeetingInfo(MessageProtocol* msg);
+    qint32             handAcceptMeetingInfo(MessageProtocol* msg);
 
     Q_INVOKABLE qint32 startSendNewComment(const qint32 gameIndex, const QString comment,
                                            const qint32 type);
-    qint32 handleSendCommentResponse(MessageProtocol* msg);
+    qint32             handleSendCommentResponse(MessageProtocol* msg);
 
     Q_INVOKABLE QString when() { return this->m_when; }
     Q_INVOKABLE QString where() { return this->m_where; }
@@ -63,12 +65,12 @@ public:
     void setInfo(QString info) { this->m_info = info; }
 
     Q_INVOKABLE AcceptMeetingInfo* getAcceptInfoFromIndex(qint32 index);
-    qint32 addNewAcceptInfo(AcceptMeetingInfo* info);
-    Q_INVOKABLE void clearAcceptInfoList();
+    qint32                         addNewAcceptInfo(AcceptMeetingInfo* info);
+    Q_INVOKABLE void               clearAcceptInfoList();
     Q_INVOKABLE qint32 getAcceptedListCount();
 
     Q_INVOKABLE cDataCommentItem* getCommentFromIndex(qint32 index);
-    Q_INVOKABLE void clearCommentList();
+    Q_INVOKABLE void              clearCommentList();
     Q_INVOKABLE qint32 getCommentCount();
 
 
@@ -76,6 +78,7 @@ private:
     QString                   m_when;
     QString                   m_where;
     QString                   m_info;
+    bool                      m_bDataIsReseted;
     QList<AcceptMeetingInfo*> m_acceptInfo;
     QList<cDataCommentItem*>  m_comments;
     QMutex                    m_mutex;

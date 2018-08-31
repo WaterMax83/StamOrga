@@ -84,7 +84,7 @@ MessageProtocol* cGamesManager::getGamesList(UserConData* pUserCon, MessageProto
             && updateIndex == UpdateIndex::UpdateDiff && pGame->m_lastUpdate <= lastUpdateGamesFromApp)
             continue; // Skip ticket because user already has all info
 
-        if (pGame->m_competition == CompetitionIndex::ONLY_MEETING && request->getVersion() < MSG_HEADER_ADD_FANCLUB_MEETING)
+        if (pGame->m_competition == CompetitionIndex::OTHER_COMP && request->getVersion() < MSG_HEADER_ADD_FANCLUB_MEETING)
             continue;
 
         QJsonObject gameObj;
@@ -144,7 +144,7 @@ MessageProtocol* cGamesManager::getGamesInfoList(UserConData* pUserCon, MessageP
             if (pGame->m_timestamp + 2 * MSEC_PER_HOUR < currentTime)
                 continue;
             //    #endif
-            if (pGame->m_competition == CompetitionIndex::ONLY_MEETING && request->getVersion() < MSG_HEADER_ADD_FANCLUB_MEETING)
+            if (pGame->m_competition == CompetitionIndex::OTHER_COMP && request->getVersion() < MSG_HEADER_ADD_FANCLUB_MEETING)
                 continue;
 
             qint16 freeTickets     = g_GlobalData->getTicketNumber(pGame->m_index, TICKET_STATE_FREE);
@@ -230,4 +230,61 @@ MessageProtocol* cGamesManager::getChangeGameRequest(UserConData* pUserCon, Mess
     result = g_GlobalData->m_GamesList.changeOptionValue(result, option);
 
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME_TCP, result);
+}
+
+MessageProtocol* cGamesManager::getGetGameEventsRequest(UserConData* pUserCon, MessageProtocol* request)
+{
+    if (!this->m_initialized)
+        return NULL;
+
+    QByteArray  data    = QByteArray(request->getPointerToData());
+    QJsonObject rootObj = QJsonDocument::fromJson(data).object();
+
+    qint32 index = rootObj.value("index").toInt(-1);
+
+    QJsonObject rootAns;
+    rootAns.insert("index", index);
+
+    QMutexLocker lock(&g_GlobalData->m_globalDataMutex);
+
+    qint32     result = ERROR_CODE_SUCCESS;
+    GamesPlay* pGame  = (GamesPlay*)g_GlobalData->m_GamesList.getItem(index);
+    if (pGame == NULL) {
+        result = ERROR_CODE_NOT_FOUND;
+    } else {
+        rootAns.insert("tickets", false);
+        rootAns.insert("meeting", false);
+        rootAns.insert("trip", false);
+        if (pGame->m_itemName == "KSC" && gIsGameASeasonTicketGame(pGame->m_competition))
+            rootAns.insert("tickets", true);
+
+        if (pGame->m_competition != OTHER_COMP)
+            rootAns.insert("meeting", true);
+        else {
+            for (int i = 0; i < g_GlobalData->m_meetingInfos.size(); i++) {
+                MeetingInfo* mi = g_GlobalData->m_meetingInfos.at(i);
+                if (mi->getGameIndex() == index) {
+                    rootAns.insert("meeting", true);
+                    break;
+                }
+            }
+        }
+
+        if (pGame->m_itemName != "KSC" && pGame->m_competition != OTHER_COMP)
+            rootAns.insert("awaytrip", true);
+        else {
+            for (int i = 0; i < g_GlobalData->m_awayTripInfos.size(); i++) {
+                MeetingInfo* mi = g_GlobalData->m_awayTripInfos.at(i);
+                if (mi->getGameIndex() == index) {
+                    rootAns.insert("trip", true);
+                    break;
+                }
+            }
+        }
+    }
+
+    rootAns.insert("ack", result);
+    QByteArray answer = QJsonDocument(rootAns).toJson(QJsonDocument::Compact);
+
+    return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_GAME_EVENTS, answer);
 }

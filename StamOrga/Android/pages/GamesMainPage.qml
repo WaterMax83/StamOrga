@@ -167,26 +167,77 @@ Page {
     function toolButtonClicked() {
 
         if (gConUserSettings.userIsGameAddingEnabled() || userIntGames.isDebuggingEnabled()) {
-            var component = Qt.createComponent("../components/ChangeGameDialog.qml");
-            if (component.status === Component.Ready) {
-                var dialog = component.createObject(mainItemGamesMainPage,{popupType: 1});
-                dialog.y = 0;
-                dialog.headerText = "Neues Spiel";
-                dialog.parentHeight = mainItemGamesMainPage.height
-                dialog.parentWidth = mainItemGamesMainPage.width
-                dialog.homeTeam = "";
-                dialog.awayTeam = "";
-                dialog.score = "";
-                dialog.seasonIndex = 1;
-                dialog.competitionIndex = 2;
-                dialog.date = "";
-                dialog.index = 0;
-                dialog.fixedTime = false;
-                dialog.onlyFanclub = false;
-                dialog.font.family= txtForFontFamily.font
-                dialog.acceptedDialog.connect(acceptedAddGameDialog);
-                addGameDialog = dialog
-                dialog.open();
+            menuAddNewGame.open();
+        }
+    }
+
+    Menu {
+        id: menuAddNewGame
+        x: (mainItemGamesMainPage.width - width) / 2
+        y: mainItemGamesMainPage.height / 6
+
+        background: Rectangle {
+            implicitWidth: menuItemAddGame.width
+            color: "#4f4f4f"
+        }
+
+        MenuItem {
+            id: menuItemAddGame
+            font.family: txtForFontFamily.font
+            height: visible ? implicitHeight : 0
+            text: "Spiel hinzufügen"
+            onClicked: {
+                var component = Qt.createComponent("../components/ChangeGameDialog.qml");
+                if (component.status === Component.Ready) {
+                    var dialog = component.createObject(mainItemGamesMainPage,{popupType: 1});
+                    dialog.y = 0;
+                    dialog.headerText = text;
+                    dialog.parentHeight = mainItemGamesMainPage.height
+                    dialog.parentWidth = mainItemGamesMainPage.width
+                    dialog.homeTeam = "";
+                    dialog.awayTeam = "";
+                    dialog.score = "";
+                    dialog.seasonIndex = 1;
+                    dialog.competitionIndex = 2;
+                    dialog.date = "";
+                    dialog.index = 0;
+                    dialog.fixedTime = false;
+                    dialog.onlyFanclub = false;
+                    dialog.font.family= txtForFontFamily.font
+                    dialog.acceptedDialog.connect(acceptedAddGameDialog);
+                    addGameDialog = dialog
+                    dialog.open();
+                }
+            }
+        }
+
+        MenuItem {
+            id: menuItemAddEvent
+            font.family: txtForFontFamily.font
+            height: visible ? implicitHeight : 0
+            text: "Event hinzufügen"
+            onClicked: {
+                var component = Qt.createComponent("../components/ChangeEventDialog.qml");
+                if (component.status === Component.Ready) {
+                    var dialog = component.createObject(mainItemGamesMainPage,{popupType: 1});
+                    dialog.y = 0;
+                    dialog.headerText = text;
+                    dialog.parentHeight = mainItemGamesMainPage.height
+                    dialog.parentWidth = mainItemGamesMainPage.width
+                    dialog.homeTeam = "";
+                    dialog.awayTeam = "";
+                    dialog.score = "";
+                    dialog.seasonIndex = 1;
+                    dialog.competitionIndex = 2;
+                    dialog.date = "";
+                    dialog.index = 0;
+                    dialog.fixedTime = false;
+                    dialog.onlyFanclub = false;
+                    dialog.font.family= txtForFontFamily.font
+                    dialog.acceptedDialog.connect(acceptedAddGameDialog);
+                    addGameDialog = dialog
+                    dialog.open();
+                }
             }
         }
     }

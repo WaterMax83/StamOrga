@@ -42,13 +42,51 @@ Item {
             visible: false
         }
 
-        MyComponents.GamesDesignItem{
-            id: gameHeader
-            Layout.fillWidth: true
-            Layout.topMargin: gameTopMargin
-            Layout.alignment: Qt.AlignTop
-            showGameSeperator: false
-            onPressedAndHoldCurrentGame: Qt.openUrlExternally("https://www.youtube.com/watch?v=4DNGMoMNLRY")
+        RowLayout {
+            width: parent.width
+            spacing: 0
+            MyComponents.GamesDesignItem{
+                id: gameHeader
+                Layout.fillWidth: true
+                Layout.topMargin: gameTopMargin
+                Layout.alignment: Qt.AlignTop
+                showGameSeperator: false
+                onPressedAndHoldCurrentGame: Qt.openUrlExternally("https://www.youtube.com/watch?v=4DNGMoMNLRY")
+            }
+
+            Rectangle {
+                width: 25
+                height: 25
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.margins: 5
+                color : "transparent"
+                visible: gConUserSettings.userIsGameAddingEnabled()
+                Image {
+                    id: addImage
+                    width: parent.width / 3 * 2
+                    height: parent.width / 3 * 2
+                    source: "../images/back.png"
+                    rotation: -90
+                    anchors.centerIn: parent
+                }
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        if (m_gamePlayCurrentItem.hasGameMeetingEvent())
+                            menuItemAddMeeting.visible = false
+                        else
+                            menuItemAddMeeting.visible = true
+
+                        if (m_gamePlayCurrentItem.hasGameAwayTripEvent())
+                            menuItemAddAwayTrip.visible = false
+                        else
+                            menuItemAddAwayTrip.visible = true
+
+                        menuAddNewEvent.open()
+                    }
+                }
+            }
         }
 
         MyComponents.BusyLoadingIndicator {
@@ -130,6 +168,9 @@ Item {
                 Layout.topMargin: 5
                 enabled: true
                 onClickedButton: {
+                    if (textInputConsole.input === "")
+                        return;
+
                     if (swipeViewCurrentHomeGame.currentItem === currentMeetInfo) {
                         currentMeetInfo.sendNewComment(textInputConsole.input);
                     } else {
@@ -144,6 +185,38 @@ Item {
 
     ListModel {
         id: tabModel
+    }
+
+    Menu {
+        id: menuAddNewEvent
+        x: (mainPaneCurrentGame.width - width) / 2
+        y: mainPaneCurrentGame.height / 6
+
+        background: Rectangle {
+            implicitWidth: menuItemAddMeeting.width
+            color: "#4f4f4f"
+        }
+
+        MenuItem {
+            id: menuItemAddMeeting
+            font.family: txtForFontFamily.font
+            height: visible ? implicitHeight : 0
+            text: "Treffen hinzufügen"
+            onClicked: {
+                bAddedNewEvent = true;
+                gDataMeetingInfo.startSaveMeetingInfo(m_gamePlayCurrentItem.index, "", "", "", 0);
+            }
+        }
+        MenuItem {
+            id: menuItemAddAwayTrip
+            font.family: txtForFontFamily.font
+            height: visible ? implicitHeight : 0
+            text: "Fahrt hinzufügen"
+            onClicked: {
+                bAddedNewEvent = true;
+                gDataTripInfo.startSaveMeetingInfo(m_gamePlayCurrentItem.index, "", "", "", 1);
+            }
+        }
     }
 
     CurrentTicketInfo {
@@ -303,6 +376,7 @@ Item {
     property int movedStartMargin: 0
     property int movedInfoHeigth: gameHeader.height + 20
     property bool bShowComment: false
+    property bool bAddedNewEvent : false
 
     function toolButtonClicked() {
         var favIndex = gDataGameUserData.getFavoriteGameIndex(
@@ -327,48 +401,20 @@ Item {
         m_gamePlayCurrentItem = sender
         gameHeader.showGamesInfo(sender)
 
-        if (sender.isGameASeasonTicketGame()) {
-            tabModel.append({
-                                text: "Karten",
-                                useCommentLine: false
-                            })
-            swipeViewCurrentHomeGame.addItem(currentTicketInfo)
-            currentTicketInfo.showInfoHeader.connect(
-                        currentTicketInfoNewHeaderInfo)
-            currentTicketInfo.showAllInfoAboutGame(sender)
-        }
+        gDataGamesManager.startGetGamesEvents(m_gamePlayCurrentItem.index);
 
-        tabModel.append({
-                            text: "Treffen",
-                            useCommentLine: true
-                        })
-        swipeViewCurrentHomeGame.addItem(currentMeetInfo)
+        busyIndicatorCurrentGame.infoVisible = true
+        busyIndicatorCurrentGame.loadingVisible = true
+        busyIndicatorCurrentGame.infoText = "Lade Daten"
 
-        currentMeetInfo.meetingType = 0
-        currentMeetInfo.showInfoHeader.connect(currentMeetInfoNewHeaderInfo)
-        currentMeetInfo.showAllInfoAboutGame()
-
-        if (sender.isGameAAwayGame()) {
-            tabModel.append({
-                                text: "Fahrt",
-                                useCommentLine: true
-                            })
-            swipeViewCurrentHomeGame.addItem(currentAwayTripInfo)
-
-            currentAwayTripInfo.meetingType = 1
-            currentAwayTripInfo.showInfoHeader.connect(
-                        currentAwayTriptInfoNewHeaderInfo)
-            currentAwayTripInfo.showAllInfoAboutGame()
-        }
-
-        tabModel.append({
-                            text: "Medien",
-                            useCommentLine: false
-                        })
-        swipeViewCurrentHomeGame.addItem(currentMediaInfo)
-        currentMediaInfo.showInfoHeader.connect(
-                    currentMediaInfoNewHeaderInfo)
-        currentMediaInfo.showAllInfoAboutGame(sender)
+        //        tabModel.append({
+        //                            text: "Medien",
+        //                            useCommentLine: false
+        //                        })
+        //        swipeViewCurrentHomeGame.addItem(currentMediaInfo)
+        //        currentMediaInfo.showInfoHeader.connect(
+        //                    currentMediaInfoNewHeaderInfo)
+        //        currentMediaInfo.showAllInfoAboutGame(sender)
 
         var icon = ""
         var favIndex = gDataGameUserData.getFavoriteGameIndex(sender.index)
@@ -387,11 +433,62 @@ Item {
         }
     }
 
-    function pageOpenedUpdateView() {}
+    function pageOpenedUpdateView() {
+        gDataMeetingInfo.resetMeetingInfo();
+        gDataTripInfo.resetMeetingInfo();
+    }
 
     function notifyGetUserProperties(result) {
         gameHeader.showGamesInfo(m_gamePlayCurrentItem)
     }
+
+    function notifyGetGameEventsFinished(result) {
+        if (result !== 1) {
+            toastManager.show(userIntGames.getErrorCodeToString(result), 4000);
+            busyIndicatorCurrentGame.infoVisible = true
+            busyIndicatorCurrentGame.loadingVisible = false
+            busyIndicatorCurrentGame.infoText = "Konnte keine Infos über dieses Spiel laden"
+            return;
+        }
+
+
+        var isAnythingOpen = false;
+        if (m_gamePlayCurrentItem.hasGameTicketEvent()) {
+            tabModel.append({text: "Karten", useCommentLine: false  })
+            swipeViewCurrentHomeGame.addItem(currentTicketInfo)
+            currentTicketInfo.showInfoHeader.connect(currentTicketInfoNewHeaderInfo)
+            currentTicketInfo.showAllInfoAboutGame(m_gamePlayCurrentItem)
+            isAnythingOpen = true;
+        }
+
+        if (m_gamePlayCurrentItem.hasGameMeetingEvent()) {
+            tabModel.append({text: "Treffen", useCommentLine: true })
+            swipeViewCurrentHomeGame.addItem(currentMeetInfo)
+
+            currentMeetInfo.meetingType = 0
+            currentMeetInfo.showInfoHeader.connect(currentMeetInfoNewHeaderInfo)
+            currentMeetInfo.showAllInfoAboutGame()
+            isAnythingOpen = true;
+        }
+
+        if (m_gamePlayCurrentItem.hasGameAwayTripEvent()) {
+            tabModel.append({text: "Fahrt", useCommentLine: true })
+            swipeViewCurrentHomeGame.addItem(currentAwayTripInfo)
+
+            currentAwayTripInfo.meetingType = 1
+            currentAwayTripInfo.showInfoHeader.connect(currentAwayTriptInfoNewHeaderInfo)
+            currentAwayTripInfo.showAllInfoAboutGame()
+            isAnythingOpen = true;
+        }
+
+        if (!isAnythingOpen) {
+            busyIndicatorCurrentGame.infoVisible = true
+            busyIndicatorCurrentGame.loadingVisible = false
+            busyIndicatorCurrentGame.infoText = "Keine Elemente vorhanden"
+        }
+    }
+
+    /* ********************** TICKETS *************************** */
 
     function notifyUserIntSeasonTicketListFinished(result) {
         currentTicketInfo.notifyUserIntSeasonTicketListFinished(result)
@@ -416,6 +513,12 @@ Item {
     }
 
     function notifyChangedMeetingInfoFinished(result) {
+        if (bAddedNewEvent) {
+            bAddedNewEvent = false;
+            gDataGamesManager.startGetGamesEvents(m_gamePlayCurrentItem.index);
+            return;
+        }
+
         currentMeetInfo.notifyChangedMeetingInfoFinished(result)
     }
 
@@ -439,6 +542,12 @@ Item {
     }
 
     function notifyChangedAwayTripInfoFinished(result) {
+        if (bAddedNewEvent) {
+            bAddedNewEvent = false;
+            gDataGamesManager.startGetGamesEvents(m_gamePlayCurrentItem.index);
+            return;
+        }
+
         currentAwayTripInfo.notifyChangedMeetingInfoFinished(result)
     }
 
@@ -451,6 +560,11 @@ Item {
             textInputConsole.clear()
         graphicalButtonComment.enabled = true;
         currentAwayTripInfo.notifySendCommentMeetFinished(result)
+    }
+
+    /************************ Media ************************************/
+    function notifyMediaCommandFinished(result){
+        currentMediaInfo.notifyMediaCommandFinished(result);
     }
 
     function notifyUserIntConnectionFinished(result, msg) {}

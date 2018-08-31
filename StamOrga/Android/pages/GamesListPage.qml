@@ -183,6 +183,13 @@ Flickable {
                 if (openCounter > 0) {
                     var globalCoordinates = mapToItem(mainItemGamesMainPage, 0, 0)
                     pressAndHoldCurrentGameMenu.y = globalCoordinates.y - height / 2
+                    if (sender.competitionValue() !== 7) {
+                        menuItemEditGame.visible = true;
+                        menuItemEditEvent.visible = false;
+                    } else {
+                        menuItemEditGame.visible = false;
+                        menuItemEditEvent.visible = true;
+                    }
                     pressAndHoldCurrentGameMenu.open();
                 }
             }
@@ -214,7 +221,37 @@ Flickable {
                 if (component.status === Component.Ready) {
                     var dialog = component.createObject(mainItemGamesMainPage,{popupType: 1});
                     dialog.y = 0;
-                    dialog.headerText = "Spiel ändern";
+                    dialog.headerText = text;
+                    dialog.parentHeight = mainItemGamesMainPage.height
+                    dialog.parentWidth = mainItemGamesMainPage.width
+                    dialog.homeTeam = menuSender.home;
+                    dialog.awayTeam = menuSender.away;
+                    dialog.score = menuSender.score;
+                    dialog.competitionIndex = menuSender.competitionValue() - 1;
+                    dialog.seasonIndex = menuSender.seasonIndex;
+                    dialog.date = menuSender.timestamp;
+                    dialog.index = menuSender.index;
+                    dialog.fixedTime = menuSender.timeFixed;
+                    dialog.onlyFanclub = menuSender.onlyFanclub;
+                    dialog.font.family= txtForFontFamily.font
+                    dialog.acceptedDialog.connect(acceptedChangeGameDialog);
+                    changeGameDialog = dialog
+                    dialog.open();
+                }
+            }
+        }
+
+        MenuItem {
+            id: menuItemEditEvent
+            font.family: txtForFontFamily.font
+            height: visible ? implicitHeight : 0
+            text: "Event editieren"
+            onClicked: {
+                var component = Qt.createComponent("../components/ChangeEventDialog.qml");
+                if (component.status === Component.Ready) {
+                    var dialog = component.createObject(mainItemGamesMainPage,{popupType: 1});
+                    dialog.y = 0;
+                    dialog.headerText = text;
                     dialog.parentHeight = mainItemGamesMainPage.height
                     dialog.parentWidth = mainItemGamesMainPage.width
                     dialog.homeTeam = menuSender.home;

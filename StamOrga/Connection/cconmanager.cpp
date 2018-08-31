@@ -255,6 +255,7 @@ void cConManager::slotDataConLastRequestFinished(TcpDataConRequest* request)
     }
     case OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO:
     case OP_CODE_CMD_REQ::REQ_GET_AWAYTRIP_INFO:
+    case OP_CODE_CMD_REQ::REQ_CMD_MEDIA:
         emit this->signalNotifyCommandFinished(request->m_request, request->m_result);
         if (request->m_result == ERROR_CODE_NOT_FOUND)
             return;

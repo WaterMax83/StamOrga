@@ -36,6 +36,10 @@ GamePlay::GamePlay(QObject* parent)
     this->m_declinedTrip      = 0;
     this->m_driveInfo         = 0;
     this->m_eventCount        = 0;
+
+    this->m_bHasTicketEvent   = false;
+    this->m_bHasMeetingEvent  = false;
+    this->m_bHasAwayTripEvent = false;
 }
 
 
@@ -70,17 +74,7 @@ bool GamePlay::isGameASeasonTicketGame()
     if (!this->isGameAHomeGame())
         return false;
 
-    switch (this->m_comp) {
-    case BUNDESLIGA_1:
-    case BUNDESLIGA_2:
-    case LIGA_3:
-    case DFB_POKAL:
-        return true;
-    default:
-        return false;
-    }
-
-    return false;
+    return gIsGameASeasonTicketGame(this->m_comp);
 }
 
 bool GamePlay::isGameAAwayGame()
@@ -88,7 +82,7 @@ bool GamePlay::isGameAAwayGame()
     if (this->isGameAHomeGame())
         return false;
 
-    if (this->competitionValue() == CompetitionIndex::ONLY_MEETING)
+    if (this->competitionValue() == CompetitionIndex::OTHER_COMP)
         return false;
 
     return true;
@@ -167,7 +161,7 @@ QString GamePlay::getCompetitionShortRound()
         else
             return "TestSpiel";
 #endif
-    } else if (this->m_comp == ONLY_MEETING) {
+    } else if (this->m_comp == OTHER_COMP) {
         return "";
     }
 

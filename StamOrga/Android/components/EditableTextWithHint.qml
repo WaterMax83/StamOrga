@@ -27,6 +27,7 @@ import com.watermax.demo 1.0
 Rectangle {
     property alias hint: hintText.text
     property alias input: inputText.text
+    property alias inputFocus: inputText.focus
     property alias imageSource: rightImage.source
     property bool  enableImage: false
     property bool enableKeyEnterSignal : false
@@ -70,6 +71,7 @@ Rectangle {
                 return;
             textInputChanged();
         }
+        onPreeditTextChanged: console.log("onPreeditTextChanged:" + inputText.preeditText)
         Keys.onReturnPressed: {
             if (enableKeyEnterSignal)
                 keysEnterPressed();

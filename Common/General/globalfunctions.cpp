@@ -161,8 +161,8 @@ CompetitionIndex getCompetitionIndex(QString comp)
         return BADISCHER_POKAL;
     if (comp == "TestSpiel")
         return TESTSPIEL;
-    if (comp == "Treffen")
-        return ONLY_MEETING;
+    if (comp == "Other")
+        return OTHER_COMP;
 
     return NO_COMPETITION;
 }
@@ -182,8 +182,8 @@ QString getCompetitionString(CompetitionIndex index)
         return "Badischer Pokal";
     case TESTSPIEL:
         return "TestSpiel";
-    case ONLY_MEETING:
-        return "Treffen";
+    case OTHER_COMP:
+        return "Other";
     default:
         return "not implemented";
     }
@@ -204,8 +204,8 @@ QString getCompetitionShortString(CompetitionIndex index)
         return "Bfv";
     case TESTSPIEL:
         return "T";
-    case ONLY_MEETING:
-        return "M";
+    case OTHER_COMP:
+        return "O";
     default:
         return "not implemented";
     }
@@ -220,4 +220,18 @@ QString createRandomString(qint32 size)
         rValue = rValue.left(size);
 
     return rValue;
+}
+
+bool gIsGameASeasonTicketGame(CompetitionIndex comp)
+{
+    switch (comp) {
+    case BUNDESLIGA_1:
+    case BUNDESLIGA_2:
+    case LIGA_3:
+        return true;
+    default:
+        return false;
+    }
+
+    return false;
 }

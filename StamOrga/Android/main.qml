@@ -418,23 +418,20 @@ ApplicationWindow {
             if (stackView.currentItem.notifyGetUserProperties)
                 stackView.currentItem.notifyGetUserProperties(result);
         }
-        onNotifyConsoleCommandFinished: stackView.currentItem.notifyConsoleCommandFinished(result)
 
-        onNotifyUpdatePasswordRequestFinished: {
-            stackView.currentItem.notifyUserIntUpdatePasswordFinished(result)
-        }
-        onNotifyUpdateReadableNameRequest: {
-            stackView.currentItem.notifyUserIntUpdateReadableNameFinished(result)
-        }
+
+        onNotifyUpdatePasswordRequestFinished: viewUserLogin.notifyUserIntUpdatePasswordFinished(result)
+        onNotifyUpdateReadableNameRequest:  viewUserLogin.notifyUserIntUpdateReadableNameFinished(result)
+
         onNotifyGamesListFinished: viewMainGames.notifyUserIntGamesListFinished(result)
         onNotifyGamesInfoListFinished: viewMainGames.notifyUserIntGamesInfoListFinished(result);
-        //        onNotifySetGamesFixedTimeFinished: viewMainGames.notifySetGamesFixedTimeFinished(result);
-        onNotifyChangedGameFinished: stackView.currentItem.notifyGameChangedFinished(result);
+        onNotifyChangedGameFinished: viewMainGames.notifyGameChangedFinished(result);
+        onNotifyGetGameEventsFinished: stackView.currentItem.notifyGetGameEventsFinished(result);
 
-        onNotifySeasonTicketAddFinished: stackView.currentItem.notifyUserIntSeasonTicketAdd(result)
-        onNotifySeasonTicketListFinished: stackView.currentItem.notifyUserIntSeasonTicketListFinished(result)
-        onNotifySeasonTicketRemoveFinished: stackView.currentItem.notifyUserIntSeasonTicketRemoveFinished(result)
-        onNotifySeasonTicketEditFinished: stackView.currentItem.notifyUserIntSeasonTicketEditFinished(result)
+        onNotifySeasonTicketAddFinished: viewSeasonTickets.notifyUserIntSeasonTicketAdd(result)
+        onNotifySeasonTicketRemoveFinished: viewSeasonTickets.notifyUserIntSeasonTicketRemoveFinished(result)
+        onNotifySeasonTicketEditFinished: viewSeasonTickets.notifyUserIntSeasonTicketEditFinished(result)
+        onNotifySeasonTicketListFinished: if (stackView.currentItem.notifyUserIntSeasonTicketListFinished) stackView.currentItem.notifyUserIntSeasonTicketListFinished(result)
 
         onNotifyAvailableTicketStateChangedFinished: stackView.currentItem.notifyAvailableTicketStateChangedFinished(result);
         onNotifyAvailableTicketListFinsished: stackView.currentItem.notifyAvailableTicketListFinished(result);
@@ -448,12 +445,14 @@ ApplicationWindow {
         onNotifySendCommentMeetFinished: stackView.currentItem.notifySendCommentMeetFinished(result);
         onNotifySendCommentTripFinished: stackView.currentItem.notifySendCommentTripFinished(result);
 
-        onNotifyChangeNewsDataFinished: stackView.currentItem.notifyChangeNewsDataFinished(result);
-        onNotifyFanclubNewsListFinished: stackView.currentItem.notifyFanclubNewsListFinished(result);
-        onNotifyGetFanclubNewsItemFinished: stackView.currentItem.notifyGetFanclubNewsItemFinished(result);
-        onNotifyDeleteFanclubNewsItemFinished: stackView.currentItem.notifyDeleteFanclubNewsItemFinished(result);
+        onNotifyChangeNewsDataFinished: viewFanclubNewList.notifyChangeNewsDataFinished(result);
+        onNotifyFanclubNewsListFinished: viewFanclubNewList.notifyFanclubNewsListFinished(result);
+        onNotifyGetFanclubNewsItemFinished: viewFanclubNewList.notifyGetFanclubNewsItemFinished(result);
+        onNotifyDeleteFanclubNewsItemFinished: viewFanclubNewList.notifyDeleteFanclubNewsItemFinished(result);
 
-        onNotifyStatisticsCommandFinished: stackView.currentItem.notifyStatisticsCommandFinished(result);
+        onNotifyStatisticsCommandFinished: viewStatistics.notifyStatisticsCommandFinished(result);
+        onNotifyConsoleCommandFinished: viewConsolePage.notifyConsoleCommandFinished(result);
+        onNotifyMediaCommandFinished: stackView.currentItem.notifyMediaCommandFinished(result);
     }
 
     Connections {

@@ -21,6 +21,7 @@
 
 #include "ccontrolmanager.h"
 #include "cgamesmanager.h"
+#include "cmediamanager.h"
 #include "cmeetinginfomanager.h"
 #include "cnewsdatamanager.h"
 #include "csmtpmanager.h"
@@ -49,6 +50,9 @@ qint32 cGlobalManager::initialize()
 
     if (rValue == ERROR_CODE_SUCCESS)
         rValue = g_MeetingInfoManager.initialize();
+
+    if (rValue == ERROR_CODE_SUCCESS)
+        rValue = g_MediaManager.initialize();
 
     if (rValue == ERROR_CODE_SUCCESS) {
         rValue = g_SmtpManager.initialize();

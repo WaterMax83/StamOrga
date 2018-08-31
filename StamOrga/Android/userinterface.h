@@ -65,6 +65,8 @@ signals:
     void notifyUpdateReadableNameRequest(qint32 result);
     void notifyGamesListFinished(qint32 result);
     void notifyGamesInfoListFinished(qint32 result);
+    void notifyChangedGameFinished(qint32 result);
+    void notifyGetGameEventsFinished(qint32 result);
     //    void notifySetGamesFixedTimeFinished(qint32 result);
     void notifySeasonTicketAddFinished(qint32 result);
     void notifySeasonTicketRemoveFinished(qint32 result);
@@ -72,7 +74,6 @@ signals:
     void notifySeasonTicketListFinished(qint32 result);
     void notifyAvailableTicketStateChangedFinished(qint32 result);
     void notifyAvailableTicketListFinsished(qint32 result);
-    void notifyChangedGameFinished(qint32 result);
     void notifyChangedMeetingInfoFinished(qint32 result);
     void notifyChangedAwayTripInfoFinished(qint32 result);
     void notifyLoadMeetingInfoFinished(qint32 result);
@@ -86,6 +87,7 @@ signals:
     void notifyGetFanclubNewsItemFinished(qint32 result);
     void notifyDeleteFanclubNewsItemFinished(qint32 result);
     void notifyStatisticsCommandFinished(qint32 result);
+    void notifyMediaCommandFinished(qint32 result);
 
 public slots:
     void slotConnectionRequestFinished(qint32 result, const QString msg);
