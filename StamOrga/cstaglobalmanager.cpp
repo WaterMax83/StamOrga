@@ -134,6 +134,9 @@ qint32 cStaGlobalManager::initialize()
         g_PCControlManager = new cPCControlManager();
         rCode              = g_PCControlManager->initialize();
     }
+#else
+    if (rCode == ERROR_CODE_SUCCESS)
+        this->m_mediaProvider = new cDataMediaProvider();
 #endif
 
     if (rCode == ERROR_CODE_SUCCESS)
@@ -159,6 +162,10 @@ void cStaGlobalManager::setQmlInformationClasses(QQmlApplicationEngine* engine)
     engine->rootContext()->setContextProperty("gDataConsoleManager", g_DataConsoleManager);
     engine->rootContext()->setContextProperty("gDataMediaManager", g_DataMediaManager);
     engine->rootContext()->setContextProperty("gConUserSettings", g_ConUserSettings);
+
+#ifdef STAMORGA_APP
+    engine->addImageProvider("media", this->m_mediaProvider);
+#endif
 }
 #endif
 

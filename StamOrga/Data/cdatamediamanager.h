@@ -20,10 +20,16 @@
 #define CDATAMEDIAMANAGER_H
 
 #include <QObject>
+#include <QtCore/QList>
 #include <QtCore/QMutex>
 
 #include "../Common/General/cgendisposer.h"
 #include "../Common/Network/messageprotocol.h"
+
+struct MediaContent {
+    QString    m_fileUrl;
+    QByteArray m_data;
+};
 
 class cDataMediaManager : public cGenDisposer
 {
@@ -35,16 +41,20 @@ public:
 
     Q_INVOKABLE qint32 startGetPictureList(const qint32 gameIndex);
     Q_INVOKABLE qint32 startAddPicture(const qint32 gameIndex, QString url);
+    Q_INVOKABLE qint32 startDeletePictures(const qint32 gameIndex, QStringList list);
     qint32             handleMediaCommandResponse(MessageProtocol* msg);
+
+    Q_INVOKABLE qint32 getMediaCount();
+    Q_INVOKABLE QString getMediaFileString(qint32 index);
 
 signals:
 
 public slots:
 
 private:
-    QMutex m_mutex;
+    QMutex               m_mutex;
+    QList<MediaContent*> m_files;
 };
-
 
 extern cDataMediaManager* g_DataMediaManager;
 #endif // CDATAMEDIAMANAGER_H

@@ -298,8 +298,15 @@ qint64 PushNotification::sendNewFirstAwayAccept(const QString body, const qint32
     if (!this->m_initialized)
         return ERROR_CODE_NOT_READY;
 
-    PushNotifyInfo* push   = new PushNotifyInfo();
-    push->m_topic          = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_AWAY_ACCEPT;
+    GamesPlay* pGame = (GamesPlay*)this->m_pGlobalData->m_GamesList.getItem(gameIndex);
+    if (pGame == NULL)
+        return ERROR_CODE_NOT_FOUND;
+
+    PushNotifyInfo* push = new PushNotifyInfo();
+    if (IS_PLAY_ONLY_FANCLUB(pGame->m_options))
+        push->m_topic = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_FAN_NEWS;
+    else
+        push->m_topic      = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_AWAY_ACCEPT;
     push->m_userEventTopic = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_AWAY_ACCEPT;
     push->m_header         = "Neuer Auswärtsfahrer";
     push->m_body           = body;

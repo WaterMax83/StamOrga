@@ -25,15 +25,8 @@
 // clang-format off
 #define MEDIA_HEADER          "MediaHeader"
 
-//#define MEET_INFO_HEAD_WHEN     "when"
-//#define MEET_INFO_HEAD_WHERE    "where"
-//#define MEET_INFO_HEAD_INFO     "infoseg"
-//#define MEET_INFO_HEAD_TYPE     "type"
+#define MEDIA_USER_ID         "userID"
 
-//#define MEET_INFO_STATE         "acceptState"
-//#define MEET_INFO_USER_ID       "userID"
-
-//#define GROUP_COMMENTS          "Comments"
 // clang-format on
 
 MediaInfo::MediaInfo()
@@ -80,8 +73,8 @@ qint32 MediaInfo::initialize(QString filePath)
 
     this->m_year        = this->m_pConfigSettings->value("year", 0).toUInt();
     this->m_competition = this->m_pConfigSettings->value("competition", 0).toUInt();
-    this->m_seasonIndex = this->m_pConfigSettings->value("seasonIndex", 0).toUInt();
-    this->m_gameIndex   = this->m_pConfigSettings->value("gameIndex", 0).toUInt();
+    this->m_seasonIndex = this->m_pConfigSettings->value("seasonIndex", 0).toInt();
+    this->m_gameIndex   = this->m_pConfigSettings->value("gameIndex", 0).toInt();
 
     this->m_pConfigSettings->endGroup();
 
@@ -98,10 +91,11 @@ qint32 MediaInfo::initialize(QString filePath)
 
         for (int i = 0; i < sizeOfArray; i++) {
             this->m_pConfigSettings->setArrayIndex(i);
-            ConfigItem* media  = new ConfigItem();
+            MediaItem* media   = new MediaItem();
             media->m_itemName  = this->m_pConfigSettings->value(ITEM_NAME, "").toString();
-            media->m_index     = this->m_pConfigSettings->value(ITEM_INDEX, 0).toUInt();
+            media->m_index     = this->m_pConfigSettings->value(ITEM_INDEX, 0).toInt();
             media->m_timestamp = this->m_pConfigSettings->value(ITEM_TIMESTAMP, 0x0).toLongLong();
+            media->m_userID    = this->m_pConfigSettings->value(MEDIA_USER_ID, 0).toInt();
 
             if (!this->addNewMediaInfo(media))
                 bProblems = true;
@@ -112,8 +106,8 @@ qint32 MediaInfo::initialize(QString filePath)
 
 
     for (int i = 0; i < this->m_lAddItemProblems.size(); i++) {
-        bProblems          = true;
-        ConfigItem* pMedia = (ConfigItem*)(this->getProblemItemFromArrayIndex(i));
+        bProblems         = true;
+        MediaItem* pMedia = (MediaItem*)(this->getProblemItemFromArrayIndex(i));
         if (pMedia == NULL)
             continue;
         pMedia->m_index = this->getNextInternalIndex();
@@ -129,50 +123,9 @@ qint32 MediaInfo::initialize(QString filePath)
     return ERROR_CODE_SUCCESS;
 }
 
-//qint32 MediaInfo::changeMeetingInfo(const QString when, const QString where, const QString info)
-//{
-//    if (this->m_when != when) {
-//        this->updateHeaderValue(MEET_INFO_HEAD_WHEN, when);
-//        this->m_when = when;
-//    }
-
-//    if (this->m_where != where) {
-//        this->updateHeaderValue(MEET_INFO_HEAD_WHERE, where);
-//        this->m_where = where;
-//    }
-
-//    if (this->m_info != info) {
-//        this->updateHeaderValue(MEET_INFO_HEAD_INFO, info);
-//        this->m_info = info;
-//    }
-
-//    return ERROR_CODE_SUCCESS;
-//}
-
-//qint32 MediaInfo::getMeetingInfo(QString& when, QString& where, QString& info)
-//{
-//    when  = this->m_when;
-//    where = this->m_where;
-//    info  = this->m_info;
-//    return ERROR_CODE_SUCCESS;
-//}
-
-qint32 MediaInfo::addNewMediaItem(const QString format, QByteArray& data)
+qint32 MediaInfo::addNewMediaItem(const QString format, QByteArray& data, const qint32 userID)
 {
-
     Q_UNUSED(data);
-    //qint32 MediaInfo::addNewAcceptation(const qint32 acceptState, const qint32 userID, QString name)
-    //{
-    //    if (acceptState == ACCEPT_STATE_NOT_POSSIBLE) {
-    //        qWarning().noquote() << QString("Could not add acceptation \"%1\", state 0 is not allowed").arg(name);
-    //        return ERROR_CODE_COMMON;
-    //    }
-
-    //    if (this->itemExists(name)) {
-    //        qWarning().noquote() << QString("Could not add acceptation \"%1\", name already exists").arg(name);
-    //        return ERROR_CODE_ALREADY_EXIST;
-    //    }
-
 
     int     newIndex = this->getNextInternalIndex();
     QString name     = QString("Media_Game_%1_%2.%3").arg(this->m_gameIndex).arg(newIndex).arg(format);
@@ -189,14 +142,17 @@ qint32 MediaInfo::addNewMediaItem(const QString format, QByteArray& data)
     this->m_pConfigSettings->setValue(ITEM_TIMESTAMP, timestamp);
     this->m_pConfigSettings->setValue(ITEM_INDEX, newIndex);
 
+    this->m_pConfigSettings->setValue(MEDIA_USER_ID, userID);
+
     this->m_pConfigSettings->endArray();
     this->m_pConfigSettings->endGroup();
     this->m_pConfigSettings->sync();
 
-    ConfigItem* info  = new ConfigItem();
+    MediaItem* info   = new MediaItem();
     info->m_itemName  = name;
     info->m_timestamp = timestamp;
     info->m_index     = newIndex;
+    info->m_userID    = userID;
     this->addNewMediaInfo(info, false);
 
     this->sortMedias();
@@ -205,97 +161,30 @@ qint32 MediaInfo::addNewMediaItem(const QString format, QByteArray& data)
     return ERROR_CODE_SUCCESS;
 }
 
-//qint32 MediaInfo::changeAcceptation(const qint32 acceptIndex, const qint32 acceptState, const qint32 userID, QString name)
-//{
-//    AcceptMeetingInfo* aInfo = (AcceptMeetingInfo*)this->getItem(acceptIndex);
-//    if (aInfo == NULL) {
-//        qWarning().noquote() << QString("Could not found a accept meeting info to change with index %1").arg(acceptIndex);
-//        return ERROR_CODE_NOT_FOUND;
-//    }
+qint32 MediaInfo::removeMediaItems(QStringList& lMedias)
+{
+    if (lMedias.size() == 0)
+        return ERROR_CODE_COMMON;
 
-//    this->m_mInternalInfoMutex.lock();
+    QMutexLocker locker(&this->m_mInternalInfoMutex);
 
-//    bool bChangedItem = false;
-//    if (aInfo->m_state != acceptState) {
-//        if (this->updateItemValue(aInfo, MEET_INFO_STATE, QVariant(acceptState))) {
-//            aInfo->m_state = acceptState;
-//            qInfo().noquote() << QString("Changed accept state from game %1 to %2").arg(this->m_gameIndex).arg(acceptState);
-//            bChangedItem = true;
-//        }
-//    }
-//    if (aInfo->m_itemName != name) {
-//        if (this->updateItemValue(aInfo, ITEM_NAME, QVariant(name))) {
-//            aInfo->m_itemName = name;
-//            qInfo().noquote() << QString("Changed accept name from game %1 to %2").arg(this->m_gameIndex).arg(name);
-//            bChangedItem = true;
-//        }
-//    }
-//    if (aInfo->m_userID != userID) {
-//        if (this->updateItemValue(aInfo, MEET_INFO_USER_ID, QVariant(userID)))
-//            aInfo->m_userID = userID;
-//    }
+    qint32 removeCounter = 0;
+    foreach (QString url, lMedias) {
+        for (int i = 0; i < this->m_lInteralList.size(); i++) {
+            if (this->m_lInteralList[i]->m_itemName == url) {
+                this->m_lInteralList.removeAt(i);
+                removeCounter++;
+            }
+        }
+    }
 
-//    this->m_mInternalInfoMutex.unlock();
+    if (removeCounter > 0) {
+        this->saveCurrentInteralList();
+        return ERROR_CODE_SUCCESS;
+    }
 
-//    if (bChangedItem)
-//        this->sortAcceptations();
-
-//    return ERROR_CODE_SUCCESS;
-//}
-
-//bool MediaInfo::updateHeaderValue(QString key, QVariant value)
-//{
-//    bool         rValue = true;
-//    QMutexLocker locker(&this->m_mConfigIniMutex);
-
-//    this->m_pConfigSettings->beginGroup(this->getMeetingHeader());
-//    this->m_pConfigSettings->setValue(key, value);
-//    this->m_pConfigSettings->endGroup();
-//    return rValue;
-//}
-
-//quint16 MediaInfo::getAcceptedNumber(const qint32 state)
-//{
-//    QMutexLocker locker(&this->m_mInternalInfoMutex);
-
-//    quint16 rValue = 0;
-//    for (int i = 0; i < this->getNumberOfInternalList(); i++) {
-//        AcceptMeetingInfo* pInfo = (AcceptMeetingInfo*)(this->getItemFromArrayIndex(i));
-//        if (pInfo->m_state == state)
-//            rValue++;
-//    }
-//    return rValue;
-//}
-
-//qint32 MediaInfo::addMeetingComment(const qint32 userID, const qint64 timestamp, const QString comment)
-//{
-//    QMutexLocker locker1(&this->m_mConfigIniMutex);
-//    QMutexLocker locker2(&this->m_mInternalInfoMutex);
-
-//    ConfigItem* pComment  = new ConfigItem();
-//    pComment->m_itemName  = comment;
-//    pComment->m_index     = userID;
-//    pComment->m_timestamp = timestamp;
-
-//    this->m_pConfigSettings->beginGroup(GROUP_COMMENTS);
-//    this->m_pConfigSettings->beginWriteArray(CONFIG_LIST_ARRAY);
-//    this->m_pConfigSettings->setArrayIndex(this->m_lComments.size());
-
-//    this->m_pConfigSettings->setValue(ITEM_NAME, comment);
-//    this->m_pConfigSettings->setValue(ITEM_TIMESTAMP, timestamp);
-//    this->m_pConfigSettings->setValue(ITEM_INDEX, userID);
-
-//    this->m_pConfigSettings->endArray();
-//    this->m_pConfigSettings->endGroup();
-//    this->m_pConfigSettings->sync();
-
-//    this->m_lComments.append(pComment);
-
-//    std::sort(this->m_lComments.begin(), this->m_lComments.end(), ConfigItem::compareTimeStampFunctionAscending);
-
-//    return ERROR_CODE_SUCCESS;
-//}
-
+    return ERROR_CODE_NOT_FOUND;
+}
 
 void MediaInfo::saveCurrentInteralList()
 {
@@ -307,7 +196,7 @@ void MediaInfo::saveCurrentInteralList()
     this->m_pConfigSettings->beginWriteArray(CONFIG_LIST_ARRAY);
     for (int i = 0; i < this->getNumberOfInternalList(); i++) {
 
-        ConfigItem* pItem = (ConfigItem*)(this->getItemFromArrayIndex(i));
+        MediaItem* pItem = (MediaItem*)(this->getItemFromArrayIndex(i));
         if (pItem == NULL)
             continue;
         this->m_pConfigSettings->setArrayIndex(i);
@@ -315,6 +204,8 @@ void MediaInfo::saveCurrentInteralList()
         this->m_pConfigSettings->setValue(ITEM_NAME, pItem->m_itemName);
         this->m_pConfigSettings->setValue(ITEM_TIMESTAMP, pItem->m_timestamp);
         this->m_pConfigSettings->setValue(ITEM_INDEX, pItem->m_index);
+
+        this->m_pConfigSettings->setValue(MEDIA_USER_ID, pItem->m_userID);
     }
 
     this->m_pConfigSettings->endArray();
@@ -330,7 +221,7 @@ void MediaInfo::sortMedias()
     std::sort(this->m_lInteralList.begin(), this->m_lInteralList.end(), ConfigItem::compareTimeStampFunctionAscending);
 }
 
-bool MediaInfo::addNewMediaInfo(ConfigItem* media, bool checkItem)
+bool MediaInfo::addNewMediaInfo(MediaItem* media, bool checkItem)
 {
     if (checkItem) {
         if (media->m_index == 0 || itemExists(media->m_index)) {

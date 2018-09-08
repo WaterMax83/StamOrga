@@ -52,11 +52,11 @@ Games::Games()
             this->m_pConfigSettings->setArrayIndex(i);
             QString home      = this->m_pConfigSettings->value(ITEM_NAME, "").toString();
             qint64  timestamp = this->m_pConfigSettings->value(ITEM_TIMESTAMP, 0x0).toLongLong();
-            quint32 index     = this->m_pConfigSettings->value(ITEM_INDEX, 0).toInt();
+            qint32  index     = this->m_pConfigSettings->value(ITEM_INDEX, 0).toInt();
 
             QString          away        = this->m_pConfigSettings->value(PLAY_AWAY, "").toString();
             quint8           saisonIndex = quint8(this->m_pConfigSettings->value(PLAY_SAISON_INDEX, 0).toUInt());
-            quint16          saison      = quint16(this->m_pConfigSettings->value(PLAY_SAISON, 0).toUInt());
+            qint16           saison      = quint16(this->m_pConfigSettings->value(PLAY_SAISON, 0).toInt());
             QString          score       = this->m_pConfigSettings->value(PLAY_SCORE, "").toString();
             CompetitionIndex competition = CompetitionIndex(this->m_pConfigSettings->value(PLAY_COMPETITION, 0).toUInt());
             qint64           lastUpdate  = this->m_pConfigSettings->value(PLAY_LAST_UDPATE, 0).toLongLong();

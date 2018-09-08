@@ -448,7 +448,8 @@ MessageProtocol* cStatisticManager::handleStatisticCommand(UserConData* pUserCon
     rootObjAnswer.insert("cmd", cmd);
     rootObjAnswer.insert("ack", rCode);
 
-    qInfo().noquote() << QString("Handle statistics command from %1 with %2").arg(pUserCon->m_userName).arg(rCode);
+    Q_UNUSED(pUserCon);
+    //    qInfo().noquote() << QString("Handle statistics command from %1 with %2").arg(pUserCon->m_userName).arg(rCode);
 
     QByteArray answer = QJsonDocument(rootObjAnswer).toJson(QJsonDocument::Compact);
 

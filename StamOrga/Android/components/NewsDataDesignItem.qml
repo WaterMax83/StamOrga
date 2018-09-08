@@ -29,8 +29,8 @@ import "../components" as MyComponents
 
 Item {
     width: parent.width
-    height: mainGameLayout.implicitHeight
-    Layout.minimumHeight: mainGameLayout.height
+    height: mainNewsLayout.implicitHeight
+    Layout.minimumHeight: mainNewsLayout.height
 
     property bool showNewDataSeperator: true
 
@@ -62,7 +62,7 @@ Item {
     }
 
     ColumnLayout {
-        id: mainGameLayout
+        id: mainNewsLayout
         anchors.fill : parent
         spacing: 3
         Rectangle {
@@ -117,7 +117,6 @@ Item {
                 id: columnItem
                 Layout.fillWidth: true
                 Layout.leftMargin: 10
-
                 Layout.minimumHeight: columnItemLayout.implicitHeight
                 ColumnLayout {
                     id: columnItemLayout
@@ -149,7 +148,7 @@ Item {
                         Text {
                             id: labelTime
                             anchors.right: parent.right
-                            Layout.fillWidth: true
+                            anchors.rightMargin: 5
                             color: "grey"
                             font.pixelSize: 14
                         }

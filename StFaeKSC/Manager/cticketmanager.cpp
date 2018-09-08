@@ -86,7 +86,8 @@ MessageProtocol* cTicketManager::getSeasonTicketList(UserConData* pUserCon, Mess
 
     QByteArray answer = QJsonDocument(rootAns).toJson(QJsonDocument::Compact);
 
-    qInfo().noquote() << QString("User %1 request Ticket List with %2 entries").arg(pUserCon->m_userName).arg(numbOfTickets);
+    Q_UNUSED(pUserCon);
+    //    qInfo().noquote() << QString("User %1 request Ticket List with %2 entries").arg(pUserCon->m_userName).arg(numbOfTickets);
 
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_TICKETS_LIST, answer);
 }
@@ -163,7 +164,7 @@ MessageProtocol* cTicketManager::getAvailableSeasonTicketList(UserConData* pUser
         else {
 
             rootAns.insert("game", index);
-            bool bFoundTicket = false;
+//            bool bFoundTicket = false;
             foreach (AvailableGameTickets* ticket, g_GlobalData->m_availableTickets) {
                 if (ticket->getGameIndex() == index) {
                     qint32     totalCount = ticket->getNumberOfInternalList();
@@ -190,24 +191,26 @@ MessageProtocol* cTicketManager::getAvailableSeasonTicketList(UserConData* pUser
                     }
                     rootAns.insert("free", freeTickets);
                     rootAns.insert("reserved", reservedTickets);
-                    bFoundTicket = true;
+//                    bFoundTicket = true;
 
                     break;
                 }
             }
 
-            if (bFoundTicket)
-                qInfo().noquote() << QString("User %1 got available SeasonTicket List for game %2:%3:%4")
-                                         .arg(pUserCon->m_userName)
-                                         .arg(index)
-                                         .arg(pGame->m_competition)
-                                         .arg(pGame->m_seasonIndex);
-            else
-                qInfo().noquote() << QString("User %1 got available SeasonTicket List for game %2:%3:%4 with no entries")
-                                         .arg(pUserCon->m_userName)
-                                         .arg(index)
-                                         .arg(pGame->m_competition)
-                                         .arg(pGame->m_seasonIndex);
+            Q_UNUSED(pUserCon);
+
+            //            if (bFoundTicket)
+            //                qInfo().noquote() << QString("User %1 got available SeasonTicket List for game %2:%3:%4")
+            //                                         .arg(pUserCon->m_userName)
+            //                                         .arg(index)
+            //                                         .arg(pGame->m_competition)
+            //                                         .arg(pGame->m_seasonIndex);
+            //            else
+            //                qInfo().noquote() << QString("User %1 got available SeasonTicket List for game %2:%3:%4 with no entries")
+            //                                         .arg(pUserCon->m_userName)
+            //                                         .arg(index)
+            //                                         .arg(pGame->m_competition)
+            //                                         .arg(pGame->m_seasonIndex);
         }
     }
 

@@ -257,6 +257,8 @@ public:
     void             setGameHasMeetingEvent(const bool en) { this->m_bHasMeetingEvent = en; }
     Q_INVOKABLE bool hasGameAwayTripEvent() { return this->m_bHasAwayTripEvent; }
     void             setGameHasAwayTripEvent(const bool en) { this->m_bHasAwayTripEvent = en; }
+    Q_INVOKABLE bool hasGameMediaEvent() { return this->m_bHasMediaEvent; }
+    void             setGameHasMediaEvent(const bool en) { this->m_bHasMediaEvent = en; }
 
     void setEnableAddGame(bool enable);
 
@@ -302,6 +304,7 @@ private:
     bool m_bHasTicketEvent;
     bool m_bHasMeetingEvent;
     bool m_bHasAwayTripEvent;
+    bool m_bHasMediaEvent;
 };
 
 #endif // GAMEPLAY_H

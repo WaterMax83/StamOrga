@@ -31,9 +31,9 @@
 class NewsData : public ConfigItem
 {
 public:
-    NewsData(QString name, quint32 index,
+    NewsData(QString name, qint32 index,
              qint64 timestamp, QByteArray newsText,
-             quint32 userID)
+             qint32 userID)
     {
         this->m_itemName  = name;
         this->m_index     = index;
@@ -44,7 +44,7 @@ public:
     }
 
     QByteArray m_newsText;
-    quint32    m_userID;
+    qint32     m_userID;
 };
 
 class FanclubNews : public ConfigList
@@ -54,7 +54,7 @@ public:
 
     int addNewFanclubNews(const QString header, const QByteArray info, const quint32 userID);
 
-    int changeFanclubNews(const quint32 newsIndex, const QString header, const QByteArray info, const quint32 userID);
+    int changeFanclubNews(const quint32 newsIndex, const QString header, const QByteArray info, const qint32 userID);
 
     QString showNewsData();
 

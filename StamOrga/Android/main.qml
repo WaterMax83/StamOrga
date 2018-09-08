@@ -37,6 +37,11 @@ ApplicationWindow {
     onClosing: {
         if (userInt.isDeviceMobile() && stackView.depth > 1) {
             close.accepted = false
+            if (stackView.currentItem.getPreventEscape){
+                var prevent = stackView.currentItem.getPreventEscape()
+                if (prevent)
+                    return;
+            }
             stackView.pop()
         } else {
             return
@@ -47,6 +52,12 @@ ApplicationWindow {
         sequence: "Esc"
         enabled: stackView.depth > 1
         onActivated: {
+
+            if (stackView.currentItem.getPreventEscape){
+                var prevent = stackView.currentItem.getPreventEscape()
+                if (prevent)
+                    return;
+            }
             stackView.pop()
         }
     }
@@ -393,7 +404,7 @@ ApplicationWindow {
                                                  title: "Console",
                                                  element: viewConsolePage,
                                                  toolButtonImgSource: "",
-                                                 listImgSource: ""
+                                                 listImgSource: "images/notes.png"
                                              });
                 }
             }

@@ -49,7 +49,7 @@ FanclubNews::FanclubNews()
             quint32 index     = this->m_pConfigSettings->value(ITEM_INDEX, 0).toInt();
 
             QByteArray newsText = this->m_pConfigSettings->value(NEWS_DATA_TEXT, "").toByteArray();
-            quint32    userID   = this->m_pConfigSettings->value(NEWS_DATA_USERID, false).toUInt();
+            qint32     userID   = this->m_pConfigSettings->value(NEWS_DATA_USERID, false).toInt();
 
             if (header == "") {
                 bProblems = true;
@@ -117,7 +117,7 @@ int FanclubNews::addNewFanclubNews(const QString header, const QByteArray info, 
     return newIndex;
 }
 
-int FanclubNews::changeFanclubNews(const quint32 newsIndex, const QString header, const QByteArray info, const quint32 userID)
+int FanclubNews::changeFanclubNews(const quint32 newsIndex, const QString header, const QByteArray info, const qint32 userID)
 {
     NewsData* pItem = (NewsData*)this->getItem(newsIndex);
     if (pItem == NULL)

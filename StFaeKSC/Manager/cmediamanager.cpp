@@ -93,9 +93,15 @@ MessageProtocol* cMediaManager::handleMediaCommand(UserConData* pUserCon, Messag
 
             QString    format = rootObj.value("format").toString();
             QByteArray data   = QByteArray::fromHex(rootObj.value("data").toString().toUtf8());
-            rCode             = this->handleMediaAddCommand(pGame, format, data);
+            rCode             = this->handleMediaAddCommand(pUserCon, pGame, format, data);
         } else if (cmd == "list") {
             rCode = this->handleMediaGetListCommand(pGame, rootObjAnswer);
+        } else if (cmd == "delete") {
+            QStringList lPics;
+            QJsonArray  picArr = rootObj.value("media").toArray();
+            for (int i = 0; i < picArr.size(); i++)
+                lPics.append(picArr.at(i).toString());
+            rCode = this->handleMediaDeleteCommand(pUserCon, pGame, lPics);
         } else
             rCode = ERROR_CODE_NOT_IMPLEMENTED;
     }
@@ -104,20 +110,21 @@ MessageProtocol* cMediaManager::handleMediaCommand(UserConData* pUserCon, Messag
     rootObjAnswer.insert("cmd", cmd);
     rootObjAnswer.insert("ack", rCode);
 
-    qInfo().noquote() << QString("Handle media command %3 from %1 with %2").arg(pUserCon->m_userName).arg(rCode).arg(cmd);
+    if (cmd != "list")
+        qInfo().noquote() << QString("Handle media command %3 from %1 with %2").arg(pUserCon->m_userName).arg(rCode).arg(cmd);
 
     QByteArray answer = QJsonDocument(rootObjAnswer).toJson(QJsonDocument::Compact);
 
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_CMD_MEDIA, answer);
 }
 
-qint32 cMediaManager::handleMediaAddCommand(GamesPlay* pGame, QString format, QByteArray& data)
+qint32 cMediaManager::handleMediaAddCommand(UserConData* pUserCon, GamesPlay* pGame, QString format, QByteArray& data)
 {
     qint32 rCode;
     for (int i = 0; i < this->m_mediaInfos.size(); i++) {
         MediaInfo* mInfo = this->m_mediaInfos.at(i);
         if (mInfo->getGameIndex() == pGame->m_index) {
-            rCode = mInfo->addNewMediaItem(format, data);
+            rCode = mInfo->addNewMediaItem(format, data, pUserCon->m_userID);
             qInfo().noquote() << QString("Added media at game %1:%2, %3").arg(pGame->m_itemName, pGame->m_away).arg(pGame->m_index);
             return rCode;
             //                            messageID    = g_pushNotify->sendNewMeetingNotification(body, userID, gameIndex, type);
@@ -127,7 +134,7 @@ qint32 cMediaManager::handleMediaAddCommand(GamesPlay* pGame, QString format, QB
     MediaInfo* mInfo = new MediaInfo();
     if (mInfo->initialize(pGame->m_season, pGame->m_competition, pGame->m_seasonIndex, pGame->m_index)) {
         this->m_mediaInfos.append(mInfo);
-        rCode = mInfo->addNewMediaItem(format, data);
+        rCode = mInfo->addNewMediaItem(format, data, pUserCon->m_userID);
         qInfo().noquote() << QString("Added media at game %1:%2, %3").arg(pGame->m_itemName, pGame->m_away).arg(pGame->m_index);
         //                    QString body = QString(BODY_ADD_MEETING).arg(pGame->m_itemName, pGame->m_away);
         //                    messageID    = g_pushNotify->sendNewMeetingNotification(body, userID, gameIndex, type);
@@ -159,5 +166,20 @@ qint32 cMediaManager::handleMediaGetListCommand(GamesPlay* pGame, QJsonObject& r
         }
     }
 
+    return ERROR_CODE_NOT_FOUND;
+}
+
+qint32 cMediaManager::handleMediaDeleteCommand(UserConData* pUserCon, GamesPlay* pGame, QStringList& lPics)
+{
+    Q_UNUSED(pUserCon);
+
+    for (int i = 0; i < this->m_mediaInfos.size(); i++) {
+        MediaInfo* mInfo = this->m_mediaInfos.at(i);
+        if (mInfo->getGameIndex() == pGame->m_index) {
+            qint32 rCode = mInfo->removeMediaItems(lPics);
+            qInfo().noquote() << QString("Removed medias at game %1:%2, %3").arg(pGame->m_itemName, pGame->m_away).arg(pGame->m_index);
+            return rCode;
+        }
+    }
     return ERROR_CODE_NOT_FOUND;
 }

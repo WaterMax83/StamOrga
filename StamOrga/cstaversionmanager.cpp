@@ -208,7 +208,7 @@ QString cStaVersionManager::getVersionChangeInfo()
 {
     QString rValue;
 
-    rValue.append("<b>V1.1.2:</b>(XX.XX.2018)<br>");
+    rValue.append("<b>V1.1.2:</b>(08.09.2018)<br>");
     rValue.append("- Installiere neue Version intern<br>");
     rValue.append("- Verbindung über SSL möglich (-> siehe Einstellungen)<br>");
     rValue.append("- Ticketänderungszeit, mehrere Benachrichtungen<br>");

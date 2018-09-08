@@ -32,7 +32,7 @@ struct AvailableTicketInfo : public ConfigItem {
     quint32 m_state;
 
     AvailableTicketInfo(QString name, qint64 timestamp,
-                        quint32 index, quint32 ticketID,
+                        qint32 index, qint32 ticketID,
                         qint32 userID, quint32 state)
     {
         this->m_itemName  = name;
@@ -70,8 +70,8 @@ public:
 private:
     quint32 m_year;
     quint32 m_competition;
-    quint32 m_seasonIndex;
-    qint32 m_gameIndex;
+    qint32  m_seasonIndex;
+    qint32  m_gameIndex;
 
     void saveCurrentInteralList() override;
 

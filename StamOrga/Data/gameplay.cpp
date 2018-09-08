@@ -40,6 +40,7 @@ GamePlay::GamePlay(QObject* parent)
     this->m_bHasTicketEvent   = false;
     this->m_bHasMeetingEvent  = false;
     this->m_bHasAwayTripEvent = false;
+    this->m_bHasMediaEvent    = false;
 }
 
 

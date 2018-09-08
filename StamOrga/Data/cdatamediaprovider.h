@@ -16,40 +16,22 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CSTAGLOBALMANAGER_H
-#define CSTAGLOBALMANAGER_H
+#ifndef CDATAMEDIAPROVIDER_H
+#define CDATAMEDIAPROVIDER_H
 
 #include <QObject>
-#ifdef STAMORGA_APP
-#include <QtQml/QQmlApplicationEngine>
-#include <QtQml/QQmlContext>
+#include <QtQuick/QQuickImageProvider>
 
-#include "../Data/cdatamediaprovider.h"
-#endif
-
-#include "../Common/General/cgendisposer.h"
-
-
-class cStaGlobalManager : public cGenDisposer
+class cDataMediaProvider : public QQuickImageProvider
 {
-    Q_OBJECT
 public:
-    explicit cStaGlobalManager(QObject* parent = nullptr);
+    explicit cDataMediaProvider();
 
-    qint32 initialize();
-
-#ifdef STAMORGA_APP
-    void setQmlInformationClasses(QQmlApplicationEngine* engine);
-#endif
-
-    void setQMLObjectOwnershipToCpp(QObject* pObject);
+    virtual QImage requestImage(const QString& id, QSize* size, const QSize& requestedSize);
 
 signals:
 
-private:
-#ifdef STAMORGA_APP
-    cDataMediaProvider* m_mediaProvider;
-#endif
+public slots:
 };
 
-#endif // CSTAGLOBALMANAGER_H
+#endif // CDATAMEDIAPROVIDER_H

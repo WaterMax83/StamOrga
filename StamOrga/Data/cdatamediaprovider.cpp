@@ -16,40 +16,29 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CSTAGLOBALMANAGER_H
-#define CSTAGLOBALMANAGER_H
+#include <QtCore/QDebug>
 
-#include <QObject>
-#ifdef STAMORGA_APP
-#include <QtQml/QQmlApplicationEngine>
-#include <QtQml/QQmlContext>
+#include "cdatamediaprovider.h"
 
-#include "../Data/cdatamediaprovider.h"
-#endif
-
-#include "../Common/General/cgendisposer.h"
-
-
-class cStaGlobalManager : public cGenDisposer
+cDataMediaProvider::cDataMediaProvider()
+    : QQuickImageProvider(QQuickImageProvider::Image)
 {
-    Q_OBJECT
-public:
-    explicit cStaGlobalManager(QObject* parent = nullptr);
+}
 
-    qint32 initialize();
 
-#ifdef STAMORGA_APP
-    void setQmlInformationClasses(QQmlApplicationEngine* engine);
-#endif
+QImage cDataMediaProvider::requestImage(const QString& id, QSize* size, const QSize& requestedSize)
+{
+    qInfo() << QString("Request Image with %1 ").arg(id) << requestedSize;
 
-    void setQMLObjectOwnershipToCpp(QObject* pObject);
+    //    QImage image(requestedSize.width() > 0 ? requestedSize.width() : 50,
+    //                 requestedSize.height() > 0 ? requestedSize.height() : 50, QImage::Format_RGB32);
+    QImage image;
 
-signals:
 
-private:
-#ifdef STAMORGA_APP
-    cDataMediaProvider* m_mediaProvider;
-#endif
-};
+    qInfo() << image.load(":/images/+material/help.png");
 
-#endif // CSTAGLOBALMANAGER_H
+    qInfo() << image.size();
+    *size = image.size();
+
+    return image;
+}

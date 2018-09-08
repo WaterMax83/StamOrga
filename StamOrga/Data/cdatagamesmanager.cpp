@@ -513,6 +513,7 @@ qint32 cDataGamesManager::handleGetGamesEventsResponse(MessageProtocol* msg)
     play->setGameHasTicketEvent(rootObj.value("tickets").toBool(false));
     play->setGameHasMeetingEvent(rootObj.value("meeting").toBool(false));
     play->setGameHasAwayTripEvent(rootObj.value("trip").toBool(false));
+    play->setGameHasMediaEvent(rootObj.value("media").toBool(false));
 
     return result;
 }

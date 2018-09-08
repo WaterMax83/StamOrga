@@ -124,9 +124,10 @@ MessageProtocol* cMeetingInfoManager::getMeetingInfo(UserConData* pUserCon, Mess
 
     QByteArray answer = QJsonDocument(rootAns).toJson(QJsonDocument::Compact);
 
-    qInfo().noquote() << QString("User %1 got MeetingInfo of game %2")
-                             .arg(pUserCon->m_userName)
-                             .arg(g_GlobalData->m_GamesList.getItemName(gameIndex));
+    Q_UNUSED(pUserCon);
+    //    qInfo().noquote() << QString("User %1 got MeetingInfo of game %2")
+    //                             .arg(pUserCon->m_userName)
+    //                             .arg(g_GlobalData->m_GamesList.getItemName(gameIndex));
     return new MessageProtocol(ack, answer);
 }
 

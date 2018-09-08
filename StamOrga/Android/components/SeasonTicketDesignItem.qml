@@ -29,8 +29,8 @@ import "../components" as MyComponents
 
 Item {
     width: parent.width
-    height: mainGameLayout.implicitHeight
-    Layout.minimumHeight: mainGameLayout.height
+    height: mainTicketLayout.implicitHeight
+    Layout.minimumHeight: mainTicketLayout.height
 
     property bool showTicketSeperator: true
 
@@ -58,7 +58,7 @@ Item {
     }
 
     ColumnLayout {
-        id: mainGameLayout
+        id: mainTicketLayout
         anchors.fill : parent
         spacing: 3
         Rectangle {

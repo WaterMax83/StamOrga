@@ -100,8 +100,8 @@ qint32 MeetingInfo::initialize(QString filePath)
 
     this->m_year        = this->m_pConfigSettings->value("year", 0).toUInt();
     this->m_competition = this->m_pConfigSettings->value("competition", 0).toUInt();
-    this->m_seasonIndex = this->m_pConfigSettings->value("seasonIndex", 0).toUInt();
-    this->m_gameIndex   = this->m_pConfigSettings->value("gameIndex", 0).toUInt();
+    this->m_seasonIndex = this->m_pConfigSettings->value("seasonIndex", 0).toInt();
+    this->m_gameIndex   = this->m_pConfigSettings->value("gameIndex", 0).toInt();
 
     this->m_when  = this->m_pConfigSettings->value(MEET_INFO_HEAD_WHEN, "").toString();
     this->m_where = this->m_pConfigSettings->value(MEET_INFO_HEAD_WHERE, "").toString();
@@ -144,11 +144,11 @@ qint32 MeetingInfo::initialize(QString filePath)
         for (int i = 0; i < sizeOfArray; i++) {
             this->m_pConfigSettings->setArrayIndex(i);
             QString name      = this->m_pConfigSettings->value(ITEM_NAME, "").toString();
-            qint32  index     = this->m_pConfigSettings->value(ITEM_INDEX, 0).toUInt();
+            qint32  index     = this->m_pConfigSettings->value(ITEM_INDEX, 0).toInt();
             qint64  timestamp = this->m_pConfigSettings->value(ITEM_TIMESTAMP, 0x0).toLongLong();
 
-            qint32 state  = this->m_pConfigSettings->value(MEET_INFO_STATE, 0x0).toUInt();
-            qint32 userID = this->m_pConfigSettings->value(MEET_INFO_USER_ID, 0x0).toUInt();
+            qint32 state  = this->m_pConfigSettings->value(MEET_INFO_STATE, 0x0).toInt();
+            qint32 userID = this->m_pConfigSettings->value(MEET_INFO_USER_ID, 0x0).toInt();
 
             if (userID == 0 || state == 0)
                 continue;

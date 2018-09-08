@@ -112,24 +112,86 @@ qint32 cDataMediaManager::startAddPicture(const qint32 gameIndex, QString url)
     return ERROR_CODE_SUCCESS;
 }
 
+qint32 cDataMediaManager::startDeletePictures(const qint32 gameIndex, QStringList list)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QMutexLocker lock(&this->m_mutex);
+
+    QJsonObject rootObj;
+    rootObj.insert("cmd", "delete");
+    rootObj.insert("type", "Media");
+    rootObj.insert("version", "V1.0");
+    rootObj.insert("gameIndex", gameIndex);
+
+    QJsonArray picsArr;
+    foreach (QString pic, list) {
+        pic.replace("image://media/", "");
+        picsArr.append(pic);
+    }
+    rootObj.insert("media", picsArr);
+
+    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CMD_MEDIA);
+    req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+
+    g_ConManager->sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
+
+    return 0;
+}
+
 qint32 cDataMediaManager::handleMediaCommandResponse(MessageProtocol* msg)
 {
     if (!this->m_initialized)
         return ERROR_CODE_NOT_INITIALIZED;
+
+    QMutexLocker lock(&this->m_mutex);
 
     QByteArray  data(msg->getPointerToData());
     QJsonObject rootObj = QJsonDocument::fromJson(data).object();
 
     qint32  result  = rootObj.value("ack").toInt(ERROR_CODE_NOT_FOUND);
     QString command = rootObj.value("cmd").toString();
-    if (command == "add") {
+
+    if (result != ERROR_CODE_SUCCESS)
+        return result;
+
+    if (command == "add" || command == "delete") {
 
     } else if (command == "list") {
+        for (int i = 0; i < this->m_files.size(); i++)
+            delete this->m_files.at(i);
+        this->m_files.clear();
+
         QJsonArray mediaArr = rootObj.value("media").toArray();
-        qInfo() << mediaArr;
+        for (int i = 0; i < mediaArr.size(); i++) {
+            MediaContent* pContent = new MediaContent();
+            pContent->m_fileUrl    = mediaArr.at(i).toObject().value("file").toString("");
+            pContent->m_data       = QByteArray::fromHex(mediaArr.at(i).toObject().value("data").toString("").toUtf8());
+
+            this->m_files.append(pContent);
+        }
     } else
         result = ERROR_CODE_NOT_IMPLEMENTED;
 
-
     return result;
+}
+
+qint32 cDataMediaManager::getMediaCount()
+{
+    QMutexLocker lock(&this->m_mutex);
+
+    return this->m_files.size();
+}
+
+
+QString cDataMediaManager::getMediaFileString(qint32 index)
+{
+    QMutexLocker lock(&this->m_mutex);
+
+    if (index >= this->m_files.size())
+        return "";
+
+    return this->m_files.at(index)->m_fileUrl;
 }

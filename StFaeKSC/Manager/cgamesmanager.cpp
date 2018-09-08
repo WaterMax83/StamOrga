@@ -110,7 +110,8 @@ MessageProtocol* cGamesManager::getGamesList(UserConData* pUserCon, MessageProto
 
     QByteArray answer = QJsonDocument(rootAns).toJson(QJsonDocument::Compact);
 
-    qInfo().noquote() << QString("User %1 request Games List with %2 entries").arg(pUserCon->m_userName).arg(arrGames.size());
+    Q_UNUSED(pUserCon);
+    //    qInfo().noquote() << QString("User %1 request Games List with %2 entries").arg(pUserCon->m_userName).arg(arrGames.size());
 
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_GAMES_LIST, answer);
 }
@@ -184,7 +185,8 @@ MessageProtocol* cGamesManager::getGamesInfoList(UserConData* pUserCon, MessageP
         }
         rootAns.insert("infos", gameInfoArr);
 
-        qInfo().noquote() << QString("User %1 request Games Info List").arg(pUserCon->m_userName);
+        Q_UNUSED(pUserCon);
+        //        qInfo().noquote() << QString("User %1 request Games Info List").arg(pUserCon->m_userName);
     }
     QByteArray answer = QJsonDocument(rootAns).toJson(QJsonDocument::Compact);
 
@@ -257,6 +259,9 @@ MessageProtocol* cGamesManager::getGetGameEventsRequest(UserConData* pUserCon, M
         rootAns.insert("tickets", false);
         rootAns.insert("meeting", false);
         rootAns.insert("trip", false);
+#ifdef QT_DEBUG
+        rootAns.insert("media", true);
+#endif
         if (pGame->m_itemName == "KSC" && gIsGameASeasonTicketGame(pGame->m_competition))
             rootAns.insert("tickets", true);
 
@@ -273,7 +278,7 @@ MessageProtocol* cGamesManager::getGetGameEventsRequest(UserConData* pUserCon, M
         }
 
         if (pGame->m_itemName != "KSC" && pGame->m_competition != OTHER_COMP)
-            rootAns.insert("awaytrip", true);
+            rootAns.insert("trip", true);
         else {
             for (int i = 0; i < g_GlobalData->m_awayTripInfos.size(); i++) {
                 MeetingInfo* mi = g_GlobalData->m_awayTripInfos.at(i);

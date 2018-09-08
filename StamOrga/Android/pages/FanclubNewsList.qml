@@ -92,8 +92,9 @@ Flickable {
 
         if (!isViewAlreadyOpened)
             updateFanclubNewsList();
+        else
+            showNewsDataList();
         isViewAlreadyOpened = true;
-        showNewsDataList();
     }
 
     function toolButtonClicked() {

@@ -1,5 +1,5 @@
 @echo off
-set NewFolderPath="D:\Daten\Projekte\StamOrga\versions\StamOrga.Winx64.V1.1.X"
+set NewFolderPath="D:\Daten\Projekte\StamOrga\versions\StamOrga.Winx64.V1.1.2"
 
 cd \
 c:

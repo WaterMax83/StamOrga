@@ -22,8 +22,8 @@
 #include "../Common/General/globalfunctions.h"
 #include "../Common/Network/messagecommand.h"
 #include "../General/globaldata.h"
-#include "cnewsdatamanager.h"
 #include "../General/pushnotification.h"
+#include "cnewsdatamanager.h"
 
 extern GlobalData* g_GlobalData;
 
@@ -85,7 +85,8 @@ MessageProtocol* cNewsDataManager::getNewsDataList(UserConData* pUserCon, Messag
 
     QByteArray answer = QJsonDocument(rootAns).toJson(QJsonDocument::Compact);
 
-    qInfo().noquote() << QString("User %1 request News Data List with %2 entries").arg(pUserCon->m_userName).arg(numbOfNews);
+    Q_UNUSED(pUserCon);
+    //    qInfo().noquote() << QString("User %1 request News Data List with %2 entries").arg(pUserCon->m_userName).arg(numbOfNews);
 
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_LIST, answer);
 }
@@ -115,11 +116,12 @@ MessageProtocol* cNewsDataManager::getNewsDataItem(UserConData* pUserCon, Messag
             rootAns.insert("info", info);
             rootAns.insert("timestamp", pItem->m_timestamp);
 
-            qInfo().noquote() << QString("User %1 got fanclub news item %2").arg(pUserCon->m_userName, pItem->m_itemName);
+            Q_UNUSED(pUserCon);
+            //            qInfo().noquote() << QString("User %1 got fanclub news item %2").arg(pUserCon->m_userName, pItem->m_itemName);
         }
     }
 
-     QByteArray answer = QJsonDocument(rootAns).toJson(QJsonDocument::Compact);
+    QByteArray answer = QJsonDocument(rootAns).toJson(QJsonDocument::Compact);
 
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_GET_NEWS_DATA_ITEM, answer);
 }
@@ -131,12 +133,12 @@ MessageProtocol* cNewsDataManager::getNewsDataChangeRequest(UserConData* pUserCo
     QByteArray  data    = QByteArray(request->getPointerToData());
     QJsonObject rootObj = QJsonDocument::fromJson(data).object();
 
-    qint32  newsIndex    = rootObj.value("index").toInt(-1);
-    QString header     = rootObj.value("header").toString();
-    QByteArray info    = QByteArray::fromHex(rootObj.value("info").toString().toUtf8());
+    qint32     newsIndex = rootObj.value("index").toInt(-1);
+    QString    header    = rootObj.value("header").toString();
+    QByteArray info      = QByteArray::fromHex(rootObj.value("info").toString().toUtf8());
 
-    qint64 messageID = -1;
-    qint32 rCode;
+    qint64      messageID = -1;
+    qint32      rCode;
     QJsonObject rootAns;
     rootAns.insert("ack", ERROR_CODE_NOT_FOUND);
     rootAns.insert("index", newsIndex);
@@ -173,7 +175,7 @@ MessageProtocol* cNewsDataManager::getNewsDataRemoveRequest(UserConData* pUserCo
 
     qint32 index = rootObj.value("index").toInt(0);
     qint32 rCode = ERROR_CODE_NOT_FOUND;
-    if (index != 0){
+    if (index != 0) {
         if ((rCode = g_GlobalData->m_fanclubNews.removeItem(index)) == ERROR_CODE_SUCCESS) {
             qInfo().noquote() << QString("User %1 removed News Item %2")
                                      .arg(pUserCon->m_userName)

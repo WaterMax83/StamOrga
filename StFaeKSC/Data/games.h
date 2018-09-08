@@ -40,7 +40,7 @@ public:
 
     GamesPlay(QString home, QString away, qint64 timestamp,
               quint8 sIndex, QString score, CompetitionIndex comp,
-              qint32 season, quint32 index, qint64 lastUpdate,
+              qint32 season, qint32 index, qint64 lastUpdate,
               qint32 options)
     {
         this->m_itemName  = home;

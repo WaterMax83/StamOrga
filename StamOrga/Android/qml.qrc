@@ -11,14 +11,12 @@
         <file>pages/UserLogin.qml</file>
         <file>images/+material/refresh.png</file>
         <file>images/refresh.png</file>
-        <file>components/Games.qml</file>
         <file>pages/UserLoginForm.ui.qml</file>
         <file>pages/SeasonTickets.qml</file>
         <file>images/+material/add.png</file>
         <file>images/add.png</file>
         <file>pages/GamesListPage.qml</file>
         <file>components/VersionDialog.qml</file>
-        <file>components/SeasonTicket.qml</file>
         <file>components/EditableTextDialog.qml</file>
         <file>pages/LogginPage.qml</file>
         <file>components/AcceptDialog.qml</file>
@@ -64,7 +62,6 @@
         <file>images/copy.png</file>
         <file>images/cut.png</file>
         <file>images/paste.png</file>
-        <file>components/NewsDataItem.qml</file>
         <file>components/CustomDialog.qml</file>
         <file>components/EventIndicator.qml</file>
         <file>images/+material/train.png</file>
@@ -118,5 +115,9 @@
         <file>pages/MediaPage.qml</file>
         <file>components/PictureFileDialog.qml</file>
         <file>components/ChangeEventDialog.qml</file>
+        <file>images/+material/notes.png</file>
+        <file>images/notes.png</file>
+        <file>images/+material/delete.png</file>
+        <file>images/delete.png</file>
     </qresource>
 </RCC>

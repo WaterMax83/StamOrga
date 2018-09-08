@@ -29,7 +29,6 @@ Flickable {
     clip: true
     height: parent.height * 1.2
     contentHeight: mainPaneCurrentMediaInfo.height
-    //    property bool useCommentLine : false
 
     signal showInfoHeader(var text, var load)
 
@@ -42,11 +41,9 @@ Flickable {
         }
     }
 
-    property int listViewItemHeight : 30
-
     onDragEnded: {
         if (flickableCurrentMediaInfo.contentY < -refreshItem.refreshHeight) {
-            //            loadAvailableTicketList();
+            loadMediaList();
         }
     }
 
@@ -67,46 +64,54 @@ Flickable {
             id: addImage
             width: parent.width / 3 * 2
             height: parent.width / 3 * 2
-            source: "../images/add.png"
+            source: bIsDeletingMode ? "../images/delete.png" : "../images/add.png"
             anchors.centerIn: parent
         }
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                var componentFile = Qt.createComponent("../components/PictureFileDialog.qml")
-                if (componentFile.status === Component.Ready) {
-                    var dialog = componentFile.createObject(mainPaneCurrentGame);
-                    dialog.acceptedFileDialog.connect(acceptedFileDialogMedia);
-                    dialog.open();
-                } else
-                    console.error("Fehler beim Laden des File Dialog " + componentFile.errorString())
+                if (bIsDeletingMode) {
+                    while (deleteArray.length > 0)
+                        deleteArray.pop();
+                    for(var i = 0; i < photosModel.count; i++) {
+                        if (photosModel.get(i).deleteFlag) {
+                            deleteArray.push(photosModel.get(i).imageSrc);
+                        }
+                    }
+
+                    if (deleteArray.length === 0) {
+                        toastManager.show("Keine Bilder ausgewählt", 2000);
+                        return;
+                    }
+
+                    gDataMediaManager.startDeletePictures(m_gamePlayCurrentItem.index, deleteArray);
+                    iCurrentCommandIndex = 3;
+                    if (deleteArray.length === 1)
+                        showInfoHeader("Lösche Bild", true)
+                    else
+                        showInfoHeader("Lösche Bilder", true)
+                } else {
+
+                    var componentFile = Qt.createComponent("../components/PictureFileDialog.qml")
+                    if (componentFile.status === Component.Ready) {
+                        var dialog = componentFile.createObject(mainPaneCurrentGame);
+                        dialog.acceptedFileDialog.connect(acceptedFileDialogMedia);
+                        dialog.open();
+                    } else
+                        console.error("Fehler beim Laden des File Dialog " + componentFile.errorString())
+                }
             }
         }
     }
+
+    property var deleteArray: []
 
     Pane {
         id: mainPaneCurrentMediaInfo
         width: parent.width
 
-        //        ColumnLayout {
-        //            id: mainColumnLayoutCurrentMediaInfo
-        //            width: parent.width
-
-        //            Text {
-        ////                id: txtInfoCurrentGameFreeTickets
-        ////                visible: columnLayoutFreeTickets.children.length > 0 ? true : false
-        //                color: "grey"
-        //                font.pixelSize: 14
-        //                text: "<b>Freie Karten:</b>"
-        //                Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-        //            }
-        //        }
-
         ListModel {
             id: photosModel
-            //            ListElement { imageSrc: "../images/account.png" }
-            //            ListElement { imageSrc: "../images/add.png" }
-            //            ListElement { imageSrc: "../images/back.png" }
         }
 
         //        DelegateModel {
@@ -132,6 +137,16 @@ Flickable {
                     fillMode: Image.PreserveAspectFit;
                     width: parent.width; height: parent.width;
                 }
+                Rectangle {
+                    anchors.right: parent.right; anchors.top: parent.top; anchors.margins: 5
+                    width: 20; height: 20; radius: width * 0.5
+                    color: "grey"; visible: deleteFlag
+                    Image {
+                        source: "../images/done.png"
+                        fillMode: Image.PreserveAspectFit;
+                        anchors.fill: parent
+                    }
+                }
 
                 //        Image {
                 //            id: hqImage; antialiasing: true; source: imageSrc; visible: false; cache: false
@@ -141,13 +156,31 @@ Flickable {
                 MouseArea {
                     width: originalImage.paintedWidth; height: originalImage.paintedHeight; anchors.centerIn: originalImage
                     onClicked: {
-                        console.log("Clicked Image to open " + index)
-                        var componentPage = Qt.createComponent("../pages/MediaPage.qml")
-                        if (componentPage.status === Component.Ready) {
-                            var spritePage = stackView.push(componentPage)
-                            spritePage.startWithIndex(index)
-                        } else
-                            console.error("Fehler beim Laden von der Medienseite " + componentPage.errorString())
+                        if (bIsDeletingMode) {
+                            if (photosModel.get(index).deleteFlag)
+                                photosModel.get(index).deleteFlag = false
+                            else
+                                photosModel.get(index).deleteFlag = true
+                        } else {
+
+                            console.log("Clicked Image to open " + index)
+                            var componentPage = Qt.createComponent("../pages/MediaPage.qml")
+                            if (componentPage.status === Component.Ready) {
+                                var spritePage = stackView.push(componentPage)
+                                spritePage.startWithIndex(index)
+                            } else
+                                console.error("Fehler beim Laden von der Medienseite " + componentPage.errorString())
+                        }
+                    }
+                    onPressAndHold: {
+                        if (bIsDeletingMode) {
+                            bIsDeletingMode = false
+                            for(var i = 0; i < photosModel.count; i++)
+                                photosModel.get(i).deleteFlag = false;
+                        } else {
+                            bIsDeletingMode = true;
+                            photosModel.get(index).deleteFlag = true;
+                        }
                     }
                 }
             }
@@ -169,39 +202,72 @@ Flickable {
     }
 
     property int iCurrentCommandIndex: 0
+    property bool  bIsDeletingMode: false
     function showAllInfoAboutGame(sender) {
 
-        //        loadAvailableTicketList()
+        loadMediaList()
+    }
+
+    function getPreventEscape() {
+        if (bIsDeletingMode) {
+            bIsDeletingMode = false;
+            for(var i = 0; i < photosModel.count; i++)
+                photosModel.get(i).deleteFlag = false;
+            return true;
+        }
+
+        return false;
+    }
+
+    function loadMediaList() {
         gDataMediaManager.startGetPictureList(m_gamePlayCurrentItem.index);
         iCurrentCommandIndex = 1;
+        showInfoHeader("Lade Bilder", true)
     }
 
     function acceptedFileDialogMedia(url) {
-        console.log("Try to add " + url)
         var result = gDataMediaManager.startAddPicture(m_gamePlayCurrentItem.index, url);
         if (result !== 1)
             toastManager.show(userIntGames.getErrorCodeToString(result), 4000);
-        else
+        else {
             iCurrentCommandIndex = 2;
+            showInfoHeader("Speichere Bild", true)
+        }
     }
 
     function notifyMediaCommandFinished(result){
         if (iCurrentCommandIndex === 1) {   // list
-            if (result === 1)
-                toastManager.show("Medien geladen", 2000);
-            else if (result === -5)
-                toastManager.show("Bisher noch keine Medien gespeichert", 2000);
-            else {
+            if (result === 1) {
+                toastManager.show("Bilder geladen", 2000);
+
+                photosModel.clear();
+                for(var i = 0; i < gDataMediaManager.getMediaCount(); i++) {
+                    var url = gDataMediaManager.getMediaFileString(i);
+                    photosModel.append({ imageSrc: "image://media/" + url, deleteFlag: false});
+                }
+                showInfoHeader("", false)
+            } else if (result === -5) {
+                toastManager.show("Bisher noch keine Bilder gespeichert", 2000);
+                showInfoHeader("", false)
+            } else {
                 toastManager.show(userIntGames.getErrorCodeToString(result), 4000);
-                showInfoHeader("Medien laden hat nicht funktioniert", false)
+                showInfoHeader("Bilder laden hat nicht funktioniert", false)
             }
         } else if (iCurrentCommandIndex === 2) { // add
             if (result === 1) {
                 toastManager.show("Bild erfolgreich hinzugefügt", 2000);
-                gDataMediaManager.startGetPictureList(m_gamePlayCurrentItem.index);
+                loadMediaList();
             } else {
                 toastManager.show(userIntGames.getErrorCodeToString(result), 4000);
                 showInfoHeader("Bild hinzufügen hat nicht funktioniert", false)
+            }
+        } else if (iCurrentCommandIndex === 3) { // delete
+            if (result === 1) {
+                toastManager.show("Bilder erfolgreich gelöscht", 2000);
+                loadMediaList();
+            } else {
+                toastManager.show(userIntGames.getErrorCodeToString(result), 4000);
+                showInfoHeader("Bild löschen hat nicht funktioniert", false)
             }
         }
     }

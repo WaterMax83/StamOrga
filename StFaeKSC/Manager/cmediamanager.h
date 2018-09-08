@@ -50,8 +50,9 @@ private:
     QMutex            m_mutex;
     QList<MediaInfo*> m_mediaInfos;
 
-    qint32 handleMediaAddCommand(GamesPlay* pGame, QString format, QByteArray& data);
+    qint32 handleMediaAddCommand(UserConData* pUserCon, GamesPlay* pGame, QString format, QByteArray& data);
     qint32 handleMediaGetListCommand(GamesPlay* pGame, QJsonObject& rootObjAnswer);
+    qint32 handleMediaDeleteCommand(UserConData* pUserCon, GamesPlay* pGame, QStringList& lPics);
 };
 
 extern cMediaManager g_MediaManager;

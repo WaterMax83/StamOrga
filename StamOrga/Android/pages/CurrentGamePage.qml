@@ -401,6 +401,14 @@ Item {
         gameHeader.showGamesInfo(m_gamePlayCurrentItem)
     }
 
+    function getPreventEscape() {
+        if (swipeViewCurrentHomeGame.currentItem === currentMediaInfo){
+            return currentMediaInfo.getPreventEscape();
+        }
+
+        return false;
+    }
+
     function showAllInfoAboutGame(sender) {
 
         m_gamePlayCurrentItem = sender
@@ -411,15 +419,6 @@ Item {
         busyIndicatorCurrentGame.infoVisible = true
         busyIndicatorCurrentGame.loadingVisible = true
         busyIndicatorCurrentGame.infoText = "Lade Daten"
-
-        //        tabModel.append({
-        //                            text: "Medien",
-        //                            useCommentLine: false
-        //                        })
-        //        swipeViewCurrentHomeGame.addItem(currentMediaInfo)
-        //        currentMediaInfo.showInfoHeader.connect(
-        //                    currentMediaInfoNewHeaderInfo)
-        //        currentMediaInfo.showAllInfoAboutGame(sender)
 
         var icon = ""
         var favIndex = gDataGameUserData.getFavoriteGameIndex(sender.index)
@@ -485,6 +484,14 @@ Item {
             currentAwayTripInfo.showAllInfoAboutGame()
             isAnythingOpen = true;
         }
+
+//        if (m_gamePlayCurrentItem.hasGameMediaEvent()) {
+//            tabModel.append({text: "Medien", useCommentLine: false })
+//            swipeViewCurrentHomeGame.addItem(currentMediaInfo)
+//            currentMediaInfo.showInfoHeader.connect(currentMediaInfoNewHeaderInfo)
+//            currentMediaInfo.showAllInfoAboutGame(m_gamePlayCurrentItem)
+//            isAnythingOpen = true;
+//        }
 
         if (!isAnythingOpen) {
             busyIndicatorCurrentGame.infoVisible = true
