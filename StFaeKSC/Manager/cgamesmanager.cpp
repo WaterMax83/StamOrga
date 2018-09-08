@@ -213,6 +213,9 @@ MessageProtocol* cGamesManager::getChangeGameRequest(UserConData* pUserCon, Mess
     qint64           timestamp = (qint64)rootObj.value("timestamp").toDouble();
     qint32           option    = rootObj.value("option").toInt();
 
+    if (timestamp < 0)
+        return new MessageProtocol(OP_CODE_CMD_RES::ACK_CHANGE_GAME_TCP, ERROR_CODE_IN_PAST);
+
     /* game already exists, should only be changed */
     if (index > 0) {
         quint16    saison = getSeasonFromTimeStamp(timestamp);

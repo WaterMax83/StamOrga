@@ -114,6 +114,10 @@ void cDataTicketManager::addNewSeasonTicket(SeasonTicketItem* sTicket, const qui
         if (pTicket->discount() != sTicket->discount()) {
             pTicket->setDiscount(sTicket->discount());
         }
+        if (pTicket->getTimeStampValue() != sTicket->getTimeStampValue()) {
+            pTicket->setTimeStamp(sTicket->getTimeStampValue());
+        }
+
 
         delete sTicket;
     }

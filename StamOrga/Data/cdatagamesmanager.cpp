@@ -447,7 +447,10 @@ qint32 cDataGamesManager::startChangeGame(const qint32 index, const qint32 sInde
         return ERROR_CODE_WRONG_PARAMETER;
 
     qint64 timestamp = QDateTime::fromString(date, "dd.MM.yyyy hh:mm").toMSecsSinceEpoch();
-    qint32 option    = fixedTime ? PLAY_OPTIONS_FIXED : 0;
+    if (timestamp < 0)
+        return ERROR_CODE_IN_PAST;
+
+    qint32 option = fixedTime ? PLAY_OPTIONS_FIXED : 0;
     option |= onlyFanclub ? PLAY_OPTIONS_FANCLUB : 0;
 
     QJsonObject rootObj;
