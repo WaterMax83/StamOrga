@@ -84,6 +84,7 @@ public class MyFcmListenerService extends FirebaseMessagingService
                 .setContentText(message)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
+                .setGroup("com.stamorga.example.NOTIFY")
                 .setStyle(new NotificationCompat.BigTextStyle()
                                 .bigText(message));
 //                .setContentInfo("Info");

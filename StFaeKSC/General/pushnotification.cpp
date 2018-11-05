@@ -129,7 +129,7 @@ int PushNotification::DoBackgroundWork()
     return ERROR_CODE_SUCCESS;
 }
 
-qint64 PushNotification::sendNewGeneralTopicNotification(const QString header, const QString body)
+qint64 PushNotification::sendNewGeneralTopicNotification(const QString header, const QString body, const QString bigText)
 {
     if (!this->m_initialized)
         return ERROR_CODE_NOT_READY;
@@ -139,6 +139,7 @@ qint64 PushNotification::sendNewGeneralTopicNotification(const QString header, c
     push->m_userEventTopic = PUSH_NOTIFY_TOPIC::PUSH_NOT_GEN_TOPIC;
     push->m_header         = header;
     push->m_body           = body;
+    push->m_bigText        = bigText;
     push->m_sendMessageID  = getNextInternalPushNumber();
     push->m_sendTime       = QDateTime::currentMSecsSinceEpoch();
     push->m_userID         = -1;
@@ -351,7 +352,7 @@ qint64 PushNotification::sendNewFanclubNewsNotification(const QString body, cons
     return push->m_sendMessageID;
 }
 
-qint64 PushNotification::sendNewMeetingComment(const QString body, const qint32 userID, const quint32 gameIndex)
+qint64 PushNotification::sendNewMeetingComment(const QString body, const QString bigText, const qint32 userID, const quint32 gameIndex)
 {
     if (!this->m_initialized)
         return ERROR_CODE_NOT_READY;
@@ -361,6 +362,7 @@ qint64 PushNotification::sendNewMeetingComment(const QString body, const qint32 
     push->m_userEventTopic = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_COMMENT;
     push->m_header         = "Neuer Kommentar";
     push->m_body           = body;
+    push->m_bigText        = bigText;
     push->m_sendMessageID  = getNextInternalPushNumber();
     push->m_sendTime       = QDateTime::currentMSecsSinceEpoch();
     push->m_userID         = userID;
@@ -457,6 +459,7 @@ void PushNotification::startSendNewPushNotify(PushNotifyInfo* pushNotify)
     jsonString.append(QString("\"to\" : \"/topics/%1\",").arg(sendTopic));
     jsonString.append("\"data\" : {");
     jsonString.append(QString("\"body\" : \"%1\",").arg(pushNotify->m_body));
+    jsonString.append(QString("\"bigText\" : \"%1\",").arg(pushNotify->m_bigText));
     jsonString.append(QString("\"title\" : \"%1\",").arg(pushNotify->m_header));
     jsonString.append(QString("\"m_id\" : \"%1\",").arg(pushNotify->m_sendMessageID));
     jsonString.append(QString("\"u_id\" : \"%1\",").arg(pushNotify->m_userID));
@@ -473,7 +476,11 @@ void PushNotification::startSendNewPushNotify(PushNotifyInfo* pushNotify)
         this->m_nam->post(request, jsonString);
     this->m_connectionTimeoutTimer->start();
 
-    g_SmtpManager.sendNewEmail(pushNotify->m_header, pushNotify->m_body);
+    QString body = pushNotify->m_body;
+    if (!pushNotify->m_bigText.isEmpty())
+        body.append(QString("\n%1").arg(pushNotify->m_bigText));
+
+    g_SmtpManager.sendNewEmail(pushNotify->m_header, body);
 }
 
 void PushNotification::finished(QNetworkReply* reply)

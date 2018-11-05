@@ -694,8 +694,8 @@ qint32 GlobalData::requestSendCommentMeeting(const qint32 gameIndex, const qint3
             if (result == ERROR_CODE_SUCCESS) {
                 qInfo().noquote() << QString("Added Comment %2 at game %1").arg(pGame->m_index).arg(comment);
 
-                QString body = QString("%1 hat einen Kommentar bei Spiel %2:%3 hinzugefügt").arg(userName, pGame->m_itemName, pGame->m_away);
-                messageID    = g_pushNotify->sendNewMeetingComment(body, userID, gameIndex);
+                QString body = QString("%1 hat bei %2:%3 geschrieben").arg(userName, pGame->m_itemName, pGame->m_away);
+                messageID    = g_pushNotify->sendNewMeetingComment(body, comment, userID, gameIndex);
             } else
                 qWarning().noquote() << QString("Error adding comment at game %1: %2").arg(pGame->m_index).arg(result);
             return result;
@@ -711,8 +711,8 @@ qint32 GlobalData::requestSendCommentMeeting(const qint32 gameIndex, const qint3
         pList->append(mInfo);
         result = mInfo->addMeetingComment(userID, timestamp, comment);
         qInfo().noquote() << QString("Added Comment %2 at game %1").arg(pGame->m_index).arg(comment);
-        QString body = QString("%1 hat einen Kommentar bei Spiel %2:%3 hinzugefügt").arg(userName, pGame->m_itemName, pGame->m_away);
-        messageID    = g_pushNotify->sendNewMeetingComment(body, userID, gameIndex);
+        QString body = QString("%1 hat bei Spiel %2:%3 geschrieben").arg(userName, pGame->m_itemName, pGame->m_away);
+        messageID    = g_pushNotify->sendNewMeetingComment(body, comment, userID, gameIndex);
     } else {
         delete mInfo;
         qWarning().noquote() << QString("Error creating meeting info file for game %1").arg(pGame->m_index);

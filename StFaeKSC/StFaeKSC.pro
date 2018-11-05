@@ -40,10 +40,7 @@ SOURCES += main.cpp \
     ../Common/Network/messagecommand.cpp \
     General/globaldata.cpp \
     General/console.cpp \
-    General/dataconnection.cpp \
     General/pushnotification.cpp \
-    Network/udpdataserver.cpp \
-    Network/udpserver.cpp \
     Data/listeduser.cpp \
     Data/games.cpp \
     Data/readdatacsv.cpp \
@@ -87,11 +84,8 @@ HEADERS += \
     General/globaldata.h \
     General/console.h \
     General/usercommand.h \
-    General/dataconnection.h \
     General/pushnotification.h \
-    Network/udpdataserver.h \
     Network/connectiondata.h \
-    Network/udpserver.h \
     Data/listeduser.h \
     Data/games.h \
     Data/readdatacsv.h \
@@ -119,6 +113,11 @@ HEADERS += \
     Network/cconsslserver.h \
     Manager/cmediamanager.h \
     Data/mediainfo.h
+
+
+# General/dataconnection.cpp \
+# Network/udpserver.cpp \
+# Network/udpdataserver.h \
 
 unix {
 #    QMAKE_POST_LINK = mkdir -p $$OUTPUT_FOLDER && cp $$TARGET $$OUTPUT_FOLDER

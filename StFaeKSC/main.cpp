@@ -38,7 +38,7 @@
 #include "Manager/cglobalmanager.h"
 #include "Network/ccontcpmaindata.h"
 #include "Network/ccontcpmainserver.h"
-#include "Network/udpserver.h"
+//#include "Network/udpserver.h"
 
 GlobalData* g_GlobalData;
 
@@ -68,15 +68,15 @@ int main(int argc, char* argv[])
     qInfo().noquote() << "*************************************************************";
     qInfo().noquote() << QString("Starting StFaeKSC %1").arg(STAM_ORGA_VERSION_S);
 
-    BackgroundController ctrlUdp;
+//    BackgroundController ctrlUdp;
     BackgroundController ctrlTcp;
     cGlobalManager       globalManager;
     if (argc > 1 && QString(argv[1]) == "-noServer") {
         qInfo() << "Starting only as a deamon without a server";
     } else {
 
-        UdpServer* udpServ = new UdpServer(&globalData);
-        ctrlUdp.Start(udpServ, false);
+//        UdpServer* udpServ = new UdpServer(&globalData);
+//        ctrlUdp.Start(udpServ, false);
 
         cConTcpMainServer* tcpMain = new cConTcpMainServer();
         tcpMain->initialize();
@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
     int result = a.exec();
 
     qDebug().noquote() << QString("Ending program %1: %2").arg(result).arg(QCoreApplication::applicationPid());
-    ctrlUdp.Stop();
+//    ctrlUdp.Stop();
     delete g_Console;
 
     delete checkConsistData;

@@ -302,8 +302,9 @@ qint32 cControlManager::handleNotifyCommand(QJsonObject &rootObj)
 {
     QString  header   = rootObj.value("header").toString();
     QString  body = rootObj.value("body").toString();
+    QString  bigText = rootObj.value("bigText").toString();
 
-    qint64 result = g_pushNotify->sendNewGeneralTopicNotification(header, body);
+    qint64 result = g_pushNotify->sendNewGeneralTopicNotification(header, body, bigText);
     if (result < 0)
         return (qint32) result;
     return ERROR_CODE_SUCCESS;
