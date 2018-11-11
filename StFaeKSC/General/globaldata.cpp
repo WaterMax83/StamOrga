@@ -412,9 +412,7 @@ quint16 GlobalData::getMeetingInfoValue(const qint32 type, const qint32 gamesInd
     return 0;
 }
 
-#define BODY_CHANGE_MEET "Beim Spiel %1 : %2 wurde das Treffen geändert"
-#define BODY_CHANGE_TRIP "Beim Spiel %1 : %2 wurde die Fahrt geändert"
-#define BODY_ADD_MEETING "Kommst du zu %1 : %2 ?"
+#define BODY_MEETING "%1 : %2"
 
 qint32 GlobalData::requestChangeMeetingInfo(const qint32 gameIndex, const qint32 version,
                                             const QString when, const QString where, const QString info,
@@ -453,17 +451,11 @@ qint32 GlobalData::requestChangeMeetingInfo(const qint32 gameIndex, const qint32
             if (result == ERROR_CODE_SUCCESS) {
                 qInfo().noquote() << QString("Changed Meeting info at game %1:%2, %3").arg(pGame->m_itemName, pGame->m_away).arg(type);
 
+                QString body = QString(BODY_MEETING).arg(pGame->m_itemName, pGame->m_away);
                 /* When there were no infos saved, this was also a new meeting */
                 if (oldWhen.length() > 0 || oldWhere.length() > 0 || oldInfo.length() > 0) {
-                    QString body;
-                    if (type == MEETING_TYPE_MEETING)
-                        body = QString(BODY_CHANGE_MEET).arg(pGame->m_itemName, pGame->m_away);
-                    else
-                        body  = QString(BODY_CHANGE_TRIP).arg(pGame->m_itemName, pGame->m_away);
                     messageID = g_pushNotify->sendChangeMeetingNotification(body, userID, gameIndex, type);
-
                 } else {
-                    QString body = QString(BODY_ADD_MEETING).arg(pGame->m_itemName, pGame->m_away);
                     messageID    = g_pushNotify->sendNewMeetingNotification(body, userID, gameIndex, type);
                 }
             } else
@@ -482,7 +474,7 @@ qint32 GlobalData::requestChangeMeetingInfo(const qint32 gameIndex, const qint32
         pList->append(mInfo);
         mInfo->changeMeetingInfo(when, where, info);
         qInfo().noquote() << QString("Added MeetingInfo at game %1:%2, %3").arg(pGame->m_itemName, pGame->m_away).arg(pGame->m_index);
-        QString body = QString(BODY_ADD_MEETING).arg(pGame->m_itemName, pGame->m_away);
+        QString body = QString(BODY_MEETING).arg(pGame->m_itemName, pGame->m_away);
         messageID    = g_pushNotify->sendNewMeetingNotification(body, userID, gameIndex, type);
     } else {
         delete mInfo;
@@ -589,7 +581,7 @@ qint32 GlobalData::requestGetMeetingInfo(const qint32 gameIndex, const qint32 ve
 }
 
 
-#define BODY_NEW_AWAY_ACCEPT "%1 fährt zu %2, kommst du mit?"
+#define BODY_NEW_AWAY_ACCEPT "%1 fährt zu %2"
 
 /*  answer
  * 0                Header          12

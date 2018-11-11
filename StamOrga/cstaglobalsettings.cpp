@@ -270,9 +270,7 @@ QSslCertificate cStaGlobalSettings::getSSLCaCertificate()
 
 #define NOT_OFFSET_NEWAPPV 0
 #define NOT_OFFSET_NEWMEET 1
-#define NOT_OFFSET_CHGGAME 2
 #define NOT_OFFSET_NEWTICK 3
-#define NOT_OFFSET_NEWAWAY 4
 #define NOT_OFFSET_FANCLUB 5
 #define NOT_OFFSET_COMMENT 6
 
@@ -284,17 +282,9 @@ bool cStaGlobalSettings::isNotificationNewMeetingEnabled()
 {
     return (this->m_notificationEnabledValue & (1 << NOT_OFFSET_NEWMEET)) ? true : false;
 }
-bool cStaGlobalSettings::isNotificationChangedMeetingEnabled()
-{
-    return (this->m_notificationEnabledValue & (1 << NOT_OFFSET_CHGGAME)) ? true : false;
-}
 bool cStaGlobalSettings::isNotificationNewFreeTicketEnabled()
 {
     return (this->m_notificationEnabledValue & (1 << NOT_OFFSET_NEWTICK)) ? true : false;
-}
-bool cStaGlobalSettings::isNotificationNewAwayAcceptEnabled()
-{
-    return (this->m_notificationEnabledValue & (1 << NOT_OFFSET_NEWAWAY)) ? true : false;
 }
 bool cStaGlobalSettings::isNotificationMeetingCommentEnabled()
 {
@@ -319,24 +309,11 @@ void cStaGlobalSettings::setNotificationNewMeetingEnabled(bool enable)
     g_StaSettingsManager->setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
     this->updatePushNotification();
 }
-void cStaGlobalSettings::setNotificationChangedMeetingEnabled(bool enable)
-{
-    this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_CHGGAME);
-    this->m_notificationEnabledValue |= (enable ? 1 : 0) << NOT_OFFSET_CHGGAME;
-    g_StaSettingsManager->setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
-    this->updatePushNotification();
-}
+
 void cStaGlobalSettings::setNotificationNewFreeTicketEnabled(bool enable)
 {
     this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_NEWTICK);
     this->m_notificationEnabledValue |= (enable ? 1 : 0) << NOT_OFFSET_NEWTICK;
-    g_StaSettingsManager->setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
-    this->updatePushNotification();
-}
-void cStaGlobalSettings::setNotificationNewAwayAcceptEnabled(bool enable)
-{
-    this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_NEWAWAY);
-    this->m_notificationEnabledValue |= (enable ? 1 : 0) << NOT_OFFSET_NEWAWAY;
     g_StaSettingsManager->setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
     this->updatePushNotification();
 }
@@ -369,20 +346,14 @@ void cStaGlobalSettings::updatePushNotification()
     else
         AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_MEETING);
 
-    if (this->m_bAlreadyConnected && this->isNotificationChangedMeetingEnabled())
-        AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_CHANGE_MEETING);
-    else
-        AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_CHANGE_MEETING);
+    AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_CHANGE_MEETING);
 
     if (this->m_bAlreadyConnected && this->isNotificationNewFreeTicketEnabled())
         AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_FREE_TICKET);
     else
         AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_FREE_TICKET);
 
-    if (this->m_bAlreadyConnected && this->isNotificationNewAwayAcceptEnabled())
-        AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_AWAY_ACCEPT);
-    else
-        AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_AWAY_ACCEPT);
+    AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_AWAY_ACCEPT);
 
     if (this->m_bAlreadyConnected && this->isNotificationMeetingCommentEnabled())
         AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_COMMENT);

@@ -181,7 +181,7 @@ Flickable {
                 var sprite = seasonTicketItem.createObject(columnLayoutTickets)
                 sprite.showTicketInfo(i);
             }
-            busyIndicatorTicket.infoText = "Letztes Update am " + gDataTicketManager.getSeasonTicketLastLocalUpdateString()
+            busyIndicatorTicket.infoText = "Letztes Update vor " + gDataTicketManager.getSeasonTicketLastLocalUpdateString()
         } else
             busyIndicatorTicket.infoText = "Keine Daten gespeichert\nZiehen zum Aktualisieren"
     }

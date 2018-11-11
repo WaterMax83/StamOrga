@@ -186,10 +186,11 @@ qint64 PushNotification::sendNewMeetingNotification(const QString body, const qi
         push->m_topic      = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING;
     push->m_userEventTopic = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING;
     if (type == MEETING_TYPE_MEETING)
-        push->m_header = "Neues Treffen angelegt";
+        push->m_header = "Treffen";
     else
-        push->m_header     = "Neue Fahrt angelegt";
+        push->m_header     = "Fahrt";
     push->m_body           = body;
+    push->m_bigText = "Kommst du mit?";
     push->m_sendMessageID  = getNextInternalPushNumber();
     push->m_sendTime       = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND; // 5min
     push->m_userID         = userID;
@@ -209,7 +210,7 @@ qint64 PushNotification::sendChangeMeetingNotification(const QString body, const
     this->m_notifyMutex.lock();
 
     foreach (PushNotifyInfo* p, this->m_lPushToSend) {
-        if (p->m_userEventTopic == PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING || p->m_userEventTopic == PUSH_NOTIFY_TOPIC::PUSH_NOT_CHG_MEETING) {
+        if (p->m_userEventTopic == PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING) {
             if (p->m_internalIndex1 == gameIndex) {
                 this->m_notifyMutex.unlock();
                 return -1;
@@ -227,13 +228,14 @@ qint64 PushNotification::sendChangeMeetingNotification(const QString body, const
     if (IS_PLAY_ONLY_FANCLUB(pGame->m_options))
         push->m_topic = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_FAN_NEWS;
     else
-        push->m_topic      = PUSH_NOTIFY_TOPIC::PUSH_NOT_CHG_MEETING;
-    push->m_userEventTopic = PUSH_NOTIFY_TOPIC::PUSH_NOT_CHG_MEETING;
+        push->m_topic      = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING;
+    push->m_userEventTopic = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING;
     if (type == MEETING_TYPE_MEETING)
-        push->m_header = "Treffen wurde verändert";
+        push->m_header = "Treffen";
     else
-        push->m_header     = "Fahrt wurde verändert";
+        push->m_header     = "Fahrt";
     push->m_body           = body;
+    push->m_bigText = "Information wurden angepasst";
     push->m_sendMessageID  = getNextInternalPushNumber();
     push->m_sendTime       = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND;
     push->m_userID         = userID;
@@ -253,7 +255,7 @@ qint64 PushNotification::sendNewTicketNotification(const QString body, const qin
     this->m_notifyMutex.lock();
 
     foreach (PushNotifyInfo* p, this->m_lPushToSend) {
-        if (p->m_userEventTopic == PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING || p->m_userEventTopic == PUSH_NOTIFY_TOPIC::PUSH_NOT_CHG_MEETING) {
+        if (p->m_userEventTopic == PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_TICKET) {
             if (p->m_internalIndex1 == gameIndex && p->m_internalIndex2 == ticketIndex) {
                 this->m_notifyMutex.unlock();
                 return -1;
@@ -307,10 +309,11 @@ qint64 PushNotification::sendNewFirstAwayAccept(const QString body, const qint32
     if (IS_PLAY_ONLY_FANCLUB(pGame->m_options))
         push->m_topic = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_FAN_NEWS;
     else
-        push->m_topic      = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_AWAY_ACCEPT;
-    push->m_userEventTopic = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_AWAY_ACCEPT;
+        push->m_topic      = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING;
+    push->m_userEventTopic = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING;
     push->m_header         = "Neuer Auswärtsfahrer";
     push->m_body           = body;
+    push->m_bigText = "Kommst du mit?";
     push->m_sendMessageID  = getNextInternalPushNumber();
     push->m_sendTime       = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND;
     push->m_userID         = userID;
@@ -533,12 +536,12 @@ QString PushNotification::getTopicStringFromIndex(const PUSH_NOTIFY_TOPIC topic)
         return NOTIFY_TOPIC_NEW_APP_VERSION;
     case PUSH_NOT_NEW_MEETING:
         return NOTIFY_TOPIC_NEW_MEETING;
-    case PUSH_NOT_CHG_MEETING:
-        return NOTIFY_TOPIC_CHANGE_MEETING;
+//    case PUSH_NOT_CHG_MEETING:
+//        return NOTIFY_TOPIC_CHANGE_MEETING;
     case PUSH_NOT_NEW_TICKET:
         return NOTIFY_TOPIC_NEW_FREE_TICKET;
-    case PUSH_NOT_NEW_AWAY_ACCEPT:
-        return NOTIFY_TOPIC_NEW_AWAY_ACCEPT;
+//    case PUSH_NOT_NEW_AWAY_ACCEPT:
+//        return NOTIFY_TOPIC_NEW_AWAY_ACCEPT;
     case PUSH_NOT_NEW_FAN_NEWS:
         return NOTIFY_TOPIC_NEW_FANCLUB_NEWS;
     case PUSH_NOT_NEW_COMMENT:

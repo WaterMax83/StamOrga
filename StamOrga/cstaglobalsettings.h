@@ -46,16 +46,16 @@ public:
     Q_INVOKABLE void setUseVersionPopup(const bool use);
 
     Q_INVOKABLE QString getDebugIP();
-    Q_INVOKABLE void    setDebugIP(const QString ip);
+    Q_INVOKABLE void setDebugIP(const QString ip);
 
     Q_INVOKABLE QString getDebugIPWifi();
-    Q_INVOKABLE void    setDebugIPWifi(const QString ip);
+    Q_INVOKABLE void setDebugIPWifi(const QString ip);
 
     Q_INVOKABLE QString getChangeDefaultFont();
-    Q_INVOKABLE void    setChangeDefaultFont(const QString font);
+    Q_INVOKABLE void setChangeDefaultFont(const QString font);
 
     Q_INVOKABLE qint32 getCurrentFontIndex();
-    void               setCurrentFontList(QStringList* list);
+    void setCurrentFontList(QStringList* list);
 
     Q_INVOKABLE qint64 getKeepPastItemsCount();
 
@@ -69,16 +69,12 @@ public:
 
     Q_INVOKABLE bool isNotificationNewAppVersionEnabled();
     Q_INVOKABLE bool isNotificationNewMeetingEnabled();
-    Q_INVOKABLE bool isNotificationChangedMeetingEnabled();
     Q_INVOKABLE bool isNotificationNewFreeTicketEnabled();
-    Q_INVOKABLE bool isNotificationNewAwayAcceptEnabled();
     Q_INVOKABLE bool isNotificationMeetingCommentEnabled();
     Q_INVOKABLE bool isNotificationFanclubNewsEnabled();
     Q_INVOKABLE void setNotificationNewAppVersionEnabled(bool enable);
     Q_INVOKABLE void setNotificationNewMeetingEnabled(bool enable);
-    Q_INVOKABLE void setNotificationChangedMeetingEnabled(bool enable);
     Q_INVOKABLE void setNotificationNewFreeTicketEnabled(bool enabled);
-    Q_INVOKABLE void setNotificationNewAwayAcceptEnabled(bool enable);
     Q_INVOKABLE void setNotificationMeetingCommentEnabled(bool enable);
     Q_INVOKABLE void setNotificationFanclubNewsEnabled(bool enable);
 

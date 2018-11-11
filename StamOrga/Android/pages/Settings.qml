@@ -157,15 +157,6 @@ Flickable {
                 MouseArea {
                     anchors.fill: labelNotificationText
                     onClicked: {
-//                        viewNotifySettings.enableNewAppVersion = notifyNewAppVersion;
-//                        viewNotifySettings.enableMeetingAdded = notifyNewMeetInfo;
-//                        viewNotifySettings.enableMeetingChanged = notifyChangeMeetInfo;
-//                        viewNotifySettings.enableNewFreeTicket = notifyFreeTicket;
-//                        viewNotifySettings.enableNewAwayAccept = notifyAwayAccept;
-//                        viewNotifySettings.enableMeetComment = notifyMeetComment;
-//                        viewNotifySettings.enableFanclubNews = notifyFanclubNews;
-//                        viewNotifySettings.visibleFanclubNews = gConUserSettings.userIsFanclubEnabled();
-//                        viewNotifySettings.acceptedDialog.connect(acceptedNotificationDialog);
                         stackView.push(viewNotifySettings);
                     }
                 }
@@ -280,9 +271,7 @@ Flickable {
         visible: false
         enableNewAppVersion : notifyNewAppVersion;
         enableMeetingAdded : notifyNewMeetInfo;
-        enableMeetingChanged : notifyChangeMeetInfo;
         enableNewFreeTicket : notifyFreeTicket;
-        enableNewAwayAccept : notifyAwayAccept;
         enableMeetComment : notifyMeetComment;
         enableFanclubNews : notifyFanclubNews;
         visibleFanclubNews : gConUserSettings.userIsFanclubEnabled();
@@ -336,14 +325,8 @@ Flickable {
         if (viewNotifySettings.enableMeetingAdded !== gStaGlobalSettings.isNotificationNewMeetingEnabled()){
             gStaGlobalSettings.setNotificationNewMeetingEnabled(viewNotifySettings.enableMeetingAdded);
         }
-        if (viewNotifySettings.enableMeetingChanged !== gStaGlobalSettings.isNotificationChangedMeetingEnabled()){
-            gStaGlobalSettings.setNotificationChangedMeetingEnabled(viewNotifySettings.enableMeetingChanged);
-        }
         if (viewNotifySettings.enableNewFreeTicket !== gStaGlobalSettings.isNotificationNewFreeTicketEnabled()){
             gStaGlobalSettings.setNotificationNewFreeTicketEnabled(viewNotifySettings.enableNewFreeTicket);
-        }
-        if (viewNotifySettings.enableNewAwayAccept !== gStaGlobalSettings.isNotificationNewAwayAcceptEnabled()){
-            gStaGlobalSettings.setNotificationNewAwayAcceptEnabled(viewNotifySettings.enableNewAwayAccept);
         }
         if (viewNotifySettings.enableMeetComment !== gStaGlobalSettings.isNotificationMeetingCommentEnabled()) {
             gStaGlobalSettings.setNotificationMeetingCommentEnabled(viewNotifySettings.enableMeetComment );
@@ -395,9 +378,7 @@ Flickable {
 
         notifyNewAppVersion = gStaGlobalSettings.isNotificationNewAppVersionEnabled();
         notifyNewMeetInfo = gStaGlobalSettings.isNotificationNewMeetingEnabled();
-        notifyChangeMeetInfo = gStaGlobalSettings.isNotificationChangedMeetingEnabled()
         notifyFreeTicket = gStaGlobalSettings.isNotificationNewFreeTicketEnabled();
-        notifyAwayAccept = gStaGlobalSettings.isNotificationNewAwayAcceptEnabled();
         notifyMeetComment = gStaGlobalSettings.isNotificationMeetingCommentEnabled();
         notifyFanclubNews = gStaGlobalSettings.isNotificationFanclubNewsEnabled();
 
@@ -406,23 +387,10 @@ Flickable {
 
     property bool notifyNewAppVersion : false
     property bool notifyNewMeetInfo : false
-    property bool notifyChangeMeetInfo : false
     property bool notifyFreeTicket : false
-    property bool notifyAwayAccept : false
     property bool notifyMeetComment : false
     property bool notifyFanclubNews : false
     property bool notifySettingsDialog : false
-//    function acceptedNotificationDialog() {
-//        notifyNewAppVersion = viewNotifySettings.enableNewAppVersion;
-//        notifyNewMeetInfo = viewNotifySettings.enableMeetingAdded;
-//        notifyChangeMeetInfo = viewNotifySettings.enableMeetingChanged;
-//        notifyFreeTicket = viewNotifySettings.enableNewFreeTicket;
-//        notifyAwayAccept = viewNotifySettings.enableNewAwayAccept;
-//        notifyMeetComment = viewNotifySettings.enableMeetComment;
-//        notifyFanclubNews = viewNotifySettings.enableFanclubNews
-
-//        valueWasEditedEnableSave();
-//    }
 
     function notifyUserIntConnectionFinished(result, msg) {}
 }

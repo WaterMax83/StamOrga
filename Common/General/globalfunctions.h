@@ -132,6 +132,7 @@ extern CompetitionIndex getCompetitionIndex(QString comp);
 extern QString getCompetitionString(CompetitionIndex index);
 extern QString getCompetitionShortString(CompetitionIndex index);
 extern QString createRandomString(qint32 size);
+extern QString getTimeStampSinceString(QDateTime& time);
 extern bool gIsGameASeasonTicketGame(CompetitionIndex comp);
 
 // clang-format off

@@ -31,6 +31,7 @@ public class MyFcmListenerService extends FirebaseMessagingService
         Map<String, String> data = message.getData();
         String title = "";
         String body = "";
+        String bigText = "";
 
 //        for (Map.Entry<String, String> entry : data.entrySet())
 //        {
@@ -40,6 +41,8 @@ public class MyFcmListenerService extends FirebaseMessagingService
             title = data.get("title").toString();
         if (data.containsKey("body"))
             body = data.get("body").toString();
+        if (data.containsKey("bigText"))
+            bigText = data.get("bigText").toString();
 
         Log.d(TAG, "From: " + from);
         Log.d(TAG, "Size: " + data.size());
@@ -69,10 +72,10 @@ public class MyFcmListenerService extends FirebaseMessagingService
             }
         }
 
-        sendNotification(title, body, messageNumber);
+        sendNotification(title, body, bigText, messageNumber);
     }
 
-    private void sendNotification(String title, String message, int msgNmb)
+    private void sendNotification(String title, String message, String bigText, int msgNmb)
     {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -86,7 +89,7 @@ public class MyFcmListenerService extends FirebaseMessagingService
                 .setContentIntent(pendingIntent)
                 .setGroup("com.stamorga.example.NOTIFY")
                 .setStyle(new NotificationCompat.BigTextStyle()
-                                .bigText(message));
+                                .bigText(bigText));
 //                .setContentInfo("Info");
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

@@ -159,7 +159,9 @@ QString cDataTicketManager::getSeasonTicketLastLocalUpdateString()
         return "";
 
     QMutexLocker lock(&this->m_mutex);
-    return QDateTime::fromMSecsSinceEpoch(this->m_stLastLocalUpdateTimeStamp).toString("dd.MM.yy hh:mm:ss");
+    QDateTime    time = QDateTime::fromMSecsSinceEpoch(this->m_stLastLocalUpdateTimeStamp);
+    //    return QDateTime::fromMSecsSinceEpoch(this->m_stLastLocalUpdateTimeStamp).toString("dd.MM.yy hh:mm:ss");
+    return getTimeStampSinceString(time);
 }
 
 qint32 cDataTicketManager::startListSeasonTickets()

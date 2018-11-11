@@ -29,9 +29,7 @@ Item {
     id: mainItemNotificationSettings
     property alias enableNewAppVersion : newAppVersion.checked
     property alias enableMeetingAdded : newMeeting.checked
-    property alias enableMeetingChanged : changedMeeting.checked
     property alias enableNewFreeTicket : newFreeTicket.checked
-    property alias enableNewAwayAccept : newAwayAccept.checked
     property alias enableFanclubNews: newFanclubNews.checked
     property alias enableMeetComment: newMeetComment.checked
     property alias visibleFanclubNews: rowFanclubNews.visible
@@ -81,7 +79,7 @@ Item {
                     RowLayout {
                         Text {
                             id: text2
-                            text: qsTr("Neues Treffen:")
+                            text: qsTr("Treffen/Fahrt:")
                             Layout.fillWidth: true
                             Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                             font.pixelSize: 14
@@ -89,21 +87,6 @@ Item {
                         }
                         CheckBox {
                             id: newMeeting
-                            onCheckedChanged:if (isNotifyStartupDone) valueWasEditedEnableSave();
-                        }
-                    }
-
-                    RowLayout {
-                        Text {
-                            id: text3
-                            text: qsTr("Treffen geändert:")
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                            font.pixelSize: 14
-                            color: "white"
-                        }
-                        CheckBox {
-                            id: changedMeeting
                             onCheckedChanged:if (isNotifyStartupDone) valueWasEditedEnableSave();
                         }
                     }
@@ -119,21 +102,6 @@ Item {
                         }
                         CheckBox {
                             id: newFreeTicket
-                            onCheckedChanged:if (isNotifyStartupDone) valueWasEditedEnableSave();
-                        }
-                    }
-
-                    RowLayout {
-                        Text {
-                            id: text5
-                            text: qsTr("Erster Auswärtsfahrer:")
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
-                            font.pixelSize: 14
-                            color: "white"
-                        }
-                        CheckBox {
-                            id: newAwayAccept
                             onCheckedChanged:if (isNotifyStartupDone) valueWasEditedEnableSave();
                         }
                     }

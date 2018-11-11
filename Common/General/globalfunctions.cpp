@@ -222,6 +222,29 @@ QString createRandomString(qint32 size)
     return rValue;
 }
 
+QString getTimeStampSinceString(QDateTime& time)
+{
+    QDateTime now = QDateTime::currentDateTime();
+
+    qint64 days = time.daysTo(now);
+    if (days > 3) {
+        if (days > 730)
+            return QString("%1 Jahren").arg(days / 365);
+        else if (days > 60)
+            return QString("%1 Monaten").arg(days / 30);
+
+        return QString("%1 Tage").arg(days);
+    }
+
+    qint64 msecs = time.msecsTo(now);
+    if (msecs > 7200000)
+        return QString("%1 Stunden").arg(msecs / 3600000);
+    else if (msecs > 120000)
+        return QString("%1 Minuten").arg(msecs / 60000);
+
+    return QString("%1 Sekunden").arg(msecs / 1000);
+}
+
 bool gIsGameASeasonTicketGame(CompetitionIndex comp)
 {
     switch (comp) {

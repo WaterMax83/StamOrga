@@ -196,9 +196,13 @@ QString SeasonTicket::showAllSeasonTickets()
         if (pTicket == NULL)
             continue;
         QString date   = QDateTime::fromMSecsSinceEpoch(pTicket->m_timestamp).toString("dd.MM.yyyy hh:mm");
+        QString creation = QDateTime::fromMSecsSinceEpoch(pTicket->m_creation).toString("dd.MM.yyyy hh:mm");
+        QString deleteTS = QDateTime::fromMSecsSinceEpoch(pTicket->m_deleteTimeStamp).toString("dd.MM.yyyy hh:mm");
         QString output = QString("%1: %2").arg(pTicket->m_itemName, -maxSizeName).arg(pTicket->m_discount);
-        output.append(QString(" - %1 \n  %2").arg(date).arg(pTicket->m_place, -maxSizePlace));
-        output.append(QString(" - %1\n").arg(pTicket->m_user));
+        output.append(QString(" - %1 - %2").arg(date, creation));
+        if (pTicket->m_deleteTimeStamp != 0)
+            output.append(QString(" - %1").arg(deleteTS));
+        output.append(QString("\n  %1 - %2\n").arg(pTicket->m_place, -maxSizePlace).arg(pTicket->m_user));
         rValue.append(output);
     }
     return rValue;
