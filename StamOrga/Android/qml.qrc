@@ -105,7 +105,7 @@
         <file>components/SeasonTicketDesignItem.qml</file>
         <file>images/+material/discount.png</file>
         <file>images/discount.png</file>
-        <file>components/NewsDataDesignItem.qml</file>
+        <file>components/TextDataDesignItem.qml</file>
         <file>images/+material/timelaps.png</file>
         <file>images/timelaps.png</file>
         <file>pages/UpdatePage.qml</file>
@@ -119,5 +119,7 @@
         <file>images/notes.png</file>
         <file>images/+material/delete.png</file>
         <file>images/delete.png</file>
+        <file>pages/StadiumWebPage.qml</file>
+        <file>pages/StadiumWebList.qml</file>
     </qresource>
 </RCC>

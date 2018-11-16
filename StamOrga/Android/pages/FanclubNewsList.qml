@@ -164,7 +164,7 @@ Flickable {
         if (gDataNewsDataManager.getNewsDataLength() > 0) {
             for (var i = 0; i < gDataNewsDataManager.getNewsDataLength(); i++) {
                 var sprite = newsDataItem.createObject(columnLayoutFanClubList)
-                sprite.showNewsDataInfo(i);
+                sprite.showTextDataInfo(i, 0);
             }
             busyIndicatorNewsList.infoText = "Letztes Update vor " + gDataNewsDataManager.getNewsDataLastLocalUpdateString()
         } else
@@ -174,7 +174,7 @@ Flickable {
 
     Component {
         id: newsDataItem
-        MyComponents.NewsDataDesignItem {
+        MyComponents.TextDataDesignItem {
             onClickedItem: {
                 var component = Qt.createComponent("../pages/FanclubNewsItem.qml")
                 if (component.status === Component.Ready) {

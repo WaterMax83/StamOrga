@@ -32,9 +32,9 @@ Item {
     height: mainNewsLayout.implicitHeight
     Layout.minimumHeight: mainNewsLayout.height
 
-    property bool showNewDataSeperator: true
+    property bool showTextDataSeperator: true
 
-    property var m_newsDataItem
+    property var m_textDataItem
 
     signal clickedItem(var sender)
     signal pressAndHoldItem(var sender)
@@ -46,10 +46,10 @@ Item {
     MouseArea {
         anchors.fill: parent
         onClicked: {
-            clickedItem(m_newsDataItem);
+            clickedItem(m_textDataItem);
         }
         onPressAndHold: {
-            pressAndHoldItem(m_newsDataItem);
+            pressAndHoldItem(m_textDataItem);
         }
     }
 
@@ -68,7 +68,7 @@ Item {
         Rectangle {
             color: Material.hintTextColor
             height: 1
-            visible: showNewDataSeperator
+            visible: showTextDataSeperator
             Layout.fillWidth: true
         }
 
@@ -138,7 +138,7 @@ Item {
                     }
                     RowLayout {
                         Text {
-                            id: labelUserName
+                            id: labelSubHeader
                             anchors.left: parent.left
                             Layout.fillWidth: true
                             color: "#B0BEC5"
@@ -158,22 +158,35 @@ Item {
         }
     }
 
-    function showNewsDataInfo(index) {
-        var newsDataItem = gDataNewsDataManager.getNewsDataFromArrayIndex(index)
-        if (newsDataItem !== null) {
-            m_newsDataItem = newsDataItem
-            labelHeaderItem.text = newsDataItem.header
-            labelUserName.text = "von " + newsDataItem.user;
-            labelTime.text = newsDataItem.timestampReadableLine();
+    function showTextDataInfo(index, type) {
 
-            var eventCount = newsDataItem.event;
+        var textDataItem;
+        if (type === 0)
+            textDataItem = gDataNewsDataManager.getNewsDataFromArrayIndex(index)
+        else if (type === 1)
+            textDataItem = gDataWebPageManager.getWebDataFromArrayIndex(index)
+        if (textDataItem !== null) {
+            m_textDataItem = textDataItem
+            if (type === 0) {
+                labelHeaderItem.text = textDataItem.header
+                labelSubHeader.text = "von " + textDataItem.user;
+                labelTime.text = textDataItem.timestampReadableLine();
+            } else if (type === 1) {
+                labelHeaderItem.text = textDataItem.timestampReadableLine();
+                labelSubHeader.text = textDataItem.header;
+            }
+
+            var eventCount = textDataItem.event;
             if (eventCount > 0) {
                 eventIndicator.disableVisibility = false;
                 eventIndicator.eventCount = eventCount;
             } else
                 eventIndicator.disableVisibility = true;
 
-            labelLineNewsDataShortName.text = newsDataItem.getHeaderShortString();
+            if (type === 0)
+                labelLineNewsDataShortName.text = textDataItem.getHeaderShortString();
+            else if (type === 1)
+                labelLineNewsDataShortName.text = index + 1;
         }
     }
 }

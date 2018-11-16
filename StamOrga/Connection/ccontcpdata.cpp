@@ -34,6 +34,7 @@
 #include "../Data/cdatanewsdatamanager.h"
 #include "../Data/cdatastatisticmanager.h"
 #include "../Data/cdataticketmanager.h"
+#include "../Data/cdatawebpagemanager.h"
 #include "../cstaglobalsettings.h"
 #include "../cstaversionmanager.h"
 #include "cconmanager.h"
@@ -272,6 +273,9 @@ void cConTcpData::checkNewOncomingData()
             break;
         case OP_CODE_CMD_RES::ACK_CMD_MEDIA:
             request->m_result = g_DataMediaManager->handleMediaCommandResponse(msg);
+            break;
+        case OP_CODE_CMD_RES::ACK_CMD_STADIUM:
+            request->m_result = g_DataWebPageManager->handleWebPageResponse(msg);
             break;
 #ifndef STAMORGA_APP
         case OP_CODE_CMD_RES::ACK_CMD_CONTROL:

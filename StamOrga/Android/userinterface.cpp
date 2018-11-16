@@ -199,6 +199,10 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
         emit this->notifyMediaCommandFinished(result);
         break;
 
+    case OP_CODE_CMD_REQ::REQ_CMD_STADIUM:
+        emit this->notifyWebPageCommandFinished(result);
+        break;
+
     default:
         qWarning().noquote() << QString("Unknown acknowledge: 0x%1").arg(QString::number(command, 16));
         break;

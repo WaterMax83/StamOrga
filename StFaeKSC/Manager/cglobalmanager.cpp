@@ -25,6 +25,7 @@
 #include "cmeetinginfomanager.h"
 #include "cnewsdatamanager.h"
 #include "csmtpmanager.h"
+#include "cstadiumwebpagemanager.h"
 #include "cstatisticmanager.h"
 #include "cticketmanager.h"
 
@@ -53,6 +54,9 @@ qint32 cGlobalManager::initialize()
 
     if (rValue == ERROR_CODE_SUCCESS)
         rValue = g_MediaManager.initialize();
+
+    if (rValue == ERROR_CODE_SUCCESS)
+        rValue = g_StadiumWebPageManager.initialize();
 
     if (rValue == ERROR_CODE_SUCCESS) {
         rValue = g_SmtpManager.initialize();

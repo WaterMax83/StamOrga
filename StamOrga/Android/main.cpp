@@ -24,6 +24,7 @@
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/QQmlContext>
+#include <QtWebView/QtWebView>
 #include <QtWidgets/QApplication>
 
 //#include <iostream>
@@ -46,6 +47,7 @@ int main(int argc, char* argv[])
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QCoreApplication::setAttribute(Qt::AA_UseStyleSheetPropagationInWidgetStyles, true);
     QApplication app(argc, argv);
+    QtWebView::initialize();
 
     cStaGlobalManager staGlobalManager;
     g_GlobalManager = &staGlobalManager;
@@ -80,7 +82,6 @@ int main(int argc, char* argv[])
     engine.rootContext()->setContextProperty("fontFamiliesModel", &fontFamiliesModel);
     // //    engine.rootContext()->setContextProperty("fontFamiliesModel", QVariant::fromValue(fontFamilies));
     engine.load(QUrl(QLatin1String("qrc:/main.qml")));
-
 
     if (engine.rootObjects().size() == 0) {
         qCritical() << "Warning no root qml object loaded, end programm";

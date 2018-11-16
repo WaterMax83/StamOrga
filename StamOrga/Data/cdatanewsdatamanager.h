@@ -25,7 +25,7 @@
 
 #include "../Common/General/cgendisposer.h"
 #include "../Common/Network/messageprotocol.h"
-#include "newsdataitem.h"
+#include "textdataitem.h"
 
 class cDataNewsDataManager : public cGenDisposer
 {
@@ -35,15 +35,15 @@ public:
 
     qint32 initialize();
 
-    void addNewNewsData(NewsDataItem* sNews, const quint16 updateIndex = 0);
+    void addNewNewsData(TextDataItem* sNews, const quint16 updateIndex = 0);
 
-    NewsDataItem* getNewsDataItem(qint32 newsIndex);
+    TextDataItem* getNewsDataItem(qint32 newsIndex);
 
     bool setNewsDataItemHasEvent(qint32 newsIndex);
     void resetAllNewsDataEvents();
 
     Q_INVOKABLE qint32 getNewsDataLength();
-    Q_INVOKABLE NewsDataItem* getNewsDataFromArrayIndex(int index);
+    Q_INVOKABLE TextDataItem* getNewsDataFromArrayIndex(int index);
     Q_INVOKABLE QString getNewsDataLastLocalUpdateString();
 
     Q_INVOKABLE qint32 startListNewsData();
@@ -54,7 +54,7 @@ public:
 
     Q_INVOKABLE qint32 startChangeNewsDataItem(const qint32 index, const QString header, const QString info);
     qint32 handleChangeNewsDataResponse(MessageProtocol* msg);
-    Q_INVOKABLE NewsDataItem* getCurrentEditedItem();
+    Q_INVOKABLE TextDataItem* getCurrentEditedItem();
 
     Q_INVOKABLE qint32 startRemoveNewsDataItem(const qint32 index);
     qint32 handleRemoveNewsDataItemResponse(MessageProtocol* msg);
@@ -64,7 +64,7 @@ signals:
 public slots:
 
 private:
-    QList<NewsDataItem*> m_lNews;
+    QList<TextDataItem*> m_lNews;
     QMutex               m_mutex;
 
     qint64 m_stLastLocalUpdateTimeStamp;
@@ -72,7 +72,7 @@ private:
 
     QString       m_editHeader;
     QString       m_editInfo;
-    NewsDataItem* m_editItem = NULL;
+    TextDataItem* m_editItem = NULL;
 };
 
 extern cDataNewsDataManager* g_DataNewsDataManager;

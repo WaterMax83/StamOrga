@@ -53,10 +53,13 @@ SOURCES += main.cpp \
     Data/userevents.cpp \
     Data/awaytripinfo.cpp \
     Data/checkconsistentdata.cpp \
+    Data/mediainfo.cpp \
+    Data/stadiumwebpage.cpp \
     Network/ccontcpmainserver.cpp \
     Network/ccontcpmainsocket.cpp \
     Network/ccontcpmaindata.cpp \
     Network/ccontcpdataserver.cpp \
+    Network/cconsslserver.cpp \
     Manager/cticketmanager.cpp \
     Manager/cglobalmanager.cpp \
     Manager/cnewsdatamanager.cpp \
@@ -65,9 +68,8 @@ SOURCES += main.cpp \
     Manager/cmeetinginfomanager.cpp \
     Manager/ccontrolmanager.cpp \
     Manager/csmtpmanager.cpp \
-    Network/cconsslserver.cpp \
     Manager/cmediamanager.cpp \
-    Data/mediainfo.cpp
+    Manager/cstadiumwebpagemanager.cpp
 
 
 HEADERS += \
@@ -98,10 +100,13 @@ HEADERS += \
     Data/userevents.h \
     Data/awaytripinfo.h \
     Data/checkconsistentdata.h \
+    Data/mediainfo.h \
+    Data/stadiumwebpage.h \
     Network/ccontcpmainserver.h \
     Network/ccontcpmainsocket.h \
     Network/ccontcpmaindata.h \
     Network/ccontcpdataserver.h \
+    Network/cconsslserver.h \
     Manager/cticketmanager.h \
     Manager/cglobalmanager.h \
     Manager/cnewsdatamanager.h \
@@ -110,9 +115,9 @@ HEADERS += \
     Manager/cmeetinginfomanager.h \
     Manager/ccontrolmanager.h \
     Manager/csmtpmanager.h \
-    Network/cconsslserver.h \
     Manager/cmediamanager.h \
-    Data/mediainfo.h
+    Manager/cstadiumwebpagemanager.h
+
 
 
 # General/dataconnection.cpp \

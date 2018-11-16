@@ -184,6 +184,11 @@ ApplicationWindow {
                                        listImgSource : "images/group.png"
                                    })
                         append({
+                                   title: "Bautagebuch",
+                                   element: viewWebList,
+                                   listImgSource : "images/delete.png"
+                               })
+                        append({
                                    title: "Einstellungen",
                                    element: viewSettingsPage,
                                    listImgSource : "images/settings.png"
@@ -321,7 +326,10 @@ ApplicationWindow {
         id: viewStatistics
         MyPages.Statistics {}
     }
-
+    Component{
+        id: viewWebList
+        MyPages.StadiumWebList {}
+    }
     Component {
         id: viewSettingsPage
         MyPages.Settings {}
@@ -464,6 +472,7 @@ ApplicationWindow {
         onNotifyStatisticsCommandFinished: stackView.currentItem.notifyStatisticsCommandFinished(result);
         onNotifyConsoleCommandFinished: stackView.currentItem.notifyConsoleCommandFinished(result);
         onNotifyMediaCommandFinished: stackView.currentItem.notifyMediaCommandFinished(result);
+        onNotifyWebPageCommandFinished: stackView.currentItem.notifyWebPageCommandFinished(result);
     }
 
     Connections {

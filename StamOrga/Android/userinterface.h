@@ -88,6 +88,7 @@ signals:
     void notifyDeleteFanclubNewsItemFinished(qint32 result);
     void notifyStatisticsCommandFinished(qint32 result);
     void notifyMediaCommandFinished(qint32 result);
+    void notifyWebPageCommandFinished(qint32 result);
 
 public slots:
     void slotConnectionRequestFinished(qint32 result, const QString msg);

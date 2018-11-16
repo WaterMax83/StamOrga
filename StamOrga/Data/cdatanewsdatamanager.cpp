@@ -41,7 +41,7 @@ cDataNewsDataManager::cDataNewsDataManager(QObject* parent)
 
 qint32 cDataNewsDataManager::initialize()
 {
-    qRegisterMetaType<NewsDataItem*>("NewsDataItem*");
+    qRegisterMetaType<TextDataItem*>("TextDataItem*");
 
     this->m_stLastLocalUpdateTimeStamp  = 0;
     this->m_stLastServerUpdateTimeStamp = 0;
@@ -52,12 +52,12 @@ qint32 cDataNewsDataManager::initialize()
 }
 
 
-void cDataNewsDataManager::addNewNewsData(NewsDataItem* sNews, const quint16 updateIndex)
+void cDataNewsDataManager::addNewNewsData(TextDataItem* sNews, const quint16 updateIndex)
 {
     if (!this->m_initialized)
         return;
 
-    NewsDataItem* pNews = this->getNewsDataItem(sNews->index());
+    TextDataItem* pNews = this->getNewsDataItem(sNews->index());
     if (pNews == NULL) {
         QMutexLocker lock(&this->m_mutex);
         this->m_lNews.append(sNews);
@@ -105,7 +105,7 @@ void cDataNewsDataManager::resetAllNewsDataEvents()
 }
 
 
-NewsDataItem* cDataNewsDataManager::getNewsDataItem(qint32 newsIndex)
+TextDataItem* cDataNewsDataManager::getNewsDataItem(qint32 newsIndex)
 {
     if (!this->m_initialized)
         return NULL;
@@ -125,7 +125,7 @@ qint32 cDataNewsDataManager::getNewsDataLength()
     return this->m_lNews.size();
 }
 
-NewsDataItem* cDataNewsDataManager::getNewsDataFromArrayIndex(int index)
+TextDataItem* cDataNewsDataManager::getNewsDataFromArrayIndex(int index)
 {
     QMutexLocker lock(&this->m_mutex);
 
@@ -194,7 +194,7 @@ qint32 cDataNewsDataManager::handleListNewsDataResponse(MessageProtocol* msg)
 
     for (int i = 0; i < arrNews.count(); i++) {
         QJsonObject   newsObj = arrNews.at(i).toObject();
-        NewsDataItem* pNews   = new NewsDataItem();
+        TextDataItem* pNews   = new TextDataItem();
 
         pNews->setIndex(newsObj.value("index").toInt());
         pNews->setTimeStamp((qint64)newsObj.value("timestamp").toDouble());
@@ -205,7 +205,7 @@ qint32 cDataNewsDataManager::handleListNewsDataResponse(MessageProtocol* msg)
         this->addNewNewsData(pNews, updateIndex);
     }
 
-    std::sort(this->m_lNews.begin(), this->m_lNews.end(), NewsDataItem::compareTimeStampFunctionDescending);
+    std::sort(this->m_lNews.begin(), this->m_lNews.end(), TextDataItem::compareTimeStampFunctionDescending);
 
     this->m_stLastServerUpdateTimeStamp = timestamp;
 
@@ -240,7 +240,7 @@ qint32 cDataNewsDataManager::handleGetNewsDataItem(MessageProtocol* msg)
         return result;
     qint32 newsIndex = rootObj.value("index").toInt(0);
 
-    NewsDataItem* pItem = this->getNewsDataItem(newsIndex);
+    TextDataItem* pItem = this->getNewsDataItem(newsIndex);
     if (pItem == NULL)
         return ERROR_CODE_NOT_FOUND;
 
@@ -256,7 +256,7 @@ qint32 cDataNewsDataManager::handleGetNewsDataItem(MessageProtocol* msg)
     else
         pItem->setInfo("");
 
-    std::sort(this->m_lNews.begin(), this->m_lNews.end(), NewsDataItem::compareTimeStampFunctionDescending);
+    std::sort(this->m_lNews.begin(), this->m_lNews.end(), TextDataItem::compareTimeStampFunctionDescending);
 
     return result;
 }
@@ -297,9 +297,9 @@ qint32 cDataNewsDataManager::handleChangeNewsDataResponse(MessageProtocol* msg)
 
     if (result == ERROR_CODE_SUCCESS && index > 0) {
         bool          bAddedItem = false;
-        NewsDataItem* pItem      = this->getNewsDataItem(index);
+        TextDataItem* pItem      = this->getNewsDataItem(index);
         if (pItem == NULL) {
-            pItem = new NewsDataItem();
+            pItem = new TextDataItem();
             pItem->setIndex(index);
             bAddedItem = true;
 
@@ -322,7 +322,7 @@ qint32 cDataNewsDataManager::handleChangeNewsDataResponse(MessageProtocol* msg)
 
         QMutexLocker lock(&this->m_mutex);
 
-        std::sort(this->m_lNews.begin(), this->m_lNews.end(), NewsDataItem::compareTimeStampFunctionDescending);
+        std::sort(this->m_lNews.begin(), this->m_lNews.end(), TextDataItem::compareTimeStampFunctionDescending);
     }
 
     // messageID unhandeld
@@ -330,7 +330,7 @@ qint32 cDataNewsDataManager::handleChangeNewsDataResponse(MessageProtocol* msg)
     return result;
 }
 
-NewsDataItem* cDataNewsDataManager::getCurrentEditedItem()
+TextDataItem* cDataNewsDataManager::getCurrentEditedItem()
 {
     return this->m_editItem;
 }

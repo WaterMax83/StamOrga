@@ -9,7 +9,7 @@
 ###########################################################################################
 
 
-QT += qml quick network widgets charts
+QT += qml quick network widgets charts webview
 
 android{
     QT += androidextras
@@ -37,12 +37,13 @@ SOURCES += main.cpp \
     ../Connection/ccontcpmain.cpp \
     ../Connection/ccontcpdata.cpp \
     ../Connection/cconusersettings.cpp \
+    ../Connection/cconnetworkaccess.cpp \
     ../cstaglobalmanager.cpp \
     ../cstasettingsmanager.cpp \
     ../cstaglobalsettings.cpp \
+    ../cstaversionmanager.cpp \
     ../Data/cdatappinfomanager.cpp \
     ../Data/gameplay.cpp \
-    ../Data/newsdataitem.cpp \
     ../Data/seasonticket.cpp \
     ../Data/cdataticketmanager.cpp  \
     ../Data/cdatanewsdatamanager.cpp \
@@ -54,10 +55,10 @@ SOURCES += main.cpp \
     ../Data/cdataappuserevents.cpp \
     ../Data/cdataconsolemanager.cpp \
     ../Data/cdatacommentitem.cpp \
-    ../cstaversionmanager.cpp \
-    ../Connection/cconnetworkaccess.cpp \
     ../Data/cdatamediamanager.cpp \
-    ../Data/cdatamediaprovider.cpp
+    ../Data/cdatamediaprovider.cpp \
+    ../Data/cdatawebpagemanager.cpp \
+    ../Data/textdataitem.cpp
 
 
 RESOURCES += qml.qrc
@@ -100,13 +101,14 @@ HEADERS += \
     ../Connection/ccontcpmain.h \
     ../Connection/ccontcpdata.h \
     ../Connection/cconusersettings.h \
+    ../Connection/cconnetworkaccess.h \
     ../cstaglobalmanager.h \
     ../cstasettingsmanager.h \
     ../cstaglobalsettings.h \
+    ../cstaversionmanager.h \
     ../Data/cdatappinfomanager.h \
     ../Data/gameplay.h \
     ../Data/seasonticket.h \
-    ../Data/newsdataitem.h \
     ../Data/acceptmeetinginfo.h \
     ../Data/cdataticketmanager.h \
     ../Data/cdatanewsdatamanager.h \
@@ -118,10 +120,10 @@ HEADERS += \
     ../Data/cdataappuserevents.h \
     ../Data/cdataconsolemanager.h \
     ../Data/cdatacommentitem.h \
-    ../cstaversionmanager.h \
-    ../Connection/cconnetworkaccess.h \
     ../Data/cdatamediamanager.h \
-    ../Data/cdatamediaprovider.h
+    ../Data/cdatamediaprovider.h \
+    ../Data/cdatawebpagemanager.h \
+    ../Data/textdataitem.h
 
 INCLUDEPATH += \
     ../ \

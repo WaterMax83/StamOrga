@@ -26,6 +26,7 @@
 #include "../Manager/cmediamanager.h"
 #include "../Manager/cmeetinginfomanager.h"
 #include "../Manager/cnewsdatamanager.h"
+#include "../Manager/cstadiumwebpagemanager.h"
 #include "../Manager/cstatisticmanager.h"
 #include "../Manager/cticketmanager.h"
 #include "ccontcpmaindata.h"
@@ -274,6 +275,9 @@ MessageProtocol* cConTcpDataServer::checkNewMessage(MessageProtocol* msg)
             break;
         case OP_CODE_CMD_REQ::REQ_CMD_MEDIA:
             ack = g_MediaManager.handleMediaCommand(this->m_pUserConData, msg);
+            break;
+        case OP_CODE_CMD_REQ::REQ_CMD_STADIUM:
+            ack = g_StadiumWebPageManager.handleStadiumCommand(this->m_pUserConData, msg);
             break;
 
         case OP_CODE_CMD_REQ::REQ_CMD_CONTROL:
