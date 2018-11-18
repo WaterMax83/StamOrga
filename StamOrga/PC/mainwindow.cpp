@@ -29,6 +29,7 @@
 #include "Connection/cconmanager.h"
 #include "Connection/cconusersettings.h"
 #include "Data/cdataconsolemanager.h"
+#include "Data/cdatawebpagemanager.h"
 #include "PC/cpccontrolmanager.h"
 #include "cstaglobalsettings.h"
 #include "cstaversionmanager.h"
@@ -117,6 +118,39 @@ void MainWindow::slotNotifyCommandFinished(quint32 command, qint32 result)
             }
         } else {
             this->ui->btnSaveControl->setEnabled(false);
+        }
+        break;
+    case OP_CODE_CMD_REQ::REQ_CMD_STADIUM:
+        if (result == ERROR_CODE_SUCCESS) {
+            if (this->m_lastWebPageCommand == "list") {
+                if (this->m_listModelWebpage == NULL)
+                    this->m_listModelWebpage = new QStandardItemModel();
+                for (int i = 0; i < this->m_listModelWebpage->rowCount(); i++)
+                    delete this->m_listModelWebpage->item(i);
+                this->m_listModelWebpage->clear();
+
+                for (int i = 0; i < g_DataWebPageManager->getWebListLength(); i++) {
+                    TextDataItem*  pDataItem = g_DataWebPageManager->getWebDataFromArrayIndex(i);
+                    QStandardItem* pItem     = new QStandardItem();
+                    pItem->setData(pDataItem->index());
+                    pItem->setText(pDataItem->timestampReadableLine());
+                    this->m_listModelWebpage->setItem(i, 0, pItem);
+                }
+
+                this->ui->lViewWebPageList->setModel(this->m_listModelWebpage);
+            } else if (this->m_lastWebPageCommand == "add") {
+                this->m_lastWebPageCommand = "list";
+                g_DataWebPageManager->startListWebPageData();
+            } else if (this->m_lastWebPageCommand == "load") {
+                TextDataItem* pItem = g_DataWebPageManager->getCurrentEditedItem();
+                if (pItem == NULL)
+                    break;
+                this->ui->lEditWebPageHeader->setText(pItem->header());
+                this->ui->txtEditWebPageBody->setPlainText(pItem->info());
+                qInfo() << "Loaded item";
+            } else if (this->m_lastWebPageCommand == "set") {
+                qInfo() << "Set Item";
+            }
         }
         break;
     default:
@@ -213,4 +247,28 @@ void MainWindow::sendConsoleCommand()
 
     this->ui->lEditConsoleCommand->clear();
     this->ui->txtConsole->clear();
+}
+
+void MainWindow::on_btnRefreshWebPage_clicked()
+{
+    this->m_lastWebPageCommand = "list";
+    g_DataWebPageManager->startListWebPageData();
+}
+
+void MainWindow::on_btnAddWebPage_clicked()
+{
+    this->m_lastWebPageCommand = "add";
+    g_DataWebPageManager->startAddWebPage();
+}
+
+void MainWindow::on_lViewWebPageList_clicked(const QModelIndex& index)
+{
+    this->m_lastWebPageCommand = "load";
+    g_DataWebPageManager->startLoadWebPage(this->m_listModelWebpage->item(index.row())->data().toInt());
+}
+
+void MainWindow::on_btnSendWebPageData_clicked()
+{
+    this->m_lastWebPageCommand = "set";
+    g_DataWebPageManager->startSetWebPage(this->ui->lEditWebPageHeader->text(), this->ui->txtEditWebPageBody->toPlainText());
 }

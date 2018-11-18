@@ -26,6 +26,8 @@ import com.watermax.demo 1.0
 import "../components" as MyComponents
 
 Item {
+
+    property var textDataItem
 //    anchors.fill: parent
 
 //    Pane {
@@ -52,7 +54,6 @@ Item {
         WebView {
             id: webView
             anchors.fill: parent
-            url: "file:///D:/tmp/index.html"
 //            url: "qt.io"
             onLoadingChanged: {
                 console.log("Loading changed");
@@ -61,6 +62,28 @@ Item {
 //    }
 
     function pageOpenedUpdateView() {
-        webView.reload();
+//        webView.reload();
+    }
+
+    function startShowElements(textItem, editMode) {
+
+        textDataItem = textItem;
+
+        if (textItem !== undefined) {
+            gDataWebPageManager.startLoadWebPage(textItem.index)
+//            isStartupDone = false;
+        }
+        updateHeaderFromMain(textItem.timestampReadableLine(), "")
+    }
+
+    function notifyWebPageCommandFinished(result){
+        if (result === 1) {
+            console.log("Laden hat funkioniert");
+            toastManager.show("Seite erfolgreich geladen", 2000);
+            if (textDataItem !== undefined)
+                webView.loadHtml(textDataItem.info);
+        } else {
+            toastManager.show(userInt.getErrorCodeToString(result), 4000);
+        }
     }
 }

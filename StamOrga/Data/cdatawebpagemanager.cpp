@@ -167,6 +167,66 @@ qint32 cDataWebPageManager::startListWebPageData()
     return ERROR_CODE_SUCCESS;
 }
 
+qint32 cDataWebPageManager::startAddWebPage()
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QMutexLocker lock(&this->m_mutex);
+
+    QJsonObject rootObj;
+    rootObj.insert("cmd", "add");
+
+    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CMD_STADIUM);
+    req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+
+    g_ConManager->sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 cDataWebPageManager::startLoadWebPage(qint32 index)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QMutexLocker lock(&this->m_mutex);
+
+    QJsonObject rootObj;
+    rootObj.insert("cmd", "load");
+    rootObj.insert("index", index);
+
+    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CMD_STADIUM);
+    req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+
+    g_ConManager->sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 cDataWebPageManager::startSetWebPage(const QString text, const QString body)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QMutexLocker lock(&this->m_mutex);
+
+    QJsonObject rootObj;
+    rootObj.insert("cmd", "set");
+    rootObj.insert("index", this->m_editItem->index());
+    rootObj.insert("text", text);
+    if (body.isEmpty()) {
+        rootObj.insert("body", "");
+    } else {
+        QByteArray uBody = qCompress(body.toUtf8(), 9);
+        rootObj.insert("body", QString(uBody.toHex()));
+    }
+
+    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CMD_STADIUM);
+    req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+
+    g_ConManager->sendNewRequest(req);
+    return ERROR_CODE_SUCCESS;
+}
+
 qint32 cDataWebPageManager::handleWebPageResponse(MessageProtocol* msg)
 {
     if (!this->m_initialized)
@@ -208,9 +268,29 @@ qint32 cDataWebPageManager::handleWebPageResponse(MessageProtocol* msg)
             this->addNewWebPageData(pWebPage, updateIndex);
         }
 
-        std::sort(this->m_lWebPages.begin(), this->m_lWebPages.end(), TextDataItem::compareTimeStampFunctionDescending);
+        std::sort(this->m_lWebPages.begin(), this->m_lWebPages.end(), TextDataItem::compareTimeStampFunctionAscending);
 
         this->m_stLastServerUpdateTimeStamp = timestamp;
+    } else {
+
+        this->m_mutex.unlock();
+        if (cmd == "load") {
+            qint32        index = rootObj.value("index").toInt();
+            TextDataItem* pItem = this->getWebDataItem(index);
+            if (pItem == NULL)
+                return ERROR_CODE_NOT_FOUND;
+
+            pItem->setHeader(rootObj.value("name").toString());
+            QString body = rootObj.value("body").toString();
+            if (body.isEmpty()) {
+                pItem->setInfo("");
+            } else {
+                QByteArray uBody = QByteArray::fromHex(body.toUtf8());
+                pItem->setInfo(QString(qUncompress(uBody)));
+            }
+
+            this->m_editItem = pItem;
+        }
     }
 
     return result;
@@ -334,10 +414,10 @@ qint32 cDataWebPageManager::handleWebPageResponse(MessageProtocol* msg)
 //    return result;
 //}
 
-//WebPageItem* cDataWebPageManager::getCurrentEditedItem()
-//{
-//    return this->m_editItem;
-//}
+TextDataItem* cDataWebPageManager::getCurrentEditedItem()
+{
+    return this->m_editItem;
+}
 
 //qint32 cDataWebPageManager::startRemoveNewsDataItem(const qint32 index)
 //{

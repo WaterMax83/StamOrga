@@ -20,6 +20,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QtGui/QStandardItemModel>
 
 namespace Ui
 {
@@ -54,11 +55,21 @@ private slots:
 
     void on_btnSendNotify_clicked();
 
+    void on_btnRefreshWebPage_clicked();
+
+    void on_btnAddWebPage_clicked();
+
+    void on_lViewWebPageList_clicked(const QModelIndex& index);
+
+    void on_btnSendWebPageData_clicked();
+
 private:
     Ui::MainWindow* ui;
 
-    QString m_lastControlCommand;
-    void    sendConsoleCommand();
+    QStandardItemModel* m_listModelWebpage = NULL;
+    QString             m_lastControlCommand;
+    QString             m_lastWebPageCommand;
+    void                sendConsoleCommand();
 };
 
 #endif // MAINWINDOW_H

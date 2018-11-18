@@ -57,7 +57,9 @@ public:
 
     qint32 initialize();
 
-    //    qint32 addNewWebPageItem(const QString format, QByteArray& data, const qint32 userID);
+    qint32 addNewWebPageItem(const qint32 userID);
+    qint32 loadWebPageDataItem(const qint32 index,  QString& text, QString& body);
+    qint32 setWebPageDataItem(const qint32 index, const QString text, QString body);
     //    qint32 removeWebPageItems(QStringList& lMedias);
 
     //    qint32 getGameIndex() { return this->m_gameIndex; }
@@ -66,10 +68,6 @@ public:
 
 protected:
 private:
-    //    quint32 m_year;
-    //    quint32 m_competition;
-    //    qint32  m_seasonIndex;
-    //    qint32  m_gameIndex;
     QString m_webPageFolder;
 
     void saveCurrentInteralList() override;

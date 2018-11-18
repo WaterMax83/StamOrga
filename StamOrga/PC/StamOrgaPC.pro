@@ -17,7 +17,8 @@ VERSION=$${STAMORGA_VERSION}
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
+    mainwindow.cpp \
+    cpccontrolmanager.cpp \
     ../../Common/Network/messagebuffer.cpp \
     ../../Common/Network/messageprotocol.cpp \
     ../../Common/Network/messagecommand.cpp \
@@ -25,15 +26,16 @@ SOURCES += main.cpp\
     ../../Common/General/backgroundworker.cpp \
     ../../Common/General/globalfunctions.cpp \
     ../../Common/General/cgendisposer.cpp \
+    ../../Common/General/logging.cpp \
     ../Connection/cconmanager.cpp \
     ../Connection/ccontcpmain.cpp \
     ../Connection/ccontcpdata.cpp \
     ../Connection/cconnetworkaccess.cpp \
+    ../Connection/cconusersettings.cpp \
     ../cstaglobalmanager.cpp \
     ../cstasettingsmanager.cpp \
     ../cstaglobalsettings.cpp \
     ../cstaversionmanager.cpp \
-    ../Connection/cconusersettings.cpp \
     ../Data/cdatappinfomanager.cpp \
     ../Data/cdataappuserevents.cpp \
     ../Data/cdataconsolemanager.cpp \
@@ -41,19 +43,18 @@ SOURCES += main.cpp\
     ../Data/cdatagameuserdata.cpp \
     ../Data/cDataMeetingInfo.cpp \
     ../Data/cdatanewsdatamanager.cpp \
+    ../Data/cdatawebpagemanager.cpp \
     ../Data/cdatastatisticmanager.cpp \
     ../Data/cdataticketmanager.cpp \
     ../Data/cdatamediamanager.cpp \
     ../Data/gameplay.cpp \
-    ../Data/newsdataitem.cpp \
+    ../Data/textdataitem.cpp \
     ../Data/seasonticket.cpp \
-    ../../Common/General/logging.cpp \
-    cpccontrolmanager.cpp \
     ../Data/cdatacommentitem.cpp
 
 
-
 HEADERS  += mainwindow.h \
+    cpccontrolmanager.h \
     ../../Common/Network/messagebuffer.h \
     ../../Common/Network/messageprotocol.h \
     ../../Common/General/globaltiming.h \
@@ -63,15 +64,16 @@ HEADERS  += mainwindow.h \
     ../../Common/General/globalfunctions.h \
     ../../Common/General/config.h \
     ../../Common/General/cgendisposer.h \
+    ../../Common/General/logging.h \
     ../Connection/cconmanager.h \
     ../Connection/ccontcpmain.h \
     ../Connection/ccontcpdata.h \
     ../Connection/cconnetworkaccess.h \
+    ../Connection/cconusersettings.h \
     ../cstaglobalmanager.h \
     ../cstasettingsmanager.h \
     ../cstaglobalsettings.h \
     ../cstaversionmanager.h \
-    ../Connection/cconusersettings.h \
     ../Data/cdatappinfomanager.h \
     ../Data/acceptmeetinginfo.h \
     ../Data/cdataappuserevents.h \
@@ -80,14 +82,13 @@ HEADERS  += mainwindow.h \
     ../Data/cdatagameuserdata.h \
     ../Data/cdatameetinginfo.h \
     ../Data/cdatanewsdatamanager.h \
+    ../Data/cdatawebpagemanager.h \
     ../Data/cdatastatisticmanager.h \
     ../Data/cdataticketmanager.h \
     ../Data/cdatamediamanager.h \
     ../Data/gameplay.h \
-    ../Data/newsdataitem.h \
-    ../Data/seasonticket.h \
-    ../../Common/General/logging.h \
-    cpccontrolmanager.h \
+    ../Data/textdataitem.h \
+    ../Data/seasonticket.h \   
     ../Data/cdatacommentitem.h
 
 

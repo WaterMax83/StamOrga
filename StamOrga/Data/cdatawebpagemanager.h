@@ -48,6 +48,9 @@ public:
 
     Q_INVOKABLE qint32 startListWebPageData();
 
+    qint32      startAddWebPage();
+    Q_INVOKABLE qint32 startLoadWebPage(qint32 index);
+    qint32 startSetWebPage(const QString text, const QString body);
 
     qint32 handleWebPageResponse(MessageProtocol* msg);
 
@@ -56,7 +59,7 @@ public:
 
     //    Q_INVOKABLE qint32 startChangeNewsDataItem(const qint32 index, const QString header, const QString info);
     //    qint32             handleChangeNewsDataResponse(MessageProtocol* msg);
-    //    Q_INVOKABLE TextDataItem* getCurrentEditedItem();
+    Q_INVOKABLE TextDataItem* getCurrentEditedItem();
 
     //    Q_INVOKABLE qint32 startRemoveNewsDataItem(const qint32 index);
     //    qint32             handleRemoveNewsDataItemResponse(MessageProtocol* msg);
@@ -72,8 +75,8 @@ private:
     qint64 m_stLastLocalUpdateTimeStamp;
     qint64 m_stLastServerUpdateTimeStamp;
 
-    QString       m_editHeader;
-    QString       m_editInfo;
+    //    QString       m_editHeader;
+    //    QString       m_editInfo;
     TextDataItem* m_editItem = NULL;
 };
 

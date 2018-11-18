@@ -20,7 +20,7 @@
       <item>
        <widget class="QTabWidget" name="tabWidget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>3</number>
         </property>
         <widget class="QWidget" name="tab">
          <attribute name="title">
@@ -484,6 +484,80 @@
           </property>
           <property name="readOnly">
            <bool>true</bool>
+          </property>
+         </widget>
+        </widget>
+        <widget class="QWidget" name="tab_4">
+         <attribute name="title">
+          <string>Stadium</string>
+         </attribute>
+         <widget class="QListView" name="lViewWebPageList">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>10</y>
+            <width>151</width>
+            <height>361</height>
+           </rect>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btnRefreshWebPage">
+          <property name="geometry">
+           <rect>
+            <x>20</x>
+            <y>380</y>
+            <width>131</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Refresh</string>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btnAddWebPage">
+          <property name="geometry">
+           <rect>
+            <x>20</x>
+            <y>410</y>
+            <width>131</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Add</string>
+          </property>
+         </widget>
+         <widget class="QLineEdit" name="lEditWebPageHeader">
+          <property name="geometry">
+           <rect>
+            <x>180</x>
+            <y>10</y>
+            <width>351</width>
+            <height>20</height>
+           </rect>
+          </property>
+         </widget>
+         <widget class="QPlainTextEdit" name="txtEditWebPageBody">
+          <property name="geometry">
+           <rect>
+            <x>180</x>
+            <y>40</y>
+            <width>351</width>
+            <height>331</height>
+           </rect>
+          </property>
+         </widget>
+         <widget class="QPushButton" name="btnSendWebPageData">
+          <property name="geometry">
+           <rect>
+            <x>320</x>
+            <y>390</y>
+            <width>75</width>
+            <height>23</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>Send</string>
           </property>
          </widget>
         </widget>

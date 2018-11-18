@@ -52,7 +52,6 @@ Flickable {
     Pane {
         id: mainPaneWebList
         width: parent.width
-//        height: parent.height
         padding: 0
 
         ColumnLayout {
@@ -121,17 +120,6 @@ Flickable {
         }
     }
 
-//    function notifyDeleteFanclubNewsItemFinished(result) {
-//        if (result === 1) {
-//            toastManager.show("Nachricht erfolgreich gelöscht", 2000);
-//            updateWebPageList();
-//        } else {
-//            toastManager.show(userInt.getErrorCodeToString(result), 4000);
-//            busyIndicatorWebList.loadingVisible = false;
-//            busyIndicatorWebList.infoText = "Nachricht konnte nicht gelöscht werden"
-//        }
-//    }
-
     function notifyGetUserProperties(result) {
         if (result === 1) {
             toastManager.show("Liste erfolgreich geladen", 2000);
@@ -152,7 +140,7 @@ Flickable {
         }
 
         if (gDataWebPageManager.getWebListLength() > 0) {
-            for (var i = 0; i < gDataWebPageManager.getWebListLength(); i++) {
+            for (var i = gDataWebPageManager.getWebListLength() - 1; i >= 0; i--) {
                 var sprite = webDataItem.createObject(columnLayoutWebList)
                 sprite.showTextDataInfo(i, 1);
             }
@@ -166,15 +154,14 @@ Flickable {
         id: webDataItem
         MyComponents.TextDataDesignItem {
             onClickedItem: {
-//                var component = Qt.createComponent("../pages/FanclubNewsItem.qml")
-//                if (component.status === Component.Ready) {
-//                    var sprite = stackView.push(component)
-//                    sprite.userIntCurrentNews = userInt
-//                    sprite.startShowElements(sender, false);
+                var component = Qt.createComponent("../pages/StadiumWebPage.qml")
+                if (component.status === Component.Ready) {
+                    var sprite = stackView.push(component)
+                    sprite.startShowElements(sender, false);
 
 //                    if (sender.event)
 //                        gDataAppUserEvents.clearUserEventFanclub(sender.index);
-//                }
+                }
             }
         }
     }

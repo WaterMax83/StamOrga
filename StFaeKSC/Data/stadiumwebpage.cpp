@@ -96,68 +96,99 @@ qint32 StadiumWebPage::initialize()
     return ERROR_CODE_SUCCESS;
 }
 
-//qint32 StadiumWebPage::addNewWebPageItem(const QString format, QByteArray& data, const qint32 userID)
-//{
-//    Q_UNUSED(data);
+qint32 StadiumWebPage::addNewWebPageItem(const qint32 userID)
+{
 
-//    int     newIndex = this->getNextInternalIndex();
-//    QString name     = QString("Media_Game_%1_%2.%3").arg(this->m_gameIndex).arg(newIndex).arg(format);
+    int     newIndex = this->getNextInternalIndex();
+    QMutexLocker locker(&this->m_mConfigIniMutex);
 
-//    QMutexLocker locker(&this->m_mConfigIniMutex);
+    qint64 timestamp = QDateTime::currentDateTime().toMSecsSinceEpoch();
 
-//    qint64 timestamp = QDateTime::currentDateTime().toMSecsSinceEpoch();
+    this->m_pConfigSettings->beginGroup(GROUP_LIST_ITEM);
+    this->m_pConfigSettings->beginWriteArray(CONFIG_LIST_ARRAY);
+    this->m_pConfigSettings->setArrayIndex(this->getNumberOfInternalList());
 
-//    this->m_pConfigSettings->beginGroup(GROUP_LIST_ITEM);
-//    this->m_pConfigSettings->beginWriteArray(CONFIG_LIST_ARRAY);
-//    this->m_pConfigSettings->setArrayIndex(this->getNumberOfInternalList());
+    this->m_pConfigSettings->setValue(ITEM_NAME, "");
+    this->m_pConfigSettings->setValue(ITEM_TIMESTAMP, timestamp);
+    this->m_pConfigSettings->setValue(ITEM_INDEX, newIndex);
 
-//    this->m_pConfigSettings->setValue(ITEM_NAME, name);
-//    this->m_pConfigSettings->setValue(ITEM_TIMESTAMP, timestamp);
-//    this->m_pConfigSettings->setValue(ITEM_INDEX, newIndex);
+    this->m_pConfigSettings->setValue(WEBPAGE_USER_ID, userID);
+    this->m_pConfigSettings->setValue(WEBPAGE_LASTUPDATE, timestamp);
+    this->m_pConfigSettings->setValue(WEBPAGE_LINK, "");
 
-//    this->m_pConfigSettings->setValue(MEDIA_USER_ID, userID);
+    this->m_pConfigSettings->endArray();
+    this->m_pConfigSettings->endGroup();
+    this->m_pConfigSettings->sync();
 
-//    this->m_pConfigSettings->endArray();
-//    this->m_pConfigSettings->endGroup();
-//    this->m_pConfigSettings->sync();
+    WebPageItem* info = new WebPageItem();
+    info->m_itemName  = "";
+    info->m_timestamp = timestamp;
+    info->m_index     = newIndex;
+    info->m_userID    = userID;
+    info->m_lastUpdate = timestamp;
+    info->m_link = "";
+    this->addNewStadiumWebPage(info, false);
 
-//    WebPageItem* info = new WebPageItem();
-//    info->m_itemName  = name;
-//    info->m_timestamp = timestamp;
-//    info->m_index     = newIndex;
-//    info->m_userID    = userID;
-//    this->addNewStadiumWebPage(info, false);
-
-//    this->sortMedias();
+    this->sortWebPages();
 
 
-//    return ERROR_CODE_SUCCESS;
-//}
+    return ERROR_CODE_SUCCESS;
+}
 
-//qint32 StadiumWebPage::removeWebPageItems(QStringList& lMedias)
-//{
-//    if (lMedias.size() == 0)
-//        return ERROR_CODE_COMMON;
+qint32 StadiumWebPage::loadWebPageDataItem(const qint32 index, QString &text, QString &body)
+{
+    WebPageItem* pItem = (WebPageItem*) this->getItem(index);
+    if (pItem == NULL)
+        return ERROR_CODE_NOT_FOUND;
 
-//    QMutexLocker locker(&this->m_mInternalInfoMutex);
+    text = pItem->m_itemName;
+    body = "";
+    if (!pItem->m_link.isEmpty()) {
+        QFile linkFile(pItem->m_link);
+        if (linkFile.open(QIODevice::ReadOnly)) {
 
-//    qint32 removeCounter = 0;
-//    foreach (QString url, lMedias) {
-//        for (int i = 0; i < this->m_lInteralList.size(); i++) {
-//            if (this->m_lInteralList[i]->m_itemName == url) {
-//                this->m_lInteralList.removeAt(i);
-//                removeCounter++;
-//            }
-//        }
-//    }
+            body = qCompress(linkFile.readAll(), 9).toHex();
+            linkFile.close();
+        }
+    }
 
-//    if (removeCounter > 0) {
-//        this->saveCurrentInteralList();
-//        return ERROR_CODE_SUCCESS;
-//    }
+    return ERROR_CODE_SUCCESS;
+}
 
-//    return ERROR_CODE_NOT_FOUND;
-//}
+qint32 StadiumWebPage::setWebPageDataItem(const qint32 index, const QString text, QString body)
+{
+    WebPageItem* pItem = (WebPageItem*) this->getItem(index);
+    if (pItem == NULL)
+        return ERROR_CODE_NOT_FOUND;
+
+    QByteArray uBody;
+    if (!body.isEmpty())
+        uBody = qUncompress(QByteArray::fromHex(body.toUtf8()));
+    qint64 lastUpdate = QDateTime::currentMSecsSinceEpoch();
+
+    if (pItem->m_itemName != text) {
+        pItem->m_itemName = text;
+        this->updateItemValue(pItem, ITEM_NAME, QVariant(text));
+    }
+
+    if (pItem->m_link.isEmpty()) {
+        pItem->m_link = QString("%1/WebPage_%2.html").arg(this->m_webPageFolder).arg(pItem->m_index);
+        this->updateItemValue(pItem, WEBPAGE_LINK, QVariant(pItem->m_link));
+    }
+
+    QFile linkFile(pItem->m_link);
+    if (!linkFile.open(QIODevice::WriteOnly))
+        return ERROR_CODE_NOT_POSSIBLE;
+
+    linkFile.write(uBody);
+    linkFile.flush();
+    linkFile.close();
+
+    pItem->m_lastUpdate = lastUpdate;
+    this->updateItemValue(pItem, WEBPAGE_LASTUPDATE, QVariant(lastUpdate));
+
+    return ERROR_CODE_SUCCESS;
+}
 
 void StadiumWebPage::saveCurrentInteralList()
 {

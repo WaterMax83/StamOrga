@@ -31,3 +31,10 @@ bool TextDataItem::compareTimeStampFunctionDescending(TextDataItem* p1, TextData
         return false;
     return true;
 }
+
+bool TextDataItem::compareTimeStampFunctionAscending(TextDataItem* p1, TextDataItem* p2)
+{
+    if (p1->m_timestamp > p2->m_timestamp)
+        return false;
+    return true;
+}

@@ -34,7 +34,7 @@ public:
     explicit TextDataItem(QObject* parent = 0);
 
     QString user() { return this->m_user; }
-    void    setUser(const QString& user)
+    void setUser(const QString& user)
     {
         if (this->m_user != user) {
             this->m_user = user;
@@ -43,7 +43,7 @@ public:
     }
 
     QString header() { return this->m_header; }
-    void    setHeader(const QString& header)
+    void setHeader(const QString& header)
     {
         if (this->m_header != header) {
             this->m_header = header;
@@ -52,7 +52,7 @@ public:
     }
 
     QString info() { return this->m_info; }
-    void    setInfo(const QString& info)
+    void setInfo(const QString& info)
     {
         if (this->m_info != info) {
             this->m_info = info;
@@ -61,7 +61,7 @@ public:
     }
 
     qint32 index() { return this->m_index; }
-    void   setIndex(const qint32 index)
+    void setIndex(const qint32 index)
     {
         if (this->m_index != index) {
             this->m_index = index;
@@ -70,7 +70,7 @@ public:
     }
 
     qint32 event() { return this->m_eventCnt; }
-    void   setEvent(qint32 event)
+    void setEvent(qint32 event)
     {
         if (this->m_eventCnt != event) {
             this->m_eventCnt = event;
@@ -95,6 +95,7 @@ public:
     }
 
     static bool compareTimeStampFunctionDescending(TextDataItem* p1, TextDataItem* p2);
+    static bool compareTimeStampFunctionAscending(TextDataItem* p1, TextDataItem* p2);
 
 signals:
     void userChanged();

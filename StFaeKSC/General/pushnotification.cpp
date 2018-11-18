@@ -185,12 +185,14 @@ qint64 PushNotification::sendNewMeetingNotification(const QString body, const qi
     else
         push->m_topic      = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING;
     push->m_userEventTopic = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING;
-    if (type == MEETING_TYPE_MEETING)
+    if (type == MEETING_TYPE_MEETING) {
         push->m_header = "Treffen";
-    else
+        push->m_bigText = "Kommst du auch?";
+    } else {
         push->m_header     = "Fahrt";
+        push->m_bigText = "Kommst du mit?";
+    }
     push->m_body           = body;
-    push->m_bigText = "Kommst du mit?";
     push->m_sendMessageID  = getNextInternalPushNumber();
     push->m_sendTime       = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND; // 5min
     push->m_userID         = userID;
