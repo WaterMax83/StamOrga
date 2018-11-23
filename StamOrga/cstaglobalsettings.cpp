@@ -273,6 +273,7 @@ QSslCertificate cStaGlobalSettings::getSSLCaCertificate()
 #define NOT_OFFSET_NEWTICK 3
 #define NOT_OFFSET_FANCLUB 5
 #define NOT_OFFSET_COMMENT 6
+#define NOT_OFFSET_WEBPAGE 7
 
 bool cStaGlobalSettings::isNotificationNewAppVersionEnabled()
 {
@@ -293,6 +294,11 @@ bool cStaGlobalSettings::isNotificationMeetingCommentEnabled()
 bool cStaGlobalSettings::isNotificationFanclubNewsEnabled()
 {
     return (this->m_notificationEnabledValue & (1 << NOT_OFFSET_FANCLUB)) ? true : false;
+}
+
+bool cStaGlobalSettings::isNotificationStadiumWebpageEnabled()
+{
+    return (this->m_notificationEnabledValue & (1 << NOT_OFFSET_WEBPAGE)) ? true : false;
 }
 
 void cStaGlobalSettings::setNotificationNewAppVersionEnabled(bool enable)
@@ -331,6 +337,13 @@ void cStaGlobalSettings::setNotificationFanclubNewsEnabled(bool enable)
     g_StaSettingsManager->setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
     this->updatePushNotification();
 }
+void cStaGlobalSettings::setNotificationStadiumWebPageEnabled(bool enable)
+{
+    this->m_notificationEnabledValue &= ~(1 << NOT_OFFSET_WEBPAGE);
+    this->m_notificationEnabledValue |= (enable ? 1 : 0) << NOT_OFFSET_WEBPAGE;
+    g_StaSettingsManager->setInt64Value(SETTINGS_GROUP, SETT_ENABLE_NOTIFICATION, this->m_notificationEnabledValue);
+    this->updatePushNotification();
+}
 
 
 void cStaGlobalSettings::updatePushNotification()
@@ -365,6 +378,11 @@ void cStaGlobalSettings::updatePushNotification()
             AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_FANCLUB_NEWS);
     } else
         AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_FANCLUB_NEWS);
+
+    if (this->m_bAlreadyConnected && this->isNotificationStadiumWebpageEnabled())
+        AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_STADIUM_WEBPAGE);
+    else
+        AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_STADIUM_WEBPAGE);
 
     if (this->m_bAlreadyConnected) {
         AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_GENERAL);

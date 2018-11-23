@@ -32,7 +32,9 @@ Item {
     property alias enableNewFreeTicket : newFreeTicket.checked
     property alias enableFanclubNews: newFanclubNews.checked
     property alias enableMeetComment: newMeetComment.checked
+    property alias enableStadiumWebPage: newStadiumWebPage.checked
     property alias visibleFanclubNews: rowFanclubNews.visible
+
 
 //    signal acceptedDialog()
 
@@ -64,7 +66,7 @@ Item {
                     RowLayout {
                         Text {
                             id: text1
-                            text: qsTr("Neuer App Version:")
+                            text: qsTr("Neue App Version:")
                             Layout.fillWidth: true
                             Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                             font.pixelSize: 14
@@ -94,7 +96,7 @@ Item {
                     RowLayout {
                         Text {
                             id: text4
-                            text: qsTr("Dauerkarte frei:")
+                            text: qsTr("Dauerkarten:")
                             Layout.fillWidth: true
                             Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                             font.pixelSize: 14
@@ -109,7 +111,7 @@ Item {
                     RowLayout {
                         Text {
                             id: text6
-                            text: qsTr("Neuer Kommentar:")
+                            text: qsTr("Kommentar:")
                             Layout.fillWidth: true
                             Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                             font.pixelSize: 14
@@ -125,7 +127,7 @@ Item {
                         id: rowFanclubNews
                         Text {
                             id: text7
-                            text: qsTr("Fanclub Nachrichten:")
+                            text: qsTr("Fanclub:")
                             Layout.fillWidth: true
                             Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
                             font.pixelSize: 14
@@ -137,15 +139,29 @@ Item {
                         }
                     }
 
+                    RowLayout {
+                        id: rowStadiumWebPage
+                        Text {
+                            id: text8
+                            text: qsTr("Bautagebuch:")
+                            Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                            font.pixelSize: 14
+                            color: "white"
+                        }
+                        CheckBox {
+                            id: newStadiumWebPage
+                            onCheckedChanged:if (isNotifyStartupDone) valueWasEditedEnableSave();
+                        }
+                    }
+
                 }
 
                 ScrollIndicator.vertical: ScrollIndicator { }
             }
         }
 
-        function toolButtonClicked() {
-            saveAllSettings();
-        }
+
 
 //        RowLayout {
 //            id: rowNotificationButtons
@@ -176,6 +192,9 @@ Item {
 //            }
 //        }
 
+    }
+    function toolButtonClicked() {
+        saveAllSettings();
     }
 
     property bool isNotifyStartupDone: false

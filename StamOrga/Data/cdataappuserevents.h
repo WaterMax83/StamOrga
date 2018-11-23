@@ -48,10 +48,12 @@ public:
     Q_INVOKABLE qint32 getCurrentMainEventCounter();
     Q_INVOKABLE qint32 getCurrentUpdateEventCounter();
     Q_INVOKABLE qint32 getCurrentFanclubEventCounter();
+    Q_INVOKABLE qint32 getCurrentWebPageEventCounter();
 
     Q_INVOKABLE qint32 clearUserEventFanclub(qint32 newsIndex);
     Q_INVOKABLE qint32 clearUserEventGamePlay(qint32 gameIndex);
     Q_INVOKABLE qint32 clearUserEventUpdate();
+    Q_INVOKABLE qint32 clearUserEventWebPage(qint32 index);
 
     qint32 handleSetUserEventsResponse(MessageProtocol* msg);
 
@@ -62,8 +64,9 @@ public slots:
 private:
     bool   m_eventNewAppVersion;
     qint32 m_eventNewFanclubNews;
+    qint32 m_eventWebPageItems;
 
-    qint32 startSetUserEvents(const qint64 eventID, const qint32 status);
+    qint32            startSetUserEvents(const qint64 eventID, const qint32 status);
     QList<EventInfo*> m_lEvents;
 };
 

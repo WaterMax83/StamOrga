@@ -74,33 +74,33 @@ void cDataWebPageManager::addNewWebPageData(TextDataItem* sWebPage, const quint1
     }
 }
 
-//bool cDataWebPageManager::setNewsDataItemHasEvent(qint32 newsIndex)
-//{
-//    if (!this->m_initialized)
-//        return false;
+bool cDataWebPageManager::setWebPageItemHasEvent(qint32 index)
+{
+    if (!this->m_initialized)
+        return false;
 
-//    QMutexLocker lock(&this->m_mutex);
+    QMutexLocker lock(&this->m_mutex);
 
-//    for (int i = 0; i < this->m_lNews.count(); i++) {
-//        if (this->m_lNews[i]->index() == newsIndex) {
-//            this->m_lNews[i]->setEvent(this->m_lNews[i]->event() + 1);
-//            return true;
-//        }
-//    }
-//    return false;
-//}
+    for (int i = 0; i < this->m_lWebPages.count(); i++) {
+        if (this->m_lWebPages[i]->index() == index) {
+            this->m_lWebPages[i]->setEvent(this->m_lWebPages[i]->event() + 1);
+            return true;
+        }
+    }
+    return false;
+}
 
-//void cDataWebPageManager::resetAllNewsDataEvents()
-//{
-//    if (!this->m_initialized)
-//        return;
+void cDataWebPageManager::resetAllWebPageEvents()
+{
+    if (!this->m_initialized)
+        return;
 
-//    QMutexLocker lock(&this->m_mutex);
+    QMutexLocker lock(&this->m_mutex);
 
-//    for (int i = 0; i < this->m_lNews.count(); i++) {
-//        this->m_lNews[i]->setEvent(0);
-//    }
-//}
+    for (int i = 0; i < this->m_lWebPages.count(); i++) {
+        this->m_lWebPages[i]->setEvent(0);
+    }
+}
 
 
 TextDataItem* cDataWebPageManager::getWebDataItem(qint32 index)
@@ -262,7 +262,6 @@ qint32 cDataWebPageManager::handleWebPageResponse(MessageProtocol* msg)
             pWebPage->setIndex(webObj.value("index").toInt());
             pWebPage->setTimeStamp((qint64)webObj.value("timestamp").toDouble());
             pWebPage->setHeader(webObj.value("name").toString());
-            //            pNews->setUser(webObj.value("user").toString());
 
             g_GlobalManager->setQMLObjectOwnershipToCpp(pWebPage);
             this->addNewWebPageData(pWebPage, updateIndex);
@@ -285,8 +284,14 @@ qint32 cDataWebPageManager::handleWebPageResponse(MessageProtocol* msg)
             if (body.isEmpty()) {
                 pItem->setInfo("");
             } else {
-                QByteArray uBody = QByteArray::fromHex(body.toUtf8());
-                pItem->setInfo(QString(qUncompress(uBody)));
+                QByteArray uBody        = QByteArray::fromHex(body.toUtf8());
+                QString    internalBody = QString(qUncompress(uBody));
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+                internalBody = internalBody.replace("=\"width:360px", "=\"width:540px");
+#else
+
+#endif
+                pItem->setInfo(internalBody);
             }
 
             this->m_editItem = pItem;

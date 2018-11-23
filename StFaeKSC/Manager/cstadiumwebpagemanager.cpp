@@ -18,6 +18,7 @@
 
 #include "cstadiumwebpagemanager.h"
 #include "../Common/Network/messagecommand.h"
+#include "../General/pushnotification.h"
 
 //extern GlobalData* g_GlobalData;
 
@@ -72,18 +73,20 @@ MessageProtocol* cStadiumWebPageManager::handleStadiumCommand(UserConData* pUser
             rCode = this->m_webPageList->addNewWebPageItem(pUserCon->m_userID);
         } else if (cmd == "load") {
             QString text, body;
-            qint32 index = rootObj.value("index").toInt(0);
-            rCode = this->m_webPageList->loadWebPageDataItem(index, text, body);
+            qint32  index = rootObj.value("index").toInt(0);
+            rCode         = this->m_webPageList->loadWebPageDataItem(index, text, body);
             if (rCode == ERROR_CODE_SUCCESS) {
                 rootObjAnswer.insert("index", index);
                 rootObjAnswer.insert("name", text);
                 rootObjAnswer.insert("body", body);
             }
         } else if (cmd == "set") {
-            qint32 index = rootObj.value("index").toInt(0);
-            QString text = rootObj.value("text").toString();
-            QString body   = rootObj.value("body").toString();
-            rCode = this->m_webPageList->setWebPageDataItem(index, text, body);
+            qint32  index = rootObj.value("index").toInt(0);
+            QString text  = rootObj.value("text").toString();
+            QString body  = rootObj.value("body").toString();
+            rCode         = this->m_webPageList->setWebPageDataItem(index, text, body);
+            if (rCode == ERROR_CODE_SUCCESS)
+                g_pushNotify->sendNewStadiumWebPageNotification(pUserCon->m_userID, index);
         } else if (cmd == "list") {
             rCode = this->handleStadiumGetListCommand(rootObj, rootObjAnswer);
         } else

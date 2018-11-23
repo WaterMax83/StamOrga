@@ -42,6 +42,8 @@
 
 GlobalData* g_GlobalData;
 
+#define CORE_DUMP_FILE_SIZE_MAX (256 * 1024 * 1024)
+
 int main(int argc, char* argv[])
 {
     QCoreApplication a(argc, argv);
@@ -52,9 +54,13 @@ int main(int argc, char* argv[])
 #ifdef Q_OS_LINUX
     // core dumps may be disallowed by parent of this process; change that
     struct rlimit core_limits;
-    core_limits.rlim_cur = core_limits.rlim_max = RLIM_INFINITY;
+    getrlimit(RLIMIT_CORE, &core_limits);
+    core_limits.rlim_cur = core_limits.rlim_max = CORE_DUMP_FILE_SIZE_MAX;
     setrlimit(RLIMIT_CORE, &core_limits);
 #endif
+
+    qInfo().noquote() << "*************************************************************";
+    qInfo().noquote() << QString("Starting StFaeKSC %1").arg(STAM_ORGA_VERSION_S);
 
     GlobalData globalData;
     g_GlobalData = &globalData;
@@ -65,18 +71,15 @@ int main(int argc, char* argv[])
     PushNotification pushNotify;
     pushNotify.initialize(&globalData);
 
-    qInfo().noquote() << "*************************************************************";
-    qInfo().noquote() << QString("Starting StFaeKSC %1").arg(STAM_ORGA_VERSION_S);
-
-//    BackgroundController ctrlUdp;
+    //    BackgroundController ctrlUdp;
     BackgroundController ctrlTcp;
     cGlobalManager       globalManager;
     if (argc > 1 && QString(argv[1]) == "-noServer") {
         qInfo() << "Starting only as a deamon without a server";
     } else {
 
-//        UdpServer* udpServ = new UdpServer(&globalData);
-//        ctrlUdp.Start(udpServ, false);
+        //        UdpServer* udpServ = new UdpServer(&globalData);
+        //        ctrlUdp.Start(udpServ, false);
 
         cConTcpMainServer* tcpMain = new cConTcpMainServer();
         tcpMain->initialize();
@@ -99,7 +102,7 @@ int main(int argc, char* argv[])
     int result = a.exec();
 
     qDebug().noquote() << QString("Ending program %1: %2").arg(result).arg(QCoreApplication::applicationPid());
-//    ctrlUdp.Stop();
+    //    ctrlUdp.Stop();
     delete g_Console;
 
     delete checkConsistData;

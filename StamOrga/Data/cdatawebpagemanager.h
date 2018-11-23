@@ -39,8 +39,8 @@ public:
 
     TextDataItem* getWebDataItem(qint32 index);
 
-    //    bool setNewsDataItemHasEvent(qint32 newsIndex);
-    //    void resetAllNewsDataEvents();
+    bool setWebPageItemHasEvent(qint32 index);
+    void resetAllWebPageEvents();
 
     Q_INVOKABLE qint32 getWebListLength();
     Q_INVOKABLE TextDataItem* getWebDataFromArrayIndex(int index);
@@ -50,7 +50,7 @@ public:
 
     qint32      startAddWebPage();
     Q_INVOKABLE qint32 startLoadWebPage(qint32 index);
-    qint32 startSetWebPage(const QString text, const QString body);
+    qint32             startSetWebPage(const QString text, const QString body);
 
     qint32 handleWebPageResponse(MessageProtocol* msg);
 

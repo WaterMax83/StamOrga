@@ -274,6 +274,7 @@ Flickable {
         enableNewFreeTicket : notifyFreeTicket;
         enableMeetComment : notifyMeetComment;
         enableFanclubNews : notifyFanclubNews;
+        enableStadiumWebPage : notifyStadiumWebPage
         visibleFanclubNews : gConUserSettings.userIsFanclubEnabled();
     }
 
@@ -334,6 +335,9 @@ Flickable {
         if (viewNotifySettings.enableFanclubNews !== gStaGlobalSettings.isNotificationFanclubNewsEnabled()) {
             gStaGlobalSettings.setNotificationFanclubNewsEnabled(viewNotifySettings.enableFanclubNews);
         }
+        if (viewNotifySettings.enableStadiumWebPage != gStaGlobalSettings.isNotificationStadiumWebpageEnabled()) {
+            gStaGlobalSettings.setNotificationStadiumWebPageEnabled(viewNotifySettings.enableStadiumWebPage);
+        }
 
         updateHeaderFromMain("", "");
 
@@ -381,6 +385,7 @@ Flickable {
         notifyFreeTicket = gStaGlobalSettings.isNotificationNewFreeTicketEnabled();
         notifyMeetComment = gStaGlobalSettings.isNotificationMeetingCommentEnabled();
         notifyFanclubNews = gStaGlobalSettings.isNotificationFanclubNewsEnabled();
+        notifyStadiumWebPage = gStaGlobalSettings.isNotificationStadiumWebpageEnabled();
 
         isStartupDone = true;
     }
@@ -390,6 +395,7 @@ Flickable {
     property bool notifyFreeTicket : false
     property bool notifyMeetComment : false
     property bool notifyFanclubNews : false
+    property bool notifyStadiumWebPage : false
     property bool notifySettingsDialog : false
 
     function notifyUserIntConnectionFinished(result, msg) {}

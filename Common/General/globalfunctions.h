@@ -153,6 +153,7 @@ extern bool gIsGameASeasonTicketGame(CompetitionIndex comp);
 #define NOTIFY_TOPIC_NEW_AWAY_ACCEPT        "NewAwayAccept"
 #define NOTIFY_TOPIC_NEW_FANCLUB_NEWS       "FanclubNews"
 #define NOTIFY_TOPIC_NEW_COMMENT            "MeetComment"
+#define NOTIFY_TOPIC_STADIUM_WEBPAGE        "StadiumWebPage"
 #define NOTIFY_TOPIC_GENERAL                "GeneralTopic"
 #define NOTIFY_TOPIC_GENERAL_BACKUP         "GeneralBackup"     // after versoin 1.0.3
 // clang-format on

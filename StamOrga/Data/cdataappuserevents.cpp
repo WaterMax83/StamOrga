@@ -26,6 +26,7 @@
 #include "../Connection/cconusersettings.h"
 #include "../Data/cdatagamesmanager.h"
 #include "../Data/cdatanewsdatamanager.h"
+#include "../Data/cdatawebpagemanager.h"
 #include "cdataappuserevents.h"
 
 cDataAppUserEvents* g_DataAppUserEvents;
@@ -35,6 +36,7 @@ cDataAppUserEvents::cDataAppUserEvents(QObject* parent)
 {
     this->m_eventNewAppVersion  = false;
     this->m_eventNewFanclubNews = 0;
+    this->m_eventWebPageItems   = 0;
 }
 
 
@@ -88,6 +90,9 @@ qint32 cDataAppUserEvents::addNewUserEvents(QJsonArray& jsArr)
         } else if (pEvent->m_type == NOTIFY_TOPIC_NEW_COMMENT) {
             if (!g_DataGamesManager->setGamePlayItemHasEvent(pEvent->m_info.toInt()))
                 this->startSetUserEvents(pEvent->m_eventID, 0);
+        } else if (pEvent->m_type == NOTIFY_TOPIC_STADIUM_WEBPAGE) {
+            g_DataWebPageManager->setWebPageItemHasEvent(pEvent->m_info.toInt());
+            this->m_eventWebPageItems++;
         } else
             continue;
 
@@ -101,8 +106,10 @@ void cDataAppUserEvents::resetCurrentEvents()
 {
     this->m_eventNewAppVersion  = false;
     this->m_eventNewFanclubNews = 0;
+    this->m_eventWebPageItems   = 0;
     g_DataGamesManager->resetAllGamePlayEvents();
     g_DataNewsDataManager->resetAllNewsDataEvents();
+    g_DataWebPageManager->resetAllWebPageEvents();
     for (int i = this->m_lEvents.count() - 1; i >= 0; i--) {
         delete this->m_lEvents[i];
         this->m_lEvents.removeAt(i);
@@ -120,6 +127,9 @@ qint32 cDataAppUserEvents::getCurrentMainEventCounter()
     if (this->m_eventNewFanclubNews)
         rValue += this->m_eventNewFanclubNews;
 
+    if (this->m_eventWebPageItems)
+        rValue += this->m_eventWebPageItems;
+
     return rValue;
 }
 
@@ -133,6 +143,11 @@ qint32 cDataAppUserEvents::getCurrentUpdateEventCounter()
 qint32 cDataAppUserEvents::getCurrentFanclubEventCounter()
 {
     return this->m_eventNewFanclubNews;
+}
+
+qint32 cDataAppUserEvents::getCurrentWebPageEventCounter()
+{
+    return this->m_eventWebPageItems;
 }
 
 qint32 cDataAppUserEvents::clearUserEventFanclub(qint32 newsIndex)
@@ -177,6 +192,21 @@ qint32 cDataAppUserEvents::clearUserEventUpdate()
             this->startSetUserEvents(this->m_lEvents[i]->m_eventID, 0);
             delete this->m_lEvents[i];
             this->m_lEvents.removeAt(i);
+        }
+    }
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 cDataAppUserEvents::clearUserEventWebPage(qint32 index)
+{
+    for (int i = this->m_lEvents.count() - 1; i >= 0; i--) {
+        if (this->m_lEvents[i]->m_type == NOTIFY_TOPIC_STADIUM_WEBPAGE) {
+            if (this->m_lEvents[i]->m_info.toInt() == index) {
+                this->m_eventWebPageItems--;
+                this->startSetUserEvents(this->m_lEvents[i]->m_eventID, 0);
+                delete this->m_lEvents[i];
+                this->m_lEvents.removeAt(i);
+            }
         }
     }
     return ERROR_CODE_SUCCESS;

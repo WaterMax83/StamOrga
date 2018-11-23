@@ -105,10 +105,10 @@ Flickable {
     function notifyWebPageCommandFinished(result){
         if (iCurrentCommandIndex === 1) {   // list
             if (result === 1) {
-    //            if (gDataAppUserEvents.getCurrentFanclubEventCounter() > 0) {
-    //                gConUserSettings.startGettingUserProps(true);
-    //                return;
-    //            }
+                if (gDataAppUserEvents.getCurrentWebPageEventCounter() > 0) {
+                    gConUserSettings.startGettingUserProps(true);
+                    return;
+                }
                 toastManager.show("Liste erfolgreich geladen", 2000);
                 busyIndicatorWebList.loadingVisible = false;
             } else {
@@ -159,8 +159,8 @@ Flickable {
                     var sprite = stackView.push(component)
                     sprite.startShowElements(sender, false);
 
-//                    if (sender.event)
-//                        gDataAppUserEvents.clearUserEventFanclub(sender.index);
+                    if (sender.event)
+                        gDataAppUserEvents.clearUserEventWebPage(sender.index);
                 }
             }
         }

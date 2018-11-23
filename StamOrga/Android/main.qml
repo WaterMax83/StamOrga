@@ -186,7 +186,7 @@ ApplicationWindow {
                         append({
                                    title: "Bautagebuch",
                                    element: viewWebList,
-                                   listImgSource : "images/delete.png"
+                                   listImgSource : "images/build.png"
                                })
                         append({
                                    title: "Einstellungen",
@@ -431,6 +431,8 @@ ApplicationWindow {
                     listViewListModel.get(i).event = gDataAppUserEvents.getCurrentUpdateEventCounter();
                 else if (listViewListModel.get(i).title === "Fanclub") {
                     listViewListModel.get(i).event = gDataAppUserEvents.getCurrentFanclubEventCounter();
+                } else if (listViewListModel.get(i).title === "Bautagebuch") {
+                    listViewListModel.get(i).event = gDataAppUserEvents.getCurrentWebPageEventCounter();
                 }
             }
 

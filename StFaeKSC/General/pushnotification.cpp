@@ -186,10 +186,10 @@ qint64 PushNotification::sendNewMeetingNotification(const QString body, const qi
         push->m_topic      = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING;
     push->m_userEventTopic = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING;
     if (type == MEETING_TYPE_MEETING) {
-        push->m_header = "Treffen";
+        push->m_header  = "Treffen";
         push->m_bigText = "Kommst du auch?";
     } else {
-        push->m_header     = "Fahrt";
+        push->m_header  = "Fahrt";
         push->m_bigText = "Kommst du mit?";
     }
     push->m_body           = body;
@@ -237,7 +237,7 @@ qint64 PushNotification::sendChangeMeetingNotification(const QString body, const
     else
         push->m_header     = "Fahrt";
     push->m_body           = body;
-    push->m_bigText = "Information wurden angepasst";
+    push->m_bigText        = "Information wurden angepasst";
     push->m_sendMessageID  = getNextInternalPushNumber();
     push->m_sendTime       = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND;
     push->m_userID         = userID;
@@ -315,7 +315,7 @@ qint64 PushNotification::sendNewFirstAwayAccept(const QString body, const qint32
     push->m_userEventTopic = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING;
     push->m_header         = "Neuer Auswärtsfahrer";
     push->m_body           = body;
-    push->m_bigText = "Kommst du mit?";
+    push->m_bigText        = "Kommst du mit?";
     push->m_sendMessageID  = getNextInternalPushNumber();
     push->m_sendTime       = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND;
     push->m_userID         = userID;
@@ -372,6 +372,36 @@ qint64 PushNotification::sendNewMeetingComment(const QString body, const QString
     push->m_sendTime       = QDateTime::currentMSecsSinceEpoch();
     push->m_userID         = userID;
     push->m_info           = QString::number(gameIndex);
+
+    this->insertNewNotification(push);
+
+    return push->m_sendMessageID;
+}
+
+qint64 PushNotification::sendNewStadiumWebPageNotification(const qint32 userID, const quint32 webPageIndex)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_READY;
+
+    foreach (PushNotifyInfo* p, this->m_lPushToSend) {
+        if (p->m_userEventTopic == PUSH_NOTIFY_TOPIC::PUSH_NOT_STADIUM_WEBPAGE) {
+            if (p->m_internalIndex1 == webPageIndex) {
+                this->m_notifyMutex.unlock();
+                return -1;
+            }
+        }
+    }
+
+    PushNotifyInfo* push   = new PushNotifyInfo();
+    push->m_topic          = PUSH_NOTIFY_TOPIC::PUSH_NOT_STADIUM_WEBPAGE;
+    push->m_userEventTopic = PUSH_NOTIFY_TOPIC::PUSH_NOT_STADIUM_WEBPAGE;
+    push->m_header         = "Bautagebuch";
+    push->m_body           = "Es gibt neue Änderungen";
+    push->m_sendMessageID  = getNextInternalPushNumber();
+    push->m_sendTime       = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND;
+    push->m_userID         = userID;
+    push->m_internalIndex1 = webPageIndex;
+    push->m_info           = QString::number(webPageIndex);
 
     this->insertNewNotification(push);
 
@@ -538,16 +568,18 @@ QString PushNotification::getTopicStringFromIndex(const PUSH_NOTIFY_TOPIC topic)
         return NOTIFY_TOPIC_NEW_APP_VERSION;
     case PUSH_NOT_NEW_MEETING:
         return NOTIFY_TOPIC_NEW_MEETING;
-//    case PUSH_NOT_CHG_MEETING:
-//        return NOTIFY_TOPIC_CHANGE_MEETING;
+    //    case PUSH_NOT_CHG_MEETING:
+    //        return NOTIFY_TOPIC_CHANGE_MEETING;
     case PUSH_NOT_NEW_TICKET:
         return NOTIFY_TOPIC_NEW_FREE_TICKET;
-//    case PUSH_NOT_NEW_AWAY_ACCEPT:
-//        return NOTIFY_TOPIC_NEW_AWAY_ACCEPT;
+    //    case PUSH_NOT_NEW_AWAY_ACCEPT:
+    //        return NOTIFY_TOPIC_NEW_AWAY_ACCEPT;
     case PUSH_NOT_NEW_FAN_NEWS:
         return NOTIFY_TOPIC_NEW_FANCLUB_NEWS;
     case PUSH_NOT_NEW_COMMENT:
         return NOTIFY_TOPIC_NEW_COMMENT;
+    case PUSH_NOT_STADIUM_WEBPAGE:
+        return NOTIFY_TOPIC_STADIUM_WEBPAGE;
     default:
         return NOTIFY_TOPIC_GENERAL;
     }

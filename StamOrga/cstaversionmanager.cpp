@@ -212,6 +212,7 @@ QString cStaVersionManager::getVersionChangeInfo()
     rValue.append("- Überarbeitung Benachrichtigungen<br>");
     rValue.append("- Zeiten besser darstellen<br>");
     rValue.append("- Update Android SDK API 28<br>");
+    rValue.append("- Bautagebuch<br>");
 
     rValue.append("<br><b>V1.1.2:</b>(08.09.2018)<br>");
     rValue.append("- Installiere neue Version intern<br>");

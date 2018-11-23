@@ -28,25 +28,6 @@ import "../components" as MyComponents
 Item {
 
     property var textDataItem
-//    anchors.fill: parent
-
-//    Pane {
-//        width: parent.width
-//        height: parent.height
-
-//        Text {
-//            id: txt123
-//            visible: true
-//            text: "Hello"
-//        }
-
-
-//        Rectangle {
-//            width: parent.width
-//            height: parent.height
-//                color: "blue"
-//        }
-//    }
 
 //    ScrollView {
 //        anchors.fill: parent
@@ -55,14 +36,10 @@ Item {
             id: webView
             anchors.fill: parent
 //            url: "qt.io"
-            onLoadingChanged: {
-                console.log("Loading changed");
-            }
         }
-//    }
 
     function pageOpenedUpdateView() {
-//        webView.reload();
+
     }
 
     function startShowElements(textItem, editMode) {
@@ -71,7 +48,6 @@ Item {
 
         if (textItem !== undefined) {
             gDataWebPageManager.startLoadWebPage(textItem.index)
-//            isStartupDone = false;
         }
         updateHeaderFromMain(textItem.timestampReadableLine(), "")
     }
