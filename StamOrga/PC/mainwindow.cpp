@@ -269,7 +269,7 @@ void MainWindow::on_btnAddWebPage_clicked()
 void MainWindow::on_lViewWebPageList_clicked(const QModelIndex& index)
 {
     this->m_lastWebPageCommand = "load";
-    g_DataWebPageManager->startLoadWebPage(this->m_listModelWebpage->item(index.row())->data().toInt());
+    g_DataWebPageManager->startLoadWebPage(this->m_listModelWebpage->item(index.row())->data().toInt(), 0);
 }
 
 void MainWindow::on_btnSendWebPageData_clicked()

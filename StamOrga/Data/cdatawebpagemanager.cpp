@@ -285,7 +285,7 @@ qint32 cDataWebPageManager::handleWebPageResponse(MessageProtocol* msg)
 
             pItem->setHeader(rootObj.value("name").toString());
             QString link = rootObj.value("link").toString();
-            if (!link.startsWith("http")) {
+            if (!link.startsWith("http") && this->m_screenWidth != 0) {
                 //                qInfo() << "Scrren width = " << this->m_screenWidth;
                 link = link.replace("=\"width:360px", QString("=\"width:%1px").arg(this->m_screenWidth));
                 //            QString body = rootObj.value("body").toString();

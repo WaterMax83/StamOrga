@@ -160,8 +160,8 @@ Flickable {
                     var sprite = stackView.push(component)
                     sprite.startShowElements(sender, false);
 
-//                    if (sender.event)
-//                        gDataAppUserEvents.clearUserEventWebPage(sender.index);
+                    if (sender.event)
+                        gDataAppUserEvents.clearUserEventWebPage(sender.index);
                 }
 
 //                Qt.openUrlExternally(sender.info);
