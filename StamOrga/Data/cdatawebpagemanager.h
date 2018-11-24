@@ -49,8 +49,8 @@ public:
     Q_INVOKABLE qint32 startListWebPageData();
 
     qint32      startAddWebPage();
-    Q_INVOKABLE qint32 startLoadWebPage(qint32 index);
-    qint32             startSetWebPage(const QString text, const QString body);
+    Q_INVOKABLE qint32 startLoadWebPage(const qint32 index, const qint32 width);
+    qint32 startSetWebPage(const QString text, const QString link);
 
     qint32 handleWebPageResponse(MessageProtocol* msg);
 
@@ -74,6 +74,7 @@ private:
 
     qint64 m_stLastLocalUpdateTimeStamp;
     qint64 m_stLastServerUpdateTimeStamp;
+    qint32 m_screenWidth;
 
     //    QString       m_editHeader;
     //    QString       m_editInfo;

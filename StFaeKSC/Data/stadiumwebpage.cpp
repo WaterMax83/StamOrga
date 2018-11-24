@@ -35,17 +35,17 @@ StadiumWebPage::StadiumWebPage()
 
 qint32 StadiumWebPage::initialize()
 {
-    QString stadiumWebPageFilePath = getUserHomeConfigPath() + "/Settings/StadiumWebPage/StadiumWebPage.ini";
+    QString stadiumWebPageFilePath = getUserHomeConfigPath() + "/Settings/StadiumWebPage.ini";
 
     if (!checkFilePathExistAndCreate(stadiumWebPageFilePath)) {
         CONSOLE_CRITICAL(QString("Could not create File for stadium webpage setting"));
         return ERROR_CODE_NOT_POSSIBLE;
     }
 
-    this->m_webPageFolder = getUserHomeConfigPath() + "/Settings/StadiumWebPage";
-    QDir dir(this->m_webPageFolder);
-    if (!dir.exists())
-        dir.mkdir(this->m_webPageFolder);
+//    this->m_webPageFolder = getUserHomeConfigPath() + "/Settings/StadiumWebPage";
+//    QDir dir(this->m_webPageFolder);
+//    if (!dir.exists())
+//        dir.mkdir(this->m_webPageFolder);
 
     this->m_pConfigSettings = new QSettings(stadiumWebPageFilePath, QSettings::IniFormat);
     this->m_pConfigSettings->setIniCodec(("UTF-8"));
@@ -135,35 +135,35 @@ qint32 StadiumWebPage::addNewWebPageItem(const qint32 userID)
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 StadiumWebPage::loadWebPageDataItem(const qint32 index, QString &text, QString &body)
+qint32 StadiumWebPage::loadWebPageDataItem(const qint32 index, QString &text, QString &link)
 {
     WebPageItem* pItem = (WebPageItem*) this->getItem(index);
     if (pItem == NULL)
         return ERROR_CODE_NOT_FOUND;
 
     text = pItem->m_itemName;
-    body = "";
-    if (!pItem->m_link.isEmpty()) {
-        QFile linkFile(pItem->m_link);
-        if (linkFile.open(QIODevice::ReadOnly)) {
+    link = pItem->m_link;
+            //    if (!pItem->m_link.isEmpty()) {
+//        QFile linkFile(pItem->m_link);
+//        if (linkFile.open(QIODevice::ReadOnly)) {
 
-            body = qCompress(linkFile.readAll(), 9).toHex();
-            linkFile.close();
-        }
-    }
+//            body = qCompress(linkFile.readAll(), 9).toHex();
+//            linkFile.close();
+//        }
+//    }
 
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 StadiumWebPage::setWebPageDataItem(const qint32 index, const QString text, QString body)
+qint32 StadiumWebPage::setWebPageDataItem(const qint32 index, const QString text, QString link)
 {
     WebPageItem* pItem = (WebPageItem*) this->getItem(index);
     if (pItem == NULL)
         return ERROR_CODE_NOT_FOUND;
 
-    QByteArray uBody;
-    if (!body.isEmpty())
-        uBody = qUncompress(QByteArray::fromHex(body.toUtf8()));
+//    QByteArray uBody;
+//    if (!body.isEmpty())
+//        uBody = qUncompress(QByteArray::fromHex(body.toUtf8()));
     qint64 lastUpdate = QDateTime::currentMSecsSinceEpoch();
 
     if (pItem->m_itemName != text) {
@@ -171,18 +171,23 @@ qint32 StadiumWebPage::setWebPageDataItem(const qint32 index, const QString text
         this->updateItemValue(pItem, ITEM_NAME, QVariant(text));
     }
 
-    if (pItem->m_link.isEmpty()) {
-        pItem->m_link = QString("%1/WebPage_%2.html").arg(this->m_webPageFolder).arg(pItem->m_index);
-        this->updateItemValue(pItem, WEBPAGE_LINK, QVariant(pItem->m_link));
-    }
+        if (pItem->m_link != link) {
+            pItem->m_link = link;
+            this->updateItemValue(pItem, WEBPAGE_LINK, QVariant(pItem->m_link));
+        }
 
-    QFile linkFile(pItem->m_link);
-    if (!linkFile.open(QIODevice::WriteOnly))
-        return ERROR_CODE_NOT_POSSIBLE;
+//    if (pItem->m_link.isEmpty()) {
+//        pItem->m_link = QString("%1/WebPage_%2.html").arg(this->m_webPageFolder).arg(pItem->m_index);
+//        this->updateItemValue(pItem, WEBPAGE_LINK, QVariant(pItem->m_link));
+//    }
 
-    linkFile.write(uBody);
-    linkFile.flush();
-    linkFile.close();
+//    QFile linkFile(pItem->m_link);
+//    if (!linkFile.open(QIODevice::WriteOnly))
+//        return ERROR_CODE_NOT_POSSIBLE;
+
+//    linkFile.write(uBody);
+//    linkFile.flush();
+//    linkFile.close();
 
     pItem->m_lastUpdate = lastUpdate;
     this->updateItemValue(pItem, WEBPAGE_LASTUPDATE, QVariant(lastUpdate));

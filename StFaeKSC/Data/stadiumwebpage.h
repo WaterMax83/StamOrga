@@ -58,17 +58,14 @@ public:
     qint32 initialize();
 
     qint32 addNewWebPageItem(const qint32 userID);
-    qint32 loadWebPageDataItem(const qint32 index,  QString& text, QString& body);
-    qint32 setWebPageDataItem(const qint32 index, const QString text, QString body);
-    //    qint32 removeWebPageItems(QStringList& lMedias);
-
-    //    qint32 getGameIndex() { return this->m_gameIndex; }
+    qint32 loadWebPageDataItem(const qint32 index,  QString& text, QString& link);
+    qint32 setWebPageDataItem(const qint32 index, const QString text, QString link);
 
     virtual qint32 checkConsistency() { return -12; }
 
 protected:
 private:
-    QString m_webPageFolder;
+//    QString m_webPageFolder;
 
     void saveCurrentInteralList() override;
 

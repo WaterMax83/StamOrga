@@ -537,7 +537,7 @@
            </rect>
           </property>
          </widget>
-         <widget class="QPlainTextEdit" name="txtEditWebPageBody">
+         <widget class="QPlainTextEdit" name="txtEditWebPageLink">
           <property name="geometry">
            <rect>
             <x>180</x>

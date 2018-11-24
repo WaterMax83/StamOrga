@@ -182,9 +182,9 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
         emit this->notifyDeleteFanclubNewsItemFinished(result);
         break;
 
-        //    case OP_CODE_CMD_REQ::REQ_GET_USER_EVENTS:
-        //        emit this->notifyGetUserEvents(result);
-        //        break;
+    //    case OP_CODE_CMD_REQ::REQ_GET_USER_EVENTS:
+    //        emit this->notifyGetUserEvents(result);
+    //        break;
 
     case OP_CODE_CMD_REQ::REQ_SET_USER_EVENTS:
         if (result == ERROR_CODE_SUCCESS)
@@ -207,4 +207,12 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
         qWarning().noquote() << QString("Unknown acknowledge: 0x%1").arg(QString::number(command, 16));
         break;
     }
+}
+
+bool UserInterface::isStringUrl(const QString str)
+{
+    if (str.startsWith("http"))
+        return true;
+
+    return false;
 }

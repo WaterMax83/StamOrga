@@ -172,8 +172,8 @@ Item {
                 labelSubHeader.text = "von " + textDataItem.user;
                 labelTime.text = textDataItem.timestampReadableLine();
             } else if (type === 1) {
-                labelHeaderItem.text = textDataItem.timestampReadableLine();
-                labelSubHeader.text = textDataItem.header;
+                labelHeaderItem.text = textDataItem.header;
+                labelSubHeader.text = textDataItem.timestampReadableLine();
             }
 
             var eventCount = textDataItem.event;

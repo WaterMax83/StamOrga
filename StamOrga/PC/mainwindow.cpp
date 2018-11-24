@@ -133,7 +133,10 @@ void MainWindow::slotNotifyCommandFinished(quint32 command, qint32 result)
                     TextDataItem*  pDataItem = g_DataWebPageManager->getWebDataFromArrayIndex(i);
                     QStandardItem* pItem     = new QStandardItem();
                     pItem->setData(pDataItem->index());
-                    pItem->setText(pDataItem->timestampReadableLine());
+                    if (pDataItem->header().isEmpty())
+                        pItem->setText(pDataItem->timestampReadableLine());
+                    else
+                        pItem->setText(pDataItem->header());
                     this->m_listModelWebpage->setItem(i, 0, pItem);
                 }
 
@@ -146,10 +149,12 @@ void MainWindow::slotNotifyCommandFinished(quint32 command, qint32 result)
                 if (pItem == NULL)
                     break;
                 this->ui->lEditWebPageHeader->setText(pItem->header());
-                this->ui->txtEditWebPageBody->setPlainText(pItem->info());
+                this->ui->txtEditWebPageLink->setPlainText(pItem->info());
                 qInfo() << "Loaded item";
             } else if (this->m_lastWebPageCommand == "set") {
                 qInfo() << "Set Item";
+                this->m_lastWebPageCommand = "list";
+                g_DataWebPageManager->startListWebPageData();
             }
         }
         break;
@@ -270,5 +275,5 @@ void MainWindow::on_lViewWebPageList_clicked(const QModelIndex& index)
 void MainWindow::on_btnSendWebPageData_clicked()
 {
     this->m_lastWebPageCommand = "set";
-    g_DataWebPageManager->startSetWebPage(this->ui->lEditWebPageHeader->text(), this->ui->txtEditWebPageBody->toPlainText());
+    g_DataWebPageManager->startSetWebPage(this->ui->lEditWebPageHeader->text(), this->ui->txtEditWebPageLink->toPlainText());
 }

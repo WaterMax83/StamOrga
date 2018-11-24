@@ -140,7 +140,8 @@ Flickable {
         }
 
         if (gDataWebPageManager.getWebListLength() > 0) {
-            for (var i = gDataWebPageManager.getWebListLength() - 1; i >= 0; i--) {
+//            for (var i = gDataWebPageManager.getWebListLength() - 1; i >= 0; i--) {
+            for (var i = 0; i < gDataWebPageManager.getWebListLength(); i++) {
                 var sprite = webDataItem.createObject(columnLayoutWebList)
                 sprite.showTextDataInfo(i, 1);
             }
@@ -159,9 +160,11 @@ Flickable {
                     var sprite = stackView.push(component)
                     sprite.startShowElements(sender, false);
 
-                    if (sender.event)
-                        gDataAppUserEvents.clearUserEventWebPage(sender.index);
+//                    if (sender.event)
+//                        gDataAppUserEvents.clearUserEventWebPage(sender.index);
                 }
+
+//                Qt.openUrlExternally(sender.info);
             }
         }
     }

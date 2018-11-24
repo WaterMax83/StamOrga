@@ -184,7 +184,7 @@ qint32 cDataWebPageManager::startAddWebPage()
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 cDataWebPageManager::startLoadWebPage(qint32 index)
+qint32 cDataWebPageManager::startLoadWebPage(const qint32 index, const qint32 width)
 {
     if (!this->m_initialized)
         return ERROR_CODE_NOT_INITIALIZED;
@@ -198,11 +198,13 @@ qint32 cDataWebPageManager::startLoadWebPage(qint32 index)
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CMD_STADIUM);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
 
+    this->m_screenWidth = width - 25; // Scrollbar is normaly visible
+
     g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 cDataWebPageManager::startSetWebPage(const QString text, const QString body)
+qint32 cDataWebPageManager::startSetWebPage(const QString text, const QString link)
 {
     if (!this->m_initialized)
         return ERROR_CODE_NOT_INITIALIZED;
@@ -213,12 +215,13 @@ qint32 cDataWebPageManager::startSetWebPage(const QString text, const QString bo
     rootObj.insert("cmd", "set");
     rootObj.insert("index", this->m_editItem->index());
     rootObj.insert("text", text);
-    if (body.isEmpty()) {
-        rootObj.insert("body", "");
-    } else {
-        QByteArray uBody = qCompress(body.toUtf8(), 9);
-        rootObj.insert("body", QString(uBody.toHex()));
-    }
+    rootObj.insert("link", link);
+    //    if (body.isEmpty()) {
+    //        rootObj.insert("body", "");
+    //    } else {
+    //        QByteArray uBody = qCompress(body.toUtf8(), 9);
+    //        rootObj.insert("body", QString(uBody.toHex()));
+    //    }
 
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CMD_STADIUM);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
@@ -260,8 +263,9 @@ qint32 cDataWebPageManager::handleWebPageResponse(MessageProtocol* msg)
             TextDataItem* pWebPage = new TextDataItem();
 
             pWebPage->setIndex(webObj.value("index").toInt());
-            pWebPage->setTimeStamp((qint64)webObj.value("timestamp").toDouble());
+            pWebPage->setTimeStamp((qint64)webObj.value("lastUpdate").toDouble());
             pWebPage->setHeader(webObj.value("name").toString());
+            //            pWebPage->setInfo(webObj.value("link").toString());
 
             g_GlobalManager->setQMLObjectOwnershipToCpp(pWebPage);
             this->addNewWebPageData(pWebPage, updateIndex);
@@ -280,19 +284,25 @@ qint32 cDataWebPageManager::handleWebPageResponse(MessageProtocol* msg)
                 return ERROR_CODE_NOT_FOUND;
 
             pItem->setHeader(rootObj.value("name").toString());
-            QString body = rootObj.value("body").toString();
-            if (body.isEmpty()) {
-                pItem->setInfo("");
-            } else {
-                QByteArray uBody        = QByteArray::fromHex(body.toUtf8());
-                QString    internalBody = QString(qUncompress(uBody));
-#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
-                internalBody = internalBody.replace("=\"width:360px", "=\"width:540px");
-#else
+            QString link = rootObj.value("link").toString();
+            if (!link.startsWith("http")) {
+                //                qInfo() << "Scrren width = " << this->m_screenWidth;
+                link = link.replace("=\"width:360px", QString("=\"width:%1px").arg(this->m_screenWidth));
+                //            QString body = rootObj.value("body").toString();
+                //            if (body.isEmpty()) {
+                //                pItem->setInfo("");
+                //            } else {
+                //                QByteArray uBody        = QByteArray::fromHex(body.toUtf8());
+                //                QString    internalBody = QString(qUncompress(uBody));
+                //#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
 
-#endif
-                pItem->setInfo(internalBody);
+                //#else
+
+                //#endif
+                //                pItem->setInfo(internalBody);
+                //            }
             }
+            pItem->setInfo(link);
 
             this->m_editItem = pItem;
         }

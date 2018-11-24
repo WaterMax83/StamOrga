@@ -72,19 +72,19 @@ MessageProtocol* cStadiumWebPageManager::handleStadiumCommand(UserConData* pUser
         if (cmd == "add") {
             rCode = this->m_webPageList->addNewWebPageItem(pUserCon->m_userID);
         } else if (cmd == "load") {
-            QString text, body;
+            QString text, link;
             qint32  index = rootObj.value("index").toInt(0);
-            rCode         = this->m_webPageList->loadWebPageDataItem(index, text, body);
+            rCode         = this->m_webPageList->loadWebPageDataItem(index, text, link);
             if (rCode == ERROR_CODE_SUCCESS) {
                 rootObjAnswer.insert("index", index);
                 rootObjAnswer.insert("name", text);
-                rootObjAnswer.insert("body", body);
+                rootObjAnswer.insert("link", link);
             }
         } else if (cmd == "set") {
             qint32  index = rootObj.value("index").toInt(0);
             QString text  = rootObj.value("text").toString();
-            QString body  = rootObj.value("body").toString();
-            rCode         = this->m_webPageList->setWebPageDataItem(index, text, body);
+            QString link  = rootObj.value("link").toString();
+            rCode         = this->m_webPageList->setWebPageDataItem(index, text, link);
             if (rCode == ERROR_CODE_SUCCESS)
                 g_pushNotify->sendNewStadiumWebPageNotification(pUserCon->m_userID, index);
         } else if (cmd == "list") {
@@ -130,7 +130,7 @@ qint32 cStadiumWebPageManager::handleStadiumGetListCommand(QJsonObject& rootObj,
         webPageObj.insert("timestamp", pItem->m_timestamp);
         webPageObj.insert("userID", pItem->m_userID);
         webPageObj.insert("lastUpdate", pItem->m_lastUpdate);
-        webPageObj.insert("file", pItem->m_link);
+//        webPageObj.insert("link", pItem->m_link);
         webPageArr.append(webPageObj);
     }
     rootObjAnswer.insert("timestamp", this->m_webPageList->getLastUpdateTime());

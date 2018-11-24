@@ -51,6 +51,8 @@ public:
 #endif
     }
 
+    Q_INVOKABLE bool isStringUrl(const QString str);
+
     Q_INVOKABLE QString getErrorCodeToString(qint32 code)
     {
         return getErrorCodeString(code);

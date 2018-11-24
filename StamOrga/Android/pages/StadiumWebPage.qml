@@ -37,6 +37,7 @@ Item {
             anchors.fill: parent
 //            url: "qt.io"
         }
+//    }
 
     function pageOpenedUpdateView() {
 
@@ -47,17 +48,23 @@ Item {
         textDataItem = textItem;
 
         if (textItem !== undefined) {
-            gDataWebPageManager.startLoadWebPage(textItem.index)
+            gDataWebPageManager.startLoadWebPage(textItem.index, mainWindow.width)
         }
-        updateHeaderFromMain(textItem.timestampReadableLine(), "")
+        updateHeaderFromMain(textItem.header, "")
     }
 
     function notifyWebPageCommandFinished(result){
         if (result === 1) {
-            console.log("Laden hat funkioniert");
-            toastManager.show("Seite erfolgreich geladen", 2000);
-            if (textDataItem !== undefined)
-                webView.loadHtml(textDataItem.info);
+//            console.log("Laden hat funkioniert");
+            toastManager.show("Seite wird geladen", 2000);
+            if (textDataItem !== undefined) {
+                if (userInt.isStringUrl(textDataItem.info)) {
+                    webView.url = textDataItem.info
+                    webView.reload();
+                } else
+                    webView.loadHtml(textDataItem.info);
+            }
+//                webView.loadHtml(textDataItem.info);
         } else {
             toastManager.show(userInt.getErrorCodeToString(result), 4000);
         }
