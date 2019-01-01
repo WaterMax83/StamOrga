@@ -32,6 +32,7 @@ public class MyFcmListenerService extends FirebaseMessagingService
         String title = "";
         String body = "";
         String bigText = "";
+        String summary = "";
 
 //        for (Map.Entry<String, String> entry : data.entrySet())
 //        {
@@ -43,11 +44,24 @@ public class MyFcmListenerService extends FirebaseMessagingService
             body = data.get("body").toString();
         if (data.containsKey("bigText"))
             bigText = data.get("bigText").toString();
+        if (data.containsKey("summary"))
+            summary = data.get("summary").toString();
+
+        int messageNumber = 0;
+        String sMsgNumb = "0";
+        if (data.containsKey("m_id")) {
+            sMsgNumb = data.get("m_id").toString();
+            messageNumber = Integer.parseInt(sMsgNumb);
+        }
 
         Log.d(TAG, "From: " + from);
         Log.d(TAG, "Size: " + data.size());
 
-        int messageNumber = 0;
+//        Log.d(TAG, "title: " + title);
+//        Log.d(TAG, "body: " + body);
+//        Log.d(TAG, "bigText: " + bigText);
+//        Log.d(TAG, "sMsgNumb: " + sMsgNumb);
+
         if (from.startsWith("/topics/")) {
             // message received from some topic.
 //            long time = System.currentTimeMillis();
@@ -55,12 +69,6 @@ public class MyFcmListenerService extends FirebaseMessagingService
             String userIndex = "unknown";
             if (data.containsKey("u_id"))
                 userIndex = data.get("u_id").toString();
-
-            String sMsgNumb = "0";
-            if (data.containsKey("m_id")) {
-                sMsgNumb = data.get("m_id").toString();
-                messageNumber = Integer.parseInt(sMsgNumb);
-            }
 
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
             String savedUserIndex = sharedPreferences.getString(QuickstartPreferences.FCM_TOPIC_USER_INDEX, "");
@@ -72,15 +80,18 @@ public class MyFcmListenerService extends FirebaseMessagingService
             }
         }
 
-        sendNotification(title, body, bigText, messageNumber);
+        sendNotification(title, body, bigText, summary, messageNumber);
     }
 
-    private void sendNotification(String title, String message, String bigText, int msgNmb)
+    private void sendNotification(String title, String message, String bigText, String summary, int msgNmb)
     {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent, PendingIntent.FLAG_ONE_SHOT);
 
+        NotificationCompat.BigTextStyle myBigText = new NotificationCompat.BigTextStyle().bigText(bigText);
+        if (summary != "")
+            myBigText.setSummaryText(summary);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.icon)
                 .setContentTitle(title)
@@ -88,8 +99,7 @@ public class MyFcmListenerService extends FirebaseMessagingService
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
                 .setGroup("com.stamorga.example.NOTIFY")
-                .setStyle(new NotificationCompat.BigTextStyle()
-                                .bigText(bigText));
+                .setStyle(myBigText);
 //                .setContentInfo("Info");
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);

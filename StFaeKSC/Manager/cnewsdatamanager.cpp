@@ -146,7 +146,8 @@ MessageProtocol* cNewsDataManager::getNewsDataChangeRequest(UserConData* pUserCo
         rCode = g_GlobalData->m_fanclubNews.addNewFanclubNews(header, info, pUserCon->m_userID);
         if (rCode > ERROR_CODE_NO_ERROR) {
             qInfo().noquote() << QString("User %1 added news %2").arg(pUserCon->m_userName, header);
-            messageID = g_pushNotify->sendNewFanclubNewsNotification("Es gibt eine neue Nachricht", pUserCon->m_userID, rCode);
+            QString bigText = QString("Es gibt eine neue Nachricht von %1: %2").arg(g_GlobalData->m_UserList.getReadableName(pUserCon->m_userID), header);
+            messageID = g_pushNotify->sendNewFanclubNewsNotification(header, bigText, pUserCon->m_userID, rCode);
             rootAns.insert("ack", ERROR_CODE_SUCCESS);
             rootAns.insert("index", rCode);
         }
@@ -154,7 +155,8 @@ MessageProtocol* cNewsDataManager::getNewsDataChangeRequest(UserConData* pUserCo
         rCode = g_GlobalData->m_fanclubNews.changeFanclubNews(newsIndex, header, info, pUserCon->m_userID);
         if (rCode == ERROR_CODE_SUCCESS) {
             qInfo().noquote() << QString("User %1 changed news %2").arg(pUserCon->m_userName, header);
-            messageID = g_pushNotify->sendNewFanclubNewsNotification("Eine Nachricht wurde geändert", pUserCon->m_userID, newsIndex);
+            QString bigText = QString("Eine Nachricht wurde geändert von %1: %2").arg(g_GlobalData->m_UserList.getReadableName(pUserCon->m_userID), header);
+            messageID = g_pushNotify->sendNewFanclubNewsNotification(header, bigText, pUserCon->m_userID, newsIndex);
             rootAns.insert("ack", ERROR_CODE_SUCCESS);
         }
     }

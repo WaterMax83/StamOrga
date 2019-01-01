@@ -86,7 +86,7 @@ MessageProtocol* cStadiumWebPageManager::handleStadiumCommand(UserConData* pUser
             QString link  = rootObj.value("link").toString();
             rCode         = this->m_webPageList->setWebPageDataItem(index, text, link);
             if (rCode == ERROR_CODE_SUCCESS)
-                g_pushNotify->sendNewStadiumWebPageNotification(pUserCon->m_userID, index);
+                g_pushNotify->sendNewStadiumWebPageNotification(text, pUserCon->m_userID, index);
         } else if (cmd == "list") {
             rCode = this->handleStadiumGetListCommand(rootObj, rootObjAnswer);
         } else

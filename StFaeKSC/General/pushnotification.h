@@ -53,11 +53,12 @@ struct PushNotifyInfo {
     QString           m_header;
     QString           m_body;
     QString           m_bigText;
+    QString           m_summary;
     qint64            m_sendMessageID;
     qint64            m_sendTime;
     qint32            m_userID;
-    quint32           m_internalIndex1;
-    quint32           m_internalIndex2;
+    qint32           m_internalIndex1;
+    qint32           m_internalIndex2;
 
     /* For user Events */
     QString m_info;
@@ -110,15 +111,15 @@ public:
     QString showCurrentTokenInformation(const QString cmd);
 
     qint64 sendNewGeneralTopicNotification(const QString header, const QString body, const QString bigText);
-    qint64 sendNewVersionNotification(const QString body);
-    qint64 sendNewMeetingNotification(const QString body, const qint32 userID, const quint32 gameIndex, const qint32 type);
-    qint64 sendChangeMeetingNotification(const QString body, const qint32 userID, const quint32 gameIndex, const qint32 type);
-    qint64 sendNewTicketNotification(const QString body, const qint32 userID, const quint32 gameIndex, const quint32 ticketIndex);
-    qint64 removeNewTicketNotification(const quint32 gameIndex, const quint32 ticketIndex);
-    qint64 sendNewFirstAwayAccept(const QString body, const qint32 userID, const quint32 gameIndex);
-    qint64 sendNewFanclubNewsNotification(const QString body, const qint32 userID, const qint32 newsID);
-    qint64 sendNewMeetingComment(const QString body, const QString bigText, const qint32 userID, const quint32 gameIndex);
-    qint64 sendNewStadiumWebPageNotification(const qint32 userID, const quint32 webPageIndex);
+    qint64 sendNewVersionNotification();
+    qint64 sendNewMeetingNotification(const GamesPlay* pGame, QString& bigText, const qint32 userID, const qint32 type);
+    qint64 sendChangeMeetingNotification(const GamesPlay* pGame, QString& bigText, const qint32 userID, const qint32 type);
+    qint64 sendNewTicketNotification(const GamesPlay* pGame, const qint32 userID, const qint32 ticketIndex);
+    qint64 removeNewTicketNotification(const qint32 gameIndex, const qint32 ticketIndex);
+    qint64 sendNewFirstAwayAccept(const QString bigText, const qint32 userID, const qint32 gameIndex);
+    qint64 sendNewFanclubNewsNotification(const QString body, const QString bigText, const qint32 userID, const qint32 newsID);
+    qint64 sendNewMeetingComment(const QString comment, const qint32 userID, const GamesPlay* pGame);
+    qint64 sendNewStadiumWebPageNotification(const QString body, const qint32 userID, const qint32 webPageIndex);
 
     virtual qint32 checkConsistency() { return -12; }
 
