@@ -26,19 +26,18 @@
 #include <QtCore/QSettings>
 
 #include "configlist.h"
+#include "userinformation.h"
 
 class UserLogin : public ConfigItem
 {
 public:
     QString m_password;
     QString m_salt;
-    QString m_readName;
     quint32 m_properties;
 
     UserLogin(QString name, qint64 timestamp,
               quint32 index, QString password,
-              QString salt, quint32 prop,
-              QString readname)
+              QString salt, quint32 prop)
     {
         this->m_itemName  = name;
         this->m_timestamp = timestamp;
@@ -46,7 +45,6 @@ public:
 
         this->m_password   = password;
         this->m_salt       = salt;
-        this->m_readName   = readname;
         this->m_properties = prop;
     }
 };
@@ -71,24 +69,20 @@ public:
     ListedUser();
     ~ListedUser();
 
-    int addNewUser(const QString name, const QString password = "", quint32 props = DEFAULT_LOGIN_PROPS);
+    int addNewUser(const QString& name, const QString& password = "", quint32 props = DEFAULT_LOGIN_PROPS);
     QString showAllUsers();
 
-    bool userCheckPassword(QString name, QString passw);
-    qint32 userCheckPasswordHash(QString name, QString hash, QString random);
-    bool userChangePassword(QString name, QString passw);
-    bool userChangePasswordHash(QString name, QString passw);
-    bool userChangeProperties(QString name, quint32 props);
-    bool userChangeReadName(QString name, QString readName);
-    quint32 getUserProperties(QString name);
-    QString getReadableName(quint32 userIndex);
-    QString getSalt(QString name);
+    bool userCheckPassword(const QString& name, const QString& passw);
+    qint32 userCheckPasswordHash(const QString& name, const QString& hash, const QString& random);
+    bool userChangePassword(const QString& name, const QString& passw);
+    bool userChangePasswordHash(const QString& name, const QString& passw);
+    bool userChangeProperties(const QString& name, quint32 props);
+    bool userChangeReadName(const qint32 userIndex, const QString& readName);
+    quint32 getUserProperties(const qint32 userIndex);
+    QString getReadableName(const qint32 userIndex);
+    QString getSalt(const QString& name);
 
-    ConfigItem* getRequestConfigItemFromListIndex(int index)
-    {
-        Q_UNUSED(index)
-        return NULL;
-    }
+    ConfigItem* getRequestConfigItemFromListIndex(int index) override;
 
     virtual qint32 checkConsistency() { return -12; }
 
@@ -99,7 +93,7 @@ private:
 
     QString createHashPassword(const QString passWord, const QString salt);
     QCryptographicHash* m_hash;
-};
 
-extern ListedUser* g_ListedUser;
+    UserInformation* m_pUserInfo;
+};
 #endif // LISTEDUSER_H

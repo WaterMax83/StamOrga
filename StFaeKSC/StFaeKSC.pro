@@ -69,7 +69,9 @@ SOURCES += main.cpp \
     Manager/ccontrolmanager.cpp \
     Manager/csmtpmanager.cpp \
     Manager/cmediamanager.cpp \
-    Manager/cstadiumwebpagemanager.cpp
+    Manager/cstadiumwebpagemanager.cpp \
+    Manager/cusermanager.cpp \
+    Data/userinformation.cpp
 
 
 HEADERS += \
@@ -116,7 +118,9 @@ HEADERS += \
     Manager/ccontrolmanager.h \
     Manager/csmtpmanager.h \
     Manager/cmediamanager.h \
-    Manager/cstadiumwebpagemanager.h
+    Manager/cstadiumwebpagemanager.h \
+    Manager/cusermanager.h \
+    Data/userinformation.h
 
 
 

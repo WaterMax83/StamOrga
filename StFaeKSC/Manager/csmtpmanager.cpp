@@ -140,7 +140,7 @@ qint32 cSmtpManager::sendNewEmail(const QString header, const QString body)
     pMail->m_header = header;
     pMail->m_body   = body;
 
-    QThread::sleep(1);
+    //    QThread::sleep(1);
 
     emit this->signalSendNewEmails(pMail);
 

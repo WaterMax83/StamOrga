@@ -47,17 +47,6 @@ public:
 
     MessageProtocol* getNewUserAcknowledge(const QString userName, const QHostAddress addr, const cConSslUsage sslUsage);
 
-    MessageProtocol* getUserCheckLogin(UserConData* pUserCon, MessageProtocol* request);
-
-    MessageProtocol* getUserCheckVersion(UserConData* pUserCon, MessageProtocol* request);
-
-    MessageProtocol* getUserProperties(UserConData* pUserCon, MessageProtocol* request);
-
-    MessageProtocol* getUserChangeReadableName(UserConData* pUserCon, MessageProtocol* request);
-
-    MessageProtocol* getUserChangePassword(UserConData* pUserCon, MessageProtocol* request);
-
-    MessageProtocol* getSetUserEvent(UserConData* pUserCon, MessageProtocol* request);
 
 private slots:
     void slotServerClosed(quint16 destPort);

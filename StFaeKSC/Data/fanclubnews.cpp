@@ -156,6 +156,8 @@ int FanclubNews::changeFanclubNews(const quint32 newsIndex, const QString header
     return ERROR_CODE_SUCCESS;
 }
 
+#include "../General/globaldata.h"
+extern GlobalData* g_GlobalData;
 
 QString FanclubNews::showNewsData()
 {
@@ -168,8 +170,8 @@ QString FanclubNews::showNewsData()
         if (pItem == NULL)
             continue;
 
-        if (g_ListedUser->getItemName(pItem->m_userID).size() > maxSizeUser)
-            maxSizeUser = g_ListedUser->getItemName(pItem->m_userID).size();
+        if (g_GlobalData->m_UserList.getReadableName(pItem->m_userID).size() > maxSizeUser)
+            maxSizeUser = g_GlobalData->m_UserList.getReadableName(pItem->m_userID).size();
     }
 
     for (int i = 0; i < this->getNumberOfInternalList(); i++) {
@@ -181,7 +183,7 @@ QString FanclubNews::showNewsData()
         QString output = QString("%1 - %2: %3 \n  %4\n")
                              .arg(pItem->m_index, 2, 10, QChar('0'))
                              .arg(date)
-                             .arg(g_ListedUser->getItemName(pItem->m_userID), -maxSizeUser)
+                             .arg(g_GlobalData->m_UserList.getReadableName(pItem->m_userID), -maxSizeUser)
                              .arg(pItem->m_itemName);
 
         rValue.append(output);

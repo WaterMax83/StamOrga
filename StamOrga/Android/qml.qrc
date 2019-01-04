@@ -123,5 +123,7 @@
         <file>pages/StadiumWebList.qml</file>
         <file>images/+material/build.png</file>
         <file>images/build.png</file>
+        <file>pages/UserOverview.qml</file>
+        <file>components/UserInformationItem.qml</file>
     </qresource>
 </RCC>

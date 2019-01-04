@@ -57,13 +57,8 @@ public:
     Q_INVOKABLE qint32 startGettingUserProps(const bool loadEverything = false);
     qint32             handleUserPropsResponse(MessageProtocol* msg);
 
-    Q_INVOKABLE qint32 startUpdateReadableName(QString name);
-    qint32             handleUpdateReadableNameResponse(MessageProtocol* msg);
-
-    Q_INVOKABLE qint32 startUpdatePassword(QString password);
-    qint32             handleUpdatePasswordResponse(MessageProtocol* msg);
-
-    void setRandomLoginValue(const QString random) { this->m_currentRandomValue = random; }
+    void    setRandomLoginValue(const QString random) { this->m_currentRandomValue = random; }
+    QString getRandomLoginValue() { return this->m_currentRandomValue; }
 
     QString createHashValue(const QString first, const QString second);
 
@@ -88,9 +83,7 @@ private:
     qint32  m_userIndex;
     quint32 m_userProperties;
 
-    QString m_newReadableName;
     QString m_currentRandomValue;
-    QString m_newPassWord;
 
     QCryptographicHash* m_hash = NULL;
 

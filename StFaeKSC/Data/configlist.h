@@ -72,7 +72,8 @@ public:
     bool itemExists(qint32 index);
     ConfigItem* getItem(qint32 index);
     qint32 getItemIndex(const QString name);
-    QString getItemName(qint32 index);
+    QString getItemName(const qint32 index);
+    qint64 getTimeStamp(const qint32 index);
 
     QString getFileName();
 

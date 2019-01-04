@@ -31,6 +31,7 @@
 #include "Data/cdatappinfomanager.h"
 #include "Data/cdatastatisticmanager.h"
 #include "Data/cdataticketmanager.h"
+#include "Data/cdatausermanager.h"
 #include "Data/cdatawebpagemanager.h"
 #include "cstaglobalmanager.h"
 #include "cstaglobalsettings.h"
@@ -85,6 +86,10 @@ qint32 cStaGlobalManager::initialize()
     if (rCode == ERROR_CODE_SUCCESS) {
         g_StaVersionManager = new cStaVersionManager();
         rCode               = g_StaVersionManager->initialize();
+    }
+    if (rCode == ERROR_CODE_SUCCESS) {
+        g_DataUserManager = new cDataUserManager();
+        rCode             = g_DataUserManager->initialize();
     }
     if (rCode == ERROR_CODE_SUCCESS) {
         g_DataGamesManager = new cDataGamesManager();
@@ -156,6 +161,7 @@ void cStaGlobalManager::setQmlInformationClasses(QQmlApplicationEngine* engine)
     engine->rootContext()->setContextProperty("gDataAppInfoManager", g_DatAppInfoManager);
     engine->rootContext()->setContextProperty("gStaGlobalSettings", g_StaGlobalSettings);
     engine->rootContext()->setContextProperty("gStaVersionManager", g_StaVersionManager);
+    engine->rootContext()->setContextProperty("gDataUserManager", g_DataUserManager);
     engine->rootContext()->setContextProperty("gDataGamesManager", g_DataGamesManager);
     engine->rootContext()->setContextProperty("gDataTicketManager", g_DataTicketManager);
     engine->rootContext()->setContextProperty("gDataNewsDataManager", g_DataNewsDataManager);

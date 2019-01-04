@@ -75,7 +75,7 @@ MessageProtocol* cNewsDataManager::getNewsDataList(UserConData* pUserCon, Messag
         newsObj.insert("header", pNews->m_itemName);
         newsObj.insert("timestamp", pNews->m_timestamp);
         newsObj.insert("index", pNews->m_index);
-        newsObj.insert("user", g_ListedUser->getReadableName(pNews->m_userID));
+        newsObj.insert("user", g_GlobalData->m_UserList.getReadableName(pNews->m_userID));
 
         arrNews.append(newsObj);
     }
@@ -110,7 +110,7 @@ MessageProtocol* cNewsDataManager::getNewsDataItem(UserConData* pUserCon, Messag
         if (pItem != NULL) {
 
             rootAns.insert("ack", ERROR_CODE_SUCCESS);
-            rootAns.insert("user", g_ListedUser->getReadableName(pItem->m_userID));
+            rootAns.insert("user", g_GlobalData->m_UserList.getReadableName(pItem->m_userID));
             rootAns.insert("header", pItem->m_itemName);
             QString info = QString(pItem->m_newsText.toHex());
             rootAns.insert("info", info);
@@ -147,7 +147,7 @@ MessageProtocol* cNewsDataManager::getNewsDataChangeRequest(UserConData* pUserCo
         if (rCode > ERROR_CODE_NO_ERROR) {
             qInfo().noquote() << QString("User %1 added news %2").arg(pUserCon->m_userName, header);
             QString bigText = QString("Es gibt eine neue Nachricht von %1: %2").arg(g_GlobalData->m_UserList.getReadableName(pUserCon->m_userID), header);
-            messageID = g_pushNotify->sendNewFanclubNewsNotification(header, bigText, pUserCon->m_userID, rCode);
+            messageID       = g_pushNotify->sendNewFanclubNewsNotification(header, bigText, pUserCon->m_userID, rCode);
             rootAns.insert("ack", ERROR_CODE_SUCCESS);
             rootAns.insert("index", rCode);
         }
@@ -156,7 +156,7 @@ MessageProtocol* cNewsDataManager::getNewsDataChangeRequest(UserConData* pUserCo
         if (rCode == ERROR_CODE_SUCCESS) {
             qInfo().noquote() << QString("User %1 changed news %2").arg(pUserCon->m_userName, header);
             QString bigText = QString("Eine Nachricht wurde geändert von %1: %2").arg(g_GlobalData->m_UserList.getReadableName(pUserCon->m_userID), header);
-            messageID = g_pushNotify->sendNewFanclubNewsNotification(header, bigText, pUserCon->m_userID, newsIndex);
+            messageID       = g_pushNotify->sendNewFanclubNewsNotification(header, bigText, pUserCon->m_userID, newsIndex);
             rootAns.insert("ack", ERROR_CODE_SUCCESS);
         }
     }

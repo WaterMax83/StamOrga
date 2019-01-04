@@ -176,8 +176,9 @@ Flickable {
                         busyIndicatorUserlogin.loadingVisible = true;
                         busyIndicatorUserlogin.infoVisible = true;
                         busyIndicatorUserlogin.infoText = "Ändere Nutzernamen"
-                        gConUserSettings.startUpdateReadableName(text.trim());
-//                        userIntUser.startUpdateReadableName(text)
+
+                        currentUserCommand = 1;
+                        gDataUserManager.startUpdateReadableName(text.trim());
                     }
                 }
                 Text {
@@ -255,6 +256,7 @@ Flickable {
     }
 
 
+    property int currentUserCommand : 0
     function notifyUserIntConnectionFinished(result, msg) {
         btnSendData.enabled = true
         busyIndicatorUserlogin.loadingVisible = false;
@@ -273,30 +275,28 @@ Flickable {
         }
     }
 
-    function notifyUserIntUpdatePasswordFinished(result) {
+    function notifyUserCommandFinished(result) {
         busyIndicatorUserlogin.loadingVisible = false;
         busyIndicatorUserlogin.infoVisible = false;
-        if (result === 1) {
-            toastManager.show("Passwort erfolgreich geändert", 2000)
-            busyIndicatorUserlogin.infoVisible = false;
-        }
-        else {
-            busyIndicatorUserlogin.infoText = "Fehler beim Passwort ändern"
-            toastManager.show(userIntUser.getErrorCodeToString(result), 5000)
-        }
-    }
 
-
-    function notifyUserIntUpdateReadableNameFinished(result) {
-        busyIndicatorUserlogin.loadingVisible = false;
-
-        if (result === 1) {
-            toastManager.show("Nutzername erfolgreich geändert", 2000)
-            busyIndicatorUserlogin.infoVisible = false;
-        }
-        else {
-            busyIndicatorUserlogin.infoText = "Fehler beim Namen ändern"
-            toastManager.show(userIntUser.getErrorCodeToString(result), 5000)
+        if (currentUserCommand === 1) { // change readableName
+            if (result === 1) {
+                toastManager.show("Nutzername erfolgreich geändert", 2000)
+                busyIndicatorUserlogin.infoVisible = false;
+            }
+            else {
+                busyIndicatorUserlogin.infoText = "Fehler beim Namen ändern"
+                toastManager.show(userIntUser.getErrorCodeToString(result), 5000)
+            }
+        } else if (currentUserCommand === 2) { // change password
+            if (result === 1) {
+                toastManager.show("Passwort erfolgreich geändert", 2000)
+                busyIndicatorUserlogin.infoVisible = false;
+            }
+            else {
+                busyIndicatorUserlogin.infoText = "Fehler beim Passwort ändern"
+                toastManager.show(userIntUser.getErrorCodeToString(result), 5000)
+            }
         }
     }
 
@@ -339,8 +339,10 @@ Flickable {
                 labelPasswordTooShort.visible = true
                 changePassWordDialog.open()
             } else if (txtnewPassWord.text.trim() == txtnewPassWordReplay.text.trim()) {
-                gConUserSettings.startUpdatePassword(txtnewPassWord.text.trim());
-//                userIntUser.startUpdateUserPassword()
+
+                currentUserCommand = 2;
+                gDataUserManager.startUpdatePassword(txtnewPassWord.text.trim());
+
                 busyIndicatorUserlogin.loadingVisible = true;
                 busyIndicatorUserlogin.infoVisible = true;
                 busyIndicatorUserlogin.infoText = "Ändere Passwort"

@@ -58,7 +58,8 @@ SOURCES += main.cpp \
     ../Data/cdatamediamanager.cpp \
     ../Data/cdatamediaprovider.cpp \
     ../Data/cdatawebpagemanager.cpp \
-    ../Data/textdataitem.cpp
+    ../Data/textdataitem.cpp \
+    ../Data/cdatausermanager.cpp
 
 
 RESOURCES += qml.qrc
@@ -123,7 +124,8 @@ HEADERS += \
     ../Data/cdatamediamanager.h \
     ../Data/cdatamediaprovider.h \
     ../Data/cdatawebpagemanager.h \
-    ../Data/textdataitem.h
+    ../Data/textdataitem.h \
+    ../Data/cdatausermanager.h
 
 INCLUDEPATH += \
     ../ \

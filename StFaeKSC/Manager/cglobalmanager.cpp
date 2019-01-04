@@ -28,6 +28,7 @@
 #include "cstadiumwebpagemanager.h"
 #include "cstatisticmanager.h"
 #include "cticketmanager.h"
+#include "cusermanager.h"
 
 cGlobalManager::cGlobalManager(QObject* parent)
     : cGenDisposer(parent)
@@ -38,7 +39,10 @@ qint32 cGlobalManager::initialize()
 {
     qint32 rValue;
 
-    rValue = g_GamesManager.initialize();
+    rValue = g_UserManager.initialize();
+
+    if (rValue == ERROR_CODE_SUCCESS)
+        rValue = g_GamesManager.initialize();
 
     if (rValue == ERROR_CODE_SUCCESS)
         rValue = g_TicketManager.initialize();

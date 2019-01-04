@@ -27,6 +27,7 @@
 #include "../Common/Network/messageprotocol.h"
 #include "../Data/cdatagamesmanager.h"
 #include "../Data/cdataticketmanager.h"
+#include "../Data/cdatausermanager.h"
 #include "../cstaglobalsettings.h"
 #include "../cstaversionmanager.h"
 #include "cconmanager.h"
@@ -185,7 +186,7 @@ void cConManager::slotDataConLastRequestFinished(TcpDataConRequest* request)
                 if (request->m_request != OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN)
                     this->sendNewRequest(request);
                 else
-                    g_ConUserSettings->startUpdatePassword("");
+                    g_DataUserManager->startUpdatePassword("");
                 this->m_lRequestConError.removeLast();
             }
             QString passWord = this->m_mainConRequestPassWord;

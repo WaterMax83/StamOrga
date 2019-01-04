@@ -113,7 +113,7 @@ qint32 ConfigList::getItemIndex(const QString name)
     return -1;
 }
 
-QString ConfigList::getItemName(qint32 index)
+QString ConfigList::getItemName(const qint32 index)
 {
     QMutexLocker locker(&this->m_mInternalInfoMutex);
 
@@ -122,6 +122,17 @@ QString ConfigList::getItemName(qint32 index)
             return this->m_lInteralList[i]->m_itemName;
     }
     return "";
+}
+
+qint64 ConfigList::getTimeStamp(const qint32 index)
+{
+    QMutexLocker locker(&this->m_mInternalInfoMutex);
+
+    for (int i = 0; i < this->getNumberOfInternalList(); i++) {
+        if (this->m_lInteralList[i]->m_index == index)
+            return this->m_lInteralList[i]->m_timestamp;
+    }
+    return -1;
 }
 
 QString ConfigList::getFileName()

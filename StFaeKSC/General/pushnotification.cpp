@@ -172,7 +172,7 @@ qint64 PushNotification::sendNewVersionNotification()
     return push->m_sendMessageID;
 }
 
-#define BODY_GAME "%1 gegen %2"
+#define BODY_GAME "%1 - %2"
 #define BIG_TEXT_MEETING "Am %1 beim Spiel %2:%3 wurde ein neues Treffen von %4 angelegt."
 #define BIG_TEXT_AWAYTRIP "Am %1 beim Spiel %2:%3 wurde eine neue Fahrt von %4 angelegt."
 
@@ -182,22 +182,24 @@ qint64 PushNotification::sendNewMeetingNotification(const GamesPlay* pGame, QStr
         return ERROR_CODE_NOT_READY;
 
     PushNotifyInfo* push = new PushNotifyInfo();
-    push->m_body           = QString(BODY_GAME).arg(pGame->m_itemName, pGame->m_away);
-    push->m_summary        = QDateTime::fromMSecsSinceEpoch(pGame->m_timestamp).toString("dd.MM.yy");
+    push->m_body         = QString(BODY_GAME).arg(pGame->m_itemName, pGame->m_away);
+    push->m_summary      = QDateTime::fromMSecsSinceEpoch(pGame->m_timestamp).toString("dd.MM.yy");
     if (IS_PLAY_ONLY_FANCLUB(pGame->m_options))
         push->m_topic = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_FAN_NEWS;
     else
         push->m_topic      = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING;
     push->m_userEventTopic = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING;
     if (type == MEETING_TYPE_MEETING) {
-        push->m_header  = "Neues Treffen";
+        push->m_header = "Neues Treffen";
         bigText.prepend(QString(BIG_TEXT_MEETING).arg(push->m_summary, pGame->m_itemName, pGame->m_away, this->m_pGlobalData->m_UserList.getReadableName(userID)));
         bigText.append(QString("Kommst du auch?"));
     } else {
-        push->m_header  = "Neue Fahrt";
+        push->m_header = "Neue Fahrt";
         bigText.prepend(QString(BIG_TEXT_AWAYTRIP).arg(push->m_summary, pGame->m_itemName, pGame->m_away, this->m_pGlobalData->m_UserList.getReadableName(userID)));
         bigText.append(QString("Kommst du mit?"));
     }
+    if (pGame->m_competition == 7)
+        bigText.replace("Spiel", "Event");
     push->m_bigText        = bigText;
     push->m_sendMessageID  = getNextInternalPushNumber();
     push->m_sendTime       = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND; // 5min
@@ -223,6 +225,7 @@ qint64 PushNotification::sendChangeMeetingNotification(const GamesPlay* pGame, Q
     foreach (PushNotifyInfo* p, this->m_lPushToSend) {
         if (p->m_userEventTopic == PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_MEETING) {
             if (p->m_internalIndex1 == pGame->m_index) {
+                p->m_bigText = bigText;
                 this->m_notifyMutex.unlock();
                 return -1;
             }
@@ -232,8 +235,8 @@ qint64 PushNotification::sendChangeMeetingNotification(const GamesPlay* pGame, Q
     this->m_notifyMutex.unlock();
 
     PushNotifyInfo* push = new PushNotifyInfo();
-    push->m_body           = QString(BODY_GAME).arg(pGame->m_itemName, pGame->m_away);
-    push->m_summary        = QDateTime::fromMSecsSinceEpoch(pGame->m_timestamp).toString("dd.MM.yy");
+    push->m_body         = QString(BODY_GAME).arg(pGame->m_itemName, pGame->m_away);
+    push->m_summary      = QDateTime::fromMSecsSinceEpoch(pGame->m_timestamp).toString("dd.MM.yy");
     if (IS_PLAY_ONLY_FANCLUB(pGame->m_options))
         push->m_topic = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_FAN_NEWS;
     else
@@ -244,10 +247,12 @@ qint64 PushNotification::sendChangeMeetingNotification(const GamesPlay* pGame, Q
         bigText.prepend(QString(BIG_TEXT_CHG_MEETING).arg(push->m_summary, pGame->m_itemName, pGame->m_away, this->m_pGlobalData->m_UserList.getReadableName(userID)));
         bigText.append(QString("Kommst du auch?"));
     } else {
-        push->m_header     = "Fahrt";
+        push->m_header = "Fahrt";
         bigText.prepend(QString(BIG_TEXT_CHG_AWAYTRIP).arg(push->m_summary, pGame->m_itemName, pGame->m_away, this->m_pGlobalData->m_UserList.getReadableName(userID)));
         bigText.append(QString("Kommst du mit?"));
     }
+    if (pGame->m_competition == 7)
+        bigText.replace("Spiel", "Event");
     push->m_bigText        = bigText;
     push->m_sendMessageID  = getNextInternalPushNumber();
     push->m_sendTime       = QDateTime::currentMSecsSinceEpoch() + WAIT_TIME_BEFORE_SEND;
@@ -355,6 +360,8 @@ qint64 PushNotification::sendNewFanclubNewsNotification(const QString body, cons
 
     foreach (PushNotifyInfo* p, this->m_lPushToSend) {
         if (p->m_userEventTopic == PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_FAN_NEWS) {
+            p->m_body    = body;
+            p->m_bigText = bigText;
             this->m_notifyMutex.unlock();
             return -1;
         }
@@ -387,7 +394,7 @@ qint64 PushNotification::sendNewMeetingComment(const QString comment, const qint
     if (!this->m_initialized)
         return ERROR_CODE_NOT_READY;
 
-    QString date           = QDateTime::fromMSecsSinceEpoch(pGame->m_timestamp).toString("dd.MM.yy");
+    QString         date   = QDateTime::fromMSecsSinceEpoch(pGame->m_timestamp).toString("dd.MM.yy");
     PushNotifyInfo* push   = new PushNotifyInfo();
     push->m_topic          = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_COMMENT;
     push->m_userEventTopic = PUSH_NOTIFY_TOPIC::PUSH_NOT_NEW_COMMENT;
@@ -413,6 +420,8 @@ qint64 PushNotification::sendNewStadiumWebPageNotification(const QString body, c
     foreach (PushNotifyInfo* p, this->m_lPushToSend) {
         if (p->m_userEventTopic == PUSH_NOTIFY_TOPIC::PUSH_NOT_STADIUM_WEBPAGE) {
             if (p->m_internalIndex1 == webPageIndex) {
+                p->m_body    = body;
+                p->m_bigText = QString("Es gibt neue Änderungen bei %1").arg(body);
                 this->m_notifyMutex.unlock();
                 return -1;
             }

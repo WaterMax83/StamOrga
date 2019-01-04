@@ -45,8 +45,6 @@
 #define USER_SALT       "Salt"
 #define USER_READABLE   "ReadableName"
 
-#define USER_IS_ENABLED(val) ((this->m_userProperties & val) > 0 ? true : false)
-
 // clang-format on
 
 
@@ -245,62 +243,6 @@ qint32 cConUserSettings::handleUserPropsResponse(MessageProtocol* msg)
     return rValue;
 }
 
-qint32 cConUserSettings::startUpdateReadableName(QString name)
-{
-    QJsonObject rootObj;
-    rootObj.insert("reableName", name);
-
-    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME);
-    req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
-
-    this->m_newReadableName = name;
-
-    g_ConManager->sendNewRequest(req);
-    return ERROR_CODE_SUCCESS;
-}
-
-qint32 cConUserSettings::handleUpdateReadableNameResponse(MessageProtocol* msg)
-{
-    qint32 rValue = msg->getIntData();
-    if (rValue == ERROR_CODE_SUCCESS)
-        this->setReadableName(this->m_newReadableName);
-
-    this->m_newReadableName.clear();
-    return rValue;
-}
-
-qint32 cConUserSettings::startUpdatePassword(QString password)
-{
-    QString newPassWord;
-    if (password.length() > 0)
-        newPassWord = this->createHashValue(password, this->getSalt());
-    else
-        newPassWord = this->m_newPassWord;
-    QString     currentPassWord = this->createHashValue(this->getPassWord(), this->m_currentRandomValue);
-    QJsonObject rootObj;
-    rootObj.insert("new", newPassWord);
-    rootObj.insert("current", currentPassWord);
-
-    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN);
-    req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
-
-    this->m_newPassWord = newPassWord;
-
-    g_ConManager->sendNewRequest(req);
-    return ERROR_CODE_SUCCESS;
-}
-
-qint32 cConUserSettings::handleUpdatePasswordResponse(MessageProtocol* msg)
-{
-    qint32 rValue = msg->getIntData();
-    if (rValue == ERROR_CODE_SUCCESS)
-        this->setPassWord(this->m_newPassWord);
-
-    this->m_newPassWord.clear();
-
-    return rValue;
-}
-
 QString cConUserSettings::createHashValue(const QString first, const QString second)
 {
     this->m_hash->reset();
@@ -314,27 +256,27 @@ QString cConUserSettings::createHashValue(const QString first, const QString sec
 
 bool cConUserSettings::userIsDebugEnabled()
 {
-    return USER_IS_ENABLED(USER_ENABLE_LOG);
+    return USER_IS_ENABLED(this->m_userProperties, USER_ENABLE_LOG);
 }
 bool cConUserSettings::userIsGameAddingEnabled()
 {
-    return USER_IS_ENABLED(USER_ENABLE_ADD_GAME);
+    return USER_IS_ENABLED(this->m_userProperties, USER_ENABLE_ADD_GAME);
 }
 bool cConUserSettings::userIsGameFixedTimeEnabled()
 {
-    return USER_IS_ENABLED(USER_ENABLE_FIXED_GAME_TIME);
+    return USER_IS_ENABLED(this->m_userProperties, USER_ENABLE_FIXED_GAME_TIME);
 }
 bool cConUserSettings::userIsFanclubEnabled()
 {
-    return USER_IS_ENABLED(USER_ENABLE_FANCLUB);
+    return USER_IS_ENABLED(this->m_userProperties, USER_ENABLE_FANCLUB);
 }
 bool cConUserSettings::userIsFanclubEditEnabled()
 {
-    return USER_IS_ENABLED(USER_ENABLE_FANCLUB_EDIT);
+    return USER_IS_ENABLED(this->m_userProperties, USER_ENABLE_FANCLUB_EDIT);
 }
 bool cConUserSettings::userIsConsoleEnabled()
 {
-    return USER_IS_ENABLED(USER_ENABLE_CONSOLE);
+    return USER_IS_ENABLED(this->m_userProperties, USER_ENABLE_CONSOLE);
 }
 
 cConUserSettings::~cConUserSettings()

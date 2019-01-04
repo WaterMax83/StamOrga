@@ -152,6 +152,10 @@ ApplicationWindow {
                 implicitWidth: drawer.width
                 implicitHeight: drawer.height
                 highlight: highlightBar
+                clip: true
+                snapMode: ListView.SnapToItem
+
+                boundsBehavior: Flickable.StopAtBounds
 
                 delegate: listDelegate
 
@@ -159,10 +163,10 @@ ApplicationWindow {
                     id: listViewListModel
                     Component.onCompleted: {
                         append({
-                                   title: "Benutzerprofil",
-                                   element: viewUserLogin,
+                                   title: "Benutzer",
+                                   element: viewUserOverview,
                                    event: 0,
-                                   toolButtonImgSource: "images/menu.png",
+//                                   toolButtonImgSource: "images/menu.png",
                                    listImgSource : "images/account.png"
                                })
                         append({
@@ -311,12 +315,16 @@ ApplicationWindow {
         }
     }
 
+    MyPages.UserLogin {
+        visible: false
+        userIntUser: userInt
+        id: viewUserLogin
+    }
+
     /* Need components because otherwise they will be shown in main view */
     Component {
-        id: viewUserLogin
-        MyPages.UserLogin {
-            userIntUser: userInt
-        }
+        id: viewUserOverview
+        MyPages.UserOverview {}
     }
     Component {
         id: viewSeasonTickets
@@ -354,6 +362,13 @@ ApplicationWindow {
     UserInterface {
         id: userInt
         onNotifyConnectionFinished: {
+            if (result !== 1) {
+                console.log(stackView.currentItem)
+                console.log(viewUserLogin)
+                if (stackView.currentItem !== viewUserLogin)
+                    stackView.push(viewUserLogin)
+            }
+
             if (stackView.currentItem.notifyUserIntConnectionFinished)
                 stackView.currentItem.notifyUserIntConnectionFinished(result, msg)
         }
@@ -439,10 +454,7 @@ ApplicationWindow {
             if (stackView.currentItem.notifyGetUserProperties)
                 stackView.currentItem.notifyGetUserProperties(result);
         }
-
-
-        onNotifyUpdatePasswordRequestFinished: stackView.currentItem.notifyUserIntUpdatePasswordFinished(result)
-        onNotifyUpdateReadableNameRequest:  stackView.currentItem.notifyUserIntUpdateReadableNameFinished(result)
+        onNotifyUserCommandFinished: stackView.currentItem.notifyUserCommandFinished(result)
 
         onNotifyGamesListFinished: viewMainGames.notifyUserIntGamesListFinished(result)
         onNotifyGamesInfoListFinished: viewMainGames.notifyUserIntGamesInfoListFinished(result);
@@ -494,7 +506,6 @@ ApplicationWindow {
             stackView.push(viewUserLogin)
             imageToolButton.visible = false
         } else {
-            //            stackView.currentItem.showListedGames()
             gStaGlobalSettings.checkNewStateChangedAtStart();
 
             if (!gStaVersionManager.isVersionChangeAlreadyShown()) {

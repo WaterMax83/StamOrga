@@ -34,6 +34,7 @@
 #include "../Data/cdatanewsdatamanager.h"
 #include "../Data/cdatastatisticmanager.h"
 #include "../Data/cdataticketmanager.h"
+#include "../Data/cdatausermanager.h"
 #include "../Data/cdatawebpagemanager.h"
 #include "../cstaglobalsettings.h"
 #include "../cstaversionmanager.h"
@@ -190,10 +191,10 @@ void cConTcpData::checkNewOncomingData()
             break;
 
         case OP_CODE_CMD_RES::ACK_USER_CHANGE_LOGIN:
-            request->m_result = g_ConUserSettings->handleUpdatePasswordResponse(msg);
+            request->m_result = g_DataUserManager->handleUpdatePasswordResponse(msg);
             break;
-        case OP_CODE_CMD_RES::ACK_USER_CHANGE_READNAME:
-            request->m_result = g_ConUserSettings->handleUpdateReadableNameResponse(msg);
+        case OP_CODE_CMD_RES::ACK_USER_COMMAND:
+            request->m_result = g_DataUserManager->handleUserCommandResponse(msg);
             break;
 
         case OP_CODE_CMD_RES::ACK_GET_GAMES_LIST:

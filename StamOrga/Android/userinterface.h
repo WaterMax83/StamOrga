@@ -63,8 +63,7 @@ signals:
     void notifyVersionRequestFinished(qint32 result);
     void notifyUserPropertiesFinished(qint32 result);
     void notifyConsoleCommandFinished(qint32 result);
-    void notifyUpdatePasswordRequestFinished(qint32 result);
-    void notifyUpdateReadableNameRequest(qint32 result);
+    void notifyUserCommandFinished(qint32 result);
     void notifyGamesListFinished(qint32 result);
     void notifyGamesInfoListFinished(qint32 result);
     void notifyChangedGameFinished(qint32 result);

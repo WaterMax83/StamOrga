@@ -68,7 +68,7 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
         break;
 
     case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
-        emit this->notifyUpdatePasswordRequestFinished(result);
+        emit this->notifyUserCommandFinished(result);
         break;
 
     case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
@@ -79,8 +79,8 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
         emit this->notifyConsoleCommandFinished(result);
         break;
 
-    case OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME:
-        emit this->notifyUpdateReadableNameRequest(result);
+    case OP_CODE_CMD_REQ::REQ_USER_COMMAND:
+        emit this->notifyUserCommandFinished(result);
         break;
 
     case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
@@ -182,9 +182,9 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
         emit this->notifyDeleteFanclubNewsItemFinished(result);
         break;
 
-    //    case OP_CODE_CMD_REQ::REQ_GET_USER_EVENTS:
-    //        emit this->notifyGetUserEvents(result);
-    //        break;
+        //    case OP_CODE_CMD_REQ::REQ_GET_USER_EVENTS:
+        //        emit this->notifyGetUserEvents(result);
+        //        break;
 
     case OP_CODE_CMD_REQ::REQ_SET_USER_EVENTS:
         if (result == ERROR_CODE_SUCCESS)

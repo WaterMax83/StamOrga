@@ -29,6 +29,7 @@
 #include "../Manager/cstadiumwebpagemanager.h"
 #include "../Manager/cstatisticmanager.h"
 #include "../Manager/cticketmanager.h"
+#include "../Manager/cusermanager.h"
 #include "ccontcpmaindata.h"
 
 cConTcpDataServer::cConTcpDataServer()
@@ -192,20 +193,24 @@ MessageProtocol* cConTcpDataServer::checkNewMessage(MessageProtocol* msg)
         //        ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_NOT_LOGGED_IN);
         switch (msg->getIndex()) {
         case OP_CODE_CMD_REQ::REQ_GET_VERSION:
-            ack = g_ConTcpMainData.getUserCheckVersion(this->m_pUserConData, msg);
+            ack = g_UserManager.getUserCheckVersion(this->m_pUserConData, msg);
             break;
         case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
-            ack = g_ConTcpMainData.getUserProperties(this->m_pUserConData, msg);
+            ack = g_UserManager.getUserProperties(this->m_pUserConData, msg);
             break;
         case OP_CODE_CMD_REQ::REQ_USER_CHANGE_READNAME:
-            ack = g_ConTcpMainData.getUserChangeReadableName(this->m_pUserConData, msg);
+            ack = g_UserManager.getUserChangeReadableName(this->m_pUserConData, msg);
             break;
         case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
-            ack = g_ConTcpMainData.getUserChangePassword(this->m_pUserConData, msg);
+            ack = g_UserManager.getUserChangePassword(this->m_pUserConData, msg);
             break;
         case OP_CODE_CMD_REQ::REQ_SET_USER_EVENTS:
-            ack = g_ConTcpMainData.getSetUserEvent(this->m_pUserConData, msg);
+            ack = g_UserManager.getSetUserEvent(this->m_pUserConData, msg);
             break;
+        case OP_CODE_CMD_REQ::REQ_USER_COMMAND:
+            ack = g_UserManager.getUserCommandResponse(this->m_pUserConData, msg);
+            break;
+
         case OP_CODE_CMD_REQ::REQ_SEND_CONSOLE_CMD:
             ack = g_Console->getCommandAnswer(this->m_pUserConData, msg);
             break;
@@ -285,7 +290,7 @@ MessageProtocol* cConTcpDataServer::checkNewMessage(MessageProtocol* msg)
             break;
         }
     } else if (msg->getIndex() == OP_CODE_CMD_REQ::REQ_LOGIN_USER) {
-        ack = g_ConTcpMainData.getUserCheckLogin(this->m_pUserConData, msg);
+        ack = g_UserManager.getUserCheckLogin(this->m_pUserConData, msg);
     } else
         ack = new MessageProtocol(OP_CODE_CMD_RES::ACK_NOT_LOGGED_IN);
     return ack;

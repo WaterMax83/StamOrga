@@ -129,11 +129,11 @@ enum MeetingType {
 };
 
 extern CompetitionIndex getCompetitionIndex(QString comp);
-extern QString getCompetitionString(CompetitionIndex index);
-extern QString getCompetitionShortString(CompetitionIndex index);
-extern QString createRandomString(qint32 size);
-extern QString getTimeStampSinceString(QDateTime& time);
-extern bool gIsGameASeasonTicketGame(CompetitionIndex comp);
+extern QString          getCompetitionString(CompetitionIndex index);
+extern QString          getCompetitionShortString(CompetitionIndex index);
+extern QString          createRandomString(qint32 size);
+extern QString          getTimeStampSinceString(QDateTime& time);
+extern bool             gIsGameASeasonTicketGame(CompetitionIndex comp);
 
 // clang-format off
 #define USER_ENABLE_LOG                     0x0001
@@ -142,6 +142,9 @@ extern bool gIsGameASeasonTicketGame(CompetitionIndex comp);
 #define USER_ENABLE_FANCLUB                 0x0008
 #define USER_ENABLE_FANCLUB_EDIT            0x0010
 #define USER_ENABLE_CONSOLE                 0x0020
+#define USER_ENABLE_ADMIN                   0x1000
+
+#define USER_IS_ENABLED(prop, val) ((prop & USER_ENABLE_ADMIN) > 0 ? true : ((prop & val) > 0 ? true : false))
 // clang-format on
 
 

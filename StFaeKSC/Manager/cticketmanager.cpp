@@ -59,10 +59,10 @@ MessageProtocol* cTicketManager::getSeasonTicketList(UserConData* pUserCon, Mess
     rootAns.insert("ack", ERROR_CODE_SUCCESS);
     rootAns.insert("index", updateIndex);
 
-    quint16 numbOfTickets = g_GlobalData->m_SeasonTicket.getNumberOfInternalList();
+    qint32 numbOfTickets = g_GlobalData->m_SeasonTicket.getNumberOfInternalList();
 
     QJsonArray arrTickets;
-    for (quint32 i = 0; i < numbOfTickets; i++) {
+    for (qint32 i = 0; i < numbOfTickets; i++) {
         TicketInfo* pTicket = (TicketInfo*)(g_GlobalData->m_SeasonTicket.getRequestConfigItemFromListIndex(i));
         if (pTicket == NULL || pTicket->isTicketRemoved())
             continue;
@@ -164,7 +164,7 @@ MessageProtocol* cTicketManager::getAvailableSeasonTicketList(UserConData* pUser
         else {
 
             rootAns.insert("game", index);
-//            bool bFoundTicket = false;
+            //            bool bFoundTicket = false;
             foreach (AvailableGameTickets* ticket, g_GlobalData->m_availableTickets) {
                 if (ticket->getGameIndex() == index) {
                     qint32     totalCount = ticket->getNumberOfInternalList();
@@ -191,7 +191,7 @@ MessageProtocol* cTicketManager::getAvailableSeasonTicketList(UserConData* pUser
                     }
                     rootAns.insert("free", freeTickets);
                     rootAns.insert("reserved", reservedTickets);
-//                    bFoundTicket = true;
+                    //                    bFoundTicket = true;
 
                     break;
                 }
