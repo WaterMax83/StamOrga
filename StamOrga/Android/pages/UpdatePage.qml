@@ -56,10 +56,7 @@ Flickable {
                 color: "white"
                 text: "Deine Version: <a href=\"tmp\">" + gStaVersionManager.getCurrentVersion() + "</a>"
                 onLinkActivated: {
-                    var component = Qt.createComponent("../pages/newVersionInfo.qml");
-                    if (component.status === Component.Ready) {
-                        stackView.push(component);
-                    }
+                        stackView.push(viewSettingsVersionInfoPage);
                 }
             }
 

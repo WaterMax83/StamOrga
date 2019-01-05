@@ -41,7 +41,7 @@ qint32 cStaSettingsManager::initialize()
 }
 
 /************************ QString values ******************************/
-qint32 cStaSettingsManager::getValue(const QString group, const QString key, QString& value, const QString defaultValue)
+qint32 cStaSettingsManager::getValue(const QString& group, const QString& key, QString& value, const QString& defaultValue)
 {
     QVariant vValue;
     qint32   rValue = this->getValue(group, key, vValue, QVariant(defaultValue));
@@ -52,12 +52,12 @@ qint32 cStaSettingsManager::getValue(const QString group, const QString key, QSt
     return rValue;
 }
 
-qint32 cStaSettingsManager::setValue(const QString group, const QString key, const QString value)
+qint32 cStaSettingsManager::setValue(const QString& group, const QString& key, const QString& value)
 {
     return this->setValue(group, key, QVariant(value));
 }
 
-qint32 cStaSettingsManager::getValue(const QString group, const QString key, const qint32 index, QString& value)
+qint32 cStaSettingsManager::getValue(const QString& group, const QString& key, const qint32 index, QString& value)
 {
     QVariant vValue;
     qint32   rValue = this->getValue(group, key, index, vValue, QVariant(""));
@@ -68,13 +68,13 @@ qint32 cStaSettingsManager::getValue(const QString group, const QString key, con
     return rValue;
 }
 
-qint32 cStaSettingsManager::setValue(const QString group, const QString key, const qint32 index, const QString value)
+qint32 cStaSettingsManager::setValue(const QString& group, const QString& key, const qint32 index, const QString& value)
 {
     return this->setValue(group, key, index, QVariant(value));
 }
 
 /************************ Boolean values ******************************/
-qint32 cStaSettingsManager::getBoolValue(const QString group, const QString key, bool& value, const bool defaultValue)
+qint32 cStaSettingsManager::getBoolValue(const QString& group, const QString& key, bool& value, const bool defaultValue)
 {
     QVariant vValue;
     qint32   rValue = this->getValue(group, key, vValue, QVariant(defaultValue));
@@ -85,12 +85,12 @@ qint32 cStaSettingsManager::getBoolValue(const QString group, const QString key,
     return rValue;
 }
 
-qint32 cStaSettingsManager::setBoolValue(const QString group, const QString key, const bool value)
+qint32 cStaSettingsManager::setBoolValue(const QString& group, const QString& key, const bool value)
 {
     return this->setValue(group, key, QVariant(value));
 }
 
-qint32 cStaSettingsManager::getBoolValue(const QString group, const QString key, const qint32 index, bool& value)
+qint32 cStaSettingsManager::getBoolValue(const QString& group, const QString& key, const qint32 index, bool& value)
 {
     QVariant vValue;
     qint32   rValue = this->getValue(group, key, index, vValue, QVariant(false));
@@ -101,13 +101,13 @@ qint32 cStaSettingsManager::getBoolValue(const QString group, const QString key,
     return rValue;
 }
 
-qint32 cStaSettingsManager::setBoolValue(const QString group, const QString key, const qint32 index, const bool value)
+qint32 cStaSettingsManager::setBoolValue(const QString& group, const QString& key, const qint32 index, const bool value)
 {
     return this->setValue(group, key, index, QVariant(value));
 }
 
 /************************ qint32 values ******************************/
-qint32 cStaSettingsManager::getInt32ValueDF(const QString group, const QString key, qint32& value, const qint32 defaultValue)
+qint32 cStaSettingsManager::getInt32ValueDF(const QString& group, const QString& key, qint32& value, const qint32 defaultValue)
 {
     QVariant vValue;
     qint32   rValue = this->getValue(group, key, vValue, QVariant(defaultValue));
@@ -118,12 +118,12 @@ qint32 cStaSettingsManager::getInt32ValueDF(const QString group, const QString k
     return rValue;
 }
 
-qint32 cStaSettingsManager::setInt32Value(const QString group, const QString key, const qint32 value)
+qint32 cStaSettingsManager::setInt32Value(const QString& group, const QString& key, const qint32 value)
 {
     return this->setValue(group, key, QVariant(value));
 }
 
-qint32 cStaSettingsManager::getInt32Value(const QString group, const QString key, const qint32 index, qint32& value)
+qint32 cStaSettingsManager::getInt32Value(const QString& group, const QString& key, const qint32 index, qint32& value)
 {
     QVariant vValue;
     qint32   rValue = this->getValue(group, key, index, vValue, QVariant(0));
@@ -134,13 +134,13 @@ qint32 cStaSettingsManager::getInt32Value(const QString group, const QString key
     return rValue;
 }
 
-qint32 cStaSettingsManager::setInt32Value(const QString group, const QString key, const qint32 index, const qint32 value)
+qint32 cStaSettingsManager::setInt32Value(const QString& group, const QString& key, const qint32 index, const qint32 value)
 {
     return this->setValue(group, key, index, QVariant(value));
 }
 
 /************************ qint64 values ******************************/
-qint32 cStaSettingsManager::getInt64Value(const QString group, const QString key, qint64& value, const qint64 defaultValue)
+qint32 cStaSettingsManager::getInt64Value(const QString& group, const QString& key, qint64& value, const qint64 defaultValue)
 {
     QVariant vValue;
     qint32   rValue = this->getValue(group, key, vValue, QVariant(defaultValue));
@@ -151,12 +151,12 @@ qint32 cStaSettingsManager::getInt64Value(const QString group, const QString key
     return rValue;
 }
 
-qint32 cStaSettingsManager::setInt64Value(const QString group, const QString key, const qint64 value)
+qint32 cStaSettingsManager::setInt64Value(const QString& group, const QString& key, const qint64 value)
 {
     return this->setValue(group, key, QVariant(value));
 }
 
-qint32 cStaSettingsManager::getInt64Value(const QString group, const QString key, const qint32 index, qint64& value)
+qint32 cStaSettingsManager::getInt64Value(const QString& group, const QString& key, const qint32 index, qint64& value)
 {
     QVariant vValue;
     qint32   rValue = this->getValue(group, key, index, vValue, QVariant(0));
@@ -167,12 +167,12 @@ qint32 cStaSettingsManager::getInt64Value(const QString group, const QString key
     return rValue;
 }
 
-qint32 cStaSettingsManager::setInt64Value(const QString group, const QString key, const qint32 index, const qint64 value)
+qint32 cStaSettingsManager::setInt64Value(const QString& group, const QString& key, const qint32 index, const qint64 value)
 {
     return this->setValue(group, key, index, QVariant(value));
 }
 
-qint32 cStaSettingsManager::removeGroup(const QString group)
+qint32 cStaSettingsManager::removeGroup(const QString& group)
 {
     qint32 rValue = ERROR_CODE_NOT_FOUND;
     this->m_pMainUserSettings->beginGroup(group);
@@ -189,7 +189,7 @@ qint32 cStaSettingsManager::removeGroup(const QString group)
 
 
 /************************ private ******************************/
-qint32 cStaSettingsManager::getValue(const QString group, const QString key, QVariant& value, const QVariant defaultValue)
+qint32 cStaSettingsManager::getValue(const QString& group, const QString& key, QVariant& value, const QVariant defaultValue)
 {
     if (!this->m_initialized)
         return ERROR_CODE_NOT_INITIALIZED;
@@ -203,7 +203,7 @@ qint32 cStaSettingsManager::getValue(const QString group, const QString key, QVa
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 cStaSettingsManager::setValue(const QString group, const QString key, const QVariant value)
+qint32 cStaSettingsManager::setValue(const QString& group, const QString& key, const QVariant value)
 {
     if (!this->m_initialized)
         return ERROR_CODE_NOT_INITIALIZED;
@@ -219,7 +219,7 @@ qint32 cStaSettingsManager::setValue(const QString group, const QString key, con
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 cStaSettingsManager::getValue(const QString group, const QString key, const qint32 index, QVariant& value, const QVariant defaultValue)
+qint32 cStaSettingsManager::getValue(const QString& group, const QString& key, const qint32 index, QVariant& value, const QVariant defaultValue)
 {
     if (!this->m_initialized)
         return ERROR_CODE_NOT_INITIALIZED;
@@ -243,7 +243,7 @@ qint32 cStaSettingsManager::getValue(const QString group, const QString key, con
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 cStaSettingsManager::setValue(const QString group, const QString key, const qint32 index, const QVariant value)
+qint32 cStaSettingsManager::setValue(const QString& group, const QString& key, const qint32 index, const QVariant value)
 {
     if (!this->m_initialized)
         return ERROR_CODE_NOT_INITIALIZED;

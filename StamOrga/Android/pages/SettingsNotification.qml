@@ -26,17 +26,7 @@ import "../components" as MyComponents
 import "../controls" as MyControls
 
 Item {
-    id: mainItemNotificationSettings
-    property alias enableNewAppVersion : newAppVersion.checked
-    property alias enableMeetingAdded : newMeeting.checked
-    property alias enableNewFreeTicket : newFreeTicket.checked
-    property alias enableFanclubNews: newFanclubNews.checked
-    property alias enableMeetComment: newMeetComment.checked
-    property alias enableStadiumWebPage: newStadiumWebPage.checked
-    property alias visibleFanclubNews: rowFanclubNews.visible
-
-
-//    signal acceptedDialog()
+    id: mainItemSettingsNotification
 
     Pane {
         id: mainPaneNotification
@@ -74,7 +64,8 @@ Item {
                         }
                         CheckBox {
                             id: newAppVersion
-                            onCheckedChanged:if (isNotifyStartupDone) valueWasEditedEnableSave();
+                            checked: gStaGlobalSettings.isNotificationNewAppVersionEnabled()
+                            onCheckedChanged: if (isNotifyStartupDone) gStaGlobalSettings.setNotificationNewAppVersionEnabled(checked);
                         }
                     }
 
@@ -89,7 +80,8 @@ Item {
                         }
                         CheckBox {
                             id: newMeeting
-                            onCheckedChanged:if (isNotifyStartupDone) valueWasEditedEnableSave();
+                            checked: gStaGlobalSettings.isNotificationNewMeetingEnabled()
+                            onCheckedChanged:if (isNotifyStartupDone) gStaGlobalSettings.setNotificationNewMeetingEnabled(checked);
                         }
                     }
 
@@ -104,7 +96,8 @@ Item {
                         }
                         CheckBox {
                             id: newFreeTicket
-                            onCheckedChanged:if (isNotifyStartupDone) valueWasEditedEnableSave();
+                            checked: gStaGlobalSettings.isNotificationNewFreeTicketEnabled()
+                            onCheckedChanged:if (isNotifyStartupDone) gStaGlobalSettings.setNotificationNewFreeTicketEnabled(checked);
                         }
                     }
 
@@ -119,12 +112,14 @@ Item {
                         }
                         CheckBox {
                             id: newMeetComment
-                            onCheckedChanged:if (isNotifyStartupDone) valueWasEditedEnableSave();
+                            checked: gStaGlobalSettings.isNotificationMeetingCommentEnabled()
+                            onCheckedChanged:if (isNotifyStartupDone) gStaGlobalSettings.setNotificationMeetingCommentEnabled(checked);
                         }
                     }
 
                     RowLayout {
                         id: rowFanclubNews
+                        visible: gConUserSettings.userIsFanclubEnabled()
                         Text {
                             id: text7
                             text: qsTr("Fanclub:")
@@ -135,7 +130,8 @@ Item {
                         }
                         CheckBox {
                             id: newFanclubNews
-                            onCheckedChanged:if (isNotifyStartupDone) valueWasEditedEnableSave();
+                            checked: gStaGlobalSettings.isNotificationFanclubNewsEnabled()
+                            onCheckedChanged:if (isNotifyStartupDone) gStaGlobalSettings.setNotificationFanclubNewsEnabled(checked);
                         }
                     }
 
@@ -151,7 +147,8 @@ Item {
                         }
                         CheckBox {
                             id: newStadiumWebPage
-                            onCheckedChanged:if (isNotifyStartupDone) valueWasEditedEnableSave();
+                            checked: gStaGlobalSettings.isNotificationStadiumWebpageEnabled()
+                            onCheckedChanged: if (isNotifyStartupDone) gStaGlobalSettings.setNotificationStadiumWebPageEnabled(checked);
                         }
                     }
 
@@ -163,39 +160,37 @@ Item {
 
 
 
-//        RowLayout {
-//            id: rowNotificationButtons
-//            width: parent.width
-//            anchors.bottom: parent.bottom
+        //        RowLayout {
+        //            id: rowNotificationButtons
+        //            width: parent.width
+        //            anchors.bottom: parent.bottom
 
-//            MyControls.Button {
-//                id: acceptButton
-//                text: "Bestätigen"
-//                font.family: txtForFontFamily.font
-//                Layout.alignment: Qt.AlignHCenter
-//                Layout.fillWidth: true
-//                onClicked: {
-//                    acceptedDialog()
-//                    stackView.pop();
-//                }
-//            }
+        //            MyControls.Button {
+        //                id: acceptButton
+        //                text: "Bestätigen"
+        //                font.family: txtForFontFamily.font
+        //                Layout.alignment: Qt.AlignHCenter
+        //                Layout.fillWidth: true
+        //                onClicked: {
+        //                    acceptedDialog()
+        //                    stackView.pop();
+        //                }
+        //            }
 
-//            MyControls.Button {
-//                id: camcelButton
-//                text: "Abbrechen"
-//                font.family: txtForFontFamily.font
-//                Layout.alignment: Qt.AlignHCenter
-//                Layout.fillWidth: true
-//                onClicked: {
-//                    stackView.pop();
-//                }
-//            }
-//        }
+        //            MyControls.Button {
+        //                id: camcelButton
+        //                text: "Abbrechen"
+        //                font.family: txtForFontFamily.font
+        //                Layout.alignment: Qt.AlignHCenter
+        //                Layout.fillWidth: true
+        //                onClicked: {
+        //                    stackView.pop();
+        //                }
+        //            }
+        //        }
 
     }
-    function toolButtonClicked() {
-        saveAllSettings();
-    }
+    function toolButtonClicked() {    }
 
     property bool isNotifyStartupDone: false
 

@@ -208,7 +208,11 @@ QString cStaVersionManager::getVersionChangeInfo()
 {
     QString rValue;
 
-    rValue.append("<b>V1.1.3:</b>(24.11.2018)<br>");
+    rValue.append("<b>V1.1.4:</b>(XX.XX.2019)<br>");
+    rValue.append("- Benachrichtigung erweiterbar<br>");
+    rValue.append("- Einstellungen überarbeitet<br>");
+
+    rValue.append("<br><b>V1.1.3:</b>(24.11.2018)<br>");
     rValue.append("- Überarbeitung Benachrichtigungen<br>");
     rValue.append("- Zeiten besser darstellen<br>");
     rValue.append("- Update Android SDK API<br>");
@@ -283,6 +287,7 @@ QString cStaVersionManager::getVersionChangeInfo()
 
         g_StaSettingsManager->setValue(SETTINGS_GROUP, SETT_LAST_SHOWN_VERSION, this->m_lastShownVersion);
 
+        qInfo() << "Hier wird das aufgerufen";
         g_StaGlobalSettings->updatePushNotification();
     }
 

@@ -104,7 +104,7 @@ void AdrPushNotifyInfoHandler::subscribeToTopic(QString topic)
 #else
     Q_UNUSED(topic);
 
-    qDebug() << "Subscribe to " << topic;
+    qInfo() << "Subscribe to " << topic;
 #endif
 }
 
@@ -122,6 +122,8 @@ void AdrPushNotifyInfoHandler::unSubscribeFromTopic(QString topic)
                                               javaNotification.object<jstring>());
 #else
     Q_UNUSED(topic);
+
+    qInfo() << "Unsubscribe to " << topic;
 #endif
 }
 

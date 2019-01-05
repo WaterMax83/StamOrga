@@ -233,6 +233,7 @@ void cStaGlobalSettings::setAlreadyConnected(const bool con)
 {
     if (con != this->m_bAlreadyConnected) {
         this->m_bAlreadyConnected = con;
+
         this->updatePushNotification();
 
         g_StaSettingsManager->setBoolValue(SETTINGS_GROUP, SETT_ALREADY_CONNECTED, con);

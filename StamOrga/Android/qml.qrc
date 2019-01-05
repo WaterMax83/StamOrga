@@ -11,20 +11,19 @@
         <file>pages/UserLogin.qml</file>
         <file>images/+material/refresh.png</file>
         <file>images/refresh.png</file>
-        <file>pages/UserLoginForm.ui.qml</file>
         <file>pages/SeasonTickets.qml</file>
         <file>images/+material/add.png</file>
         <file>images/add.png</file>
         <file>pages/GamesListPage.qml</file>
         <file>components/VersionDialog.qml</file>
         <file>components/EditableTextDialog.qml</file>
-        <file>pages/LogginPage.qml</file>
+        <file>pages/AdminLogging.qml</file>
         <file>components/AcceptDialog.qml</file>
         <file>images/StammtischLogo.png</file>
         <file>pages/CurrentGamePage.qml</file>
         <file>components/Toast.qml</file>
         <file>components/ToastManager.qml</file>
-        <file>pages/Settings.qml</file>
+        <file>pages/SettingsMain.qml</file>
         <file>pages/CurrentTicketInfo.qml</file>
         <file>components/ChangeGameDialog.qml</file>
         <file>pages/CurrentMeetInfo.qml</file>
@@ -46,7 +45,7 @@
         <file>images/close.png</file>
         <file>images/done.png</file>
         <file>images/help.png</file>
-        <file>pages/newVersionInfo.qml</file>
+        <file>pages/SettingsVersionInfo.qml</file>
         <file>components/EditSeasonTicketDialog.qml</file>
         <file>pages/GamesMainPage.qml</file>
         <file>components/TicketInfoSingleItem.qml</file>
@@ -91,7 +90,7 @@
         <file>images/chart.png</file>
         <file>images/share.png</file>
         <file>images/+material/chart.png</file>
-        <file>pages/Console.qml</file>
+        <file>pages/AdminConsole.qml</file>
         <file>images/+material/send.png</file>
         <file>images/send.png</file>
         <file>controls/TabBar.qml</file>
@@ -99,7 +98,7 @@
         <file>components/CommentItem.qml</file>
         <file>components/ShiftableSeperator.qml</file>
         <file>components/AcceptInfoSingleItem.qml</file>
-        <file>pages/NotificationSettings.qml</file>
+        <file>pages/SettingsNotification.qml</file>
         <file>components/RefreshItem.qml</file>
         <file>components/GamesDesignItem.qml</file>
         <file>components/SeasonTicketDesignItem.qml</file>
@@ -125,5 +124,8 @@
         <file>images/build.png</file>
         <file>pages/UserOverview.qml</file>
         <file>components/UserInformationItem.qml</file>
+        <file>images/+material/notification.png</file>
+        <file>images/notification.png</file>
+        <file>pages/SettingsGeneral.qml</file>
     </qresource>
 </RCC>

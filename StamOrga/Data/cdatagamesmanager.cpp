@@ -171,6 +171,10 @@ bool cDataGamesManager::setGamePlayItemHasEvent(qint32 gameIndex)
 
     for (int i = 0; i < this->m_lGames.count(); i++) {
         if (this->m_lGames[i]->index() == gameIndex) {
+
+            if (this->m_lGames[i]->isGameInPast())
+                return false;
+
             this->m_lGames[i]->setEvent(this->m_lGames[i]->getEvent() + 1);
             return true;
         }

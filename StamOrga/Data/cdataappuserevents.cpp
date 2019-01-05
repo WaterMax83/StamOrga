@@ -91,8 +91,10 @@ qint32 cDataAppUserEvents::addNewUserEvents(QJsonArray& jsArr)
             if (!g_DataGamesManager->setGamePlayItemHasEvent(pEvent->m_info.toInt()))
                 this->startSetUserEvents(pEvent->m_eventID, 0);
         } else if (pEvent->m_type == NOTIFY_TOPIC_STADIUM_WEBPAGE) {
-            g_DataWebPageManager->setWebPageItemHasEvent(pEvent->m_info.toInt());
-            this->m_eventWebPageItems++;
+            if (!g_DataWebPageManager->setWebPageItemHasEvent(pEvent->m_info.toInt()))
+                this->startSetUserEvents(pEvent->m_eventID, 0);
+            else
+                this->m_eventWebPageItems++;
         } else
             continue;
 

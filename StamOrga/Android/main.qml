@@ -157,7 +157,7 @@ ApplicationWindow {
 
                 boundsBehavior: Flickable.StopAtBounds
 
-                delegate: listDelegate
+                delegate: listDelegateDrawer
 
                 model: ListModel {
                     id: listViewListModel
@@ -261,7 +261,7 @@ ApplicationWindow {
     }
 
     Component {
-        id: listDelegate
+        id: listDelegateDrawer
         Item {
             id: delegateItem
             width: listView.width
@@ -340,11 +340,15 @@ ApplicationWindow {
     }
     Component {
         id: viewSettingsPage
-        MyPages.Settings {}
+        MyPages.SettingsMain {}
+    }
+    Component {
+        id: viewSettingsVersionInfoPage
+        MyPages.SettingsVersionInfo {}
     }
     Component{
         id: viewLoggingPage
-        MyPages.LogginPage {}
+        MyPages.AdminLogging {}
     }
     Component{
         id: viewUpdatePage
@@ -356,7 +360,7 @@ ApplicationWindow {
     }
     Component {
         id: viewConsolePage
-        MyPages.Console {}
+        MyPages.AdminConsole {}
     }
 
     UserInterface {
@@ -509,10 +513,10 @@ ApplicationWindow {
             gStaGlobalSettings.checkNewStateChangedAtStart();
 
             if (!gStaVersionManager.isVersionChangeAlreadyShown()) {
-                var component = Qt.createComponent("../pages/newVersionInfo.qml");
-                if (component.status === Component.Ready) {
-                    stackView.push(component);
-                }
+//                var component = Qt.createComponent("../pages/SettingsVersionInfo.qml");
+//                if (component.status === Component.Ready) {
+                    stackView.push(viewSettingsVersionInfoPage);
+//                }
             }
         }
     }
