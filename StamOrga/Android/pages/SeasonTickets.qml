@@ -160,7 +160,7 @@ Flickable {
         }
     }
 
-    function notifyUserIntConnectionFinished(result, msg) {}
+    function notifyUserIntConnectionFinished(result) {}
 
     function pageOpenedUpdateView() {
 

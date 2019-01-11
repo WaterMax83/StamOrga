@@ -90,8 +90,6 @@ private:
     QString          m_title;
     qint32           m_maxX;
     QList<StatBars*> m_statBars;
-
-    qint32 startSendCommand(QJsonObject& rootObj);
 };
 
 extern cDataStatisticManager* g_DataStatisticManager;

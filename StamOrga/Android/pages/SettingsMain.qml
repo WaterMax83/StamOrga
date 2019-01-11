@@ -163,5 +163,5 @@ Item {
         updateHeaderFromMain("Einstellungen", "");
     }
 
-    function notifyUserIntConnectionFinished(result, msg) {}
+    function notifyUserIntConnectionFinished(result) {}
 }

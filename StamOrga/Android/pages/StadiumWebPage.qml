@@ -39,8 +39,10 @@ Item {
         }
 //    }
 
-    function pageOpenedUpdateView() {
+    function pageOpenedUpdateView() { }
 
+    function toolButtonClicked(){
+        gDataWebPageManager.startSetWebPage(textDataItem.header, textDataItem.info);
     }
 
     function startShowElements(textItem, editMode) {
@@ -50,23 +52,31 @@ Item {
         if (textItem !== undefined) {
             gDataWebPageManager.startLoadWebPage(textItem.index, mainWindow.width)
         }
-        updateHeaderFromMain(textItem.header, "")
+        if (gConUserSettings.userIsAdminEnabled())
+            updateHeaderFromMain(textItem.header, "/images/refresh.png")
+        else
+            updateHeaderFromMain(textItem.header, "")
     }
 
-    function notifyWebPageCommandFinished(result){
-        if (result === 1) {
-//            console.log("Laden hat funkioniert");
-            toastManager.show("Seite wird geladen", 2000);
-            if (textDataItem !== undefined) {
-                if (userInt.isStringUrl(textDataItem.info)) {
-                    webView.url = textDataItem.info
-                    webView.reload();
-                } else
-                    webView.loadHtml(textDataItem.info);
+    function notifyWebPageCommandFinished(result, subCmd){
+        if (subCmd === 1) { // load
+            if (result === 1) {
+                toastManager.show("Seite wird geladen", 2000);
+                if (textDataItem !== undefined) {
+                    if (userInt.isStringUrl(textDataItem.info)) {
+                        webView.url = textDataItem.info
+                        webView.reload();
+                    } else
+                        webView.loadHtml(textDataItem.info);
+                }
+            } else {
+                toastManager.show(userInt.getErrorCodeToString(result), 4000);
             }
-//                webView.loadHtml(textDataItem.info);
-        } else {
-            toastManager.show(userInt.getErrorCodeToString(result), 4000);
+        } else if (subCmd === 2) {// set
+            if (result === 1)
+                toastManager.show("Seite wurde gespeichert", 2000);
+            else
+                toastManager.show(userInt.getErrorCodeToString(result), 4000);
         }
     }
 }

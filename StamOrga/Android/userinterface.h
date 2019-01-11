@@ -59,11 +59,11 @@ public:
     }
 
 signals:
-    void notifyConnectionFinished(qint32 result, const QString msg);
+    void notifyConnectionFinished(qint32 result);
     void notifyVersionRequestFinished(qint32 result);
     void notifyUserPropertiesFinished(qint32 result);
     void notifyConsoleCommandFinished(qint32 result);
-    void notifyUserCommandFinished(qint32 result);
+    void notifyUserCommandFinished(const qint32 result, const qint32 subCmd);
     void notifyGamesListFinished(qint32 result);
     void notifyGamesInfoListFinished(qint32 result);
     void notifyChangedGameFinished(qint32 result);
@@ -87,13 +87,13 @@ signals:
     void notifyFanclubNewsListFinished(qint32 result);
     void notifyGetFanclubNewsItemFinished(qint32 result);
     void notifyDeleteFanclubNewsItemFinished(qint32 result);
-    void notifyStatisticsCommandFinished(qint32 result);
+    void notifyStatisticsCommandFinished(const qint32 result, const qint32 subCmd);
     void notifyMediaCommandFinished(qint32 result);
-    void notifyWebPageCommandFinished(qint32 result);
+    void notifyWebPageCommandFinished(const qint32 result, const qint32 subCmd);
 
 public slots:
-    void slotConnectionRequestFinished(qint32 result, const QString msg);
-    void slotCommandFinished(quint32 command, qint32 result);
+    void slotConnectionRequestFinished(const qint32 result);
+    void slotCommandFinished(const quint32 command, const qint32 result, const qint32 subCmd);
 
 
 private:

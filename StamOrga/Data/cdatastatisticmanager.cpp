@@ -26,6 +26,9 @@
 #include "cdatastatisticmanager.h"
 #include "cstaglobalmanager.h"
 
+#define STAT_CMD_OVERVIEW 0
+#define STAT_CMD_CONTENT 1
+
 extern cStaGlobalManager* g_GlobalManager;
 
 cDataStatisticManager* g_DataStatisticManager;
@@ -52,8 +55,15 @@ qint32 cDataStatisticManager::startLoadStatisticOverview()
 
     QJsonObject rootObj;
     rootObj.insert("cmd", "overview");
+    rootObj.insert("type", "cDataStatisticManager");
 
-    return this->startSendCommand(rootObj);
+    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CMD_STATISTIC);
+    req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+    req->m_subCmd          = STAT_CMD_OVERVIEW;
+
+    g_ConManager->sendNewRequest(req);
+
+    return ERROR_CODE_SUCCESS;
 }
 
 qint32 cDataStatisticManager::handleStatisticResponse(MessageProtocol* msg)
@@ -161,8 +171,13 @@ qint32 cDataStatisticManager::startLoadStatisticContent(qint32 catIndex, qint32 
     rootObj.insert("cmd", "content");
     rootObj.insert("parameter", this->m_overView.at(catIndex));
     rootObj.insert("year", this->m_years.at(yearIndex).toInt());
+    rootObj.insert("type", "cDataStatisticManager");
 
-    return this->startSendCommand(rootObj);
+    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CMD_STATISTIC);
+    req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+    req->m_subCmd          = STAT_CMD_CONTENT;
+
+    g_ConManager->sendNewRequest(req);
 
     return ERROR_CODE_SUCCESS;
 }
@@ -173,17 +188,6 @@ StatBars* cDataStatisticManager::getNextStatBar(const qint32 index)
         return NULL;
 
     return this->m_statBars.at(index);
-}
-
-qint32 cDataStatisticManager::startSendCommand(QJsonObject& rootObj)
-{
-    rootObj.insert("type", "cDataStatisticManager");
-
-    TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CMD_STATISTIC);
-    req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
-
-    g_ConManager->sendNewRequest(req);
-    return ERROR_CODE_SUCCESS;
 }
 
 QStringList cDataStatisticManager::getCurrentYearList()

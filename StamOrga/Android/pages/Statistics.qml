@@ -172,13 +172,13 @@ Item {
     }
 
 
-    function notifyStatisticsCommandFinished(result) {
+    function notifyStatisticsCommandFinished(result, subCmd) {
         busyIndicatorStatistic.loadingVisible = false;
         loadAgainButton.visible = false;
 
         if (result === 1) {
 
-            if (iLoadingIndex === 0) {
+            if (subCmd === 0) {
 
                 comboStatisticOverview.model = gDataStatisticManager.getCurrentOverviewList();
                 comboStatisticYear.model = gDataStatisticManager.getCurrentYearList();

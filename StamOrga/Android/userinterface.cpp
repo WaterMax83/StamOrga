@@ -50,13 +50,13 @@ qint32 UserInterface::startMainConnection(QString name, QString passw)
     return g_ConManager->startMainConnection(name, passw);
 }
 
-void UserInterface::slotConnectionRequestFinished(qint32 result, const QString msg)
+void UserInterface::slotConnectionRequestFinished(const qint32 result)
 {
-    emit this->notifyConnectionFinished(result, msg);
+    emit this->notifyConnectionFinished(result);
 }
 
 
-void UserInterface::slotCommandFinished(quint32 command, qint32 result)
+void UserInterface::slotCommandFinished(const quint32 command, const qint32 result, const qint32 subCmd)
 {
     QMutexLocker lock(&this->m_notifyMutex);
 
@@ -68,7 +68,7 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
         break;
 
     case OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN:
-        emit this->notifyUserCommandFinished(result);
+        emit this->notifyUserCommandFinished(result, subCmd);
         break;
 
     case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
@@ -80,7 +80,7 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
         break;
 
     case OP_CODE_CMD_REQ::REQ_USER_COMMAND:
-        emit this->notifyUserCommandFinished(result);
+        emit this->notifyUserCommandFinished(result, subCmd);
         break;
 
     case OP_CODE_CMD_REQ::REQ_GET_GAMES_LIST:
@@ -192,7 +192,7 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
         break;
 
     case OP_CODE_CMD_REQ::REQ_CMD_STATISTIC:
-        emit this->notifyStatisticsCommandFinished(result);
+        emit this->notifyStatisticsCommandFinished(result, subCmd);
         break;
 
     case OP_CODE_CMD_REQ::REQ_CMD_MEDIA:
@@ -200,7 +200,7 @@ void UserInterface::slotCommandFinished(quint32 command, qint32 result)
         break;
 
     case OP_CODE_CMD_REQ::REQ_CMD_STADIUM:
-        emit this->notifyWebPageCommandFinished(result);
+        emit this->notifyWebPageCommandFinished(result, subCmd);
         break;
 
     default:

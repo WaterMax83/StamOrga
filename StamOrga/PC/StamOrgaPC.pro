@@ -46,6 +46,7 @@ SOURCES += main.cpp\
     ../Data/cdatawebpagemanager.cpp \
     ../Data/cdatastatisticmanager.cpp \
     ../Data/cdataticketmanager.cpp \
+    ../Data/cdatausermanager.cpp \
     ../Data/cdatamediamanager.cpp \
     ../Data/gameplay.cpp \
     ../Data/textdataitem.cpp \
@@ -84,6 +85,7 @@ HEADERS  += mainwindow.h \
     ../Data/cdatanewsdatamanager.h \
     ../Data/cdatawebpagemanager.h \
     ../Data/cdatastatisticmanager.h \
+    ../Data/cdatausermanager.h \
     ../Data/cdataticketmanager.h \
     ../Data/cdatamediamanager.h \
     ../Data/gameplay.h \

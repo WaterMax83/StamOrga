@@ -29,6 +29,14 @@
 #include "../Connection/cconusersettings.h"
 #include "cstaglobalmanager.h"
 
+// clang-format off
+#define WEBPAGE_CMD_LIST    0
+#define WEBPAGE_CMD_LOAD    1
+#define WEBPAGE_CMD_SET     2
+#define WEBPAGE_CMD_ADD     3
+// clang-format on
+
+
 extern cStaGlobalManager* g_GlobalManager;
 
 
@@ -80,6 +88,10 @@ bool cDataWebPageManager::setWebPageItemHasEvent(qint32 index)
         return false;
 
     QMutexLocker lock(&this->m_mutex);
+
+    /* WebPage data is not yet called */
+    if (this->m_stLastLocalUpdateTimeStamp == 0)
+        return true;
 
     for (int i = 0; i < this->m_lWebPages.count(); i++) {
         if (this->m_lWebPages[i]->index() == index) {
@@ -162,6 +174,7 @@ qint32 cDataWebPageManager::startListWebPageData()
 
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CMD_STADIUM);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+    req->m_subCmd          = WEBPAGE_CMD_LIST;
 
     g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
@@ -179,6 +192,7 @@ qint32 cDataWebPageManager::startAddWebPage()
 
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CMD_STADIUM);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+    req->m_subCmd          = WEBPAGE_CMD_ADD;
 
     g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;
@@ -197,6 +211,7 @@ qint32 cDataWebPageManager::startLoadWebPage(const qint32 index, const qint32 wi
 
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CMD_STADIUM);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+    req->m_subCmd          = WEBPAGE_CMD_LOAD;
 
     this->m_screenWidth = width - 25; // Scrollbar is normaly visible
 
@@ -225,6 +240,7 @@ qint32 cDataWebPageManager::startSetWebPage(const QString text, const QString li
 
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_CMD_STADIUM);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+    req->m_subCmd          = WEBPAGE_CMD_SET;
 
     g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;

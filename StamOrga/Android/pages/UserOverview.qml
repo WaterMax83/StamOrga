@@ -92,15 +92,17 @@ Flickable {
         }
     }
 
-    function notifyUserCommandFinished(result) {
+    function notifyUserCommandFinished(result, subCmd) {
 
-        busyIndicatorUserOverview.loadingVisible = false
-        if (result === 1) {
-            toastManager.show("Benutzer geladen", 2000)
-        } else {
-            toastManager.show(userInt.getErrorCodeToString(result), 5000);
+        if (subCmd === 0) {       // list
+            busyIndicatorUserOverview.loadingVisible = false
+            if (result === 1) {
+                toastManager.show("Benutzer geladen", 2000)
+            } else {
+                toastManager.show(userInt.getErrorCodeToString(result), 5000);
+            }
+            showUserOverview();
         }
-        showUserOverview();
     }
 
 
@@ -126,7 +128,7 @@ Flickable {
             busyIndicatorUserOverview.infoText = "Keine Daten gespeichert\nZiehen zum Aktualisieren"
     }
 
-    function notifyUserIntConnectionFinished(result, msg) {}
+    function notifyUserIntConnectionFinished(result) {}
 
     Component {
         id: userInformationItem

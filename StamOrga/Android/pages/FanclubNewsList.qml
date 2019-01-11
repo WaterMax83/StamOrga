@@ -234,5 +234,5 @@ Flickable {
 //        userInt.startDeleteFanclubNewsItem(m_newsItemEditIndex);
     }
 
-    function notifyUserIntConnectionFinished(result, msg) {}
+    function notifyUserIntConnectionFinished(result) {}
 }

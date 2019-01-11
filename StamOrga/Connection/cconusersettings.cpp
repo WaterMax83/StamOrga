@@ -254,7 +254,7 @@ QString cConUserSettings::createHashValue(const QString first, const QString sec
     return QString(this->m_hash->result());
 }
 
-bool cConUserSettings::userIsDebugEnabled()
+bool cConUserSettings::userIsLoggingEnabled()
 {
     return USER_IS_ENABLED(this->m_userProperties, USER_ENABLE_LOG);
 }
@@ -277,6 +277,10 @@ bool cConUserSettings::userIsFanclubEditEnabled()
 bool cConUserSettings::userIsConsoleEnabled()
 {
     return USER_IS_ENABLED(this->m_userProperties, USER_ENABLE_CONSOLE);
+}
+bool cConUserSettings::userIsAdminEnabled()
+{
+    return USER_IS_ENABLED(this->m_userProperties, USER_ENABLE_ADMIN);
 }
 
 cConUserSettings::~cConUserSettings()

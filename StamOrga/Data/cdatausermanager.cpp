@@ -27,6 +27,12 @@
 #include "../cstaglobalmanager.h"
 #include "cdatausermanager.h"
 
+// clang-format off
+#define USER_COMMAND_LIST               0
+#define USER_COMMAND_READABLE_NAME      1
+#define USER_COMMAND_CHANGE_LOGIN       2
+// clang-format on
+
 extern cStaGlobalManager* g_GlobalManager;
 
 cDataUserManager* g_DataUserManager;
@@ -73,6 +79,7 @@ qint32 cDataUserManager::startUpdateReadableName(QString name)
 
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_USER_COMMAND);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+    req->m_subCmd          = USER_COMMAND_READABLE_NAME;
 
     this->m_newReadableName = name;
 
@@ -99,6 +106,7 @@ qint32 cDataUserManager::startUpdatePassword(QString password)
 
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_USER_CHANGE_LOGIN);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+    req->m_subCmd          = USER_COMMAND_CHANGE_LOGIN;
 
     this->m_newPassWord = newPassWord;
 
@@ -118,6 +126,7 @@ qint32 cDataUserManager::startListUserOverview()
 
     TcpDataConRequest* req = new TcpDataConRequest(OP_CODE_CMD_REQ::REQ_USER_COMMAND);
     req->m_lData           = QJsonDocument(rootObj).toJson(QJsonDocument::Compact);
+    req->m_subCmd          = USER_COMMAND_LIST;
 
     g_ConManager->sendNewRequest(req);
     return ERROR_CODE_SUCCESS;

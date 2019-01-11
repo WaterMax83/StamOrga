@@ -28,6 +28,7 @@
 
 #include "../Common/General/cgendisposer.h"
 #include "../Common/Network/messageprotocol.h"
+#include "../Data/checkconsistentdata.h"
 #include "../Data/stadiumwebpage.h"
 #include "../General/globaldata.h"
 #include "../Network/connectiondata.h"
@@ -36,6 +37,9 @@
 class cStadiumWebPageManager : public cGenDisposer
 {
     Q_OBJECT
+
+    friend class CheckConsistentData;
+
 public:
     explicit cStadiumWebPageManager(QObject* parent = nullptr);
 

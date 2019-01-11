@@ -27,6 +27,7 @@
 #include "../Common/Network/messageprotocol.h"
 #include "textdataitem.h"
 
+
 class cDataWebPageManager : public cGenDisposer
 {
     Q_OBJECT
@@ -50,19 +51,11 @@ public:
 
     qint32      startAddWebPage();
     Q_INVOKABLE qint32 startLoadWebPage(const qint32 index, const qint32 width);
-    qint32 startSetWebPage(const QString text, const QString link);
+    Q_INVOKABLE qint32 startSetWebPage(const QString text, const QString link);
 
     qint32 handleWebPageResponse(MessageProtocol* msg);
 
-    //    Q_INVOKABLE qint32 startGetNewsDataItem(qint32 index);
-    //    qint32             handleGetNewsDataItem(MessageProtocol* msg);
-
-    //    Q_INVOKABLE qint32 startChangeNewsDataItem(const qint32 index, const QString header, const QString info);
-    //    qint32             handleChangeNewsDataResponse(MessageProtocol* msg);
     Q_INVOKABLE TextDataItem* getCurrentEditedItem();
-
-    //    Q_INVOKABLE qint32 startRemoveNewsDataItem(const qint32 index);
-    //    qint32             handleRemoveNewsDataItemResponse(MessageProtocol* msg);
 
 signals:
 

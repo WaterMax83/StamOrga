@@ -82,7 +82,6 @@ Flickable {
     }
 
     property bool isViewAlreadyOpened: false
-    property int iCurrentCommandIndex: 0
 
     function pageOpenedUpdateView() {
 
@@ -99,11 +98,10 @@ Flickable {
         gDataWebPageManager.startListWebPageData();
         busyIndicatorWebList.loadingVisible = true;
         busyIndicatorWebList.infoText = "Aktualisiere Liste"
-        iCurrentCommandIndex = 1;
     }
 
-    function notifyWebPageCommandFinished(result){
-        if (iCurrentCommandIndex === 1) {   // list
+    function notifyWebPageCommandFinished(result, subCmd){
+        if (subCmd === 0) {   // list
             if (result === 1) {
                 if (gDataAppUserEvents.getCurrentWebPageEventCounter() > 0) {
                     gConUserSettings.startGettingUserProps(true);
@@ -170,5 +168,5 @@ Flickable {
     }
 
 
-    function notifyUserIntConnectionFinished(result, msg) {}
+    function notifyUserIntConnectionFinished(result) {}
 }

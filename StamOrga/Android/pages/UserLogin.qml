@@ -177,7 +177,6 @@ Flickable {
                         busyIndicatorUserlogin.infoVisible = true;
                         busyIndicatorUserlogin.infoText = "Ändere Nutzernamen"
 
-                        currentUserCommand = 1;
                         gDataUserManager.startUpdateReadableName(text.trim());
                     }
                 }
@@ -255,9 +254,7 @@ Flickable {
         }
     }
 
-
-    property int currentUserCommand : 0
-    function notifyUserIntConnectionFinished(result, msg) {
+    function notifyUserIntConnectionFinished(result) {
         btnSendData.enabled = true
         busyIndicatorUserlogin.loadingVisible = false;
         if (result === 1) {
@@ -275,11 +272,11 @@ Flickable {
         }
     }
 
-    function notifyUserCommandFinished(result) {
+    function notifyUserCommandFinished(result, subCmd) {
         busyIndicatorUserlogin.loadingVisible = false;
         busyIndicatorUserlogin.infoVisible = false;
 
-        if (currentUserCommand === 1) { // change readableName
+        if (subCmd === 1) { // change readableName
             if (result === 1) {
                 toastManager.show("Nutzername erfolgreich geändert", 2000)
                 busyIndicatorUserlogin.infoVisible = false;
@@ -288,7 +285,7 @@ Flickable {
                 busyIndicatorUserlogin.infoText = "Fehler beim Namen ändern"
                 toastManager.show(userIntUser.getErrorCodeToString(result), 5000)
             }
-        } else if (currentUserCommand === 2) { // change password
+        } else if (subCmd === 2) { // change password
             if (result === 1) {
                 toastManager.show("Passwort erfolgreich geändert", 2000)
                 busyIndicatorUserlogin.infoVisible = false;
@@ -340,7 +337,6 @@ Flickable {
                 changePassWordDialog.open()
             } else if (txtnewPassWord.text.trim() == txtnewPassWordReplay.text.trim()) {
 
-                currentUserCommand = 2;
                 gDataUserManager.startUpdatePassword(txtnewPassWord.text.trim());
 
                 busyIndicatorUserlogin.loadingVisible = true;

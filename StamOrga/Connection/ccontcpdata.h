@@ -31,6 +31,7 @@
 
 struct TcpDataConRequest {
     quint32    m_request;
+    qint32     m_subCmd;
     QByteArray m_lData;
     qint32     m_result;
 

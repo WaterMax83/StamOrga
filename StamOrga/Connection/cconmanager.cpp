@@ -51,7 +51,7 @@ qint32 cConManager::initialize()
 }
 
 
-qint32 cConManager::startMainConnection(QString name, QString passw)
+qint32 cConManager::startMainConnection(const QString& name, const QString& passw)
 {
     if (!this->m_initialized)
         return ERROR_CODE_NOT_INITIALIZED;
@@ -81,7 +81,7 @@ qint32 cConManager::startMainConnection(QString name, QString passw)
 /*
      * Answer function after connection with username
      */
-void cConManager::slMainConReqFin(qint32 result, const QString msg, const QString salt, const QString random)
+void cConManager::slMainConReqFin(qint32 result, const QString& msg, const QString& salt, const QString& random)
 {
     //    qDebug() << QString("Resul = %1: %2").arg(result).arg(msg);
     if (result > ERROR_CODE_NO_ERROR) {
@@ -103,7 +103,7 @@ void cConManager::slMainConReqFin(qint32 result, const QString msg, const QStrin
         qWarning().noquote() << QString("Error main connecting: %1").arg(msg);
         this->stopDataConnection();
         this->m_bIsConnecting = false;
-        emit this->signalNotifyConnectionFinished(result, msg);
+        emit this->signalNotifyConnectionFinished(result);
 
         if (result == ERROR_CODE_NO_USER)
             g_StaGlobalSettings->setAlreadyConnected(false);
@@ -125,7 +125,7 @@ void cConManager::slotDataConnnectionFinished(qint32 result, const QString msg)
         this->sendLoginRequest();
     } else {
         if (this->m_bIsConnecting)
-            emit this->signalNotifyConnectionFinished(result, msg);
+            emit this->signalNotifyConnectionFinished(result);
         this->stopDataConnection();
     }
 }
@@ -196,7 +196,7 @@ void cConManager::slotDataConLastRequestFinished(TcpDataConRequest* request)
             g_ConUserSettings->setSalt(this->m_mainConRequestSalt);
             g_ConUserSettings->setPassWord(passWord);
 
-            emit this->signalNotifyConnectionFinished(request->m_result, "");
+            emit this->signalNotifyConnectionFinished(request->m_result);
         } else {
             qWarning().noquote() << QString("Error Login: %1").arg(request->m_result);
             while (this->m_lRequestConError.size() > 0) {
@@ -210,7 +210,7 @@ void cConManager::slotDataConLastRequestFinished(TcpDataConRequest* request)
 
             g_ConUserSettings->setSalt("");
             g_ConUserSettings->setPassWord("");
-            emit this->signalNotifyConnectionFinished(request->m_result, getErrorCodeString(request->m_result));
+            emit this->signalNotifyConnectionFinished(request->m_result);
             this->stopDataConnection();
         }
 
@@ -220,7 +220,7 @@ void cConManager::slotDataConLastRequestFinished(TcpDataConRequest* request)
     case OP_CODE_CMD_REQ::REQ_GET_USER_PROPS:
         if (request->m_result == ERROR_CODE_NO_ERROR)
             return;
-        emit this->signalNotifyCommandFinished(request->m_request, request->m_result);
+        emit this->signalNotifyCommandFinished(request->m_request, request->m_result, request->m_subCmd);
         break;
 
     case OP_CODE_CMD_REQ::REQ_GET_GAMES_INFO_LIST: {
@@ -234,7 +234,7 @@ void cConManager::slotDataConLastRequestFinished(TcpDataConRequest* request)
                 return;
             }
         }
-        emit this->signalNotifyCommandFinished(request->m_request, request->m_result);
+        emit this->signalNotifyCommandFinished(request->m_request, request->m_result, request->m_subCmd);
         retryGetGamesInfoCount = 0;
         break;
     }
@@ -250,20 +250,20 @@ void cConManager::slotDataConLastRequestFinished(TcpDataConRequest* request)
                 return;
             }
         }
-        emit this->signalNotifyCommandFinished(request->m_request, request->m_result);
+        emit this->signalNotifyCommandFinished(request->m_request, request->m_result, request->m_subCmd);
         retryGetTicketCount = 0;
         break;
     }
     case OP_CODE_CMD_REQ::REQ_GET_MEETING_INFO:
     case OP_CODE_CMD_REQ::REQ_GET_AWAYTRIP_INFO:
     case OP_CODE_CMD_REQ::REQ_CMD_MEDIA:
-        emit this->signalNotifyCommandFinished(request->m_request, request->m_result);
+        emit this->signalNotifyCommandFinished(request->m_request, request->m_result, request->m_subCmd);
         if (request->m_result == ERROR_CODE_NOT_FOUND)
             return;
         break;
 
     default:
-        emit this->signalNotifyCommandFinished(request->m_request, request->m_result);
+        emit this->signalNotifyCommandFinished(request->m_request, request->m_result, request->m_subCmd);
         break;
     }
 

@@ -179,7 +179,8 @@ bool cDataGamesManager::setGamePlayItemHasEvent(qint32 gameIndex)
             return true;
         }
     }
-    return false;
+    /* Game could be not loaded */
+    return true;
 }
 
 void cDataGamesManager::resetAllGamePlayEvents()

@@ -19,6 +19,7 @@
 #include <QDateTime>
 
 #include "../General/globaldata.h"
+#include "../Manager/cstadiumwebpagemanager.h"
 #include "checkconsistentdata.h"
 
 extern GlobalData* g_GlobalData;
@@ -76,8 +77,8 @@ void CheckConsistentData::slotTimerFired()
                     g_GlobalData->m_userEvents.removeAt(i);
                 }
             }
-        }
-        else if (g_GlobalData->m_userEvents.at(i)->getType() == NOTIFY_TOPIC_NEW_FANCLUB_NEWS) {
+        } else if (g_GlobalData->m_userEvents.at(i)->getType() == NOTIFY_TOPIC_NEW_FANCLUB_NEWS) {
+
             qint32 newsIndex = g_GlobalData->m_userEvents.at(i)->getInfo().toInt(0);
             if (newsIndex == 0)
                 continue;
@@ -88,6 +89,24 @@ void CheckConsistentData::slotTimerFired()
                 if (eventFile.exists() && eventFile.remove()) {
                     g_GlobalData->m_userEvents.at(i)->terminate();
                     qInfo().noquote() << QString("Delete Event of news with index %1, because its deleted").arg(newsIndex);
+                    g_GlobalData->m_userEvents.removeAt(i);
+                }
+            }
+        } else if (g_GlobalData->m_userEvents.at(i)->getType() == NOTIFY_TOPIC_STADIUM_WEBPAGE) {
+
+            qint32 pageIndex = g_GlobalData->m_userEvents.at(i)->getInfo().toInt(0);
+            if (pageIndex == 0)
+                continue;
+
+            QMutexLocker lock(&g_StadiumWebPageManager.m_mutex);
+
+            WebPageItem* pWebPage = (WebPageItem*)g_StadiumWebPageManager.m_webPageList->getItem(pageIndex);
+            if (pWebPage == NULL) {
+                QString fileName = g_GlobalData->m_userEvents.at(i)->getFileName();
+                QFile   eventFile(fileName);
+                if (eventFile.exists() && eventFile.remove()) {
+                    g_GlobalData->m_userEvents.at(i)->terminate();
+                    qInfo().noquote() << QString("Delete Event of web page with index %1, because its deleted").arg(pageIndex);
                     g_GlobalData->m_userEvents.removeAt(i);
                 }
             }

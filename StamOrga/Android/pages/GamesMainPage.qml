@@ -264,7 +264,7 @@ Page {
         }
     }
 
-    function notifyUserIntConnectionFinished(result, msg) {}
+    function notifyUserIntConnectionFinished(result) {}
 
     function notifyUserIntGamesListFinished(result) {
         if (result !== 1) {

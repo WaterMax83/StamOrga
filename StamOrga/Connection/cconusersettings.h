@@ -62,12 +62,13 @@ public:
 
     QString createHashValue(const QString first, const QString second);
 
-    Q_INVOKABLE bool userIsDebugEnabled();
+    Q_INVOKABLE bool userIsLoggingEnabled();
     Q_INVOKABLE bool userIsGameAddingEnabled();
     Q_INVOKABLE bool userIsGameFixedTimeEnabled();
     Q_INVOKABLE bool userIsFanclubEnabled();
     Q_INVOKABLE bool userIsFanclubEditEnabled();
     Q_INVOKABLE bool userIsConsoleEnabled();
+    Q_INVOKABLE bool userIsAdminEnabled();
 
 signals:
 

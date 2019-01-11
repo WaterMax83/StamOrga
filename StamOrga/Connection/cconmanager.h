@@ -37,20 +37,20 @@ public:
 
     qint32 initialize();
 
-    qint32 startMainConnection(QString name, QString passw);
+    qint32 startMainConnection(const QString& name, const QString& passw);
 
     void sendLoginRequest();
     void sendNewRequest(TcpDataConRequest* request);
 
 signals:
-    void signalNotifyConnectionFinished(const qint32 result, const QString msg);
-    void signalNotifyCommandFinished(quint32 command, qint32 result);
+    void signalNotifyConnectionFinished(const qint32 result);
+    void signalNotifyCommandFinished(const quint32 command, const qint32 result, const qint32 subCmd);
     void signalStartSendNewRequest(TcpDataConRequest* request);
 
 public slots:
 
 private slots:
-    void slMainConReqFin(qint32 result, const QString msg, const QString salt, const QString random);
+    void slMainConReqFin(qint32 result, const QString& msg, const QString& salt, const QString& random);
     void slotDataConnnectionFinished(qint32 result, const QString msg);
     void slotDataConLastRequestFinished(TcpDataConRequest* request);
 

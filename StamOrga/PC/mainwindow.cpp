@@ -26,6 +26,7 @@
 #include "../../Common/General/globalfunctions.h"
 #include "../../Common/Network/messagecommand.h"
 #include "../../Common/Network/messageprotocol.h"
+#include "../Data/cdatausermanager.h"
 #include "Connection/cconmanager.h"
 #include "Connection/cconusersettings.h"
 #include "Data/cdataconsolemanager.h"
@@ -187,7 +188,7 @@ void MainWindow::on_btnSetReadableName_clicked()
     else if (name == g_ConUserSettings->getReadableName())
         qInfo() << "Name nicht verändert";
     else
-        g_ConUserSettings->startUpdateReadableName(name);
+        g_DataUserManager->startUpdateReadableName(name);
 }
 
 void MainWindow::on_btnUdpatePassword_clicked()
@@ -196,7 +197,7 @@ void MainWindow::on_btnUdpatePassword_clicked()
     if (password.isEmpty())
         qInfo() << "No password";
     else
-        g_ConUserSettings->startUpdatePassword(password);
+        g_DataUserManager->startUpdatePassword(password);
 }
 
 void MainWindow::on_btnRefreshControl_clicked()

@@ -366,15 +366,13 @@ ApplicationWindow {
     UserInterface {
         id: userInt
         onNotifyConnectionFinished: {
-            if (result !== 1) {
-                console.log(stackView.currentItem)
-                console.log(viewUserLogin)
+            if (result === -21 || result === -5) { // Wrong password or not Found
                 if (stackView.currentItem !== viewUserLogin)
                     stackView.push(viewUserLogin)
             }
 
             if (stackView.currentItem.notifyUserIntConnectionFinished)
-                stackView.currentItem.notifyUserIntConnectionFinished(result, msg)
+                stackView.currentItem.notifyUserIntConnectionFinished(result)
         }
         onNotifyVersionRequestFinished: {
             if (result === 5) {
@@ -401,7 +399,7 @@ ApplicationWindow {
             if (result > 0 && !userInt.isDebuggingEnabled()) {
                 if (!isLoggingWindowShown) {
                     isLoggingWindowShown = true;
-                    if (gConUserSettings.userIsDebugEnabled()) {
+                    if (gConUserSettings.userIsLoggingEnabled()) {
                         listViewListModel.append({
                                                      title: "Logging",
                                                      element: viewLoggingPage,
@@ -458,7 +456,7 @@ ApplicationWindow {
             if (stackView.currentItem.notifyGetUserProperties)
                 stackView.currentItem.notifyGetUserProperties(result);
         }
-        onNotifyUserCommandFinished: stackView.currentItem.notifyUserCommandFinished(result)
+        onNotifyUserCommandFinished: stackView.currentItem.notifyUserCommandFinished(result, subCmd)
 
         onNotifyGamesListFinished: viewMainGames.notifyUserIntGamesListFinished(result)
         onNotifyGamesInfoListFinished: viewMainGames.notifyUserIntGamesInfoListFinished(result);
@@ -487,10 +485,10 @@ ApplicationWindow {
         onNotifyGetFanclubNewsItemFinished: stackView.currentItem.notifyGetFanclubNewsItemFinished(result);
         onNotifyDeleteFanclubNewsItemFinished: stackView.currentItem.notifyDeleteFanclubNewsItemFinished(result);
 
-        onNotifyStatisticsCommandFinished: stackView.currentItem.notifyStatisticsCommandFinished(result);
+        onNotifyStatisticsCommandFinished: stackView.currentItem.notifyStatisticsCommandFinished(result, subCmd);
         onNotifyConsoleCommandFinished: stackView.currentItem.notifyConsoleCommandFinished(result);
         onNotifyMediaCommandFinished: stackView.currentItem.notifyMediaCommandFinished(result);
-        onNotifyWebPageCommandFinished: stackView.currentItem.notifyWebPageCommandFinished(result);
+        onNotifyWebPageCommandFinished: stackView.currentItem.notifyWebPageCommandFinished(result, subCmd);
     }
 
     Connections {

@@ -262,6 +262,6 @@ Item {
         }
     }
 
-    function notifyUserIntConnectionFinished(result, msg) {}
+    function notifyUserIntConnectionFinished(result) {}
 
 }

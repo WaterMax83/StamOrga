@@ -583,5 +583,5 @@ Item {
         currentMediaInfo.notifyMediaCommandFinished(result);
     }
 
-    function notifyUserIntConnectionFinished(result, msg) {}
+    function notifyUserIntConnectionFinished(result) {}
 }

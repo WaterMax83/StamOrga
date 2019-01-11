@@ -99,7 +99,7 @@ Flickable {
        }
    }
 
-   function notifyUserIntConnectionFinished(result, msg) {}
+   function notifyUserIntConnectionFinished(result) {}
 
 
    ScrollIndicator.vertical: ScrollIndicator { }
