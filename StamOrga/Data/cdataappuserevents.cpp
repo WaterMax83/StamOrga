@@ -54,7 +54,7 @@ qint32 cDataAppUserEvents::addNewUserEvents(QJsonArray& jsArr)
 
     this->resetCurrentEvents();
 
-    qInfo() << jsArr;
+    //    qInfo() << jsArr;
 
     for (int i = 0; i < jsArr.size(); i++) {
         QJsonObject jsObj  = jsArr.at(i).toObject();

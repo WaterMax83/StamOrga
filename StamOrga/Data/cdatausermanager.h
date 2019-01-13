@@ -86,7 +86,12 @@ public:
         return true;
     }
 
-    Q_INVOKABLE QString getUserShortString() { return this->m_readName.left(1); }
+    Q_INVOKABLE QString getUserShortString()
+    {
+        if (this->m_owner)
+            return "Du";
+        return this->m_readName.left(1);
+    }
 };
 
 class cDataUserManager : public cGenDisposer

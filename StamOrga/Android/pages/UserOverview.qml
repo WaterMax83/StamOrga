@@ -133,9 +133,15 @@ Flickable {
     Component {
         id: userInformationItem
         MyComponents.UserInformationItem {
-//            onClickedSeasonTicket: {
-//                seasonTicketClickedMenu.openWithNameAndIndex(sender.name, sender.place, sender.discount, sender.index)
-//            }
+            onClickedItem: {
+                console.log("clicked " + sender.readName + " " + sender.admin)
+                if (sender.admin) {
+                    titleLabel.text = "Benutzerprofil";
+                    stackView.push(viewUserLogin)
+                } else {
+
+                }
+            }
         }
     }
 

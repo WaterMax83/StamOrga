@@ -130,6 +130,7 @@ ApplicationWindow {
             anchors.fill: parent
 
             Rectangle {
+                id: rectangleLogo
                 implicitWidth: drawer.width
                 implicitHeight: drawer.width
 
@@ -149,8 +150,10 @@ ApplicationWindow {
 
                 focus: true
                 currentIndex: -1
-                implicitWidth: drawer.width
-                implicitHeight: drawer.height
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                anchors.top: rectangleLogo.bottom
                 highlight: highlightBar
                 clip: true
                 snapMode: ListView.SnapToItem
@@ -166,7 +169,7 @@ ApplicationWindow {
                                    title: "Benutzer",
                                    element: viewUserOverview,
                                    event: 0,
-//                                   toolButtonImgSource: "images/menu.png",
+                                   //                                   toolButtonImgSource: "images/menu.png",
                                    listImgSource : "images/account.png"
                                })
                         append({
@@ -264,8 +267,8 @@ ApplicationWindow {
         id: listDelegateDrawer
         Item {
             id: delegateItem
-            width: listView.width
             height: 50
+            width: listView.width
 
             RowLayout {
                 anchors.fill: parent
@@ -308,7 +311,6 @@ ApplicationWindow {
                         }
                         stackView.push(element)
                     }
-
                     drawer.close()
                 }
             }
@@ -511,10 +513,10 @@ ApplicationWindow {
             gStaGlobalSettings.checkNewStateChangedAtStart();
 
             if (!gStaVersionManager.isVersionChangeAlreadyShown()) {
-//                var component = Qt.createComponent("../pages/SettingsVersionInfo.qml");
-//                if (component.status === Component.Ready) {
-                    stackView.push(viewSettingsVersionInfoPage);
-//                }
+                //                var component = Qt.createComponent("../pages/SettingsVersionInfo.qml");
+                //                if (component.status === Component.Ready) {
+                stackView.push(viewSettingsVersionInfoPage);
+                //                }
             }
         }
     }

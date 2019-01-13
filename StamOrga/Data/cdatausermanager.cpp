@@ -96,7 +96,7 @@ qint32 cDataUserManager::startUpdatePassword(QString password)
     if (password.length() > 0)
         newPassWord = g_ConUserSettings->createHashValue(password, g_ConUserSettings->getSalt());
     else
-        newPassWord = this->m_newPassWord;
+        newPassWord             = this->m_newPassWord;
     QString     currentPassWord = g_ConUserSettings->createHashValue(g_ConUserSettings->getPassWord(), g_ConUserSettings->getRandomLoginValue());
     QJsonObject rootObj;
     rootObj.insert("type", "user");
@@ -162,11 +162,13 @@ qint32 cDataUserManager::handleUserCommandResponse(MessageProtocol* msg)
 
         //        this->m_stLastLocalUpdateTimeStamp = QDateTime::currentMSecsSinceEpoch();
 
-        qint32 ownIndex = g_ConUserSettings->getUserIndex();
+        qint32           ownUserIndex = g_ConUserSettings->getUserIndex();
+        UserInformation* pOwnUser     = NULL;
 
         for (int i = 0; i < arrUser.count(); i++) {
             QJsonObject      userObj = arrUser.at(i).toObject();
             UserInformation* pUser   = new UserInformation();
+            g_GlobalManager->setQMLObjectOwnershipToCpp(pUser);
 
             pUser->m_index      = userObj.value("index").toInt();
             pUser->m_timestamp  = (qint64)userObj.value("timestamp").toDouble();
@@ -175,23 +177,27 @@ qint32 cDataUserManager::handleUserCommandResponse(MessageProtocol* msg)
             pUser->m_readName   = userObj.value("readName").toString();
             if (pUser->m_readName.isEmpty())
                 pUser->m_readName = "NoName";
-            pUser->m_prop = (quint32)userObj.value("props").toDouble();
-            if (pUser->m_index == ownIndex)
-                pUser->m_owner = true;
-            else
-                pUser->m_owner = false;
-            pUser->m_admin = USER_IS_ENABLED(pUser->m_prop, USER_ENABLE_ADMIN);
+            pUser->m_prop         = (quint32)userObj.value("props").toDouble();
+            pUser->m_admin        = USER_IS_ENABLED(pUser->m_prop, USER_ENABLE_ADMIN);
             if (pUser->m_admin)
                 pUser->m_userType = "Admin";
             else
                 pUser->m_userType = "Benutzer";
 
-            g_GlobalManager->setQMLObjectOwnershipToCpp(pUser);
+            if (pUser->m_index == ownUserIndex) {
+                pUser->m_owner = true;
+                pOwnUser       = pUser;
+                continue;
+            }
+            pUser->m_owner = false;
+
             this->m_lUser.append(pUser);
         }
 
         std::sort(this->m_lUser.begin(), this->m_lUser.end(), UserInformation::compareTimeStampFunctionAscending);
 
+        if (pOwnUser != NULL)
+            this->m_lUser.insert(0, pOwnUser);
         //        this->m_stLastServerUpdateTimeStamp = timestamp;
     } else
         result = ERROR_CODE_NOT_IMPLEMENTED;

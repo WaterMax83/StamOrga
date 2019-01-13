@@ -35,6 +35,7 @@ Item {
         WebView {
             id: webView
             anchors.fill: parent
+            onCanGoBackChanged: console.log ("Back changed")
 //            url: "qt.io"
         }
 //    }

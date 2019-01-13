@@ -53,13 +53,13 @@ Item {
         }
     }
 
-//    MyComponents.EventIndicator {
-//        id: eventIndicator
-//        disableVisibility: true
-//        eventCount : 1
-//        itemSize: imageSize * 2
-//        z : 1000
-//    }
+    //    MyComponents.EventIndicator {
+    //        id: eventIndicator
+    //        disableVisibility: true
+    //        eventCount : 1
+    //        itemSize: imageSize * 2
+    //        z : 1000
+    //    }
 
     ColumnLayout {
         id: mainUserInfoLayout
@@ -128,6 +128,7 @@ Item {
                         Layout.maximumWidth: parent.width
                         Text {
                             Layout.maximumWidth: parent.width
+                            Layout.fillWidth: true
                             anchors.left: parent.left
                             id: labelHeaderItem
                             font.bold: true
@@ -136,27 +137,44 @@ Item {
                             wrapMode: Text.Wrap
                         }
 
-//                        Text {
-//                            text: ", "
-//                            color: "#B0BEC5"
-//                            font.pixelSize: 14
-//                        }
+                        Rectangle {
+                            id: adminSymbol
+                            implicitWidth: 50
+                            implicitHeight: parent.height
+                            anchors.right: parent.right
+                            anchors.rightMargin: 5
+                            border.color: "#2196F3"
+                            radius: 5
+                            color: "transparent"
+                            visible: false
+                            Text {
+                                anchors.centerIn: parent
+                                text: "Admin"
+                                color: "#2196F3"
+                            }
+                        }
 
-//                        Text {
-//                            id: labelUserType
+                        //                        Text {
+                        //                            text: ", "
+                        //                            color: "#B0BEC5"
+                        //                            font.pixelSize: 14
+                        //                        }
 
-//                            Layout.fillWidth: true
-//                            color: "#B0BEC5"
-//                            font.pixelSize: 14
-//                        }
+                        //                        Text {
+                        //                            id: labelUserType
 
-//                        Text {
-//                            id: labelTime
-//                            anchors.right: parent.right
-//                            anchors.rightMargin: 5
-//                            color: "grey"
-//                            font.pixelSize: 13
-//                        }
+                        //                            Layout.fillWidth: true
+                        //                            color: "#B0BEC5"
+                        //                            font.pixelSize: 14
+                        //                        }
+
+                        //                        Text {
+                        //                            id: labelTime
+                        //                            anchors.right: parent.right
+                        //                            anchors.rightMargin: 5
+                        //                            color: "grey"
+                        //                            font.pixelSize: 13
+                        //                        }
                     }
                     RowLayout {
                         Text {
@@ -166,8 +184,6 @@ Item {
                             color: "#B0BEC5"
                             font.pixelSize: 14
                         }
-
-
                     }
                 }
             }
@@ -177,13 +193,13 @@ Item {
     function showUserInformation(index) {
 
         var userInfoItem;
-            userInfoItem = gDataUserManager.getUserInfoFromArrayIndex(index);
+        userInfoItem = gDataUserManager.getUserInfoFromArrayIndex(index);
         if (userInfoItem !== null) {
             m_userInfoItem = userInfoItem
             labelHeaderItem.text = userInfoItem.readName
-//            labelUserType.text = userInfoItem.userType
-                labelSubHeader.text = "zuletzt online vor " + userInfoItem.onlineTime;
-//                labelTime.text = textDataItem.timestampReadableLine();
+            adminSymbol.visible = userInfoItem.admin;
+            labelSubHeader.text = "zuletzt eingeloggt vor " + userInfoItem.onlineTime;
+            //                labelTime.text = textDataItem.timestampReadableLine();
 
             if (userInfoItem.owner) {
                 itemUserInfo.border.color = "orange";
@@ -192,6 +208,7 @@ Item {
                 itemUserInfo.border.color = "grey";
                 itemUserInfo.border.width = 2;
             }
+
 
             labelLineUserInfoShortName.text = userInfoItem.getUserShortString();
         }
