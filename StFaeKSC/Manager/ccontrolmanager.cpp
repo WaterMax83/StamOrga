@@ -20,10 +20,10 @@
 
 #include "../Common/General/globalfunctions.h"
 #include "../Common/Network/messagecommand.h"
+#include "General/pushnotification.h"
 #include "ccontrolmanager.h"
 #include "csmtpmanager.h"
 #include "cstatisticmanager.h"
-#include "General/pushnotification.h"
 
 // clang-format off
 #define GROUP_STATS             "Statistic"
@@ -112,11 +112,11 @@ qint32 cControlManager::initialize()
 
         for (int i = 0; i < sizeOfArray; i++) {
             this->m_pConfigSettings->setArrayIndex(i);
-            QString addr = this->m_pConfigSettings->value(ITEM_NAME, "").toString();
+            QString addr = this->m_pConfigSettings->value(ITEM_NAME, "").toString().toLower();
             if (addr.isEmpty())
                 bProblems = true;
             else
-                g_SmtpManager.addDestinationEmail(addr);
+                g_SmtpManager.addDestinationEAddr(addr);
         }
         this->m_pConfigSettings->endArray();
 
@@ -137,54 +137,64 @@ qint32 cControlManager::initialize()
 
 void cControlManager::saveCurrentInteralList()
 {
+    this->saveControlList();
+}
+
+void cControlManager::saveControlList(const qint32 index)
+{
     this->m_mConfigIniMutex.lock();
 
-    this->m_pConfigSettings->beginGroup(GROUP_STATS);
-    this->m_pConfigSettings->remove(""); // clear all elements
+    if (index < 0) {
+        this->m_pConfigSettings->beginGroup(GROUP_STATS);
+        this->m_pConfigSettings->remove(""); // clear all elements
 
-    this->m_pConfigSettings->beginWriteArray(CONFIG_LIST_ARRAY);
-    for (int i = 0; i < this->m_statistic.size(); i++) {
-        this->m_pConfigSettings->setArrayIndex(i);
+        this->m_pConfigSettings->beginWriteArray(CONFIG_LIST_ARRAY);
+        for (int i = 0; i < this->m_statistic.size(); i++) {
+            this->m_pConfigSettings->setArrayIndex(i);
 
-        this->m_pConfigSettings->setValue(ITEM_NAME, this->m_statistic.at(i));
+            this->m_pConfigSettings->setValue(ITEM_NAME, this->m_statistic.at(i));
+        }
+
+        this->m_pConfigSettings->endArray();
+        this->m_pConfigSettings->endGroup();
     }
 
-    this->m_pConfigSettings->endArray();
-    this->m_pConfigSettings->endGroup();
+    if (index < 0) {
+        this->m_pConfigSettings->beginGroup(GROUP_ONLINE_GAMES);
+        this->m_pConfigSettings->remove(""); // clear all elements
 
-    this->m_pConfigSettings->beginGroup(GROUP_ONLINE_GAMES);
-    this->m_pConfigSettings->remove(""); // clear all elements
+        this->m_pConfigSettings->beginWriteArray(CONFIG_LIST_ARRAY);
+        for (int i = 0; i < this->m_onlineGames.size(); i++) {
+            this->m_pConfigSettings->setArrayIndex(i);
 
-    this->m_pConfigSettings->beginWriteArray(CONFIG_LIST_ARRAY);
-    for (int i = 0; i < this->m_onlineGames.size(); i++) {
-        this->m_pConfigSettings->setArrayIndex(i);
+            this->m_pConfigSettings->setValue(ITEM_NAME, this->m_onlineGames.at(i)->m_game->getCompetition());
+            this->m_pConfigSettings->setValue(ONL_GAM_MAX_INDEX, this->m_onlineGames.at(i)->m_game->getMaxIndex());
+            this->m_pConfigSettings->setValue(ONL_GAM_SEASON, this->m_onlineGames.at(i)->m_game->getSeason());
+        }
 
-        this->m_pConfigSettings->setValue(ITEM_NAME, this->m_onlineGames.at(i)->m_game->getCompetition());
-        this->m_pConfigSettings->setValue(ONL_GAM_MAX_INDEX, this->m_onlineGames.at(i)->m_game->getMaxIndex());
-        this->m_pConfigSettings->setValue(ONL_GAM_SEASON, this->m_onlineGames.at(i)->m_game->getSeason());
+        this->m_pConfigSettings->endArray();
+        this->m_pConfigSettings->endGroup();
     }
 
-    this->m_pConfigSettings->endArray();
-    this->m_pConfigSettings->endGroup();
 
+    if (index < 0 || index == 1) {
+        this->m_pConfigSettings->beginGroup(GROUP_SMTP);
+        this->m_pConfigSettings->remove(""); // clear all elements
 
-    this->m_pConfigSettings->beginGroup(GROUP_SMTP);
-    this->m_pConfigSettings->remove(""); // clear all elements
+        this->m_pConfigSettings->setValue(SMTP_LOGIN, g_SmtpManager.getServerEmail());
+        this->m_pConfigSettings->setValue(SMTP_PASSW, g_SmtpManager.getServerPassword());
 
-    this->m_pConfigSettings->setValue(SMTP_LOGIN, g_SmtpManager.getServerEmail());
-    this->m_pConfigSettings->setValue(SMTP_PASSW, g_SmtpManager.getServerPassword());
+        QStringList addrs = g_SmtpManager.getDestinationEAddresses();
+        this->m_pConfigSettings->beginWriteArray(CONFIG_LIST_ARRAY);
+        for (int i = 0; i < addrs.size(); i++) {
+            this->m_pConfigSettings->setArrayIndex(i);
 
-    QStringList addrs = g_SmtpManager.getDestinationEmails();
-    this->m_pConfigSettings->beginWriteArray(CONFIG_LIST_ARRAY);
-    for (int i = 0; i < addrs.size(); i++) {
-        this->m_pConfigSettings->setArrayIndex(i);
+            this->m_pConfigSettings->setValue(ITEM_NAME, addrs.at(i));
+        }
 
-        this->m_pConfigSettings->setValue(ITEM_NAME, addrs.at(i));
+        this->m_pConfigSettings->endArray();
+        this->m_pConfigSettings->endGroup();
     }
-
-    this->m_pConfigSettings->endArray();
-    this->m_pConfigSettings->endGroup();
-
     this->m_mConfigIniMutex.unlock();
 
     this->setNewUpdateTime();
@@ -221,6 +231,31 @@ MessageProtocol* cControlManager::getControlCommandResponse(UserConData* pUserCo
     return new MessageProtocol(OP_CODE_CMD_RES::ACK_CMD_CONTROL, answer);
 }
 
+qint32 cControlManager::addDestinationEmailAddress(const QString& addr)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    qint32 result = g_SmtpManager.addDestinationEAddr(addr);
+    if (result == ERROR_CODE_SUCCESS)
+        this->saveControlList(1);
+
+    return result;
+}
+
+qint32 cControlManager::removeDestinationEmailAddress(const QString& addr)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    qint32 result = g_SmtpManager.removeDestinationEAddr(addr);
+    if (result == ERROR_CODE_SUCCESS)
+        this->saveControlList(1);
+
+    return result;
+}
+
+
 qint32 cControlManager::handleRefreshCommand(QJsonObject& rootAns)
 {
     QJsonArray  statsYearsArr;
@@ -240,7 +275,7 @@ qint32 cControlManager::handleRefreshCommand(QJsonObject& rootAns)
     }
 
     QJsonArray  addrArr;
-    QStringList addrs = g_SmtpManager.getDestinationEmails();
+    QStringList addrs = g_SmtpManager.getDestinationEAddresses();
     foreach (QString addr, addrs)
         addrArr.append(addr);
     smtpObj.insert("login", g_SmtpManager.getServerEmail());
@@ -290,7 +325,7 @@ qint32 cControlManager::handleSaveCommand(QJsonObject& rootObj)
     g_SmtpManager.setServerPassword(smtpObj.value("password").toString());
     QJsonArray addrArr = smtpObj.value("addresses").toArray();
     for (int i = 0; i < addrArr.size(); i++)
-        g_SmtpManager.addDestinationEmail(addrArr.at(i).toString());
+        g_SmtpManager.addDestinationEAddr(addrArr.at(i).toString());
 
     this->saveCurrentInteralList();
     this->startAllControls();
@@ -298,15 +333,15 @@ qint32 cControlManager::handleSaveCommand(QJsonObject& rootObj)
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 cControlManager::handleNotifyCommand(QJsonObject &rootObj)
+qint32 cControlManager::handleNotifyCommand(QJsonObject& rootObj)
 {
-    QString  header   = rootObj.value("header").toString();
-    QString  body = rootObj.value("body").toString();
-    QString  bigText = rootObj.value("bigText").toString();
+    QString header  = rootObj.value("header").toString();
+    QString body    = rootObj.value("body").toString();
+    QString bigText = rootObj.value("bigText").toString();
 
     qint64 result = g_pushNotify->sendNewGeneralTopicNotification(header, body, bigText);
     if (result < 0)
-        return (qint32) result;
+        return (qint32)result;
     return ERROR_CODE_SUCCESS;
 }
 
@@ -331,5 +366,5 @@ void cControlManager::stopAllControls()
 
     g_SmtpManager.setServerEmail("");
     g_SmtpManager.setServerPassword("");
-    g_SmtpManager.clearDestinationEmails();
+    g_SmtpManager.clearDestinationEAddresses();
 }

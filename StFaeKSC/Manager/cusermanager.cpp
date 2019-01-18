@@ -24,6 +24,8 @@
 #include "../Common/Network/messagecommand.h"
 #include "../General/globaldata.h"
 #include "../General/pushnotification.h"
+#include "ccontrolmanager.h"
+#include "csmtpmanager.h"
 #include "cusermanager.h"
 
 extern GlobalData* g_GlobalData;
@@ -115,6 +117,7 @@ MessageProtocol* cUserManager::getUserProperties(UserConData* pUserCon, MessageP
     rootObjAns.insert("index", pUserCon->m_userID);
     rootObjAns.insert("readableName", g_GlobalData->m_UserList.getReadableName(pUserCon->m_userID));
     rootObjAns.insert("loadAll", loadAll);
+    rootObjAns.insert("emailNotifiy", g_SmtpManager.getDoesDestEAddressExist(pUserCon->m_userName));
 
     if (loadAll) {
         QJsonArray arrTickets;
@@ -219,6 +222,17 @@ MessageProtocol* cUserManager::getUserCommandResponse(UserConData* pUserCon, Mes
         rootAns.insert("timestamp", g_GlobalData->m_UserList.getLastUpdateTime());
         rootAns.insert("user", arrUsers);
         result = ERROR_CODE_SUCCESS;
+    } else if (cmd == "notifyEmail") {
+        qint32 activate = rootObj.value("activate").toInt(0);
+
+        if (activate == 1)
+            result = g_ControlManager.addDestinationEmailAddress(pUserCon->m_userName);
+        else if (activate == 0)
+            result = g_ControlManager.removeDestinationEmailAddress(pUserCon->m_userName);
+        else
+            result = ERROR_CODE_NOT_POSSIBLE;
+
+        rootAns.insert("activate", g_SmtpManager.getDoesDestEAddressExist(pUserCon->m_userName));
     }
 
     rootAns.insert("ack", result);

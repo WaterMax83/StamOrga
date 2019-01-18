@@ -45,7 +45,7 @@ public:
 
     qint32 initialize(ListedUser* pListedUser);
 
-    MessageProtocol* getNewUserAcknowledge(const QString userName, const QHostAddress addr, const cConSslUsage sslUsage);
+    MessageProtocol* getNewUserAcknowledge(const QString& userName, const QHostAddress& addr, const cConSslUsage& sslUsage);
 
 
 private slots:

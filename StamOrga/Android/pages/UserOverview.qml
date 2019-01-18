@@ -81,6 +81,7 @@ Flickable {
 
     function toolButtonClicked() {
 
+        updateHeaderFromMain("Benutzer", "");
     }
 
     function updateUserOverviewList(){
@@ -134,10 +135,9 @@ Flickable {
         id: userInformationItem
         MyComponents.UserInformationItem {
             onClickedItem: {
-                console.log("clicked " + sender.readName + " " + sender.admin)
-                if (sender.admin) {
+                if (sender.owner) {
                     titleLabel.text = "Benutzerprofil";
-                    stackView.push(viewUserLogin)
+                    stackView.push(viewUserProfil)
                 } else {
 
                 }

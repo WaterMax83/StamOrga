@@ -63,18 +63,20 @@ MainWindow::~MainWindow()
 }
 
 
-void MainWindow::connectionFinished(qint32 result, const QString msg)
+void MainWindow::connectionFinished(const qint32 result)
 {
     if (result >= ERROR_CODE_NO_ERROR) {
         this->ui->conResult->setStyleSheet("background-color:green");
     } else {
         this->ui->conResult->setStyleSheet("background-color:red");
-        qWarning() << QString("Could not connect: %1:%2").arg(result).arg(msg);
+        qWarning() << QString("Could not connect: %1").arg(result);
     }
 }
 
-void MainWindow::slotNotifyCommandFinished(quint32 command, qint32 result)
+void MainWindow::slotNotifyCommandFinished(const quint32 command, const qint32 result, const qint32 subCmd)
 {
+    Q_UNUSED(subCmd);
+
     switch (command) {
     case OP_CODE_CMD_REQ::REQ_GET_VERSION:
         if (result == ERROR_CODE_SUCCESS)

@@ -45,6 +45,9 @@ public:
 
     MessageProtocol* getControlCommandResponse(UserConData* pUserCon, MessageProtocol* request);
 
+    qint32 addDestinationEmailAddress(const QString& addr);
+    qint32 removeDestinationEmailAddress(const QString& addr);
+
     qint32 checkConsistency() { return ERROR_CODE_NOT_FOUND; }
 
 signals:
@@ -53,6 +56,8 @@ public slots:
 
 private:
     void saveCurrentInteralList() override;
+
+    void saveControlList(const qint32 index = -1);
 
     QList<qint32>          m_statistic;
     QList<OnlineGameCtrl*> m_onlineGames;

@@ -90,7 +90,8 @@ void cConTcpMainSocket::checkNewOncomingData()
 
             this->m_pConTimeout->start();
             /* Get userName from packet */
-            QString          userName(QByteArray(msg->getPointerToData(), msg->getDataLength()));
+            QString userName(QByteArray(msg->getPointerToData(), msg->getDataLength()));
+            userName             = userName.toLower();
             MessageProtocol* ack = g_ConTcpMainData.getNewUserAcknowledge(userName, this->m_pTcpMasterSocket->peerAddress(), this->m_sslUsage);
 
             /* send answer */

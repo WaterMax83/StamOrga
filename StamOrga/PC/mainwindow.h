@@ -24,7 +24,7 @@
 
 namespace Ui
 {
-class MainWindow;
+    class MainWindow;
 }
 
 class MainWindow : public QMainWindow
@@ -36,8 +36,8 @@ public:
     ~MainWindow();
 
 private slots:
-    void connectionFinished(const qint32 result, const QString msg);
-    void slotNotifyCommandFinished(quint32 command, qint32 result);
+    void connectionFinished(const qint32 result);
+    void slotNotifyCommandFinished(const quint32 command, const qint32 result, const qint32 subCmd);
 
     void on_btnLogin_clicked();
 

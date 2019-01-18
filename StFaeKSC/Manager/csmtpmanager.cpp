@@ -90,22 +90,37 @@ QString cSmtpManager::getServerPassword()
     return this->m_serverPassword;
 }
 
-qint32 cSmtpManager::addDestinationEmail(const QString email)
+qint32 cSmtpManager::addDestinationEAddr(const QString& email)
 {
     if (!this->m_initialized)
         return ERROR_CODE_NOT_INITIALIZED;
 
     QMutexLocker lock(&this->m_mutex);
 
-    if (this->m_destinationAdress.contains(email))
+    if (this->m_destinationAdress.contains(email.toLower()))
         return ERROR_CODE_ALREADY_EXIST;
 
-    this->m_destinationAdress.append(email);
+    this->m_destinationAdress.append(email.toLower());
 
     return ERROR_CODE_SUCCESS;
 }
 
-qint32 cSmtpManager::clearDestinationEmails()
+qint32 cSmtpManager::removeDestinationEAddr(const QString& email)
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QMutexLocker lock(&this->m_mutex);
+
+    if (!this->m_destinationAdress.contains(email.toLower()))
+        return ERROR_CODE_NOT_FOUND;
+
+    this->m_destinationAdress.removeOne(email.toLower());
+
+    return ERROR_CODE_SUCCESS;
+}
+
+qint32 cSmtpManager::clearDestinationEAddresses()
 {
     if (!this->m_initialized)
         return ERROR_CODE_NOT_INITIALIZED;
@@ -117,7 +132,7 @@ qint32 cSmtpManager::clearDestinationEmails()
     return ERROR_CODE_SUCCESS;
 }
 
-QStringList cSmtpManager::getDestinationEmails()
+QStringList cSmtpManager::getDestinationEAddresses()
 {
     if (!this->m_initialized)
         return QStringList();
@@ -125,6 +140,18 @@ QStringList cSmtpManager::getDestinationEmails()
     QMutexLocker lock(&this->m_mutex);
 
     return this->m_destinationAdress;
+}
+
+qint32 cSmtpManager::getDoesDestEAddressExist(const QString& addr)
+{
+    if (!this->m_initialized)
+        return -1;
+
+    QMutexLocker lock(&this->m_mutex);
+
+    if (this->m_destinationAdress.contains(addr.toLower()))
+        return 1;
+    return 0;
 }
 
 qint32 cSmtpManager::sendNewEmail(const QString header, const QString body)
@@ -139,8 +166,6 @@ qint32 cSmtpManager::sendNewEmail(const QString header, const QString body)
     SmtpMail* pMail = new SmtpMail();
     pMail->m_header = header;
     pMail->m_body   = body;
-
-    //    QThread::sleep(1);
 
     emit this->signalSendNewEmails(pMail);
 

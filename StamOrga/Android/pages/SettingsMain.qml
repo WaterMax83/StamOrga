@@ -53,8 +53,8 @@ Item {
                 id: listViewListModelSettings
                 Component.onCompleted: {
                     append({
-                               title: "BenutzerProfil",
-                               element: viewUserLogin,
+                               title: "Benutzerprofil",
+                               element: viewUserProfil,
                                showSeperator: true,
                                listImgSource : "/images/account.png"
                            })

@@ -123,7 +123,7 @@ void AdrPushNotifyInfoHandler::unSubscribeFromTopic(QString topic)
 #else
     Q_UNUSED(topic);
 
-    qInfo() << "Unsubscribe to " << topic;
+    qInfo() << "Unsubscribe from " << topic;
 #endif
 }
 

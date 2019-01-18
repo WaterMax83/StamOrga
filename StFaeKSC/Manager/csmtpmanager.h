@@ -45,9 +45,11 @@ public:
 
     void setDeactivate(const bool bValue) { this->m_bDeactivate = bValue; }
 
-    qint32 addDestinationEmail(const QString email);
-    qint32      clearDestinationEmails();
-    QStringList getDestinationEmails();
+    qint32 addDestinationEAddr(const QString& email);
+    qint32 removeDestinationEAddr(const QString& email);
+    qint32      clearDestinationEAddresses();
+    QStringList getDestinationEAddresses();
+    qint32 getDoesDestEAddressExist(const QString& addr);
 
     qint32 sendNewEmail(const QString header, const QString body);
 

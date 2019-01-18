@@ -68,6 +68,10 @@ int main(int argc, char* argv[])
 
     g_Console = new Console();
 
+    // For Logging output
+    qInfo().noquote() << "*************************************************************";
+    qInfo().noquote() << QString("Starting StFaeKSC %1").arg(STAM_ORGA_VERSION_S);
+
     PushNotification pushNotify;
     pushNotify.initialize(&globalData);
 

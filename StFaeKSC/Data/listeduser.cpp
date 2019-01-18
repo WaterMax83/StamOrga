@@ -55,7 +55,7 @@ ListedUser::ListedUser()
 
         for (int i = 0; i < sizeOfArray; i++) {
             this->m_pConfigSettings->setArrayIndex(i);
-            QString name      = this->m_pConfigSettings->value(ITEM_NAME, "").toString();
+            QString name      = this->m_pConfigSettings->value(ITEM_NAME, "").toString().toLower();
             qint32  index     = this->m_pConfigSettings->value(ITEM_INDEX, 0).toInt();
             qint64  timestamp = this->m_pConfigSettings->value(ITEM_TIMESTAMP, 0x0).toLongLong();
 

@@ -104,8 +104,6 @@ ApplicationWindow {
                 implicitHeight: 50
                 contentItem: Image {
                     id: imageToolButton
-                    //                    anchors.fill: parent
-                    //                    anchors.margins: 5
                     fillMode: Image.Pad
                     horizontalAlignment: Image.AlignHCenter
                     verticalAlignment: Image.AlignVCenter
@@ -319,8 +317,12 @@ ApplicationWindow {
 
     MyPages.UserLogin {
         visible: false
-        userIntUser: userInt
         id: viewUserLogin
+    }
+
+    Component {
+        id: viewUserProfil
+        MyPages.UserProfil {}
     }
 
     /* Need components because otherwise they will be shown in main view */
@@ -368,7 +370,7 @@ ApplicationWindow {
     UserInterface {
         id: userInt
         onNotifyConnectionFinished: {
-            if (result === -21 || result === -5) { // Wrong password or not Found
+            if (result === -21 || result === -5 || result === -20) { // Wrong password or not Found or user unknown
                 if (stackView.currentItem !== viewUserLogin)
                     stackView.push(viewUserLogin)
             }
@@ -513,10 +515,7 @@ ApplicationWindow {
             gStaGlobalSettings.checkNewStateChangedAtStart();
 
             if (!gStaVersionManager.isVersionChangeAlreadyShown()) {
-                //                var component = Qt.createComponent("../pages/SettingsVersionInfo.qml");
-                //                if (component.status === Component.Ready) {
                 stackView.push(viewSettingsVersionInfoPage);
-                //                }
             }
         }
     }

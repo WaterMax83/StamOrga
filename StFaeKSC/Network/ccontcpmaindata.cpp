@@ -42,7 +42,7 @@ qint32 cConTcpMainData::initialize(ListedUser* pListedUser)
     return ERROR_CODE_SUCCESS;
 }
 
-MessageProtocol* cConTcpMainData::getNewUserAcknowledge(const QString userName, const QHostAddress addr, const cConSslUsage sslUsage)
+MessageProtocol* cConTcpMainData::getNewUserAcknowledge(const QString& userName, const QHostAddress& addr, const cConSslUsage& sslUsage)
 {
     QJsonObject rootObj;
     qint32      userIndex = this->m_pListedUser->getItemIndex(userName);

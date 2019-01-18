@@ -103,10 +103,14 @@ void cConManager::slMainConReqFin(qint32 result, const QString& msg, const QStri
         qWarning().noquote() << QString("Error main connecting: %1").arg(msg);
         this->stopDataConnection();
         this->m_bIsConnecting = false;
-        emit this->signalNotifyConnectionFinished(result);
 
-        if (result == ERROR_CODE_NO_USER)
+        if (result == ERROR_CODE_NO_USER) {
             g_StaGlobalSettings->setAlreadyConnected(false);
+
+            g_ConUserSettings->setSalt("");
+            g_ConUserSettings->setPassWord("");
+        }
+        emit this->signalNotifyConnectionFinished(result);
 
         while (this->m_lRequestConError.size() > 0) {
             TcpDataConRequest* request = this->m_lRequestConError.last();

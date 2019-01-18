@@ -86,6 +86,19 @@ public:
         return true;
     }
 
+    static bool compareuUserNameFunctionAscending(UserInformation* p1, UserInformation* p2)
+    {
+        qint32 value = p1->m_user.compare(p2->m_user);
+        if (value > 0)
+            return true;
+        else if (value < 0)
+            return false;
+
+        if (p1->m_timestamp > p2->m_timestamp)
+            return false;
+        return true;
+    }
+
     Q_INVOKABLE QString getUserShortString()
     {
         if (this->m_owner)
@@ -109,6 +122,7 @@ public:
     Q_INVOKABLE qint32 startUpdateReadableName(QString name);
     Q_INVOKABLE qint32 startUpdatePassword(QString password);
     Q_INVOKABLE qint32 startListUserOverview();
+    Q_INVOKABLE qint32 startChangeEmailNotification();
 
     qint32 handleUserCommandResponse(MessageProtocol* msg);
     qint32 handleUpdatePasswordResponse(MessageProtocol* msg);

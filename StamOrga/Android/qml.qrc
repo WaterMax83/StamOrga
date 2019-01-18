@@ -127,5 +127,7 @@
         <file>images/+material/notification.png</file>
         <file>images/notification.png</file>
         <file>pages/SettingsGeneral.qml</file>
+        <file>pages/UserProperties.qml</file>
+        <file>pages/UserProfil.qml</file>
     </qresource>
 </RCC>

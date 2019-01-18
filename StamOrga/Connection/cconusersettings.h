@@ -46,6 +46,10 @@ public:
     Q_INVOKABLE QString getReadableName();
     void                setReadableName(const QString name);
 
+    Q_INVOKABLE qint32 getEmailNotification();
+    void               setEmailNotification(const qint32 notify);
+    Q_INVOKABLE QString getEmailNotifyString();
+
     QString getSalt();
     void    setSalt(const QString salt);
 
@@ -83,6 +87,7 @@ private:
     QString m_salt;
     qint32  m_userIndex;
     quint32 m_userProperties;
+    qint32  m_emailNotify;
 
     QString m_currentRandomValue;
 

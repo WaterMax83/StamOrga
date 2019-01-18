@@ -37,13 +37,14 @@
 
 // clang-format off
 
-#define USER_GROUP      "USER_LOGIN"
+#define USER_GROUP          "USER_LOGIN"
 
-#define USER_IPADDR     "IPAddress"
-#define USER_USERNAME   "UserName"
-#define USER_PASSWORD   "Password"
-#define USER_SALT       "Salt"
-#define USER_READABLE   "ReadableName"
+#define USER_IPADDR         "IPAddress"
+#define USER_USERNAME       "UserName"
+#define USER_PASSWORD       "Password"
+#define USER_SALT           "Salt"
+#define USER_READABLE       "ReadableName"
+#define USER_EMAIL_NOTIFY   "EmailNotify"
 
 // clang-format on
 
@@ -58,6 +59,7 @@ cConUserSettings::cConUserSettings(QObject* parent)
 qint32 cConUserSettings::initialize()
 {
     QString value;
+    qint32  iValue;
 
     g_StaSettingsManager->getValue(USER_GROUP, USER_IPADDR, value);
     this->m_ipAddr = value;
@@ -69,6 +71,9 @@ qint32 cConUserSettings::initialize()
     this->m_salt = value;
     g_StaSettingsManager->getValue(USER_GROUP, USER_READABLE, value);
     this->m_readableName = value;
+    g_StaSettingsManager->getInt32ValueDF(USER_GROUP, USER_EMAIL_NOTIFY, iValue, -1);
+    this->m_emailNotify = iValue;
+
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 9, 0)
     this->m_hash = new QCryptographicHash(QCryptographicHash::Sha3_512);
@@ -135,6 +140,28 @@ void cConUserSettings::setReadableName(const QString name)
     }
 }
 
+qint32 cConUserSettings::getEmailNotification()
+{
+    return this->m_emailNotify;
+}
+
+void cConUserSettings::setEmailNotification(const qint32 notify)
+{
+    if (this->m_emailNotify != notify) {
+        this->m_emailNotify = notify;
+        g_StaSettingsManager->setInt32Value(USER_GROUP, USER_EMAIL_NOTIFY, notify);
+    }
+}
+
+QString cConUserSettings::getEmailNotifyString()
+{
+    if (this->m_emailNotify == 0)
+        return "Deaktiviert";
+    else if (this->m_emailNotify == 1)
+        return "Aktiviert";
+
+    return "Nicht gesetzt";
+}
 
 QString cConUserSettings::getSalt()
 {
@@ -207,9 +234,11 @@ qint32 cConUserSettings::handleUserPropsResponse(MessageProtocol* msg)
     quint32 properties   = (quint32)rootObj.value("property").toDouble(0);
     QString readableName = rootObj.value("readableName").toString();
     bool    loadAll      = rootObj.value("loadAll").toBool();
+    qint32  emailNotify  = rootObj.value("emailNotifiy").toInt(-1);
 
     this->setUserIndex(index);
     this->setReadableName(readableName);
+    this->setEmailNotification(emailNotify);
     if (rValue == ERROR_CODE_SUCCESS) {
         if (this->getUserProperties() != properties) {
             this->setUserProperties(properties);
@@ -230,15 +259,11 @@ qint32 cConUserSettings::handleUserPropsResponse(MessageProtocol* msg)
     }
 
     /* Call this classes to remove all old data */
-    //    if (rootObj.contains("tickets")) {
     QJsonArray arrTickets = rootObj.value("tickets").toArray();
     g_DataGameUserData->handleUserPropTickets(arrTickets);
-    //    }
 
-    //    if (rootObj.contains("events")) {
     QJsonArray arrEvents = rootObj.value("events").toArray();
     g_DataAppUserEvents->addNewUserEvents(arrEvents);
-    //    }
 
     return rValue;
 }
