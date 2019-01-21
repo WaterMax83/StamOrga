@@ -88,11 +88,11 @@ public:
 
     static bool compareuUserNameFunctionAscending(UserInformation* p1, UserInformation* p2)
     {
-        qint32 value = p1->m_user.compare(p2->m_user);
+        qint32 value = p1->m_readName.compare(p2->m_readName);
         if (value > 0)
-            return true;
-        else if (value < 0)
             return false;
+        else if (value < 0)
+            return true;
 
         if (p1->m_timestamp > p2->m_timestamp)
             return false;

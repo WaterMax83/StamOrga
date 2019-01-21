@@ -142,7 +142,9 @@ void cConUserSettings::setReadableName(const QString name)
 
 qint32 cConUserSettings::getEmailNotification()
 {
-    return this->m_emailNotify;
+    if (this->m_userName.contains("@"))
+        return this->m_emailNotify;
+    return -2;
 }
 
 void cConUserSettings::setEmailNotification(const qint32 notify)

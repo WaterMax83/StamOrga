@@ -28,10 +28,13 @@ MyComponents.CustomDialog {
     property int parentWidth : 540
     property int parentHeight : 960
     property int textMinSize : 3
-    property alias editableText : txtEditableText.text
+    property alias editableText : editableTextItem.text
     property alias headerText: editableTextDialog.title
+    property string checkBoxText: ""
+    property bool checkBoxChecked: false
 
     signal acceptedTextEdit(var text)
+    signal acceptedTextEditAndCheckBox(var text, var checked)
 
     id: editableTextDialog
     x: Math.round((parentWidth - width) / 2)
@@ -43,12 +46,13 @@ MyComponents.CustomDialog {
     standardButtons: Dialog.Ok | Dialog.Cancel
     onAccepted: {
         labelTextTooShort.visible = false
-        if (txtEditableText.text.trim().length < textMinSize) {
+        if (editableTextItem.text.trim().length < textMinSize) {
             labelTextTooShort.visible = true
-            labelTextTooShort.text = "Der Text muss mindestens " + textMinSize + " Zeichen lang sein";
+            labelTextTooShort.text = "Die Eingabe muss mindestens " + textMinSize + " Zeichen lang sein";
             editableTextDialog.open()
         } else {
-            acceptedTextEdit(txtEditableText.text.trim());
+            acceptedTextEdit(editableTextItem.text.trim());
+            acceptedTextEditAndCheckBox(editableTextItem.text.trim(), checkBoxItem.checked);
             editableTextDialog.close();
             editableTextDialog.destroy();
         }
@@ -70,7 +74,7 @@ MyComponents.CustomDialog {
         }
 
         TextField {
-            id: txtEditableText
+            id: editableTextItem
             font.family: txtForFontFamily.font
             implicitWidth: editableTextDialogColumn.width / 4 * 3
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
@@ -84,6 +88,14 @@ MyComponents.CustomDialog {
             font.pixelSize: 12
             Layout.maximumWidth: parent.width
             color: "orange"
+        }
+
+        CheckBox {
+            id: checkBoxItem
+            font.family: txtForFontFamily.font
+            text: checkBoxText
+            checked: checkBoxChecked
+            visible: checkBoxText.length > 0
         }
     }
 }

@@ -97,7 +97,7 @@ qint32 cDataUserManager::startUpdatePassword(QString password)
     if (password.length() > 0)
         newPassWord = g_ConUserSettings->createHashValue(password, g_ConUserSettings->getSalt());
     else
-        newPassWord = this->m_newPassWord;
+        newPassWord             = this->m_newPassWord;
     QString     currentPassWord = g_ConUserSettings->createHashValue(g_ConUserSettings->getPassWord(), g_ConUserSettings->getRandomLoginValue());
     QJsonObject rootObj;
     rootObj.insert("type", "user");
@@ -139,6 +139,8 @@ qint32 cDataUserManager::startChangeEmailNotification()
         return ERROR_CODE_NOT_INITIALIZED;
 
     qint32 value = g_ConUserSettings->getEmailNotification();
+    if (value == -2)
+        return ERROR_CODE_NOT_POSSIBLE;
     if (value == 1)
         value = 0;
     else
@@ -188,6 +190,7 @@ qint32 cDataUserManager::handleUserCommandResponse(MessageProtocol* msg)
         //        this->m_stLastLocalUpdateTimeStamp = QDateTime::currentMSecsSinceEpoch();
 
         qint32           ownUserIndex = g_ConUserSettings->getUserIndex();
+        bool             bIsUserAdmin = g_ConUserSettings->userIsAdminEnabled();
         UserInformation* pOwnUser     = NULL;
 
         for (int i = 0; i < arrUser.count(); i++) {
@@ -195,20 +198,24 @@ qint32 cDataUserManager::handleUserCommandResponse(MessageProtocol* msg)
             UserInformation* pUser   = new UserInformation();
             g_GlobalManager->setQMLObjectOwnershipToCpp(pUser);
 
-            pUser->m_index      = userObj.value("index").toInt();
+            pUser->m_user  = userObj.value("user").toString();
+            pUser->m_index = userObj.value("index").toInt();
+            if (!bIsUserAdmin && pUser->m_index != ownUserIndex && !pUser->m_user.contains("@")) {
+                delete pUser;
+                continue;
+            }
+
             pUser->m_timestamp  = (qint64)userObj.value("timestamp").toDouble();
             pUser->m_lastOnline = (qint64)userObj.value("online").toDouble();
-            pUser->m_user       = userObj.value("user").toString();
             pUser->m_readName   = userObj.value("readName").toString();
             if (pUser->m_readName.isEmpty())
                 pUser->m_readName = "NoName";
-            pUser->m_prop  = (quint32)userObj.value("props").toDouble();
-            pUser->m_admin = USER_IS_ENABLED(pUser->m_prop, USER_ENABLE_ADMIN);
+            pUser->m_prop         = (quint32)userObj.value("props").toDouble();
+            pUser->m_admin        = USER_IS_ENABLED(pUser->m_prop, USER_ENABLE_ADMIN);
             if (pUser->m_admin)
                 pUser->m_userType = "Admin";
             else
                 pUser->m_userType = "Benutzer";
-
             if (pUser->m_index == ownUserIndex) {
                 pUser->m_owner = true;
                 pOwnUser       = pUser;

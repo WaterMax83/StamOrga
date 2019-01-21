@@ -44,6 +44,7 @@ Flickable {
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
                 Layout.fillHeight: false
                 Layout.topMargin: 10
+                Layout.bottomMargin: 10
                 infoVisible: false
             }
 
@@ -62,7 +63,7 @@ Flickable {
                     font.family: txtForFontFamily.font
                     text: gConUserSettings.getIPAddr()
                     padding: 10
-                    implicitWidth: parent.width / 3 * 2
+                    implicitWidth: parent.width / 5 * 4
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     visible: userInt.isDebuggingEnabled()
                     Layout.bottomMargin: 35
@@ -80,7 +81,7 @@ Flickable {
                     font.family: txtForFontFamily.font
                     text: gConUserSettings.getUserName()
                     padding: 10
-                    implicitWidth: parent.width / 3 * 2
+                    implicitWidth: parent.width / 5 * 4
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     onTextChanged: {
                         if (text !== gConUserSettings.getUserName()) {
@@ -102,7 +103,7 @@ Flickable {
                     font.family: txtForFontFamily.font
                     text: gConUserSettings.getPassWord().length === 0 ? "" : "dEf1AuLt"
                     padding: 10
-                    implicitWidth: parent.width / 3 * 2
+                    implicitWidth: parent.width / 5 * 4
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     onTextChanged: {
                         //                        globalUserData.bIsConnected = false;
@@ -148,7 +149,9 @@ Flickable {
             //            busyIndicatorUserlogin.infoText = "Verbindung erfolgreich";
             busyIndicatorUserlogin.infoVisible = false;
             toastManager.show("Verbindung erfolgreich", 2000)
-            stackView.pop();
+            stackView.clear();
+            stackView.push(viewMainGames);
+//            stackView.push(viewUserProfil);
         }
         else {
             if (result === -21)
@@ -159,12 +162,7 @@ Flickable {
         }
     }
 
-    function pageOpenedUpdateView() {
-    }
-
-    function updateUserColumnView(enableLogin) {
-
-    }
+    function pageOpenedUpdateView() {  }
 
     ScrollIndicator.vertical: ScrollIndicator { }
 }

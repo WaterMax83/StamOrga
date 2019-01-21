@@ -81,19 +81,17 @@ Flickable {
     }
 
     function toolButtonClicked() {
-        var component = Qt.createComponent("../components/EditSeasonTicketDialog.qml");
+        var component = Qt.createComponent("../components/EditableTextDialog.qml");
         if (component.status === Component.Ready) {
             var dialog = component.createObject(flickableTickets,{popupType: 1});
             dialog.headerText = "Neue Dauerkarte";
             dialog.parentHeight = flickableTickets.height
             dialog.parentWidth =  flickableTickets.width
             dialog.textMinSize = 4;
-//            if (globalSettings.useReadableName)
-                dialog.editableText = gConUserSettings.getReadableName();
-//            else
-//                dialog.editableText = "";
-            dialog.checkBoxState = false
-            dialog.acceptedSeasonTicketEdit.connect(acceptedAddSeasonTicketDialog);
+            dialog.editableText = gConUserSettings.getReadableName();
+            dialog.checkBoxChecked = false
+            dialog.checkBoxText = "ermäßigt";
+            dialog.acceptedTextEditAndCheckBox.connect(acceptedAddSeasonTicketDialog);
             dialog.font.family= txtForFontFamily.font
             dialog.open();
         } else
@@ -224,7 +222,7 @@ Flickable {
                 id: menuItemEdit
                 font.family: txtForFontFamily.font
                 onClicked: {
-                    var component = Qt.createComponent("../components/EditSeasonTicketDialog.qml");
+                    var component = Qt.createComponent("../components/EditableTextDialog.qml");
                     if (component.status === Component.Ready) {
                         var dialog = component.createObject(flickableTickets,{popupType: 1});
                         dialog.headerText = "Editiere Dauerkarte";
@@ -234,10 +232,11 @@ Flickable {
                         dialog.font.family= txtForFontFamily.font
                         dialog.editableText = m_ticketNameToChange;
                         if (m_ticketDiscountToChange === 0)
-                            dialog.checkBoxState = false
+                            dialog.checkBoxChecked = false
                         else
-                            dialog.checkBoxState = true
-                        dialog.acceptedSeasonTicketEdit.connect(acceptedEditSeasonTicketDialog);
+                            dialog.checkBoxChecked = true
+                        dialog.checkBoxText = "ermäßigt";
+                        dialog.acceptedTextEditAndCheckBox.connect(acceptedEditSeasonTicketDialog);
                         dialog.open();
                     } else
                         console.log(component.errorString());

@@ -46,7 +46,6 @@
         <file>images/done.png</file>
         <file>images/help.png</file>
         <file>pages/SettingsVersionInfo.qml</file>
-        <file>components/EditSeasonTicketDialog.qml</file>
         <file>pages/GamesMainPage.qml</file>
         <file>components/TicketInfoSingleItem.qml</file>
         <file>components/TicketInfoDoubleItem.qml</file>

@@ -460,7 +460,7 @@ Flickable {
                     dialog.parentHeight = mainPaneCurrentGame.height
                     dialog.parentWidth = mainPaneCurrentGame.width
                     dialog.textToAccept = "Der Name exisitiert bereits.\n\nZum Ändern eines vorhanden Eintrags auf den Namen klicken.";
-                    dialog.showCancelButton = false
+                    dialog.enableCancelButton = false
                     dialog.font.family= txtForFontFamily.font
                     dialog.open();
                 }

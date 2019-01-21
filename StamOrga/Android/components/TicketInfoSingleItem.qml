@@ -107,7 +107,7 @@ Item {
                     dialog.textToAccept = "Die Karte von<br><br><b>" + title + "</b><br><br>
                                             befindet sich seit<br><br><b>" + timestamp + "</b><br><br>
                                             aktuell bei<br><br> <b>" + place + "</b>";
-                    dialog.showCancelButton = false
+                    dialog.enableCancelButton = false
                     dialog.font.family= txtForFontFamily.font
                     dialog.open();
                 }

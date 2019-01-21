@@ -29,7 +29,7 @@ MyComponents.CustomDialog {
     property int parentHeight : 960
     property alias textToAccept : labelAcceptText.text
     property alias headerText: accepptTextDialog.title
-    property bool showCancelButton: true
+    property bool enableCancelButton: true
 
     signal acceptedDialog()
 
@@ -41,7 +41,7 @@ MyComponents.CustomDialog {
     modal: true
     focus: true
 
-    standardButtons: Dialog.Ok | (showCancelButton ? Dialog.Cancel : 0)
+    standardButtons: Dialog.Ok | (enableCancelButton ? Dialog.Cancel : 0)
     onAccepted: {
         acceptedDialog();
         accepptTextDialog.close();

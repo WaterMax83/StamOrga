@@ -179,7 +179,7 @@ Item {
                 dialog.parentHeight = mainPaneCurrentNews.height
                 dialog.parentWidth = mainPaneCurrentNews.width
                 dialog.textToAccept = "Die Überschrift darf nicht leer sein";
-                dialog.showCancelButton = false
+                dialog.enableCancelButton = false
                 dialog.open();
             }
             return;

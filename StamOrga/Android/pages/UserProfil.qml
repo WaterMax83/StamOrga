@@ -71,6 +71,7 @@ Flickable {
                             id: text1
                             text: "Nutzername"
                             color: "white"
+                            font.pixelSize: 16
                             Layout.fillWidth: true
                         }
 
@@ -78,6 +79,7 @@ Flickable {
                             id: textPreviewUserName
                             text: gConUserSettings.getReadableName()
                             color: Material.hintTextColor
+                            font.pixelSize: 14
                             Layout.fillWidth: true
                             Layout.leftMargin: 10
                             Layout.bottomMargin: 5
@@ -121,8 +123,10 @@ Flickable {
                 }
 
                 Item {
+                    id: itemEmailNotify
                     width: parent.width
                     height: column2.height
+                    visible: gConUserSettings.getEmailNotification() !== -2
 
                     ColumnLayout {
                         id: column2
@@ -131,6 +135,7 @@ Flickable {
                         Text {
                             text: "Email Benachrichtigung"
                             color: "white"
+                            font.pixelSize: 16
                             Layout.fillWidth: true
                         }
 
@@ -138,6 +143,7 @@ Flickable {
                             id: emailNotifyText
                             text: gConUserSettings.getEmailNotifyString()
                             color: Material.hintTextColor
+                            font.pixelSize: 14
                             Layout.fillWidth: true
                             Layout.leftMargin: 10
                         }
@@ -146,20 +152,22 @@ Flickable {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            busyIndicatorUserProfil.loadingVisible = true;
-                            busyIndicatorUserProfil.infoVisible = true;
-                            busyIndicatorUserProfil.infoText = "Ändere Aktivierung"
-
-                            gDataUserManager.startChangeEmailNotification();
+                            if (gConUserSettings.getEmailNotification() !== -2) {
+                                if (gDataUserManager.startChangeEmailNotification() === 1) {
+                                    busyIndicatorUserProfil.loadingVisible = true;
+                                    busyIndicatorUserProfil.infoVisible = true;
+                                    busyIndicatorUserProfil.infoText = "Ändere Aktivierung"
+                                }
+                            }
                         }
                     }
                 }
 
                 Rectangle {
-                    id: sep2
                     color: Material.hintTextColor
                     height: 1
                     Layout.fillWidth: true
+                    visible: gConUserSettings.getEmailNotification() !== -2
                 }
 
                 Item {
@@ -173,12 +181,14 @@ Flickable {
                         Text {
                             text: "Passwort ändern"
                             color: "white"
+                            font.pixelSize: 16
                             Layout.fillWidth: true
                         }
 
                         Text {
                             text: "********"
                             color: Material.hintTextColor
+                            font.pixelSize: 14
                             Layout.fillWidth: true
                             Layout.leftMargin: 10
                         }
@@ -211,12 +221,14 @@ Flickable {
                         Text {
                             text: "Benutzer wechseln"
                             color: "white"
+                            font.pixelSize: 16
                             Layout.fillWidth: true
                         }
 
                         Text {
                             text: gConUserSettings.getUserName();
                             color: Material.hintTextColor
+                            font.pixelSize: 14
                             Layout.fillWidth: true
                             Layout.leftMargin: 10
                         }
@@ -303,12 +315,14 @@ Flickable {
     }
 
     function pageOpenedUpdateView() {
-        if (gConUserSettings.getEmailNotification() < 0) {
+
+        if (gConUserSettings.getEmailNotification() === -1) {
             busyIndicatorUserProfil.loadingVisible = true;
             busyIndicatorUserProfil.infoVisible = true;
             busyIndicatorUserProfil.infoText = "Lade Daten"
             gConUserSettings.startGettingUserProps(true);
         }
+
     }
 
     function notifyGetUserProperties(result) {

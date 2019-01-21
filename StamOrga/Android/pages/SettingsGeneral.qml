@@ -225,7 +225,7 @@ Flickable {
             dialog.parentHeight = mainWindow.height
             dialog.parentWidth = mainWindow.width
             dialog.textToAccept = "Zum Aktualisieren muss die App neu gestarted werden";
-            dialog.showCancelButton = false
+            dialog.enableCancelButton = false
             dialog.open();
         }
     }

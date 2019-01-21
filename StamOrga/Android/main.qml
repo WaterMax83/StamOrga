@@ -237,7 +237,7 @@ ApplicationWindow {
         initialItem: viewMainGames
 
         onCurrentItemChanged: {
-            if (stackView.currentItem.pageOpenedUpdateView)
+            if (stackView.currentItem !== null && stackView.currentItem.pageOpenedUpdateView)
                 stackView.currentItem.pageOpenedUpdateView()
         }
     }
