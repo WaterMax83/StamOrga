@@ -44,6 +44,8 @@ public:
 
     void setQMLObjectOwnershipToCpp(QObject* pObject);
 
+    Q_INVOKABLE qint32 startLogoutUser(const bool bKeepUserName = true);
+
 signals:
 
 private:

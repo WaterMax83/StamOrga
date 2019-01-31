@@ -39,6 +39,8 @@ public:
 
     qint32 startMainConnection(const QString& name, const QString& passw);
 
+    qint32 resetCurrentConnection();
+
     void sendLoginRequest();
     void sendNewRequest(TcpDataConRequest* request);
 

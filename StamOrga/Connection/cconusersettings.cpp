@@ -205,6 +205,12 @@ void cConUserSettings::setUserProperties(const quint32 userProperties)
     //    }
 }
 
+void cConUserSettings::resetUserProperties(void)
+{
+    this->m_userProperties = 0;
+}
+
+
 qint32 cConUserSettings::startGettingUserProps(const bool loadEverything)
 {
     QJsonObject rootObj;

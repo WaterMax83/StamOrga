@@ -58,6 +58,11 @@ MyComponents.CustomDialog {
         spacing: 20
 
         Text {
+            id: txtForFontFamily
+            visible: false
+        }
+
+        Text {
             id: labelAcceptText
             textFormat: Text.RichText
             font.pixelSize: 14

@@ -117,7 +117,7 @@ public:
 
     Q_INVOKABLE qint32 getUserInformationLength();
     Q_INVOKABLE UserInformation* getUserInfoFromArrayIndex(int index);
-    //    Q_INVOKABLE QString getUserInfoLastLocalUpdateString();
+    Q_INVOKABLE QString getUserInfoLastLocalUpdateString();
 
     Q_INVOKABLE qint32 startUpdateReadableName(QString name);
     Q_INVOKABLE qint32 startUpdatePassword(QString password);
@@ -126,6 +126,7 @@ public:
 
     qint32 handleUserCommandResponse(MessageProtocol* msg);
     qint32 handleUpdatePasswordResponse(MessageProtocol* msg);
+    qint32 clearUserList();
 
 signals:
 
@@ -137,6 +138,9 @@ private:
     QString m_newReadableName;
     QString m_currentRandomValue;
     QString m_newPassWord;
+
+    qint64 m_stLastLocalUpdateTimeStamp;
+    qint64 m_stLastServerUpdateTimeStamp;
 
     QList<UserInformation*> m_lUser;
 };

@@ -106,8 +106,11 @@ qint32 cDataAppUserEvents::addNewUserEvents(QJsonArray& jsArr)
     return ERROR_CODE_SUCCESS;
 }
 
-void cDataAppUserEvents::resetCurrentEvents()
+qint32 cDataAppUserEvents::resetCurrentEvents()
 {
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
     this->m_eventNewAppVersion  = false;
     this->m_eventNewFanclubNews = 0;
     this->m_eventWebPageItems   = 0;
@@ -118,6 +121,8 @@ void cDataAppUserEvents::resetCurrentEvents()
         delete this->m_lEvents[i];
         this->m_lEvents.removeAt(i);
     }
+
+    return ERROR_CODE_SUCCESS;
 }
 
 
@@ -156,6 +161,9 @@ qint32 cDataAppUserEvents::getCurrentWebPageEventCounter()
 
 qint32 cDataAppUserEvents::clearUserEventFanclub(qint32 newsIndex)
 {
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
     for (int i = this->m_lEvents.count() - 1; i >= 0; i--) {
         if (this->m_lEvents[i]->m_type == NOTIFY_TOPIC_NEW_FANCLUB_NEWS) {
             if (this->m_lEvents[i]->m_info.toInt() == newsIndex) {
@@ -171,6 +179,9 @@ qint32 cDataAppUserEvents::clearUserEventFanclub(qint32 newsIndex)
 
 qint32 cDataAppUserEvents::clearUserEventGamePlay(qint32 gameIndex)
 {
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
     for (int i = this->m_lEvents.count() - 1; i >= 0; i--) {
         if (this->m_lEvents[i]->m_type == NOTIFY_TOPIC_NEW_FREE_TICKET
             || this->m_lEvents[i]->m_type == NOTIFY_TOPIC_NEW_AWAY_ACCEPT
@@ -190,6 +201,9 @@ qint32 cDataAppUserEvents::clearUserEventGamePlay(qint32 gameIndex)
 
 qint32 cDataAppUserEvents::clearUserEventUpdate()
 {
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
     for (int i = this->m_lEvents.count() - 1; i >= 0; i--) {
         if (this->m_lEvents[i]->m_type == NOTIFY_TOPIC_NEW_APP_VERSION) {
             this->m_eventNewAppVersion = false;
@@ -203,6 +217,9 @@ qint32 cDataAppUserEvents::clearUserEventUpdate()
 
 qint32 cDataAppUserEvents::clearUserEventWebPage(qint32 index)
 {
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
     for (int i = this->m_lEvents.count() - 1; i >= 0; i--) {
         if (this->m_lEvents[i]->m_type == NOTIFY_TOPIC_STADIUM_WEBPAGE) {
             if (this->m_lEvents[i]->m_info.toInt() == index) {

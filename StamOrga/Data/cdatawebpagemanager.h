@@ -55,6 +55,8 @@ public:
 
     qint32 handleWebPageResponse(MessageProtocol* msg);
 
+    qint32 clearWebPageList();
+
     Q_INVOKABLE TextDataItem* getCurrentEditedItem();
 
 signals:

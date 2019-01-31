@@ -91,6 +91,7 @@ Flickable {
             dialog.editableText = gConUserSettings.getReadableName();
             dialog.checkBoxChecked = false
             dialog.checkBoxText = "ermäßigt";
+            dialog.infoText = "Name";
             dialog.acceptedTextEditAndCheckBox.connect(acceptedAddSeasonTicketDialog);
             dialog.font.family= txtForFontFamily.font
             dialog.open();
@@ -236,6 +237,7 @@ Flickable {
                         else
                             dialog.checkBoxChecked = true
                         dialog.checkBoxText = "ermäßigt";
+                        dialog.infoText = "Name";
                         dialog.acceptedTextEditAndCheckBox.connect(acceptedEditSeasonTicketDialog);
                         dialog.open();
                     } else
@@ -249,11 +251,12 @@ Flickable {
                     var component = Qt.createComponent("../components/EditableTextDialog.qml");
                     if (component.status === Component.Ready) {
                         var dialog = component.createObject(flickableTickets,{popupType: 1});
-                        dialog.headerText = "Neuer Ort für " + m_ticketNameToChange;
+                        dialog.headerText = m_ticketNameToChange;
                         dialog.parentHeight = flickableTickets.height
                         dialog.parentWidth = flickableTickets.width
                         dialog.textMinSize = 4;
                         dialog.font.family= txtForFontFamily.font
+                        dialog.infoText = "Neuer Ort"
                         dialog.acceptedTextEdit.connect(acceptedEditNewSeasonTicketPlace);
                         dialog.open();
                     }

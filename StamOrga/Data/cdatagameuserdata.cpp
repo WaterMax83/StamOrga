@@ -100,11 +100,31 @@ int cDataGameUserData::initialize()
     return ERROR_CODE_SUCCESS;
 }
 
+qint32 cDataGameUserData::clearUserData()
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    this->m_mutex.lock();
+
+    g_StaSettingsManager->removeGroup(GROUP_FAVGAME);
+
+    for (int i = 0; i < this->m_lFavGames.count(); i++)
+        delete this->m_lFavGames.at(i);
+    this->m_lFavGames.clear();
+
+    this->m_mutex.unlock();
+
+    this->clearTicketGameList();
+
+    return ERROR_CODE_SUCCESS;
+}
+
 
 int cDataGameUserData::getFavoriteGameIndex(qint32 gameIndex)
 {
     if (!this->m_initialized)
-        return -1;
+        return ERROR_CODE_NOT_INITIALIZED;
 
     return this->getGameIndex(&this->m_lFavGames, gameIndex);
 }
@@ -112,7 +132,7 @@ int cDataGameUserData::getFavoriteGameIndex(qint32 gameIndex)
 int cDataGameUserData::setFavoriteGameIndex(qint32 gameIndex, qint32 favIndex)
 {
     if (!this->m_initialized)
-        return -1;
+        return ERROR_CODE_NOT_INITIALIZED;
 
     return this->setGameIndex(&this->m_lFavGames, gameIndex, favIndex, true);
 }
@@ -120,7 +140,7 @@ int cDataGameUserData::setFavoriteGameIndex(qint32 gameIndex, qint32 favIndex)
 int cDataGameUserData::getTicketGameIndex(qint32 gameIndex)
 {
     if (!this->m_initialized)
-        return -1;
+        return ERROR_CODE_NOT_INITIALIZED;
 
     return this->getGameIndex(&this->m_lTicketGames, gameIndex);
 }
@@ -128,7 +148,7 @@ int cDataGameUserData::getTicketGameIndex(qint32 gameIndex)
 int cDataGameUserData::setTicketGameIndex(qint32 gameIndex, qint32 favIndex)
 {
     if (!this->m_initialized)
-        return -1;
+        return ERROR_CODE_NOT_INITIALIZED;
 
     return this->setGameIndex(&this->m_lTicketGames, gameIndex, favIndex);
 }

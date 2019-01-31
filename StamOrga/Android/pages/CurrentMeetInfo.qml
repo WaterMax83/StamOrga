@@ -333,6 +333,7 @@ Flickable {
             dialog.parentWidth =  mainPaneCurrentGame.width
             dialog.textMinSize = 4;
             dialog.editableText = text;
+            dialog.infoText = "Name";
             dialog.acceptedTextEdit.connect(acceptedEditTextDialogAccept);
             dialog.font.family= txtForFontFamily.font
             dialog.open();

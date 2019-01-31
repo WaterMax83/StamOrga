@@ -48,6 +48,7 @@ public:
 
     Q_INVOKABLE qint32 startListGames(qint32 pastGames = -1);
     qint32             handleListGamesResponse(MessageProtocol* msg);
+    qint32             clearGamesList();
 
     Q_INVOKABLE qint32 startListGamesInfo();
     qint32             handleListGamesInfoResponse(MessageProtocol* msg);

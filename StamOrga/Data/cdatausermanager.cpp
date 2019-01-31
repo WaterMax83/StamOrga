@@ -47,6 +47,9 @@ qint32 cDataUserManager::initialize()
 {
     qRegisterMetaType<UserInformation*>("UserInformation*");
 
+    this->m_stLastLocalUpdateTimeStamp  = 0;
+    this->m_stLastServerUpdateTimeStamp = 0;
+
     this->m_initialized = true;
 
     return ERROR_CODE_SUCCESS;
@@ -66,6 +69,17 @@ UserInformation* cDataUserManager::getUserInfoFromArrayIndex(int index)
         return this->m_lUser.at(index);
     }
     return NULL;
+}
+
+QString cDataUserManager::getUserInfoLastLocalUpdateString()
+{
+    if (!this->m_initialized)
+        return "";
+
+    QMutexLocker lock(&this->m_mutex);
+    QDateTime    time = QDateTime::fromMSecsSinceEpoch(this->m_stLastLocalUpdateTimeStamp);
+    //    return QDateTime::fromMSecsSinceEpoch(this->m_stLastLocalUpdateTimeStamp).toString("dd.MM.yy hh:mm:ss");
+    return getTimeStampSinceString(time);
 }
 
 qint32 cDataUserManager::startUpdateReadableName(QString name)
@@ -97,7 +111,7 @@ qint32 cDataUserManager::startUpdatePassword(QString password)
     if (password.length() > 0)
         newPassWord = g_ConUserSettings->createHashValue(password, g_ConUserSettings->getSalt());
     else
-        newPassWord             = this->m_newPassWord;
+        newPassWord = this->m_newPassWord;
     QString     currentPassWord = g_ConUserSettings->createHashValue(g_ConUserSettings->getPassWord(), g_ConUserSettings->getRandomLoginValue());
     QJsonObject rootObj;
     rootObj.insert("type", "user");
@@ -185,9 +199,10 @@ qint32 cDataUserManager::handleUserCommandResponse(MessageProtocol* msg)
             delete this->m_lUser[i];
         this->m_lUser.clear();
 
-        QJsonArray arrUser = rootObj.value("user").toArray();
+        QJsonArray arrUser   = rootObj.value("user").toArray();
+        qint64     timestamp = (qint64)rootObj.value("timestamp").toDouble(0);
 
-        //        this->m_stLastLocalUpdateTimeStamp = QDateTime::currentMSecsSinceEpoch();
+        this->m_stLastLocalUpdateTimeStamp = QDateTime::currentMSecsSinceEpoch();
 
         qint32           ownUserIndex = g_ConUserSettings->getUserIndex();
         bool             bIsUserAdmin = g_ConUserSettings->userIsAdminEnabled();
@@ -210,8 +225,8 @@ qint32 cDataUserManager::handleUserCommandResponse(MessageProtocol* msg)
             pUser->m_readName   = userObj.value("readName").toString();
             if (pUser->m_readName.isEmpty())
                 pUser->m_readName = "NoName";
-            pUser->m_prop         = (quint32)userObj.value("props").toDouble();
-            pUser->m_admin        = USER_IS_ENABLED(pUser->m_prop, USER_ENABLE_ADMIN);
+            pUser->m_prop  = (quint32)userObj.value("props").toDouble();
+            pUser->m_admin = USER_IS_ENABLED(pUser->m_prop, USER_ENABLE_ADMIN);
             if (pUser->m_admin)
                 pUser->m_userType = "Admin";
             else
@@ -230,7 +245,7 @@ qint32 cDataUserManager::handleUserCommandResponse(MessageProtocol* msg)
 
         if (pOwnUser != NULL)
             this->m_lUser.insert(0, pOwnUser);
-        //        this->m_stLastServerUpdateTimeStamp = timestamp;
+        this->m_stLastServerUpdateTimeStamp = timestamp;
     } else if (command == "notifyEmail") {
         qint32 activate = rootObj.value("activate").toInt();
         g_ConUserSettings->setEmailNotification(activate);
@@ -239,6 +254,23 @@ qint32 cDataUserManager::handleUserCommandResponse(MessageProtocol* msg)
         result = ERROR_CODE_NOT_IMPLEMENTED;
 
     return result;
+}
+
+qint32 cDataUserManager::clearUserList()
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QMutexLocker lock(&this->m_mutex);
+
+    for (int i = 0; i < this->m_lUser.size(); i++)
+        delete this->m_lUser[i];
+    this->m_lUser.clear();
+
+    this->m_stLastLocalUpdateTimeStamp  = 0;
+    this->m_stLastServerUpdateTimeStamp = 0;
+
+    return ERROR_CODE_SUCCESS;
 }
 
 qint32 cDataUserManager::handleUpdatePasswordResponse(MessageProtocol* msg)

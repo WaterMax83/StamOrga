@@ -28,11 +28,14 @@ MyComponents.CustomDialog {
     property int parentWidth : 540
     property int parentHeight : 960
     property int textMinSize : 3
+    property bool enableEditText : true;
     property alias editableText : editableTextItem.text
     property alias headerText: editableTextDialog.title
+    property string infoText : ""
     property string checkBoxText: ""
     property bool checkBoxChecked: false
 
+    signal acceptedDialog()
     signal acceptedTextEdit(var text)
     signal acceptedTextEditAndCheckBox(var text, var checked)
 
@@ -46,11 +49,12 @@ MyComponents.CustomDialog {
     standardButtons: Dialog.Ok | Dialog.Cancel
     onAccepted: {
         labelTextTooShort.visible = false
-        if (editableTextItem.text.trim().length < textMinSize) {
+        if (enableEditText && editableTextItem.text.trim().length < textMinSize) {
             labelTextTooShort.visible = true
             labelTextTooShort.text = "Die Eingabe muss mindestens " + textMinSize + " Zeichen lang sein";
             editableTextDialog.open()
         } else {
+            acceptedDialog();
             acceptedTextEdit(editableTextItem.text.trim());
             acceptedTextEditAndCheckBox(editableTextItem.text.trim(), checkBoxItem.checked);
             editableTextDialog.close();
@@ -73,8 +77,19 @@ MyComponents.CustomDialog {
             visible: false
         }
 
+        Text {
+//            textFormat: Text.RichText
+            font.pixelSize: 14
+            color: "white"
+            text: infoText
+            wrapMode: Text.WordWrap
+            Layout.maximumWidth: parent.width
+            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+        }
+
         TextField {
             id: editableTextItem
+            visible: enableEditText
             font.family: txtForFontFamily.font
             implicitWidth: editableTextDialogColumn.width / 4 * 3
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter

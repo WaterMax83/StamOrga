@@ -158,6 +158,7 @@ qint32 cStaGlobalManager::initialize()
 #ifdef STAMORGA_APP
 void cStaGlobalManager::setQmlInformationClasses(QQmlApplicationEngine* engine)
 {
+    engine->rootContext()->setContextProperty("gStaGlobalManager", this);
     engine->rootContext()->setContextProperty("gDataAppInfoManager", g_DatAppInfoManager);
     engine->rootContext()->setContextProperty("gStaGlobalSettings", g_StaGlobalSettings);
     engine->rootContext()->setContextProperty("gStaVersionManager", g_StaVersionManager);
@@ -188,4 +189,29 @@ void cStaGlobalManager::setQMLObjectOwnershipToCpp(QObject* pObject)
 #else
     Q_UNUSED(pObject);
 #endif
+}
+
+qint32 cStaGlobalManager::startLogoutUser(const bool bKeepUserName)
+{
+    g_StaGlobalSettings->setAlreadyConnected(false);
+
+    if (!bKeepUserName)
+        g_ConUserSettings->setUserName("");
+    g_ConUserSettings->setSalt("");
+    g_ConUserSettings->setPassWord("");
+    g_ConUserSettings->setReadableName("");
+    g_ConUserSettings->resetUserProperties();
+
+    g_DataGamesManager->clearGamesList();
+    g_DataTicketManager->clearTicketList();
+    g_DataNewsDataManager->clearNewsDataList();
+    g_DataUserManager->clearUserList();
+    g_DataWebPageManager->clearWebPageList();
+    g_DataAppUserEvents->resetCurrentEvents();
+    if (!bKeepUserName)
+        g_DataGameUserData->clearUserData();
+
+    g_ConManager->resetCurrentConnection();
+
+    return ERROR_CODE_SUCCESS;
 }

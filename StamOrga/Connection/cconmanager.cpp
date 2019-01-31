@@ -28,12 +28,15 @@
 #include "../Data/cdatagamesmanager.h"
 #include "../Data/cdataticketmanager.h"
 #include "../Data/cdatausermanager.h"
+#include "../cstaglobalmanager.h"
 #include "../cstaglobalsettings.h"
 #include "../cstaversionmanager.h"
 #include "cconmanager.h"
 #include "cconusersettings.h"
 
 cConManager* g_ConManager;
+
+extern cStaGlobalManager* g_GlobalManager;
 
 cConManager::cConManager(QObject* parent)
     : cGenDisposer(parent)
@@ -78,6 +81,16 @@ qint32 cConManager::startMainConnection(const QString& name, const QString& pass
     return ERROR_CODE_SUCCESS;
 }
 
+qint32 cConManager::resetCurrentConnection()
+{
+    this->stopDataConnection();
+
+    this->m_ctrlMainCon.Stop();
+    this->m_pMainCon = NULL;
+
+    return ERROR_CODE_SUCCESS;
+}
+
 /*
      * Answer function after connection with username
      */
@@ -105,10 +118,7 @@ void cConManager::slMainConReqFin(qint32 result, const QString& msg, const QStri
         this->m_bIsConnecting = false;
 
         if (result == ERROR_CODE_NO_USER) {
-            g_StaGlobalSettings->setAlreadyConnected(false);
-
-            g_ConUserSettings->setSalt("");
-            g_ConUserSettings->setPassWord("");
+            g_GlobalManager->startLogoutUser();
         }
         emit this->signalNotifyConnectionFinished(result);
 
@@ -209,11 +219,10 @@ void cConManager::slotDataConLastRequestFinished(TcpDataConRequest* request)
                 this->slotDataConLastRequestFinished(req);
                 this->m_lRequestConError.removeLast();
             }
-            if (request->m_result == ERROR_CODE_WRONG_PASSWORD)
-                g_StaGlobalSettings->setAlreadyConnected(false);
+            if (request->m_result == ERROR_CODE_WRONG_PASSWORD || request->m_result == ERROR_CODE_NOT_FOUND) {
+                g_GlobalManager->startLogoutUser();
+            }
 
-            g_ConUserSettings->setSalt("");
-            g_ConUserSettings->setPassWord("");
             emit this->signalNotifyConnectionFinished(request->m_result);
             this->stopDataConnection();
         }

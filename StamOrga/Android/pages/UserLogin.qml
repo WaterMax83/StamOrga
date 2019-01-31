@@ -149,8 +149,11 @@ Flickable {
             //            busyIndicatorUserlogin.infoText = "Verbindung erfolgreich";
             busyIndicatorUserlogin.infoVisible = false;
             toastManager.show("Verbindung erfolgreich", 2000)
-            stackView.clear();
-            stackView.push(viewMainGames);
+            while(stackView.depth > 1)
+                stackView.pop();
+//            stackView.initialItem
+//            stackView.clear();
+//            stackView.push(viewMainGames);
 //            stackView.push(viewUserProfil);
         }
         else {
@@ -162,7 +165,12 @@ Flickable {
         }
     }
 
-    function pageOpenedUpdateView() {  }
+    function pageOpenedUpdateView() {
+        txtUserName.text = gConUserSettings.getUserName()
+        txtPassWord.text = gConUserSettings.getPassWord().length === 0 ? "" : "dEf1AuLt"
+    }
+
+    function notifyUserCommandFinished(result, subCmd) { }
 
     ScrollIndicator.vertical: ScrollIndicator { }
 }

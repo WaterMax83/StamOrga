@@ -79,10 +79,7 @@ Flickable {
         }
     }
 
-    function toolButtonClicked() {
-
-        updateHeaderFromMain("Benutzer", "");
-    }
+    function toolButtonClicked() { }
 
     function updateUserOverviewList(){
         gDataUserManager.startListUserOverview()
@@ -110,6 +107,7 @@ Flickable {
 
     function pageOpenedUpdateView() {
 
+        updateHeaderFromMain("Benutzer", "");
         updateUserOverviewList();
     }
 
@@ -124,7 +122,7 @@ Flickable {
                 var sprite = userInformationItem.createObject(columnLayoutUserOverview)
                 sprite.showUserInformation(i);
             }
-            busyIndicatorUserOverview.infoText = "Letztes Update vor ";// + gDataTicketManager.getSeasonTicketLastLocalUpdateString()
+            busyIndicatorUserOverview.infoText = "Letztes Update vor " + gDataUserManager.getUserInfoLastLocalUpdateString();
         } else
             busyIndicatorUserOverview.infoText = "Keine Daten gespeichert\nZiehen zum Aktualisieren"
     }

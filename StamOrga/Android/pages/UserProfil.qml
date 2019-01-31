@@ -101,6 +101,7 @@ Flickable {
                                 dialog.parentWidth = flickableUserProfil.width
                                 dialog.textMinSize = 4;
                                 dialog.editableText = gConUserSettings.getReadableName();
+                                dialog.infoText = "Der Nutzername dient als Anzeige für andere Nutzer und zur Vorauswahl für editierbare Textfelder"
                                 dialog.acceptedTextEdit.connect(acceptedEditReadableName);
                                 dialog.open();
                             }
@@ -133,7 +134,7 @@ Flickable {
                         width: parent.width
 
                         Text {
-                            text: "Email Benachrichtigung"
+                            text: "E-Mail Benachrichtigung"
                             color: "white"
                             font.pixelSize: 16
                             Layout.fillWidth: true
@@ -152,12 +153,31 @@ Flickable {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-                            if (gConUserSettings.getEmailNotification() !== -2) {
-                                if (gDataUserManager.startChangeEmailNotification() === 1) {
-                                    busyIndicatorUserProfil.loadingVisible = true;
-                                    busyIndicatorUserProfil.infoVisible = true;
-                                    busyIndicatorUserProfil.infoText = "Ändere Aktivierung"
+                            var notifyIndex = gConUserSettings.getEmailNotification();
+                            if (notifyIndex !== -2) {
+                                var component = Qt.createComponent("../components/EditableTextDialog.qml");
+                                if (component.status === Component.Ready) {
+                                    var dialog = component.createObject(flickableUserProfil,{popupType: 1});
+                                    dialog.headerText = "Bestätigung";
+                                    dialog.font.family= txtForFontFamily.font
+                                    dialog.parentHeight = flickableUserProfil.height
+                                    dialog.parentWidth = flickableUserProfil.width
+                                    dialog.enableEditText = false;
+                                    if (notifyIndex === 1)
+                                        dialog.infoText = "Hiermit werden die Benachrichtigungen per E-Mail deaktiviert";
+                                    else
+                                        dialog.infoText = "Hiermit werden die Benachrichtigungen per E-Mail aktiviert";
+                                    dialog.acceptedDialog.connect(acceptedChangeEmailNotify);
+                                    dialog.open();
                                 }
+                            }
+                        }
+
+                        function acceptedChangeEmailNotify() {
+                            if (gDataUserManager.startChangeEmailNotification() === 1) {
+                                busyIndicatorUserProfil.loadingVisible = true;
+                                busyIndicatorUserProfil.infoVisible = true;
+                                busyIndicatorUserProfil.infoText = "Ändere Aktivierung"
                             }
                         }
                     }
@@ -237,6 +257,26 @@ Flickable {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
+                            var component = Qt.createComponent("../components/EditableTextDialog.qml");
+                            if (component.status === Component.Ready) {
+                                var dialog = component.createObject(flickableUserProfil,{popupType: 1});
+                                dialog.headerText = "Bestätigung";
+                                dialog.font.family= txtForFontFamily.font
+                                dialog.parentHeight = flickableUserProfil.height
+                                dialog.parentWidth = flickableUserProfil.width
+                                dialog.enableEditText = false;
+                                dialog.infoText = "Der aktuelle Benutzer wird ausgeloggt und alle Daten werden gelöscht";
+                                dialog.acceptedDialog.connect(acceptedLogoutUser);
+                                dialog.open();
+                            }
+
+
+                        }
+
+                        function acceptedLogoutUser() {
+                            mainLogOutUser();
+                            gStaGlobalManager.startLogoutUser(false);
+
                             stackView.push(viewUserLogin)
                         }
                     }

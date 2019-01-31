@@ -212,6 +212,23 @@ qint32 cDataNewsDataManager::handleListNewsDataResponse(MessageProtocol* msg)
     return result;
 }
 
+qint32 cDataNewsDataManager::clearNewsDataList()
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QMutexLocker lock(&this->m_mutex);
+
+    for (int i = 0; i < this->m_lNews.size(); i++)
+        delete this->m_lNews[i];
+    this->m_lNews.clear();
+
+    this->m_stLastLocalUpdateTimeStamp  = 0;
+    this->m_stLastServerUpdateTimeStamp = 0;
+
+    return ERROR_CODE_SUCCESS;
+}
+
 qint32 cDataNewsDataManager::startGetNewsDataItem(qint32 index)
 {
     if (!this->m_initialized)

@@ -55,6 +55,7 @@ public:
 
     qint32  getUserIndex();
     quint32 getUserProperties();
+    void    resetUserProperties();
 
     qint32 getMasterConPort() { return 55000; }
 

@@ -75,7 +75,7 @@ Dialog {
         bottomPadding: 0
         // TODO: QPlatformTheme::TitleBarFont
         font.bold: true
-        font.pixelSize: 16
+        font.pixelSize: 18
 
         background: PaddedRectangle {
             radius: 2

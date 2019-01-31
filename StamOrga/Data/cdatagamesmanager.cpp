@@ -361,6 +361,28 @@ qint32 cDataGamesManager::handleListGamesResponse(MessageProtocol* msg)
     return result;
 }
 
+qint32 cDataGamesManager::clearGamesList()
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QMutexLocker lock(&this->m_mutex);
+
+    g_StaSettingsManager->removeGroup(GAMES_GROUP);
+
+    for (int i = 0; i < this->m_lGames.size(); i++)
+        delete this->m_lGames[i];
+    this->m_lGames.clear();
+
+    this->m_stLastLocalUpdateTimeStamp  = 0;
+    this->m_stLastServerUpdateTimeStamp = 0;
+    this->m_LastGameInfoUpdate          = 0;
+    this->m_bSkipedOldGames             = true;
+    this->m_bLoadedGamesAfterRestart    = false;
+
+    return ERROR_CODE_SUCCESS;
+}
+
 qint32 cDataGamesManager::startListGamesInfo()
 {
     if (!this->m_initialized)

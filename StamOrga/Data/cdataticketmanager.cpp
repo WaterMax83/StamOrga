@@ -255,6 +255,25 @@ qint32 cDataTicketManager::handleListSeasonTicketsResponse(MessageProtocol* msg)
     return result;
 }
 
+qint32 cDataTicketManager::clearTicketList()
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QMutexLocker lock(&this->m_mutex);
+
+    g_StaSettingsManager->removeGroup(SEASONTICKET_GROUP);
+
+    for (int i = 0; i < this->m_lTickets.size(); i++)
+        delete this->m_lTickets[i];
+    this->m_lTickets.clear();
+
+    this->m_stLastLocalUpdateTimeStamp  = 0;
+    this->m_stLastServerUpdateTimeStamp = 0;
+
+    return ERROR_CODE_SUCCESS;
+}
+
 
 qint32 cDataTicketManager::startAddSeasonTicket(const qint32 index, const QString name, const QString place, const qint32 discount)
 {

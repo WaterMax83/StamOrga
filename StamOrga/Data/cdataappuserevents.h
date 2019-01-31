@@ -43,7 +43,7 @@ public:
 
     qint32 addNewUserEvents(QJsonArray& jsArr);
 
-    void resetCurrentEvents();
+    qint32 resetCurrentEvents();
 
     Q_INVOKABLE qint32 getCurrentMainEventCounter();
     Q_INVOKABLE qint32 getCurrentUpdateEventCounter();

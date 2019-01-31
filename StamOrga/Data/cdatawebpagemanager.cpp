@@ -327,6 +327,23 @@ qint32 cDataWebPageManager::handleWebPageResponse(MessageProtocol* msg)
     return result;
 }
 
+qint32 cDataWebPageManager::clearWebPageList()
+{
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_INITIALIZED;
+
+    QMutexLocker lock(&this->m_mutex);
+
+    for (int i = 0; i < this->m_lWebPages.size(); i++)
+        delete this->m_lWebPages[i];
+    this->m_lWebPages.clear();
+
+    this->m_stLastLocalUpdateTimeStamp  = 0;
+    this->m_stLastServerUpdateTimeStamp = 0;
+
+    return ERROR_CODE_SUCCESS;
+}
+
 //qint32 cDataWebPageManager::startGetNewsDataItem(qint32 index)
 //{
 //    if (!this->m_initialized)

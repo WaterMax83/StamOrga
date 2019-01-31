@@ -28,8 +28,8 @@ import "components" as MyComponents
 ApplicationWindow {
     id: mainWindow
     visible: true
-    width: userInt.isDeviceMobile() ? 540 : 360
-    height: userInt.isDeviceMobile() ? 960 : 600
+    width: userInt.isDeviceMobile() ? 720 : 360
+    height: userInt.isDeviceMobile() ? 1280 : 600
     title: qsTr("StamOrga")
 
     property int iMainToolButtonEventCount : 0
@@ -167,8 +167,7 @@ ApplicationWindow {
                                    title: "Benutzer",
                                    element: viewUserOverview,
                                    event: 0,
-                                   //                                   toolButtonImgSource: "images/menu.png",
-                                   listImgSource : "images/account.png"
+                                   listImgSource : "images/group.png"
                                })
                         append({
                                    title: "Dauerkarten",
@@ -181,13 +180,6 @@ ApplicationWindow {
                                    element: viewStatistics,
                                    listImgSource : "images/chart.png"
                                })
-                        if (userInt.isDebuggingEnabled())
-                            append({
-                                       title: "Fanclub",
-                                       element: viewFanclubNewList,
-                                       event: 0,
-                                       listImgSource : "images/group.png"
-                                   })
                         append({
                                    title: "Bautagebuch",
                                    element: viewWebList,
@@ -203,12 +195,6 @@ ApplicationWindow {
                                    element: viewUpdatePage,
                                    listImgSource : "images/download.png"
                                })
-                        if (userInt.isDebuggingEnabled())
-                            append({
-                                       title: "Logging",
-                                       element: viewLoggingPage,
-                                       listImgSource : "images/bug.png"
-                                   })
                     }
                 }
 
@@ -371,6 +357,7 @@ ApplicationWindow {
         id: userInt
         onNotifyConnectionFinished: {
             if (result === -21 || result === -5 || result === -20) { // Wrong password or not Found or user unknown
+                mainLogOutUser();
                 if (stackView.currentItem !== viewUserLogin)
                     stackView.push(viewUserLogin)
             }
@@ -400,31 +387,28 @@ ApplicationWindow {
         property bool isFanclubNewsWindowShown : false;
         property bool isConsoleWindowShown : false;
         onNotifyUserPropertiesFinished: {
-            if (result > 0 && !userInt.isDebuggingEnabled()) {
-                if (!isLoggingWindowShown) {
-                    isLoggingWindowShown = true;
-                    if (gConUserSettings.userIsLoggingEnabled()) {
-                        listViewListModel.append({
-                                                     title: "Logging",
-                                                     element: viewLoggingPage,
-                                                     toolButtonImgSource: "",
-                                                     listImgSource : "images/bug.png"
-                                                 })
-                    }
+            if (result > 0 && !isLoggingWindowShown) {
+                isLoggingWindowShown = true;
+                if (gConUserSettings.userIsLoggingEnabled()) {
+                    listViewListModel.append({
+                                                 title: "Logging",
+                                                 element: viewLoggingPage,
+                                                 toolButtonImgSource: "",
+                                                 listImgSource : "images/bug.png"
+                                             })
                 }
-                if (!isFanclubNewsWindowShown) {
-                    isFanclubNewsWindowShown = true;
-                    if (gConUserSettings.userIsFanclubEnabled()) {
-                        listViewListModel.insert(2, {
-                                                     title: "Fanclub",
-                                                     element: viewFanclubNewList,
-                                                     toolButtonImgSource: "",
-                                                     event : 0,
-                                                     listImgSource : "images/group.png"
-                                                 })
-                    }
+            }
+            if (result > 0 && !isFanclubNewsWindowShown) {
+                isFanclubNewsWindowShown = true;
+                if (gConUserSettings.userIsFanclubEnabled()) {
+                    listViewListModel.insert(2, {
+                                                 title: "Fanclub",
+                                                 element: viewFanclubNewList,
+                                                 toolButtonImgSource: "",
+                                                 event : 0,
+                                                 listImgSource : "images/message.png"
+                                             })
                 }
-
             }
             if (result > 0 && !isConsoleWindowShown) {
                 isConsoleWindowShown = true;
@@ -504,6 +488,24 @@ ApplicationWindow {
             //           else if (value === 2)
             //                gDataGamesManager.startListGames();
         }
+    }
+
+    function mainLogOutUser() {
+
+        for(var i=listViewListModel.count -1 ; i >= 0; i--) {
+            listViewListModel.get(i).event = 0;
+            if (listViewListModel.get(i).title === "Logging")
+                listViewListModel.remove(i)
+            else if (listViewListModel.get(i).title === "Fanclub") {
+                listViewListModel.remove(i);
+            } else if (listViewListModel.get(i).title === "Console") {
+                listViewListModel.remove(i);
+            }
+        }
+        iMainToolButtonEventCount = 0;
+        userInt.isLoggingWindowShown = false;
+        userInt.isFanclubNewsWindowShown = false;
+        userInt.isConsoleWindowShown = false;
     }
 
     function openUserLogin(open) {

@@ -128,5 +128,7 @@
         <file>pages/SettingsGeneral.qml</file>
         <file>pages/UserProperties.qml</file>
         <file>pages/UserProfil.qml</file>
+        <file>images/+material/message.png</file>
+        <file>images/message.png</file>
     </qresource>
 </RCC>

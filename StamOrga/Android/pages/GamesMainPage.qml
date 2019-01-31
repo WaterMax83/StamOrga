@@ -265,6 +265,7 @@ Page {
     }
 
     function notifyUserIntConnectionFinished(result) {}
+    function notifyUserCommandFinished(result, subCmd) { }
 
     function notifyUserIntGamesListFinished(result) {
         if (result !== 1) {
