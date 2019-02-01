@@ -208,9 +208,11 @@ QString cStaVersionManager::getVersionChangeInfo()
 {
     QString rValue;
 
-    rValue.append("<b>V1.1.4:</b>(XX.XX.2019)<br>");
+    rValue.append("<b>V1.1.4:</b>(01.02.2019)<br>");
     rValue.append("- Benachrichtigung erweiterbar<br>");
-    rValue.append("- Einstellungen überarbeitet<br>");
+    rValue.append("- Einstellungen/Benutzerprofil überarbeitet<br>");
+    rValue.append("- Benutzerliste hinzugefügtr<br>");
+    rValue.append("- E-Mail Benachrichtigung de/aktivierbar<br>");
 
     rValue.append("<br><b>V1.1.3:</b>(24.11.2018)<br>");
     rValue.append("- Überarbeitung Benachrichtigungen<br>");
@@ -225,7 +227,7 @@ QString cStaVersionManager::getVersionChangeInfo()
     rValue.append("- Weitere Events in Spielliste möglich<br>");
 
     rValue.append("<br><b>V1.1.1:</b>(06.07.2018)<br>");
-    rValue.append("- Benachrichtigung per Email (auf Wunsch)<br>");
+    rValue.append("- Benachrichtigung per E-Mail (auf Wunsch)<br>");
     rValue.append("- Kommentare bei Treffen und Fahrt<br>");
     rValue.append("- Lade vergangene Spiele dynamisch<br>");
     rValue.append("- Design Überarbeitung<br>");

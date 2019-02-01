@@ -168,6 +168,7 @@ Flickable {
     function pageOpenedUpdateView() {
         txtUserName.text = gConUserSettings.getUserName()
         txtPassWord.text = gConUserSettings.getPassWord().length === 0 ? "" : "dEf1AuLt"
+        updateHeaderFromMain("Login", "");
     }
 
     function notifyUserCommandFinished(result, subCmd) { }
