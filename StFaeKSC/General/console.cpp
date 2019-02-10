@@ -46,8 +46,10 @@ extern GlobalData* g_GlobalData;
 Console::Console(QObject* parent)
     : QObject(parent)
 {
+#ifdef QT_DEBUG
     /* Notifier to get console input */
     this->m_pSNotify = new QSocketNotifier(fileno(stdin), QSocketNotifier::Read, this);
+#endif
 
     /* path for storing and reading files */
     this->m_applicationPath = QCoreApplication::applicationDirPath();
@@ -65,8 +67,10 @@ void Console::run()
     std::cout << "Welcome to Console for StFaeKSC" << std::endl;
     std::cout << "> " << std::flush;
 
+#ifdef QT_DEBUG
     /* connect the input of a new line in the console */
     connect(this->m_pSNotify, SIGNAL(activated(int)), this, SLOT(readCommand()));
+#endif
 
     QDir        appDir(this->m_applicationPath);
     QStringList appDirFiles = appDir.entryList(QDir::Readable | QDir::Files);
@@ -82,12 +86,13 @@ void Console::run()
     //    }
 }
 
+#ifdef QT_DEBUG
 /* parsing the input commands */
 void Console::readCommand()
 {
     std::string line;
     std::getline(std::cin, line);
-    if (std::cin.eof() || line == "quit" || line == "exit") {
+    if (line == "quit" || line == "exit") {
         std::cout << "Ending console!" << std::endl;
         emit quit();
     } else {
@@ -97,6 +102,7 @@ void Console::readCommand()
         std::cout << "> " << std::flush;
     }
 }
+#endif
 
 QString Console::runCommand(QString command)
 {

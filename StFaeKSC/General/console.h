@@ -45,10 +45,14 @@ signals:
     void quit();
 
 private slots:
+#ifdef QT_DEBUG
     void readCommand();
+#endif
 
 private:
+#ifdef QT_DEBUG
     QSocketNotifier* m_pSNotify;
+#endif
 
     QString m_applicationPath;
 
