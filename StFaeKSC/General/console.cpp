@@ -186,5 +186,7 @@ Console::~Console()
 {
     if (this->m_ctrlLog.IsRunning())
         this->m_ctrlLog.Stop();
+#ifdef QT_DEBUG
     delete this->m_pSNotify;
+#endif
 }
