@@ -135,6 +135,8 @@ void cConManager::slMainConReqFin(qint32 result, const QString& msg, const QStri
 
 void cConManager::slotDataConnnectionFinished(qint32 result, const QString msg)
 {
+    Q_UNUSED(msg);
+
     if (result == ERROR_CODE_SUCCESS) {
         this->sendLoginRequest();
     } else {

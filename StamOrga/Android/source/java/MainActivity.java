@@ -68,6 +68,9 @@ public class MainActivity extends org.qtproject.qt5.android.bindings.QtActivity
         super.onPause();
     }
 
+
+    /* Commands from Qt */
+
     public static void SubscribeToTopic(String topic)
     {
         FirebaseMessaging.getInstance().subscribeToTopic(topic);

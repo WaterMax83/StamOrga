@@ -29,7 +29,7 @@
 #include "Connection/cconusersettings.h"
 #include "cstaglobalsettings.h"
 #ifdef STAMORGA_APP
-#include "source/cadrpushnotifyinfohandler.h"
+#include "source/candroidqtconnector.h"
 #endif
 
 cStaGlobalSettings* g_StaGlobalSettings;
@@ -351,46 +351,46 @@ void cStaGlobalSettings::updatePushNotification()
 {
 #ifdef STAMORGA_APP
     if (this->m_bAlreadyConnected && this->isNotificationNewAppVersionEnabled())
-        AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_APP_VERSION);
+        cAndroidQtConnector::subscribeToTopic(NOTIFY_TOPIC_NEW_APP_VERSION);
     else
-        AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_APP_VERSION);
+        cAndroidQtConnector::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_APP_VERSION);
 
     if (this->m_bAlreadyConnected && this->isNotificationNewMeetingEnabled())
-        AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_MEETING);
+        cAndroidQtConnector::subscribeToTopic(NOTIFY_TOPIC_NEW_MEETING);
     else
-        AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_MEETING);
+        cAndroidQtConnector::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_MEETING);
 
-    AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_CHANGE_MEETING);
+    cAndroidQtConnector::unSubscribeFromTopic(NOTIFY_TOPIC_CHANGE_MEETING);
 
     if (this->m_bAlreadyConnected && this->isNotificationNewFreeTicketEnabled())
-        AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_FREE_TICKET);
+        cAndroidQtConnector::subscribeToTopic(NOTIFY_TOPIC_NEW_FREE_TICKET);
     else
-        AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_FREE_TICKET);
+        cAndroidQtConnector::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_FREE_TICKET);
 
-    AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_AWAY_ACCEPT);
+    cAndroidQtConnector::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_AWAY_ACCEPT);
 
     if (this->m_bAlreadyConnected && this->isNotificationMeetingCommentEnabled())
-        AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_COMMENT);
+        cAndroidQtConnector::subscribeToTopic(NOTIFY_TOPIC_NEW_COMMENT);
     else
-        AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_COMMENT);
+        cAndroidQtConnector::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_COMMENT);
 
     if (this->m_bAlreadyConnected && this->isNotificationFanclubNewsEnabled()) {
         if (g_ConUserSettings->userIsFanclubEnabled())
-            AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_NEW_FANCLUB_NEWS);
+            cAndroidQtConnector::subscribeToTopic(NOTIFY_TOPIC_NEW_FANCLUB_NEWS);
     } else
-        AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_FANCLUB_NEWS);
+        cAndroidQtConnector::unSubscribeFromTopic(NOTIFY_TOPIC_NEW_FANCLUB_NEWS);
 
     if (this->m_bAlreadyConnected && this->isNotificationStadiumWebpageEnabled())
-        AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_STADIUM_WEBPAGE);
+        cAndroidQtConnector::subscribeToTopic(NOTIFY_TOPIC_STADIUM_WEBPAGE);
     else
-        AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_STADIUM_WEBPAGE);
+        cAndroidQtConnector::unSubscribeFromTopic(NOTIFY_TOPIC_STADIUM_WEBPAGE);
 
     if (this->m_bAlreadyConnected) {
-        AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_GENERAL);
-        AdrPushNotifyInfoHandler::subscribeToTopic(NOTIFY_TOPIC_GENERAL_BACKUP);
+        cAndroidQtConnector::subscribeToTopic(NOTIFY_TOPIC_GENERAL);
+        cAndroidQtConnector::subscribeToTopic(NOTIFY_TOPIC_GENERAL_BACKUP);
     } else {
-        AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_GENERAL);
-        AdrPushNotifyInfoHandler::unSubscribeFromTopic(NOTIFY_TOPIC_GENERAL_BACKUP);
+        cAndroidQtConnector::unSubscribeFromTopic(NOTIFY_TOPIC_GENERAL);
+        cAndroidQtConnector::unSubscribeFromTopic(NOTIFY_TOPIC_GENERAL_BACKUP);
     }
 #endif
 }

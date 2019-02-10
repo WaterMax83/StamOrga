@@ -51,7 +51,6 @@ SOURCES += main.cpp \
     ../Data/cdatagamesmanager.cpp \
     ../Data/cdatameetinginfo.cpp \
     ../Data/cdatagameuserdata.cpp \
-    source/cadrpushnotifyinfohandler.cpp \
     ../Data/cdataappuserevents.cpp \
     ../Data/cdataconsolemanager.cpp \
     ../Data/cdatacommentitem.cpp \
@@ -59,7 +58,8 @@ SOURCES += main.cpp \
     ../Data/cdatamediaprovider.cpp \
     ../Data/cdatawebpagemanager.cpp \
     ../Data/textdataitem.cpp \
-    ../Data/cdatausermanager.cpp
+    ../Data/cdatausermanager.cpp \
+    source/candroidqtconnector.cpp
 
 
 RESOURCES += qml.qrc
@@ -117,7 +117,6 @@ HEADERS += \
     ../Data/cdatagamesmanager.h \
     ../Data/cdatameetinginfo.h \
     ../Data/cdatagameuserdata.h \
-    source/cadrpushnotifyinfohandler.h \
     ../Data/cdataappuserevents.h \
     ../Data/cdataconsolemanager.h \
     ../Data/cdatacommentitem.h \
@@ -125,7 +124,8 @@ HEADERS += \
     ../Data/cdatamediaprovider.h \
     ../Data/cdatawebpagemanager.h \
     ../Data/textdataitem.h \
-    ../Data/cdatausermanager.h
+    ../Data/cdatausermanager.h \
+    source/candroidqtconnector.h
 
 INCLUDEPATH += \
     ../ \
@@ -148,6 +148,7 @@ DISTFILES += \
     android/gradlew \
     android/google-services.json \
     android/res/values/libs.xml \
+    android/res/xml/provider_paths.xml \
     android/build.gradle \
     android/gradle/wrapper/gradle-wrapper.properties \
     android/gradlew.bat

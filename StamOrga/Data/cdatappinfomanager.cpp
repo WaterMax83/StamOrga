@@ -49,8 +49,8 @@ qint32 cDatAppInfoManager::initialize()
     this->m_ctrlLog.Start(this->m_logApp, false);
 
 #ifdef Q_OS_ANDROID
-    this->m_pushNotificationInfoHandler = new AdrPushNotifyInfoHandler(this);
-    connect(this->m_pushNotificationInfoHandler, &AdrPushNotifyInfoHandler::fcmRegistrationTokenChanged,
+    this->m_pushNotificationInfoHandler = new cAndroidQtConnector(this);
+    connect(this->m_pushNotificationInfoHandler, &cAndroidQtConnector::fcmRegistrationTokenChanged,
             this, &cDatAppInfoManager::slotNewFcmRegistrationToken);
 
     g_StaSettingsManager->getValue(APP_INFO_GROUP, APP_INFO_TOKEN, value);

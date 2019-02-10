@@ -1,5 +1,5 @@
 @echo off
-set NewFolderPath="E:\Users\WaterMax\Documents\Projekte\Qt\StamOrga\versions\StamOrga.Winx64.V1.1.4"
+set NewFolderPath="E:\Users\WaterMax\Documents\Projekte\Qt\StamOrga\versions\StamOrga.Winx64.v1.1.4"
 
 cd \
 c:

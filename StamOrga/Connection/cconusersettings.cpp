@@ -32,7 +32,7 @@
 #include "cconmanager.h"
 #include "cconusersettings.h"
 #ifdef Q_OS_ANDROID
-#include "source/cadrpushnotifyinfohandler.h"
+#include "source/candroidqtconnector.h"
 #endif
 
 // clang-format off
@@ -188,7 +188,7 @@ void cConUserSettings::setUserIndex(const qint32 userIndex)
     if (this->m_userIndex != userIndex) {
         this->m_userIndex = userIndex;
 #ifdef Q_OS_ANDROID
-        AdrPushNotifyInfoHandler::setUserIndexForTopics(QString::number(userIndex));
+        cAndroidQtConnector::setUserIndexForTopics(QString::number(userIndex));
 #endif
     }
 }

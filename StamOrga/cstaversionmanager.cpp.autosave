@@ -140,8 +140,6 @@ qint32 cStaVersionManager::startDownloadCurrentVersion()
     this->m_downloadSavePath = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
     this->m_downloadSavePath.append(QString("/%1").arg(QString(STAM_ORGA_VERSION_SAVE).arg(this->m_remoteVersion)));
 
-    qInfo() << "Start to download to " << this->m_downloadSavePath;
-
     this->m_progress = 0.0;
     emit this->currentProgressChanged();
     this->m_versionUpdateIndex = VersionStatusBusy;

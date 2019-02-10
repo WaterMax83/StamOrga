@@ -21,18 +21,19 @@
 
 #include <QObject>
 
-class AdrPushNotifyInfoHandler : public QObject
+class cAndroidQtConnector : public QObject
 {
     Q_OBJECT
 public:
-    AdrPushNotifyInfoHandler(QObject* parent = 0);
-    ~AdrPushNotifyInfoHandler();
+    cAndroidQtConnector(QObject* parent = 0);
+    ~cAndroidQtConnector();
 
-    void setNewRegistrationToken(QString token);
+    void setNewRegistrationToken(const QString& token);
 
-    static void subscribeToTopic(QString topic);
-    static void unSubscribeFromTopic(QString topic);
-    static void setUserIndexForTopics(QString userIndex);
+    static void subscribeToTopic(const QString& topic);
+    static void unSubscribeFromTopic(const QString& topic);
+    static void setUserIndexForTopics(const QString& userIndex);
+    //    static void installApp(const QString& appPackageName);
 
 signals:
     void fcmRegistrationTokenChanged(QString token);

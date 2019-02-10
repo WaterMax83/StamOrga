@@ -16,27 +16,27 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "cadrpushnotifyinfohandler.h"
+#include "candroidqtconnector.h"
 
 #ifdef Q_OS_ANDROID
 #include <QAndroidJniObject>
 #include <QtAndroidExtras>
 #endif
 
-static AdrPushNotifyInfoHandler* g_PushInstance = NULL;
+static cAndroidQtConnector* g_PushInstance = NULL;
 
-AdrPushNotifyInfoHandler::AdrPushNotifyInfoHandler(QObject* parent)
+cAndroidQtConnector::cAndroidQtConnector(QObject* parent)
     : QObject(parent)
 {
     this->m_fcmToken = "";
     g_PushInstance   = this;
 }
 
-AdrPushNotifyInfoHandler::~AdrPushNotifyInfoHandler()
+cAndroidQtConnector::~cAndroidQtConnector()
 {
 }
 
-void AdrPushNotifyInfoHandler::setNewRegistrationToken(QString token)
+void cAndroidQtConnector::setNewRegistrationToken(const QString& token)
 {
     if (this->m_fcmToken != token) {
         this->m_fcmToken = token;
@@ -90,7 +90,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* /*reserved*/)
 #endif
 
 #include <QtCore/QDebug>
-void AdrPushNotifyInfoHandler::subscribeToTopic(QString topic)
+void cAndroidQtConnector::subscribeToTopic(const QString& topic)
 {
 #ifdef Q_OS_ANDROID
 #ifdef QT_DEBUG
@@ -108,7 +108,7 @@ void AdrPushNotifyInfoHandler::subscribeToTopic(QString topic)
 #endif
 }
 
-void AdrPushNotifyInfoHandler::unSubscribeFromTopic(QString topic)
+void cAndroidQtConnector::unSubscribeFromTopic(const QString& topic)
 {
 #ifdef Q_OS_ANDROID
 #ifdef QT_DEBUG
@@ -127,7 +127,7 @@ void AdrPushNotifyInfoHandler::unSubscribeFromTopic(QString topic)
 #endif
 }
 
-void AdrPushNotifyInfoHandler::setUserIndexForTopics(QString userIndex)
+void cAndroidQtConnector::setUserIndexForTopics(const QString& userIndex)
 {
 #ifdef Q_OS_ANDROID
     QAndroidJniObject javaNotification = QAndroidJniObject::fromString(userIndex);
@@ -139,3 +139,16 @@ void AdrPushNotifyInfoHandler::setUserIndexForTopics(QString userIndex)
     Q_UNUSED(userIndex);
 #endif
 }
+
+
+/* This is to install an app with SDK >= 24, but it fails with parsing problem */
+//void cAndroidQtConnector::installApp(const QString& appPackageName)
+//{
+//#ifdef Q_OS_ANDROID
+//    QAndroidJniObject appName = QAndroidJniObject::fromString(appPackageName);
+//    QAndroidJniObject::callStaticMethod<jint>("org/qtproject/example/JavaQtConnector",
+//                                              "installApp",
+//                                              "(Ljava/lang/String;)I",
+//                                              appName.object<jstring>());
+//#endif
+//}
