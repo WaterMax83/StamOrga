@@ -136,8 +136,9 @@ Flickable {
                 if (sender.owner) {
                     titleLabel.text = "Benutzerprofil";
                     stackView.push(viewUserProfil)
-                } else {
-
+                } else if (gConUserSettings.userIsAdminEnabled()) {
+                    stackView.push(viewUserProperties);
+                    stackView.currentItem.updatePageWithUser(sender);
                 }
             }
         }

@@ -306,20 +306,25 @@ ApplicationWindow {
         id: viewUserLogin
     }
 
+    /* Need components because otherwise they will be shown in main view */
     Component {
         id: viewUserProfil
         MyPages.UserProfil {}
     }
-
-    /* Need components because otherwise they will be shown in main view */
     Component {
         id: viewUserOverview
         MyPages.UserOverview {}
     }
     Component {
+        id: viewUserProperties
+        MyPages.UserProperties {}
+    }
+    Component {
         id: viewSeasonTickets
         MyPages.SeasonTickets {}
     }
+
+
     Component {
         id: viewStatistics
         MyPages.Statistics {}
