@@ -643,6 +643,9 @@ qint64 PushNotification::getNextInternalPushNumber()
 qint32 PushNotification::addNewAppInformation(const QString guid, const QString fcmToken,
                                               const qint32 system, const quint32 userIndex)
 {
+    if (!this->m_initialized)
+        return ERROR_CODE_NOT_READY;
+
     qint64       timestamp = QDateTime::currentMSecsSinceEpoch();
     AppTokenUID* app;
     if ((app = this->appInfoExists(guid)) != NULL) {

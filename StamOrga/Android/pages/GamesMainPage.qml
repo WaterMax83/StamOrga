@@ -57,8 +57,9 @@ Page {
 
         MyControls.TabBar {
                 id: tabBarGamesMainPage
-                anchors.left: parent.left
-                anchors.right: parent.right
+//                anchors.left: parent.left
+//                anchors.right: parent.right
+                Layout.fillWidth: true
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
                 currentIndex: swipeViewGamesMainPage.currentIndex
                 Layout.columnSpan: 2
@@ -76,10 +77,7 @@ Page {
 
         SwipeView {
             id: swipeViewGamesMainPage
-            anchors.top : tabBarGamesMainPage.bottom
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            anchors.right: parent.right
+            Layout.fillWidth: true
             Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
             Layout.fillHeight: true
             currentIndex: tabBarGamesMainPage.currentIndex

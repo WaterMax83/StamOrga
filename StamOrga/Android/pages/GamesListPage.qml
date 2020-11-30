@@ -77,8 +77,7 @@ Flickable {
 
             Column {
                 id: columnLayoutGames
-                anchors.right: parent.right
-                anchors.left: parent.left
+                Layout.fillWidth: true
                 width: parent.width
                 spacing: 5
                 Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter

@@ -16,11 +16,12 @@
 *    along with StamOrga.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import QtQuick 2.8
-import QtQuick.Controls 2.2
-import QtQuick.Layouts 1.2
-import QtQuick.Controls.Material 2.2
-import QtQuick.Controls.Material.impl 2.2
+import QtQuick 2.12
+import QtQuick.Templates 2.12 as T
+import QtQuick.Controls 2.12
+import QtQuick.Controls.impl 2.12
+import QtQuick.Controls.Material 2.12
+import QtQuick.Controls.Material.impl 2.12
 
 import com.watermax.demo 1.0
 

@@ -79,10 +79,9 @@ Item {
             Layout.bottomMargin: 5
 
             ColumnLayout {
-                anchors.top: parent.top
-                anchors.left: parent.left
-                anchors.topMargin: 3
-                anchors.leftMargin: 3
+                Layout.alignment: Qt.AlignLeft | Qt.AlignTop
+                Layout.leftMargin: 3
+                Layout.topMargin: 3
 
                 Rectangle {
                     id: itemCompetitionInfo
@@ -136,7 +135,7 @@ Item {
                     RowLayout {
                         Text {
                             id: labelLineDate
-                            anchors.left: parent.left
+                            Layout.alignment: Qt.AlignLeft
                             text: qsTr("Date")
                             color: "#B0BEC5"
                             font.pixelSize: 14
@@ -167,7 +166,8 @@ Item {
                     }
                     RowLayout {
                         Text {
-                            anchors.left: parent.left
+//                            anchors.left: parent.left
+                            Layout.fillWidth: true
                             id: labelLineHome
                             text: qsTr("Home")
                             font.bold: true
@@ -178,7 +178,6 @@ Item {
                     RowLayout {
                         Text {
                             id: labelLineAway
-                            anchors.left: parent.left
                             Layout.fillWidth: true
                             text: qsTr("Away")
                             font.bold: true
@@ -187,8 +186,8 @@ Item {
                         }
                         Text {
                             id: labelLineScore
-                            anchors.right: parent.right
-                            anchors.rightMargin: 5
+                            Layout.alignment: Qt.AlignRight
+                            Layout.rightMargin: 5
                             text: qsTr("")
                             font.bold: true
                             color: "white"

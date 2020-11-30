@@ -148,10 +148,8 @@ ApplicationWindow {
 
                 focus: true
                 currentIndex: -1
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                anchors.top: rectangleLogo.bottom
+                Layout.fillHeight: true
+                Layout.fillWidth: true
                 highlight: highlightBar
                 clip: true
                 snapMode: ListView.SnapToItem
