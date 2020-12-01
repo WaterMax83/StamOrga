@@ -25,7 +25,7 @@ class AcceptMeetingInfo : public QObject
 {
     Q_OBJECT
 public:
-    explicit AcceptMeetingInfo(QObject* parent = 0)
+    explicit AcceptMeetingInfo(QObject* parent = nullptr)
         : QObject(parent)
     {
     }

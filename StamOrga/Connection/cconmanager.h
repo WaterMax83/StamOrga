@@ -32,7 +32,7 @@ class cConManager : public cGenDisposer
 {
     Q_OBJECT
 public:
-    explicit cConManager(QObject* parent = 0);
+    explicit cConManager(QObject* parent = nullptr);
     ~cConManager();
 
     qint32 initialize();
@@ -58,10 +58,10 @@ private slots:
 
 private:
     BackgroundController m_ctrlMainCon;
-    cConTcpMain*         m_pMainCon = NULL;
+    cConTcpMain*         m_pMainCon = nullptr;
 
     BackgroundController m_ctrlDataCon;
-    cConTcpData*         m_pDataCon = NULL;
+    cConTcpData*         m_pDataCon = nullptr;
 
     bool m_bIsConnecting = false;
 

@@ -76,7 +76,7 @@ private:
     MessageBuffer m_messageBuffer;
 
     QTimer*     m_pConTimeout;
-    QTcpSocket* m_pDataTcpSocket = NULL;
+    QTcpSocket* m_pDataTcpSocket = nullptr;
 
     void               checkNewOncomingData();
     qint32             sendMessageRequest(MessageProtocol* msg, TcpDataConRequest* request);

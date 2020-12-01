@@ -73,7 +73,7 @@ private:
 
     //    QString       m_editHeader;
     //    QString       m_editInfo;
-    TextDataItem* m_editItem = NULL;
+    TextDataItem* m_editItem = nullptr;
 };
 
 extern cDataWebPageManager* g_DataWebPageManager;

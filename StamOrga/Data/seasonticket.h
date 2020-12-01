@@ -33,7 +33,7 @@ class SeasonTicketItem : public QObject
     Q_PROPERTY(qint32 index READ index NOTIFY indexChanged)
     Q_PROPERTY(qint32 userIndex READ userIndex NOTIFY userIndexChanged)
 public:
-    explicit SeasonTicketItem(QObject* parent = 0);
+    explicit SeasonTicketItem(QObject* parent = nullptr);
 
     QString name() { return this->m_name; }
     void setName(const QString& name)

@@ -71,7 +71,7 @@ public:
     const char* getPointerToData()
     {
         if (this->getDataLength() == 0)
-            return NULL;
+            return nullptr;
         return getNetworkProtocol() + MSG_HEADER_SIZE;
     }
 

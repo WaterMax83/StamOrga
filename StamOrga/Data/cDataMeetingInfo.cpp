@@ -128,7 +128,7 @@ qint32 cDataMeetingInfo::handleLoadMeetingInfoResponse(MessageProtocol* msg)
     }
 
     GamePlay* pGame = g_DataGamesManager->getGamePlay(gameIndex);
-    if (pGame != NULL) {
+    if (pGame != nullptr) {
         if (type == MEETING_TYPE_MEETING) {
             pGame->setAcceptedMeetingCount(acceptMeeting);
             pGame->setInterestedMeetingCount(interestMeeting);
@@ -293,7 +293,7 @@ AcceptMeetingInfo* cDataMeetingInfo::getAcceptInfoFromIndex(qint32 index)
     QMutexLocker lock(&this->m_mutex);
 
     if (index >= this->m_acceptInfo.size())
-        return NULL;
+        return nullptr;
 
     return this->m_acceptInfo[index];
 }
@@ -332,7 +332,7 @@ cDataCommentItem* cDataMeetingInfo::getCommentFromIndex(qint32 index)
     QMutexLocker lock(&this->m_mutex);
 
     if (index >= this->m_comments.size())
-        return NULL;
+        return nullptr;
 
     return this->m_comments[index];
 }

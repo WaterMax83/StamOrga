@@ -98,8 +98,10 @@ int cConTcpMain::DoBackgroundWork()
         this->m_pMasterTcpSocket->setProxy(QNetworkProxy::NoProxy);
         ((QSslSocket*)this->m_pMasterTcpSocket)->addCaCertificate(g_StaGlobalSettings->getSSLCaCertificate());
         ((QSslSocket*)this->m_pMasterTcpSocket)->connectToHostEncrypted(SERVER_HOST_ADDRESS, g_ConUserSettings->getMasterConPort() + 1);
-    } else
+    } else {
+        qInfo() << "Trying to connec to " << this->m_hMasterReceiver << " " << g_ConUserSettings->getMasterConPort();
         this->m_pMasterTcpSocket->connectToHost(this->m_hMasterReceiver, g_ConUserSettings->getMasterConPort());
+    }
 
 
     this->m_pConTimeout->start(SOCKET_TIMEOUT_MS);
@@ -166,7 +168,7 @@ void cConTcpMain::slotSslErrors(const QList<QSslError>& errors)
 void cConTcpMain::checkNewOncomingData()
 {
     MessageProtocol* msg;
-    while ((msg = this->m_messageBuffer.GetNextMessage()) != NULL) {
+    while ((msg = this->m_messageBuffer.GetNextMessage()) != nullptr) {
 
         if (msg->getIndex() == OP_CODE_CMD_RES::ACK_CONNECT_USER) {
             this->m_pConTimeout->stop();
@@ -197,7 +199,7 @@ void cConTcpMain::checkNewOncomingData()
 
 cConTcpMain::~cConTcpMain()
 {
-    if (this->m_pMasterTcpSocket != NULL)
+    if (this->m_pMasterTcpSocket != nullptr)
         delete this->m_pMasterTcpSocket;
-    this->m_pMasterTcpSocket = NULL;
+    this->m_pMasterTcpSocket = nullptr;
 }

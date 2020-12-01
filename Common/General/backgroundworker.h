@@ -39,7 +39,7 @@ class BackgroundWorker : public cGenDisposer
     Q_OBJECT
 
 public:
-    explicit BackgroundWorker(QObject* parent = 0);
+    explicit BackgroundWorker(QObject* parent = nullptr);
     explicit BackgroundWorker(QString& name);
     virtual ~BackgroundWorker();
 

@@ -66,7 +66,7 @@ int cDataGameUserData::initialize()
 
         //        /* remove games which are older */
         //        GamePlay* game = g_GlobalData->getGamePlay(fGame->m_gameIndex);
-        //        if (game != NULL) {
+        //        if (game != nullptr) {
         //            qDebug() << game->seasonIndex();
         //            qDebug() << currentSeason;
         //            if (game->seasonIndex() < currentSeason) {

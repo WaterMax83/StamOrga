@@ -25,7 +25,7 @@
 //#define STAM_ORGA_VERSION_S "V1.0.0"
 
 #define STAM_ORGA_VERSION_S "V" + QString(STAMORGA_VERSION)
-#define STAM_ORGA_VERSION_I QString("0x0" + QString(STAMORGA_VERSION).replace(".", "0") + "00").toUInt(NULL, 16)
+#define STAM_ORGA_VERSION_I QString("0x0" + QString(STAMORGA_VERSION).replace(".", "0") + "00").toUInt(nullptr, 16)
 
 #ifdef Q_OS_WIN
 #undef STAM_ORGA_VERSION_LINK_WITH_TEXT

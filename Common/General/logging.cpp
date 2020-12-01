@@ -34,13 +34,13 @@
 #define MAX_DAYS_LOG_FILES 30
 #endif
 
-Logging* g_Logging = NULL;
+Logging* g_Logging = nullptr;
 
 void logMyMessageLogginOutPut(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
     Q_UNUSED(context);
 
-    if (g_Logging != NULL)
+    if (g_Logging != nullptr)
         g_Logging->addNewEntry(type, msg);
 }
 
@@ -48,8 +48,8 @@ void logMyMessageLogginOutPut(QtMsgType type, const QMessageLogContext& context,
 Logging::Logging(QObject* parent)
     : BackgroundWorker(parent)
 {
-    this->m_logFile     = NULL;
-    this->m_hourTimer   = NULL;
+    this->m_logFile     = nullptr;
+    this->m_hourTimer   = nullptr;
     this->m_initialized = false;
 }
 
@@ -227,7 +227,7 @@ void Logging::slotNewLogEntries()
 
         this->m_internalMutex.lock();
         this->m_currentLogging.append(msg + "\n");
-        if (this->m_logFile != NULL && this->m_logFile->isOpen()) {
+        if (this->m_logFile != nullptr && this->m_logFile->isOpen()) {
             QTextStream out(this->m_logFile);
             out << msg << "\n";
             if (entry->m_type == QtCriticalMsg)
@@ -250,10 +250,10 @@ void Logging::slotEveryHourTimeout()
     /* Check if new path is needed */
     QString loggingPath = this->createLoggingFilePath();
     if (loggingPath.size() > 0) {
-        if (this->m_logFile == NULL || this->m_logFile->fileName() != loggingPath) {
+        if (this->m_logFile == nullptr || this->m_logFile->fileName() != loggingPath) {
 
             this->m_internalMutex.lock();
-            if (this->m_logFile != NULL) {
+            if (this->m_logFile != nullptr) {
                 this->m_logFile->close();
                 delete this->m_logFile;
             }
@@ -311,13 +311,13 @@ void Logging::terminate()
 {
     disconnect(this, &Logging::signalNewLogEntries, this, &Logging::slotNewLogEntries);
     this->slotNewLogEntries();
-    if (this->m_logFile != NULL) {
+    if (this->m_logFile != nullptr) {
         this->m_logFile->close();
         delete this->m_logFile;
-        this->m_logFile = NULL;
+        this->m_logFile = nullptr;
     }
 
-    if (this->m_hourTimer == NULL)
+    if (this->m_hourTimer == nullptr)
         delete this->m_hourTimer;
-    this->m_hourTimer = NULL;
+    this->m_hourTimer = nullptr;
 }

@@ -29,7 +29,7 @@ class UserInterface : public QObject
 {
     Q_OBJECT
 public:
-    explicit UserInterface(QObject* parent = 0);
+    explicit UserInterface(QObject* parent = nullptr);
 
     Q_INVOKABLE qint32 startMainConnection(QString name, QString passw);
 

@@ -64,7 +64,7 @@ void cDataWebPageManager::addNewWebPageData(TextDataItem* sWebPage, const quint1
         return;
 
     TextDataItem* pWebPage = this->getWebDataItem(sWebPage->index());
-    if (pWebPage == NULL) {
+    if (pWebPage == nullptr) {
         QMutexLocker lock(&this->m_mutex);
         this->m_lWebPages.append(sWebPage);
         return;
@@ -118,7 +118,7 @@ void cDataWebPageManager::resetAllWebPageEvents()
 TextDataItem* cDataWebPageManager::getWebDataItem(qint32 index)
 {
     if (!this->m_initialized)
-        return NULL;
+        return nullptr;
 
     QMutexLocker lock(&this->m_mutex);
 
@@ -126,7 +126,7 @@ TextDataItem* cDataWebPageManager::getWebDataItem(qint32 index)
         if (this->m_lWebPages[i]->index() == index)
             return this->m_lWebPages[i];
     }
-    return NULL;
+    return nullptr;
 }
 
 qint32 cDataWebPageManager::getWebListLength()
@@ -142,7 +142,7 @@ TextDataItem* cDataWebPageManager::getWebDataFromArrayIndex(int index)
     if (index < this->m_lWebPages.size()) {
         return this->m_lWebPages.at(index);
     }
-    return NULL;
+    return nullptr;
 }
 
 QString cDataWebPageManager::getWebPageLastLocalUpdateString()
@@ -296,7 +296,7 @@ qint32 cDataWebPageManager::handleWebPageResponse(MessageProtocol* msg)
         if (cmd == "load") {
             qint32        index = rootObj.value("index").toInt();
             TextDataItem* pItem = this->getWebDataItem(index);
-            if (pItem == NULL)
+            if (pItem == nullptr)
                 return ERROR_CODE_NOT_FOUND;
 
             pItem->setHeader(rootObj.value("name").toString());
@@ -373,7 +373,7 @@ qint32 cDataWebPageManager::clearWebPageList()
 //    qint32 newsIndex = rootObj.value("index").toInt(0);
 
 //    WebPageItem* pItem = this->getNewsDataItem(newsIndex);
-//    if (pItem == NULL)
+//    if (pItem == nullptr)
 //        return ERROR_CODE_NOT_FOUND;
 
 //    QMutexLocker lock(&this->m_mutex);
@@ -430,7 +430,7 @@ qint32 cDataWebPageManager::clearWebPageList()
 //    if (result == ERROR_CODE_SUCCESS && index > 0) {
 //        bool          bAddedItem = false;
 //        WebPageItem* pItem      = this->getNewsDataItem(index);
-//        if (pItem == NULL) {
+//        if (pItem == nullptr) {
 //            pItem = new WebPageItem();
 //            pItem->setIndex(index);
 //            bAddedItem = true;

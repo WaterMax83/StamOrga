@@ -185,7 +185,7 @@ qint32 cDataStatisticManager::startLoadStatisticContent(qint32 catIndex, qint32 
 StatBars* cDataStatisticManager::getNextStatBar(const qint32 index)
 {
     if (this->m_statBars.count() <= index)
-        return NULL;
+        return nullptr;
 
     return this->m_statBars.at(index);
 }

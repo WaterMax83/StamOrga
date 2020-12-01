@@ -58,7 +58,7 @@ void cDataNewsDataManager::addNewNewsData(TextDataItem* sNews, const quint16 upd
         return;
 
     TextDataItem* pNews = this->getNewsDataItem(sNews->index());
-    if (pNews == NULL) {
+    if (pNews == nullptr) {
         QMutexLocker lock(&this->m_mutex);
         this->m_lNews.append(sNews);
         return;
@@ -108,7 +108,7 @@ void cDataNewsDataManager::resetAllNewsDataEvents()
 TextDataItem* cDataNewsDataManager::getNewsDataItem(qint32 newsIndex)
 {
     if (!this->m_initialized)
-        return NULL;
+        return nullptr;
 
     QMutexLocker lock(&this->m_mutex);
 
@@ -116,7 +116,7 @@ TextDataItem* cDataNewsDataManager::getNewsDataItem(qint32 newsIndex)
         if (this->m_lNews[i]->index() == newsIndex)
             return this->m_lNews[i];
     }
-    return NULL;
+    return nullptr;
 }
 
 qint32 cDataNewsDataManager::getNewsDataLength()
@@ -132,7 +132,7 @@ TextDataItem* cDataNewsDataManager::getNewsDataFromArrayIndex(int index)
     if (index < this->m_lNews.size()) {
         return this->m_lNews.at(index);
     }
-    return NULL;
+    return nullptr;
 }
 
 QString cDataNewsDataManager::getNewsDataLastLocalUpdateString()
@@ -258,7 +258,7 @@ qint32 cDataNewsDataManager::handleGetNewsDataItem(MessageProtocol* msg)
     qint32 newsIndex = rootObj.value("index").toInt(0);
 
     TextDataItem* pItem = this->getNewsDataItem(newsIndex);
-    if (pItem == NULL)
+    if (pItem == nullptr)
         return ERROR_CODE_NOT_FOUND;
 
     QMutexLocker lock(&this->m_mutex);
@@ -315,7 +315,7 @@ qint32 cDataNewsDataManager::handleChangeNewsDataResponse(MessageProtocol* msg)
     if (result == ERROR_CODE_SUCCESS && index > 0) {
         bool          bAddedItem = false;
         TextDataItem* pItem      = this->getNewsDataItem(index);
-        if (pItem == NULL) {
+        if (pItem == nullptr) {
             pItem = new TextDataItem();
             pItem->setIndex(index);
             bAddedItem = true;

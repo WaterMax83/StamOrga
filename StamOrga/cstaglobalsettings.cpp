@@ -207,12 +207,12 @@ void cStaGlobalSettings::setChangeDefaultFont(const QString font)
 
         g_StaSettingsManager->setValue(SETTINGS_GROUP, SETT_CHANGE_DEFAULT_FONT, font);
 
-        if (this->m_fontList != NULL)
+        if (this->m_fontList != nullptr)
             this->m_currentFontIndex = this->m_fontList->indexOf(font);
     }
 }
 
-qint32 cStaGlobalSettings::getCurrentFontIndex()
+qint64 cStaGlobalSettings::getCurrentFontIndex()
 {
     return this->m_currentFontIndex;
 }
@@ -220,7 +220,7 @@ qint32 cStaGlobalSettings::getCurrentFontIndex()
 void cStaGlobalSettings::setCurrentFontList(QStringList* list)
 {
     this->m_fontList = list;
-    if (this->m_fontList != NULL)
+    if (this->m_fontList != nullptr)
         this->m_currentFontIndex = this->m_fontList->indexOf(this->m_changeDefaultFont);
 }
 

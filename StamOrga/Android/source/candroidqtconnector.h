@@ -25,7 +25,7 @@ class cAndroidQtConnector : public QObject
 {
     Q_OBJECT
 public:
-    cAndroidQtConnector(QObject* parent = 0);
+    cAndroidQtConnector(QObject* parent = nullptr);
     ~cAndroidQtConnector();
 
     void setNewRegistrationToken(const QString& token);

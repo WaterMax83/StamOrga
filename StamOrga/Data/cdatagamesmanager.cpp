@@ -131,7 +131,7 @@ void cDataGamesManager::addNewGamesPlay(GamePlay* sGame, const quint16 updateInd
         return;
 
     GamePlay* pGame = this->getGamePlay(sGame->index());
-    if (pGame == NULL) {
+    if (pGame == nullptr) {
         QMutexLocker lock(&this->m_mutex);
 
         this->m_lGames.append(sGame);
@@ -198,7 +198,7 @@ void cDataGamesManager::resetAllGamePlayEvents()
 GamePlay* cDataGamesManager::getGamePlay(qint32 gameIndex)
 {
     if (!this->m_initialized)
-        return NULL;
+        return nullptr;
 
     QMutexLocker lock(&this->m_mutex);
 
@@ -206,7 +206,7 @@ GamePlay* cDataGamesManager::getGamePlay(qint32 gameIndex)
         if (this->m_lGames[i]->index() == gameIndex)
             return this->m_lGames[i];
     }
-    return NULL;
+    return nullptr;
 }
 
 qint32 cDataGamesManager::getGamePlayLength()
@@ -222,7 +222,7 @@ GamePlay* cDataGamesManager::getGamePlayFromArrayIndex(int index)
     if (index < this->m_lGames.size()) {
         return this->m_lGames.at(index);
     }
-    return NULL;
+    return nullptr;
 }
 
 QString cDataGamesManager::getGamePlayLastLocalUpdateString()
@@ -432,7 +432,7 @@ qint32 cDataGamesManager::handleListGamesInfoResponse(MessageProtocol* msg)
         QJsonObject gameObj = infoArr.at(i).toObject();
 
         GamePlay* play = this->getGamePlay(gameObj.value("index").toInt());
-        if (play == NULL)
+        if (play == nullptr)
             continue;
 
         play->setFreeTickets(gameObj.value("free").toInt());
@@ -537,7 +537,7 @@ qint32 cDataGamesManager::handleGetGamesEventsResponse(MessageProtocol* msg)
         return result;
 
     GamePlay* play = this->getGamePlay(rootObj.value("index").toInt(-1));
-    if (play == NULL)
+    if (play == nullptr)
         return ERROR_CODE_NOT_FOUND;
 
     QMutexLocker lock(&this->m_mutex);

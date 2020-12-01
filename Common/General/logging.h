@@ -43,7 +43,7 @@ class Logging : public BackgroundWorker
 {
     Q_OBJECT
 public:
-    explicit Logging(QObject* parent = 0);
+    explicit Logging(QObject* parent = nullptr);
 
     qint32 initialize();
 

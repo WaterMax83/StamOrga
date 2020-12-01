@@ -68,7 +68,7 @@ UserInformation* cDataUserManager::getUserInfoFromArrayIndex(int index)
     if (index < this->m_lUser.size()) {
         return this->m_lUser.at(index);
     }
-    return NULL;
+    return nullptr;
 }
 
 QString cDataUserManager::getUserInfoLastLocalUpdateString()
@@ -206,7 +206,7 @@ qint32 cDataUserManager::handleUserCommandResponse(MessageProtocol* msg)
 
         qint32           ownUserIndex = g_ConUserSettings->getUserIndex();
         bool             bIsUserAdmin = g_ConUserSettings->userIsAdminEnabled();
-        UserInformation* pOwnUser     = NULL;
+        UserInformation* pOwnUser     = nullptr;
 
         for (int i = 0; i < arrUser.count(); i++) {
             QJsonObject      userObj = arrUser.at(i).toObject();
@@ -243,7 +243,7 @@ qint32 cDataUserManager::handleUserCommandResponse(MessageProtocol* msg)
 
         std::sort(this->m_lUser.begin(), this->m_lUser.end(), UserInformation::compareuUserNameFunctionAscending);
 
-        if (pOwnUser != NULL)
+        if (pOwnUser != nullptr)
             this->m_lUser.insert(0, pOwnUser);
         this->m_stLastServerUpdateTimeStamp = timestamp;
     } else if (command == "notifyEmail") {

@@ -62,7 +62,7 @@ private:
     bool          m_bIsConnecting;
 
     QTimer*      m_pConTimeout;
-    QTcpSocket*  m_pMasterTcpSocket = NULL;
+    QTcpSocket*  m_pMasterTcpSocket = nullptr;
     QHostAddress m_hMasterReceiver;
 
     void checkNewOncomingData();

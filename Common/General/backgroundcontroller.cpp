@@ -95,7 +95,7 @@ void BackgroundController::finishedBackgroundWorker(const int& result)
 
 void BackgroundController::CleanupBackgroundWorker()
 {
-    if (this->m_worker == NULL)
+    if (this->m_worker == nullptr)
         return;
 
     if (this->IsRunning()) {
@@ -109,7 +109,7 @@ void BackgroundController::CleanupBackgroundWorker()
     disconnect(&this->m_thread, &QThread::started, this->m_worker, &BackgroundWorker::startBackgroundWork);
     disconnect(&this->m_thread, &QThread::finished, this, &BackgroundController::finishedThread);
 
-    this->m_worker = NULL;
+    this->m_worker = nullptr;
 }
 
 

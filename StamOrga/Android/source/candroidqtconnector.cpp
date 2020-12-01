@@ -23,7 +23,7 @@
 #include <QtAndroidExtras>
 #endif
 
-static cAndroidQtConnector* g_PushInstance = NULL;
+static cAndroidQtConnector* g_PushInstance = nullptr;
 
 cAndroidQtConnector::cAndroidQtConnector(QObject* parent)
     : QObject(parent)
@@ -51,7 +51,7 @@ static void fcmTokenResult(JNIEnv* /*env*/ env, jobject obj, jstring fcmToken)
     const char* nativeString = env->GetStringUTFChars(fcmToken, 0);
     Q_UNUSED(obj);
 
-    if (g_PushInstance != NULL)
+    if (g_PushInstance != nullptr)
         g_PushInstance->setNewRegistrationToken(QString(nativeString));
 }
 

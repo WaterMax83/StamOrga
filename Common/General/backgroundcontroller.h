@@ -39,7 +39,7 @@ class BackgroundController : public QObject
 {
     Q_OBJECT
 public:
-    explicit BackgroundController(QObject* parent = 0);
+    explicit BackgroundController(QObject* parent = nullptr);
     virtual ~BackgroundController();
 
     bool IsRunning() { return m_thread.isRunning(); }
@@ -66,7 +66,7 @@ private slots:
 private:
     QThread m_thread;
 
-    BackgroundWorker* m_worker = NULL;
+    BackgroundWorker* m_worker = nullptr;
 
     bool m_bCleanupAfterWorkerFinished;
 

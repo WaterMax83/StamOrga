@@ -150,7 +150,7 @@ void cConTcpData::slotReadyReadDataPort()
 void cConTcpData::checkNewOncomingData()
 {
     MessageProtocol* msg;
-    while ((msg = this->m_messageBuffer.GetNextMessage()) != NULL) {
+    while ((msg = this->m_messageBuffer.GetNextMessage()) != nullptr) {
 
 
         if (msg->getIndex() == OP_CODE_CMD_RES::ACK_NOT_LOGGED_IN) {
@@ -161,7 +161,7 @@ void cConTcpData::checkNewOncomingData()
             return;
         }
         TcpDataConRequest* request = this->getActualRequest(msg->getIndex() & 0x00FFFFFF);
-        if (request == NULL)
+        if (request == nullptr)
             continue;
 
 
@@ -299,7 +299,7 @@ void cConTcpData::checkNewOncomingData()
 
 qint32 cConTcpData::sendMessageRequest(MessageProtocol* msg, TcpDataConRequest* request)
 {
-    if (this->m_pDataTcpSocket == NULL)
+    if (this->m_pDataTcpSocket == nullptr)
         return -1;
 
     quint32     sendBytes       = 0;
@@ -340,7 +340,7 @@ void cConTcpData::removeActualRequest(TcpDataConRequest* request)
 {
     for (int i = 0; i < this->m_lActualRequest.size(); i++) {
         if (this->m_lActualRequest[i] == request) {
-            //            if (this->m_lActualRequest[i].m_lData != NULL)
+            //            if (this->m_lActualRequest[i].m_lData != nullptr)
             //                delete this->m_lActualRequest[i].m_lData;
             this->m_lActualRequest.removeAt(i);
         }
@@ -355,7 +355,7 @@ TcpDataConRequest* cConTcpData::getActualRequest(quint32 req)
             return this->m_lActualRequest[i];
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void cConTcpData::sendActualRequestsAgain(qint32 result)
@@ -383,15 +383,15 @@ void cConTcpData::startSendNewRequest(TcpDataConRequest* request)
 
 qint32 cConTcpData::terminate()
 {
-    if (this->m_pConTimeout != NULL) {
+    if (this->m_pConTimeout != nullptr) {
         this->m_pConTimeout->deleteLater();
     }
-    this->m_pConTimeout = NULL;
+    this->m_pConTimeout = nullptr;
 
-    if (this->m_pDataTcpSocket != NULL) {
+    if (this->m_pDataTcpSocket != nullptr) {
         this->m_pDataTcpSocket->deleteLater();
     }
-    this->m_pDataTcpSocket = NULL;
+    this->m_pDataTcpSocket = nullptr;
 
     return ERROR_CODE_SUCCESS;
 }

@@ -41,7 +41,7 @@ extern cStaGlobalManager* g_GlobalManager;
 cConManager::cConManager(QObject* parent)
     : cGenDisposer(parent)
 {
-    this->m_pMainCon = NULL;
+    this->m_pMainCon = nullptr;
 }
 
 qint32 cConManager::initialize()
@@ -64,7 +64,7 @@ qint32 cConManager::startMainConnection(const QString& name, const QString& pass
 
     this->stopDataConnection();
 
-    if (this->m_pMainCon == NULL) {
+    if (this->m_pMainCon == nullptr) {
         this->m_pMainCon = new cConTcpMain();
         qint32 rCode     = this->m_pMainCon->initialize(g_ConUserSettings->getIPAddr(), name);
         if (rCode != ERROR_CODE_SUCCESS)
@@ -86,7 +86,7 @@ qint32 cConManager::resetCurrentConnection()
     this->stopDataConnection();
 
     this->m_ctrlMainCon.Stop();
-    this->m_pMainCon = NULL;
+    this->m_pMainCon = nullptr;
 
     return ERROR_CODE_SUCCESS;
 }
@@ -130,7 +130,7 @@ void cConManager::slMainConReqFin(qint32 result, const QString& msg, const QStri
         }
     }
     this->m_ctrlMainCon.Stop();
-    this->m_pMainCon = NULL;
+    this->m_pMainCon = nullptr;
 }
 
 void cConManager::slotDataConnnectionFinished(qint32 result, const QString msg)

@@ -262,7 +262,7 @@ qint32 cConUserSettings::handleUserPropsResponse(MessageProtocol* msg)
 
     SeasonTicketItem* seasonTicket;
     int               i = 0;
-    while ((seasonTicket = g_DataTicketManager->getSeasonTicketFromArrayIndex(i++)) != NULL) {
+    while ((seasonTicket = g_DataTicketManager->getSeasonTicketFromArrayIndex(i++)) != nullptr) {
         seasonTicket->checkTicketOwn(index);
     }
 

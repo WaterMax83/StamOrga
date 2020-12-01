@@ -42,7 +42,7 @@ void MessageBuffer::StoreNewData(QByteArray& data)
 MessageProtocol* MessageBuffer::GetNextMessage()
 {
     if (this->m_DataBuffer.length() < 12)
-        return NULL;
+        return nullptr;
 
     msg_Header* pHead = (msg_Header*)this->m_DataBuffer.constData();
 
@@ -56,11 +56,11 @@ MessageProtocol* MessageBuffer::GetNextMessage()
 
     //    if (payLoadLength > MAX_PAYLOAD_SIZE) {
     //        this->m_DataBuffer.clear();
-    //        return NULL;
+    //        return nullptr;
     //    }
 
     if (payLoadLength > (uint)this->m_DataBuffer.length()) // not yet received everything
-        return NULL;
+        return nullptr;
 
     QByteArray       packet = this->m_DataBuffer.left(payLoadLength);
     MessageProtocol* msg    = new MessageProtocol(packet);

@@ -45,7 +45,7 @@ class GamePlay : public QObject
     Q_PROPERTY(quint8 seasonIndex READ seasonIndex WRITE setSeasonIndex NOTIFY seasonIndexChanged)
     Q_PROPERTY(quint32 event READ getEvent NOTIFY eventChanged)
 public:
-    explicit GamePlay(QObject* parent = 0);
+    explicit GamePlay(QObject* parent = nullptr);
 
     QString home() { return this->m_home; }
     void    setHome(const QString& home)

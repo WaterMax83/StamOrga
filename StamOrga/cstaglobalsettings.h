@@ -54,7 +54,7 @@ public:
     Q_INVOKABLE QString getChangeDefaultFont();
     Q_INVOKABLE void    setChangeDefaultFont(const QString font);
 
-    Q_INVOKABLE qint32 getCurrentFontIndex();
+    Q_INVOKABLE qint64 getCurrentFontIndex();
     void               setCurrentFontList(QStringList* list);
 
     Q_INVOKABLE qint64 getKeepPastItemsCount();
@@ -108,7 +108,7 @@ private:
 
     QString      m_changeDefaultFont;
     qint64       m_currentFontIndex;
-    QStringList* m_fontList = NULL;
+    QStringList* m_fontList = nullptr;
 
     bool m_bAlreadyConnected;
 };

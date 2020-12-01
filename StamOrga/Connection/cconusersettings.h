@@ -92,7 +92,7 @@ private:
 
     QString m_currentRandomValue;
 
-    QCryptographicHash* m_hash = NULL;
+    QCryptographicHash* m_hash = nullptr;
 
     void setUserIndex(const qint32 userIndex);
     void setUserProperties(const quint32 userProperties);

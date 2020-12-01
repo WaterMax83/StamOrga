@@ -33,7 +33,7 @@ class cDataMeetingInfo : public cGenDisposer
 {
     Q_OBJECT
 public:
-    explicit cDataMeetingInfo(QObject* parent = 0);
+    explicit cDataMeetingInfo(QObject* parent = nullptr);
 
     qint32 initialize();
 

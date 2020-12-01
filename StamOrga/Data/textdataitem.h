@@ -31,7 +31,7 @@ class TextDataItem : public QObject
     Q_PROPERTY(QString info READ info WRITE setInfo NOTIFY infoChanged)
     Q_PROPERTY(qint32 event READ event NOTIFY eventChanged)
 public:
-    explicit TextDataItem(QObject* parent = 0);
+    explicit TextDataItem(QObject* parent = nullptr);
 
     QString user() { return this->m_user; }
     void setUser(const QString& user)

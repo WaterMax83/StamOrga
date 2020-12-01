@@ -100,7 +100,7 @@ void cDataTicketManager::addNewSeasonTicket(SeasonTicketItem* sTicket, const qui
         return;
 
     SeasonTicketItem* pTicket = this->getSeasonTicket(sTicket->index());
-    if (pTicket == NULL) {
+    if (pTicket == nullptr) {
         QMutexLocker lock(&this->m_mutex);
         this->m_lTickets.append(sTicket);
         return;
@@ -126,7 +126,7 @@ void cDataTicketManager::addNewSeasonTicket(SeasonTicketItem* sTicket, const qui
 SeasonTicketItem* cDataTicketManager::getSeasonTicket(qint32 ticketIndex)
 {
     if (!this->m_initialized)
-        return NULL;
+        return nullptr;
 
     QMutexLocker lock(&this->m_mutex);
 
@@ -134,7 +134,7 @@ SeasonTicketItem* cDataTicketManager::getSeasonTicket(qint32 ticketIndex)
         if (this->m_lTickets[i]->index() == ticketIndex)
             return this->m_lTickets[i];
     }
-    return NULL;
+    return nullptr;
 }
 
 qint32 cDataTicketManager::getSeasonTicketLength()
@@ -150,7 +150,7 @@ SeasonTicketItem* cDataTicketManager::getSeasonTicketFromArrayIndex(int index)
     if (index < this->m_lTickets.size()) {
         return this->m_lTickets.at(index);
     }
-    return NULL;
+    return nullptr;
 }
 
 QString cDataTicketManager::getSeasonTicketLastLocalUpdateString()
@@ -363,7 +363,7 @@ qint32 cDataTicketManager::handleListAvailableSeasonTicketResponse(MessageProtoc
 
     for (int i = 0; i < this->getSeasonTicketLength(); i++) {
         SeasonTicketItem* pItem = this->getSeasonTicketFromArrayIndex(i);
-        if (pItem != NULL)
+        if (pItem != nullptr)
             pItem->setTicketState(TICKET_STATE_BLOCKED);
     }
 
@@ -374,7 +374,7 @@ qint32 cDataTicketManager::handleListAvailableSeasonTicketResponse(MessageProtoc
     for (int i = 0; i < freeArr.count(); i++) {
         qint32            ticketIndex = freeArr.at(i).toInt();
         SeasonTicketItem* pItem       = this->getSeasonTicket(ticketIndex);
-        if (pItem != NULL)
+        if (pItem != nullptr)
             pItem->setTicketState(TICKET_STATE_FREE);
         else {
             qWarning().noquote() << QString("Ticket with number %1 is missing for availableTicket Free").arg(ticketIndex);
@@ -384,7 +384,7 @@ qint32 cDataTicketManager::handleListAvailableSeasonTicketResponse(MessageProtoc
     for (int i = 0; i < resArr.count(); i++) {
         qint32            ticketIndex = resArr.at(i).toObject().value("index").toInt(0);
         SeasonTicketItem* pItem       = this->getSeasonTicket(ticketIndex);
-        if (pItem != NULL)
+        if (pItem != nullptr)
             pItem->setTicketState(TICKET_STATE_RESERVED);
         else {
             qWarning().noquote() << QString("Ticket with number %1 is missing for availableTicket Reserved").arg(ticketIndex);
@@ -396,7 +396,7 @@ qint32 cDataTicketManager::handleListAvailableSeasonTicketResponse(MessageProtoc
     }
 
     GamePlay* pGame = g_DataGamesManager->getGamePlay(gameIndex);
-    if (pGame != NULL) {
+    if (pGame != nullptr) {
         pGame->setFreeTickets(freeArr.count());
         pGame->setReservedTickets(resArr.count());
         pGame->setBlockedTickets(this->getSeasonTicketLength() - freeArr.count() - resArr.count());
