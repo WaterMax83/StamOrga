@@ -398,7 +398,7 @@ bool ReadOnlineGames::readSingleGame(QJsonObject& json)
     CompetitionIndex comp = NO_COMPETITION;
     if (this->m_currentGameInfo->m_competition == "bl1")
         comp = BUNDESLIGA_1;
-    else if (this->m_currentGameInfo->m_competition == "bl2")
+    else if (this->m_currentGameInfo->m_competition == "bl2" || this->m_currentGameInfo->m_competition == "bl_2")
         comp = BUNDESLIGA_2;
     else if (this->m_currentGameInfo->m_competition == "bl3")
         comp = LIGA_3;
