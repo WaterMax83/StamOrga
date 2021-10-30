@@ -49,6 +49,7 @@ public:
     cConTcpData();
     ~cConTcpData();
 
+    using cGenDisposer::initialize;
     qint32 initialize(QString host, qint32 port);
 
     int DoBackgroundWork() override;

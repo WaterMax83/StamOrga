@@ -28,7 +28,8 @@ public:
     cAndroidQtConnector(QObject* parent = nullptr);
     ~cAndroidQtConnector();
 
-    void setNewRegistrationToken(const QString& token);
+    void    setNewRegistrationToken(const QString& token);
+    QString getRegistrationToken(void) { return this->m_fcmToken; }
 
     static void subscribeToTopic(const QString& topic);
     static void unSubscribeFromTopic(const QString& topic);

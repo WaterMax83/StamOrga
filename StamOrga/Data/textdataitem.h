@@ -29,12 +29,12 @@ class TextDataItem : public QObject
     Q_PROPERTY(QString header READ header WRITE setHeader NOTIFY headerChanged)
     Q_PROPERTY(qint32 index READ index WRITE setIndex NOTIFY indexChanged)
     Q_PROPERTY(QString info READ info WRITE setInfo NOTIFY infoChanged)
-    Q_PROPERTY(qint32 event READ event NOTIFY eventChanged)
+    Q_PROPERTY(qint32 event READ getEvent NOTIFY eventChanged)
 public:
     explicit TextDataItem(QObject* parent = nullptr);
 
     QString user() { return this->m_user; }
-    void setUser(const QString& user)
+    void    setUser(const QString& user)
     {
         if (this->m_user != user) {
             this->m_user = user;
@@ -43,7 +43,7 @@ public:
     }
 
     QString header() { return this->m_header; }
-    void setHeader(const QString& header)
+    void    setHeader(const QString& header)
     {
         if (this->m_header != header) {
             this->m_header = header;
@@ -52,7 +52,7 @@ public:
     }
 
     QString info() { return this->m_info; }
-    void setInfo(const QString& info)
+    void    setInfo(const QString& info)
     {
         if (this->m_info != info) {
             this->m_info = info;
@@ -61,7 +61,7 @@ public:
     }
 
     qint32 index() { return this->m_index; }
-    void setIndex(const qint32 index)
+    void   setIndex(const qint32 index)
     {
         if (this->m_index != index) {
             this->m_index = index;
@@ -69,8 +69,8 @@ public:
         }
     }
 
-    qint32 event() { return this->m_eventCnt; }
-    void setEvent(qint32 event)
+    qint32 getEvent() { return this->m_eventCnt; }
+    void   setEvent(qint32 event)
     {
         if (this->m_eventCnt != event) {
             this->m_eventCnt = event;

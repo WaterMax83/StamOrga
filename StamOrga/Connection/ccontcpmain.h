@@ -36,6 +36,7 @@ public:
     cConTcpMain();
     ~cConTcpMain();
 
+    using cGenDisposer::initialize;
     qint32 initialize(const QString host, const QString userName);
 
     int DoBackgroundWork() override;

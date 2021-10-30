@@ -10,9 +10,14 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AppCompatActivity;
+//import android.support.v4.content.LocalBroadcastManager;
+//import android.support.v7.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
 import android.util.Log;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -31,10 +36,35 @@ public class MainActivity extends org.qtproject.qt5.android.bindings.QtActivity
 
         m_context = this;
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String token1 = sharedPreferences.getString(QuickstartPreferences.FCM_TOKEN, "");
-        Log.i(TAG, "Token beim Start " + token1);
+        String currentToken = sharedPreferences.getString(QuickstartPreferences.FCM_TOKEN, "");
+        Log.i(TAG, "Token beim Start " + currentToken);
 
-        FirebaseMessaging.getInstance().subscribeToTopic("TestProject");
+//        if (currentToken.length() == 0) {
+            FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                      if (!task.isSuccessful()) {
+                        Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                        return;
+                      }
+
+                      // Get new FCM registration token
+                      String newToken = task.getResult();
+                      Log.d(TAG, "Got Token after startup: " + newToken);
+
+                      if (currentToken != newToken) {
+                          SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(m_context);
+                          sharedPreferences.edit().putString(QuickstartPreferences.FCM_TOKEN, newToken).apply();
+                      }
+                      JavaNatives.sendFCMToken(newToken);
+                    }
+                });
+//        } else {
+//            JavaNatives.sendFCMToken(currentToken);
+//        }
+
+        FirebaseMessaging.getInstance().subscribeToTopic("WaterMaxTopic");
 
         mRegistrationBroadcastReceiver = new BroadcastReceiver()
         {

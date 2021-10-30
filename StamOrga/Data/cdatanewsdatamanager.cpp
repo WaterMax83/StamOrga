@@ -85,7 +85,7 @@ bool cDataNewsDataManager::setNewsDataItemHasEvent(qint32 newsIndex)
 
     for (int i = 0; i < this->m_lNews.count(); i++) {
         if (this->m_lNews[i]->index() == newsIndex) {
-            this->m_lNews[i]->setEvent(this->m_lNews[i]->event() + 1);
+            this->m_lNews[i]->setEvent(this->m_lNews[i]->getEvent() + 1);
             return true;
         }
     }

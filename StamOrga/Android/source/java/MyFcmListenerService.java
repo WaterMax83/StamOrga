@@ -10,7 +10,9 @@ import android.preference.PreferenceManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
+//import android.support.v4.app.NotificationCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
 import java.util.Map;
 import java.lang.System;
@@ -18,9 +20,38 @@ import java.lang.System;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import static org.qtproject.example.MyApplication.CHANNEL_GENERAL_ID;
+
 public class MyFcmListenerService extends FirebaseMessagingService
 {
     private static final String TAG = "MyFcmListenerService";
+
+    /**
+    * Called if InstanceID token is updated. This may occur if the security of
+    * the previous token had been compromised. Note that this is also called
+    * when the InstanceID token is initially generated, so this is where
+    * you retrieve the token.
+    */
+    // [START refresh_token]
+    @Override
+    public void onNewToken(String token) {
+      // Get updated InstanceID token.
+//      String refreshedToken = FirebaseMessaging.getInstance().getToken();
+      String refreshedToken = token;
+      Log.d(TAG, "Refreshed token: " + refreshedToken);
+      // TODO: Implement this method to send any registration to your app's servers.
+      sendRegistrationToServer(refreshedToken);
+    }
+  // [END refresh_token]
+
+    public void sendRegistrationToServer(String token) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        sharedPreferences.edit().putString(QuickstartPreferences.FCM_TOKEN, token).apply();
+
+        Intent gotToken = new Intent(QuickstartPreferences.FCM_TOKEN);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(gotToken);
+    }
 
     /**
      * Called when message is received.
@@ -92,7 +123,7 @@ public class MyFcmListenerService extends FirebaseMessagingService
         NotificationCompat.BigTextStyle myBigText = new NotificationCompat.BigTextStyle().bigText(bigText);
         if (summary != "")
             myBigText.setSummaryText(summary);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, CHANNEL_GENERAL_ID)
                 .setSmallIcon(R.drawable.icon)
                 .setContentTitle(title)
                 .setContentText(message)

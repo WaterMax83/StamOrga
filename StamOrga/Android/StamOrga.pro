@@ -150,13 +150,19 @@ DISTFILES += \
     android/res/values/libs.xml \
     android/res/xml/provider_paths.xml \
     android/build.gradle \
+    android/gradle.properties \
     android/gradle/wrapper/gradle-wrapper.properties \
     android/gradlew.bat
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 
-contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
-    ANDROID_EXTRA_LIBS = \
-        $$PWD/libs/libcrypto.so \
-        $$PWD/libs/libssl.so
-}
+#contains(ANDROID_TARGET_ARCH,armeabi-v7a) {
+#    ANDROID_EXTRA_LIBS = \
+#        $$PWD/libs/libcrypto.so \
+#        $$PWD/libs/libssl.so
+#}
+android: include(D:/Daten/Projekte/build/Android/sdk/android_openssl/openssl.pri)
+
+ANDROID_EXTRA_LIBS = D:/Daten/Projekte/build/Android/sdk/android_openssl/latest/arm/libcrypto_1_1.so D:/Daten/Projekte/build/Android/sdk/android_openssl/latest/arm/libssl_1_1.so D:/Daten/Projekte/build/Android/sdk/android_openssl/latest/arm64/libcrypto_1_1.so D:/Daten/Projekte/build/Android/sdk/android_openssl/latest/arm64/libssl_1_1.so D:/Daten/Projekte/build/Android/sdk/android_openssl/latest/x86/libcrypto_1_1.so D:/Daten/Projekte/build/Android/sdk/android_openssl/latest/x86/libssl_1_1.so D:/Daten/Projekte/build/Android/sdk/android_openssl/latest/x86_64/libcrypto_1_1.so D:/Daten/Projekte/build/Android/sdk/android_openssl/latest/x86_64/libssl_1_1.so
+
+ANDROID_ABIS = armeabi-v7a arm64-v8a x86 x86_64

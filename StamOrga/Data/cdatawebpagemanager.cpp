@@ -95,7 +95,7 @@ bool cDataWebPageManager::setWebPageItemHasEvent(qint32 index)
 
     for (int i = 0; i < this->m_lWebPages.count(); i++) {
         if (this->m_lWebPages[i]->index() == index) {
-            this->m_lWebPages[i]->setEvent(this->m_lWebPages[i]->event() + 1);
+            this->m_lWebPages[i]->setEvent(this->m_lWebPages[i]->getEvent() + 1);
             return true;
         }
     }
@@ -258,6 +258,8 @@ qint32 cDataWebPageManager::handleWebPageResponse(MessageProtocol* msg)
     qint32  result = rootObj.value("ack").toInt(ERROR_CODE_NOT_FOUND);
 
     this->m_mutex.lock();
+
+    qInfo() << rootObj;
 
     if (cmd == "list" && result == ERROR_CODE_SUCCESS) {
 

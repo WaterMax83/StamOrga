@@ -49,12 +49,14 @@ qint32 cDatAppInfoManager::initialize()
     this->m_ctrlLog.Start(this->m_logApp, false);
 
 #ifdef Q_OS_ANDROID
-    this->m_pushNotificationInfoHandler = new cAndroidQtConnector(this);
-    connect(this->m_pushNotificationInfoHandler, &cAndroidQtConnector::fcmRegistrationTokenChanged,
-            this, &cDatAppInfoManager::slotNewFcmRegistrationToken);
-
     g_StaSettingsManager->getValue(APP_INFO_GROUP, APP_INFO_TOKEN, value);
     this->m_pushNotificationToken = value;
+
+    this->m_pushNotificationInfoHandler = new cAndroidQtConnector(this);
+    if (!this->m_pushNotificationInfoHandler->getRegistrationToken().isEmpty())
+        this->slotNewFcmRegistrationToken(this->m_pushNotificationInfoHandler->getRegistrationToken());
+    connect(this->m_pushNotificationInfoHandler, &cAndroidQtConnector::fcmRegistrationTokenChanged,
+            this, &cDatAppInfoManager::slotNewFcmRegistrationToken);
 #endif
 
     g_StaSettingsManager->getValue(APP_INFO_GROUP, APP_INFO_GUID, value);
@@ -76,11 +78,14 @@ void cDatAppInfoManager::slotNewFcmRegistrationToken(QString token)
 {
     QMutexLocker lock(&this->m_pushNotificationMutex);
 
-    this->m_pushNotificationToken = token;
+    if (this->m_pushNotificationToken != token) {
 
-    g_StaSettingsManager->setValue(APP_INFO_GROUP, APP_INFO_TOKEN, token);
+        this->m_pushNotificationToken = token;
 
-    qInfo().noquote() << QString("Global Data got a new token %1").arg(token);
+        g_StaSettingsManager->setValue(APP_INFO_GROUP, APP_INFO_TOKEN, token);
+
+        qInfo().noquote() << QString("Global Data got a new token %1").arg(token);
+    }
 }
 #endif
 

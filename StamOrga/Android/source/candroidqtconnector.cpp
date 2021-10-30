@@ -25,11 +25,21 @@
 
 static cAndroidQtConnector* g_PushInstance = nullptr;
 
+#ifdef Q_OS_ANDROID
+static QString sendFcmToken = "";
+#endif
+
 cAndroidQtConnector::cAndroidQtConnector(QObject* parent)
     : QObject(parent)
 {
     this->m_fcmToken = "";
     g_PushInstance   = this;
+
+#ifdef Q_OS_ANDROID
+    if (sendFcmToken != "") {
+        this->m_fcmToken = sendFcmToken;
+    }
+#endif
 }
 
 cAndroidQtConnector::~cAndroidQtConnector()
@@ -51,8 +61,12 @@ static void fcmTokenResult(JNIEnv* /*env*/ env, jobject obj, jstring fcmToken)
     const char* nativeString = env->GetStringUTFChars(fcmToken, 0);
     Q_UNUSED(obj);
 
+    qInfo() << "Got new fcmTokenResult " << nativeString;
+
     if (g_PushInstance != nullptr)
         g_PushInstance->setNewRegistrationToken(QString(nativeString));
+    else
+        sendFcmToken = QString(nativeString);
 }
 
 

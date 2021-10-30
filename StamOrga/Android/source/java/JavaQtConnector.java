@@ -9,7 +9,8 @@ import android.util.Log;
 import android.net.Uri;
 import android.content.ContentValues;
 import android.content.Context;
-import android.support.v4.content.FileProvider;
+//import android.support.v4.content.FileProvider;
+import androidx.core.content.FileProvider;
 
 public class JavaQtConnector
 {
