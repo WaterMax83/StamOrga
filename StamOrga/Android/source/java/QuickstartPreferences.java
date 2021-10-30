@@ -1,4 +1,4 @@
-package org.qtproject.example;
+package com.watermax.stamorga;
 
 public class QuickstartPreferences {
     public static final String FCM_TOKEN = "";

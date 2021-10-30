@@ -135,7 +135,7 @@ android{
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 
     ################# adapt that accordingly #######################
-    ANDROID_JAVA_SOURCES.path = /src/org/qtproject/example
+    ANDROID_JAVA_SOURCES.path = /src/com/watermax/starmorga
     ################################################################
 
     ANDROID_JAVA_SOURCES.files = $$files($$PWD/source/java/*.java)

@@ -89,7 +89,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* /*reserved*/)
         return JNI_ERR;
     }
 
-    jclass javaClass = env->FindClass("org/qtproject/example/JavaNatives");
+    jclass javaClass = env->FindClass("com/watermax/stamorga/JavaNatives");
     if (!javaClass)
         return JNI_ERR;
 
@@ -111,7 +111,7 @@ void cAndroidQtConnector::subscribeToTopic(const QString& topic)
     topic.append("Debug");
 #endif
     QAndroidJniObject javaNotification = QAndroidJniObject::fromString(topic);
-    QAndroidJniObject::callStaticMethod<void>("org/qtproject/example/MainActivity",
+    QAndroidJniObject::callStaticMethod<void>("com.watermax.stamorga/MainActivity",
                                               "SubscribeToTopic",
                                               "(Ljava/lang/String;)V",
                                               javaNotification.object<jstring>());
@@ -130,7 +130,7 @@ void cAndroidQtConnector::unSubscribeFromTopic(const QString& topic)
 #endif
 
     QAndroidJniObject javaNotification = QAndroidJniObject::fromString(topic);
-    QAndroidJniObject::callStaticMethod<void>("org/qtproject/example/MainActivity",
+    QAndroidJniObject::callStaticMethod<void>("com.watermax.stamorga/MainActivity",
                                               "UnRegisterFromTopic",
                                               "(Ljava/lang/String;)V",
                                               javaNotification.object<jstring>());
@@ -145,7 +145,7 @@ void cAndroidQtConnector::setUserIndexForTopics(const QString& userIndex)
 {
 #ifdef Q_OS_ANDROID
     QAndroidJniObject javaNotification = QAndroidJniObject::fromString(userIndex);
-    QAndroidJniObject::callStaticMethod<void>("org/qtproject/example/MainActivity",
+    QAndroidJniObject::callStaticMethod<void>("com.watermax.stamorga/MainActivity",
                                               "SetUserIndexForNotificationTopic",
                                               "(Ljava/lang/String;)V",
                                               javaNotification.object<jstring>());
@@ -160,7 +160,7 @@ void cAndroidQtConnector::setUserIndexForTopics(const QString& userIndex)
 //{
 //#ifdef Q_OS_ANDROID
 //    QAndroidJniObject appName = QAndroidJniObject::fromString(appPackageName);
-//    QAndroidJniObject::callStaticMethod<jint>("org/qtproject/example/JavaQtConnector",
+//    QAndroidJniObject::callStaticMethod<jint>("com.watermax.stamorga/JavaQtConnector",
 //                                              "installApp",
 //                                              "(Ljava/lang/String;)I",
 //                                              appName.object<jstring>());

@@ -1,5 +1,5 @@
-package org.qtproject.example;
-import org.qtproject.example.R;
+package com.watermax.stamorga;
+import com.watermax.stamorga.R;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -20,7 +20,7 @@ import java.lang.System;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
-import static org.qtproject.example.MyApplication.CHANNEL_GENERAL_ID;
+import static com.watermax.stamorga.MyApplication.CHANNEL_GENERAL_ID;
 
 public class MyFcmListenerService extends FirebaseMessagingService
 {

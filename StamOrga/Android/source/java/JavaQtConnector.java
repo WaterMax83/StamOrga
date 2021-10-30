@@ -1,4 +1,4 @@
-package org.qtproject.example;
+package com.watermax.stamorga;
 
 import org.qtproject.qt5.android.QtNative;
 

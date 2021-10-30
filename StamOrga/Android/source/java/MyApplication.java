@@ -1,4 +1,4 @@
-package org.qtproject.example;
+package com.watermax.stamorga;
 
 import android.util.Log;
 import android.content.Context;

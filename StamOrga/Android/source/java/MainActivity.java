@@ -1,5 +1,5 @@
-package org.qtproject.example;
-import org.qtproject.example.R;
+package com.watermax.stamorga;
+import com.watermax.stamorga.R;
 
 import android.content.Context;
 import android.app.Activity;
