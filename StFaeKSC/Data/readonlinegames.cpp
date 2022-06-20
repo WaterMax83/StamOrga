@@ -373,11 +373,11 @@ bool ReadOnlineGames::readSingleGame(QJsonObject& json)
     else
         return false;
 
-    if (!json.contains(("group")))
+    if (!json.contains(("Group")))
         return false;
 
-    QJsonObject groupObj     = json.value("group").toObject();
-    qint32      groupOrderId = groupObj.value("groupOrderID").toInt(-1);
+    QJsonObject groupObj     = json.value("Group").toObject();
+    qint32      groupOrderId = groupObj.value("GroupOrderID").toInt(-1);
     if (groupOrderId != this->m_currentGameInfo->m_index) {
         qInfo().noquote() << "Error reading game. Index is different: " << groupOrderId << " " << this->m_currentGameInfo->m_index;
         return false;
