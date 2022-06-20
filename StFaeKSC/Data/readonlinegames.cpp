@@ -148,10 +148,10 @@ void ReadOnlineGames::startNetWorkRequest(OnlineGameInfo* info)
 
     this->m_bRequestCanceled = false;
 
-    //    qInfo().noquote() << QString("Request for game %1:%2:%3")
-    //                             .arg(this->m_currentGameInfo->m_index)
-    //                             .arg(this->m_currentGameInfo->m_competition)
-    //                             .arg(this->m_currentGameInfo->m_season);
+    qInfo().noquote() << QString("Request for game %1:%2:%3")
+                             .arg(this->m_currentGameInfo->m_index)
+                             .arg(this->m_currentGameInfo->m_competition)
+                             .arg(this->m_currentGameInfo->m_season);
 
 #ifdef QT_DEBUG
     qInfo().noquote() << QString("Single game answer for game %1:%2:%3")
@@ -293,8 +293,9 @@ void ReadOnlineGames::slotNetWorkRequestTimeout()
     /* 20.06.22
      * As request is handled even if timeout occurs, this will lead to undefined behaviour with seasonIndex
      * So better restart whole reading games in a few seconds
-     */
+     *
     this->checkNewNetworkRequest(true);
+     */
 
     this->m_timeOutCounter++;
     qint32 iUpdate = m_timeOutCounter * 60;
@@ -307,8 +308,10 @@ void ReadOnlineGames::slotNetWorkRequestTimeout()
 
 void ReadOnlineGames::slotNetWorkRequestFinished(QNetworkReply* reply)
 {
-    if (this->m_bRequestCanceled)
+    if (this->m_bRequestCanceled) {
+        qInfo().noquote() << "Read online games, last request was canceled!";
         return;
+    }
 
     this->m_networkTimout->stop();
 
@@ -316,10 +319,10 @@ void ReadOnlineGames::slotNetWorkRequestFinished(QNetworkReply* reply)
     QJsonDocument d   = QJsonDocument::fromJson(arr);
 
     if (d.isArray()) { /* all Games */
-                       //        qInfo().noquote() << QString("Request answer for game %1:%2:%3")
-                       //                                 .arg(this->m_currentGameInfo->m_index)
-                       //                                 .arg(this->m_currentGameInfo->m_competition)
-                       //                                 .arg(this->m_currentGameInfo->m_season);
+        qInfo().noquote() << QString("Request answer for game %1:%2:%3")
+                                 .arg(this->m_currentGameInfo->m_index)
+                                 .arg(this->m_currentGameInfo->m_competition)
+                                 .arg(this->m_currentGameInfo->m_season);
         QJsonArray array = d.array();
         for (int i = 0; i < array.size(); i++) {
             QJsonObject gameObj = array[i].toObject();
@@ -328,10 +331,10 @@ void ReadOnlineGames::slotNetWorkRequestFinished(QNetworkReply* reply)
         }
     } else { /* just single game */
         QJsonObject gameObj = d.object();
-        //        qInfo().noquote() << QString("Single game answer for game %1:%2:%3")
-        //                                 .arg(this->m_currentGameInfo->m_index)
-        //                                 .arg(this->m_currentGameInfo->m_competition)
-        //                                 .arg(this->m_currentGameInfo->m_season);
+        qInfo().noquote() << QString("Single game answer for game %1:%2:%3")
+                                 .arg(this->m_currentGameInfo->m_index)
+                                 .arg(this->m_currentGameInfo->m_competition)
+                                 .arg(this->m_currentGameInfo->m_season);
         this->readSingleGame(gameObj);
     }
 
