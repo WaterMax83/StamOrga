@@ -64,7 +64,6 @@ public:
     explicit ReadOnlineGames(QObject* parent = 0);
     virtual ~ReadOnlineGames();
 
-
     qint32 initialize(QString comp, qint32 max, qint32 season);
 
     QString getCompetition() { return this->m_comp; }
@@ -79,7 +78,6 @@ public slots:
     void slotNetWorkRequestFinished(QNetworkReply* reply);
     void slotNetWorkRequestTimeout();
     void slotNetWorkUpdateTimeout();
-
 
 protected:
     int DoBackgroundWork();
@@ -102,6 +100,7 @@ protected:
     OnlineGameInfo* getNextRequest(OnlineGameInfo* currentGame);
 
     QTimer* m_networkUpdate;
+    qint32  m_timeOutCounter;
 
     void startNetWorkRequest(OnlineGameInfo* info);
 
@@ -111,9 +110,9 @@ protected:
 
     void checkNewNetworkRequest(bool checkLastItem);
 
-    bool readSingleGame(QJsonObject& json);
+    bool    readSingleGame(QJsonObject& json);
     QString readSingleTeam(QJsonObject& json);
     QString readSingleGameResult(QJsonArray& json);
 };
 
-#endif // READONLINEGAMES_H
+#endif  // READONLINEGAMES_H
