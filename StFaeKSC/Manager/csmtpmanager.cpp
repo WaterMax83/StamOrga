@@ -185,15 +185,20 @@ void cSmtpManager::slotSendNewEmails(SmtpMail* pMail)
 
     SmtpClient client("mail.gmx.net", 465, SmtpClient::ConnectionType::SslConnection);
 
-    client.setUser(this->m_serverEmail);
-    client.setPassword(this->m_serverPassword);
+//    client.setUser(this->m_serverEmail);
+//    client.setPassword(this->m_serverPassword);
 
     MimeMessage message;
 
-    message.setSender(new EmailAddress(this->m_serverEmail, "StamOrga"));
-    message.addTo(new EmailAddress(this->m_serverEmail, "StamOrga"));
-    for (int i = 0; i < this->m_destinationAdress.size(); i++)
-        message.addBcc(new EmailAddress(this->m_destinationAdress.at(i)));
+    EmailAddress sender(this->m_serverEmail, "StamOrga");
+    message.setSender(sender);
+
+    EmailAddress to(this->m_serverEmail, "StamOrga");
+    message.addTo(to);
+    for (int i = 0; i < this->m_destinationAdress.size(); i++) {
+        EmailAddress bcc(this->m_destinationAdress.at(i));
+        message.addBcc(bcc);
+    }
     message.setSubject(pMail->m_header);
 
     // Now add some text to the email.
@@ -208,22 +213,30 @@ void cSmtpManager::slotSendNewEmails(SmtpMail* pMail)
     message.addPart(&text);
 
     // Now we can send the mail
-    qint32 successCnt = 0;
-    bool   rCode      = client.connectToHost();
-    if (rCode) {
-        successCnt++;
-        rCode = client.login();
+    client.connectToHost();
+    if (!client.waitForReadyConnected()) {
+        qWarning() << "SmptManager::Failed to connect to host.";
+        delete pMail;
+        return;
     }
-    if (rCode) {
-        successCnt++;
-        rCode = client.sendMail(message);
+    client.login(this->m_serverEmail, this->m_serverPassword);
+    if (!client.waitForAuthenticated()) {
+        qWarning() << "SmptManager::Failed to authenticate.";
+        delete pMail;
+        return;
     }
+    client.sendMail(message);
+    if (!client.waitForMailSent()) {
+        qWarning() << "SmptManager::Failed to send mail.";
+        delete pMail;
+        return;
+    }
+
+
     client.quit();
 
-    if (rCode)
         qInfo().noquote() << QString("Sending email with success to %1 recipients").arg(this->m_destinationAdress.size());
-    else
-        qWarning().noquote() << QString("Error sending email with step %1").arg(successCnt);
+
 
     delete pMail;
 }
